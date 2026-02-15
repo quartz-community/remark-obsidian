@@ -57,6 +57,27 @@ describe("remark-obsidian", () => {
     expect(imageNode.path).toBe("image.png");
     expect(imageNode.alias).toBe("alt 100x200");
 
+    const escapedEmbedAlias = parse("![[image\\|800]]");
+    const [escapedEmbedAliasNode] = findNodes(escapedEmbedAlias, "wikilink");
+    expect(escapedEmbedAliasNode.embedded).toBe(true);
+    expect(escapedEmbedAliasNode.path).toBe("image");
+    expect(escapedEmbedAliasNode.alias).toBe("800");
+
+    const escapedAlias = parse("[[page\\|alias]]");
+    const [escapedAliasNode] = findNodes(escapedAlias, "wikilink");
+    expect(escapedAliasNode.path).toBe("page");
+    expect(escapedAliasNode.alias).toBe("alias");
+
+    const escapedHeadingAlias = parse("![[image#heading\\|800]]");
+    const [escapedHeadingAliasNode] = findNodes(
+      escapedHeadingAlias,
+      "wikilink",
+    );
+    expect(escapedHeadingAliasNode.embedded).toBe(true);
+    expect(escapedHeadingAliasNode.path).toBe("image");
+    expect(escapedHeadingAliasNode.heading).toBe("heading");
+    expect(escapedHeadingAliasNode.alias).toBe("800");
+
     const blockref = parse("[[page#^blockref]]");
     const [blockrefNode] = findNodes(blockref, "wikilink");
     expect(blockrefNode.heading).toBe("^blockref");

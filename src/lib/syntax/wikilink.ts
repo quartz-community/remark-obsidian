@@ -108,6 +108,10 @@ function tokenize(
   }
 
   function pathEscape(code: Code): State | undefined {
+    if (code === PIPE) {
+      effects.exit("wikilinkPath");
+      return aliasMarker(code);
+    }
     if (code === null || isLineEnding(code)) return nok(code);
     effects.consume(code);
     return path;
@@ -131,6 +135,11 @@ function tokenize(
   }
 
   function heading(code: Code): State | undefined {
+    if (code === BACKSLASH) {
+      effects.consume(code);
+      return headingEscape;
+    }
+
     if (code === PIPE) {
       effects.exit("wikilinkHeading");
       return aliasMarker(code);
@@ -143,6 +152,16 @@ function tokenize(
 
     if (code === null || isLineEnding(code)) return nok(code);
 
+    effects.consume(code);
+    return heading;
+  }
+
+  function headingEscape(code: Code): State | undefined {
+    if (code === PIPE) {
+      effects.exit("wikilinkHeading");
+      return aliasMarker(code);
+    }
+    if (code === null || isLineEnding(code)) return nok(code);
     effects.consume(code);
     return heading;
   }

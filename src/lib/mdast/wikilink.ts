@@ -22,11 +22,11 @@ export function wikilinkFromMarkdown(): Extension {
       },
       wikilinkPath(token) {
         const node = this.stack[this.stack.length - 1] as any;
-        node.path = this.sliceSerialize(token);
+        node.path = this.sliceSerialize(token).replace(/\\([#\[\]])/g, "$1");
       },
       wikilinkHeading(token) {
         const node = this.stack[this.stack.length - 1] as any;
-        node.heading = this.sliceSerialize(token);
+        node.heading = this.sliceSerialize(token).replace(/\\([#\[\]])/g, "$1");
       },
       wikilinkAlias(token) {
         const node = this.stack[this.stack.length - 1] as any;
@@ -35,6 +35,12 @@ export function wikilinkFromMarkdown(): Extension {
     },
     exit: {
       wikilink(token) {
+        const node = this.stack[this.stack.length - 1] as any;
+        if (node.alias) {
+          if (node.path.endsWith("\\")) node.path = node.path.slice(0, -1);
+          if (node.heading.endsWith("\\"))
+            node.heading = node.heading.slice(0, -1);
+        }
         this.exit(token);
       },
     },

@@ -82,6 +82,10 @@ function tokenize(effects, ok, nok) {
     return path;
   }
   function pathEscape(code) {
+    if (code === PIPE) {
+      effects.exit("wikilinkPath");
+      return aliasMarker(code);
+    }
     if (code === null || isLineEnding(code)) return nok(code);
     effects.consume(code);
     return path;
@@ -102,6 +106,10 @@ function tokenize(effects, ok, nok) {
     return heading(code);
   }
   function heading(code) {
+    if (code === BACKSLASH) {
+      effects.consume(code);
+      return headingEscape;
+    }
     if (code === PIPE) {
       effects.exit("wikilinkHeading");
       return aliasMarker(code);
@@ -109,6 +117,15 @@ function tokenize(effects, ok, nok) {
     if (code === RIGHT_BRACKET) {
       effects.exit("wikilinkHeading");
       return closeFirst(code);
+    }
+    if (code === null || isLineEnding(code)) return nok(code);
+    effects.consume(code);
+    return heading;
+  }
+  function headingEscape(code) {
+    if (code === PIPE) {
+      effects.exit("wikilinkHeading");
+      return aliasMarker(code);
     }
     if (code === null || isLineEnding(code)) return nok(code);
     effects.consume(code);
@@ -500,11 +517,11 @@ function wikilinkFromMarkdown() {
       },
       wikilinkPath(token) {
         const node = this.stack[this.stack.length - 1];
-        node.path = this.sliceSerialize(token);
+        node.path = this.sliceSerialize(token).replace(/\\([#\[\]])/g, "$1");
       },
       wikilinkHeading(token) {
         const node = this.stack[this.stack.length - 1];
-        node.heading = this.sliceSerialize(token);
+        node.heading = this.sliceSerialize(token).replace(/\\([#\[\]])/g, "$1");
       },
       wikilinkAlias(token) {
         const node = this.stack[this.stack.length - 1];
@@ -513,6 +530,12 @@ function wikilinkFromMarkdown() {
     },
     exit: {
       wikilink(token) {
+        const node = this.stack[this.stack.length - 1];
+        if (node.alias) {
+          if (node.path.endsWith("\\")) node.path = node.path.slice(0, -1);
+          if (node.heading.endsWith("\\"))
+            node.heading = node.heading.slice(0, -1);
+        }
         this.exit(token);
       }
     }
