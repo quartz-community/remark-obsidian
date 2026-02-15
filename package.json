@@ -1,0 +1,47 @@
+{
+  "name": "@quartz-community/remark-obsidian",
+  "version": "0.1.0",
+  "description": "Remark plugin for Obsidian-flavored markdown syntax (wikilinks, highlights, comments, tags, arrows).",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "micromark-util-types": "^2.0.0",
+    "micromark-util-symbol": "^2.0.0",
+    "mdast-util-from-markdown": "^2.0.0",
+    "mdast-util-to-markdown": "^2.1.0",
+    "unist-util-visit": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^22.0.0",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3",
+    "unified": "^11.0.5",
+    "vitest": "^2.1.9"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
