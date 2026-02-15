@@ -1,14 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
+import remarkGfm from "remark-gfm";
 import remarkObsidian, { type RemarkObsidianOptions } from "../src/index.js";
 
 function parse(md: string, opts?: RemarkObsidianOptions) {
   return unified().use(remarkParse).use(remarkObsidian, opts).parse(md);
 }
 
-function process(md: string, opts?: RemarkObsidianOptions) {
-  const processor = unified().use(remarkParse).use(remarkObsidian, opts);
+function processWithGfm(md: string, opts?: RemarkObsidianOptions) {
+  const processor = unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkObsidian, opts);
   return processor.runSync(processor.parse(md));
 }
 
@@ -103,10 +107,10 @@ describe("remark-obsidian", () => {
   });
 
   it("strips comments", () => {
-    const single = process("%%comment%%");
+    const single = processWithGfm("%%comment%%");
     expect(findNodes(single, "comment").length).toBe(0);
 
-    const multi = process("%%multi\nline%%");
+    const multi = processWithGfm("%%multi\nline%%");
     expect(findNodes(multi, "comment").length).toBe(0);
   });
 
@@ -128,21 +132,6 @@ describe("remark-obsidian", () => {
     expect(afterSpaceNode.value).toBe("tag");
   });
 
-  it("parses arrows", () => {
-    const arrows = parse("-> --> => ==> <- <-- <= <==");
-    const arrowNodes = findNodes(arrows, "arrow");
-    expect(arrowNodes.map((node) => node.value)).toEqual([
-      "&rarr;",
-      "&rArr;",
-      "&rArr;",
-      "&rArr;",
-      "&larr;",
-      "&lArr;",
-      "&lArr;",
-      "&lArr;",
-    ]);
-  });
-
   it("parses mixed inline syntax", () => {
     const mixed = parse("Mix [[page]] ==hi== #tag");
     expect(findNodes(mixed, "wikilink").length).toBe(1);
@@ -159,8 +148,56 @@ describe("remark-obsidian", () => {
 
     const noTags = parse("#tag", { tags: false });
     expect(findNodes(noTags, "tag").length).toBe(0);
+  });
 
-    const noArrows = parse("->", { arrows: false });
-    expect(findNodes(noArrows, "arrow").length).toBe(0);
+  it("parses custom task characters", () => {
+    const md = [
+      "- [?] question",
+      "- [!] important",
+      "- [>] forwarded",
+      "- [/] partial",
+      "- [s] special",
+      "- [-] cancelled",
+      "- [x] done",
+      "- [ ] todo",
+    ].join("\n");
+
+    const tree = processWithGfm(md);
+    const items = findNodes(tree, "listItem");
+    expect(items).toHaveLength(8);
+
+    expect(items[0].checked).toBe(true);
+    expect(items[0].data.taskChar).toBe("?");
+    expect(items[1].checked).toBe(true);
+    expect(items[1].data.taskChar).toBe("!");
+    expect(items[2].checked).toBe(true);
+    expect(items[2].data.taskChar).toBe(">");
+    expect(items[3].checked).toBe(true);
+    expect(items[3].data.taskChar).toBe("/");
+    expect(items[4].checked).toBe(true);
+    expect(items[4].data.taskChar).toBe("s");
+    expect(items[5].checked).toBe(true);
+    expect(items[5].data.taskChar).toBe("-");
+
+    expect(items[6].checked).toBe(true);
+    expect(items[6].data.taskChar).toBe("x");
+    expect(items[7].checked).toBe(false);
+    expect(items[7].data.taskChar).toBe(" ");
+
+    const getText = (item: any) =>
+      findNodes(item, "text")
+        .map((n: any) => n.value)
+        .join("");
+    expect(getText(items[0])).toBe("question");
+    expect(getText(items[6])).toBe("done");
+    expect(getText(items[7])).toBe("todo");
+  });
+
+  it("respects customTaskChars option", () => {
+    const md = "- [?] question";
+    const disabled = processWithGfm(md, { customTaskChars: false });
+    const items = findNodes(disabled, "listItem");
+    expect(items[0].checked).toBeNull();
+    expect(items[0].data).toBeUndefined();
   });
 });

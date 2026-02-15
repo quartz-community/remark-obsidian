@@ -11,20 +11,19 @@ import { wikilinkSyntax } from "./lib/syntax/wikilink.js";
 import { highlightSyntax } from "./lib/syntax/highlight.js";
 import { commentSyntax } from "./lib/syntax/comment.js";
 import { tagSyntax } from "./lib/syntax/tag.js";
-import { arrowSyntax } from "./lib/syntax/arrow.js";
 
 import { wikilinkFromMarkdown } from "./lib/mdast/wikilink.js";
 import { highlightFromMarkdown } from "./lib/mdast/highlight.js";
 import { commentFromMarkdown } from "./lib/mdast/comment.js";
 import { tagFromMarkdown } from "./lib/mdast/tag.js";
-import { arrowFromMarkdown } from "./lib/mdast/arrow.js";
+import { customTaskCharTransform } from "./lib/task-char.js";
 
 export interface RemarkObsidianOptions {
   wikilinks?: boolean;
   highlights?: boolean;
   comments?: boolean;
   tags?: boolean;
-  arrows?: boolean;
+  customTaskChars?: boolean;
 }
 
 const defaultOptions: Required<RemarkObsidianOptions> = {
@@ -32,7 +31,7 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
   highlights: true,
   comments: true,
   tags: true,
-  arrows: true,
+  customTaskChars: true,
 };
 
 export default function remarkObsidian(
@@ -57,29 +56,31 @@ export default function remarkObsidian(
     data.micromarkExtensions.push(tagSyntax());
     data.fromMarkdownExtensions.push(tagFromMarkdown());
   }
-  if (opts.arrows) {
-    data.micromarkExtensions.push(arrowSyntax());
-    data.fromMarkdownExtensions.push(arrowFromMarkdown());
-  }
   if (opts.highlights) {
     data.micromarkExtensions.push(highlightSyntax());
     data.fromMarkdownExtensions.push(highlightFromMarkdown());
   }
 
-  if (!opts.comments) return undefined;
+  const needsTransform = opts.comments || opts.customTaskChars;
+  if (!needsTransform) return undefined;
 
-  return (tree) => {
-    visit(
-      tree,
-      "comment",
-      (_node: unknown, index: number | undefined, parent: any) => {
-        if (parent && typeof index === "number") {
-          parent.children.splice(index, 1);
-          return index;
-        }
-        return undefined;
-      },
-    );
+  return (tree: Root) => {
+    if (opts.comments) {
+      visit(
+        tree,
+        "comment",
+        (_node: unknown, index: number | undefined, parent: any) => {
+          if (parent && typeof index === "number") {
+            parent.children.splice(index, 1);
+            return index;
+          }
+          return undefined;
+        },
+      );
+    }
+    if (opts.customTaskChars) {
+      customTaskCharTransform(tree);
+    }
   };
 }
 
@@ -87,12 +88,11 @@ export { wikilinkSyntax } from "./lib/syntax/wikilink.js";
 export { highlightSyntax } from "./lib/syntax/highlight.js";
 export { commentSyntax } from "./lib/syntax/comment.js";
 export { tagSyntax } from "./lib/syntax/tag.js";
-export { arrowSyntax } from "./lib/syntax/arrow.js";
 
 export { wikilinkFromMarkdown } from "./lib/mdast/wikilink.js";
 export { highlightFromMarkdown } from "./lib/mdast/highlight.js";
 export { commentFromMarkdown } from "./lib/mdast/comment.js";
 export { tagFromMarkdown } from "./lib/mdast/tag.js";
-export { arrowFromMarkdown } from "./lib/mdast/arrow.js";
+export { customTaskCharTransform } from "./lib/task-char.js";
 
-export type { Wikilink, Highlight, Comment, Tag, Arrow } from "./lib/types.js";
+export type { Wikilink, Highlight, Comment, Tag } from "./lib/types.js";

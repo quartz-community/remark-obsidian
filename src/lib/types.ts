@@ -21,17 +21,16 @@ export interface Tag extends Literal {
   type: "tag";
 }
 
-export interface Arrow extends Literal {
-  type: "arrow";
-}
-
 declare module "mdast" {
+  interface ListItemData {
+    taskChar?: string;
+  }
+
   interface RootContentMap {
     wikilink: Wikilink;
     highlight: Highlight;
     comment: Comment;
     tag: Tag;
-    arrow: Arrow;
   }
 
   interface PhrasingContentMap {
@@ -39,7 +38,6 @@ declare module "mdast" {
     highlight: Highlight;
     comment: Comment;
     tag: Tag;
-    arrow: Arrow;
   }
 }
 
@@ -62,7 +60,5 @@ declare module "micromark-util-types" {
     tag: "tag";
     tagMarker: "tagMarker";
     tagContent: "tagContent";
-    arrow: "arrow";
-    arrowContent: "arrowContent";
   }
 }

@@ -25,15 +25,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "micromark-util-types": "^2.0.0",
-    "micromark-util-symbol": "^2.0.0",
     "mdast-util-from-markdown": "^2.0.0",
     "mdast-util-to-markdown": "^2.1.0",
+    "micromark-util-symbol": "^2.0.0",
+    "micromark-util-types": "^2.0.0",
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
     "@types/mdast": "^4.0.4",
     "@types/node": "^22.0.0",
+    "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "remark-stringify": "^11.0.0",
     "tsup": "^8.5.0",

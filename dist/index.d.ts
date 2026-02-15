@@ -19,23 +19,21 @@ interface Comment extends Literal {
 interface Tag extends Literal {
     type: "tag";
 }
-interface Arrow extends Literal {
-    type: "arrow";
-}
 declare module "mdast" {
+    interface ListItemData {
+        taskChar?: string;
+    }
     interface RootContentMap {
         wikilink: Wikilink;
         highlight: Highlight;
         comment: Comment;
         tag: Tag;
-        arrow: Arrow;
     }
     interface PhrasingContentMap {
         wikilink: Wikilink;
         highlight: Highlight;
         comment: Comment;
         tag: Tag;
-        arrow: Arrow;
     }
 }
 declare module "micromark-util-types" {
@@ -57,8 +55,6 @@ declare module "micromark-util-types" {
         tag: "tag";
         tagMarker: "tagMarker";
         tagContent: "tagContent";
-        arrow: "arrow";
-        arrowContent: "arrowContent";
     }
 }
 
@@ -70,8 +66,6 @@ declare function commentSyntax(): Extension;
 
 declare function tagSyntax(): Extension;
 
-declare function arrowSyntax(): Extension;
-
 declare function wikilinkFromMarkdown(): Extension$1;
 
 declare function highlightFromMarkdown(): Extension$1;
@@ -80,15 +74,15 @@ declare function commentFromMarkdown(): Extension$1;
 
 declare function tagFromMarkdown(): Extension$1;
 
-declare function arrowFromMarkdown(): Extension$1;
+declare function customTaskCharTransform(tree: Root): void;
 
 interface RemarkObsidianOptions {
     wikilinks?: boolean;
     highlights?: boolean;
     comments?: boolean;
     tags?: boolean;
-    arrows?: boolean;
+    customTaskChars?: boolean;
 }
 declare function remarkObsidian(userOpts?: RemarkObsidianOptions): undefined | ((tree: Root) => void);
 
-export { type Arrow, type Comment, type Highlight, type RemarkObsidianOptions, type Tag, type Wikilink, arrowFromMarkdown, arrowSyntax, commentFromMarkdown, commentSyntax, remarkObsidian as default, highlightFromMarkdown, highlightSyntax, tagFromMarkdown, tagSyntax, wikilinkFromMarkdown, wikilinkSyntax };
+export { type Comment, type Highlight, type RemarkObsidianOptions, type Tag, type Wikilink, commentFromMarkdown, commentSyntax, customTaskCharTransform, remarkObsidian as default, highlightFromMarkdown, highlightSyntax, tagFromMarkdown, tagSyntax, wikilinkFromMarkdown, wikilinkSyntax };

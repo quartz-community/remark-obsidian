@@ -1,5 +1,5 @@
 // src/index.ts
-import { visit } from "unist-util-visit";
+import { visit as visit2 } from "unist-util-visit";
 
 // src/lib/syntax/wikilink.ts
 import { codes } from "micromark-util-symbol";
@@ -376,124 +376,6 @@ function tokenize4(effects, ok, nok) {
   }
 }
 
-// src/lib/syntax/arrow.ts
-var DASH2 = 45;
-var EQUALS2 = 61;
-var LEFT_ANGLE = 60;
-var RIGHT_ANGLE = 62;
-function arrowSyntax() {
-  return {
-    text: {
-      [DASH2]: { name: "arrow", tokenize: tokenizeDash },
-      [EQUALS2]: { name: "arrow", tokenize: tokenizeEquals },
-      [LEFT_ANGLE]: { name: "arrow", tokenize: tokenizeLeftAngle }
-    }
-  };
-}
-function tokenizeDash(effects, ok, nok) {
-  return start;
-  function start(code) {
-    if (code !== DASH2) return nok(code);
-    effects.enter("arrow");
-    effects.enter("arrowContent");
-    effects.consume(code);
-    return afterFirst;
-  }
-  function afterFirst(code) {
-    if (code === RIGHT_ANGLE) {
-      effects.consume(code);
-      effects.exit("arrowContent");
-      effects.exit("arrow");
-      return ok;
-    }
-    if (code === DASH2) {
-      effects.consume(code);
-      return afterSecond;
-    }
-    return nok(code);
-  }
-  function afterSecond(code) {
-    if (code !== RIGHT_ANGLE) return nok(code);
-    effects.consume(code);
-    effects.exit("arrowContent");
-    effects.exit("arrow");
-    return ok;
-  }
-}
-function tokenizeEquals(effects, ok, nok) {
-  return start;
-  function start(code) {
-    if (code !== EQUALS2) return nok(code);
-    effects.enter("arrow");
-    effects.enter("arrowContent");
-    effects.consume(code);
-    return afterFirst;
-  }
-  function afterFirst(code) {
-    if (code === RIGHT_ANGLE) {
-      effects.consume(code);
-      effects.exit("arrowContent");
-      effects.exit("arrow");
-      return ok;
-    }
-    if (code === EQUALS2) {
-      effects.consume(code);
-      return afterSecond;
-    }
-    return nok(code);
-  }
-  function afterSecond(code) {
-    if (code !== RIGHT_ANGLE) return nok(code);
-    effects.consume(code);
-    effects.exit("arrowContent");
-    effects.exit("arrow");
-    return ok;
-  }
-}
-function tokenizeLeftAngle(effects, ok, nok) {
-  return start;
-  function start(code) {
-    if (code !== LEFT_ANGLE) return nok(code);
-    effects.enter("arrow");
-    effects.enter("arrowContent");
-    effects.consume(code);
-    return afterLeft;
-  }
-  function afterLeft(code) {
-    if (code === DASH2) {
-      effects.consume(code);
-      return leftDash;
-    }
-    if (code === EQUALS2) {
-      effects.consume(code);
-      return leftEquals;
-    }
-    return nok(code);
-  }
-  function leftDash(code) {
-    if (code === DASH2) {
-      effects.consume(code);
-      effects.exit("arrowContent");
-      effects.exit("arrow");
-      return ok;
-    }
-    effects.exit("arrowContent");
-    effects.exit("arrow");
-    return ok(code);
-  }
-  function leftEquals(code) {
-    if (code === EQUALS2) {
-      effects.consume(code);
-      effects.exit("arrowContent");
-      effects.exit("arrow");
-      return ok;
-    }
-    effects.exit("arrowContent");
-    effects.exit("arrow");
-    return ok(code);
-  }
-}
-
 // src/lib/mdast/wikilink.ts
 function wikilinkFromMarkdown() {
   return {
@@ -602,33 +484,38 @@ function tagFromMarkdown() {
   };
 }
 
-// src/lib/mdast/arrow.ts
-var arrowMap = {
-  "->": "&rarr;",
-  "-->": "&rArr;",
-  "=>": "&rArr;",
-  "==>": "&rArr;",
-  "<-": "&larr;",
-  "<--": "&lArr;",
-  "<=": "&lArr;",
-  "<==": "&lArr;"
-};
-function arrowFromMarkdown() {
-  return {
-    enter: {
-      arrow(token) {
-        this.enter({ type: "arrow", value: "" }, token);
-      }
-    },
-    exit: {
-      arrow(token) {
-        const node = this.stack[this.stack.length - 1];
-        const raw = this.sliceSerialize(token);
-        node.value = arrowMap[raw] ?? raw;
-        this.exit(token);
-      }
+// src/lib/task-char.ts
+import { visit } from "unist-util-visit";
+function customTaskCharTransform(tree) {
+  visit(tree, "listItem", (node) => {
+    if (typeof node.checked === "boolean") {
+      const char = node.checked ? "x" : " ";
+      node.data ??= {};
+      node.data.taskChar = char;
+      node.data.hProperties ??= {};
+      node.data.hProperties.dataTaskChar = char;
+      return;
     }
-  };
+    const firstChild = node.children?.[0];
+    if (!firstChild || firstChild.type !== "paragraph") return;
+    const firstText = firstChild.children?.[0];
+    if (!firstText || firstText.type !== "text") return;
+    const match = firstText.value.match(/^\[([^\]])\]\s/);
+    if (!match) return;
+    const taskChar = match[1];
+    node.checked = taskChar !== " ";
+    node.data ??= {};
+    node.data.taskChar = taskChar;
+    node.data.hProperties ??= {};
+    node.data.hProperties.dataTaskChar = taskChar;
+    firstText.value = firstText.value.slice(match[0].length);
+    if (firstText.value.length === 0) {
+      firstChild.children.shift();
+    } else if (firstText.position && typeof firstText.position.start.offset === "number") {
+      firstText.position.start.column += match[0].length;
+      firstText.position.start.offset += match[0].length;
+    }
+  });
 }
 
 // src/index.ts
@@ -637,7 +524,7 @@ var defaultOptions = {
   highlights: true,
   comments: true,
   tags: true,
-  arrows: true
+  customTaskChars: true
 };
 function remarkObsidian(userOpts) {
   const opts = { ...defaultOptions, ...userOpts };
@@ -656,34 +543,35 @@ function remarkObsidian(userOpts) {
     data.micromarkExtensions.push(tagSyntax());
     data.fromMarkdownExtensions.push(tagFromMarkdown());
   }
-  if (opts.arrows) {
-    data.micromarkExtensions.push(arrowSyntax());
-    data.fromMarkdownExtensions.push(arrowFromMarkdown());
-  }
   if (opts.highlights) {
     data.micromarkExtensions.push(highlightSyntax());
     data.fromMarkdownExtensions.push(highlightFromMarkdown());
   }
-  if (!opts.comments) return void 0;
+  const needsTransform = opts.comments || opts.customTaskChars;
+  if (!needsTransform) return void 0;
   return (tree) => {
-    visit(
-      tree,
-      "comment",
-      (_node, index, parent) => {
-        if (parent && typeof index === "number") {
-          parent.children.splice(index, 1);
-          return index;
+    if (opts.comments) {
+      visit2(
+        tree,
+        "comment",
+        (_node, index, parent) => {
+          if (parent && typeof index === "number") {
+            parent.children.splice(index, 1);
+            return index;
+          }
+          return void 0;
         }
-        return void 0;
-      }
-    );
+      );
+    }
+    if (opts.customTaskChars) {
+      customTaskCharTransform(tree);
+    }
   };
 }
 export {
-  arrowFromMarkdown,
-  arrowSyntax,
   commentFromMarkdown,
   commentSyntax,
+  customTaskCharTransform,
   remarkObsidian as default,
   highlightFromMarkdown,
   highlightSyntax,
