@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
+import remarkRehype from "remark-rehype";
+import rehypeStringify from "rehype-stringify";
 import remarkObsidian, { type RemarkObsidianOptions } from "../src/index.js";
 
 function parse(md: string, opts?: RemarkObsidianOptions) {
@@ -14,6 +16,17 @@ function processWithGfm(md: string, opts?: RemarkObsidianOptions) {
     .use(remarkGfm)
     .use(remarkObsidian, opts);
   return processor.runSync(processor.parse(md));
+}
+
+async function toHtml(md: string, opts?: RemarkObsidianOptions) {
+  const result = await unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkObsidian, opts)
+    .use(remarkRehype)
+    .use(rehypeStringify)
+    .process(md);
+  return String(result);
 }
 
 function findNodes(tree: any, type: string): any[] {
@@ -199,5 +212,29 @@ describe("remark-obsidian", () => {
     const items = findNodes(disabled, "listItem");
     expect(items[0].checked).toBeNull();
     expect(items[0].data).toBeUndefined();
+  });
+
+  it("renders custom task characters as checkboxes in HTML output", async () => {
+    const md = [
+      "- [?] question",
+      "- [!] important",
+      "- [x] done",
+      "- [ ] todo",
+    ].join("\n");
+
+    const html = await toHtml(md);
+
+    expect(html).toContain('class="task-list-item"');
+    expect(html).toContain('class="contains-task-list"');
+
+    expect(html).toContain('data-task-char="?"');
+    expect(html).toContain('data-task-char="!"');
+    expect(html).toContain('data-task-char="x"');
+    expect(html).toContain('data-task-char=" "');
+
+    const checkboxCount = (html.match(/type="checkbox"/g) || []).length;
+    expect(checkboxCount).toBe(4);
+
+    expect(html).toContain("checked");
   });
 });
