@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
 import remarkObsidian, { type RemarkObsidianOptions } from "../src/index.js";
@@ -99,6 +100,26 @@ describe("remark-obsidian", () => {
     const [blockrefNode] = findNodes(blockref, "wikilink");
     expect(blockrefNode.heading).toBe("^blockref");
 
+    const emptyHeading = parse("[[page#]]");
+    const [emptyHeadingNode] = findNodes(emptyHeading, "wikilink");
+    expect(emptyHeadingNode.path).toBe("page");
+    expect(emptyHeadingNode.heading).toBe("");
+
+    const emptyHeadingAlias = parse("[[page#|alias]]");
+    const [emptyHeadingAliasNode] = findNodes(emptyHeadingAlias, "wikilink");
+    expect(emptyHeadingAliasNode.path).toBe("page");
+    expect(emptyHeadingAliasNode.heading).toBe("");
+    expect(emptyHeadingAliasNode.alias).toBe("alias");
+
+    const headingOnly = parse("[[#heading]]");
+    const [headingOnlyNode] = findNodes(headingOnly, "wikilink");
+    expect(headingOnlyNode.path).toBe("");
+    expect(headingOnlyNode.heading).toBe("heading");
+
+    const subheading = parse("[[page#h1#h2]]");
+    const [subheadingNode] = findNodes(subheading, "wikilink");
+    expect(subheadingNode.heading).toBe("h1#h2");
+
     const incomplete = parse("[[incomplete");
     expect(findNodes(incomplete, "wikilink").length).toBe(0);
   });
@@ -125,6 +146,38 @@ describe("remark-obsidian", () => {
 
     const multi = processWithGfm("%%multi\nline%%");
     expect(findNodes(multi, "comment").length).toBe(0);
+  });
+
+  it("strips block comments spanning multiple lines", () => {
+    const block = processWithGfm("before\n%%\nblock\ncomment\n%%\nafter");
+    expect(findNodes(block, "comment").length).toBe(0);
+    const paragraphs = findNodes(block, "paragraph");
+    const texts = paragraphs.flatMap((p: any) =>
+      findNodes(p, "text").map((n: any) => n.value),
+    );
+    expect(texts).toContain("before");
+    expect(texts).toContain("after");
+  });
+
+  it("does not parse highlights inside code", () => {
+    const fenced = parse("```\n==not a highlight==\n```");
+    expect(findNodes(fenced, "highlight").length).toBe(0);
+
+    const inline = parse("`==not a highlight==`");
+    expect(findNodes(inline, "highlight").length).toBe(0);
+  });
+
+  it("does not parse comments inside math blocks", () => {
+    const processor = unified()
+      .use(remarkParse)
+      .use(remarkMath)
+      .use(remarkObsidian);
+
+    const mathBlock = processor.parse("$$\n%%not a comment%%\n$$");
+    expect(findNodes(mathBlock, "comment").length).toBe(0);
+
+    const inlineMath = processor.parse("$%%not a comment%%$");
+    expect(findNodes(inlineMath, "comment").length).toBe(0);
   });
 
   it("parses tags", () => {

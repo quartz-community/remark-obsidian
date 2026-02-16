@@ -126,9 +126,18 @@ function tokenize(
   }
 
   function headingStart(code: Code): State | undefined {
-    if (code === PIPE) return nok(code);
-    if (code === RIGHT_BRACKET || code === null || isLineEnding(code))
-      return nok(code);
+    if (code === null || isLineEnding(code)) return nok(code);
+
+    // Allow empty heading: [[page#]] or [[page#|alias]]
+    if (code === RIGHT_BRACKET) {
+      hasHeading = true;
+      return closeFirst(code);
+    }
+    if (code === PIPE) {
+      hasHeading = true;
+      return aliasMarker(code);
+    }
+
     effects.enter("wikilinkHeading");
     hasHeading = true;
     return heading(code);

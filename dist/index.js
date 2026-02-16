@@ -98,9 +98,15 @@ function tokenize(effects, ok, nok) {
     return headingStart;
   }
   function headingStart(code) {
-    if (code === PIPE) return nok(code);
-    if (code === RIGHT_BRACKET || code === null || isLineEnding(code))
-      return nok(code);
+    if (code === null || isLineEnding(code)) return nok(code);
+    if (code === RIGHT_BRACKET) {
+      hasHeading = true;
+      return closeFirst(code);
+    }
+    if (code === PIPE) {
+      hasHeading = true;
+      return aliasMarker(code);
+    }
     effects.enter("wikilinkHeading");
     hasHeading = true;
     return heading(code);
@@ -240,17 +246,32 @@ function tokenize2(effects, ok, nok) {
 
 // src/lib/syntax/comment.ts
 var PERCENT = 37;
+var LINE_FEED = -4;
+var CARRIAGE_RETURN = -3;
+var CARRIAGE_RETURN_LINE_FEED = -5;
+function isLineEnding3(code) {
+  return code === LINE_FEED || code === CARRIAGE_RETURN || code === CARRIAGE_RETURN_LINE_FEED;
+}
+var commentFlow = {
+  tokenize: tokenizeFlow,
+  concrete: true,
+  name: "commentFlow"
+};
+var nonLazyContinuation = {
+  tokenize: tokenizeNonLazyContinuation,
+  partial: true
+};
 function commentSyntax() {
   return {
     text: {
-      [PERCENT]: { name: "comment", tokenize: tokenize3 }
+      [PERCENT]: { name: "comment", tokenize: tokenizeText }
     },
     flow: {
-      [PERCENT]: { name: "comment", tokenize: tokenize3 }
+      [PERCENT]: commentFlow
     }
   };
 }
-function tokenize3(effects, ok, nok) {
+function tokenizeText(effects, ok, nok) {
   const close = { tokenize: tokenizeClose, partial: true };
   return start;
   function start(code) {
@@ -300,6 +321,127 @@ function tokenize3(effects, ok, nok) {
     return ok(code);
   }
 }
+function tokenizeFlow(effects, ok, nok) {
+  const self = this;
+  const flowClose = {
+    tokenize: tokenizeFlowClose,
+    partial: true
+  };
+  return start;
+  function start(code) {
+    if (code !== PERCENT) return nok(code);
+    effects.enter("comment");
+    effects.enter("commentMarker");
+    effects.consume(code);
+    return openSecond;
+  }
+  function openSecond(code) {
+    if (code !== PERCENT) return nok(code);
+    effects.consume(code);
+    effects.exit("commentMarker");
+    return afterOpen;
+  }
+  function afterOpen(code) {
+    if (code === null) return nok(code);
+    if (isLineEnding3(code)) {
+      return effects.attempt(
+        nonLazyContinuation,
+        beforeContentChunk,
+        abandon
+      )(code);
+    }
+    effects.enter("commentContent");
+    return contentChunk(code);
+  }
+  function beforeContentChunk(code) {
+    if (code === null) {
+      return abandon(code);
+    }
+    if (code === PERCENT) {
+      return effects.attempt(flowClose, closeAfter, startContent)(code);
+    }
+    effects.enter("commentContent");
+    return contentChunk(code);
+  }
+  function startContent(code) {
+    effects.enter("commentContent");
+    effects.consume(code);
+    return contentChunk;
+  }
+  function contentChunk(code) {
+    if (code === null) return abandon(code);
+    if (code === PERCENT) {
+      return effects.attempt(flowClose, closeAfter, contentConsume)(code);
+    }
+    if (isLineEnding3(code)) {
+      effects.exit("commentContent");
+      return effects.attempt(
+        nonLazyContinuation,
+        beforeContentChunk,
+        abandon
+      )(code);
+    }
+    effects.consume(code);
+    return contentChunk;
+  }
+  function contentConsume(code) {
+    if (code === null) return abandon(code);
+    effects.consume(code);
+    return contentChunk;
+  }
+  function closeAfter(code) {
+    effects.exit("comment");
+    return ok(code);
+  }
+  function abandon(code) {
+    effects.exit("comment");
+    return nok(code);
+  }
+  function tokenizeFlowClose(closeEffects, closeOk, closeNok) {
+    let inContent = false;
+    return closeStart;
+    function closeStart(closeCode) {
+      if (closeCode !== PERCENT) return closeNok(closeCode);
+      const current = self.events[self.events.length - 1];
+      if (current && current[0] === "enter" && current[1].type === "commentContent") {
+        closeEffects.exit("commentContent");
+        inContent = true;
+      }
+      closeEffects.enter("commentMarker");
+      closeEffects.consume(closeCode);
+      return closeSecond;
+    }
+    function closeSecond(closeCode) {
+      if (closeCode !== PERCENT) {
+        if (inContent) {
+          closeEffects.exit("commentMarker");
+          closeEffects.enter("commentContent");
+        }
+        return closeNok(closeCode);
+      }
+      closeEffects.consume(closeCode);
+      closeEffects.exit("commentMarker");
+      return closeOk;
+    }
+  }
+}
+function tokenizeNonLazyContinuation(effects, ok, nok) {
+  const self = this;
+  return start;
+  function start(code) {
+    if (code === null) {
+      return ok(code);
+    }
+    if (!isLineEnding3(code)) return nok(code);
+    effects.enter("lineEnding");
+    effects.consume(code);
+    effects.exit("lineEnding");
+    return lineStart;
+  }
+  function lineStart(code) {
+    return self.parser.lazy[self.now().line] ? nok(code) : ok(code);
+  }
+}
 
 // src/lib/syntax/tag.ts
 import { codes as codes3 } from "micromark-util-symbol";
@@ -324,11 +466,11 @@ function isNonDigit(code) {
 function tagSyntax() {
   return {
     text: {
-      [HASH2]: { name: "tag", tokenize: tokenize4 }
+      [HASH2]: { name: "tag", tokenize: tokenize3 }
     }
   };
 }
-function tokenize4(effects, ok, nok) {
+function tokenize3(effects, ok, nok) {
   let hasNonDigit = false;
   const context = this;
   return start;
