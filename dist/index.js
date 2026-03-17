@@ -1,8 +1,452 @@
-// src/index.ts
-import { visit as visit2 } from "unist-util-visit";
+// node_modules/unist-util-is/lib/index.js
+var convert = (
+  // Note: overloads in JSDoc can’t yet use different `@template`s.
+  /**
+   * @type {(
+   *   (<Condition extends string>(test: Condition) => (node: unknown, index?: number | null | undefined, parent?: Parent | null | undefined, context?: unknown) => node is Node & {type: Condition}) &
+   *   (<Condition extends Props>(test: Condition) => (node: unknown, index?: number | null | undefined, parent?: Parent | null | undefined, context?: unknown) => node is Node & Condition) &
+   *   (<Condition extends TestFunction>(test: Condition) => (node: unknown, index?: number | null | undefined, parent?: Parent | null | undefined, context?: unknown) => node is Node & Predicate<Condition, Node>) &
+   *   ((test?: null | undefined) => (node?: unknown, index?: number | null | undefined, parent?: Parent | null | undefined, context?: unknown) => node is Node) &
+   *   ((test?: Test) => Check)
+   * )}
+   */
+  /**
+   * @param {Test} [test]
+   * @returns {Check}
+   */
+  (function(test) {
+    if (test === null || test === void 0) {
+      return ok;
+    }
+    if (typeof test === "function") {
+      return castFactory(test);
+    }
+    if (typeof test === "object") {
+      return Array.isArray(test) ? anyFactory(test) : (
+        // Cast because `ReadonlyArray` goes into the above but `isArray`
+        // narrows to `Array`.
+        propertiesFactory(
+          /** @type {Props} */
+          test
+        )
+      );
+    }
+    if (typeof test === "string") {
+      return typeFactory(test);
+    }
+    throw new Error("Expected function, string, or object as test");
+  })
+);
+function anyFactory(tests) {
+  const checks = [];
+  let index = -1;
+  while (++index < tests.length) {
+    checks[index] = convert(tests[index]);
+  }
+  return castFactory(any);
+  function any(...parameters) {
+    let index2 = -1;
+    while (++index2 < checks.length) {
+      if (checks[index2].apply(this, parameters)) return true;
+    }
+    return false;
+  }
+}
+function propertiesFactory(check) {
+  const checkAsRecord = (
+    /** @type {Record<string, unknown>} */
+    check
+  );
+  return castFactory(all);
+  function all(node) {
+    const nodeAsRecord = (
+      /** @type {Record<string, unknown>} */
+      /** @type {unknown} */
+      node
+    );
+    let key;
+    for (key in check) {
+      if (nodeAsRecord[key] !== checkAsRecord[key]) return false;
+    }
+    return true;
+  }
+}
+function typeFactory(check) {
+  return castFactory(type);
+  function type(node) {
+    return node && node.type === check;
+  }
+}
+function castFactory(testFunction) {
+  return check;
+  function check(value, index, parent) {
+    return Boolean(
+      looksLikeANode(value) && testFunction.call(
+        this,
+        value,
+        typeof index === "number" ? index : void 0,
+        parent || void 0
+      )
+    );
+  }
+}
+function ok() {
+  return true;
+}
+function looksLikeANode(value) {
+  return value !== null && typeof value === "object" && "type" in value;
+}
+
+// node_modules/unist-util-visit-parents/lib/color.node.js
+function color(d) {
+  return "\x1B[33m" + d + "\x1B[39m";
+}
+
+// node_modules/unist-util-visit-parents/lib/index.js
+var empty = [];
+var CONTINUE = true;
+var EXIT = false;
+var SKIP = "skip";
+function visitParents(tree, test, visitor, reverse) {
+  let check;
+  if (typeof test === "function" && typeof visitor !== "function") {
+    reverse = visitor;
+    visitor = test;
+  } else {
+    check = test;
+  }
+  const is2 = convert(check);
+  const step = reverse ? -1 : 1;
+  factory(tree, void 0, [])();
+  function factory(node, index, parents) {
+    const value = (
+      /** @type {Record<string, unknown>} */
+      node && typeof node === "object" ? node : {}
+    );
+    if (typeof value.type === "string") {
+      const name = (
+        // `hast`
+        typeof value.tagName === "string" ? value.tagName : (
+          // `xast`
+          typeof value.name === "string" ? value.name : void 0
+        )
+      );
+      Object.defineProperty(visit2, "name", {
+        value: "node (" + color(node.type + (name ? "<" + name + ">" : "")) + ")"
+      });
+    }
+    return visit2;
+    function visit2() {
+      let result = empty;
+      let subresult;
+      let offset;
+      let grandparents;
+      if (!test || is2(node, index, parents[parents.length - 1] || void 0)) {
+        result = toResult(visitor(node, parents));
+        if (result[0] === EXIT) {
+          return result;
+        }
+      }
+      if ("children" in node && node.children) {
+        const nodeAsParent = (
+          /** @type {UnistParent} */
+          node
+        );
+        if (nodeAsParent.children && result[0] !== SKIP) {
+          offset = (reverse ? nodeAsParent.children.length : -1) + step;
+          grandparents = parents.concat(nodeAsParent);
+          while (offset > -1 && offset < nodeAsParent.children.length) {
+            const child = nodeAsParent.children[offset];
+            subresult = factory(child, offset, grandparents)();
+            if (subresult[0] === EXIT) {
+              return subresult;
+            }
+            offset = typeof subresult[1] === "number" ? subresult[1] : offset + step;
+          }
+        }
+      }
+      return result;
+    }
+  }
+}
+function toResult(value) {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  if (typeof value === "number") {
+    return [CONTINUE, value];
+  }
+  return value === null || value === void 0 ? empty : [value];
+}
+
+// node_modules/unist-util-visit/lib/index.js
+function visit(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
+  let reverse;
+  let test;
+  let visitor;
+  if (typeof testOrVisitor === "function" && typeof visitorOrReverse !== "function") {
+    test = void 0;
+    visitor = testOrVisitor;
+    reverse = visitorOrReverse;
+  } else {
+    test = testOrVisitor;
+    visitor = visitorOrReverse;
+    reverse = maybeReverse;
+  }
+  visitParents(tree, test, overload, reverse);
+  function overload(node, parents) {
+    const parent = parents[parents.length - 1];
+    const index = parent ? parent.children.indexOf(node) : void 0;
+    return visitor(node, index, parent);
+  }
+}
+
+// node_modules/micromark-util-symbol/lib/codes.js
+var codes = (
+  /** @type {const} */
+  {
+    carriageReturn: -5,
+    lineFeed: -4,
+    carriageReturnLineFeed: -3,
+    horizontalTab: -2,
+    virtualSpace: -1,
+    eof: null,
+    nul: 0,
+    soh: 1,
+    stx: 2,
+    etx: 3,
+    eot: 4,
+    enq: 5,
+    ack: 6,
+    bel: 7,
+    bs: 8,
+    ht: 9,
+    // `\t`
+    lf: 10,
+    // `\n`
+    vt: 11,
+    // `\v`
+    ff: 12,
+    // `\f`
+    cr: 13,
+    // `\r`
+    so: 14,
+    si: 15,
+    dle: 16,
+    dc1: 17,
+    dc2: 18,
+    dc3: 19,
+    dc4: 20,
+    nak: 21,
+    syn: 22,
+    etb: 23,
+    can: 24,
+    em: 25,
+    sub: 26,
+    esc: 27,
+    fs: 28,
+    gs: 29,
+    rs: 30,
+    us: 31,
+    space: 32,
+    exclamationMark: 33,
+    // `!`
+    quotationMark: 34,
+    // `"`
+    numberSign: 35,
+    // `#`
+    dollarSign: 36,
+    // `$`
+    percentSign: 37,
+    // `%`
+    ampersand: 38,
+    // `&`
+    apostrophe: 39,
+    // `'`
+    leftParenthesis: 40,
+    // `(`
+    rightParenthesis: 41,
+    // `)`
+    asterisk: 42,
+    // `*`
+    plusSign: 43,
+    // `+`
+    comma: 44,
+    // `,`
+    dash: 45,
+    // `-`
+    dot: 46,
+    // `.`
+    slash: 47,
+    // `/`
+    digit0: 48,
+    // `0`
+    digit1: 49,
+    // `1`
+    digit2: 50,
+    // `2`
+    digit3: 51,
+    // `3`
+    digit4: 52,
+    // `4`
+    digit5: 53,
+    // `5`
+    digit6: 54,
+    // `6`
+    digit7: 55,
+    // `7`
+    digit8: 56,
+    // `8`
+    digit9: 57,
+    // `9`
+    colon: 58,
+    // `:`
+    semicolon: 59,
+    // `;`
+    lessThan: 60,
+    // `<`
+    equalsTo: 61,
+    // `=`
+    greaterThan: 62,
+    // `>`
+    questionMark: 63,
+    // `?`
+    atSign: 64,
+    // `@`
+    uppercaseA: 65,
+    // `A`
+    uppercaseB: 66,
+    // `B`
+    uppercaseC: 67,
+    // `C`
+    uppercaseD: 68,
+    // `D`
+    uppercaseE: 69,
+    // `E`
+    uppercaseF: 70,
+    // `F`
+    uppercaseG: 71,
+    // `G`
+    uppercaseH: 72,
+    // `H`
+    uppercaseI: 73,
+    // `I`
+    uppercaseJ: 74,
+    // `J`
+    uppercaseK: 75,
+    // `K`
+    uppercaseL: 76,
+    // `L`
+    uppercaseM: 77,
+    // `M`
+    uppercaseN: 78,
+    // `N`
+    uppercaseO: 79,
+    // `O`
+    uppercaseP: 80,
+    // `P`
+    uppercaseQ: 81,
+    // `Q`
+    uppercaseR: 82,
+    // `R`
+    uppercaseS: 83,
+    // `S`
+    uppercaseT: 84,
+    // `T`
+    uppercaseU: 85,
+    // `U`
+    uppercaseV: 86,
+    // `V`
+    uppercaseW: 87,
+    // `W`
+    uppercaseX: 88,
+    // `X`
+    uppercaseY: 89,
+    // `Y`
+    uppercaseZ: 90,
+    // `Z`
+    leftSquareBracket: 91,
+    // `[`
+    backslash: 92,
+    // `\`
+    rightSquareBracket: 93,
+    // `]`
+    caret: 94,
+    // `^`
+    underscore: 95,
+    // `_`
+    graveAccent: 96,
+    // `` ` ``
+    lowercaseA: 97,
+    // `a`
+    lowercaseB: 98,
+    // `b`
+    lowercaseC: 99,
+    // `c`
+    lowercaseD: 100,
+    // `d`
+    lowercaseE: 101,
+    // `e`
+    lowercaseF: 102,
+    // `f`
+    lowercaseG: 103,
+    // `g`
+    lowercaseH: 104,
+    // `h`
+    lowercaseI: 105,
+    // `i`
+    lowercaseJ: 106,
+    // `j`
+    lowercaseK: 107,
+    // `k`
+    lowercaseL: 108,
+    // `l`
+    lowercaseM: 109,
+    // `m`
+    lowercaseN: 110,
+    // `n`
+    lowercaseO: 111,
+    // `o`
+    lowercaseP: 112,
+    // `p`
+    lowercaseQ: 113,
+    // `q`
+    lowercaseR: 114,
+    // `r`
+    lowercaseS: 115,
+    // `s`
+    lowercaseT: 116,
+    // `t`
+    lowercaseU: 117,
+    // `u`
+    lowercaseV: 118,
+    // `v`
+    lowercaseW: 119,
+    // `w`
+    lowercaseX: 120,
+    // `x`
+    lowercaseY: 121,
+    // `y`
+    lowercaseZ: 122,
+    // `z`
+    leftCurlyBrace: 123,
+    // `{`
+    verticalBar: 124,
+    // `|`
+    rightCurlyBrace: 125,
+    // `}`
+    tilde: 126,
+    // `~`
+    del: 127,
+    // Unicode Specials block.
+    byteOrderMarker: 65279,
+    // Unicode Specials block.
+    replacementCharacter: 65533
+    // `�`
+  }
+);
 
 // src/lib/syntax/wikilink.ts
-import { codes } from "micromark-util-symbol";
 var EXCLAMATION = 33;
 var HASH = 35;
 var LEFT_BRACKET = 91;
@@ -20,7 +464,7 @@ function wikilinkSyntax() {
     }
   };
 }
-function tokenize(effects, ok, nok) {
+function tokenize(effects, ok2, nok) {
   let hasPath = false;
   let hasHeading = false;
   let hasAlias = false;
@@ -172,15 +616,14 @@ function tokenize(effects, ok, nok) {
     effects.consume(code);
     effects.exit("wikilinkMarker");
     effects.exit("wikilink");
-    return ok;
+    return ok2;
   }
 }
 
 // src/lib/syntax/highlight.ts
-import { codes as codes2 } from "micromark-util-symbol";
 var EQUALS = 61;
 function isLineEnding2(code) {
-  return code === codes2.lineFeed || code === codes2.carriageReturn;
+  return code === codes.lineFeed || code === codes.carriageReturn;
 }
 function highlightSyntax() {
   return {
@@ -189,7 +632,7 @@ function highlightSyntax() {
     }
   };
 }
-function tokenize2(effects, ok, nok) {
+function tokenize2(effects, ok2, nok) {
   const close = { tokenize: tokenizeClose, partial: true };
   let hasContent = false;
   return start;
@@ -209,7 +652,7 @@ function tokenize2(effects, ok, nok) {
   }
   function content(code) {
     if (code === null || isLineEnding2(code)) return nok(code);
-    if (!hasContent && (code === EQUALS || code === codes2.greaterThan))
+    if (!hasContent && (code === EQUALS || code === codes.greaterThan))
       return nok(code);
     if (code === EQUALS)
       return effects.attempt(close, closeAfter, contentConsume)(code);
@@ -240,7 +683,7 @@ function tokenize2(effects, ok, nok) {
   }
   function closeAfter(code) {
     effects.exit("highlight");
-    return ok(code);
+    return ok2(code);
   }
 }
 
@@ -271,7 +714,7 @@ function commentSyntax() {
     }
   };
 }
-function tokenizeText(effects, ok, nok) {
+function tokenizeText(effects, ok2, nok) {
   const close = { tokenize: tokenizeClose, partial: true };
   return start;
   function start(code) {
@@ -318,10 +761,10 @@ function tokenizeText(effects, ok, nok) {
   }
   function closeAfter(code) {
     effects.exit("comment");
-    return ok(code);
+    return ok2(code);
   }
 }
-function tokenizeFlow(effects, ok, nok) {
+function tokenizeFlow(effects, ok2, nok) {
   const self = this;
   const flowClose = {
     tokenize: tokenizeFlowClose,
@@ -391,7 +834,7 @@ function tokenizeFlow(effects, ok, nok) {
   }
   function closeAfter(code) {
     effects.exit("comment");
-    return ok(code);
+    return ok2(code);
   }
   function abandon(code) {
     effects.exit("comment");
@@ -425,12 +868,12 @@ function tokenizeFlow(effects, ok, nok) {
     }
   }
 }
-function tokenizeNonLazyContinuation(effects, ok, nok) {
+function tokenizeNonLazyContinuation(effects, ok2, nok) {
   const self = this;
   return start;
   function start(code) {
     if (code === null) {
-      return ok(code);
+      return ok2(code);
     }
     if (!isLineEnding3(code)) return nok(code);
     effects.enter("lineEnding");
@@ -439,19 +882,18 @@ function tokenizeNonLazyContinuation(effects, ok, nok) {
     return lineStart;
   }
   function lineStart(code) {
-    return self.parser.lazy[self.now().line] ? nok(code) : ok(code);
+    return self.parser.lazy[self.now().line] ? nok(code) : ok2(code);
   }
 }
 
 // src/lib/syntax/tag.ts
-import { codes as codes3 } from "micromark-util-symbol";
 var HASH2 = 35;
 var SLASH = 47;
 var DASH = 45;
 var UNDERSCORE = 95;
 var tagCharRegex = /[\p{L}\p{M}\p{Emoji}]/u;
 function isWhitespace(code) {
-  return code === codes3.space || code === codes3.horizontalTab || code === codes3.lineFeed || code === codes3.carriageReturn || code === codes3.carriageReturnLineFeed;
+  return code === codes.space || code === codes.horizontalTab || code === codes.lineFeed || code === codes.carriageReturn || code === codes.carriageReturnLineFeed;
 }
 function isTagChar(code) {
   if (code === null) return false;
@@ -470,7 +912,7 @@ function tagSyntax() {
     }
   };
 }
-function tokenize3(effects, ok, nok) {
+function tokenize3(effects, ok2, nok) {
   let hasNonDigit = false;
   const context = this;
   return start;
@@ -514,7 +956,7 @@ function tokenize3(effects, ok, nok) {
     if (!hasNonDigit) return nok(code);
     effects.exit("tagContent");
     effects.exit("tag");
-    return ok(code);
+    return ok2(code);
   }
 }
 
@@ -627,7 +1069,6 @@ function tagFromMarkdown() {
 }
 
 // src/lib/task-char.ts
-import { visit } from "unist-util-visit";
 function customTaskCharTransform(tree) {
   visit(tree, "listItem", (node) => {
     if (typeof node.checked === "boolean") {
@@ -693,7 +1134,7 @@ function remarkObsidian(userOpts) {
   if (!needsTransform) return void 0;
   return (tree) => {
     if (opts.comments) {
-      visit2(
+      visit(
         tree,
         "comment",
         (_node, index, parent) => {

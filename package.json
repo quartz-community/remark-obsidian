@@ -24,16 +24,13 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
+  "devDependencies": {
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^22.0.0",
     "mdast-util-from-markdown": "^2.0.0",
     "mdast-util-to-markdown": "^2.1.0",
     "micromark-util-symbol": "^2.0.0",
     "micromark-util-types": "^2.0.0",
-    "unist-util-visit": "^5.0.0"
-  },
-  "devDependencies": {
-    "@types/mdast": "^4.0.4",
-    "@types/node": "^22.0.0",
     "rehype-raw": "^7.0.0",
     "rehype-stringify": "^10.0.1",
     "remark-gfm": "^4.0.1",
@@ -44,6 +41,7 @@
     "tsup": "^8.5.0",
     "typescript": "^5.9.3",
     "unified": "^11.0.5",
+    "unist-util-visit": "^5.0.0",
     "vitest": "^2.1.9"
   },
   "engines": {
