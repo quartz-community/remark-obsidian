@@ -11,9 +11,5 @@ export function wikilinkToMarkdown(): Options {
         return `${prefix}[[${node.path}${heading}${alias}]]`;
       },
     },
-    unsafe: [
-      { character: "[", inConstruct: "phrasing" },
-      { character: "]", inConstruct: "phrasing" },
-    ],
   };
 }

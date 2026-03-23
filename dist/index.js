@@ -1078,11 +1078,7 @@ function wikilinkToMarkdown() {
         const alias = node.alias ? `|${node.alias}` : "";
         return `${prefix}[[${node.path}${heading}${alias}]]`;
       }
-    },
-    unsafe: [
-      { character: "[", inConstruct: "phrasing" },
-      { character: "]", inConstruct: "phrasing" }
-    ]
+    }
   };
 }
 
