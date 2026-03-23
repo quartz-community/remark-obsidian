@@ -16,6 +16,10 @@ import { wikilinkFromMarkdown } from "./lib/mdast/wikilink.js";
 import { highlightFromMarkdown } from "./lib/mdast/highlight.js";
 import { commentFromMarkdown } from "./lib/mdast/comment.js";
 import { tagFromMarkdown } from "./lib/mdast/tag.js";
+import { wikilinkToMarkdown } from "./lib/mdast/wikilink-to-markdown.js";
+import { highlightToMarkdown } from "./lib/mdast/highlight-to-markdown.js";
+import { commentToMarkdown } from "./lib/mdast/comment-to-markdown.js";
+import { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 import { customTaskCharTransform } from "./lib/task-char.js";
 
 export interface RemarkObsidianOptions {
@@ -43,22 +47,27 @@ export default function remarkObsidian(
 
   data.micromarkExtensions ??= [];
   data.fromMarkdownExtensions ??= [];
+  data.toMarkdownExtensions ??= [];
 
   if (opts.wikilinks) {
     data.micromarkExtensions.push(wikilinkSyntax());
     data.fromMarkdownExtensions.push(wikilinkFromMarkdown());
+    data.toMarkdownExtensions.push(wikilinkToMarkdown());
   }
   if (opts.comments) {
     data.micromarkExtensions.push(commentSyntax());
     data.fromMarkdownExtensions.push(commentFromMarkdown());
+    data.toMarkdownExtensions.push(commentToMarkdown());
   }
   if (opts.tags) {
     data.micromarkExtensions.push(tagSyntax());
     data.fromMarkdownExtensions.push(tagFromMarkdown());
+    data.toMarkdownExtensions.push(tagToMarkdown());
   }
   if (opts.highlights) {
     data.micromarkExtensions.push(highlightSyntax());
     data.fromMarkdownExtensions.push(highlightFromMarkdown());
+    data.toMarkdownExtensions.push(highlightToMarkdown());
   }
 
   const needsTransform = opts.comments || opts.customTaskChars;
@@ -93,6 +102,10 @@ export { wikilinkFromMarkdown } from "./lib/mdast/wikilink.js";
 export { highlightFromMarkdown } from "./lib/mdast/highlight.js";
 export { commentFromMarkdown } from "./lib/mdast/comment.js";
 export { tagFromMarkdown } from "./lib/mdast/tag.js";
+export { wikilinkToMarkdown } from "./lib/mdast/wikilink-to-markdown.js";
+export { highlightToMarkdown } from "./lib/mdast/highlight-to-markdown.js";
+export { commentToMarkdown } from "./lib/mdast/comment-to-markdown.js";
+export { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 export { customTaskCharTransform } from "./lib/task-char.js";
 
 export type { Wikilink, Highlight, Comment, Tag } from "./lib/types.js";

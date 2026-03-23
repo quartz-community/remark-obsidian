@@ -1068,6 +1068,60 @@ function tagFromMarkdown() {
   };
 }
 
+// src/lib/mdast/wikilink-to-markdown.ts
+function wikilinkToMarkdown() {
+  return {
+    handlers: {
+      wikilink(node) {
+        const prefix = node.embedded ? "!" : "";
+        const heading = node.heading ? `#${node.heading}` : "";
+        const alias = node.alias ? `|${node.alias}` : "";
+        return `${prefix}[[${node.path}${heading}${alias}]]`;
+      }
+    },
+    unsafe: [
+      { character: "[", inConstruct: "phrasing" },
+      { character: "]", inConstruct: "phrasing" }
+    ]
+  };
+}
+
+// src/lib/mdast/highlight-to-markdown.ts
+function highlightToMarkdown() {
+  return {
+    handlers: {
+      highlight(node, _parent, state, info) {
+        const exit = state.enter("highlight");
+        const content = state.containerPhrasing(node, info);
+        exit();
+        return `==${content}==`;
+      }
+    }
+  };
+}
+
+// src/lib/mdast/comment-to-markdown.ts
+function commentToMarkdown() {
+  return {
+    handlers: {
+      comment(node) {
+        return `%%${node.value}%%`;
+      }
+    }
+  };
+}
+
+// src/lib/mdast/tag-to-markdown.ts
+function tagToMarkdown() {
+  return {
+    handlers: {
+      tag(node) {
+        return `#${node.value}`;
+      }
+    }
+  };
+}
+
 // src/lib/task-char.ts
 function customTaskCharTransform(tree) {
   visit(tree, "listItem", (node) => {
@@ -1114,21 +1168,26 @@ function remarkObsidian(userOpts) {
   const data = this.data();
   data.micromarkExtensions ??= [];
   data.fromMarkdownExtensions ??= [];
+  data.toMarkdownExtensions ??= [];
   if (opts.wikilinks) {
     data.micromarkExtensions.push(wikilinkSyntax());
     data.fromMarkdownExtensions.push(wikilinkFromMarkdown());
+    data.toMarkdownExtensions.push(wikilinkToMarkdown());
   }
   if (opts.comments) {
     data.micromarkExtensions.push(commentSyntax());
     data.fromMarkdownExtensions.push(commentFromMarkdown());
+    data.toMarkdownExtensions.push(commentToMarkdown());
   }
   if (opts.tags) {
     data.micromarkExtensions.push(tagSyntax());
     data.fromMarkdownExtensions.push(tagFromMarkdown());
+    data.toMarkdownExtensions.push(tagToMarkdown());
   }
   if (opts.highlights) {
     data.micromarkExtensions.push(highlightSyntax());
     data.fromMarkdownExtensions.push(highlightFromMarkdown());
+    data.toMarkdownExtensions.push(highlightToMarkdown());
   }
   const needsTransform = opts.comments || opts.customTaskChars;
   if (!needsTransform) return void 0;
@@ -1154,13 +1213,17 @@ function remarkObsidian(userOpts) {
 export {
   commentFromMarkdown,
   commentSyntax,
+  commentToMarkdown,
   customTaskCharTransform,
   remarkObsidian as default,
   highlightFromMarkdown,
   highlightSyntax,
+  highlightToMarkdown,
   tagFromMarkdown,
   tagSyntax,
+  tagToMarkdown,
   wikilinkFromMarkdown,
-  wikilinkSyntax
+  wikilinkSyntax,
+  wikilinkToMarkdown
 };
 //# sourceMappingURL=index.js.map

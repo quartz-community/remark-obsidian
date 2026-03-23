@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
+import remarkStringify from "remark-stringify";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import remarkRehype from "remark-rehype";
@@ -17,6 +18,15 @@ function processWithGfm(md: string, opts?: RemarkObsidianOptions) {
     .use(remarkGfm)
     .use(remarkObsidian, opts);
   return processor.runSync(processor.parse(md));
+}
+
+async function toMd(md: string, opts?: RemarkObsidianOptions) {
+  const result = await unified()
+    .use(remarkParse)
+    .use(remarkObsidian, { ...opts, comments: false })
+    .use(remarkStringify)
+    .process(md);
+  return String(result);
 }
 
 async function toHtml(md: string, opts?: RemarkObsidianOptions) {
@@ -289,5 +299,81 @@ describe("remark-obsidian", () => {
     expect(checkboxCount).toBe(4);
 
     expect(html).toContain("checked");
+  });
+
+  describe("toMarkdown serialization", () => {
+    it("round-trips basic wikilinks", async () => {
+      expect(await toMd("[[page]]")).toBe("[[page]]\n");
+    });
+
+    it("round-trips wikilinks with alias", async () => {
+      expect(await toMd("[[page|display name]]")).toBe(
+        "[[page|display name]]\n",
+      );
+    });
+
+    it("round-trips wikilinks with heading", async () => {
+      expect(await toMd("[[page#heading]]")).toBe("[[page#heading]]\n");
+    });
+
+    it("round-trips wikilinks with heading and alias", async () => {
+      expect(await toMd("[[page#heading|alias]]")).toBe(
+        "[[page#heading|alias]]\n",
+      );
+    });
+
+    it("round-trips embedded wikilinks", async () => {
+      expect(await toMd("![[embed]]")).toBe("![[embed]]\n");
+    });
+
+    it("round-trips embedded wikilinks with alias", async () => {
+      expect(await toMd("![[image.png|alt 100x200]]")).toBe(
+        "![[image.png|alt 100x200]]\n",
+      );
+    });
+
+    it("round-trips block references", async () => {
+      expect(await toMd("[[page#^blockref]]")).toBe("[[page#^blockref]]\n");
+    });
+
+    it("round-trips heading-only links", async () => {
+      expect(await toMd("[[#heading]]")).toBe("[[#heading]]\n");
+    });
+
+    it("round-trips highlights", async () => {
+      expect(await toMd("==hello==")).toBe("==hello==\n");
+    });
+
+    it("round-trips tags", async () => {
+      const result = await toMd("hello #tag");
+      expect(result).toBe("hello #tag\n");
+    });
+
+    it("round-trips mixed inline syntax", async () => {
+      const result = await toMd("Mix [[page]] ==hi== #tag");
+      expect(result).toBe("Mix [[page]] ==hi== #tag\n");
+    });
+
+    it("serializes comments when not stripped", async () => {
+      // Use lower-level API: parse with comment syntax but don't run
+      // the plugin's tree transform that strips comments
+      const processor = unified()
+        .use(remarkParse)
+        .use(remarkObsidian, { comments: false, customTaskChars: false })
+        .use(remarkStringify);
+
+      const data = processor.data();
+      const { commentSyntax, commentFromMarkdown, commentToMarkdown } =
+        await import("../src/index.js");
+      data.micromarkExtensions ??= [];
+      data.fromMarkdownExtensions ??= [];
+      data.toMarkdownExtensions ??= [];
+      data.micromarkExtensions.push(commentSyntax());
+      data.fromMarkdownExtensions.push(commentFromMarkdown());
+      data.toMarkdownExtensions.push(commentToMarkdown());
+
+      const result = await processor.process("%%hidden%%");
+      expect(String(result)).toBe("%%hidden%%\n");
+    });
   });
 });

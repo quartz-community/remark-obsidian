@@ -1,6 +1,7 @@
 import { Literal, Parent, Root } from 'mdast';
 import { Extension } from 'micromark-util-types';
 import { Extension as Extension$1 } from 'mdast-util-from-markdown';
+import { Options } from 'mdast-util-to-markdown';
 
 interface Wikilink extends Literal {
     type: "wikilink";
@@ -74,6 +75,14 @@ declare function commentFromMarkdown(): Extension$1;
 
 declare function tagFromMarkdown(): Extension$1;
 
+declare function wikilinkToMarkdown(): Options;
+
+declare function highlightToMarkdown(): Options;
+
+declare function commentToMarkdown(): Options;
+
+declare function tagToMarkdown(): Options;
+
 declare function customTaskCharTransform(tree: Root): void;
 
 interface RemarkObsidianOptions {
@@ -85,4 +94,4 @@ interface RemarkObsidianOptions {
 }
 declare function remarkObsidian(userOpts?: RemarkObsidianOptions): undefined | ((tree: Root) => void);
 
-export { type Comment, type Highlight, type RemarkObsidianOptions, type Tag, type Wikilink, commentFromMarkdown, commentSyntax, customTaskCharTransform, remarkObsidian as default, highlightFromMarkdown, highlightSyntax, tagFromMarkdown, tagSyntax, wikilinkFromMarkdown, wikilinkSyntax };
+export { type Comment, type Highlight, type RemarkObsidianOptions, type Tag, type Wikilink, commentFromMarkdown, commentSyntax, commentToMarkdown, customTaskCharTransform, remarkObsidian as default, highlightFromMarkdown, highlightSyntax, highlightToMarkdown, tagFromMarkdown, tagSyntax, tagToMarkdown, wikilinkFromMarkdown, wikilinkSyntax, wikilinkToMarkdown };
