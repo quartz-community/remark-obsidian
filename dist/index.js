@@ -896,7 +896,7 @@ function isWhitespace(code) {
   return code === codes.space || code === codes.horizontalTab || code === codes.lineFeed || code === codes.carriageReturn || code === codes.carriageReturnLineFeed;
 }
 function isTagChar(code) {
-  if (code === null) return false;
+  if (code === null || code < 0) return false;
   if (code >= 48 && code <= 57) return true;
   if (code === DASH || code === UNDERSCORE) return true;
   return tagCharRegex.test(String.fromCodePoint(code));

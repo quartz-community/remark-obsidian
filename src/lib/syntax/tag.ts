@@ -25,7 +25,7 @@ function isWhitespace(code: Code): boolean {
 }
 
 function isTagChar(code: Code): boolean {
-  if (code === null) return false;
+  if (code === null || code < 0) return false;
   if (code >= 48 && code <= 57) return true;
   if (code === DASH || code === UNDERSCORE) return true;
   return tagCharRegex.test(String.fromCodePoint(code));

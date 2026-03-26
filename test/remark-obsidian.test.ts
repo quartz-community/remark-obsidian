@@ -208,6 +208,28 @@ describe("remark-obsidian", () => {
     expect(afterSpaceNode.value).toBe("tag");
   });
 
+  it("parses tags immediately followed by wikilink on next line", () => {
+    // Regression: tag followed by wikilink without blank line caused
+    // "Invalid code point -4" because isTagChar didn't guard against
+    // negative micromark codes (lineFeed = -4).
+    const tagThenEmbed = parse("#tag\n![[image.jpg]]");
+    const tagNodes = findNodes(tagThenEmbed, "tag");
+    expect(tagNodes.length).toBe(1);
+    expect(tagNodes[0].value).toBe("tag");
+    const wikiNodes = findNodes(tagThenEmbed, "wikilink");
+    expect(wikiNodes.length).toBe(1);
+    expect(wikiNodes[0].path).toBe("image.jpg");
+
+    const multiTags = parse("#foo #bar\n![[img.png]]");
+    const multiTagNodes = findNodes(multiTags, "tag");
+    expect(multiTagNodes.map((n: any) => n.value)).toEqual(["foo", "bar"]);
+    expect(findNodes(multiTags, "wikilink").length).toBe(1);
+
+    const withBlank = parse("#tag\n\n![[image.jpg]]");
+    expect(findNodes(withBlank, "tag").length).toBe(1);
+    expect(findNodes(withBlank, "wikilink").length).toBe(1);
+  });
+
   it("parses mixed inline syntax", () => {
     const mixed = parse("Mix [[page]] ==hi== #tag");
     expect(findNodes(mixed, "wikilink").length).toBe(1);
