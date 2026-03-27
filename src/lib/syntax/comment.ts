@@ -160,6 +160,14 @@ function tokenizeFlow(
       return abandon(code);
     }
 
+    if (isLineEnding(code)) {
+      return effects.attempt(
+        nonLazyContinuation,
+        beforeContentChunk,
+        abandon,
+      )(code);
+    }
+
     if (code === PERCENT) {
       return effects.attempt(flowClose, closeAfter, startContent)(code);
     }

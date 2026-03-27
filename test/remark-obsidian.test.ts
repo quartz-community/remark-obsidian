@@ -169,6 +169,42 @@ describe("remark-obsidian", () => {
     expect(texts).toContain("after");
   });
 
+  it("strips block comments containing empty lines", () => {
+    const block = processWithGfm(
+      "before\n%%\nfirst line\n\nsecond line\n%%\nafter",
+    );
+    expect(findNodes(block, "comment").length).toBe(0);
+    const paragraphs = findNodes(block, "paragraph");
+    const texts = paragraphs.flatMap((p: any) =>
+      findNodes(p, "text").map((n: any) => n.value),
+    );
+    expect(texts).toContain("before");
+    expect(texts).toContain("after");
+    expect(texts.join(" ")).not.toContain("first line");
+  });
+
+  it("strips block comments with only empty lines", () => {
+    const block = processWithGfm("before\n%%\n\n%%\nafter");
+    expect(findNodes(block, "comment").length).toBe(0);
+    const paragraphs = findNodes(block, "paragraph");
+    const texts = paragraphs.flatMap((p: any) =>
+      findNodes(p, "text").map((n: any) => n.value),
+    );
+    expect(texts).toContain("before");
+    expect(texts).toContain("after");
+  });
+
+  it("strips block comments with multiple consecutive empty lines", () => {
+    const block = processWithGfm("before\n%%\nline\n\n\n\nline\n%%\nafter");
+    expect(findNodes(block, "comment").length).toBe(0);
+    const paragraphs = findNodes(block, "paragraph");
+    const texts = paragraphs.flatMap((p: any) =>
+      findNodes(p, "text").map((n: any) => n.value),
+    );
+    expect(texts).toContain("before");
+    expect(texts).toContain("after");
+  });
+
   it("does not parse highlights inside code", () => {
     const fenced = parse("```\n==not a highlight==\n```");
     expect(findNodes(fenced, "highlight").length).toBe(0);

@@ -10,7 +10,7 @@ export function commentFromMarkdown(): Extension {
     exit: {
       commentContent(token) {
         const node = this.stack[this.stack.length - 1] as any;
-        node.value = this.sliceSerialize(token);
+        node.value += this.sliceSerialize(token);
       },
       comment(token) {
         this.exit(token);
