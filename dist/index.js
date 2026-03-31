@@ -1126,10 +1126,20 @@ function tagToMarkdown() {
 }
 
 // src/lib/task-char.ts
-function customTaskCharTransform(tree) {
+function customTaskCharTransform(tree, source) {
   visit(tree, "listItem", (node) => {
     if (typeof node.checked === "boolean") {
-      const char = node.checked ? "x" : " ";
+      let char = node.checked ? "x" : " ";
+      if (source && node.position?.start?.offset != null) {
+        const slice = source.slice(
+          node.position.start.offset,
+          node.position.start.offset + 20
+        );
+        const m = slice.match(/\[([^\]])\]/);
+        if (m) {
+          char = m[1];
+        }
+      }
       node.data ??= {};
       node.data.taskChar = char;
       node.data.hProperties ??= {};
@@ -1194,7 +1204,7 @@ function remarkObsidian(userOpts) {
   }
   const needsTransform = opts.comments || opts.customTaskChars;
   if (!needsTransform) return void 0;
-  return (tree) => {
+  return (tree, file) => {
     if (opts.comments) {
       visit(
         tree,
@@ -1209,7 +1219,7 @@ function remarkObsidian(userOpts) {
       );
     }
     if (opts.customTaskChars) {
-      customTaskCharTransform(tree);
+      customTaskCharTransform(tree, String(file));
     }
   };
 }

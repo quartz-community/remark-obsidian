@@ -1,10 +1,23 @@
 import type { Root } from "mdast";
 import { visit } from "unist-util-visit";
 
-export function customTaskCharTransform(tree: Root) {
+export function customTaskCharTransform(tree: Root, source?: string) {
   visit(tree, "listItem", (node: any) => {
     if (typeof node.checked === "boolean") {
-      const char = node.checked ? "x" : " ";
+      let char = node.checked ? "x" : " ";
+
+      // Recover original character (e.g. "X" vs "x") from source
+      if (source && node.position?.start?.offset != null) {
+        const slice = source.slice(
+          node.position.start.offset,
+          node.position.start.offset + 20,
+        );
+        const m = slice.match(/\[([^\]])\]/);
+        if (m) {
+          char = m[1];
+        }
+      }
+
       node.data ??= {};
       node.data.taskChar = char;
       node.data.hProperties ??= {};

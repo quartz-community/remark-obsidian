@@ -40,7 +40,7 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
 
 export default function remarkObsidian(
   userOpts?: RemarkObsidianOptions,
-): undefined | ((tree: Root) => void) {
+): undefined | ((tree: Root, file: any) => void) {
   const opts = { ...defaultOptions, ...userOpts };
   // @ts-expect-error - unified `this` context
   const data = (this as Processor<Root>).data();
@@ -73,7 +73,7 @@ export default function remarkObsidian(
   const needsTransform = opts.comments || opts.customTaskChars;
   if (!needsTransform) return undefined;
 
-  return (tree: Root) => {
+  return (tree: Root, file: any) => {
     if (opts.comments) {
       visit(
         tree,
@@ -88,7 +88,7 @@ export default function remarkObsidian(
       );
     }
     if (opts.customTaskChars) {
-      customTaskCharTransform(tree);
+      customTaskCharTransform(tree, String(file));
     }
   };
 }

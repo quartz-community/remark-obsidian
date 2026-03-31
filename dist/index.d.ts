@@ -83,7 +83,7 @@ declare function commentToMarkdown(): Options;
 
 declare function tagToMarkdown(): Options;
 
-declare function customTaskCharTransform(tree: Root): void;
+declare function customTaskCharTransform(tree: Root, source?: string): void;
 
 interface RemarkObsidianOptions {
     wikilinks?: boolean;
@@ -92,6 +92,6 @@ interface RemarkObsidianOptions {
     tags?: boolean;
     customTaskChars?: boolean;
 }
-declare function remarkObsidian(userOpts?: RemarkObsidianOptions): undefined | ((tree: Root) => void);
+declare function remarkObsidian(userOpts?: RemarkObsidianOptions): undefined | ((tree: Root, file: any) => void);
 
 export { type Comment, type Highlight, type RemarkObsidianOptions, type Tag, type Wikilink, commentFromMarkdown, commentSyntax, commentToMarkdown, customTaskCharTransform, remarkObsidian as default, highlightFromMarkdown, highlightSyntax, highlightToMarkdown, tagFromMarkdown, tagSyntax, tagToMarkdown, wikilinkFromMarkdown, wikilinkSyntax, wikilinkToMarkdown };

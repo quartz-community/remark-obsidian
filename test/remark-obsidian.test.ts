@@ -17,7 +17,7 @@ function processWithGfm(md: string, opts?: RemarkObsidianOptions) {
     .use(remarkParse)
     .use(remarkGfm)
     .use(remarkObsidian, opts);
-  return processor.runSync(processor.parse(md));
+  return processor.runSync(processor.parse(md), md);
 }
 
 async function toMd(md: string, opts?: RemarkObsidianOptions) {
@@ -325,6 +325,19 @@ describe("remark-obsidian", () => {
     expect(getText(items[0])).toBe("question");
     expect(getText(items[6])).toBe("done");
     expect(getText(items[7])).toBe("todo");
+  });
+
+  it("preserves uppercase X in task checkboxes", () => {
+    const md = ["- [X] done uppercase", "- [x] done lowercase"].join("\n");
+
+    const tree = processWithGfm(md);
+    const items = findNodes(tree, "listItem");
+    expect(items).toHaveLength(2);
+
+    expect(items[0].checked).toBe(true);
+    expect(items[0].data.taskChar).toBe("X");
+    expect(items[1].checked).toBe(true);
+    expect(items[1].data.taskChar).toBe("x");
   });
 
   it("respects customTaskChars option", () => {
