@@ -372,6 +372,46 @@ describe("remark-obsidian", () => {
     expect(html).toContain("checked");
   });
 
+  describe("math support", () => {
+    it("parses inline math into inlineMath nodes", () => {
+      const tree = parse("$x_i$");
+      const nodes = findNodes(tree, "inlineMath");
+      expect(nodes.length).toBe(1);
+      expect(nodes[0].value).toBe("x_i");
+    });
+
+    it("parses display math into math nodes", () => {
+      const tree = parse("$$\nx_{ij} = y\n$$");
+      const nodes = findNodes(tree, "math");
+      expect(nodes.length).toBe(1);
+      expect(nodes[0].value).toBe("x_{ij} = y");
+    });
+
+    it("round-trips inline math without escaping underscores", async () => {
+      expect(await toMd("$x_i$")).toBe("$x_i$\n");
+    });
+
+    it("round-trips inline math with multiple subscripts", async () => {
+      expect(await toMd("$a_{ij} + b_{kl}$")).toBe("$a_{ij} + b_{kl}$\n");
+    });
+
+    it("round-trips display math without escaping", async () => {
+      const input = "$$\nx_{ij} = y\n$$";
+      const result = await toMd(input);
+      expect(result).toContain("x_{ij} = y");
+      expect(result).not.toContain("\\_");
+    });
+
+    it("round-trips inline math with equals sign", async () => {
+      expect(await toMd("$a = b$")).toBe("$a = b$\n");
+    });
+
+    it("does not parse math when math option is false", () => {
+      const tree = parse("$x_i$", { math: false });
+      expect(findNodes(tree, "inlineMath").length).toBe(0);
+    });
+  });
+
   describe("toMarkdown serialization", () => {
     it("round-trips basic wikilinks", async () => {
       expect(await toMd("[[page]]")).toBe("[[page]]\n");

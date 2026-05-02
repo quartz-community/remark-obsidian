@@ -1169,12 +1169,15 @@ function customTaskCharTransform(tree, source) {
 }
 
 // src/index.ts
+import { math as mathSyntax } from "micromark-extension-math";
+import { mathFromMarkdown, mathToMarkdown } from "mdast-util-math";
 var defaultOptions = {
   wikilinks: true,
   highlights: true,
   comments: true,
   tags: true,
-  customTaskChars: true
+  customTaskChars: true,
+  math: true
 };
 function remarkObsidian(userOpts) {
   const opts = { ...defaultOptions, ...userOpts };
@@ -1201,6 +1204,11 @@ function remarkObsidian(userOpts) {
     data.micromarkExtensions.push(highlightSyntax());
     data.fromMarkdownExtensions.push(highlightFromMarkdown());
     data.toMarkdownExtensions.push(highlightToMarkdown());
+  }
+  if (opts.math) {
+    data.micromarkExtensions.push(mathSyntax());
+    data.fromMarkdownExtensions.push(mathFromMarkdown());
+    data.toMarkdownExtensions.push(mathToMarkdown());
   }
   const needsTransform = opts.comments || opts.customTaskChars;
   if (!needsTransform) return void 0;

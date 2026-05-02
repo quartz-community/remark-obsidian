@@ -22,12 +22,16 @@ import { commentToMarkdown } from "./lib/mdast/comment-to-markdown.js";
 import { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 import { customTaskCharTransform } from "./lib/task-char.js";
 
+import { math as mathSyntax } from "micromark-extension-math";
+import { mathFromMarkdown, mathToMarkdown } from "mdast-util-math";
+
 export interface RemarkObsidianOptions {
   wikilinks?: boolean;
   highlights?: boolean;
   comments?: boolean;
   tags?: boolean;
   customTaskChars?: boolean;
+  math?: boolean;
 }
 
 const defaultOptions: Required<RemarkObsidianOptions> = {
@@ -36,6 +40,7 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
   comments: true,
   tags: true,
   customTaskChars: true,
+  math: true,
 };
 
 export default function remarkObsidian(
@@ -68,6 +73,11 @@ export default function remarkObsidian(
     data.micromarkExtensions.push(highlightSyntax());
     data.fromMarkdownExtensions.push(highlightFromMarkdown());
     data.toMarkdownExtensions.push(highlightToMarkdown());
+  }
+  if (opts.math) {
+    data.micromarkExtensions.push(mathSyntax());
+    data.fromMarkdownExtensions.push(mathFromMarkdown());
+    data.toMarkdownExtensions.push(mathToMarkdown());
   }
 
   const needsTransform = opts.comments || opts.customTaskChars;

@@ -24,6 +24,10 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "mdast-util-math": "^3.0.0",
+    "micromark-extension-math": "^3.0.0"
+  },
   "devDependencies": {
     "@types/mdast": "^4.0.4",
     "@types/node": "^22.0.0",

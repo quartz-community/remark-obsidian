@@ -91,6 +91,7 @@ interface RemarkObsidianOptions {
     comments?: boolean;
     tags?: boolean;
     customTaskChars?: boolean;
+    math?: boolean;
 }
 declare function remarkObsidian(userOpts?: RemarkObsidianOptions): undefined | ((tree: Root, file: any) => void);
 
