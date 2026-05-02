@@ -464,7 +464,7 @@ function wikilinkSyntax() {
     }
   };
 }
-function tokenize(effects, ok2, nok) {
+function tokenize(effects, ok3, nok) {
   let hasPath = false;
   let hasHeading = false;
   let hasAlias = false;
@@ -616,7 +616,7 @@ function tokenize(effects, ok2, nok) {
     effects.consume(code);
     effects.exit("wikilinkMarker");
     effects.exit("wikilink");
-    return ok2;
+    return ok3;
   }
 }
 
@@ -632,7 +632,7 @@ function highlightSyntax() {
     }
   };
 }
-function tokenize2(effects, ok2, nok) {
+function tokenize2(effects, ok3, nok) {
   const close = { tokenize: tokenizeClose, partial: true };
   let hasContent = false;
   return start;
@@ -683,7 +683,7 @@ function tokenize2(effects, ok2, nok) {
   }
   function closeAfter(code) {
     effects.exit("highlight");
-    return ok2(code);
+    return ok3(code);
   }
 }
 
@@ -714,7 +714,7 @@ function commentSyntax() {
     }
   };
 }
-function tokenizeText(effects, ok2, nok) {
+function tokenizeText(effects, ok3, nok) {
   const close = { tokenize: tokenizeClose, partial: true };
   return start;
   function start(code) {
@@ -761,10 +761,10 @@ function tokenizeText(effects, ok2, nok) {
   }
   function closeAfter(code) {
     effects.exit("comment");
-    return ok2(code);
+    return ok3(code);
   }
 }
-function tokenizeFlow(effects, ok2, nok) {
+function tokenizeFlow(effects, ok3, nok) {
   const self = this;
   const flowClose = {
     tokenize: tokenizeFlowClose,
@@ -841,7 +841,7 @@ function tokenizeFlow(effects, ok2, nok) {
   }
   function closeAfter(code) {
     effects.exit("comment");
-    return ok2(code);
+    return ok3(code);
   }
   function abandon(code) {
     effects.exit("comment");
@@ -875,12 +875,12 @@ function tokenizeFlow(effects, ok2, nok) {
     }
   }
 }
-function tokenizeNonLazyContinuation(effects, ok2, nok) {
+function tokenizeNonLazyContinuation(effects, ok3, nok) {
   const self = this;
   return start;
   function start(code) {
     if (code === null) {
-      return ok2(code);
+      return ok3(code);
     }
     if (!isLineEnding3(code)) return nok(code);
     effects.enter("lineEnding");
@@ -889,7 +889,7 @@ function tokenizeNonLazyContinuation(effects, ok2, nok) {
     return lineStart;
   }
   function lineStart(code) {
-    return self.parser.lazy[self.now().line] ? nok(code) : ok2(code);
+    return self.parser.lazy[self.now().line] ? nok(code) : ok3(code);
   }
 }
 
@@ -919,13 +919,13 @@ function tagSyntax() {
     }
   };
 }
-function tokenize3(effects, ok2, nok) {
+function tokenize3(effects, ok3, nok) {
   let hasNonDigit = false;
   const context = this;
   return start;
   function start(code) {
-    const previous = context.previous;
-    const allowedStart = previous === null || isWhitespace(previous) || previous === HASH2;
+    const previous2 = context.previous;
+    const allowedStart = previous2 === null || isWhitespace(previous2) || previous2 === HASH2;
     if (!allowedStart) return nok(code);
     if (code !== HASH2) return nok(code);
     effects.enter("tag");
@@ -963,7 +963,7 @@ function tokenize3(effects, ok2, nok) {
     if (!hasNonDigit) return nok(code);
     effects.exit("tagContent");
     effects.exit("tag");
-    return ok2(code);
+    return ok3(code);
   }
 }
 
@@ -1168,9 +1168,535 @@ function customTaskCharTransform(tree, source) {
   });
 }
 
+// node_modules/micromark-util-character/index.js
+var asciiAlpha = regexCheck(/[A-Za-z]/);
+var asciiAlphanumeric = regexCheck(/[\dA-Za-z]/);
+var asciiAtext = regexCheck(/[#-'*+\--9=?A-Z^-~]/);
+var asciiDigit = regexCheck(/\d/);
+var asciiHexDigit = regexCheck(/[\dA-Fa-f]/);
+var asciiPunctuation = regexCheck(/[!-/:-@[-`{-~]/);
+function markdownLineEnding(code) {
+  return code !== null && code < -2;
+}
+function markdownSpace(code) {
+  return code === -2 || code === -1 || code === 32;
+}
+var unicodePunctuation = regexCheck(/\p{P}|\p{S}/u);
+var unicodeWhitespace = regexCheck(/\s/);
+function regexCheck(regex) {
+  return check;
+  function check(code) {
+    return code !== null && code > -1 && regex.test(String.fromCharCode(code));
+  }
+}
+
+// node_modules/micromark-factory-space/index.js
+function factorySpace(effects, ok3, type, max) {
+  const limit = max ? max - 1 : Number.POSITIVE_INFINITY;
+  let size = 0;
+  return start;
+  function start(code) {
+    if (markdownSpace(code)) {
+      effects.enter(type);
+      return prefix(code);
+    }
+    return ok3(code);
+  }
+  function prefix(code) {
+    if (markdownSpace(code) && size++ < limit) {
+      effects.consume(code);
+      return prefix;
+    }
+    effects.exit(type);
+    return ok3(code);
+  }
+}
+
+// node_modules/micromark-extension-math/lib/math-flow.js
+var mathFlow = {
+  tokenize: tokenizeMathFenced,
+  concrete: true,
+  name: "mathFlow"
+};
+var nonLazyContinuation2 = {
+  tokenize: tokenizeNonLazyContinuation2,
+  partial: true
+};
+function tokenizeMathFenced(effects, ok3, nok) {
+  const self = this;
+  const tail = self.events[self.events.length - 1];
+  const initialSize = tail && tail[1].type === "linePrefix" ? tail[2].sliceSerialize(tail[1], true).length : 0;
+  let sizeOpen = 0;
+  return start;
+  function start(code) {
+    effects.enter("mathFlow");
+    effects.enter("mathFlowFence");
+    effects.enter("mathFlowFenceSequence");
+    return sequenceOpen(code);
+  }
+  function sequenceOpen(code) {
+    if (code === 36) {
+      effects.consume(code);
+      sizeOpen++;
+      return sequenceOpen;
+    }
+    if (sizeOpen < 2) {
+      return nok(code);
+    }
+    effects.exit("mathFlowFenceSequence");
+    return factorySpace(effects, metaBefore, "whitespace")(code);
+  }
+  function metaBefore(code) {
+    if (code === null || markdownLineEnding(code)) {
+      return metaAfter(code);
+    }
+    effects.enter("mathFlowFenceMeta");
+    effects.enter("chunkString", {
+      contentType: "string"
+    });
+    return meta(code);
+  }
+  function meta(code) {
+    if (code === null || markdownLineEnding(code)) {
+      effects.exit("chunkString");
+      effects.exit("mathFlowFenceMeta");
+      return metaAfter(code);
+    }
+    if (code === 36) {
+      return nok(code);
+    }
+    effects.consume(code);
+    return meta;
+  }
+  function metaAfter(code) {
+    effects.exit("mathFlowFence");
+    if (self.interrupt) {
+      return ok3(code);
+    }
+    return effects.attempt(nonLazyContinuation2, beforeNonLazyContinuation, after)(code);
+  }
+  function beforeNonLazyContinuation(code) {
+    return effects.attempt({
+      tokenize: tokenizeClosingFence,
+      partial: true
+    }, after, contentStart)(code);
+  }
+  function contentStart(code) {
+    return (initialSize ? factorySpace(effects, beforeContentChunk, "linePrefix", initialSize + 1) : beforeContentChunk)(code);
+  }
+  function beforeContentChunk(code) {
+    if (code === null) {
+      return after(code);
+    }
+    if (markdownLineEnding(code)) {
+      return effects.attempt(nonLazyContinuation2, beforeNonLazyContinuation, after)(code);
+    }
+    effects.enter("mathFlowValue");
+    return contentChunk(code);
+  }
+  function contentChunk(code) {
+    if (code === null || markdownLineEnding(code)) {
+      effects.exit("mathFlowValue");
+      return beforeContentChunk(code);
+    }
+    effects.consume(code);
+    return contentChunk;
+  }
+  function after(code) {
+    effects.exit("mathFlow");
+    return ok3(code);
+  }
+  function tokenizeClosingFence(effects2, ok4, nok2) {
+    let size = 0;
+    return factorySpace(effects2, beforeSequenceClose, "linePrefix", self.parser.constructs.disable.null.includes("codeIndented") ? void 0 : 4);
+    function beforeSequenceClose(code) {
+      effects2.enter("mathFlowFence");
+      effects2.enter("mathFlowFenceSequence");
+      return sequenceClose(code);
+    }
+    function sequenceClose(code) {
+      if (code === 36) {
+        size++;
+        effects2.consume(code);
+        return sequenceClose;
+      }
+      if (size < sizeOpen) {
+        return nok2(code);
+      }
+      effects2.exit("mathFlowFenceSequence");
+      return factorySpace(effects2, afterSequenceClose, "whitespace")(code);
+    }
+    function afterSequenceClose(code) {
+      if (code === null || markdownLineEnding(code)) {
+        effects2.exit("mathFlowFence");
+        return ok4(code);
+      }
+      return nok2(code);
+    }
+  }
+}
+function tokenizeNonLazyContinuation2(effects, ok3, nok) {
+  const self = this;
+  return start;
+  function start(code) {
+    if (code === null) {
+      return ok3(code);
+    }
+    effects.enter("lineEnding");
+    effects.consume(code);
+    effects.exit("lineEnding");
+    return lineStart;
+  }
+  function lineStart(code) {
+    return self.parser.lazy[self.now().line] ? nok(code) : ok3(code);
+  }
+}
+
+// node_modules/micromark-extension-math/lib/math-text.js
+function mathText(options) {
+  const options_ = options || {};
+  let single = options_.singleDollarTextMath;
+  if (single === null || single === void 0) {
+    single = true;
+  }
+  return {
+    tokenize: tokenizeMathText,
+    resolve: resolveMathText,
+    previous,
+    name: "mathText"
+  };
+  function tokenizeMathText(effects, ok3, nok) {
+    const self = this;
+    let sizeOpen = 0;
+    let size;
+    let token;
+    return start;
+    function start(code) {
+      effects.enter("mathText");
+      effects.enter("mathTextSequence");
+      return sequenceOpen(code);
+    }
+    function sequenceOpen(code) {
+      if (code === 36) {
+        effects.consume(code);
+        sizeOpen++;
+        return sequenceOpen;
+      }
+      if (sizeOpen < 2 && !single) {
+        return nok(code);
+      }
+      effects.exit("mathTextSequence");
+      return between(code);
+    }
+    function between(code) {
+      if (code === null) {
+        return nok(code);
+      }
+      if (code === 36) {
+        token = effects.enter("mathTextSequence");
+        size = 0;
+        return sequenceClose(code);
+      }
+      if (code === 32) {
+        effects.enter("space");
+        effects.consume(code);
+        effects.exit("space");
+        return between;
+      }
+      if (markdownLineEnding(code)) {
+        effects.enter("lineEnding");
+        effects.consume(code);
+        effects.exit("lineEnding");
+        return between;
+      }
+      effects.enter("mathTextData");
+      return data(code);
+    }
+    function data(code) {
+      if (code === null || code === 32 || code === 36 || markdownLineEnding(code)) {
+        effects.exit("mathTextData");
+        return between(code);
+      }
+      effects.consume(code);
+      return data;
+    }
+    function sequenceClose(code) {
+      if (code === 36) {
+        effects.consume(code);
+        size++;
+        return sequenceClose;
+      }
+      if (size === sizeOpen) {
+        effects.exit("mathTextSequence");
+        effects.exit("mathText");
+        return ok3(code);
+      }
+      token.type = "mathTextData";
+      return data(code);
+    }
+  }
+}
+function resolveMathText(events) {
+  let tailExitIndex = events.length - 4;
+  let headEnterIndex = 3;
+  let index;
+  let enter;
+  if ((events[headEnterIndex][1].type === "lineEnding" || events[headEnterIndex][1].type === "space") && (events[tailExitIndex][1].type === "lineEnding" || events[tailExitIndex][1].type === "space")) {
+    index = headEnterIndex;
+    while (++index < tailExitIndex) {
+      if (events[index][1].type === "mathTextData") {
+        events[tailExitIndex][1].type = "mathTextPadding";
+        events[headEnterIndex][1].type = "mathTextPadding";
+        headEnterIndex += 2;
+        tailExitIndex -= 2;
+        break;
+      }
+    }
+  }
+  index = headEnterIndex - 1;
+  tailExitIndex++;
+  while (++index <= tailExitIndex) {
+    if (enter === void 0) {
+      if (index !== tailExitIndex && events[index][1].type !== "lineEnding") {
+        enter = index;
+      }
+    } else if (index === tailExitIndex || events[index][1].type === "lineEnding") {
+      events[enter][1].type = "mathTextData";
+      if (index !== enter + 2) {
+        events[enter][1].end = events[index - 1][1].end;
+        events.splice(enter + 2, index - enter - 2);
+        tailExitIndex -= index - enter - 2;
+        index = enter + 2;
+      }
+      enter = void 0;
+    }
+  }
+  return events;
+}
+function previous(code) {
+  return code !== 36 || this.events[this.events.length - 1][1].type === "characterEscape";
+}
+
+// node_modules/micromark-extension-math/lib/syntax.js
+function math(options) {
+  return {
+    flow: {
+      [36]: mathFlow
+    },
+    text: {
+      [36]: mathText(options)
+    }
+  };
+}
+
+// node_modules/devlop/lib/default.js
+function ok2() {
+}
+
+// node_modules/longest-streak/index.js
+function longestStreak(value, substring) {
+  const source = String(value);
+  let index = source.indexOf(substring);
+  let expected = index;
+  let count = 0;
+  let max = 0;
+  if (typeof substring !== "string") {
+    throw new TypeError("Expected substring");
+  }
+  while (index !== -1) {
+    if (index === expected) {
+      if (++count > max) {
+        max = count;
+      }
+    } else {
+      count = 1;
+    }
+    expected = index + substring.length;
+    index = source.indexOf(substring, expected);
+  }
+  return max;
+}
+
+// node_modules/mdast-util-math/lib/index.js
+function mathFromMarkdown() {
+  return {
+    enter: {
+      mathFlow: enterMathFlow,
+      mathFlowFenceMeta: enterMathFlowMeta,
+      mathText: enterMathText
+    },
+    exit: {
+      mathFlow: exitMathFlow,
+      mathFlowFence: exitMathFlowFence,
+      mathFlowFenceMeta: exitMathFlowMeta,
+      mathFlowValue: exitMathData,
+      mathText: exitMathText,
+      mathTextData: exitMathData
+    }
+  };
+  function enterMathFlow(token) {
+    const code = {
+      type: "element",
+      tagName: "code",
+      properties: { className: ["language-math", "math-display"] },
+      children: []
+    };
+    this.enter(
+      {
+        type: "math",
+        meta: null,
+        value: "",
+        data: { hName: "pre", hChildren: [code] }
+      },
+      token
+    );
+  }
+  function enterMathFlowMeta() {
+    this.buffer();
+  }
+  function exitMathFlowMeta() {
+    const data = this.resume();
+    const node = this.stack[this.stack.length - 1];
+    ok2(node.type === "math");
+    node.meta = data;
+  }
+  function exitMathFlowFence() {
+    if (this.data.mathFlowInside) return;
+    this.buffer();
+    this.data.mathFlowInside = true;
+  }
+  function exitMathFlow(token) {
+    const data = this.resume().replace(/^(\r?\n|\r)|(\r?\n|\r)$/g, "");
+    const node = this.stack[this.stack.length - 1];
+    ok2(node.type === "math");
+    this.exit(token);
+    node.value = data;
+    const code = (
+      /** @type {HastElement} */
+      node.data.hChildren[0]
+    );
+    ok2(code.type === "element");
+    ok2(code.tagName === "code");
+    code.children.push({ type: "text", value: data });
+    this.data.mathFlowInside = void 0;
+  }
+  function enterMathText(token) {
+    this.enter(
+      {
+        type: "inlineMath",
+        value: "",
+        data: {
+          hName: "code",
+          hProperties: { className: ["language-math", "math-inline"] },
+          hChildren: []
+        }
+      },
+      token
+    );
+    this.buffer();
+  }
+  function exitMathText(token) {
+    const data = this.resume();
+    const node = this.stack[this.stack.length - 1];
+    ok2(node.type === "inlineMath");
+    this.exit(token);
+    node.value = data;
+    const children = (
+      /** @type {Array<HastElementContent>} */
+      // @ts-expect-error: we defined it in `enterMathFlow`.
+      node.data.hChildren
+    );
+    children.push({ type: "text", value: data });
+  }
+  function exitMathData(token) {
+    this.config.enter.data.call(this, token);
+    this.config.exit.data.call(this, token);
+  }
+}
+function mathToMarkdown(options) {
+  let single = (options || {}).singleDollarTextMath;
+  if (single === null || single === void 0) {
+    single = true;
+  }
+  inlineMath.peek = inlineMathPeek;
+  return {
+    unsafe: [
+      { character: "\r", inConstruct: "mathFlowMeta" },
+      { character: "\n", inConstruct: "mathFlowMeta" },
+      {
+        character: "$",
+        after: single ? void 0 : "\\$",
+        inConstruct: "phrasing"
+      },
+      { character: "$", inConstruct: "mathFlowMeta" },
+      { atBreak: true, character: "$", after: "\\$" }
+    ],
+    handlers: { math: math2, inlineMath }
+  };
+  function math2(node, _, state, info) {
+    const raw = node.value || "";
+    const tracker = state.createTracker(info);
+    const sequence = "$".repeat(Math.max(longestStreak(raw, "$") + 1, 2));
+    const exit = state.enter("mathFlow");
+    let value = tracker.move(sequence);
+    if (node.meta) {
+      const subexit = state.enter("mathFlowMeta");
+      value += tracker.move(
+        state.safe(node.meta, {
+          after: "\n",
+          before: value,
+          encode: ["$"],
+          ...tracker.current()
+        })
+      );
+      subexit();
+    }
+    value += tracker.move("\n");
+    if (raw) {
+      value += tracker.move(raw + "\n");
+    }
+    value += tracker.move(sequence);
+    exit();
+    return value;
+  }
+  function inlineMath(node, _, state) {
+    let value = node.value || "";
+    let size = 1;
+    if (!single) size++;
+    while (new RegExp("(^|[^$])" + "\\$".repeat(size) + "([^$]|$)").test(value)) {
+      size++;
+    }
+    const sequence = "$".repeat(size);
+    if (
+      // Contains non-space.
+      /[^ \r\n]/.test(value) && // Starts with space and ends with space.
+      (/^[ \r\n]/.test(value) && /[ \r\n]$/.test(value) || // Starts or ends with dollar.
+      /^\$|\$$/.test(value))
+    ) {
+      value = " " + value + " ";
+    }
+    let index = -1;
+    while (++index < state.unsafe.length) {
+      const pattern = state.unsafe[index];
+      if (!pattern.atBreak) continue;
+      const expression = state.compilePattern(pattern);
+      let match;
+      while (match = expression.exec(value)) {
+        let position = match.index;
+        if (value.codePointAt(position) === 10 && value.codePointAt(position - 1) === 13) {
+          position--;
+        }
+        value = value.slice(0, position) + " " + value.slice(match.index + 1);
+      }
+    }
+    return sequence + value + sequence;
+  }
+  function inlineMathPeek() {
+    return "$";
+  }
+}
+
 // src/index.ts
-import { math as mathSyntax } from "micromark-extension-math";
-import { mathFromMarkdown, mathToMarkdown } from "mdast-util-math";
 var defaultOptions = {
   wikilinks: true,
   highlights: true,
@@ -1206,7 +1732,7 @@ function remarkObsidian(userOpts) {
     data.toMarkdownExtensions.push(highlightToMarkdown());
   }
   if (opts.math) {
-    data.micromarkExtensions.push(mathSyntax());
+    data.micromarkExtensions.push(math());
     data.fromMarkdownExtensions.push(mathFromMarkdown());
     data.toMarkdownExtensions.push(mathToMarkdown());
   }
