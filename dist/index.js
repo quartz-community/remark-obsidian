@@ -652,8 +652,7 @@ function tokenize2(effects, ok3, nok) {
   }
   function content(code) {
     if (code === null || isLineEnding2(code)) return nok(code);
-    if (!hasContent && (code === EQUALS || code === codes.greaterThan))
-      return nok(code);
+    if (!hasContent && code === EQUALS) return nok(code);
     if (code === EQUALS)
       return effects.attempt(close, closeAfter, contentConsume)(code);
     effects.consume(code);

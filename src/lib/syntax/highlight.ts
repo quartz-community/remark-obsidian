@@ -50,8 +50,7 @@ function tokenize(
 
   function content(code: Code): State | undefined {
     if (code === null || isLineEnding(code)) return nok(code);
-    if (!hasContent && (code === EQUALS || code === codes.greaterThan))
-      return nok(code);
+    if (!hasContent && code === EQUALS) return nok(code);
     if (code === EQUALS)
       return effects.attempt(close, closeAfter, contentConsume)(code);
     effects.consume(code);
