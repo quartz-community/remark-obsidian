@@ -1,4 +1,4 @@
-// node_modules/unist-util-is/lib/index.js
+// ../../node_modules/.pnpm/unist-util-is@6.0.1/node_modules/unist-util-is/lib/index.js
 var convert = (
   // Note: overloads in JSDoc can’t yet use different `@template`s.
   /**
@@ -97,12 +97,12 @@ function looksLikeANode(value) {
   return value !== null && typeof value === "object" && "type" in value;
 }
 
-// node_modules/unist-util-visit-parents/lib/color.node.js
+// ../../node_modules/.pnpm/unist-util-visit-parents@6.0.2/node_modules/unist-util-visit-parents/lib/color.node.js
 function color(d) {
   return "\x1B[33m" + d + "\x1B[39m";
 }
 
-// node_modules/unist-util-visit-parents/lib/index.js
+// ../../node_modules/.pnpm/unist-util-visit-parents@6.0.2/node_modules/unist-util-visit-parents/lib/index.js
 var empty = [];
 var CONTINUE = true;
 var EXIT = false;
@@ -179,7 +179,7 @@ function toResult(value) {
   return value === null || value === void 0 ? empty : [value];
 }
 
-// node_modules/unist-util-visit/lib/index.js
+// ../../node_modules/.pnpm/unist-util-visit@5.1.0/node_modules/unist-util-visit/lib/index.js
 function visit(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
   let reverse;
   let test;
@@ -201,7 +201,7 @@ function visit(tree, testOrVisitor, visitorOrReverse, maybeReverse) {
   }
 }
 
-// node_modules/micromark-util-symbol/lib/codes.js
+// ../../node_modules/.pnpm/micromark-util-symbol@2.0.1/node_modules/micromark-util-symbol/lib/codes.js
 var codes = (
   /** @type {const} */
   {
@@ -1167,7 +1167,7 @@ function customTaskCharTransform(tree, source) {
   });
 }
 
-// node_modules/micromark-util-character/index.js
+// ../../node_modules/.pnpm/micromark-util-character@2.1.1/node_modules/micromark-util-character/index.js
 var asciiAlpha = regexCheck(/[A-Za-z]/);
 var asciiAlphanumeric = regexCheck(/[\dA-Za-z]/);
 var asciiAtext = regexCheck(/[#-'*+\--9=?A-Z^-~]/);
@@ -1189,7 +1189,7 @@ function regexCheck(regex) {
   }
 }
 
-// node_modules/micromark-factory-space/index.js
+// ../../node_modules/.pnpm/micromark-factory-space@2.0.1/node_modules/micromark-factory-space/index.js
 function factorySpace(effects, ok3, type, max) {
   const limit = max ? max - 1 : Number.POSITIVE_INFINITY;
   let size = 0;
@@ -1211,7 +1211,7 @@ function factorySpace(effects, ok3, type, max) {
   }
 }
 
-// node_modules/micromark-extension-math/lib/math-flow.js
+// ../../node_modules/.pnpm/micromark-extension-math@3.1.0/node_modules/micromark-extension-math/lib/math-flow.js
 var mathFlow = {
   tokenize: tokenizeMathFenced,
   concrete: true,
@@ -1351,7 +1351,7 @@ function tokenizeNonLazyContinuation2(effects, ok3, nok) {
   }
 }
 
-// node_modules/micromark-extension-math/lib/math-text.js
+// ../../node_modules/.pnpm/micromark-extension-math@3.1.0/node_modules/micromark-extension-math/lib/math-text.js
 function mathText(options) {
   const options_ = options || {};
   let single = options_.singleDollarTextMath;
@@ -1476,7 +1476,7 @@ function previous(code) {
   return code !== 36 || this.events[this.events.length - 1][1].type === "characterEscape";
 }
 
-// node_modules/micromark-extension-math/lib/syntax.js
+// ../../node_modules/.pnpm/micromark-extension-math@3.1.0/node_modules/micromark-extension-math/lib/syntax.js
 function math(options) {
   return {
     flow: {
@@ -1488,11 +1488,11 @@ function math(options) {
   };
 }
 
-// node_modules/devlop/lib/default.js
+// ../../node_modules/.pnpm/devlop@1.1.0/node_modules/devlop/lib/default.js
 function ok2() {
 }
 
-// node_modules/longest-streak/index.js
+// ../../node_modules/.pnpm/longest-streak@3.1.0/node_modules/longest-streak/index.js
 function longestStreak(value, substring) {
   const source = String(value);
   let index = source.indexOf(substring);
@@ -1516,7 +1516,7 @@ function longestStreak(value, substring) {
   return max;
 }
 
-// node_modules/mdast-util-math/lib/index.js
+// ../../node_modules/.pnpm/mdast-util-math@3.0.0/node_modules/mdast-util-math/lib/index.js
 function mathFromMarkdown() {
   return {
     enter: {

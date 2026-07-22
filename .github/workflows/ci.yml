@@ -1,36 +1,26 @@
 name: CI
 
 on:
-  push:
-    branches: ["main"]
-    tags: ["v*"]
   pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    tags: ["v*"]
 
 jobs:
-  test:
+  check:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: "22"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Test
-        run: npm run test
-
-      - name: Build
-        run: npm run build
-
+          node-version: 22
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format
+      - run: npm run test
+      - run: npm run build
       - name: Verify dist externals
         run: |
           node -e "
@@ -40,7 +30,7 @@ jobs:
           const pkg = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
           const peerDeps = Object.keys(pkg.peerDependencies || {});
           const builtins = new Set(['assert','buffer','child_process','cluster','console','constants','crypto','dgram','dns','domain','events','fs','http','http2','https','inspector','module','net','os','path','perf_hooks','process','punycode','querystring','readline','repl','stream','string_decoder','sys','timers','tls','trace_events','tty','url','util','v8','vm','wasi','worker_threads','zlib']);
-          const shared = ['@quartz-community/','preact','@jackyzha0/quartz','vfile'];
+          const shared = ['@quartz-community/','preact','@jackyzha0/quartz','vfile','unified'];
           const content = fs.readFileSync(dist, 'utf-8');
           const re = /^\s*(?:import\s+.*\s+from|export\s+.*\s+from)\s+[\"']([^\"'./][^\"']*)[\"']/gm;
           const unexpected = new Set();
@@ -64,26 +54,19 @@ jobs:
 
   publish:
     if: startsWith(github.ref, 'refs/tags/v')
+    needs: check
     runs-on: ubuntu-latest
-    needs: [test]
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: "22"
-          cache: "npm"
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Publish
-        run: npm publish --access public
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: npm run build
+      - run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
