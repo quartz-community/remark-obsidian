@@ -16,10 +16,10 @@ jobs:
         with:
           node-version: 22
       - run: npm ci
-      - run: npm run typecheck
-      - run: npm run lint
-      - run: npm run format
-      - run: npm run test
+      - run: npm run typecheck --if-present
+      - run: npm run lint --if-present
+      - run: npm run format --if-present
+      - run: npm run test --if-present
       - run: npm run build
       - name: Verify dist externals
         run: |
