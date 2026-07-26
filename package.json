@@ -1,13 +1,14 @@
 {
   "name": "@quartz-community/remark-obsidian",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Remark plugin for Obsidian-flavored markdown syntax (wikilinks, highlights, comments, tags, arrows).",
   "type": "module",
   "license": "MIT",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
     },
     "./package.json": "./package.json"
   },
