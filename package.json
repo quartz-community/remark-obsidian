@@ -1,6 +1,6 @@
 {
   "name": "@quartz-community/remark-obsidian",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Remark plugin for Obsidian-flavored markdown syntax (wikilinks, highlights, comments, tags, arrows).",
   "type": "module",
   "license": "MIT",

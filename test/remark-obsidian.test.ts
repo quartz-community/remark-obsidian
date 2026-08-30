@@ -481,6 +481,41 @@ describe("remark-obsidian", () => {
       expect(result).toBe("Mix [[page]] ==hi== #tag\n");
     });
 
+    it("round-trips unchecked task list items", async () => {
+      expect(await toMd("- [ ] unchecked")).toBe("* [ ] unchecked\n");
+    });
+
+    it("round-trips checked task list items", async () => {
+      expect(await toMd("- [x] checked")).toBe("* [x] checked\n");
+    });
+
+    it("round-trips uppercase X task list items", async () => {
+      expect(await toMd("- [X] done")).toBe("* [X] done\n");
+    });
+
+    it("round-trips custom task characters", async () => {
+      const input = "- [/] in progress\n- [-] cancelled\n- [>] forwarded\n";
+      const result = await toMd(input);
+      expect(result).toContain("[/] in progress");
+      expect(result).toContain("[-] cancelled");
+      expect(result).toContain("[>] forwarded");
+    });
+
+    it("round-trips mixed task and non-task items", async () => {
+      const input = "- [ ] task\n- regular\n- [x] done\n";
+      const result = await toMd(input);
+      expect(result).toContain("[ ] task");
+      expect(result).toContain("regular");
+      expect(result).toContain("[x] done");
+    });
+
+    it("round-trips nested task lists", async () => {
+      const input = "- [ ] parent\n    - [x] child\n";
+      const result = await toMd(input);
+      expect(result).toContain("[ ] parent");
+      expect(result).toContain("[x] child");
+    });
+
     it("serializes comments when not stripped", async () => {
       // Use lower-level API: parse with comment syntax but don't run
       // the plugin's tree transform that strips comments

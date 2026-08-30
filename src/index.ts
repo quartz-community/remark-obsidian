@@ -21,6 +21,7 @@ import { highlightToMarkdown } from "./lib/mdast/highlight-to-markdown.js";
 import { commentToMarkdown } from "./lib/mdast/comment-to-markdown.js";
 import { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 import { customTaskCharTransform } from "./lib/task-char.js";
+import { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 
 import { math as mathSyntax } from "micromark-extension-math";
 import { mathFromMarkdown, mathToMarkdown } from "mdast-util-math";
@@ -80,6 +81,10 @@ export default function remarkObsidian(
     data.toMarkdownExtensions.push(mathToMarkdown());
   }
 
+  if (opts.customTaskChars) {
+    data.toMarkdownExtensions.push(taskCharToMarkdown());
+  }
+
   const needsTransform = opts.comments || opts.customTaskChars;
   if (!needsTransform) return undefined;
 
@@ -117,5 +122,6 @@ export { highlightToMarkdown } from "./lib/mdast/highlight-to-markdown.js";
 export { commentToMarkdown } from "./lib/mdast/comment-to-markdown.js";
 export { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 export { customTaskCharTransform } from "./lib/task-char.js";
+export { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 
 export type { Wikilink, Highlight, Comment, Tag } from "./lib/types.js";
