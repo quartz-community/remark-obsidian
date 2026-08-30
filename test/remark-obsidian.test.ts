@@ -205,6 +205,22 @@ describe("remark-obsidian", () => {
     expect(texts).toContain("after");
   });
 
+  it("does not crash on flow comment with lazy continuation", () => {
+    expect(() => parse("> %%\nlazy line\n%%")).not.toThrow();
+  });
+
+  it("does not crash on unterminated flow comment at EOF", () => {
+    expect(() => parse("%%\nunclosed comment")).not.toThrow();
+    expect(() => parse("%%")).not.toThrow();
+    expect(() => parse("before\n%%\nfirst\n\nsecond")).not.toThrow();
+  });
+
+  it("does not crash on flow comment with CRLF line endings", () => {
+    expect(() => parse("%%\r\ncomment\r\n%%")).not.toThrow();
+    expect(() => parse("%%\r\nunclosed")).not.toThrow();
+    expect(() => parse("before\r\n%%\r\nblock\r\n%%\r\nafter")).not.toThrow();
+  });
+
   it("does not parse highlights inside code", () => {
     const fenced = parse("```\n==not a highlight==\n```");
     expect(findNodes(fenced, "highlight").length).toBe(0);

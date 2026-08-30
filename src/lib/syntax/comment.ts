@@ -140,14 +140,20 @@ function tokenizeFlow(
     return afterOpen;
   }
 
+  // Once the opening %% is confirmed, we must never nok().
+  // Concrete flow constructs that nok() after entering tokens
+  // corrupt the event stream and crash subtokenize's SpliceBuffer.
   function afterOpen(code: Code): State | undefined {
-    if (code === null) return nok(code);
+    if (code === null) {
+      effects.exit("comment");
+      return ok(code);
+    }
 
     if (isLineEnding(code)) {
       return effects.attempt(
         nonLazyContinuation,
         beforeContentChunk,
-        abandon,
+        afterLazy,
       )(code);
     }
 
@@ -157,14 +163,15 @@ function tokenizeFlow(
 
   function beforeContentChunk(code: Code): State | undefined {
     if (code === null) {
-      return abandon(code);
+      effects.exit("comment");
+      return ok(code);
     }
 
     if (isLineEnding(code)) {
       return effects.attempt(
         nonLazyContinuation,
         beforeContentChunk,
-        abandon,
+        afterLazy,
       )(code);
     }
 
@@ -183,7 +190,11 @@ function tokenizeFlow(
   }
 
   function contentChunk(code: Code): State | undefined {
-    if (code === null) return abandon(code);
+    if (code === null) {
+      effects.exit("commentContent");
+      effects.exit("comment");
+      return ok(code);
+    }
 
     if (code === PERCENT) {
       return effects.attempt(flowClose, closeAfter, contentConsume)(code);
@@ -194,7 +205,7 @@ function tokenizeFlow(
       return effects.attempt(
         nonLazyContinuation,
         beforeContentChunk,
-        abandon,
+        afterLazy,
       )(code);
     }
 
@@ -203,7 +214,11 @@ function tokenizeFlow(
   }
 
   function contentConsume(code: Code): State | undefined {
-    if (code === null) return abandon(code);
+    if (code === null) {
+      effects.exit("commentContent");
+      effects.exit("comment");
+      return ok(code);
+    }
     effects.consume(code);
     return contentChunk;
   }
@@ -213,9 +228,10 @@ function tokenizeFlow(
     return ok(code);
   }
 
-  function abandon(code: Code): State | undefined {
+  // Lazy continuation: close the comment cleanly instead of nok().
+  function afterLazy(code: Code): State | undefined {
     effects.exit("comment");
-    return nok(code);
+    return ok(code);
   }
 
   function tokenizeFlowClose(
