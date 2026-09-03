@@ -99,7 +99,7 @@ describe("remark-obsidian", () => {
     const escapedHeadingAlias = parse("![[image#heading\\|800]]");
     const [escapedHeadingAliasNode] = findNodes(
       escapedHeadingAlias,
-      "wikilink",
+      "wikilink"
     );
     expect(escapedHeadingAliasNode.embedded).toBe(true);
     expect(escapedHeadingAliasNode.path).toBe("image");
@@ -163,7 +163,7 @@ describe("remark-obsidian", () => {
     expect(findNodes(block, "comment").length).toBe(0);
     const paragraphs = findNodes(block, "paragraph");
     const texts = paragraphs.flatMap((p: any) =>
-      findNodes(p, "text").map((n: any) => n.value),
+      findNodes(p, "text").map((n: any) => n.value)
     );
     expect(texts).toContain("before");
     expect(texts).toContain("after");
@@ -171,12 +171,12 @@ describe("remark-obsidian", () => {
 
   it("strips block comments containing empty lines", () => {
     const block = processWithGfm(
-      "before\n%%\nfirst line\n\nsecond line\n%%\nafter",
+      "before\n%%\nfirst line\n\nsecond line\n%%\nafter"
     );
     expect(findNodes(block, "comment").length).toBe(0);
     const paragraphs = findNodes(block, "paragraph");
     const texts = paragraphs.flatMap((p: any) =>
-      findNodes(p, "text").map((n: any) => n.value),
+      findNodes(p, "text").map((n: any) => n.value)
     );
     expect(texts).toContain("before");
     expect(texts).toContain("after");
@@ -188,7 +188,7 @@ describe("remark-obsidian", () => {
     expect(findNodes(block, "comment").length).toBe(0);
     const paragraphs = findNodes(block, "paragraph");
     const texts = paragraphs.flatMap((p: any) =>
-      findNodes(p, "text").map((n: any) => n.value),
+      findNodes(p, "text").map((n: any) => n.value)
     );
     expect(texts).toContain("before");
     expect(texts).toContain("after");
@@ -199,7 +199,7 @@ describe("remark-obsidian", () => {
     expect(findNodes(block, "comment").length).toBe(0);
     const paragraphs = findNodes(block, "paragraph");
     const texts = paragraphs.flatMap((p: any) =>
-      findNodes(p, "text").map((n: any) => n.value),
+      findNodes(p, "text").map((n: any) => n.value)
     );
     expect(texts).toContain("before");
     expect(texts).toContain("after");
@@ -258,6 +258,21 @@ describe("remark-obsidian", () => {
     const afterSpace = parse("hello #tag");
     const [afterSpaceNode] = findNodes(afterSpace, "tag");
     expect(afterSpaceNode.value).toBe("tag");
+  });
+
+  it("parses tags beginning with a non-BMP emoji", () => {
+    // micromark yields UTF-16 code units, so an astral emoji reaches the
+    // tokenizer as two lone surrogates (📚 = U+1F4DA = 0xD83D 0xDCDA).
+    const emoji = parse("#📚/status/finished #🗓️/2024/01/07");
+    expect(findNodes(emoji, "tag").map((node) => node.value)).toEqual([
+      "📚/status/finished",
+      "🗓️/2024/01/07",
+    ]);
+
+    // A leading emoji satisfies the non-digit requirement, so a date-shaped
+    // tag is still a tag rather than being rejected like bare "#123".
+    const dateLike = parse("#🗓️/2024");
+    expect(findNodes(dateLike, "tag").length).toBe(1);
   });
 
   it("parses tags immediately followed by wikilink on next line", () => {
@@ -435,7 +450,7 @@ describe("remark-obsidian", () => {
 
     it("round-trips wikilinks with alias", async () => {
       expect(await toMd("[[page|display name]]")).toBe(
-        "[[page|display name]]\n",
+        "[[page|display name]]\n"
       );
     });
 
@@ -445,7 +460,7 @@ describe("remark-obsidian", () => {
 
     it("round-trips wikilinks with heading and alias", async () => {
       expect(await toMd("[[page#heading|alias]]")).toBe(
-        "[[page#heading|alias]]\n",
+        "[[page#heading|alias]]\n"
       );
     });
 
@@ -455,7 +470,7 @@ describe("remark-obsidian", () => {
 
     it("round-trips embedded wikilinks with alias", async () => {
       expect(await toMd("![[image.png|alt 100x200]]")).toBe(
-        "![[image.png|alt 100x200]]\n",
+        "![[image.png|alt 100x200]]\n"
       );
     });
 
