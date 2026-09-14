@@ -42,13 +42,19 @@ export function commentSyntax(): Extension {
   };
 }
 
+// A token may never span a line ending. `commentContent` is therefore closed
+// before each line break and reopened after it, with a real `lineEnding` token
+// in between. Omitting those tokens desynchronizes micromark's linked
+// `chunkText` chain and makes `subtokenize` read past its splice buffer.
 function tokenizeText(
   this: TokenizeContext,
   effects: Effects,
   ok: State,
   nok: State,
 ): State {
-  const close: Construct = { tokenize: tokenizeClose, partial: true };
+  const closeFromContent = createClose(true);
+  const closeFromBoundary = createClose(false);
+
   return start;
 
   function start(code: Code): State | undefined {
@@ -63,51 +69,97 @@ function tokenizeText(
     if (code !== PERCENT) return nok(code);
     effects.consume(code);
     effects.exit("commentMarker");
+    return atContentBoundary;
+  }
+
+  function atContentBoundary(code: Code): State | undefined {
+    if (code === null) return nok(code);
+
+    if (isLineEnding(code)) {
+      return effects.attempt(nonLazyContinuation, atContentBoundary, nok)(code);
+    }
+
+    if (code === PERCENT) {
+      return effects.attempt(closeFromBoundary, closeAfter, startContent)(code);
+    }
+
     effects.enter("commentContent");
+    effects.consume(code);
+    return content;
+  }
+
+  function startContent(code: Code): State | undefined {
+    if (code === null) return nok(code);
+    effects.enter("commentContent");
+    effects.consume(code);
     return content;
   }
 
   function content(code: Code): State | undefined {
-    if (code === null) return nok(code);
-    if (code === PERCENT)
-      return effects.attempt(close, closeAfter, contentConsume)(code);
+    if (code === null) {
+      effects.exit("commentContent");
+      return nok(code);
+    }
+
+    if (isLineEnding(code)) {
+      effects.exit("commentContent");
+
+      return effects.attempt(nonLazyContinuation, atContentBoundary, nok)(code);
+    }
+
+    if (code === PERCENT) {
+      return effects.attempt(
+        closeFromContent,
+        closeAfter,
+        contentConsume,
+      )(code);
+    }
+
     effects.consume(code);
     return content;
   }
 
   function contentConsume(code: Code): State | undefined {
-    if (code === null) return nok(code);
+    if (code === null) {
+      effects.exit("commentContent");
+      return nok(code);
+    }
     effects.consume(code);
     return content;
-  }
-
-  function tokenizeClose(
-    this: TokenizeContext,
-    closeEffects: Effects,
-    closeOk: State,
-    closeNok: State,
-  ): State {
-    return closeStart;
-
-    function closeStart(closeCode: Code): State | undefined {
-      if (closeCode !== PERCENT) return closeNok(closeCode);
-      closeEffects.exit("commentContent");
-      closeEffects.enter("commentMarker");
-      closeEffects.consume(closeCode);
-      return closeSecond;
-    }
-
-    function closeSecond(closeCode: Code): State | undefined {
-      if (closeCode !== PERCENT) return closeNok(closeCode);
-      closeEffects.consume(closeCode);
-      closeEffects.exit("commentMarker");
-      return closeOk;
-    }
   }
 
   function closeAfter(code: Code): State | undefined {
     effects.exit("comment");
     return ok(code);
+  }
+
+  function createClose(hasOpenContent: boolean): Construct {
+    return {
+      partial: true,
+      tokenize: function tokenizeClose(
+        this: TokenizeContext,
+        closeEffects: Effects,
+        closeOk: State,
+        closeNok: State,
+      ): State {
+        return closeStart;
+
+        function closeStart(closeCode: Code): State | undefined {
+          if (closeCode !== PERCENT) return closeNok(closeCode);
+          if (hasOpenContent) closeEffects.exit("commentContent");
+          closeEffects.enter("commentMarker");
+          closeEffects.consume(closeCode);
+          return closeSecond;
+        }
+
+        function closeSecond(closeCode: Code): State | undefined {
+          if (closeCode !== PERCENT) return closeNok(closeCode);
+          closeEffects.consume(closeCode);
+          closeEffects.exit("commentMarker");
+          return closeOk;
+        }
+      },
+    };
   }
 }
 

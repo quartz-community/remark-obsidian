@@ -11,7 +11,11 @@ import { codes } from "micromark-util-symbol";
 const EQUALS = 61;
 
 function isLineEnding(code: Code): boolean {
-  return code === codes.lineFeed || code === codes.carriageReturn;
+  return (
+    code === codes.lineFeed ||
+    code === codes.carriageReturn ||
+    code === codes.carriageReturnLineFeed
+  );
 }
 
 export function highlightSyntax(): Extension {

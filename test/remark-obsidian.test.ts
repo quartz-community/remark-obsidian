@@ -221,6 +221,78 @@ describe("remark-obsidian", () => {
     expect(() => parse("before\r\n%%\r\nblock\r\n%%\r\nafter")).not.toThrow();
   });
 
+  // Regression: a text construct that consumes line endings without emitting
+  // `lineEnding` tokens desynchronizes micromark's chunked token chain, so
+  // `subtokenize` scans past its splice buffer and throws a RangeError.
+  it("does not crash on inline comment spanning multiple line endings", () => {
+    expect(() => parse("a%%\nb%%")).not.toThrow();
+    expect(() => parse("a%%\nb\nc%%")).not.toThrow();
+    expect(() => parse("a%%\nb\nc\nd%%")).not.toThrow();
+    expect(() =>
+      parse("Note text %%TODO\nfix this\nlater%% end."),
+    ).not.toThrow();
+  });
+
+  it("does not crash on inline comment spanning lines inside containers", () => {
+    expect(() => parse("> a%%\n> b\n> c%%")).not.toThrow();
+    expect(() => parse("- a%%\n  b\n  c%%")).not.toThrow();
+    expect(() => parse("| a%%\nb\nc%% |")).not.toThrow();
+  });
+
+  it("does not crash on inline comment with CRLF line endings", () => {
+    expect(() => parse("a%%\r\nb\r\nc%%")).not.toThrow();
+    expect(() => parse("a%%\r\nb\r\nc\r\nd%%")).not.toThrow();
+  });
+
+  it("does not crash on unterminated inline comment", () => {
+    expect(() => parse("a%%\nb\nc")).not.toThrow();
+    expect(() => parse("a%%b")).not.toThrow();
+    expect(() => parse("a%%")).not.toThrow();
+  });
+
+  it("does not crash on inline comment with lazy continuation", () => {
+    expect(() => parse("> a%%\nlazy line\nmore%%")).not.toThrow();
+    expect(() => parse("- a%%\nlazy line\nmore%%")).not.toThrow();
+  });
+
+  it("does not crash on highlights spanning CRLF line endings", () => {
+    expect(() => parse("a==b\r\nc\r\nd==")).not.toThrow();
+    expect(() => parse("a==b\r\nc\r\nd\r\ne==")).not.toThrow();
+    expect(() => parse("a==b\nc\nd==")).not.toThrow();
+  });
+
+  it("does not crash on wikilinks spanning CRLF line endings", () => {
+    expect(() => parse("a[[b\r\nc\r\nd]]")).not.toThrow();
+    expect(() => parse("a[[b\r\nc\r\nd\r\ne]]")).not.toThrow();
+    expect(() => parse("a[[b\nc\nd]]")).not.toThrow();
+  });
+
+  it("does not treat line-broken highlights or wikilinks as markup", () => {
+    expect(findNodes(parse("a==b\r\nc=="), "highlight").length).toBe(0);
+    expect(findNodes(parse("a[[b\r\nc]]"), "wikilink").length).toBe(0);
+  });
+
+  it("strips inline comments spanning multiple line endings", () => {
+    const block = processWithGfm("before a%%\nhidden\nmore hidden%% after");
+    expect(findNodes(block, "comment").length).toBe(0);
+    const texts = findNodes(block, "text").map((n: any) => n.value);
+    expect(texts.join(" ")).toContain("before a");
+    expect(texts.join(" ")).toContain("after");
+    expect(texts.join(" ")).not.toContain("hidden");
+  });
+
+  it("keeps text following a multiline inline comment intact", () => {
+    const tree = processWithGfm("start %%c1\nc2\nc3%% [[link]] end");
+    expect(findNodes(tree, "comment").length).toBe(0);
+    const [link] = findNodes(tree, "wikilink");
+    expect(link.path).toBe("link");
+    expect(
+      findNodes(tree, "text")
+        .map((n: any) => n.value)
+        .join(" "),
+    ).toContain("end");
+  });
+
   it("does not parse highlights inside code", () => {
     const fenced = parse("```\n==not a highlight==\n```");
     expect(findNodes(fenced, "highlight").length).toBe(0);
@@ -536,6 +608,31 @@ describe("remark-obsidian", () => {
 
       const result = await processor.process("%%hidden%%");
       expect(String(result)).toBe("%%hidden%%\n");
+    });
+
+    it("preserves line endings in multiline comment values", async () => {
+      const processor = unified()
+        .use(remarkParse)
+        .use(remarkObsidian, { comments: false, customTaskChars: false })
+        .use(remarkStringify);
+
+      const data = processor.data();
+      const { commentSyntax, commentFromMarkdown, commentToMarkdown } =
+        await import("../src/index.js");
+      data.micromarkExtensions ??= [];
+      data.fromMarkdownExtensions ??= [];
+      data.toMarkdownExtensions ??= [];
+      data.micromarkExtensions.push(commentSyntax());
+      data.fromMarkdownExtensions.push(commentFromMarkdown());
+      data.toMarkdownExtensions.push(commentToMarkdown());
+
+      expect(String(await processor.process("a%%b\nc%%"))).toBe("a%%b\nc%%\n");
+      expect(String(await processor.process("a%%b\nc\nd%%"))).toBe(
+        "a%%b\nc\nd%%\n",
+      );
+      expect(String(await processor.process("%%\nblock\ncomment\n%%"))).toBe(
+        "%%\nblock\ncomment\n%%\n",
+      );
     });
   });
 });

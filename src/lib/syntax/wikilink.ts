@@ -15,7 +15,11 @@ const RIGHT_BRACKET = 93;
 const PIPE = 124;
 
 function isLineEnding(code: Code): boolean {
-  return code === codes.lineFeed || code === codes.carriageReturn;
+  return (
+    code === codes.lineFeed ||
+    code === codes.carriageReturn ||
+    code === codes.carriageReturnLineFeed
+  );
 }
 
 export function wikilinkSyntax(): Extension {
