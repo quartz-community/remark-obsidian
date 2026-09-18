@@ -124,4 +124,12 @@ export { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 export { customTaskCharTransform } from "./lib/task-char.js";
 export { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 
+export {
+  isWikilink,
+  isEmbed,
+  collectWikilinks,
+  collectEmbedPaths,
+} from "./lib/collect.js";
+
 export type { Wikilink, Highlight, Comment, Tag } from "./lib/types.js";
+export type { CollectWikilinksOptions } from "./lib/collect.js";
