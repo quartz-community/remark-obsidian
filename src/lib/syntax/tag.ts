@@ -12,6 +12,9 @@ const SLASH = 47;
 const DASH = 45;
 const UNDERSCORE = 95;
 
+const HIGH_SURROGATE_START = 0xd800;
+const LOW_SURROGATE_END = 0xdfff;
+
 const tagCharRegex = /[\p{L}\p{M}\p{Emoji}]/u;
 
 function isWhitespace(code: Code): boolean {
@@ -28,6 +31,10 @@ function isTagChar(code: Code): boolean {
   if (code === null || code < 0) return false;
   if (code >= 48 && code <= 57) return true;
   if (code === DASH || code === UNDERSCORE) return true;
+  // micromark tokenizes over UTF-16 code units, so a non-BMP character arrives
+  // as two lone surrogates. Neither half is L, M or Emoji on its own — it is Cs
+  // — so testing them individually would reject every astral emoji tag.
+  if (code >= HIGH_SURROGATE_START && code <= LOW_SURROGATE_END) return true;
   return tagCharRegex.test(String.fromCodePoint(code));
 }
 
@@ -48,7 +55,7 @@ function tokenize(
   this: TokenizeContext,
   effects: Effects,
   ok: State,
-  nok: State,
+  nok: State
 ): State {
   let hasNonDigit = false;
   const context = this;
