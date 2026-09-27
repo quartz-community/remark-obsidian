@@ -53,7 +53,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-09-27T18:57:54.960Z",
+  "recordedAt": "2026-09-27T20:39:26.298Z",
   "cases": {
     "math/list-boundary": {
       "id": "math/list-boundary",
@@ -5796,7 +5796,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate"
+      "triage": "replicate",
+      "note": "Needs micromark's `previous` guard relaxed, which is safe for our tokenizer alone but crashes while stock remark-math is co-registered for `$`. Unblocked by removing the duplicate registration upstream."
     },
     "token/inline-math/doubled-close": {
       "id": "token/inline-math/doubled-close",
@@ -5832,7 +5833,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "token/inline-math/empty": {
       "id": "token/inline-math/empty",
@@ -6333,26 +6334,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: `text $$x+1$$ text` and `# $$x^2$$` should NOT render as math at all; display `$$` is intended to work only on its own line/block. Both Obsidian's display-math and our inline-math are wrong, so do not mirror. Revisit when the upstream fix ships.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "$$x^2$$$$",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "$$x^2$$$$"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/display-math/empty": {
       "id": "token/display-math/empty",
@@ -6523,7 +6505,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "token/display-math/escaped-close": {
       "id": "token/display-math/escaped-close",
@@ -6619,26 +6601,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: display `$$` should only work on its own line/block. A half-escaped closer leaves one unescaped `$`, so Obsidian falls back to single-dollar inline math spanning newlines. Do not mirror.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "$$x^2$$",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "\\$$x^2\\$$"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/display-math/newline-escaped-close": {
       "id": "token/display-math/newline-escaped-close",
@@ -12610,7 +12573,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     }
   }
 }
