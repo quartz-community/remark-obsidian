@@ -69,6 +69,7 @@ const QUARTZ_DEFAULT: ChainProfile = {
     tags: true,
     customTaskChars: false,
     math: true,
+    taskReparse: true,
   },
   rehypeObsidian: {
     blockReferences: true,
@@ -89,6 +90,7 @@ const ALL_FEATURES: ChainProfile = {
     tags: true,
     customTaskChars: true,
     math: true,
+    taskReparse: true,
   },
   rehypeObsidian: {
     blockReferences: true,
@@ -203,8 +205,11 @@ export function parseOurs(
     .use(remarkGfm)
     .use(remarkMath)
     .use(remarkBreaks);
-  const tree = processor.parse(applyTextTransform(markdown));
-  return processor.runSync(tree) as MdRoot;
+  // The source must be passed: transforms that need the original text, such as
+  // custom task characters and display-math classification, read it off the file.
+  const source = applyTextTransform(markdown);
+  const tree = processor.parse(source);
+  return processor.runSync(tree, source) as MdRoot;
 }
 
 export type { HastRoot };

@@ -70,6 +70,8 @@ export function mathTextSyntax(): Construct {
 
   return {
     name: "obsidianMathText",
+    // Must stay upstream's guard: the delegated tokenizer asserts it again
+    // internally, so relaxing it here crashes under micromark's dev build.
     previous: base.previous,
     resolve: base.resolve,
     tokenize(

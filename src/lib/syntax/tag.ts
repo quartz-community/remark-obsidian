@@ -11,6 +11,7 @@ const HASH = 35;
 const SLASH = 47;
 const DASH = 45;
 const UNDERSCORE = 95;
+const ASTERISK = 42;
 
 const tagCharRegex = /[\p{L}\p{M}\p{Emoji}]/u;
 
@@ -28,6 +29,9 @@ function isTagChar(code: Code): boolean {
   if (code === null || code < 0) return false;
   if (code >= 48 && code <= 57) return true;
   if (code === DASH || code === UNDERSCORE) return true;
+  // `#` and `*` are emoji keycap bases, so `\p{Emoji}` matches them. Without this
+  // `#tag#tag` reads as the single tag `tag#tag`; Obsidian yields two.
+  if (code === HASH || code === ASTERISK) return false;
   // micromark yields UTF-16 code units, so an emoji arrives as two surrogates and
   // neither half matches a unicode property escape. Test them by range instead.
   if (code >= 0xd800 && code <= 0xdfff) return true;
@@ -60,8 +64,17 @@ function tokenize(
 
   function start(code: Code): State | undefined {
     const previous = context.previous;
+    // Obsidian also starts a tag straight after an inline construct, so
+    // `a**b**#next` and `a[[t]]#next` tag `next` while `foo#next` does not. The
+    // boundary is the end of a construct, not the character before it.
+    const last = context.events[context.events.length - 1];
+    const afterConstruct =
+      !!last && last[0] === "exit" && last[1].type !== "data";
     const allowedStart =
-      previous === null || isWhitespace(previous) || previous === HASH;
+      previous === null ||
+      isWhitespace(previous) ||
+      previous === HASH ||
+      afterConstruct;
     if (!allowedStart) return nok(code);
     if (code !== HASH) return nok(code);
     effects.enter("tag");

@@ -31,6 +31,58 @@ const nonLazyContinuation: Construct = {
   partial: true,
 };
 
+/**
+ * Rewindable lookahead for a second `%%` later on the opening line. Obsidian
+ * prefers an inline comment whenever one could close on the same line, so
+ * `%%text%%` is a paragraph containing a hidden comment rather than a block
+ * comment. A block comment only wins when the construct spans lines.
+ */
+const noCloserOnOpeningLine: Construct = {
+  partial: true,
+  tokenize(effects, ok, nok) {
+    return start;
+
+    function start(code: Code): State | undefined {
+      if (code !== PERCENT) return nok(code);
+      effects.enter("chunkString", { contentType: "string" });
+      effects.consume(code);
+      return second;
+    }
+
+    function second(code: Code): State | undefined {
+      if (code !== PERCENT) return nok(code);
+      effects.consume(code);
+      return scan;
+    }
+
+    function scan(code: Code): State | undefined {
+      if (code === null || isLineEnding(code)) {
+        effects.exit("chunkString");
+        return ok(code);
+      }
+      if (code === PERCENT) {
+        effects.consume(code);
+        return maybeCloser;
+      }
+      effects.consume(code);
+      return scan;
+    }
+
+    function maybeCloser(code: Code): State | undefined {
+      if (code === PERCENT) {
+        effects.exit("chunkString");
+        return nok(code);
+      }
+      if (code === null || isLineEnding(code)) {
+        effects.exit("chunkString");
+        return ok(code);
+      }
+      effects.consume(code);
+      return scan;
+    }
+  },
+};
+
 export function commentSyntax(): Extension {
   return {
     text: {
@@ -175,7 +227,11 @@ function tokenizeFlow(
     partial: true,
   };
 
-  return start;
+  return checkOpeningLine;
+
+  function checkOpeningLine(code: Code): State | undefined {
+    return effects.check(noCloserOnOpeningLine, start, nok)(code);
+  }
 
   function start(code: Code): State | undefined {
     if (code !== PERCENT) return nok(code);

@@ -301,6 +301,42 @@ describe("remark-obsidian", () => {
     expect(findNodes(parse("==text=="), "highlight").length).toBe(1);
   });
 
+  it("classifies $$..$$ as display math wherever it appears, like Obsidian", () => {
+    const inline = processWithGfm("$$E=mc^2$$");
+    const [node] = findNodes(inline, "inlineMath");
+    expect(node.data?.display).toBe(true);
+    expect(node.data?.hProperties?.className).toContain("math-display");
+
+    const [single] = findNodes(processWithGfm("text $x^2$ text"), "inlineMath");
+    expect(single.data?.display).toBeUndefined();
+  });
+
+  it("reparses a task body as block markdown, like Obsidian", () => {
+    const ordered = processWithGfm("- [ ] 1.");
+    const [item] = findNodes(ordered, "listItem");
+    expect(item.children[0].type).toBe("list");
+
+    const quote = processWithGfm("- [ ] > quote");
+    const [quoteItem] = findNodes(quote, "listItem");
+    expect(quoteItem.children[0].type).toBe("blockquote");
+
+    // A body that stays a paragraph is where both agree; leave it alone.
+    const plain = processWithGfm("- [ ] just text");
+    const [plainItem] = findNodes(plain, "listItem");
+    expect(plainItem.children[0].type).toBe("paragraph");
+  });
+
+  it("ends a tag at the next hash and starts one after an inline construct", () => {
+    expect(
+      findNodes(parse("#tag#tag"), "tag").map((n: any) => n.value),
+    ).toEqual(["tag", "tag"]);
+    expect(
+      findNodes(parse("a**b**#next"), "tag").map((n: any) => n.value),
+    ).toEqual(["next"]);
+    expect(findNodes(parse("foo#next"), "tag").length).toBe(0);
+    expect(findNodes(parse("(foo)#next"), "tag").length).toBe(0);
+  });
+
   it("does not treat a currency amount as inline math", () => {
     expect(findNodes(parse("$5 and $10"), "inlineMath").length).toBe(0);
     expect(findNodes(parse("costs $20,000 today"), "inlineMath").length).toBe(

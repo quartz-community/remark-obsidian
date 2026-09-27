@@ -167,7 +167,10 @@ export function projectMdast(
       return;
     }
     if (node.type === "inlineMath") {
-      math.push({ display: false, tex: (node as ValueNode).value });
+      const display = Boolean(
+        (node as { data?: { display?: boolean } }).data?.display,
+      );
+      math.push({ display, tex: (node as ValueNode).value });
       return;
     }
     if (node.type === "math") {

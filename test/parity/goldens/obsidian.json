@@ -53,7 +53,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-09-27T17:55:52.964Z",
+  "recordedAt": "2026-09-27T18:57:54.960Z",
   "cases": {
     "math/list-boundary": {
       "id": "math/list-boundary",
@@ -512,31 +512,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: `text $$x+1$$ text` and `# $$x^2$$` should NOT render as math at all; display `$$` is intended to work only on its own line/block. Both Obsidian's display-math and our inline-math are wrong, so do not mirror. Revisit when the upstream fix ships.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [
-            {
-              "display": false,
-              "tex": "E=mc^2"
-            }
-          ],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "⟨math⟩",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "$$E=mc^2$$"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "math/inline": {
       "id": "math/inline",
@@ -1856,28 +1832,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: known problem. `#` after an inline construct should not start a tag; our whitespace/start-of-line rule is the intended behaviour. Forum 82901.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [
-            "tag#tag"
-          ],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "#tag#tag",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "#tag#tag"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "tag/emoji": {
       "id": "tag/emoji",
@@ -2471,33 +2426,7 @@
           "footnotes": []
         }
       },
-      "triage": "accepted",
-      "note": "Obsidian keeps a section for the comment; we delete the node outright. Rendered text agrees, so the representation differs but the output does not.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [
-            "1:Heading 1",
-            "1:Heading 2"
-          ],
-          "tasks": [],
-          "highlights": [],
-          "text": "Heading 1 Heading 2",
-          "sections": [
-            {
-              "type": "heading",
-              "text": "# Heading 1"
-            },
-            {
-              "type": "heading",
-              "text": "# Heading 2"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "comment/unterminated": {
       "id": "comment/unterminated",
@@ -2699,31 +2628,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Obsidian reading mode re-parses text after a task marker as block markdown; Live Preview does not. Reported behaviour, deliberately not mirrored.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [
-            {
-              "char": " ",
-              "checked": false
-            }
-          ],
-          "highlights": [],
-          "text": "1.",
-          "sections": [
-            {
-              "type": "list",
-              "text": "- [ ] 1."
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "task/reparse-paren": {
       "id": "task/reparse-paren",
@@ -2760,31 +2665,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Obsidian reading mode re-parses text after a task marker as block markdown; Live Preview does not. Reported behaviour, deliberately not mirrored.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [
-            {
-              "char": " ",
-              "checked": false
-            }
-          ],
-          "highlights": [],
-          "text": "1) text",
-          "sections": [
-            {
-              "type": "list",
-              "text": "- [ ] 1) text"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "task/reparse-bullet": {
       "id": "task/reparse-bullet",
@@ -2821,31 +2702,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Obsidian reading mode re-parses text after a task marker as block markdown; Live Preview does not. Reported behaviour, deliberately not mirrored.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [
-            {
-              "char": " ",
-              "checked": false
-            }
-          ],
-          "highlights": [],
-          "text": "- bullet",
-          "sections": [
-            {
-              "type": "list",
-              "text": "- [ ] - bullet"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "task/reparse-quote": {
       "id": "task/reparse-quote",
@@ -2882,31 +2739,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Obsidian reading mode re-parses text after a task marker as block markdown; Live Preview does not. Reported behaviour, deliberately not mirrored.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [
-            {
-              "char": " ",
-              "checked": false
-            }
-          ],
-          "highlights": [],
-          "text": "> quote",
-          "sections": [
-            {
-              "type": "list",
-              "text": "- [ ] > quote"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "task/reparse-plain": {
       "id": "task/reparse-plain",
@@ -5337,21 +5170,7 @@
           "footnotes": []
         }
       },
-      "triage": "accepted",
-      "note": "Obsidian keeps a section for the comment; we delete the node outright. Rendered text agrees, so the representation differs but the output does not.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "",
-          "sections": []
-        }
-      }
+      "triage": "match"
     },
     "token/comment/no-closer": {
       "id": "token/comment/no-closer",
@@ -5525,21 +5344,7 @@
           "footnotes": []
         }
       },
-      "triage": "accepted",
-      "note": "Obsidian keeps a section for the comment; we delete the node outright. Rendered text agrees, so the representation differs but the output does not.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "",
-          "sections": []
-        }
-      }
+      "triage": "match"
     },
     "token/comment/whitespace-body": {
       "id": "token/comment/whitespace-body",
@@ -5571,21 +5376,7 @@
           "footnotes": []
         }
       },
-      "triage": "accepted",
-      "note": "Obsidian keeps a section for the comment; we delete the node outright. Rendered text agrees, so the representation differs but the output does not.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "",
-          "sections": []
-        }
-      }
+      "triage": "match"
     },
     "token/comment/nested": {
       "id": "token/comment/nested",
@@ -5681,8 +5472,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "We ignore the backslash in the closing delimiter and close anyway; Obsidian correctly treats it as literal. Same root as over-matching a single `$`. Ours to fix."
+      "triage": "match"
     },
     "token/comment/both-escaped": {
       "id": "token/comment/both-escaped",
@@ -5838,21 +5628,7 @@
           "footnotes": []
         }
       },
-      "triage": "accepted",
-      "note": "Obsidian keeps a section for the comment; we delete the node outright. Rendered text agrees, so the representation differs but the output does not.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "",
-          "sections": []
-        }
-      }
+      "triage": "match"
     },
     "token/comment/unicode-body": {
       "id": "token/comment/unicode-body",
@@ -5884,21 +5660,7 @@
           "footnotes": []
         }
       },
-      "triage": "accepted",
-      "note": "Obsidian keeps a section for the comment; we delete the node outright. Rendered text agrees, so the representation differs but the output does not.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "",
-          "sections": []
-        }
-      }
+      "triage": "match"
     },
     "token/inline-math/balanced": {
       "id": "token/inline-math/balanced",
@@ -6174,31 +5936,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: `text $$x+1$$ text` and `# $$x^2$$` should NOT render as math at all; display `$$` is intended to work only on its own line/block. Both Obsidian's display-math and our inline-math are wrong, so do not mirror. Revisit when the upstream fix ships.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [
-            {
-              "display": false,
-              "tex": "x^2"
-            }
-          ],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "⟨math⟩",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "$$x^2$$"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/inline-math/escaped-open": {
       "id": "token/inline-math/escaped-open",
@@ -6686,31 +6424,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: `text $$x+1$$ text` and `# $$x^2$$` should NOT render as math at all; display `$$` is intended to work only on its own line/block. Both Obsidian's display-math and our inline-math are wrong, so do not mirror. Revisit when the upstream fix ships.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [
-            {
-              "display": false,
-              "tex": " "
-            }
-          ],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "⟨math⟩",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "$$ $$"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/display-math/nested": {
       "id": "token/display-math/nested",
@@ -6756,7 +6470,7 @@
         "projections": {
           "math": [
             {
-              "display": false,
+              "display": true,
               "tex": "x^2"
             }
           ],
@@ -6852,7 +6566,7 @@
         "projections": {
           "math": [
             {
-              "display": false,
+              "display": true,
               "tex": "x^2\\"
             }
           ],
@@ -7032,31 +6746,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: `text $$x+1$$ text` and `# $$x^2$$` should NOT render as math at all; display `$$` is intended to work only on its own line/block. Both Obsidian's display-math and our inline-math are wrong, so do not mirror. Revisit when the upstream fix ships.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [
-            {
-              "display": false,
-              "tex": "x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2"
-            }
-          ],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "⟨math⟩",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "$$x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2$$"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/display-math/unicode-body": {
       "id": "token/display-math/unicode-body",
@@ -7092,31 +6782,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: `text $$x+1$$ text` and `# $$x^2$$` should NOT render as math at all; display `$$` is intended to work only on its own line/block. Both Obsidian's display-math and our inline-math are wrong, so do not mirror. Revisit when the upstream fix ships.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [
-            {
-              "display": false,
-              "tex": "日本語テスト"
-            }
-          ],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "⟨math⟩",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "$$日本語テスト$$"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "context/heading/wikilink": {
       "id": "context/heading/wikilink",
@@ -9433,7 +9099,7 @@
         "projections": {
           "math": [
             {
-              "display": false,
+              "display": true,
               "tex": "x^2"
             }
           ],
@@ -9488,31 +9154,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: `text $$x+1$$ text` and `# $$x^2$$` should NOT render as math at all; display `$$` is intended to work only on its own line/block. Both Obsidian's display-math and our inline-math are wrong, so do not mirror. Revisit when the upstream fix ships.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [
-            {
-              "display": false,
-              "tex": "x^2"
-            }
-          ],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "⟨math⟩",
-          "sections": [
-            {
-              "type": "list",
-              "text": "- $$x^2$$"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "context/ordered-item/display-math": {
       "id": "context/ordered-item/display-math",
@@ -9548,31 +9190,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: `text $$x+1$$ text` and `# $$x^2$$` should NOT render as math at all; display `$$` is intended to work only on its own line/block. Both Obsidian's display-math and our inline-math are wrong, so do not mirror. Revisit when the upstream fix ships.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [
-            {
-              "display": false,
-              "tex": "x^2"
-            }
-          ],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "⟨math⟩",
-          "sections": [
-            {
-              "type": "list",
-              "text": "1. $$x^2$$"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "context/task-item/display-math": {
       "id": "context/task-item/display-math",
@@ -9613,36 +9231,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: `text $$x+1$$ text` and `# $$x^2$$` should NOT render as math at all; display `$$` is intended to work only on its own line/block. Both Obsidian's display-math and our inline-math are wrong, so do not mirror. Revisit when the upstream fix ships.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [
-            {
-              "display": false,
-              "tex": "x^2"
-            }
-          ],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [
-            {
-              "char": " ",
-              "checked": false
-            }
-          ],
-          "highlights": [],
-          "text": "⟨math⟩",
-          "sections": [
-            {
-              "type": "list",
-              "text": "- [ ] $$x^2$$"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "context/nested-list/display-math": {
       "id": "context/nested-list/display-math",
@@ -9678,31 +9267,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: `text $$x+1$$ text` and `# $$x^2$$` should NOT render as math at all; display `$$` is intended to work only on its own line/block. Both Obsidian's display-math and our inline-math are wrong, so do not mirror. Revisit when the upstream fix ships.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [
-            {
-              "display": false,
-              "tex": "x^2"
-            }
-          ],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "outer ⟨math⟩",
-          "sections": [
-            {
-              "type": "list",
-              "text": "- outer\n  - $$x^2$$"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "context/blockquote/display-math": {
       "id": "context/blockquote/display-math",
@@ -9738,31 +9303,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: `text $$x+1$$ text` and `# $$x^2$$` should NOT render as math at all; display `$$` is intended to work only on its own line/block. Both Obsidian's display-math and our inline-math are wrong, so do not mirror. Revisit when the upstream fix ships.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [
-            {
-              "display": false,
-              "tex": "x^2"
-            }
-          ],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "⟨math⟩",
-          "sections": [
-            {
-              "type": "blockquote",
-              "text": "> $$x^2$$"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "context/callout/display-math": {
       "id": "context/callout/display-math",
@@ -9835,31 +9376,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: `text $$x+1$$ text` and `# $$x^2$$` should NOT render as math at all; display `$$` is intended to work only on its own line/block. Both Obsidian's display-math and our inline-math are wrong, so do not mirror. Revisit when the upstream fix ships.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [
-            {
-              "display": false,
-              "tex": "x^2"
-            }
-          ],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "H ⟨math⟩",
-          "sections": [
-            {
-              "type": "table",
-              "text": "| H |\n| --- |\n| $$x^2$$ |"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "context/code-span/display-math": {
       "id": "context/code-span/display-math",
@@ -10879,32 +10396,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: known problem. `#` after an inline construct should not start a tag; our whitespace/start-of-line rule is the intended behaviour. Forum 82901.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [
-            {
-              "path": "target",
-              "heading": "",
-              "embedded": false
-            }
-          ],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "target#next",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "[[target]]#next"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "adjacency/wikilink/dollar": {
       "id": "adjacency/wikilink/dollar",
@@ -11392,32 +10884,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: known problem. `#` after an inline construct should not start a tag; our whitespace/start-of-line rule is the intended behaviour. Forum 82901.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [
-            {
-              "path": "target",
-              "heading": "",
-              "embedded": true
-            }
-          ],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "target#next",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "![[target]]#next"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "adjacency/embed/dollar": {
       "id": "adjacency/embed/dollar",
@@ -11839,28 +11306,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: known problem. `#` after an inline construct should not start a tag; our whitespace/start-of-line rule is the intended behaviour. Forum 82901.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [
-            "text"
-          ],
-          "text": "text#next",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "==text==#next"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "adjacency/highlight/dollar": {
       "id": "adjacency/highlight/dollar",
@@ -12118,26 +11564,7 @@
           "footnotes": []
         }
       },
-      "triage": "accepted",
-      "note": "Obsidian keeps a section for the comment; we delete the node outright. Rendered text agrees, so the representation differs but the output does not.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "next",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "next"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "adjacency/comment/blank-line": {
       "id": "adjacency/comment/blank-line",
@@ -12173,26 +11600,7 @@
           "footnotes": []
         }
       },
-      "triage": "accepted",
-      "note": "Obsidian keeps a section for the comment; we delete the node outright. Rendered text agrees, so the representation differs but the output does not.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "next",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "next"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "adjacency/comment/crlf": {
       "id": "adjacency/comment/crlf",
@@ -12224,26 +11632,7 @@
           "footnotes": []
         }
       },
-      "triage": "accepted",
-      "note": "Obsidian keeps a section for the comment; we delete the node outright. Rendered text agrees, so the representation differs but the output does not.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "next",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "next"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "adjacency/comment/immediate-text": {
       "id": "adjacency/comment/immediate-text",
@@ -12311,26 +11700,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: known problem. `#` after an inline construct should not start a tag; our whitespace/start-of-line rule is the intended behaviour. Forum 82901.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "#next",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "%%text%%#next"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "adjacency/comment/dollar": {
       "id": "adjacency/comment/dollar",
@@ -12764,28 +12134,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: known problem. `#` after an inline construct should not start a tag; our whitespace/start-of-line rule is the intended behaviour. Forum 82901.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [
-            "tag#next"
-          ],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "#tag#next",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "#tag#next"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "adjacency/tag/dollar": {
       "id": "adjacency/tag/dollar",
@@ -13225,31 +12574,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: known problem. `#` after an inline construct should not start a tag; our whitespace/start-of-line rule is the intended behaviour. Forum 82901.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [
-            {
-              "display": false,
-              "tex": "x"
-            }
-          ],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "⟨math⟩#next",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "$x$#next"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "adjacency/inline-math/dollar": {
       "id": "adjacency/inline-math/dollar",

@@ -21,6 +21,8 @@ import { highlightToMarkdown } from "./lib/mdast/highlight-to-markdown.js";
 import { commentToMarkdown } from "./lib/mdast/comment-to-markdown.js";
 import { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 import { customTaskCharTransform } from "./lib/task-char.js";
+import { mathDisplayTransform } from "./lib/math-display.js";
+import { taskReparseTransform } from "./lib/task-reparse.js";
 import { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 
 import { math as mathSyntax } from "micromark-extension-math";
@@ -34,6 +36,7 @@ export interface RemarkObsidianOptions {
   tags?: boolean;
   customTaskChars?: boolean;
   math?: boolean;
+  taskReparse?: boolean;
 }
 
 const defaultOptions: Required<RemarkObsidianOptions> = {
@@ -43,6 +46,7 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
   tags: true,
   customTaskChars: true,
   math: true,
+  taskReparse: true,
 };
 
 export default function remarkObsidian(
@@ -50,7 +54,8 @@ export default function remarkObsidian(
 ): undefined | ((tree: Root, file: any) => void) {
   const opts = { ...defaultOptions, ...userOpts };
   // @ts-expect-error - unified `this` context
-  const data = (this as Processor<Root>).data();
+  const self = this as Processor<Root>;
+  const data = self.data();
 
   data.micromarkExtensions ??= [];
   data.fromMarkdownExtensions ??= [];
@@ -89,7 +94,8 @@ export default function remarkObsidian(
     data.toMarkdownExtensions.push(taskCharToMarkdown());
   }
 
-  const needsTransform = opts.comments || opts.customTaskChars;
+  const needsTransform =
+    opts.comments || opts.customTaskChars || opts.math || opts.taskReparse;
   if (!needsTransform) return undefined;
 
   return (tree: Root, file: any) => {
@@ -109,6 +115,16 @@ export default function remarkObsidian(
     if (opts.customTaskChars) {
       customTaskCharTransform(tree, String(file));
     }
+    if (opts.math) {
+      mathDisplayTransform(tree, String(file));
+    }
+    if (opts.taskReparse) {
+      taskReparseTransform(
+        tree,
+        String(file),
+        (markdown) => self.runSync(self.parse(markdown), markdown) as Root,
+      );
+    }
   };
 }
 
@@ -126,6 +142,8 @@ export { highlightToMarkdown } from "./lib/mdast/highlight-to-markdown.js";
 export { commentToMarkdown } from "./lib/mdast/comment-to-markdown.js";
 export { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 export { customTaskCharTransform } from "./lib/task-char.js";
+export { mathDisplayTransform } from "./lib/math-display.js";
+export { taskReparseTransform } from "./lib/task-reparse.js";
 export { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 
 export {
