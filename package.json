@@ -24,7 +24,7 @@
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:parity": "vitest run test/parity",
-    "parity:record": "wdio run ./wdio.conf.mts",
+    "parity:record": "NODE_OPTIONS=--conditions=development wdio run ./wdio.conf.mts",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.parity.json --noEmit",

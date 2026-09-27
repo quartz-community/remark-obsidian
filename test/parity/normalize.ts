@@ -46,11 +46,12 @@ interface HeadingNode extends Node {
 const isType = <T extends Node>(node: Node, type: string): node is T =>
   node.type === type;
 
-/** Concatenate the text descendants of a node. */
+/** Text descendants, with hard breaks kept so a multi-line highlight compares. */
 function textOf(node: Node): string {
   let out = "";
-  visit(node, "text", (child: Node) => {
-    out += (child as ValueNode).value;
+  visit(node, (child: Node) => {
+    if (child.type === "text") out += (child as ValueNode).value;
+    else if (child.type === "break") out += "\n";
   });
   return out;
 }
@@ -81,9 +82,13 @@ export function mdastText(tree: Root): string {
         return;
       case "wikilink": {
         const link = node as WikilinkNode;
-        // Obsidian's anchor text for an un-aliased heading link is "page > heading".
+        // An embed shows its target; its alias slot holds dimensions, not display
+        // text. A plain link shows its alias, or "page > heading" when un-aliased.
         parts.push(
-          link.alias || [link.path, link.heading].filter(Boolean).join(" > "),
+          link.embedded
+            ? link.path
+            : link.alias ||
+                [link.path, link.heading].filter(Boolean).join(" > "),
         );
         return;
       }
@@ -91,11 +96,13 @@ export function mdastText(tree: Root): string {
         parts.push(`#${(node as ValueNode).value}`);
         return;
       case "inlineMath":
-      case "math":
         parts.push("\u27e8math\u27e9");
         return;
+      case "math":
+        parts.push("\u27e8math\u27e9 ");
+        return;
       case "code":
-        parts.push((node as ValueNode).value);
+        parts.push(`${(node as ValueNode).value} `);
         return;
       case "html":
         // Obsidian's textContent has no markup, so compare inner text only.

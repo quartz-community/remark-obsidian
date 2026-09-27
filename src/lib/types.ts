@@ -54,6 +54,9 @@ declare module "micromark-util-types" {
     highlight: "highlight";
     highlightMarker: "highlightMarker";
     highlightContent: "highlightContent";
+    highlightSequence: "highlightSequence";
+    highlightSequenceTemporary: "highlightSequenceTemporary";
+    highlightText: "highlightText";
     comment: "comment";
     commentMarker: "commentMarker";
     commentContent: "commentContent";

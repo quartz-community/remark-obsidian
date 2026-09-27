@@ -1,6 +1,11 @@
 import { PROFILES, type ProfileName } from "./chain.js";
 import { projectOurs } from "./normalize.js";
-import { PROJECTION_KEYS, type GoldenCase, type Projections } from "./types.js";
+import {
+  PINNED_STATES,
+  PROJECTION_KEYS,
+  type GoldenCase,
+  type Projections,
+} from "./types.js";
 
 export interface Divergence {
   readonly key: keyof Projections;
@@ -16,6 +21,8 @@ export interface CaseResult {
   readonly profile: ProfileName;
   readonly matched: boolean;
   readonly divergences: readonly Divergence[];
+  /** Our parser threw. Never an acceptable divergence, whatever the triage says. */
+  readonly crash?: string;
 }
 
 const PROFILE_NAMES = Object.keys(PROFILES) as ProfileName[];
@@ -59,13 +66,15 @@ export function compareCase(golden: GoldenCase, mathTex = false): CaseResult {
       const ours = projectOurs(golden.markdown, profile);
       divergences = diffProjections(golden.obsidian.projections, ours, mathTex);
     } catch (error) {
-      divergences = [
-        {
-          key: "text",
-          obsidian: golden.obsidian.projections.text,
-          ours: `THREW: ${error instanceof Error ? error.message : String(error)}`,
-        },
-      ];
+      return {
+        id: golden.id,
+        category: golden.category,
+        triage: golden.triage,
+        profile,
+        matched: false,
+        divergences: [],
+        crash: error instanceof Error ? error.message : String(error),
+      };
     }
 
     if (divergences.length === 0) {
@@ -97,9 +106,12 @@ export function compareCase(golden: GoldenCase, mathTex = false): CaseResult {
 /**
  * A regression gate, not a perfection gate. `match` is the contract: those cases
  * must keep matching. `replicate` is the known backlog, so it may diverge without
- * failing, and `unreviewed` fails to force triage of newly recorded cases.
+ * failing. `report-upstream`, `upstream-undecided`, `out-of-scope` and `accepted`
+ * are likewise expected to diverge. Only `unreviewed` fails, to force triage of
+ * newly recorded cases.
  */
 export function isGateFailure(result: CaseResult): boolean {
+  if (result.crash) return true;
   if (result.triage === "unreviewed") return true;
   return !result.matched && result.triage === "match";
 }
@@ -109,7 +121,71 @@ export function isStaleTriage(result: CaseResult): boolean {
   return result.matched && result.triage === "replicate";
 }
 
+export interface PinDrift {
+  readonly id: string;
+  readonly triage: GoldenCase["triage"];
+  readonly key: keyof Projections;
+  readonly pinned: unknown;
+  readonly now: unknown;
+}
+
+/**
+ * For a deliberate divergence, check our own output still matches what was pinned.
+ * `isGateFailure` only guards `match` cases, so without this the exception ledger
+ * documents intent while leaving the actual behaviour unprotected.
+ */
+export function pinDrift(golden: GoldenCase, mathTex: boolean): PinDrift[] {
+  if (!golden.ours || !PINNED_STATES.has(golden.triage)) return [];
+  const profile = (
+    PROFILE_NAMES.includes(golden.ours.profile as ProfileName)
+      ? golden.ours.profile
+      : PROFILE_NAMES[0]
+  ) as ProfileName;
+
+  let current: Projections;
+  try {
+    current = projectOurs(golden.markdown, profile);
+  } catch (error) {
+    return [
+      {
+        id: golden.id,
+        triage: golden.triage,
+        key: "text",
+        pinned: golden.ours.projections.text,
+        now: `THREW: ${error instanceof Error ? error.message : String(error)}`,
+      },
+    ];
+  }
+
+  const pinned = alignMath(golden.ours.projections, mathTex);
+  const now = alignMath(current, mathTex);
+  const out: PinDrift[] = [];
+  for (const key of PROJECTION_KEYS) {
+    if (JSON.stringify(pinned[key]) !== JSON.stringify(now[key])) {
+      out.push({
+        id: golden.id,
+        triage: golden.triage,
+        key,
+        pinned: pinned[key],
+        now: now[key],
+      });
+    }
+  }
+  return out;
+}
+
+export function formatPinDrift(d: PinDrift): string {
+  return [
+    `\u2717 ${d.id} [${d.triage}] ${d.key}`,
+    `      pinned: ${JSON.stringify(d.pinned)}`,
+    `      now:    ${JSON.stringify(d.now)}`,
+  ].join("\n");
+}
+
 export function formatResult(result: CaseResult): string {
+  if (result.crash) {
+    return `\u2717 ${result.id} [${result.profile}] CRASHED: ${result.crash}`;
+  }
   if (result.matched) return `\u2713 ${result.id} [${result.profile}]`;
   const lines = [
     `\u2717 ${result.id} [${result.profile}] triage=${result.triage}`,

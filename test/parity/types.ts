@@ -58,9 +58,20 @@ export type TriageState =
   | "match"
   | "replicate"
   | "report-upstream"
+  | "upstream-undecided"
   | "out-of-scope"
   | "accepted"
   | "unreviewed";
+
+/**
+ * Our own output, pinned for cases we have deliberately chosen to diverge on.
+ * Without this the exception list records *why* we diverge but not *how*, so a
+ * deliberate divergence could silently drift into a different wrong answer.
+ */
+export interface PinnedOurs {
+  readonly profile: string;
+  readonly projections: Projections;
+}
 
 export interface GoldenCase {
   readonly id: string;
@@ -74,7 +85,15 @@ export interface GoldenCase {
   };
   triage: TriageState;
   note?: string;
+  ours?: PinnedOurs;
 }
+
+/** Triage states whose divergence is a decision, so our side gets pinned. */
+export const PINNED_STATES: ReadonlySet<TriageState> = new Set([
+  "report-upstream",
+  "upstream-undecided",
+  "accepted",
+]);
 
 /** What the recording Obsidian was able to tell us, so the gate can scale its claims. */
 export interface OracleCapabilities {

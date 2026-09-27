@@ -267,9 +267,46 @@ describe("remark-obsidian", () => {
     expect(() => parse("a[[b\nc\nd]]")).not.toThrow();
   });
 
-  it("does not treat line-broken highlights or wikilinks as markup", () => {
-    expect(findNodes(parse("a==b\r\nc=="), "highlight").length).toBe(0);
+  it("does not treat line-broken wikilinks as markup", () => {
     expect(findNodes(parse("a[[b\r\nc]]"), "wikilink").length).toBe(0);
+  });
+
+  // Obsidian highlights span line endings: `==a\nb==` yields a single highlight
+  // containing "a\nb". Verified against Obsidian 1.13.7 by the parity harness
+  // (`highlight/across-newline`, `token/highlight/newline-body`).
+  it("treats line-broken highlights as markup, like Obsidian", () => {
+    const highlights = findNodes(parse("a==b\r\nc=="), "highlight");
+    expect(highlights.length).toBe(1);
+    const text = findNodes(highlights[0], "text")
+      .map((n: any) => n.value)
+      .join("");
+    expect(text).toContain("b");
+    expect(text).toContain("c");
+  });
+
+  it("parses nested emphasis inside a highlight", () => {
+    const [node] = findNodes(parse("==a **b** c=="), "highlight");
+    expect(node).toBeDefined();
+    expect(findNodes(node, "strong").length).toBe(1);
+  });
+
+  it("requires highlight delimiters to flank their content, like Obsidian", () => {
+    expect(findNodes(parse("before ==text == after"), "highlight").length).toBe(
+      0,
+    );
+    expect(findNodes(parse("before == text== after"), "highlight").length).toBe(
+      0,
+    );
+    expect(findNodes(parse("== =="), "highlight").length).toBe(0);
+    expect(findNodes(parse("==text=="), "highlight").length).toBe(1);
+  });
+
+  it("does not treat a currency amount as inline math", () => {
+    expect(findNodes(parse("$5 and $10"), "inlineMath").length).toBe(0);
+    expect(findNodes(parse("costs $20,000 today"), "inlineMath").length).toBe(
+      0,
+    );
+    expect(findNodes(parse("text $x^2$ text"), "inlineMath").length).toBe(1);
   });
 
   it("strips inline comments spanning multiple line endings", () => {

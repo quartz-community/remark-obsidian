@@ -189,28 +189,7 @@ function tokenizeFlow(
     if (code !== PERCENT) return nok(code);
     effects.consume(code);
     effects.exit("commentMarker");
-    return afterOpen;
-  }
-
-  // Once the opening %% is confirmed, we must never nok().
-  // Concrete flow constructs that nok() after entering tokens
-  // corrupt the event stream and crash subtokenize's SpliceBuffer.
-  function afterOpen(code: Code): State | undefined {
-    if (code === null) {
-      effects.exit("comment");
-      return ok(code);
-    }
-
-    if (isLineEnding(code)) {
-      return effects.attempt(
-        nonLazyContinuation,
-        beforeContentChunk,
-        afterLazy,
-      )(code);
-    }
-
-    effects.enter("commentContent");
-    return contentChunk(code);
+    return beforeContentChunk;
   }
 
   function beforeContentChunk(code: Code): State | undefined {
@@ -275,12 +254,15 @@ function tokenizeFlow(
     return contentChunk;
   }
 
+  // Flow owns whole lines, so succeeding mid-line trips micromark's `expected eol
+  // or eof`. `%%x%% trailing` must nok here and re-parse as a paragraph, where the
+  // text tokenizer handles the comment inline.
   function closeAfter(code: Code): State | undefined {
+    if (code !== null && !isLineEnding(code)) return nok(code);
     effects.exit("comment");
     return ok(code);
   }
 
-  // Lazy continuation: close the comment cleanly instead of nok().
   function afterLazy(code: Code): State | undefined {
     effects.exit("comment");
     return ok(code);

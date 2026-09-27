@@ -45,3 +45,4 @@ dist/
 # run, and the workspace file churns whenever Obsidian opens it.
 test-vault/__parity__/
 test-vault/.obsidian/workspace.json
+test-vault/.obsidian/graph.json

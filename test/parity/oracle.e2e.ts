@@ -15,9 +15,15 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { browser } from "@wdio/globals";
 import { obsidianPage } from "wdio-obsidian-service";
-import { CHAIN_MANIFEST } from "./chain.js";
+import { CHAIN_MANIFEST, type ProfileName } from "./chain.js";
+import { projectOurs } from "./normalize.js";
 import { buildCorpus, caseFileName, type Case } from "./corpus.js";
-import type { GoldenCase, MetaProjections, Projections } from "./types.js";
+import {
+  PINNED_STATES,
+  type GoldenCase,
+  type MetaProjections,
+  type Projections,
+} from "./types.js";
 
 const GOLDEN_PATH = path.resolve("test/parity/goldens/obsidian.json");
 const FIXTURE_DIR = "__parity__";
@@ -373,6 +379,23 @@ describe("Obsidian parity oracle", () => {
       };
     }
 
+    // Pin our own output for every deliberate divergence, so the exception ledger
+    // protects behaviour rather than only recording intent.
+    for (const golden of Object.values(cases)) {
+      if (!PINNED_STATES.has(golden.triage)) continue;
+      const previousProfile = previous[golden.id]?.ours?.profile;
+      const profile: ProfileName =
+        previousProfile === "all-features" ? "all-features" : "quartz-default";
+      try {
+        golden.ours = {
+          profile,
+          projections: projectOurs(golden.markdown, profile),
+        };
+      } catch {
+        /* a throwing case stays unpinned; the gate reports it as a normal divergence */
+      }
+    }
+
     const appVersion = await browser.getObsidianVersion();
     const installerVersion = await browser.getObsidianInstallerVersion();
     const mathTex = (await browser.executeObsidian(
@@ -412,11 +435,12 @@ describe("Obsidian parity oracle", () => {
    * *display* while agreeing on the parse. Anything outside this set means the
    * detached oracle has stopped being a faithful proxy.
    */
+  const SURPLUS_TABLE_CELLS =
+    "An unescaped pipe splits the row into more cells than the header declares. Reading View renders the surplus cells, the detached container drops them. Both parses agree (metadataCache reports no link and no math respectively), so this is rendering, not parsing.";
+
   const KNOWN_PROXY_DIVERGENCES = new Map<string, string>([
-    [
-      "wikilink/table-unescaped",
-      "Reading View still shows the alias text inside the split cell; detached render truncates at the pipe. metadataCache reports no link in both, so the parse agrees.",
-    ],
+    ["wikilink/table-unescaped", SURPLUS_TABLE_CELLS],
+    ["math/in-table-pipe", SURPLUS_TABLE_CELLS],
   ]);
 
   it("agrees with a real Reading View on the seed layer", async () => {

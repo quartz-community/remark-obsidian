@@ -1,8 +1,15 @@
 # Obsidian parity harness
 
-This package exists to match Obsidian, including Obsidian's bugs. That claim is
-only meaningful if it is measured against real Obsidian, so this harness renders a
-generated corpus inside the actual application and compares the result to ours.
+This package targets the reading-mode and `metadataCache` semantics of a named
+public Obsidian release. That is a measurable claim only against real Obsidian, so
+this harness renders a generated corpus inside the actual application and compares
+the result to ours.
+
+It is deliberately **not** "match Obsidian including every bug". Where Obsidian has
+an acknowledged defect the package may diverge on purpose, and every such case is
+enumerated in the goldens with a triage state and a reason. "Reading view" alone is
+also underspecified — the golden file stamps the exact app and installer version it
+was recorded against.
 
 ## Two phases
 
@@ -15,7 +22,11 @@ gate run on every pull request.
 | `npm run parity:record`            | yes            | weekly schedule, or by hand |
 
 `parity:record` boots Obsidian, renders all corpus cases, and rewrites
-`goldens/obsidian.json`. The gate reads those committed goldens and compares them
+`goldens/obsidian.json`. It runs with `--conditions=development` so micromark's
+assertions are active, matching vitest: without that the recorder pins output
+produced under a build where invariant violations pass silently, and the gate then
+reports drift for cases that never really agreed. That mismatch is how a real
+`expected eol or eof` violation in the comment tokenizer stayed hidden. The gate reads those committed goldens and compares them
 against our own output. A full recording takes about 25 seconds.
 
 ## Running the recorder
@@ -90,6 +101,21 @@ Instead both sides are reduced to the projections in `types.ts`:
 
 Two of these deserve explanation.
 
+**metadataCache tracks reading view, not live preview.** Obsidian has two parsers
+and they genuinely disagree, so the harness needs to know which one the API
+reflects. Measured on 1.14.2, across cases where the modes provably differ:
+
+| Input                        | Live preview        | Reading view          | metadataCache            |
+| ---------------------------- | ------------------- | --------------------- | ------------------------ |
+| `$$` block swallowing a link | link is live        | link eaten by math    | `links: []` — reading    |
+| `- [ ] 1.`                   | flat, 2 items       | reparsed, nested      | `listItems: 4` — reading |
+| `[[A[[B]]]]`                 | outer-ish           | inner wins, links `B` | `links: ["B"]` — reading |
+| `**unterminated`             | styles bold forward | no emphasis           | no signal recorded       |
+
+Every discriminating case sides with reading view, and none with live preview. So
+reading view plus `metadataCache` form one consistent oracle, and there is no need
+for a second live-preview oracle. That is why `sections` can be trusted.
+
 **`sections` is the primary oracle.** It is Obsidian's own block-level parse with
 byte offsets, so slicing the source shows exactly what the parser consumed. A
 `math` section that runs past its closing `$$` is direct evidence of a swallowed
@@ -141,17 +167,22 @@ Every case carries a `triage` state. The gate is a **regression** gate, not a
 perfection gate — a perfection gate would be red from the first commit and get
 ignored.
 
-| State             | Meaning                                           | Diverging fails the gate? |
-| ----------------- | ------------------------------------------------- | ------------------------- |
-| `match`           | We reproduce Obsidian. This is the contract.      | **yes**                   |
-| `replicate`       | Known gap we intend to close.                     | no                        |
-| `report-upstream` | Obsidian bug we deliberately do not mirror.       | no                        |
-| `out-of-scope`    | Another package in the chain owns this construct. | no                        |
-| `accepted`        | Representations differ, output does not.          | no                        |
-| `unreviewed`      | Newly recorded, not yet judged.                   | **yes**                   |
+| State                | Meaning                                           | Diverging fails the gate? |
+| -------------------- | ------------------------------------------------- | ------------------------- |
+| `match`              | We reproduce Obsidian. This is the contract.      | **yes**                   |
+| `replicate`          | Known gap we intend to close.                     | no                        |
+| `report-upstream`    | Obsidian bug we deliberately do not mirror.       | no                        |
+| `upstream-undecided` | Obsidian has not decided; do not chase.           | no                        |
+| `out-of-scope`       | Another package in the chain owns this construct. | no                        |
+| `accepted`           | Representations differ, output does not.          | no                        |
+| `unreviewed`         | Newly recorded, not yet judged.                   | **yes**                   |
 
 A `replicate` case that starts matching also fails, so the backlog cannot rot
 quietly — re-triage it to `match`.
+
+`upstream-undecided` exists because some answers are "we have not thought about
+this yet". Mirroring those would pin us to behaviour that may change, so they are
+tracked separately from confirmed bugs.
 
 `out-of-scope` carries real weight: callouts are handled by
 `obsidian-flavored-markdown`'s mdast visitor and frontmatter by Quartz's

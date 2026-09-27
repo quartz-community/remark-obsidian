@@ -24,6 +24,7 @@ import { customTaskCharTransform } from "./lib/task-char.js";
 import { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 
 import { math as mathSyntax } from "micromark-extension-math";
+import { mathTextSyntax } from "./lib/syntax/math-text.js";
 import { mathFromMarkdown, mathToMarkdown } from "mdast-util-math";
 
 export interface RemarkObsidianOptions {
@@ -76,7 +77,10 @@ export default function remarkObsidian(
     data.toMarkdownExtensions.push(highlightToMarkdown());
   }
   if (opts.math) {
-    data.micromarkExtensions.push(mathSyntax());
+    const base = mathSyntax();
+    // Upstream applies no flanking rules, so `$5 and $10` parses as math. Keep its
+    // block handling and swap in a gated text construct.
+    data.micromarkExtensions.push({ ...base, text: { 36: mathTextSyntax() } });
     data.fromMarkdownExtensions.push(mathFromMarkdown());
     data.toMarkdownExtensions.push(mathToMarkdown());
   }

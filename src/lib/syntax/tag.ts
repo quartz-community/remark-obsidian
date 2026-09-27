@@ -28,6 +28,9 @@ function isTagChar(code: Code): boolean {
   if (code === null || code < 0) return false;
   if (code >= 48 && code <= 57) return true;
   if (code === DASH || code === UNDERSCORE) return true;
+  // micromark yields UTF-16 code units, so an emoji arrives as two surrogates and
+  // neither half matches a unicode property escape. Test them by range instead.
+  if (code >= 0xd800 && code <= 0xdfff) return true;
   return tagCharRegex.test(String.fromCodePoint(code));
 }
 

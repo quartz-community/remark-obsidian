@@ -22,11 +22,15 @@ export function wikilinkFromMarkdown(): Extension {
       },
       wikilinkPath(token) {
         const node = this.stack[this.stack.length - 1] as any;
-        node.path = this.sliceSerialize(token).replace(/\\([#\[\]])/g, "$1");
+        node.path = this.sliceSerialize(token)
+          .replace(/\\([#\[\]])/g, "$1")
+          .trim();
       },
       wikilinkHeading(token) {
         const node = this.stack[this.stack.length - 1] as any;
-        node.heading = this.sliceSerialize(token).replace(/\\([#\[\]])/g, "$1");
+        node.heading = this.sliceSerialize(token)
+          .replace(/\\([#\[\]])/g, "$1")
+          .trim();
       },
       wikilinkAlias(token) {
         const node = this.stack[this.stack.length - 1] as any;

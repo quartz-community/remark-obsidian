@@ -9,9 +9,11 @@ import { describe, expect, it } from "vitest";
 import { CHAIN_MANIFEST } from "./chain.js";
 import {
   compareCase,
+  formatPinDrift,
   formatResult,
   isGateFailure,
   isStaleTriage,
+  pinDrift,
   type CaseResult,
 } from "./compare.js";
 import { buildCorpus } from "./corpus.js";
@@ -77,6 +79,22 @@ describe.skipIf(!goldens)("Obsidian parity", () => {
     expect(
       failures.map((f) => f.id),
       summary.join("\n"),
+    ).toEqual([]);
+  });
+
+  it("deliberate divergences still produce their pinned output", () => {
+    const drift = cases.flatMap((c) => pinDrift(c, mathTex));
+    const pinned = cases.filter((c) => c.ours).length;
+    expect(
+      drift.map((d) => `${d.id}:${d.key}`),
+      [
+        "",
+        `${pinned} deliberate divergence(s) are pinned; ${drift.length} drifted.`,
+        "A pinned case changed behaviour. If the change is intended, re-record;",
+        "otherwise this is a regression in a case we chose to diverge on.",
+        "",
+        ...drift.map(formatPinDrift),
+      ].join("\n"),
     ).toEqual([]);
   });
 

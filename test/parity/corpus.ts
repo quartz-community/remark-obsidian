@@ -173,6 +173,11 @@ function tokenStates(
     ["whitespace-body", `${open} ${close}`],
     ["nested", `${open}${open}${body}${close}${close}`],
     ["escaped-open", `\\${open}${body}${close}`],
+    // A half-escaped closer leaves one unescaped delimiter char, which flips
+    // Obsidian's inline-vs-display decision. `$$x\$$` is the reported case.
+    ["escaped-close", `${open}${body}\\${close}`],
+    ["both-escaped", `\\${open}${body}\\${close}`],
+    ["newline-escaped-close", `${open}${body}\n${body}\\${close}`],
     ["newline-body", `${open}${body}\n${body}${close}`],
     ["long-body", `${open}${body.repeat(40)}${close}`],
     ["unicode-body", `${open}\u65e5\u672c\u8a9e\u30c6\u30b9\u30c8${close}`],
