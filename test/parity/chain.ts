@@ -1,0 +1,210 @@
+/**
+ * The pinned Quartz processing chain, reproduced so parity goldens mean something.
+ *
+ * Quartz v5 has no built-in transformers (`quartz/plugins/transformers/index.ts` is
+ * `export {}`); every transformer is an external package ordered in
+ * `quartz.config.yaml`. The parse-affecting subset, in `order`:
+ *
+ *   30  @quartz-community/obsidian-flavored-markdown  remarkObsidian (+ wikilink visitor)
+ *   40  @quartz-community/github-flavored-markdown    remarkGfm
+ *   80  @quartz-community/latex                       remarkMath
+ *   90  @quartz-community/hard-line-breaks            remarkBreaks
+ *
+ * then `remarkRehype({allowDangerousHtml:true})` -> `rehypeRaw` -> `rehypeObsidian`.
+ *
+ * Three things here are load-bearing and were each verified against the upstream
+ * source rather than assumed:
+ *
+ *  1. `textTransform` rewrites the raw markdown *before* remark runs, forcing a
+ *     newline after every callout title line. The upstream callout visitor then
+ *     splits on that newline to separate title from body, so omitting the
+ *     pre-transform reproduces exactly the title/body leak that upstream commit
+ *     0b3ff34 fixed.
+ *  2. `remarkBreaks` measurably changes output (`Hello $$` -> `Hello $$<br>`), so a
+ *     golden recorded without it is wrong.
+ *  3. `obsidian-flavored-markdown` passes no `math` key, so remark-obsidian's own
+ *     `math: true` default applies *and* `latex` registers `remarkMath`. The
+ *     duplicate registration is redundant but provably output-identical, so it is
+ *     reproduced as-is rather than "fixed" here.
+ */
+
+import type { Root as MdRoot } from "mdast";
+import type { Root as HastRoot } from "hast";
+import { unified } from "unified";
+import remarkParse from "remark-parse";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import remarkBreaks from "remark-breaks";
+import remarkRehype from "remark-rehype";
+import rehypeRaw from "rehype-raw";
+import rehypeStringify from "rehype-stringify";
+import rehypeObsidian from "@quartz-community/rehype-obsidian";
+import remarkObsidian, { type RemarkObsidianOptions } from "../../src/index.js";
+
+/** Options `rehype-obsidian` accepts, mirrored so we do not depend on its types. */
+export interface RehypeObsidianOptions {
+  blockReferences: boolean;
+  youTubeEmbed: boolean;
+  tweetEmbed: boolean;
+  checkbox: boolean;
+  mermaid: boolean;
+  obsidianUri: boolean;
+}
+
+export interface ChainProfile {
+  readonly remarkObsidian: Required<RemarkObsidianOptions>;
+  readonly rehypeObsidian: RehypeObsidianOptions;
+}
+
+/**
+ * Faithful to `obsidian-flavored-markdown`'s `defaultOptions` as consumed by the
+ * default `quartz.config.yaml`. Note `enableCheckbox: false` upstream, which maps
+ * to `customTaskChars: false` and `checkbox: false`.
+ */
+const QUARTZ_DEFAULT: ChainProfile = {
+  remarkObsidian: {
+    wikilinks: true,
+    highlights: true,
+    comments: true,
+    tags: true,
+    customTaskChars: false,
+    math: true,
+  },
+  rehypeObsidian: {
+    blockReferences: true,
+    youTubeEmbed: true,
+    tweetEmbed: true,
+    checkbox: false,
+    mermaid: true,
+    obsidianUri: true,
+  },
+};
+
+/** Every feature on, so the corpus also covers surfaces Quartz leaves disabled. */
+const ALL_FEATURES: ChainProfile = {
+  remarkObsidian: {
+    wikilinks: true,
+    highlights: true,
+    comments: true,
+    tags: true,
+    customTaskChars: true,
+    math: true,
+  },
+  rehypeObsidian: {
+    blockReferences: true,
+    youTubeEmbed: true,
+    tweetEmbed: true,
+    checkbox: true,
+    mermaid: true,
+    obsidianUri: true,
+  },
+};
+
+export const PROFILES = {
+  "quartz-default": QUARTZ_DEFAULT,
+  "all-features": ALL_FEATURES,
+} as const;
+
+export type ProfileName = keyof typeof PROFILES;
+
+/**
+ * The ordered stack, recorded into every golden. A reorder or membership change
+ * upstream invalidates the corpus, and stamping it is what makes that visible.
+ */
+export const CHAIN_MANIFEST = {
+  quartzMajor: 5,
+  markdown: [
+    {
+      order: 30,
+      plugin: "remark-obsidian",
+      source: "@quartz-community/obsidian-flavored-markdown",
+    },
+    {
+      order: 40,
+      plugin: "remark-gfm",
+      source: "@quartz-community/github-flavored-markdown",
+    },
+    { order: 80, plugin: "remark-math", source: "@quartz-community/latex" },
+    {
+      order: 90,
+      plugin: "remark-breaks",
+      source: "@quartz-community/hard-line-breaks",
+    },
+  ],
+  html: [
+    { plugin: "remark-rehype", options: { allowDangerousHtml: true } },
+    {
+      plugin: "rehype-raw",
+      source: "@quartz-community/obsidian-flavored-markdown",
+    },
+    {
+      plugin: "rehype-obsidian",
+      source: "@quartz-community/obsidian-flavored-markdown",
+    },
+  ],
+  textTransform: ["callout-title-newline"],
+  /** Quartz renders hast via preact and never stringifies; this step is ours alone. */
+  harnessOnly: ["rehype-stringify"],
+} as const;
+
+/**
+ * `obsidian-flavored-markdown`'s `textTransform`: force a newline after each
+ * callout title so the downstream visitor can split title from body.
+ * Mirrors `calloutLineRegex` upstream.
+ */
+export function applyTextTransform(src: string): string {
+  const calloutLineRegex = /^> *\[!\w+\|?.*?\][+-]?.*$/gm;
+  return src.replace(calloutLineRegex, (value) => `${value}\n> `);
+}
+
+/** Stand-in for the vfile data Quartz populates; the wikilink visitor reads `slug`. */
+function vfileData(slug: string) {
+  return { slug, filePath: `${slug}.md` };
+}
+
+/**
+ * Render markdown exactly the way the pinned Quartz chain would, including the
+ * source-level pre-transform.
+ */
+export async function renderOurs(
+  markdown: string,
+  profileName: ProfileName = "quartz-default",
+  slug = "parity/fixture",
+): Promise<string> {
+  const profile = PROFILES[profileName];
+
+  const processor = unified()
+    .use(remarkParse)
+    .use(remarkObsidian, profile.remarkObsidian)
+    .use(remarkGfm)
+    .use(remarkMath)
+    .use(remarkBreaks)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeRaw)
+    .use(rehypeObsidian, profile.rehypeObsidian)
+    .use(rehypeStringify, { allowDangerousHtml: true });
+
+  const file = await processor.process({
+    value: applyTextTransform(markdown),
+    data: vfileData(slug),
+  });
+
+  return String(file);
+}
+
+/** mdast for a case, useful when a divergence needs to be localized to parsing. */
+export function parseOurs(
+  markdown: string,
+  profileName: ProfileName = "quartz-default",
+): MdRoot {
+  const processor = unified()
+    .use(remarkParse)
+    .use(remarkObsidian, PROFILES[profileName].remarkObsidian)
+    .use(remarkGfm)
+    .use(remarkMath)
+    .use(remarkBreaks);
+  const tree = processor.parse(applyTextTransform(markdown));
+  return processor.runSync(tree) as MdRoot;
+}
+
+export type { HastRoot };

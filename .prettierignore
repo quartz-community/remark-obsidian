@@ -1,1 +1,10 @@
 dist
+package-lock.json
+flake.lock
+
+# Machine-written by `npm run parity:record`; reformatting it would create diff
+# noise and make the parity drift detector fire on formatting rather than behaviour.
+test/parity/goldens
+
+# Owned by Obsidian, which rewrites these on its own schedule.
+test-vault/.obsidian
