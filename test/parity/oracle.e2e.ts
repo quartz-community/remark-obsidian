@@ -80,7 +80,11 @@ const CAPTURE = async (
       },
     );
 
+    // Only source-level embeds count. A transcluded note renders its own embeds
+    // inside the outer one, and a self-embed nests several deep, so counting
+    // descendants would report three embeds for a single `![[ ]]`.
     for (const el of Array.from(root.querySelectorAll(".internal-embed"))) {
+      if (el.parentElement?.closest(".internal-embed")) continue;
       const src = el.getAttribute("src") ?? "";
       const hash = src.indexOf("#");
       links.push({

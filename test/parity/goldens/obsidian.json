@@ -53,7 +53,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-09-27T20:39:26.298Z",
+  "recordedAt": "2026-09-27T20:52:42.465Z",
   "cases": {
     "math/list-boundary": {
       "id": "math/list-boundary",
@@ -1305,32 +1305,7 @@
           "footnotes": []
         }
       },
-      "triage": "upstream-undecided",
-      "note": "Team: little thought given to this case, and editor and reading mode diverge on it. Do not mirror until decided.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [
-            {
-              "path": "A[[B",
-              "heading": "",
-              "embedded": false
-            }
-          ],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "A[[B]]",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "[[A[[B]]]]"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "wikilink/table-unescaped": {
       "id": "wikilink/table-unescaped",
@@ -2202,7 +2177,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "highlight/unterminated": {
       "id": "highlight/unterminated",
@@ -3615,7 +3590,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "token/wikilink/doubled-close": {
       "id": "token/wikilink/doubled-close",
@@ -3695,7 +3670,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "token/wikilink/escaped-open": {
       "id": "token/wikilink/escaped-open",
@@ -4074,32 +4049,7 @@
           "footnotes": []
         }
       },
-      "triage": "upstream-undecided",
-      "note": "Team: little thought given to this case, and editor and reading mode diverge on it. Do not mirror until decided.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [
-            {
-              "path": "![[target",
-              "heading": "",
-              "embedded": true
-            }
-          ],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "text": "![[target",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "![[![[target]]"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/embed/doubled-close": {
       "id": "token/embed/doubled-close",
@@ -4188,31 +4138,6 @@
               "path": "",
               "heading": "",
               "embedded": true
-            },
-            {
-              "path": "",
-              "heading": "",
-              "embedded": true
-            },
-            {
-              "path": "",
-              "heading": "",
-              "embedded": true
-            },
-            {
-              "path": "",
-              "heading": "",
-              "embedded": true
-            },
-            {
-              "path": "",
-              "heading": "",
-              "embedded": true
-            },
-            {
-              "path": "",
-              "heading": "",
-              "embedded": true
             }
           ],
           "tags": [],
@@ -4236,7 +4161,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "token/embed/nested": {
       "id": "token/embed/nested",
@@ -4276,7 +4201,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "token/embed/escaped-open": {
       "id": "token/embed/escaped-open",
@@ -5070,7 +4995,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "token/highlight/long-body": {
       "id": "token/highlight/long-body",

@@ -337,6 +337,27 @@ describe("remark-obsidian", () => {
     expect(findNodes(parse("(foo)#next"), "tag").length).toBe(0);
   });
 
+  it("rejects `[[` inside a wikilink target, like Obsidian", () => {
+    expect(
+      findNodes(parse("[[[[target]]"), "wikilink").map((n: any) => n.path),
+    ).toEqual(["[target"]);
+    expect(
+      findNodes(parse("![[![[target]]]]"), "wikilink").map((n: any) => ({
+        path: n.path,
+        embedded: n.embedded,
+      })),
+    ).toEqual([{ path: "target", embedded: true }]);
+    // A single `[` is still a legal target character.
+    expect(
+      findNodes(parse("[[a[b]]"), "wikilink").map((n: any) => n.path),
+    ).toEqual(["a[b"]);
+  });
+
+  it("keeps line endings inside a highlight", () => {
+    const [node] = findNodes(parse("==a\nb=="), "highlight");
+    expect(node.children.map((c: any) => c.value)).toEqual(["a\nb"]);
+  });
+
   it("does not treat a currency amount as inline math", () => {
     expect(findNodes(parse("$5 and $10"), "inlineMath").length).toBe(0);
     expect(findNodes(parse("costs $20,000 today"), "inlineMath").length).toBe(

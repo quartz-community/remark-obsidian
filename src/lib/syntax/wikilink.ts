@@ -90,6 +90,14 @@ function tokenize(
       return pathEscape;
     }
 
+    // A single `[` is a legal target character but `[[` is not, so `[[[[x]]` has a
+    // path of `[x` and `![[![[x]]]]` resolves the inner embed. Rejecting here lets
+    // micromark retry one position along until the path is clean.
+    if (code === LEFT_BRACKET) {
+      effects.consume(code);
+      return pathBracket;
+    }
+
     if (code === HASH) {
       effects.exit("wikilinkPath");
       return headingMarker(code);
@@ -109,6 +117,11 @@ function tokenize(
 
     effects.consume(code);
     return path;
+  }
+
+  function pathBracket(code: Code): State | undefined {
+    if (code === LEFT_BRACKET) return nok(code);
+    return path(code);
   }
 
   function pathEscape(code: Code): State | undefined {
