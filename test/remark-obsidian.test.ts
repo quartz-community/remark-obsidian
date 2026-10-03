@@ -352,6 +352,29 @@ describe("remark-obsidian", () => {
     expect(findNodes(tree, "table").length).toBe(1);
   });
 
+  it("heads a one-line definition sitting under a setext underline", () => {
+    const tree = processWithGfm("[^1]: x\n===\n\nuse[^1]\n");
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
+    const heading = findNodes(tree, "heading");
+    expect(heading.length).toBe(1);
+    expect(heading[0].depth).toBe(1);
+    // The heading keeps the raw line; the bare-reference pass then reduces the
+    // label, which is how Obsidian shows it.
+    expect(heading[0].children[0].value).toBe("1: x");
+  });
+
+  it("heads one sitting above a thematic break instead", () => {
+    const tree = processWithGfm("[^1]: x\n---\n\nuse[^1]\n");
+    expect(findNodes(tree, "thematicBreak").length).toBe(0);
+    expect(findNodes(tree, "heading")[0].depth).toBe(2);
+  });
+
+  it("leaves a definition with a continuation line alone", () => {
+    const tree = processWithGfm("[^1]: x\n    y\n--\n\nuse[^1]\n");
+    expect(findNodes(tree, "heading").length).toBe(0);
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(1);
+  });
+
   it("round-trips an inline footnote back to markdown", async () => {
     expect(await toMd("text^[inline body]")).toContain("^[inline body]");
   });

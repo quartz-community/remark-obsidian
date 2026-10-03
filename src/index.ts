@@ -32,6 +32,7 @@ import { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
 import { containerLazyTransform } from "./lib/container-lazy.js";
 import { fenceOutlivesTransform } from "./lib/fence-outlives.js";
 import { tableInterruptTransform } from "./lib/table-interrupt.js";
+import { setextDefinitionTransform } from "./lib/setext-definition.js";
 import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 import { footnoteOrphanTransform } from "./lib/footnote-orphan.js";
 import { calloutTransform } from "./lib/callout.js";
@@ -246,6 +247,9 @@ export default function remarkObsidian(
         String(file),
         (markdown) => self.runSync(self.parse(markdown), markdown) as Root,
       );
+      // After the interrupt fold, or a definition about to be merged into the
+      // paragraph above it would be turned into a heading instead.
+      setextDefinitionTransform(tree, String(file));
       bareFootnoteRefTransform(tree);
       // Last: the folds above can remove the definition a reference was bound to
       // while parsing, leaving it orphaned.
