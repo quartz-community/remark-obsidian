@@ -408,6 +408,28 @@ describe("remark-obsidian", () => {
     );
   });
 
+  it("does not let a footnote definition interrupt a paragraph", () => {
+    // Obsidian reads the label as lazy continuation, the way CommonMark treats a
+    // link reference definition in the same position; micromark's gfm-footnote
+    // lets it interrupt.
+    const tree = processWithGfm("a[^1]\nmore text\n[^1]: mid");
+    expect(findNodes(tree, "root")[0].children.map((n: any) => n.type)).toEqual(
+      ["paragraph"],
+    );
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
+  });
+
+  it("still takes a definition after a blank line", () => {
+    const tree = processWithGfm("a[^1]\n\n[^1]: real");
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(1);
+  });
+
+  it("leaves a multi-block definition body alone", () => {
+    // No unambiguous inline form, so folding it would be a guess.
+    const tree = processWithGfm("a[^1]\n[^1]: one\n\n    fenced\n");
+    expect(findNodes(tree, "root")[0].children.length).toBeGreaterThan(0);
+  });
+
   it("does not crash on flow comment with lazy continuation", () => {
     expect(() => parse("> %%\nlazy line\n%%")).not.toThrow();
   });

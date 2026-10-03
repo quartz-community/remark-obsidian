@@ -29964,8 +29964,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a footnote definition is barred from interrupting a paragraph, as Obsidian and CommonMark's link-reference rule both do; micromark's gfm-footnote allows it."
     },
     "hunt/label-after-prose-line-is-prose/7": {
       "id": "hunt/label-after-prose-line-is-prose/7",
@@ -30393,8 +30393,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a footnote definition is barred from interrupting a paragraph, as Obsidian and CommonMark's link-reference rule both do; micromark's gfm-footnote allows it."
     },
     "hunt/label-gap-chunk-protected/0": {
       "id": "hunt/label-gap-chunk-protected/0",
@@ -30798,8 +30798,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a footnote definition is barred from interrupting a paragraph, as Obsidian and CommonMark's link-reference rule both do; micromark's gfm-footnote allows it."
     },
     "hunt/lazy-label-in-inline-comment/1": {
       "id": "hunt/lazy-label-in-inline-comment/1",
@@ -30970,8 +30970,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a footnote definition is barred from interrupting a paragraph, as Obsidian and CommonMark's link-reference rule both do; micromark's gfm-footnote allows it."
     },
     "hunt/lazy-label-reference-is-live/2": {
       "id": "hunt/lazy-label-reference-is-live/2",
@@ -34839,8 +34839,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a footnote definition is barred from interrupting a paragraph, as Obsidian and CommonMark's link-reference rule both do; micromark's gfm-footnote allows it."
     },
     "hunt/orphan-delete-reclassifies/0": {
       "id": "hunt/orphan-delete-reclassifies/0",
@@ -38067,8 +38067,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a footnote definition is barred from interrupting a paragraph, as Obsidian and CommonMark's link-reference rule both do; micromark's gfm-footnote allows it."
     },
     "hunt/remove-def-creates-setext-heading/1": {
       "id": "hunt/remove-def-creates-setext-heading/1",
@@ -40017,8 +40017,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a footnote definition is barred from interrupting a paragraph, as Obsidian and CommonMark's link-reference rule both do; micromark's gfm-footnote allows it."
     },
     "hunt/table-under-label-after-block-line/5": {
       "id": "hunt/table-under-label-after-block-line/5",
@@ -42435,8 +42435,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a footnote definition is barred from interrupting a paragraph, as Obsidian and CommonMark's link-reference rule both do; micromark's gfm-footnote allows it."
     },
     "hunt/label-after-link-reference-definition/2": {
       "id": "hunt/label-after-link-reference-definition/2",

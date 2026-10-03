@@ -27,6 +27,7 @@ import { customTaskCharTransform } from "./lib/task-char.js";
 import { mathDisplayTransform } from "./lib/math-display.js";
 import { taskReparseTransform } from "./lib/task-reparse.js";
 import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
+import { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
 import { calloutTransform } from "./lib/callout.js";
 import { commentHoistTransform } from "./lib/comment-hoist.js";
 import { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
@@ -199,6 +200,9 @@ export default function remarkObsidian(
       calloutTransform(tree);
     }
     if (opts.bareFootnoteRefs) {
+      // Must precede the bare-reference pass: it re-inserts a `[^n]:` label that
+      // the bare pass then reduces, as Obsidian shows it.
+      footnoteInterruptTransform(tree);
       bareFootnoteRefTransform(tree);
     }
     if (opts.taskReparse) {
@@ -229,6 +233,7 @@ export { customTaskCharTransform } from "./lib/task-char.js";
 export { mathDisplayTransform } from "./lib/math-display.js";
 export { taskReparseTransform } from "./lib/task-reparse.js";
 export { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
+export { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
 export { calloutTransform } from "./lib/callout.js";
 export { commentHoistTransform } from "./lib/comment-hoist.js";
 export { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
