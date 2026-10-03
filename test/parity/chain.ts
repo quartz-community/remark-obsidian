@@ -82,6 +82,7 @@ const QUARTZ_DEFAULT: ChainProfile = {
     bareFootnoteRefs: true,
     inlineFootnotes: true,
     callouts: true,
+    legacyEmphasis: true,
   },
   rehypeObsidian: {
     blockReferences: true,
@@ -108,6 +109,7 @@ const ALL_FEATURES: ChainProfile = {
     bareFootnoteRefs: true,
     inlineFootnotes: true,
     callouts: true,
+    legacyEmphasis: true,
   },
   rehypeObsidian: {
     blockReferences: true,

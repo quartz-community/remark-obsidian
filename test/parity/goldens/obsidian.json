@@ -2308,30 +2308,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 nests `***a***` as emphasis outside strong; Obsidian inverts the order. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "em:a",
-            "strong:a"
-          ],
-          "text": "a",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "***a***"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/run-3-2": {
       "id": "emphasis/run-3-2",
@@ -2366,29 +2344,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 leaves a surplus delimiter outside the span; Obsidian places it inside. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "strong:a"
-          ],
-          "text": "*a",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "***a**"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/run-2-3": {
       "id": "emphasis/run-2-3",
@@ -2423,29 +2380,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 leaves a surplus delimiter outside the span; Obsidian places it inside. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "strong:a"
-          ],
-          "text": "a*",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "**a***"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/run-3-1": {
       "id": "emphasis/run-3-1",
@@ -2480,29 +2416,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 leaves a surplus delimiter outside the span; Obsidian places it inside. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "em:a"
-          ],
-          "text": "**a",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "***a*"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/run-1-3": {
       "id": "emphasis/run-1-3",
@@ -2535,29 +2450,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 leaves a surplus delimiter outside the span; Obsidian places it inside. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "em:a"
-          ],
-          "text": "a**",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "*a***"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/run-4-4": {
       "id": "emphasis/run-4-4",
@@ -2592,30 +2486,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 leaves a surplus delimiter outside the span; Obsidian places it inside. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "strong:a",
-            "strong:a"
-          ],
-          "text": "a",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "****a****"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/run-5-5": {
       "id": "emphasis/run-5-5",
@@ -2651,31 +2523,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 leaves a surplus delimiter outside the span; Obsidian places it inside. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "em:a",
-            "strong:a",
-            "strong:a"
-          ],
-          "text": "a",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "*****a*****"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/underscore-1-1": {
       "id": "emphasis/underscore-1-1",
@@ -2781,30 +2630,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 nests `***a***` as emphasis outside strong; Obsidian inverts the order. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "em:a",
-            "strong:a"
-          ],
-          "text": "a",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "___a___"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/underscore-3-2": {
       "id": "emphasis/underscore-3-2",
@@ -2839,29 +2666,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 leaves a surplus delimiter outside the span; Obsidian places it inside. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "strong:a"
-          ],
-          "text": "_a",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "___a__"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/flank-both-space": {
       "id": "emphasis/flank-both-space",
@@ -2896,27 +2702,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 forbids a delimiter run followed by whitespace from opening emphasis; Obsidian opens anyway, so asterisks used as prose are consumed. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "a * b * c",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "a * b * c"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/flank-correct": {
       "id": "emphasis/flank-correct",
@@ -2986,27 +2773,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 forbids a delimiter run followed by whitespace from opening emphasis; Obsidian opens anyway, so asterisks used as prose are consumed. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "a * b* c",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "a * b* c"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/flank-close-space": {
       "id": "emphasis/flank-close-space",
@@ -3041,27 +2809,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 forbids a delimiter run followed by whitespace from opening emphasis; Obsidian opens anyway, so asterisks used as prose are consumed. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "a *b * c",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "a *b * c"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/flank-inverted": {
       "id": "emphasis/flank-inverted",
@@ -3096,27 +2845,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 forbids a delimiter run followed by whitespace from opening emphasis; Obsidian opens anyway, so asterisks used as prose are consumed. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "a* b *c",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "a* b *c"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/flank-intraword-star": {
       "id": "emphasis/flank-intraword-star",
@@ -3219,27 +2949,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 forbids a delimiter run followed by whitespace from opening emphasis; Obsidian opens anyway, so asterisks used as prose are consumed. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "a _ b _ c",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "a _ b _ c"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/flank-punct-inside": {
       "id": "emphasis/flank-punct-inside",
@@ -3447,27 +3158,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 forbids a delimiter run followed by whitespace from opening emphasis; Obsidian opens anyway, so asterisks used as prose are consumed. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "**a ** b",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "**a ** b"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/nest-strong-em": {
       "id": "emphasis/nest-strong-em",
@@ -3718,31 +3410,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Overlapping delimiter runs, where CommonMark's resolution and Obsidian's disagree. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "em:a b c",
-            "em:b c",
-            "em:b"
-          ],
-          "text": "a b c",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "*a **b* c**"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/nest-repeated-strong": {
       "id": "emphasis/nest-repeated-strong",
@@ -3778,30 +3447,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Overlapping delimiter runs, where CommonMark's resolution and Obsidian's disagree. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "strong:a b c",
-            "strong:b"
-          ],
-          "text": "a b c",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "**a **b** c**"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/escape-inner": {
       "id": "emphasis/escape-inner",
@@ -3869,29 +3516,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.1 makes `\\*` literal, leaving a single delimiter that still pairs; Obsidian produces no emphasis at all. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "em:a*"
-          ],
-          "text": "*a*",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "**a\\**"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "emphasis/escape-first-of-run": {
       "id": "emphasis/escape-first-of-run",
@@ -9287,29 +8913,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 leaves a surplus delimiter outside the span; Obsidian places it inside. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "em:text"
-          ],
-          "text": "text*",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "*text**"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "token/emphasis/empty": {
       "id": "token/emphasis/empty",
@@ -9748,29 +9353,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 leaves a surplus delimiter outside the span; Obsidian places it inside. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "strong:text"
-          ],
-          "text": "**text",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "****text**"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "token/strong/doubled-close": {
       "id": "token/strong/doubled-close",
@@ -9805,29 +9389,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 leaves a surplus delimiter outside the span; Obsidian places it inside. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "strong:text"
-          ],
-          "text": "text**",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "**text****"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "token/strong/empty": {
       "id": "token/strong/empty",
@@ -9928,30 +9491,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 leaves a surplus delimiter outside the span; Obsidian places it inside. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "strong:text",
-            "strong:text"
-          ],
-          "text": "text",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "****text****"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "token/strong/escaped-open": {
       "id": "token/strong/escaped-open",
@@ -10017,29 +9558,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.1 makes `\\*` literal, leaving a single delimiter that still pairs; Obsidian produces no emphasis at all. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "em:text*"
-          ],
-          "text": "*text*",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "**text\\**"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "token/strong/both-escaped": {
       "id": "token/strong/both-escaped",
@@ -10072,29 +9592,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.1 makes `\\*` literal, leaving a single delimiter that still pairs; Obsidian produces no emphasis at all. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "em:text*"
-          ],
-          "text": "*text*",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "\\**text\\**"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "token/strong/newline-escaped-close": {
       "id": "token/strong/newline-escaped-close",
@@ -10127,29 +9626,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.1 makes `\\*` literal, leaving a single delimiter that still pairs; Obsidian produces no emphasis at all. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "em:text text*"
-          ],
-          "text": "*text text*",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "**text\ntext\\**"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "token/strong/newline-body": {
       "id": "token/strong/newline-body",
@@ -10423,29 +9901,8 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "CommonMark 6.2 leaves a surplus delimiter outside the span; Obsidian places it inside. Verified against remark-parse + remark-gfm: our output matches the CommonMark reference exactly. See COMMONMARK-DIVERGENCES.md.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "em:text"
-          ],
-          "text": "text_",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "_text__"
-            }
-          ]
-        }
-      }
+      "triage": "match",
+      "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
     "token/underscore-emphasis/empty": {
       "id": "token/underscore-emphasis/empty",

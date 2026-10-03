@@ -18,30 +18,42 @@ prose. Every HTML fragment below is measured output from one side or the other, 
 `<p>` wrappers and `dir` attributes stripped for width.
 
 Each emphasis divergence was checked in both directions: Obsidian differs from the
-reference, **and** our own parser agrees with the reference. That second check
+reference, **and** our own parser agreed with the reference. That second check
 passed for **26 of 26** cases, which is what makes "Obsidian diverges" the right
 description rather than "the two implementations differ".
+
+Those 26 are now deliberately reproduced rather than left divergent — see
+[Bearing on `@quartz-community/remark-obsidian`](#bearing-on-quartz-communityremark-obsidian).
+The tables below are the original measurement and still describe Obsidian against
+the CommonMark reference; they are no longer a description of our own output.
 
 Measured on Obsidian **1.13.7** and **1.14.2**. All divergences are byte-identical
 on both; across the whole probe the only difference between the two versions is a
 cosmetic `data-highlight=""` attribute added to `<mark>` in 1.14.2.
 
-Coverage comes from a 490-case differential corpus (`corpus.ts`) that crosses each
+Coverage comes from a 1122-case differential corpus (`corpus.ts`) that crosses each
 delimiter shape with 13 container contexts and 12 trailing-character variants. 26
-cases are emphasis divergences; 408 of the 490 agree with Obsidian exactly.
+cases are emphasis divergences; 1032 of the 1122 agree with Obsidian exactly.
 
-## Probable common root cause
+## Common root cause
 
 The 1.14.2 bundle contains `blockTokenizers`, `interruptParagraph` and
 `options.pedantic` — the API surface of **legacy `remark-parse` (v8/v9)**, which
 predates that project's micromark rewrite. Those releases implemented emphasis with
 a pre-CommonMark tokenizer rather than CommonMark's delimiter-run and flanking
-algorithm, which would account for Groups A through E together. `a_b_c` is handled
-correctly, so `pedantic` appears to be off.
+algorithm. `a_b_c` is handled correctly, so `pedantic` is off.
 
-Stated as inference, not certainty: the tokenizer names are visible in the bundle,
-the configuration is not. It does fit the team's description of these as
-long-standing behaviour.
+This began as inference from the names visible in the bundle. It is now
+**confirmed by construction**: porting `remark-parse@8.0.3`'s `strong.js` and
+`emphasis.js` verbatim, with `pedantic` off, reproduces Obsidian on **all 26**
+divergences in Groups A through E, including shapes no rule-of-thumb would
+predict — `*****a*****`, `****a****` and `**a\**` among them. A one-line
+behavioural summary cannot produce those; the actual algorithm can.
+
+The specific defect those tokenizers carry is a loop that reads ahead two
+characters (`value.charAt(index + 2)` in `strong.js`) while advancing the cursor
+by one, so a character can be examined twice and appended to the output buffer
+twice. That is what puts the surplus delimiter _inside_ the span in Group B.
 
 ## Group A — emphasis flanking is not applied (CommonMark 6.2)
 
@@ -155,7 +167,7 @@ older builds than we have.
 ## Conformant
 
 Recorded so the report is not one-sided. Of 25 targeted spec cases 15 match the
-reference exactly, and 408 of the 490 corpus cases agree with Obsidian:
+reference exactly, and 1032 of the 1122 corpus cases agree with Obsidian:
 
 - Backslash escapes: `\*`, `\_`, `\[`, `` \` ``, `\~`, `\|` inside a table cell, and
   `\` before a non-punctuation character
@@ -179,11 +191,22 @@ reference exactly, and 408 of the 490 corpus cases agree with Obsidian:
 
 Recorded here because it sets which of the above we intend to match.
 
-Groups A through E affect CommonMark's own emphasis, and mirroring them would change
-how ordinary prose parses, so we would rather not — a formatter such as
-`obsidian-linter` acting on that basis could rewrite documents that every other
-CommonMark tool reads correctly. All 26 corpus cases are therefore triaged
-`report-upstream`, with our own output pinned so the divergence cannot drift
-silently. Group F is already mirrored, being narrow and specific to Obsidian's own
-task handling. On Group G we are waiting on the team, because the inline-math
-exception suggests the current behaviour is unintended.
+**Groups A through E are reproduced**, behind the `legacyEmphasis` option, which is
+on by default. The package's contract is to parse a document the way Obsidian
+parses it, and emphasis is not an area where a consumer can absorb a difference:
+a vault rendered by Quartz has to break its lines and bold its words where Obsidian
+does, or the published page is not the note. Leaving these divergent was also not
+the neutral choice it first appears — it silently produced different emphasis from
+the app for any unbalanced run, which is most of Group B.
+
+The implementation is a verbatim port of the two legacy tokenizers rather than a
+reimplementation of their observable behaviour, for the reason given under
+[Common root cause](#common-root-cause): the output is not summarisable, so
+anything short of the original algorithm would match the easy cases and quietly
+miss the rest. `legacyEmphasis: false` restores micromark's CommonMark attention
+for consumers that want spec behaviour.
+
+Group F is likewise mirrored, being narrow and specific to Obsidian's own task
+handling. On Group G we are waiting on the team, because the inline-math exception
+suggests the current behaviour is unintended; those 8 cases remain triaged
+`report-upstream` with our output pinned so the divergence cannot drift silently.

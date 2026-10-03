@@ -12,6 +12,7 @@ import { highlightSyntax } from "./lib/syntax/highlight.js";
 import { commentSyntax } from "./lib/syntax/comment.js";
 import { tagSyntax } from "./lib/syntax/tag.js";
 import { inlineFootnoteSyntax } from "./lib/syntax/inline-footnote.js";
+import { legacyEmphasisSyntax } from "./lib/syntax/legacy-emphasis.js";
 
 import { wikilinkFromMarkdown } from "./lib/mdast/wikilink.js";
 import { highlightFromMarkdown } from "./lib/mdast/highlight.js";
@@ -90,6 +91,17 @@ export interface RemarkObsidianOptions {
    * than a neutral choice.
    */
   callouts?: boolean;
+  /**
+   * Parse `*` and `_` the way `remark-parse@8.0.3` does, which is what Obsidian
+   * ships, instead of CommonMark's delimiter-run algorithm. The two disagree on
+   * every unbalanced run: `***a**` is `<strong>*a</strong>` rather than
+   * `*<strong>a</strong>`, `*text**` is not emphasis at all, and `***a***` nests
+   * strong outside emphasis rather than the reverse.
+   *
+   * On by default, because leaving it off is not neutral — it silently produces
+   * different emphasis from the app for any such run.
+   */
+  legacyEmphasis?: boolean;
 }
 
 const defaultOptions: Required<RemarkObsidianOptions> = {
@@ -105,6 +117,7 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
   bareFootnoteRefs: true,
   inlineFootnotes: true,
   callouts: true,
+  legacyEmphasis: true,
 };
 
 export default function remarkObsidian(
@@ -156,6 +169,10 @@ export default function remarkObsidian(
     data.micromarkExtensions.push({ ...base, text: { 36: mathTextSyntax() } });
     data.fromMarkdownExtensions.push(mathFromMarkdown());
     data.toMarkdownExtensions.push(mathToMarkdown());
+  }
+
+  if (opts.legacyEmphasis) {
+    data.micromarkExtensions.push(legacyEmphasisSyntax());
   }
 
   if (opts.customTaskChars) {

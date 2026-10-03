@@ -7,6 +7,7 @@ import remarkMath from "remark-math";
 import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
 import remarkObsidian, { type RemarkObsidianOptions } from "../src/index.js";
+import { visit } from "unist-util-visit";
 
 function parse(md: string, opts?: RemarkObsidianOptions) {
   return unified().use(remarkParse).use(remarkObsidian, opts).parse(md);
@@ -1083,6 +1084,76 @@ describe("remark-obsidian", () => {
       expect(String(await processor.process("%%\nblock\ncomment\n%%"))).toBe(
         "%%\nblock\ncomment\n%%\n",
       );
+    });
+  });
+
+  describe("legacy emphasis", () => {
+    function shapes(md: string, opts?: RemarkObsidianOptions): string[] {
+      const out: string[] = [];
+      visit(parse(md, opts), (node) => {
+        if (node.type !== "strong" && node.type !== "emphasis") return;
+        let text = "";
+        visit(node, (inner) => {
+          if (inner.type === "text") text += (inner as { value: string }).value;
+        });
+        out.push(`${node.type === "strong" ? "strong" : "em"}:${text.trim()}`);
+      });
+      return out;
+    }
+
+    function plainText(md: string, opts?: RemarkObsidianOptions): string {
+      let text = "";
+      visit(parse(md, opts), (node) => {
+        if (node.type === "text") text += (node as { value: string }).value;
+      });
+      return text;
+    }
+
+    // Every expectation below was recorded from Obsidian 1.13.7 via the parity
+    // harness; they are the cases where remark-parse@8 and CommonMark disagree.
+    it.each([
+      ["*a*", ["em:a"]],
+      ["**a**", ["strong:a"]],
+      ["***a**", ["strong:*a"]],
+      ["**a***", ["strong:a*"]],
+      ["***a*", ["em:**a"]],
+      ["*a***", []],
+      ["***a***", ["strong:a", "em:a"]],
+      ["a * b * c", ["em:b"]],
+      ["a_b_c", []],
+      ["a *b* c", ["em:b"]],
+      ["_a_", ["em:a"]],
+      ["*text**", []],
+      ["_text__", []],
+      ["**a **b** c**", ["strong:a", "strong:c"]],
+      ["*a **b* c**", ["em:a **b"]],
+      ["**a\\**", []],
+    ])("parses %j the way Obsidian does", (md, expected) => {
+      expect(shapes(md as string)).toEqual(expected);
+    });
+
+    it("leaves a marker that opens nothing as literal text", () => {
+      expect(plainText("a * b")).toBe("a * b");
+      expect(plainText("x_y_z")).toBe("x_y_z");
+      expect(plainText("a*b")).toBe("a*b");
+    });
+
+    it("keeps whitespace at the end of a span", () => {
+      expect(plainText("a* b *c")).toBe("a b c");
+      expect(plainText("**a **b** c**")).toBe("a b c");
+    });
+
+    it("nests strong outside emphasis, inverting CommonMark", () => {
+      expect(shapes("***a***")).toEqual(["strong:a", "em:a"]);
+      expect(shapes("***a***", { legacyEmphasis: false })).toEqual([
+        "em:a",
+        "strong:a",
+      ]);
+    });
+
+    it("restores CommonMark attention when turned off", () => {
+      expect(shapes("***a**", { legacyEmphasis: false })).toEqual(["strong:a"]);
+      expect(shapes("*text**", { legacyEmphasis: false })).toEqual(["em:text"]);
     });
   });
 });
