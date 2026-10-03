@@ -21025,8 +21025,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Previously deferred to another package. Callouts, frontmatter and footnotes are all handled here now, so this is an ordinary gap."
+      "triage": "match",
+      "note": "Matches once a titleless callout stops carrying an empty title node, so the capitalised type name Obsidian displays is shown."
     },
     "hunt/blockquote-region-outlives-quote/0": {
       "id": "hunt/blockquote-region-outlives-quote/0",
@@ -21883,8 +21883,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Previously deferred to another package. Callouts, frontmatter and footnotes are all handled here now, so this is an ordinary gap."
+      "triage": "match",
+      "note": "Matches once a titleless callout stops carrying an empty title node, so the capitalised type name Obsidian displays is shown."
     },
     "hunt/column-zero-callout-title/1": {
       "id": "hunt/column-zero-callout-title/1",

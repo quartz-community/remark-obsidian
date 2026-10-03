@@ -553,6 +553,14 @@ describe("remark-obsidian", () => {
     );
   });
 
+  it("leaves no empty title node on a titleless callout", () => {
+    // An empty `calloutTitle` still reads as "has a title" downstream, which
+    // suppressed the type name Obsidian shows in its place.
+    const [callout] = findNodes(processWithGfm("> [!note]\n> body"), "callout");
+    expect(findNodes(callout, "calloutTitle").length).toBe(0);
+    expect(callout.title).toBe("");
+  });
+
   it("does not crash on flow comment with lazy continuation", () => {
     expect(() => parse("> %%\nlazy line\n%%")).not.toThrow();
   });

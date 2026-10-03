@@ -92,7 +92,11 @@ export function calloutTransform(tree: Root): void {
       quote.children.shift();
     }
 
-    if (titleNodes.length > 0) {
+    // Gate on the collected text, not on the node count: stripping the marker
+    // can leave an empty text node behind, and a `calloutTitle` holding nothing
+    // still reads as "this callout has a title", which suppresses the type name
+    // Obsidian displays in its place.
+    if (title !== "") {
       quote.children.unshift({
         type: "calloutTitle",
         children: titleNodes,
