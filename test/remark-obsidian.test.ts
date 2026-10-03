@@ -544,6 +544,15 @@ describe("remark-obsidian", () => {
     expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
   });
 
+  it("ends a footnote definition at a setext underline", () => {
+    // The underline makes the line above it a heading, which ends the
+    // definition just as a table header does.
+    const tree = processWithGfm("[^1]: body\npara\n===\n    code");
+    expect(findNodes(tree, "root")[0].children.map((n: any) => n.type)).toEqual(
+      ["footnoteDefinition", "heading", "code"],
+    );
+  });
+
   it("does not crash on flow comment with lazy continuation", () => {
     expect(() => parse("> %%\nlazy line\n%%")).not.toThrow();
   });

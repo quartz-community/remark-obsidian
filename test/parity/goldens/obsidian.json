@@ -23747,8 +23747,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a setext underline ends a footnote definition's lazy continuation, as a table header already did."
     },
     "hunt/definition-starts-misses-block-enders/0": {
       "id": "hunt/definition-starts-misses-block-enders/0",
@@ -38583,8 +38583,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a setext underline ends a footnote definition's lazy continuation, as a table header already did."
     },
     "hunt/setext-paragraph-count-ignores-blocks-scan/4": {
       "id": "hunt/setext-paragraph-count-ignores-blocks-scan/4",
@@ -39429,8 +39429,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a setext underline ends a footnote definition's lazy continuation, as a table header already did."
     },
     "hunt/setext-underline-under-definition-paragraph/1": {
       "id": "hunt/setext-underline-under-definition-paragraph/1",
@@ -39578,8 +39578,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a setext underline ends a footnote definition's lazy continuation, as a table header already did."
     },
     "hunt/short-form-comment/0": {
       "id": "hunt/short-form-comment/0",
@@ -46003,8 +46003,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a setext underline ends a footnote definition's lazy continuation, as a table header already did."
     },
     "hunt/setext-underline-trailing-tab/0": {
       "id": "hunt/setext-underline-trailing-tab/0",

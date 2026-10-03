@@ -4,6 +4,9 @@ import type { Root, RootContent } from "mdast";
 const DELIMITER =
   /^ {0,3}\|?[ \t]*:?-+:?[ \t]*(\|[ \t]*:?-+:?[ \t]*)*\|?[ \t]*$/;
 
+/** A setext underline, which turns the line above it into a heading. */
+const SETEXT = /^ {0,3}(=+|-+)[ \t]*$/;
+
 /** Shift a subtree parsed in isolation onto its place in the document. */
 function shift(node: unknown, offset: number, line: number): void {
   const n = node as {
@@ -23,13 +26,12 @@ function shift(node: unknown, offset: number, line: number): void {
 }
 
 /**
- * End a footnote definition where a table begins.
+ * End a footnote definition where a new block begins.
  *
  * A definition's lazy continuation swallows every following line that is not a
- * new block, and `micromark-extension-gfm-table` does not interrupt it, so
- * `[^1]: body` followed by a table parsed as one definition. Obsidian ends the
- * definition and starts the table, including for a pipeless table whose header
- * carries no outer pipes.
+ * new block, so `[^1]: body` followed by a table, or by a setext-underlined
+ * heading, parsed as one definition. Obsidian ends the definition and starts the
+ * block, including for a pipeless table whose header carries no outer pipes.
  *
  * The split is done by re-parsing each half rather than by rewriting the source,
  * so positions stay true to the document. Columns need no adjustment because the
@@ -58,8 +60,16 @@ export function footnoteTableSplitTransform(
     for (let i = 2; i < lines.length; i++) {
       const delimiter = lines[i] ?? "";
       const header = lines[i - 1] ?? "";
-      if (!DELIMITER.test(delimiter)) continue;
       if (header.trim() === "") continue;
+
+      // A setext underline makes the line above it a heading, which ends the
+      // definition just as a table header does.
+      if (SETEXT.test(delimiter) && !delimiter.includes("|")) {
+        split = i - 1;
+        break;
+      }
+
+      if (!DELIMITER.test(delimiter)) continue;
       // Obsidian wants the two rows to agree about outer pipes: a pipeless
       // header under a piped delimiter is not a table to it, and splitting
       // there produced a table where it reports none.
@@ -78,12 +88,10 @@ export function footnoteTableSplitTransform(
     const tail = lines.slice(split).join("\n");
     const parsedHead = reparse(head);
     const parsedTail = reparse(tail);
-    if (
-      parsedHead.children.length === 0 ||
-      !parsedTail.children.some((child) => child.type === "table")
-    ) {
-      continue;
-    }
+    const opensABlock = parsedTail.children.some(
+      (child) => child.type === "table" || child.type === "heading",
+    );
+    if (parsedHead.children.length === 0 || !opensABlock) continue;
 
     for (const child of parsedHead.children) shift(child, start, startLine);
     const tailOffset = start + head.length + 1;
