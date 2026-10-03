@@ -113,8 +113,10 @@ export function mdastText(tree: Node): string {
         parts.push(`${(node as ValueNode).value} `);
         return;
       case "html":
-        // Obsidian's textContent has no markup, so compare inner text only.
-        parts.push((node as ValueNode).value.replace(/<[^>]*>/g, " "));
+        // Obsidian's textContent has no markup, so compare inner text only. The
+        // trailing space is the block separator every other block type gets from
+        // BLOCK_TYPES below, which this early return would otherwise skip.
+        parts.push(`${(node as ValueNode).value.replace(/<[^>]*>/g, " ")} `);
         return;
       case "break":
         parts.push("\n");

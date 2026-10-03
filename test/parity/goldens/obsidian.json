@@ -22451,8 +22451,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once an html block contributes the same trailing block separator every other block type gets."
     },
     "hunt/commented-label-before-closer-silent/0": {
       "id": "hunt/commented-label-before-closer-silent/0",
@@ -42242,8 +42242,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once an html block contributes the same trailing block separator every other block type gets."
     },
     "hunt/html-block-in-container/2": {
       "id": "hunt/html-block-in-container/2",
@@ -42318,8 +42318,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once an html block contributes the same trailing block separator every other block type gets."
     },
     "hunt/image-alt-reference/0": {
       "id": "hunt/image-alt-reference/0",
