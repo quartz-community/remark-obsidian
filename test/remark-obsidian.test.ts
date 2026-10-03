@@ -150,17 +150,22 @@ describe("remark-obsidian", () => {
     expect(findNodes(edge, "highlight").length).toBe(0);
   });
 
-  it("strips comments", () => {
+  it("hides comments while keeping the node for consumers", () => {
     const single = processWithGfm("%%comment%%");
-    expect(findNodes(single, "comment").length).toBe(0);
+    expect(findNodes(single, "comment").length).toBeGreaterThan(0);
+    expect(
+      findNodes(single, "text")
+        .map((n: any) => n.value)
+        .join(" "),
+    ).not.toContain("comment");
 
     const multi = processWithGfm("%%multi\nline%%");
-    expect(findNodes(multi, "comment").length).toBe(0);
+    expect(findNodes(multi, "comment").length).toBeGreaterThan(0);
   });
 
-  it("strips block comments spanning multiple lines", () => {
+  it("hides block comments spanning multiple lines", () => {
     const block = processWithGfm("before\n%%\nblock\ncomment\n%%\nafter");
-    expect(findNodes(block, "comment").length).toBe(0);
+    expect(findNodes(block, "comment").length).toBeGreaterThan(0);
     const paragraphs = findNodes(block, "paragraph");
     const texts = paragraphs.flatMap((p: any) =>
       findNodes(p, "text").map((n: any) => n.value),
@@ -169,11 +174,11 @@ describe("remark-obsidian", () => {
     expect(texts).toContain("after");
   });
 
-  it("strips block comments containing empty lines", () => {
+  it("hides block comments containing empty lines", () => {
     const block = processWithGfm(
       "before\n%%\nfirst line\n\nsecond line\n%%\nafter",
     );
-    expect(findNodes(block, "comment").length).toBe(0);
+    expect(findNodes(block, "comment").length).toBeGreaterThan(0);
     const paragraphs = findNodes(block, "paragraph");
     const texts = paragraphs.flatMap((p: any) =>
       findNodes(p, "text").map((n: any) => n.value),
@@ -183,9 +188,9 @@ describe("remark-obsidian", () => {
     expect(texts.join(" ")).not.toContain("first line");
   });
 
-  it("strips block comments with only empty lines", () => {
+  it("hides block comments with only empty lines", () => {
     const block = processWithGfm("before\n%%\n\n%%\nafter");
-    expect(findNodes(block, "comment").length).toBe(0);
+    expect(findNodes(block, "comment").length).toBeGreaterThan(0);
     const paragraphs = findNodes(block, "paragraph");
     const texts = paragraphs.flatMap((p: any) =>
       findNodes(p, "text").map((n: any) => n.value),
@@ -194,15 +199,213 @@ describe("remark-obsidian", () => {
     expect(texts).toContain("after");
   });
 
-  it("strips block comments with multiple consecutive empty lines", () => {
+  it("hides block comments with multiple consecutive empty lines", () => {
     const block = processWithGfm("before\n%%\nline\n\n\n\nline\n%%\nafter");
-    expect(findNodes(block, "comment").length).toBe(0);
+    expect(findNodes(block, "comment").length).toBeGreaterThan(0);
     const paragraphs = findNodes(block, "paragraph");
     const texts = paragraphs.flatMap((p: any) =>
       findNodes(p, "text").map((n: any) => n.value),
     );
     expect(texts).toContain("before");
     expect(texts).toContain("after");
+  });
+
+  it("keeps the rest of the note when a block comment's closer has a trailing tail", () => {
+    // The closer starting its own line used to reject after consuming earlier
+    // lines, which re-fired this construct on the closer line and opened a second
+    // comment that ran to end of file, silently dropping every later block.
+    const visibleText = (markdown: string): string[] =>
+      findNodes(processWithGfm(markdown), "text").map((n: any) => n.value);
+
+    expect(visibleText("%%\nhidden\n%% [^a]: def\n\ntail")).toContain("tail");
+    expect(visibleText("%%\nhidden\n%% trailing\n\ntail")).toContain("tail");
+    expect(visibleText("use me\n\n%%\nhidden\n%% [^d]: after")).toContain(
+      "use me",
+    );
+  });
+
+  it("still splits a mid-line closer the way Obsidian does", () => {
+    // `%%\nline %%` closes, then ` nested %% line` stays visible and the next
+    // `%%` opens a fresh comment. Rejecting mid-line is what reproduces this, so
+    // the line-start fix above must not apply here.
+    const tree = processWithGfm("%%\nline %% nested %% line\n%%\nafter");
+    const texts = findNodes(tree, "text").map((n: any) => n.value);
+    expect(texts.join("")).toContain("nested %% line");
+    expect(texts.join("")).not.toContain("after");
+  });
+
+  it("keeps comment nodes but never renders their body", async () => {
+    // `mdast-util-to-hast` turns an unknown node carrying a `value` into a text
+    // node, which would publish the comment. `data.hChildren: []` makes it an
+    // empty element instead; rehype-obsidian removes the element itself.
+    const tree = processWithGfm("before %%secret%% after");
+    expect(findNodes(tree, "comment").length).toBe(1);
+
+    const html = await toHtml("before %%secret%% after");
+    expect(html).not.toContain("secret");
+    expect(html).toContain("obsidian-comment");
+  });
+
+  it("deletes comment nodes when keepComments is off", async () => {
+    const tree = processWithGfm("before %%secret%% after", {
+      keepComments: false,
+    });
+    expect(findNodes(tree, "comment").length).toBe(0);
+    const html = await toHtml("before %%secret%% after", {
+      keepComments: false,
+    });
+    expect(html).not.toContain("secret");
+    expect(html).not.toContain("obsidian-comment");
+  });
+
+  it("parses inline footnotes", async () => {
+    const tree = processWithGfm("text^[inline body]");
+    const notes = findNodes(tree, "footnote");
+    expect(notes.length).toBe(1);
+    expect(findNodes(notes[0], "text").map((n: any) => n.value)).toEqual([
+      "inline body",
+    ]);
+  });
+
+  it("closes an inline footnote on its balanced bracket", () => {
+    const tree = processWithGfm("text^[body with [a link](u)]");
+    expect(findNodes(tree, "footnote").length).toBe(1);
+    expect(findNodes(tree, "link").length).toBe(1);
+  });
+
+  it("refuses an inline footnote that never closes on its line", () => {
+    const tree = processWithGfm("text^[never closes");
+    expect(findNodes(tree, "footnote").length).toBe(0);
+  });
+
+  it("accepts an empty inline footnote, as Obsidian does", () => {
+    // Measured: `^[]` renders a marker. An earlier guess here said otherwise.
+    expect(findNodes(processWithGfm("a^[]b"), "footnote").length).toBe(1);
+  });
+
+  it("lets an inline footnote body span lines, as Obsidian does", () => {
+    const tree = processWithGfm("a^[note\nnote]b");
+    expect(findNodes(tree, "footnote").length).toBe(1);
+  });
+
+  it("lets an inline footnote body swallow a reference-shaped string", () => {
+    // Obsidian reads `^[^literal]` as inline-footnote text, not a reference.
+    const tree = processWithGfm("text^[^literal]");
+    expect(findNodes(tree, "footnote").length).toBe(1);
+    expect(findNodes(tree, "footnoteReference").length).toBe(0);
+  });
+
+  it("treats an escaped caret as a literal, leaving a real reference", () => {
+    // Stock remark-footnotes gets this wrong and builds an inline footnote.
+    const tree = processWithGfm("text\\^[^x]\n\n[^x]: y");
+    expect(findNodes(tree, "footnote").length).toBe(0);
+    expect(findNodes(tree, "footnoteReference").length).toBe(1);
+  });
+
+  it("does not parse an inline footnote inside a code span", () => {
+    expect(findNodes(processWithGfm("`a^[code]`"), "footnote").length).toBe(0);
+  });
+
+  it("round-trips an inline footnote back to markdown", async () => {
+    expect(await toMd("text^[inline body]")).toContain("^[inline body]");
+  });
+
+  it("promotes a callout blockquote into a callout node", () => {
+    const [callout] = findNodes(
+      processWithGfm("> [!note] Title\n> Body"),
+      "callout",
+    );
+    expect(callout.calloutType).toBe("note");
+    expect(callout.title).toBe("Title");
+    expect(callout.collapsed).toBe(null);
+    // The title keeps its own nodes under `calloutTitle`, so the callout holds
+    // both the title and the body rather than the body alone.
+    const [titleNode] = findNodes(callout, "calloutTitle");
+    expect(findNodes(titleNode, "text").map((n: any) => n.value)).toEqual([
+      "Title",
+    ]);
+    const body = callout.children.filter((c: any) => c.type !== "calloutTitle");
+    expect(
+      body.flatMap((b: any) => findNodes(b, "text").map((n: any) => n.value)),
+    ).toEqual(["Body"]);
+  });
+
+  it("records the fold marker", () => {
+    const [folded] = findNodes(processWithGfm("> [!note]- C\n> H"), "callout");
+    const [open] = findNodes(processWithGfm("> [!note]+ E\n> S"), "callout");
+    expect(folded.collapsed).toBe(true);
+    expect(open.collapsed).toBe(false);
+  });
+
+  it("leaves the title empty when absent, rather than inventing one", () => {
+    // Obsidian *displays* the capitalised type; the node keeps what was written.
+    const [callout] = findNodes(
+      processWithGfm("> [!warning]\n> Body"),
+      "callout",
+    );
+    expect(callout.title).toBe("");
+    expect(callout.calloutType).toBe("warning");
+  });
+
+  it("reads a title that carries markup, keeping the markup node", () => {
+    const [callout] = findNodes(processWithGfm("> [!note] **a**"), "callout");
+    expect(callout.title).toBe("a");
+    expect(findNodes(callout, "strong").length).toBe(1);
+  });
+
+  it("accepts an unknown callout type, as Obsidian does", () => {
+    const [callout] = findNodes(
+      processWithGfm("> [!custom] C\n> B"),
+      "callout",
+    );
+    expect(callout.calloutType).toBe("custom");
+  });
+
+  it("handles a callout nested in a list item", () => {
+    // Inside a list item the newline stays in the text value instead of becoming
+    // a break node, which previously made the body get read as the title.
+    const [callout] = findNodes(
+      processWithGfm("- item\n  > [!note]\n  > body"),
+      "callout",
+    );
+    expect(callout.title).toBe("");
+    expect(findNodes(callout, "text").map((n: any) => n.value)).toEqual([
+      "body",
+    ]);
+  });
+
+  it("nests callouts", () => {
+    const callouts = findNodes(
+      processWithGfm("> [!question] Outer\n> > [!todo] Inner\n> > Body"),
+      "callout",
+    );
+    expect(callouts.length).toBe(2);
+    expect(callouts.map((c: any) => c.calloutType)).toEqual([
+      "question",
+      "todo",
+    ]);
+  });
+
+  it("leaves an ordinary blockquote alone", () => {
+    const tree = processWithGfm("> just a quote");
+    expect(findNodes(tree, "callout").length).toBe(0);
+    expect(findNodes(tree, "blockquote").length).toBe(1);
+  });
+
+  it("hoists a multi-line comment out of the paragraph that swallowed it", () => {
+    // Obsidian reports a block comment as its own section even when its closing
+    // `%%` sits mid-line, with the rest of that line continuing as a paragraph.
+    const tree = processWithGfm("%%\nline %% nested %% line\n%%\nafter");
+    expect(findNodes(tree, "root")[0].children.map((n: any) => n.type)).toEqual(
+      ["comment", "paragraph", "comment"],
+    );
+  });
+
+  it("leaves a single-line comment inline", () => {
+    const tree = processWithGfm("%%note%% tail");
+    expect(findNodes(tree, "root")[0].children.map((n: any) => n.type)).toEqual(
+      ["paragraph"],
+    );
   });
 
   it("does not crash on flow comment with lazy continuation", () => {
@@ -366,9 +569,9 @@ describe("remark-obsidian", () => {
     expect(findNodes(parse("text $x^2$ text"), "inlineMath").length).toBe(1);
   });
 
-  it("strips inline comments spanning multiple line endings", () => {
+  it("hides inline comments spanning multiple line endings", () => {
     const block = processWithGfm("before a%%\nhidden\nmore hidden%% after");
-    expect(findNodes(block, "comment").length).toBe(0);
+    expect(findNodes(block, "comment").length).toBeGreaterThan(0);
     const texts = findNodes(block, "text").map((n: any) => n.value);
     expect(texts.join(" ")).toContain("before a");
     expect(texts.join(" ")).toContain("after");
@@ -377,7 +580,7 @@ describe("remark-obsidian", () => {
 
   it("keeps text following a multiline inline comment intact", () => {
     const tree = processWithGfm("start %%c1\nc2\nc3%% [[link]] end");
-    expect(findNodes(tree, "comment").length).toBe(0);
+    expect(findNodes(tree, "comment").length).toBeGreaterThan(0);
     const [link] = findNodes(tree, "wikilink");
     expect(link.path).toBe("link");
     expect(

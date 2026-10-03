@@ -263,7 +263,11 @@ function tokenizeFlow(
     }
 
     if (code === PERCENT) {
-      return effects.attempt(flowClose, closeAfter, startContent)(code);
+      return effects.attempt(
+        flowClose,
+        closeAfterLineStart,
+        startContent,
+      )(code);
     }
 
     effects.enter("commentContent");
@@ -284,7 +288,11 @@ function tokenizeFlow(
     }
 
     if (code === PERCENT) {
-      return effects.attempt(flowClose, closeAfter, contentConsume)(code);
+      return effects.attempt(
+        flowClose,
+        closeAfterMidLine,
+        contentConsume,
+      )(code);
     }
 
     if (isLineEnding(code)) {
@@ -310,10 +318,42 @@ function tokenizeFlow(
     return contentChunk;
   }
 
-  // Flow owns whole lines, so succeeding mid-line trips micromark's `expected eol
-  // or eof`. `%%x%% trailing` must nok here and re-parse as a paragraph, where the
-  // text tokenizer handles the comment inline.
-  function closeAfter(code: Code): State | undefined {
+  /**
+   * Obsidian ends a block comment at its closing `%%` wherever that falls and
+   * reparses the rest of the line as a new block. Flow owns whole lines, so this
+   * construct cannot stop mid-line, and the two reachable approximations are not
+   * equally good — which one is right depends on where the closer sits.
+   *
+   * **Mid-line closer** (`line %% nested %% line`): reject, and the line becomes
+   * paragraph content where the *text* tokenizer handles `%%…%%` inline. That
+   * reproduces Obsidian's split exactly, including leaving the tail visible.
+   *
+   * **Closer starting its line** (`%% [^a]: def`): reject and the opener's lines
+   * fall back to a paragraph, but this very construct then re-fires on the closer
+   * line — whose own line holds no second `%%` — opening a fresh comment that runs
+   * to end of file and swallows the remainder of the note. Absorbing the closer's
+   * line instead keeps every later block alive.
+   */
+  function closeAfterLineStart(code: Code): State | undefined {
+    if (code === null || isLineEnding(code)) {
+      effects.exit("comment");
+      return ok(code);
+    }
+    effects.enter("commentContent");
+    return absorbCloserLine(code);
+  }
+
+  function absorbCloserLine(code: Code): State | undefined {
+    if (code === null || isLineEnding(code)) {
+      effects.exit("commentContent");
+      effects.exit("comment");
+      return ok(code);
+    }
+    effects.consume(code);
+    return absorbCloserLine;
+  }
+
+  function closeAfterMidLine(code: Code): State | undefined {
     if (code !== null && !isLineEnding(code)) return nok(code);
     effects.exit("comment");
     return ok(code);

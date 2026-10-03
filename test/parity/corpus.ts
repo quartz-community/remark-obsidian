@@ -7,7 +7,9 @@
  * adjacency mutations around closing delimiters.
  */
 
-export type Layer = "seed" | "token" | "context" | "adjacency";
+import { HUNT_FIXTURES } from "./corpus-hunt.js";
+
+export type Layer = "seed" | "token" | "context" | "adjacency" | "hunt";
 
 export interface Case {
   readonly id: string;
@@ -92,6 +94,75 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["highlight/across-newline", "==a\nb==\n"],
   ["highlight/unterminated", "==a and nothing closes\n"],
 
+  // Emphasis is CommonMark's own construct, and Obsidian's legacy tokenizer
+  // diverges on it. Run lengths the TOKENS layer cannot express (it only reaches
+  // 1/1, 1/2, 2/1, 2/2, 4/2 and 2/4) are enumerated here.
+  ["emphasis/run-3-3", "***a***\n"],
+  ["emphasis/run-3-2", "***a**\n"],
+  ["emphasis/run-2-3", "**a***\n"],
+  ["emphasis/run-3-1", "***a*\n"],
+  ["emphasis/run-1-3", "*a***\n"],
+  ["emphasis/run-4-4", "****a****\n"],
+  ["emphasis/run-5-5", "*****a*****\n"],
+  ["emphasis/underscore-1-1", "_a_\n"],
+  ["emphasis/underscore-2-2", "__a__\n"],
+  ["emphasis/underscore-3-3", "___a___\n"],
+  ["emphasis/underscore-3-2", "___a__\n"],
+
+  // Flanking: whether a delimiter run may open or close depends on the characters
+  // on either side of it. This is the rule Obsidian does not apply.
+  ["emphasis/flank-both-space", "a * b * c\n"],
+  ["emphasis/flank-correct", "a *b* c\n"],
+  ["emphasis/flank-open-space", "a * b* c\n"],
+  ["emphasis/flank-close-space", "a *b * c\n"],
+  ["emphasis/flank-inverted", "a* b *c\n"],
+  ["emphasis/flank-intraword-star", "a*b*c\n"],
+  ["emphasis/flank-intraword-underscore", "a_b_c\n"],
+  ["emphasis/flank-underscore-space", "a _ b _ c\n"],
+  ["emphasis/flank-punct-inside", "*(a)*\n"],
+  ["emphasis/flank-punct-outside", "(*a*)\n"],
+  ["emphasis/flank-punct-adjacent", "a.*b*.c\n"],
+  ["emphasis/flank-cjk", "\u65e5\u672c*\u8a9e*\u30c6\u30b9\u30c8\n"],
+  // `*` plus a space at line start is a bullet, so the run never reaches the
+  // inline tokenizer at all.
+  ["emphasis/flank-line-start", "* a *\n"],
+  ["emphasis/flank-trailing-run", "**a ** b\n"],
+
+  ["emphasis/nest-strong-em", "**a *b* c**\n"],
+  ["emphasis/nest-em-strong", "*a **b** c*\n"],
+  ["emphasis/nest-mixed-markers", "**a _b_ c**\n"],
+  ["emphasis/nest-underscore-outer", "_a *b* c_\n"],
+  ["emphasis/nest-leading-em", "***a* b**\n"],
+  ["emphasis/nest-trailing-em", "**a *b***\n"],
+  ["emphasis/nest-interleaved", "*a **b* c**\n"],
+  ["emphasis/nest-repeated-strong", "**a **b** c**\n"],
+
+  ["emphasis/escape-inner", "*a\\*b*\n"],
+  ["emphasis/escape-before-close", "**a\\**\n"],
+  ["emphasis/escape-first-of-run", "\\**a**\n"],
+
+  ["emphasis/unterminated-strong", "**unterminated\n"],
+  ["emphasis/across-blank-line", "*a\n\nb*\n"],
+  ["emphasis/across-newline", "**a\nb**\n"],
+
+  // Emphasis crossed with Obsidian's own constructs, where our tokenizers and
+  // Obsidian's have to agree on precedence as well as on flanking.
+  ["emphasis/in-highlight", "==**a**==\n"],
+  ["emphasis/wraps-highlight", "**==a==**\n"],
+  ["emphasis/wraps-wikilink", "**[[link]]**\n"],
+  ["emphasis/wraps-embed", "**![[embed]]**\n"],
+  ["emphasis/wraps-tag", "**#tag**\n"],
+  ["emphasis/after-tag", "#tag**bold**\n"],
+  ["emphasis/wraps-inline-math", "**$x$**\n"],
+  ["emphasis/inside-inline-math", "$*x*$\n"],
+  ["emphasis/wraps-comment", "**%%c%%**\n"],
+  ["emphasis/in-comment", "%%**a**%%\n"],
+  ["emphasis/spans-wikilink", "**a [[b]] c**\n"],
+  ["emphasis/unbalanced-in-alias", "[[page|**a]]\n"],
+  ["emphasis/in-task", "- [ ] **a**\n"],
+  ["emphasis/in-heading", "# **a**\n"],
+  ["emphasis/in-callout-title", "> [!note] **a**\n"],
+
   ["comment/inline", "This is an %%inline%% comment.\n"],
   ["comment/block", "%%\nblock comment\nspanning lines\n%%\nafter\n"],
   ["comment/nested", "%%\nline %% nested %% line\n%%\nafter\n"],
@@ -157,6 +228,12 @@ const TOKENS: ReadonlyArray<{
   { name: "comment", open: "%%", close: "%%", body: "text" },
   { name: "inline-math", open: "$", close: "$", body: "x^2" },
   { name: "display-math", open: "$$", close: "$$", body: "x^2" },
+  // Included so emphasis also gets the context and adjacency layers: which
+  // containers shield it, and which trailing character lets its closer pair.
+  { name: "emphasis", open: "*", close: "*", body: "text" },
+  { name: "strong", open: "**", close: "**", body: "text" },
+  { name: "underscore-emphasis", open: "_", close: "_", body: "text" },
+  { name: "inline-footnote", open: "^[", close: "]", body: "note" },
 ];
 
 function tokenStates(
@@ -229,6 +306,9 @@ const ADJACENCY_BASES: ReadonlyArray<readonly [string, string]> = [
   ["comment", "%%text%%"],
   ["tag", "#tag"],
   ["inline-math", "$x$"],
+  ["emphasis", "*text*"],
+  ["strong", "**text**"],
+  ["inline-footnote", "^[note]"],
 ];
 
 export function buildCorpus(): Case[] {
@@ -277,6 +357,10 @@ export function buildCorpus(): Case[] {
         `${base}${suffix}\n`,
       );
     }
+  }
+
+  for (const fixture of HUNT_FIXTURES) {
+    push(fixture.id, "hunt", fixture.category, fixture.markdown);
   }
 
   return cases;

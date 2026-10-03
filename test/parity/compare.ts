@@ -36,12 +36,33 @@ function alignMath(projections: Projections, mathTex: boolean): Projections {
   };
 }
 
+/**
+ * Drop the zero-length `text`/`element` sections Obsidian appends for its rendered
+ * footnote list. They carry no source span, so no source-derived projection can
+ * produce them, and leaving them in reports a divergence for every document that
+ * resolves a footnote reference. Only trailing empty ones go: a `text` section with
+ * real source behind it is a genuine block.
+ */
+function alignSections(projections: Projections): Projections {
+  const sections = [...projections.sections];
+  while (sections.length > 0) {
+    const last = sections[sections.length - 1]!;
+    const rendered =
+      (last.type === "text" || last.type === "element") && last.text === "";
+    if (!rendered) break;
+    sections.pop();
+  }
+  return sections.length === projections.sections.length
+    ? projections
+    : { ...projections, sections };
+}
+
 function diffProjections(
   obsidian: Projections,
   ours: Projections,
   mathTex: boolean,
 ): Divergence[] {
-  const left = alignMath(obsidian, mathTex);
+  const left = alignSections(alignMath(obsidian, mathTex));
   const right = alignMath(ours, mathTex);
   const out: Divergence[] = [];
   for (const key of PROJECTION_KEYS) {

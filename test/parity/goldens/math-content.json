@@ -1,0 +1,784 @@
+{
+  "obsidian": {
+    "app": "1.14.2",
+    "installer": "1.13.7"
+  },
+  "recordedAt": "2026-09-28T00:28:07.961Z",
+  "cases": {
+    "math/list-boundary": {
+      "markdown": "1. Hello $$\n   Math\n   $$\n2.\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "\nMath\n"
+        }
+      ],
+      "status": "divergent",
+      "note": "Obsidian opens a display-math block at a mid-line `$$`, reported in quartz-community/remark-obsidian#4. The fence template requires the opener to start its line."
+    },
+    "math/text-after-close": {
+      "markdown": "Here is an equation\n$$\nx = x + 1\n$$and text after\n\n[[Test 2]]\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x = x + 1\n$$and text after\n\n[[Test 2]]"
+        }
+      ],
+      "status": "match"
+    },
+    "math/newline-after-close": {
+      "markdown": "Here is an equation\n$$\nx = x + 1\n$$\nand text after\n\n[[Test 2]]\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x = x + 1"
+        }
+      ],
+      "status": "match"
+    },
+    "math/heading-swallow": {
+      "markdown": "# H1\n[[#H2]]\n$$\na+b=c\n$$ abc\n# H2\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "a+b=c\n$$ abc\n# H2"
+        }
+      ],
+      "status": "match"
+    },
+    "math/empty-block": {
+      "markdown": "# heading 1\n\n$$\n\n# heading 2\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "\n# heading 2"
+        }
+      ],
+      "status": "match"
+    },
+    "math/adjacent-blocks": {
+      "markdown": "$$\nP(A)\n$$$$\nP(A)\n$$\n\n[[Later]]\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "P(A)"
+        },
+        {
+          "display": true,
+          "tex": "\n[[Later]]"
+        }
+      ],
+      "status": "match"
+    },
+    "math/triple-delim": {
+      "markdown": "$$$\nMath\n$$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "Math"
+        }
+      ],
+      "status": "match"
+    },
+    "math/close-on-content-line": {
+      "markdown": "$$\nMath$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "Math"
+        }
+      ],
+      "status": "divergent",
+      "note": "Obsidian accepts a closing `$$` that is not alone on its line. The fence template requires only whitespace after the closer."
+    },
+    "math/unclosed-inner": {
+      "markdown": "$$\n$Math$$\nStill math\n$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "$Math$$\nStill math"
+        }
+      ],
+      "status": "match"
+    },
+    "math/block-own-line": {
+      "markdown": "$$\nE=mc^2\n$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "E=mc^2"
+        }
+      ],
+      "status": "match"
+    },
+    "math/inline-display": {
+      "markdown": "$$E=mc^2$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "E=mc^2"
+        }
+      ],
+      "status": "match"
+    },
+    "math/inline": {
+      "markdown": "text $x^2$ text\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "math/in-blockquote": {
+      "markdown": "> $$\n> x^2\n> $$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "emphasis/wraps-inline-math": {
+      "markdown": "**$x$**\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    },
+    "emphasis/inside-inline-math": {
+      "markdown": "$*x*$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "*x*"
+        }
+      ],
+      "status": "match"
+    },
+    "token/inline-math/balanced": {
+      "markdown": "$x^2$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "token/inline-math/doubled-open": {
+      "markdown": "$$x^2$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "token/inline-math/doubled-close": {
+      "markdown": "$x^2$$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "token/inline-math/empty": {
+      "markdown": "$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": ""
+        }
+      ],
+      "status": "match"
+    },
+    "token/inline-math/nested": {
+      "markdown": "$$x^2$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "token/inline-math/newline-body": {
+      "markdown": "$x^2\nx^2$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2\nx^2"
+        }
+      ],
+      "status": "match"
+    },
+    "token/inline-math/long-body": {
+      "markdown": "$x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "token/inline-math/unicode-body": {
+      "markdown": "$日本語テスト$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "日本語テスト"
+        }
+      ],
+      "status": "match"
+    },
+    "token/display-math/no-closer": {
+      "markdown": "$$x^2\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x^2"
+        }
+      ],
+      "status": "divergent",
+      "note": "Stock mathFlow follows the code-fence template and treats the opener's remainder as an info string, so the formula lands in `meta` and the math body is empty. Obsidian has no info-string concept for `$$`; the remainder is content."
+    },
+    "token/display-math/doubled-open": {
+      "markdown": "$$$$x^2$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": ""
+        }
+      ],
+      "status": "divergent",
+      "note": "Obsidian pairs `$$` with the very next `$$`, so adjacent delimiters yield an empty body and the formula stays text. The fence template instead reads `$$$$` as a longer opening fence and captures the formula."
+    },
+    "token/display-math/doubled-close": {
+      "markdown": "$$x^2$$$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "token/display-math/empty": {
+      "markdown": "$$$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": ""
+        }
+      ],
+      "status": "match"
+    },
+    "token/display-math/whitespace-body": {
+      "markdown": "$$ $$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": " "
+        }
+      ],
+      "status": "match"
+    },
+    "token/display-math/nested": {
+      "markdown": "$$$$x^2$$$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": ""
+        },
+        {
+          "display": true,
+          "tex": ""
+        }
+      ],
+      "status": "divergent",
+      "note": "Obsidian pairs `$$` with the very next `$$`, so adjacent delimiters yield an empty body and the formula stays text. The fence template instead reads `$$$$` as a longer opening fence and captures the formula."
+    },
+    "token/display-math/escaped-open": {
+      "markdown": "\\$$x^2$$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "token/display-math/escaped-close": {
+      "markdown": "$$x^2\\$$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2\\$"
+        }
+      ],
+      "status": "match"
+    },
+    "token/display-math/both-escaped": {
+      "markdown": "\\$$x^2\\$$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2\\$"
+        }
+      ],
+      "status": "match"
+    },
+    "token/display-math/newline-escaped-close": {
+      "markdown": "$$x^2\nx^2\\$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x^2\nx^2\\"
+        }
+      ],
+      "status": "divergent",
+      "note": "Obsidian accepts a closing `$$` that is not alone on its line. The fence template requires only whitespace after the closer. Obsidian also does not honour `\\` before it."
+    },
+    "token/display-math/newline-body": {
+      "markdown": "$$x^2\nx^2$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x^2\nx^2"
+        }
+      ],
+      "status": "divergent",
+      "note": "Obsidian accepts a closing `$$` that is not alone on its line. The fence template requires only whitespace after the closer."
+    },
+    "token/display-math/long-body": {
+      "markdown": "$$x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "token/display-math/unicode-body": {
+      "markdown": "$$日本語テスト$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "日本語テスト"
+        }
+      ],
+      "status": "match"
+    },
+    "context/heading/inline-math": {
+      "markdown": "# $x^2$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "context/list-item/inline-math": {
+      "markdown": "- $x^2$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "context/ordered-item/inline-math": {
+      "markdown": "1. $x^2$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "context/task-item/inline-math": {
+      "markdown": "- [ ] $x^2$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "context/nested-list/inline-math": {
+      "markdown": "- outer\n  - $x^2$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "context/blockquote/inline-math": {
+      "markdown": "> $x^2$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "context/callout/inline-math": {
+      "markdown": "> [!note] Title\n> $x^2$\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "context/table-cell/inline-math": {
+      "markdown": "| H |\n| --- |\n| $x^2$ |\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "context/heading/display-math": {
+      "markdown": "# $$x^2$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "context/list-item/display-math": {
+      "markdown": "- $$x^2$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "context/ordered-item/display-math": {
+      "markdown": "1. $$x^2$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "context/task-item/display-math": {
+      "markdown": "- [ ] $$x^2$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "context/nested-list/display-math": {
+      "markdown": "- outer\n  - $$x^2$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "context/blockquote/display-math": {
+      "markdown": "> $$x^2$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "context/callout/display-math": {
+      "markdown": "> [!note] Title\n> $$x^2$$\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "context/table-cell/display-math": {
+      "markdown": "| H |\n| --- |\n| $$x^2$$ |\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x^2"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/display-math/space": {
+      "markdown": "$$\nx\n$$ next\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x\n$$ next"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/display-math/period": {
+      "markdown": "$$\nx\n$$. next\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x\n$$. next"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/display-math/comma": {
+      "markdown": "$$\nx\n$$, next\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x\n$$, next"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/display-math/close-paren": {
+      "markdown": "$$\nx\n$$) next\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x\n$$) next"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/display-math/close-bracket": {
+      "markdown": "$$\nx\n$$] next\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x\n$$] next"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/display-math/pipe": {
+      "markdown": "$$\nx\n$$| next\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x\n$$| next"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/display-math/newline": {
+      "markdown": "$$\nx\n$$\nnext\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/display-math/blank-line": {
+      "markdown": "$$\nx\n$$\n\nnext\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/display-math/crlf": {
+      "markdown": "$$\nx\n$$\r\nnext\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/display-math/immediate-text": {
+      "markdown": "$$\nx\n$$next\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x\n$$next"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/display-math/hash": {
+      "markdown": "$$\nx\n$$#next\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x\n$$#next"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/display-math/dollar": {
+      "markdown": "$$\nx\n$$$next\n",
+      "math": [
+        {
+          "display": true,
+          "tex": "x\n$$$next"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/inline-math/space": {
+      "markdown": "$x$ next\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/inline-math/period": {
+      "markdown": "$x$. next\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/inline-math/comma": {
+      "markdown": "$x$, next\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/inline-math/close-paren": {
+      "markdown": "$x$) next\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/inline-math/close-bracket": {
+      "markdown": "$x$] next\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/inline-math/pipe": {
+      "markdown": "$x$| next\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/inline-math/newline": {
+      "markdown": "$x$\nnext\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/inline-math/blank-line": {
+      "markdown": "$x$\n\nnext\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/inline-math/crlf": {
+      "markdown": "$x$\r\nnext\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/inline-math/immediate-text": {
+      "markdown": "$x$next\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/inline-math/hash": {
+      "markdown": "$x$#next\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    },
+    "adjacency/inline-math/dollar": {
+      "markdown": "$x$$next\n",
+      "math": [
+        {
+          "display": false,
+          "tex": "x"
+        }
+      ],
+      "status": "match"
+    }
+  }
+}

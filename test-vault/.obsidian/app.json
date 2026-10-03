@@ -1,1 +1,7 @@
-{}
+{
+  "readableLineLength": true,
+  "strictLineBreaks": false,
+  "propertiesInDocument": "visible",
+  "showInlineTitle": true,
+  "showViewHeader": true
+}

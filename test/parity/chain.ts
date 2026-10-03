@@ -7,7 +7,7 @@
  *
  *   30  @quartz-community/obsidian-flavored-markdown  remarkObsidian (+ wikilink visitor)
  *   40  @quartz-community/github-flavored-markdown    remarkGfm
- *   80  @quartz-community/latex                       remarkMath
+ *   80  @quartz-community/latex                       (renders only; see 3 below)
  *   90  @quartz-community/hard-line-breaks            remarkBreaks
  *
  * then `remarkRehype({allowDangerousHtml:true})` -> `rehypeRaw` -> `rehypeObsidian`.
@@ -20,12 +20,20 @@
  *     splits on that newline to separate title from body, so omitting the
  *     pre-transform reproduces exactly the title/body leak that upstream commit
  *     0b3ff34 fixed.
+ *  1b. `keepComments` defaults on, so a kept comment reaches hast as an empty
+ *     `<obsidian-comment>` element. `rehype-obsidian` strips it from its next
+ *     release; the published 1.0.0 in this chain does not, so the manifest does
+ *     not claim `stripComments` yet and rendered HTML still shows the marker. No
+ *     projection reads rendered HTML, so the gate is unaffected.
  *  2. `remarkBreaks` measurably changes output (`Hello $$` -> `Hello $$<br>`), so a
  *     golden recorded without it is wrong.
  *  3. `obsidian-flavored-markdown` passes no `math` key, so remark-obsidian's own
- *     `math: true` default applies *and* `latex` registers `remarkMath`. The
- *     duplicate registration is redundant but provably output-identical, so it is
- *     reproduced as-is rather than "fixed" here.
+ *     `math: true` default parses `$`. `@quartz-community/latex` used to register
+ *     `remark-math` as well, and that was measurably *not* output-identical: two
+ *     text constructs on `$` resolve by first match per position, so `$5 and $10`
+ *     parsed as math and `$x\$` ignored its escape. latex 2.0 moved parsing behind
+ *     an opt-in `parseMath` flag, defaulting off, so only one parser claims `$`
+ *     and this chain no longer registers `remark-math`.
  */
 
 import type { Root as MdRoot } from "mdast";
@@ -33,7 +41,6 @@ import type { Root as HastRoot } from "hast";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
 import remarkBreaks from "remark-breaks";
 import remarkRehype from "remark-rehype";
 import rehypeRaw from "rehype-raw";
@@ -70,6 +77,11 @@ const QUARTZ_DEFAULT: ChainProfile = {
     customTaskChars: false,
     math: true,
     taskReparse: true,
+    frontmatter: true,
+    keepComments: true,
+    bareFootnoteRefs: true,
+    inlineFootnotes: true,
+    callouts: true,
   },
   rehypeObsidian: {
     blockReferences: true,
@@ -91,6 +103,11 @@ const ALL_FEATURES: ChainProfile = {
     customTaskChars: true,
     math: true,
     taskReparse: true,
+    frontmatter: true,
+    keepComments: true,
+    bareFootnoteRefs: true,
+    inlineFootnotes: true,
+    callouts: true,
   },
   rehypeObsidian: {
     blockReferences: true,
@@ -120,13 +137,19 @@ export const CHAIN_MANIFEST = {
       order: 30,
       plugin: "remark-obsidian",
       source: "@quartz-community/obsidian-flavored-markdown",
+      note: "parses frontmatter as of the frontmatter option; omitting it let the `---` become a thematic break and leaked the YAML body in as a list",
     },
     {
       order: 40,
       plugin: "remark-gfm",
       source: "@quartz-community/github-flavored-markdown",
     },
-    { order: 80, plugin: "remark-math", source: "@quartz-community/latex" },
+    {
+      order: 80,
+      plugin: null,
+      source: "@quartz-community/latex",
+      note: "parseMath defaults to false from latex 2.0, so it registers no markdown plugin",
+    },
     {
       order: 90,
       plugin: "remark-breaks",
@@ -144,7 +167,7 @@ export const CHAIN_MANIFEST = {
       source: "@quartz-community/obsidian-flavored-markdown",
     },
   ],
-  textTransform: ["callout-title-newline"],
+  textTransform: [],
   /** Quartz renders hast via preact and never stringifies; this step is ours alone. */
   harnessOnly: ["rehype-stringify"],
 } as const;
@@ -155,8 +178,7 @@ export const CHAIN_MANIFEST = {
  * Mirrors `calloutLineRegex` upstream.
  */
 export function applyTextTransform(src: string): string {
-  const calloutLineRegex = /^> *\[!\w+\|?.*?\][+-]?.*$/gm;
-  return src.replace(calloutLineRegex, (value) => `${value}\n> `);
+  return src;
 }
 
 /** Stand-in for the vfile data Quartz populates; the wikilink visitor reads `slug`. */
@@ -179,7 +201,6 @@ export async function renderOurs(
     .use(remarkParse)
     .use(remarkObsidian, profile.remarkObsidian)
     .use(remarkGfm)
-    .use(remarkMath)
     .use(remarkBreaks)
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
@@ -203,7 +224,6 @@ export function parseOurs(
     .use(remarkParse)
     .use(remarkObsidian, PROFILES[profileName].remarkObsidian)
     .use(remarkGfm)
-    .use(remarkMath)
     .use(remarkBreaks);
   // The source must be passed: transforms that need the original text, such as
   // custom task characters and display-math classification, read it off the file.

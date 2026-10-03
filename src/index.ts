@@ -11,23 +11,37 @@ import { wikilinkSyntax } from "./lib/syntax/wikilink.js";
 import { highlightSyntax } from "./lib/syntax/highlight.js";
 import { commentSyntax } from "./lib/syntax/comment.js";
 import { tagSyntax } from "./lib/syntax/tag.js";
+import { inlineFootnoteSyntax } from "./lib/syntax/inline-footnote.js";
 
 import { wikilinkFromMarkdown } from "./lib/mdast/wikilink.js";
 import { highlightFromMarkdown } from "./lib/mdast/highlight.js";
 import { commentFromMarkdown } from "./lib/mdast/comment.js";
 import { tagFromMarkdown } from "./lib/mdast/tag.js";
+import { inlineFootnoteFromMarkdown } from "./lib/mdast/inline-footnote.js";
 import { wikilinkToMarkdown } from "./lib/mdast/wikilink-to-markdown.js";
 import { highlightToMarkdown } from "./lib/mdast/highlight-to-markdown.js";
 import { commentToMarkdown } from "./lib/mdast/comment-to-markdown.js";
 import { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
+import { inlineFootnoteToMarkdown } from "./lib/mdast/inline-footnote-to-markdown.js";
 import { customTaskCharTransform } from "./lib/task-char.js";
 import { mathDisplayTransform } from "./lib/math-display.js";
 import { taskReparseTransform } from "./lib/task-reparse.js";
+import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
+import { calloutTransform } from "./lib/callout.js";
+import { commentHoistTransform } from "./lib/comment-hoist.js";
 import { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 
 import { math as mathSyntax } from "micromark-extension-math";
 import { mathTextSyntax } from "./lib/syntax/math-text.js";
 import { mathFromMarkdown, mathToMarkdown } from "mdast-util-math";
+import { frontmatter as frontmatterSyntax } from "micromark-extension-frontmatter";
+import {
+  frontmatterFromMarkdown,
+  frontmatterToMarkdown,
+} from "mdast-util-frontmatter";
+
+/** Marker element a kept comment renders as, which `rehype-obsidian` removes. */
+export const COMMENT_ELEMENT = "obsidian-comment";
 
 export interface RemarkObsidianOptions {
   wikilinks?: boolean;
@@ -37,6 +51,40 @@ export interface RemarkObsidianOptions {
   customTaskChars?: boolean;
   math?: boolean;
   taskReparse?: boolean;
+  /**
+   * Parse a leading `---` block as YAML frontmatter. On by default because
+   * Obsidian always does, and leaving it off is not neutral: the `---` becomes a
+   * thematic break or setext heading and the YAML body leaks into the document as
+   * a list, so everything downstream sees blocks that are not there. Turn it off
+   * only when something earlier in the pipeline has already consumed it.
+   */
+  frontmatter?: boolean;
+  /**
+   * Keep `comment` nodes in the tree instead of deleting them, so a consumer can
+   * see where `%%` comments are. A linter needs that, and it is what lets a
+   * block-level view report a comment at all.
+   *
+   * The body is still never rendered: each kept node carries `data.hChildren: []`,
+   * which makes `mdast-util-to-hast` emit an empty `<obsidian-comment>` element
+   * instead of its default for an unknown node with a `value` — a text node
+   * holding the comment body. `rehype-obsidian` removes the empty element; a chain
+   * without it shows a stray empty tag, never the comment text.
+   */
+  keepComments?: boolean;
+  /**
+   * Strip the delimiters from a footnote reference nothing defines, so `see [^x]`
+   * reads `see x` as Obsidian renders it. GFM keeps an unmatched reference literal,
+   * so this is a deliberate divergence from the spec in favour of matching the app.
+   */
+  bareFootnoteRefs?: boolean;
+  /** Parse Obsidian's `^[body]` inline footnote, which GFM has no form for. */
+  inlineFootnotes?: boolean;
+  /**
+   * Promote `> [!type] Title` blockquotes into `callout` nodes. Obsidian reports
+   * these as their own block type, so a blockquote here is a divergence rather
+   * than a neutral choice.
+   */
+  callouts?: boolean;
 }
 
 const defaultOptions: Required<RemarkObsidianOptions> = {
@@ -47,6 +95,11 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
   customTaskChars: true,
   math: true,
   taskReparse: true,
+  frontmatter: true,
+  keepComments: true,
+  bareFootnoteRefs: true,
+  inlineFootnotes: true,
+  callouts: true,
 };
 
 export default function remarkObsidian(
@@ -61,6 +114,16 @@ export default function remarkObsidian(
   data.fromMarkdownExtensions ??= [];
   data.toMarkdownExtensions ??= [];
 
+  if (opts.frontmatter) {
+    data.micromarkExtensions.push(frontmatterSyntax(["yaml"]));
+    data.fromMarkdownExtensions.push(frontmatterFromMarkdown(["yaml"]));
+    data.toMarkdownExtensions.push(frontmatterToMarkdown(["yaml"]));
+  }
+  if (opts.inlineFootnotes) {
+    data.micromarkExtensions.push(inlineFootnoteSyntax());
+    data.fromMarkdownExtensions.push(inlineFootnoteFromMarkdown());
+    data.toMarkdownExtensions.push(inlineFootnoteToMarkdown());
+  }
   if (opts.wikilinks) {
     data.micromarkExtensions.push(wikilinkSyntax());
     data.fromMarkdownExtensions.push(wikilinkFromMarkdown());
@@ -95,11 +158,16 @@ export default function remarkObsidian(
   }
 
   const needsTransform =
-    opts.comments || opts.customTaskChars || opts.math || opts.taskReparse;
+    opts.comments ||
+    opts.customTaskChars ||
+    opts.math ||
+    opts.taskReparse ||
+    opts.bareFootnoteRefs ||
+    opts.callouts;
   if (!needsTransform) return undefined;
 
   return (tree: Root, file: any) => {
-    if (opts.comments) {
+    if (opts.comments && !opts.keepComments) {
       visit(
         tree,
         "comment",
@@ -111,12 +179,27 @@ export default function remarkObsidian(
           return undefined;
         },
       );
+    } else if (opts.comments) {
+      commentHoistTransform(tree);
+      visit(tree, "comment", (node: any) => {
+        node.data = {
+          ...node.data,
+          hName: COMMENT_ELEMENT,
+          hChildren: [],
+        };
+      });
     }
     if (opts.customTaskChars) {
       customTaskCharTransform(tree, String(file));
     }
     if (opts.math) {
       mathDisplayTransform(tree, String(file));
+    }
+    if (opts.callouts) {
+      calloutTransform(tree);
+    }
+    if (opts.bareFootnoteRefs) {
+      bareFootnoteRefTransform(tree);
     }
     if (opts.taskReparse) {
       taskReparseTransform(
@@ -132,6 +215,7 @@ export { wikilinkSyntax } from "./lib/syntax/wikilink.js";
 export { highlightSyntax } from "./lib/syntax/highlight.js";
 export { commentSyntax } from "./lib/syntax/comment.js";
 export { tagSyntax } from "./lib/syntax/tag.js";
+export { inlineFootnoteSyntax } from "./lib/syntax/inline-footnote.js";
 
 export { wikilinkFromMarkdown } from "./lib/mdast/wikilink.js";
 export { highlightFromMarkdown } from "./lib/mdast/highlight.js";
@@ -144,6 +228,9 @@ export { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 export { customTaskCharTransform } from "./lib/task-char.js";
 export { mathDisplayTransform } from "./lib/math-display.js";
 export { taskReparseTransform } from "./lib/task-reparse.js";
+export { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
+export { calloutTransform } from "./lib/callout.js";
+export { commentHoistTransform } from "./lib/comment-hoist.js";
 export { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 
 export {
@@ -153,5 +240,13 @@ export {
   collectEmbedPaths,
 } from "./lib/collect.js";
 
-export type { Wikilink, Highlight, Comment, Tag } from "./lib/types.js";
+export type {
+  Wikilink,
+  Highlight,
+  Comment,
+  Tag,
+  InlineFootnote,
+  Callout,
+  CalloutTitle,
+} from "./lib/types.js";
 export type { CollectWikilinksOptions } from "./lib/collect.js";

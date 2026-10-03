@@ -27,7 +27,7 @@ assertions are active, matching vitest: without that the recorder pins output
 produced under a build where invariant violations pass silently, and the gate then
 reports drift for cases that never really agreed. That mismatch is how a real
 `expected eol or eof` violation in the comment tokenizer stayed hidden. The gate reads those committed goldens and compares them
-against our own output. A full recording takes about 25 seconds.
+against our own output. A full recording of the 490 cases takes about 70 seconds.
 
 ## Running the recorder
 
@@ -67,8 +67,13 @@ from a build CI cannot reach will make the drift detector fire every week.
 
 ## The corpus
 
-`corpus.ts` builds cases deterministically in four layers. Random input is useless
-here because it essentially never lands on a delimiter boundary.
+`corpus.ts` builds 490 cases deterministically in four layers. Random input is
+useless here because it essentially never lands on a delimiter boundary.
+
+`TOKENS` covers CommonMark's `*`, `**` and `_` alongside Obsidian's own delimiters.
+Emphasis is not an Obsidian construct, but Obsidian's tokenizer diverges from
+CommonMark on it, so it needs the same context and adjacency coverage as the rest —
+see [`COMMONMARK-DIVERGENCES.md`](COMMONMARK-DIVERGENCES.md).
 
 1. **seed** — documented behaviour and reproductions from real bug reports.
 2. **token** — each inline construct crossed with malformed delimiter states
@@ -98,6 +103,7 @@ Instead both sides are reduced to the projections in `types.ts`:
 | `math`                                    | `.math` elements                     | `math` / `inlineMath` nodes |
 | `links`                                   | `a.internal-link`, `.internal-embed` | `wikilink` nodes            |
 | `tags`, `headings`, `tasks`, `highlights` | DOM                                  | mdast                       |
+| `emphasis`                                | `strong`/`em` elements               | `strong`/`emphasis` nodes   |
 
 Two of these deserve explanation.
 
@@ -132,6 +138,36 @@ projection would report an empty string for every wikilink case.
 the capability and stores it as `oracle.mathTex`, and the comparison drops `tex`
 from both sides when it is false. Recording against 1.14 or later sharpens the
 math assertions with no code change.
+
+## The math-content oracle
+
+Dropping `tex` is not free: it left **seven wrong `$$` delimitations behind a green
+gate**, agreeing only on the `display` flag. `$$x^2` is the clearest — stock
+`mathFlow` follows the code-fence template, so the formula lands in the node's
+`meta` (an info string, as a code fence's language would be) and the math body is
+empty, while Obsidian renders `x^2`.
+
+1.14 can see all seven, but it is not `latest`, so a full golden recorded from it
+would make the weekly drift job fire. `goldens/math-content.json` is therefore a
+second, separately stamped oracle holding only the math projection for the 76 cases
+that involve math, and `math-content.test.ts` gates it with the same two-way policy
+as the main gate: a `match` case that stops matching fails, and a `divergent` case
+that starts matching fails so the backlog cannot rot. Every `divergent` entry
+carries the root cause.
+
+Re-record it against a 1.14 build, which needs `PARITY_GOLDEN_PATH` so the
+committed gate is not overwritten:
+
+```bash
+OBSIDIAN_APP_PATH=~/.config/obsidian/obsidian-1.14.2.asar \
+PARITY_GOLDEN_PATH=/tmp/golden-1.14.json \
+npm run parity:record
+```
+
+then regenerate `goldens/math-content.json` from that file. Note the recorder
+stamps `obsidian.app` from the running bundle's `apiVersion`, not from wdio's
+version getters — those report the _installer_, so an `OBSIDIAN_APP_PATH` override
+would otherwise label a 1.14 recording as 1.13.7.
 
 ## The pinned chain
 

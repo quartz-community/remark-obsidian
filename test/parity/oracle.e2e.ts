@@ -25,7 +25,15 @@ import {
   type Projections,
 } from "./types.js";
 
-const GOLDEN_PATH = path.resolve("test/parity/goldens/obsidian.json");
+/**
+ * Overridable so a release CI cannot download can be recorded to a separate file.
+ * 1.14 is the only build that still exposes the LaTeX source in `data-latex`, so
+ * it is the only way to assert math *content*; but it is not yet `latest`, and
+ * writing it over the committed gate would make the weekly drift job fire.
+ */
+const GOLDEN_PATH = path.resolve(
+  process.env.PARITY_GOLDEN_PATH ?? "test/parity/goldens/obsidian.json",
+);
 const FIXTURE_DIR = "__parity__";
 const BATCH_SIZE = 20;
 
@@ -125,10 +133,38 @@ const CAPTURE = async (
     for (const el of Array.from(clone.querySelectorAll(".internal-embed"))) {
       el.replaceWith(document.createTextNode(el.getAttribute("src") ?? ""));
     }
+    // The renderer collects every footnote body into one `section.footnotes` at the
+    // end, with a `↩︎` backref appended. That placement is the view's, not the
+    // source's, so leaving it in makes `text` compare a relocated tail against our
+    // in-place mdast for any document that resolves a reference. `sections` and
+    // `meta.footnotes` still carry the footnote structure.
+    for (const el of Array.from(clone.querySelectorAll("section.footnotes"))) {
+      el.remove();
+    }
+    // Obsidian renders frontmatter into `pre.frontmatter` with `display: none`, so
+    // the reader never sees it but `textContent` does. A collapsed callout is also
+    // hidden, but its body is real content the reader can reveal, so only the
+    // frontmatter block goes.
+    for (const el of Array.from(clone.querySelectorAll("pre.frontmatter"))) {
+      el.remove();
+    }
+    for (const el of Array.from(clone.querySelectorAll("sup.footnote-ref"))) {
+      el.replaceWith(document.createTextNode("\u27e8fn\u27e9"));
+    }
     for (const el of Array.from(clone.querySelectorAll("svg"))) el.remove();
     const text = (clone.textContent ?? "").replace(/\s+/g, " ").trim();
 
-    return { text, math, links, tags, headings, tasks, highlights };
+    // Read off the substituted clone, not `root`, so math and embeds inside an
+    // emphasis reduce the same way our mdast side reduces them. `querySelectorAll`
+    // yields document order, which matches the pre-order walk on our side.
+    const emphasis = Array.from(clone.querySelectorAll("strong,em")).map(
+      (el) =>
+        `${el.tagName.toLowerCase()}:${(el.textContent ?? "")
+          .replace(/\s+/g, " ")
+          .trim()}`,
+    );
+
+    return { text, math, links, tags, headings, tasks, highlights, emphasis };
   };
 
   // Primary oracle: a `math` section running past its closing `$$` is direct
@@ -215,6 +251,7 @@ const CAPTURE = async (
           headings: [],
           tasks: [],
           highlights: [],
+          emphasis: [],
         },
         sectionOffsets: [],
         meta: { headings: [], links: [], embeds: [], tags: [], footnotes: [] },
@@ -240,7 +277,7 @@ const DETECT_MATH_TEX = async ({
 }: {
   app: any;
   obsidian: any;
-}): Promise<boolean> => {
+}): Promise<string> => {
   const host = document.createElement("div");
   document.body.appendChild(host);
   const component = new obsidian.Component();
@@ -260,7 +297,13 @@ const DETECT_MATH_TEX = async ({
     ) {
       await new Promise((r) => setTimeout(r, 25));
     }
-    return host.querySelector("mjx-math[data-latex]") !== null;
+    // `apiVersion` comes from the running bundle. wdio's own version getters report
+    // the *installer*, so an `OBSIDIAN_APP_PATH` override records the wrong app and
+    // a 1.14 golden would claim to be 1.13.7 while carrying 1.14-only math content.
+    return JSON.stringify({
+      mathTex: host.querySelector("mjx-math[data-latex]") !== null,
+      apiVersion: obsidian.apiVersion ?? null,
+    });
   } finally {
     component.unload();
     host.remove();
@@ -314,6 +357,17 @@ const CAPTURE_READING_VIEW = async (
   }
   for (const el of Array.from(clone.querySelectorAll(".internal-embed"))) {
     el.replaceWith(document.createTextNode(el.getAttribute("src") ?? ""));
+  }
+  // Must mirror `project`'s removals exactly, or the proxy check compares two
+  // different reductions and fails for a reason that is not proxy drift.
+  for (const el of Array.from(clone.querySelectorAll("section.footnotes"))) {
+    el.remove();
+  }
+  for (const el of Array.from(clone.querySelectorAll("pre.frontmatter"))) {
+    el.remove();
+  }
+  for (const el of Array.from(clone.querySelectorAll("sup.footnote-ref"))) {
+    el.replaceWith(document.createTextNode("\u27e8fn\u27e9"));
   }
   for (const el of Array.from(clone.querySelectorAll("svg"))) el.remove();
   return (clone.textContent ?? "").replace(/\s+/g, " ").trim();
@@ -400,12 +454,14 @@ describe("Obsidian parity oracle", () => {
       }
     }
 
-    const appVersion = await browser.getObsidianVersion();
     const installerVersion = await browser.getObsidianInstallerVersion();
-    const mathTex = (await browser.executeObsidian(
-      DETECT_MATH_TEX as never,
-    )) as boolean;
-    console.log(`  math latex available: ${mathTex}`);
+    const probe = JSON.parse(
+      (await browser.executeObsidian(DETECT_MATH_TEX as never)) as string,
+    ) as { mathTex: boolean; apiVersion: string | null };
+    const { mathTex } = probe;
+    const appVersion =
+      probe.apiVersion ?? String(await browser.getObsidianVersion());
+    console.log(`  app ${appVersion}, math latex available: ${mathTex}`);
 
     await fs.mkdir(path.dirname(GOLDEN_PATH), { recursive: true });
     await fs.writeFile(

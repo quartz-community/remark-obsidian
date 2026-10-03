@@ -43,6 +43,14 @@ export interface Projections {
   readonly headings: readonly string[];
   readonly tasks: readonly TaskItem[];
   readonly highlights: readonly string[];
+  /**
+   * `strong`/`em` spans as flat `type:text` entries in document order — what
+   * separates `***a**` from `*<strong>a</strong>`, which differ only in which side
+   * the leftover delimiter lands on. Flat rather than nested because our side is
+   * mdast and Obsidian's is the DOM: `wikilink` and `tag` have no hast handler, so
+   * a nested projection would diverge on wrapper context alone.
+   */
+  readonly emphasis: readonly string[];
 }
 
 /** Obsidian's `metadataCache` view of a file, an oracle independent of the DOM. */
@@ -117,4 +125,5 @@ export const PROJECTION_KEYS = [
   "headings",
   "tasks",
   "highlights",
+  "emphasis",
 ] as const satisfies ReadonlyArray<keyof Projections>;

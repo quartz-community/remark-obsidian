@@ -21,6 +21,31 @@ export interface Tag extends Literal {
   type: "tag";
 }
 
+/**
+ * Obsidian's `^[body]`. `footnote` is the historical mdast type and the one
+ * `remark-footnotes` emits, which is what Obsidian parses with; `@types/mdast` v4
+ * dropped it when GFM footnotes landed, so it is declared here.
+ */
+export interface InlineFootnote extends Parent {
+  type: "footnote";
+}
+
+/**
+ * `> [!type] Title`. `collapsed` is `null` when no fold marker is present, `true`
+ * for `-`, `false` for `+`. `title` is as written and may be empty; Obsidian then
+ * displays the capitalised type.
+ */
+export interface CalloutTitle extends Parent {
+  type: "calloutTitle";
+}
+
+export interface Callout extends Parent {
+  type: "callout";
+  calloutType: string;
+  title: string;
+  collapsed: boolean | null;
+}
+
 declare module "mdast" {
   interface ListItemData {
     taskChar?: string;
@@ -31,6 +56,9 @@ declare module "mdast" {
     highlight: Highlight;
     comment: Comment;
     tag: Tag;
+    footnote: InlineFootnote;
+    callout: Callout;
+    calloutTitle: CalloutTitle;
   }
 
   interface PhrasingContentMap {
@@ -38,6 +66,7 @@ declare module "mdast" {
     highlight: Highlight;
     comment: Comment;
     tag: Tag;
+    footnote: InlineFootnote;
   }
 }
 
@@ -63,5 +92,8 @@ declare module "micromark-util-types" {
     tag: "tag";
     tagMarker: "tagMarker";
     tagContent: "tagContent";
+    inlineFootnote: "inlineFootnote";
+    inlineFootnoteMarker: "inlineFootnoteMarker";
+    inlineFootnoteContent: "inlineFootnoteContent";
   }
 }

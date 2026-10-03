@@ -57,6 +57,8 @@ function textOf(node: Node): string {
 }
 
 const BLOCK_TYPES = new Set([
+  "callout",
+  "calloutTitle",
   "paragraph",
   "heading",
   "listItem",
@@ -71,7 +73,7 @@ const BLOCK_TYPES = new Set([
 ]);
 
 /** From mdast, not HTML: `wikilink`/`tag` have no hast handler and vanish when rendered. */
-export function mdastText(tree: Root): string {
+export function mdastText(tree: Node): string {
   const parts: string[] = [];
 
   const walk = (node: Node): void => {
@@ -111,6 +113,35 @@ export function mdastText(tree: Root): string {
       case "break":
         parts.push("\n");
         return;
+      // Obsidian shows the callout's title, defaulting a missing one to the
+      // capitalised type (`> [!warning]` reads "Warning"). A present title lives
+      // in a `calloutTitle` child, so walking the children emits it.
+      case "callout": {
+        const callout = node as unknown as {
+          calloutType: string;
+          children?: Node[];
+        };
+        const children = callout.children ?? [];
+        if (!children.some((c) => c.type === "calloutTitle")) {
+          const type = callout.calloutType;
+          parts.push(`${type.charAt(0).toUpperCase()}${type.slice(1)} `);
+        }
+        for (const child of children) walk(child);
+        parts.push(" ");
+        return;
+      }
+      // Counterpart to the recorder dropping `section.footnotes`: the renderer
+      // relocates every definition body to the document end, so comparing them
+      // in source position would diverge on placement alone.
+      case "footnoteDefinition":
+        return;
+      // Obsidian renders the marker as `[n]`, other renderers as `n`. A
+      // placeholder on both sides compares "a reference is here" without
+      // comparing renderer styling, the same way math is handled.
+      case "footnoteReference":
+      case "footnote":
+        parts.push("\u27e8fn\u27e9");
+        return;
       default:
         break;
     }
@@ -139,8 +170,36 @@ export function mdastSections(tree: Root, source: string): SectionItem[] {
   return out;
 }
 
+/**
+ * The heading name as `metadataCache.headings[].heading` reports it: the raw
+ * source between the marker and any closing sequence, with inline markup left
+ * intact (`# **a**` is `**a**`, `# [[target]]` is `[[target]]`).
+ *
+ * Sliced from the source rather than walked, because walking cannot reproduce it —
+ * the markup has already been consumed into nodes, and a `wikilink` or `inlineMath`
+ * child would contribute nothing at all. Slicing also makes this assert the
+ * heading's own position, which nothing else here does.
+ */
+function headingName(node: Node, source: string): string {
+  const start = node.position?.start?.offset;
+  const end = node.position?.end?.offset;
+  if (start === undefined || end === undefined) return "";
+  const raw = source.slice(start, end);
+  const atx = /^#{1,6}[ \t]+/.exec(raw);
+  if (atx)
+    return raw
+      .slice(atx[0].length)
+      .replace(/[ \t]*#*[ \t]*$/, "")
+      .trim();
+  // Setext: the underline is inside the node's span but outside its name. Inside a
+  // container the slice keeps the block prefix, so `para\n> ===` must lose the
+  // whole final line, marker included.
+  return raw.replace(/\r?\n[ \t]*(?:>[ \t]*)*[=-]+[ \t]*$/, "").trim();
+}
+
 export function projectMdast(
   tree: Root,
+  source: string,
 ): Omit<Projections, "text" | "sections"> {
   const math: MathItem[] = [];
   const links: LinkItem[] = [];
@@ -148,8 +207,16 @@ export function projectMdast(
   const headings: string[] = [];
   const tasks: TaskItem[] = [];
   const highlights: string[] = [];
+  const emphasis: string[] = [];
 
   visit(tree, (node: Node) => {
+    // `mdastText`, not `textOf`, so a wikilink or math span inside the emphasis
+    // yields the same display text the DOM side reads off the rendered element.
+    if (node.type === "strong" || node.type === "emphasis") {
+      const kind = node.type === "strong" ? "strong" : "em";
+      emphasis.push(`${kind}:${mdastText(node)}`);
+      return;
+    }
     if (isType<WikilinkNode>(node, "wikilink")) {
       links.push({
         path: node.path,
@@ -178,7 +245,7 @@ export function projectMdast(
       return;
     }
     if (isType<HeadingNode>(node, "heading")) {
-      headings.push(`${node.depth}:${textOf(node).trim()}`);
+      headings.push(`${node.depth}:${headingName(node, source)}`);
       return;
     }
     if (isType<ListItemNode>(node, "listItem")) {
@@ -190,7 +257,30 @@ export function projectMdast(
     }
   });
 
-  return { math, links, tags, headings, tasks, highlights };
+  return { math, links, tags, headings, tasks, highlights, emphasis };
+}
+
+interface ParentNode extends Node {
+  children: Node[];
+}
+
+/**
+ * GFM 4.10 discards an over-long row's excess cells when *rendering*, so mdast
+ * keeps every cell it parsed while `mdast-util-to-hast` truncates. Obsidian's
+ * side is read off the DOM, so without matching that truncation the retained
+ * cells read as a parser divergence where both sides actually agree.
+ */
+function alignTableCells(tree: Root): Root {
+  visit(tree, "table", (table: Node) => {
+    const rows = (table as ParentNode).children;
+    const columns = (rows[0] as ParentNode | undefined)?.children.length;
+    if (columns === undefined) return;
+    for (const row of rows) {
+      const cells = (row as ParentNode).children;
+      if (cells.length > columns) cells.length = columns;
+    }
+  });
+  return tree;
 }
 
 export function projectOurs(
@@ -198,9 +288,9 @@ export function projectOurs(
   profile: ProfileName,
 ): Projections {
   const source = applyTextTransform(markdown);
-  const tree = parseOurs(markdown, profile);
+  const tree = alignTableCells(parseOurs(markdown, profile));
   return {
-    ...projectMdast(tree),
+    ...projectMdast(tree, source),
     text: mdastText(tree),
     sections: mdastSections(tree, source),
   };
