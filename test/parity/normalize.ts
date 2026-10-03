@@ -172,6 +172,19 @@ export function mdastText(tree: Node): string {
 }
 
 /** Counterpart to Obsidian's `sections`. Offsets index the *transformed* source we parsed. */
+/**
+ * Back an offset up to the start of its line.
+ *
+ * mdast puts a block's start *after* its leading indentation, while Obsidian's
+ * section offsets begin at the line, so `   # H` compared as `# H` and reported
+ * a divergence for a heading both sides had parsed identically.
+ */
+function lineStartOf(source: string, offset: number): number {
+  const newline = source.lastIndexOf("\n", offset - 1);
+  const start = newline + 1;
+  return source.slice(start, offset).trim() === "" ? start : offset;
+}
+
 export function mdastSections(tree: Root, source: string): SectionItem[] {
   const out: SectionItem[] = [];
   for (const child of tree.children) {
@@ -180,7 +193,7 @@ export function mdastSections(tree: Root, source: string): SectionItem[] {
     if (start === undefined || end === undefined) continue;
     out.push({
       type: child.type,
-      text: source.slice(start, end).replace(/\n+$/, ""),
+      text: source.slice(lineStartOf(source, start), end).replace(/\n+$/, ""),
     });
   }
   return out;
