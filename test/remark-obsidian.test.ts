@@ -307,6 +307,20 @@ describe("remark-obsidian", () => {
     expect(findNodes(processWithGfm("`a^[code]`"), "footnote").length).toBe(0);
   });
 
+  it("revives a reference whose definition was hidden in a comment", () => {
+    // GFM binds references before the comment transforms put the definition
+    // back, so the reference is still a text node when the definition arrives.
+    const tree = processWithGfm("x[^1]\n\n%%\nhidden\n%% [^1]: freed label\n");
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(1);
+    expect(findNodes(tree, "footnoteReference").length).toBe(1);
+  });
+
+  it("still strips a reference nothing defines", () => {
+    const tree = processWithGfm("see [^gone]\n");
+    expect(findNodes(tree, "footnoteReference").length).toBe(0);
+    expect(findNodes(tree, "text")[0].value).toBe("see gone");
+  });
+
   it("round-trips an inline footnote back to markdown", async () => {
     expect(await toMd("text^[inline body]")).toContain("^[inline body]");
   });
