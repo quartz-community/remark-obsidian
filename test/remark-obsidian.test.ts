@@ -526,6 +526,24 @@ describe("remark-obsidian", () => {
     expect(findNodes(tree, "footnoteReference").length).toBe(1);
   });
 
+  it("folds a definition under a list item into that item", () => {
+    const tree = processWithGfm("- item\n[^3]: under the item");
+    expect(findNodes(tree, "root")[0].children.map((n: any) => n.type)).toEqual(
+      ["list"],
+    );
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
+  });
+
+  it("folds a run of definitions, not just the first", () => {
+    // Folding one extends the paragraph, which is what lets the next fold in
+    // turn. Iterating backwards left the second behind.
+    const tree = processWithGfm("a[^1] b[^2]\n[^2]: first\n[^1]: mid");
+    expect(findNodes(tree, "root")[0].children.map((n: any) => n.type)).toEqual(
+      ["paragraph"],
+    );
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
+  });
+
   it("does not crash on flow comment with lazy continuation", () => {
     expect(() => parse("> %%\nlazy line\n%%")).not.toThrow();
   });

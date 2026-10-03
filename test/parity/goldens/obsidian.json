@@ -25613,8 +25613,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once the paragraph-interruption fold also handles a definition under a list item, and folds a run of definitions rather than only the first."
     },
     "hunt/fix-lazy-setext-chain-not-idempotent/1": {
       "id": "hunt/fix-lazy-setext-chain-not-idempotent/1",
@@ -29858,8 +29858,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once the paragraph-interruption fold also handles a definition under a list item, and folds a run of definitions rather than only the first."
     },
     "hunt/label-after-prose-line-is-prose/4": {
       "id": "hunt/label-after-prose-line-is-prose/4",
@@ -29930,8 +29930,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once the paragraph-interruption fold also handles a definition under a list item, and folds a run of definitions rather than only the first."
     },
     "hunt/label-after-prose-line-is-prose/6": {
       "id": "hunt/label-after-prose-line-is-prose/6",
@@ -40093,8 +40093,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once the paragraph-interruption fold also handles a definition under a list item, and folds a run of definitions rather than only the first."
     },
     "hunt/table-under-lazy-label-phantom-definition/1": {
       "id": "hunt/table-under-lazy-label-phantom-definition/1",
@@ -41886,8 +41886,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once the paragraph-interruption fold also handles a definition under a list item, and folds a run of definitions rather than only the first."
     },
     "hunt/escaped-bracket-in-label/0": {
       "id": "hunt/escaped-bracket-in-label/0",
@@ -42554,8 +42554,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once the paragraph-interruption fold also handles a definition under a list item, and folds a run of definitions rather than only the first."
     },
     "hunt/label-inside-html-block/0": {
       "id": "hunt/label-inside-html-block/0",
