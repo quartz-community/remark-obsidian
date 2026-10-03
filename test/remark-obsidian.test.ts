@@ -335,6 +335,23 @@ describe("remark-obsidian", () => {
     expect(findNodes(tree, "paragraph").length).toBe(1);
   });
 
+  it("does not let a table interrupt a paragraph", () => {
+    const tree = processWithGfm("text\n| a | b |\n| --- | --- |\n");
+    expect(findNodes(tree, "table").length).toBe(0);
+    expect(findNodes(tree, "paragraph").length).toBe(1);
+  });
+
+  it("keeps inline content inside a folded-back table row", () => {
+    const tree = processWithGfm("text\n| *a* | b |\n| --- | --- |\n");
+    expect(findNodes(tree, "table").length).toBe(0);
+    expect(findNodes(tree, "emphasis").length).toBe(1);
+  });
+
+  it("still builds a table after a blank line", () => {
+    const tree = processWithGfm("text\n\n| a | b |\n| --- | --- |\n");
+    expect(findNodes(tree, "table").length).toBe(1);
+  });
+
   it("round-trips an inline footnote back to markdown", async () => {
     expect(await toMd("text^[inline body]")).toContain("^[inline body]");
   });

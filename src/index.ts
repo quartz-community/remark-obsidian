@@ -31,6 +31,7 @@ import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 import { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
 import { containerLazyTransform } from "./lib/container-lazy.js";
 import { fenceOutlivesTransform } from "./lib/fence-outlives.js";
+import { tableInterruptTransform } from "./lib/table-interrupt.js";
 import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 import { footnoteOrphanTransform } from "./lib/footnote-orphan.js";
 import { calloutTransform } from "./lib/callout.js";
@@ -230,6 +231,9 @@ export default function remarkObsidian(
     // Before the bare-reference pass: a `[^1]` the fence swallows is code, and
     // code is literal, so it must stop looking like a reference first.
     fenceOutlivesTransform(tree, String(file));
+    tableInterruptTransform(tree, String(file), (markdown) =>
+      self.parse(markdown),
+    );
     if (opts.bareFootnoteRefs) {
       // Must precede the bare-reference pass: it re-inserts a `[^n]:` label that
       // the bare pass then reduces, as Obsidian shows it.
