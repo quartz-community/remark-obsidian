@@ -321,6 +321,20 @@ describe("remark-obsidian", () => {
     expect(findNodes(tree, "text")[0].value).toBe("see gone");
   });
 
+  it("lets an unclosed fence in a list item swallow the lazy line", () => {
+    const tree = processWithGfm("- ```\n  code\nplain[^1]\n");
+    const code = findNodes(tree, "code");
+    expect(code.length).toBe(1);
+    expect(code[0].value).toBe("code\nplain[^1]");
+    expect(findNodes(tree, "paragraph").length).toBe(0);
+  });
+
+  it("leaves a closed fence in a list item alone", () => {
+    const tree = processWithGfm("- ```\n  code\n  ```\nplain[^1]\n");
+    expect(findNodes(tree, "code")[0].value).toBe("code");
+    expect(findNodes(tree, "paragraph").length).toBe(1);
+  });
+
   it("round-trips an inline footnote back to markdown", async () => {
     expect(await toMd("text^[inline body]")).toContain("^[inline body]");
   });
