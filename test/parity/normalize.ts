@@ -67,6 +67,7 @@ const BLOCK_TYPES = new Set([
   "math",
   "table",
   "tableRow",
+  "tableCell",
   "thematicBreak",
   "html",
   "footnoteDefinition",

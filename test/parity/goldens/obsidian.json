@@ -5561,8 +5561,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Not another package's construct: `remark-gfm` is in the pinned chain. Obsidian renders a resolved reference as a visible `[n]` marker and parses `^[inline]`, which we do not. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "html/passthrough": {
       "id": "html/passthrough",
@@ -22873,8 +22873,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/continuation-masked-under-foreign-label/2": {
       "id": "hunt/continuation-masked-under-foreign-label/2",
@@ -25237,8 +25237,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Previously deferred to another package. Callouts, frontmatter and footnotes are all handled here now, so this is an ordinary gap."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/ends-protected-quoted-html-block/0": {
       "id": "hunt/ends-protected-quoted-html-block/0",
@@ -28409,8 +28409,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/indented-code-after-table/5": {
       "id": "hunt/indented-code-after-table/5",
@@ -28490,8 +28490,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/indented-code-unprotected/0": {
       "id": "hunt/indented-code-unprotected/0",
@@ -29676,8 +29676,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/label-after-pipeless-table/1": {
       "id": "hunt/label-after-pipeless-table/1",
@@ -29714,8 +29714,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/label-after-prose-line-is-prose/0": {
       "id": "hunt/label-after-prose-line-is-prose/0",
@@ -35723,8 +35723,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/pipeless-header-row-under-label/2": {
       "id": "hunt/pipeless-header-row-under-label/2",
@@ -35794,8 +35794,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/pipeless-header-row-under-label/4": {
       "id": "hunt/pipeless-header-row-under-label/4",
@@ -35984,8 +35984,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/pipeless-header-row-under-label/8": {
       "id": "hunt/pipeless-header-row-under-label/8",
@@ -36022,8 +36022,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/pipeless-table-definition-silent/0": {
       "id": "hunt/pipeless-table-definition-silent/0",
@@ -36074,8 +36074,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/pipeless-table-definition-silent/1": {
       "id": "hunt/pipeless-table-definition-silent/1",
@@ -36126,8 +36126,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/prefix-escaped-closing-quote/0": {
       "id": "hunt/prefix-escaped-closing-quote/0",
@@ -39307,8 +39307,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/setext-underline-makes-heading/11": {
       "id": "hunt/setext-underline-makes-heading/11",
@@ -39345,8 +39345,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/setext-underline-makes-heading/12": {
       "id": "hunt/setext-underline-makes-heading/12",
@@ -39383,8 +39383,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/setext-underline-under-definition-paragraph/0": {
       "id": "hunt/setext-underline-under-definition-paragraph/0",
@@ -39861,8 +39861,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/table-under-label-after-block-line/1": {
       "id": "hunt/table-under-label-after-block-line/1",
@@ -39907,8 +39907,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/table-under-label-after-block-line/2": {
       "id": "hunt/table-under-label-after-block-line/2",
@@ -39983,8 +39983,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/table-under-label-after-block-line/4": {
       "id": "hunt/table-under-label-after-block-line/4",
@@ -40059,8 +40059,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/table-under-lazy-label-phantom-definition/0": {
       "id": "hunt/table-under-lazy-label-phantom-definition/0",
@@ -40135,8 +40135,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/table-under-percent-closer-tail/0": {
       "id": "hunt/table-under-percent-closer-tail/0",
@@ -40253,8 +40253,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/table-under-percent-closer-tail/3": {
       "id": "hunt/table-under-percent-closer-tail/3",
@@ -41591,8 +41591,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/commented-label-is-a-reference/7": {
       "id": "hunt/commented-label-is-a-reference/7",
@@ -41643,8 +41643,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/commented-label-is-a-reference/8": {
       "id": "hunt/commented-label-is-a-reference/8",
@@ -42032,8 +42032,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a table ends a footnote definition's lazy continuation and table cells are separated in the text projection."
     },
     "hunt/glued-closer-label/0": {
       "id": "hunt/glued-closer-label/0",

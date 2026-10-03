@@ -478,6 +478,34 @@ describe("remark-obsidian", () => {
     );
   });
 
+  it("ends a footnote definition where a table begins", () => {
+    const tree = processWithGfm("[^1]: body\n| a | b |\n| --- | --- |");
+    expect(findNodes(tree, "root")[0].children.map((n: any) => n.type)).toEqual(
+      ["footnoteDefinition", "table"],
+    );
+  });
+
+  it("splits on a pipeless table too", () => {
+    const tree = processWithGfm("[^1]: body\na | b\n--- | ---\nc | d");
+    expect(findNodes(tree, "table").length).toBe(1);
+  });
+
+  it("needs the header and delimiter rows to agree about outer pipes", () => {
+    // Obsidian reads a pipeless header under a piped delimiter as plain
+    // continuation, not a table.
+    const tree = processWithGfm("[^1]: body\na | b\n| --- | --- |\nc | d");
+    expect(findNodes(tree, "table").length).toBe(0);
+  });
+
+  it("does not split a definition that is really lazy continuation", () => {
+    // The label belongs to the paragraph above, and a table cannot interrupt a
+    // paragraph either, so the whole run stays one block.
+    const tree = processWithGfm("prose\n[^1]: lazy\n| a | b |\n| --- | --- |");
+    expect(findNodes(tree, "root")[0].children.map((n: any) => n.type)).toEqual(
+      ["paragraph"],
+    );
+  });
+
   it("does not crash on flow comment with lazy continuation", () => {
     expect(() => parse("> %%\nlazy line\n%%")).not.toThrow();
   });

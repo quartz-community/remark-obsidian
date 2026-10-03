@@ -29,6 +29,7 @@ import { taskReparseTransform } from "./lib/task-reparse.js";
 import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 import { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
 import { containerLazyTransform } from "./lib/container-lazy.js";
+import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 import { calloutTransform } from "./lib/callout.js";
 import { commentHoistTransform } from "./lib/comment-hoist.js";
 import { commentTailTransform } from "./lib/comment-tail.js";
@@ -210,7 +211,15 @@ export default function remarkObsidian(
     if (opts.bareFootnoteRefs) {
       // Must precede the bare-reference pass: it re-inserts a `[^n]:` label that
       // the bare pass then reduces, as Obsidian shows it.
+      // Order matters: a definition that is really lazy continuation must be
+      // merged away first, or the table split fires on a definition that is
+      // about to stop being one. A table cannot interrupt a paragraph either.
       footnoteInterruptTransform(tree);
+      footnoteTableSplitTransform(
+        tree,
+        String(file),
+        (markdown) => self.runSync(self.parse(markdown), markdown) as Root,
+      );
       bareFootnoteRefTransform(tree);
     }
     if (opts.taskReparse) {
@@ -243,6 +252,7 @@ export { taskReparseTransform } from "./lib/task-reparse.js";
 export { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 export { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
 export { containerLazyTransform } from "./lib/container-lazy.js";
+export { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 export { calloutTransform } from "./lib/callout.js";
 export { commentHoistTransform } from "./lib/comment-hoist.js";
 export { commentTailTransform } from "./lib/comment-tail.js";
