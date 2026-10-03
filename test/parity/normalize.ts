@@ -189,13 +189,20 @@ function lineStartOf(source: string, offset: number): number {
 
 export function mdastSections(tree: Root, source: string): SectionItem[] {
   const out: SectionItem[] = [];
+  let consumed = 0;
   for (const child of tree.children) {
     const start = child.position?.start?.offset;
     const end = child.position?.end?.offset;
     if (start === undefined || end === undefined) continue;
+    // Clamp to the previous block's end. A setext heading preceded by a link
+    // reference definition carries a position that starts back at the
+    // definition, so `[ref]: /url\npara\n===` reported the heading as all three
+    // lines where Obsidian reports only the two it owns.
+    const from = Math.max(lineStartOf(source, start), consumed);
+    consumed = Math.max(consumed, end);
     out.push({
       type: child.type,
-      text: source.slice(lineStartOf(source, start), end).replace(/\n+$/, ""),
+      text: source.slice(from, end).replace(/^\n+/, "").replace(/\n+$/, ""),
     });
   }
   return out;
@@ -225,7 +232,15 @@ function headingName(node: Node, source: string): string {
   // Setext: the underline is inside the node's span but outside its name. Inside a
   // container the slice keeps the block prefix, so `para\n> ===` must lose the
   // whole final line, marker included.
-  return raw.replace(/\r?\n[ \t]*(?:>[ \t]*)*[=-]+[ \t]*$/, "").trim();
+  const body = raw.replace(/\r?\n[ \t]*(?:>[ \t]*)*[=-]+[ \t]*$/, "");
+  // A setext heading shares its content chunk with any link reference
+  // definitions above it, so its span starts back at them: `[ref]: /url\npara\n===`
+  // reports a heading named `para`, not `[ref]: /url\npara`.
+  const lines = body.split("\n");
+  while (lines.length > 1 && /^ {0,3}\[[^\]]*\]:/.test(lines[0] ?? "")) {
+    lines.shift();
+  }
+  return lines.join("\n").trim();
 }
 
 export function projectMdast(

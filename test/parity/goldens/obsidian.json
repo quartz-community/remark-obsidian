@@ -38445,8 +38445,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a block's section slice stops overlapping the block before it, and a setext heading's name drops the link reference definitions it shares a content chunk with."
     },
     "hunt/setext-paragraph-count-ignores-blocks-scan/1": {
       "id": "hunt/setext-paragraph-count-ignores-blocks-scan/1",
@@ -38491,8 +38491,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a block's section slice stops overlapping the block before it, and a setext heading's name drops the link reference definitions it shares a content chunk with."
     },
     "hunt/setext-paragraph-count-ignores-blocks-scan/2": {
       "id": "hunt/setext-paragraph-count-ignores-blocks-scan/2",
@@ -38625,8 +38625,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a block's section slice stops overlapping the block before it, and a setext heading's name drops the link reference definitions it shares a content chunk with."
     },
     "hunt/setext-paragraph-count-ignores-blocks/0": {
       "id": "hunt/setext-paragraph-count-ignores-blocks/0",
@@ -38810,8 +38810,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a block's section slice stops overlapping the block before it, and a setext heading's name drops the link reference definitions it shares a content chunk with."
     },
     "hunt/setext-paragraph-count-ignores-blocks/4": {
       "id": "hunt/setext-paragraph-count-ignores-blocks/4",
