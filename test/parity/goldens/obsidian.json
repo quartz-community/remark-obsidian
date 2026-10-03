@@ -22003,8 +22003,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a reference whose definition was folded into a paragraph is bared, as Obsidian renders any unresolved reference."
     },
     "hunt/column-zero-callout-title/4": {
       "id": "hunt/column-zero-callout-title/4",
@@ -22045,8 +22045,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a reference whose definition was folded into a paragraph is bared, as Obsidian renders any unresolved reference."
     },
     "hunt/column-zero-callout-title/5": {
       "id": "hunt/column-zero-callout-title/5",
@@ -22087,8 +22087,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a reference whose definition was folded into a paragraph is bared, as Obsidian renders any unresolved reference."
     },
     "hunt/column-zero-callout-title/6": {
       "id": "hunt/column-zero-callout-title/6",
@@ -25691,8 +25691,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a reference whose definition was folded into a paragraph is bared, as Obsidian renders any unresolved reference."
     },
     "hunt/fix-lazy-skip-not-revisited/0": {
       "id": "hunt/fix-lazy-skip-not-revisited/0",
@@ -27785,8 +27785,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a reference whose definition was folded into a paragraph is bared, as Obsidian renders any unresolved reference."
     },
     "hunt/indent-after-heading-live/0": {
       "id": "hunt/indent-after-heading-live/0",
@@ -29496,8 +29496,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a reference whose definition was folded into a paragraph is bared, as Obsidian renders any unresolved reference."
     },
     "hunt/label-after-comment-closer-tail/1": {
       "id": "hunt/label-after-comment-closer-tail/1",
@@ -29530,8 +29530,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a reference whose definition was folded into a paragraph is bared, as Obsidian renders any unresolved reference."
     },
     "hunt/label-after-comment-closer-tail/2": {
       "id": "hunt/label-after-comment-closer-tail/2",
@@ -29748,8 +29748,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a reference whose definition was folded into a paragraph is bared, as Obsidian renders any unresolved reference."
     },
     "hunt/label-after-prose-line-is-prose/1": {
       "id": "hunt/label-after-prose-line-is-prose/1",
@@ -29786,8 +29786,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a reference whose definition was folded into a paragraph is bared, as Obsidian renders any unresolved reference."
     },
     "hunt/label-after-prose-line-is-prose/2": {
       "id": "hunt/label-after-prose-line-is-prose/2",
@@ -29820,8 +29820,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a reference whose definition was folded into a paragraph is bared, as Obsidian renders any unresolved reference."
     },
     "hunt/label-after-prose-line-is-prose/3": {
       "id": "hunt/label-after-prose-line-is-prose/3",
@@ -31212,8 +31212,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a reference whose definition was folded into a paragraph is bared, as Obsidian renders any unresolved reference."
     },
     "hunt/lint-alerts-quoted-definitions/0": {
       "id": "hunt/lint-alerts-quoted-definitions/0",
@@ -38109,8 +38109,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a reference whose definition was folded into a paragraph is bared, as Obsidian renders any unresolved reference."
     },
     "hunt/remove-def-creates-setext-heading/2": {
       "id": "hunt/remove-def-creates-setext-heading/2",
@@ -39008,8 +39008,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a reference whose definition was folded into a paragraph is bared, as Obsidian renders any unresolved reference."
     },
     "hunt/setext-underline-makes-heading/4": {
       "id": "hunt/setext-underline-makes-heading/4",
@@ -43386,8 +43386,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a reference whose definition was folded into a paragraph is bared, as Obsidian renders any unresolved reference."
     },
     "hunt/lrd-without-destination/1": {
       "id": "hunt/lrd-without-destination/1",
@@ -44800,8 +44800,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a reference whose definition was folded into a paragraph is bared, as Obsidian renders any unresolved reference."
     },
     "hunt/obsidian-comments/27": {
       "id": "hunt/obsidian-comments/27",

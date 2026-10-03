@@ -506,6 +506,26 @@ describe("remark-obsidian", () => {
     );
   });
 
+  it("bares a reference whose definition was folded away", () => {
+    // GFM binds references while parsing, so the node survives the fold that
+    // turns the definition into lazy continuation. Obsidian never saw a
+    // definition there and renders the bare name.
+    const tree = processWithGfm("para\n[^1]: a\n\nx[^1]");
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
+    expect(findNodes(tree, "footnoteReference").length).toBe(0);
+    expect(
+      findNodes(tree, "text")
+        .map((n: any) => n.value)
+        .join(""),
+    ).toContain("x1");
+  });
+
+  it("keeps a reference bound when its definition survives", () => {
+    const tree = processWithGfm("x[^1]\n\n[^1]: real");
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(1);
+    expect(findNodes(tree, "footnoteReference").length).toBe(1);
+  });
+
   it("does not crash on flow comment with lazy continuation", () => {
     expect(() => parse("> %%\nlazy line\n%%")).not.toThrow();
   });

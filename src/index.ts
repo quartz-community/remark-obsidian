@@ -30,6 +30,7 @@ import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 import { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
 import { containerLazyTransform } from "./lib/container-lazy.js";
 import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
+import { footnoteOrphanTransform } from "./lib/footnote-orphan.js";
 import { calloutTransform } from "./lib/callout.js";
 import { commentHoistTransform } from "./lib/comment-hoist.js";
 import { commentTailTransform } from "./lib/comment-tail.js";
@@ -221,6 +222,9 @@ export default function remarkObsidian(
         (markdown) => self.runSync(self.parse(markdown), markdown) as Root,
       );
       bareFootnoteRefTransform(tree);
+      // Last: the folds above can remove the definition a reference was bound to
+      // while parsing, leaving it orphaned.
+      footnoteOrphanTransform(tree);
     }
     if (opts.taskReparse) {
       taskReparseTransform(
@@ -253,6 +257,7 @@ export { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 export { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
 export { containerLazyTransform } from "./lib/container-lazy.js";
 export { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
+export { footnoteOrphanTransform } from "./lib/footnote-orphan.js";
 export { calloutTransform } from "./lib/callout.js";
 export { commentHoistTransform } from "./lib/comment-hoist.js";
 export { commentTailTransform } from "./lib/comment-tail.js";
