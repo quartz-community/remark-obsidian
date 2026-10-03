@@ -43,6 +43,11 @@ interface HeadingNode extends Node {
   depth: number;
 }
 
+interface ImageNode extends Node {
+  type: "image";
+  url?: string;
+}
+
 const isType = <T extends Node>(node: Node, type: string): node is T =>
   node.type === type;
 
@@ -114,6 +119,16 @@ export function mdastText(tree: Node): string {
       case "break":
         parts.push("\n");
         return;
+      // Obsidian resolves a relative image path against the vault and renders it
+      // as an internal embed, which the recorder reduces to its `src`. An
+      // absolute URL stays an ordinary external image.
+      case "image": {
+        const url = (node as { url?: string }).url ?? "";
+        if (url !== "" && !/^[a-z][a-z0-9+.-]*:|^\/\//i.test(url)) {
+          parts.push(url);
+        }
+        return;
+      }
       // Obsidian shows the callout's title, defaulting a missing one to the
       // capitalised type (`> [!warning]` reads "Warning"). A present title lives
       // in a `calloutTitle` child, so walking the children emits it.
@@ -224,6 +239,13 @@ export function projectMdast(
         heading: node.heading,
         embedded: node.embedded,
       });
+      return;
+    }
+    if (isType<ImageNode>(node, "image")) {
+      const url = node.url ?? "";
+      if (url !== "" && !/^[a-z][a-z0-9+.-]*:|^\/\//i.test(url)) {
+        links.push({ path: url, heading: "", embedded: true });
+      }
       return;
     }
     if (node.type === "tag") {

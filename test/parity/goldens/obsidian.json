@@ -22129,8 +22129,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a relative markdown image projects as the internal embed Obsidian renders it as."
     },
     "hunt/comment-boundary-lines/0": {
       "id": "hunt/comment-boundary-lines/0",
@@ -27121,8 +27121,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a relative markdown image projects as the internal embed Obsidian renders it as."
     },
     "hunt/image-alt-blot-hides-reference/1": {
       "id": "hunt/image-alt-blot-hides-reference/1",
@@ -27177,8 +27177,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a relative markdown image projects as the internal embed Obsidian renders it as."
     },
     "hunt/image-alt-with-brackets/0": {
       "id": "hunt/image-alt-with-brackets/0",
@@ -27223,8 +27223,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a relative markdown image projects as the internal embed Obsidian renders it as."
     },
     "hunt/image-alt-with-brackets/1": {
       "id": "hunt/image-alt-with-brackets/1",
@@ -27269,8 +27269,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a relative markdown image projects as the internal embed Obsidian renders it as."
     },
     "hunt/image-alt-with-brackets/2": {
       "id": "hunt/image-alt-with-brackets/2",
@@ -27329,8 +27329,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a relative markdown image projects as the internal embed Obsidian renders it as."
     },
     "hunt/image-alt-with-brackets/3": {
       "id": "hunt/image-alt-with-brackets/3",
@@ -27375,8 +27375,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a relative markdown image projects as the internal embed Obsidian renders it as."
     },
     "hunt/image-alt-with-brackets/4": {
       "id": "hunt/image-alt-with-brackets/4",
@@ -42364,8 +42364,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a relative markdown image projects as the internal embed Obsidian renders it as."
     },
     "hunt/label-after-link-reference-definition/0": {
       "id": "hunt/label-after-link-reference-definition/0",
