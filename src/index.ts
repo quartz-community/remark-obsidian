@@ -30,6 +30,7 @@ import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 import { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
 import { calloutTransform } from "./lib/callout.js";
 import { commentHoistTransform } from "./lib/comment-hoist.js";
+import { commentTailTransform } from "./lib/comment-tail.js";
 import { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 
 import { math as mathSyntax } from "micromark-extension-math";
@@ -182,6 +183,11 @@ export default function remarkObsidian(
       );
     } else if (opts.comments) {
       commentHoistTransform(tree);
+      commentTailTransform(
+        tree,
+        String(file),
+        (markdown) => self.runSync(self.parse(markdown), markdown) as Root,
+      );
       visit(tree, "comment", (node: any) => {
         node.data = {
           ...node.data,
@@ -236,6 +242,7 @@ export { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 export { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
 export { calloutTransform } from "./lib/callout.js";
 export { commentHoistTransform } from "./lib/comment-hoist.js";
+export { commentTailTransform } from "./lib/comment-tail.js";
 export { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 
 export {

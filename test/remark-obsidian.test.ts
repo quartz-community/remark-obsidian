@@ -430,6 +430,30 @@ describe("remark-obsidian", () => {
     expect(findNodes(tree, "root")[0].children.length).toBeGreaterThan(0);
   });
 
+  it("re-parses what follows a block comment's closing %% on the same line", () => {
+    // Obsidian ends the comment at its closer and reads the rest of the line as
+    // a new block. The tokenizer absorbs that tail on purpose (rejecting there
+    // used to drop every later line), so the split is restored here.
+    const tree = processWithGfm("%%\nhidden\n%% [^1]: def");
+    expect(findNodes(tree, "root")[0].children.map((n: any) => n.type)).toEqual(
+      ["comment", "footnoteDefinition"],
+    );
+  });
+
+  it("keeps later blocks when a comment tail is re-parsed", () => {
+    const tree = processWithGfm("%%\nhidden\n%% [^a]: def\n\ntail");
+    expect(findNodes(tree, "root")[0].children.map((n: any) => n.type)).toEqual(
+      ["comment", "footnoteDefinition", "paragraph"],
+    );
+  });
+
+  it("leaves a comment with nothing after its closer alone", () => {
+    const tree = processWithGfm("%%\nhidden\n%%\n\ntail");
+    expect(findNodes(tree, "root")[0].children.map((n: any) => n.type)).toEqual(
+      ["comment", "paragraph"],
+    );
+  });
+
   it("does not crash on flow comment with lazy continuation", () => {
     expect(() => parse("> %%\nlazy line\n%%")).not.toThrow();
   });

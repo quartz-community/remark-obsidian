@@ -20372,8 +20372,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Obsidian ends a block comment at its closing `%%` and reparses that line's tail as its own block (here a footnote definition). Flow constructs own whole lines in micromark, so we absorb the tail into the comment instead: no content is lost and `text` agrees, but `sections` still differs by the tail's block. Closing it needs the compat-mode preprocessing hook."
+      "triage": "match",
+      "note": "Matches once the tail after a block comment's closing `%%` is re-parsed as its own block, restoring the split Obsidian reports without rewriting the source."
     },
     "hunt/aftercloser-chain-eats-referenced-definition/1": {
       "id": "hunt/aftercloser-chain-eats-referenced-definition/1",
@@ -20414,8 +20414,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Obsidian ends a block comment at its closing `%%` and reparses that line's tail as its own block (here a footnote definition). Flow constructs own whole lines in micromark, so we absorb the tail into the comment instead: no content is lost and `text` agrees, but `sections` still differs by the tail's block. Closing it needs the compat-mode preprocessing hook."
+      "triage": "match",
+      "note": "Matches once the tail after a block comment's closing `%%` is re-parsed as its own block, restoring the split Obsidian reports without rewriting the source."
     },
     "hunt/aftercloser-duplicate-silent/0": {
       "id": "hunt/aftercloser-duplicate-silent/0",
@@ -20470,8 +20470,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Obsidian ends a block comment at its closing `%%` and reparses that line's tail as its own block (here a footnote definition). Flow constructs own whole lines in micromark, so we absorb the tail into the comment instead: no content is lost and `text` agrees, but `sections` still differs by the tail's block. Closing it needs the compat-mode preprocessing hook."
+      "triage": "match",
+      "note": "Matches once the tail after a block comment's closing `%%` is re-parsed as its own block, restoring the split Obsidian reports without rewriting the source."
     },
     "hunt/aftercloser-duplicate-silent/1": {
       "id": "hunt/aftercloser-duplicate-silent/1",
@@ -20612,8 +20612,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Obsidian ends a block comment at its closing `%%` and reparses that line's tail as its own block (here a footnote definition). Flow constructs own whole lines in micromark, so we absorb the tail into the comment instead: no content is lost and `text` agrees, but `sections` still differs by the tail's block. Closing it needs the compat-mode preprocessing hook."
+      "triage": "match",
+      "note": "Matches once the tail after a block comment's closing `%%` is re-parsed as its own block, restoring the split Obsidian reports without rewriting the source."
     },
     "hunt/aftercloser-orphan-silent/1": {
       "id": "hunt/aftercloser-orphan-silent/1",
@@ -21487,8 +21487,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Obsidian ends a block comment at its closing `%%` and reparses that line's tail as its own block (here a footnote definition). Flow constructs own whole lines in micromark, so we absorb the tail into the comment instead: no content is lost and `text` agrees, but `sections` still differs by the tail's block. Closing it needs the compat-mode preprocessing hook."
+      "triage": "match",
+      "note": "Matches once the tail after a block comment's closing `%%` is re-parsed as its own block, restoring the split Obsidian reports without rewriting the source."
     },
     "hunt/closer-line-duplicate-silent/1": {
       "id": "hunt/closer-line-duplicate-silent/1",
@@ -22560,8 +22560,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Obsidian ends a block comment at its closing `%%` and reparses that line's tail as its own block (here a footnote definition). Flow constructs own whole lines in micromark, so we absorb the tail into the comment instead: no content is lost and `text` agrees, but `sections` still differs by the tail's block. Closing it needs the compat-mode preprocessing hook."
+      "triage": "match",
+      "note": "Matches once the tail after a block comment's closing `%%` is re-parsed as its own block, restoring the split Obsidian reports without rewriting the source."
     },
     "hunt/commented-label-before-closer-silent/3": {
       "id": "hunt/commented-label-before-closer-silent/3",
@@ -30836,8 +30836,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Obsidian ends a block comment at its closing `%%` and reparses that line's tail as its own block (here a footnote definition). Flow constructs own whole lines in micromark, so we absorb the tail into the comment instead: no content is lost and `text` agrees, but `sections` still differs by the tail's block. Closing it needs the compat-mode preprocessing hook."
+      "triage": "match",
+      "note": "Matches once the tail after a block comment's closing `%%` is re-parsed as its own block, restoring the split Obsidian reports without rewriting the source."
     },
     "hunt/lazy-label-opens-wide-fence/0": {
       "id": "hunt/lazy-label-opens-wide-fence/0",
