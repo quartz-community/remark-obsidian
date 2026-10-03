@@ -28,6 +28,7 @@ import { mathDisplayTransform } from "./lib/math-display.js";
 import { taskReparseTransform } from "./lib/task-reparse.js";
 import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 import { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
+import { containerLazyTransform } from "./lib/container-lazy.js";
 import { calloutTransform } from "./lib/callout.js";
 import { commentHoistTransform } from "./lib/comment-hoist.js";
 import { commentTailTransform } from "./lib/comment-tail.js";
@@ -205,6 +206,7 @@ export default function remarkObsidian(
     if (opts.callouts) {
       calloutTransform(tree);
     }
+    containerLazyTransform(tree, String(file));
     if (opts.bareFootnoteRefs) {
       // Must precede the bare-reference pass: it re-inserts a `[^n]:` label that
       // the bare pass then reduces, as Obsidian shows it.
@@ -240,6 +242,7 @@ export { mathDisplayTransform } from "./lib/math-display.js";
 export { taskReparseTransform } from "./lib/task-reparse.js";
 export { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 export { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
+export { containerLazyTransform } from "./lib/container-lazy.js";
 export { calloutTransform } from "./lib/callout.js";
 export { commentHoistTransform } from "./lib/comment-hoist.js";
 export { commentTailTransform } from "./lib/comment-tail.js";

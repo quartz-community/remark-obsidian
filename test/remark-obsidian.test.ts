@@ -454,6 +454,30 @@ describe("remark-obsidian", () => {
     );
   });
 
+  it("extends a container over the unindented line that follows it", () => {
+    // CommonMark ends the blockquote there; Obsidian keeps the line inside.
+    const tree = processWithGfm("> ```\n> fake\n> ```\nreal");
+    expect(findNodes(tree, "root")[0].children.map((n: any) => n.type)).toEqual(
+      ["blockquote"],
+    );
+  });
+
+  it("stops at a blank line, which still ends the container", () => {
+    // An unclosed fence pulls the list's span over the following newline, so
+    // this has to be judged from the source rather than from line numbers.
+    const tree = processWithGfm("- ```\n  code\n\nplain");
+    expect(findNodes(tree, "root")[0].children.map((n: any) => n.type)).toEqual(
+      ["list", "paragraph"],
+    );
+  });
+
+  it("absorbs into the last item of a list", () => {
+    const tree = processWithGfm("- ```\n  code\n  ```\nreal");
+    expect(findNodes(tree, "root")[0].children.map((n: any) => n.type)).toEqual(
+      ["list"],
+    );
+  });
+
   it("does not crash on flow comment with lazy continuation", () => {
     expect(() => parse("> %%\nlazy line\n%%")).not.toThrow();
   });

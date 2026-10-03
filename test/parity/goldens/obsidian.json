@@ -20991,8 +20991,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a container is extended over the unindented line that follows it, which Obsidian keeps inside and CommonMark does not."
     },
     "hunt/blockquote-fence-unprotected/1": {
       "id": "hunt/blockquote-fence-unprotected/1",
@@ -26426,8 +26426,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a container is extended over the unindented line that follows it, which Obsidian keeps inside and CommonMark does not."
     },
     "hunt/gen-fence-in-quote-in-list/1": {
       "id": "hunt/gen-fence-in-quote-in-list/1",
@@ -26474,8 +26474,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a container is extended over the unindented line that follows it, which Obsidian keeps inside and CommonMark does not."
     },
     "hunt/gen-list-fence-outlives-item/0": {
       "id": "hunt/gen-list-fence-outlives-item/0",
@@ -26968,8 +26968,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a container is extended over the unindented line that follows it, which Obsidian keeps inside and CommonMark does not."
     },
     "hunt/gen-nested-list-fence/1": {
       "id": "hunt/gen-nested-list-fence/1",
@@ -27020,8 +27020,8 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a container is extended over the unindented line that follows it, which Obsidian keeps inside and CommonMark does not."
     },
     "hunt/heading-migration-mangles-deliberate-value/0": {
       "id": "hunt/heading-migration-mangles-deliberate-value/0",
@@ -32106,8 +32106,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a container is extended over the unindented line that follows it, which Obsidian keeps inside and CommonMark does not."
     },
     "hunt/list-item-fence/1": {
       "id": "hunt/list-item-fence/1",
@@ -32140,8 +32140,8 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match",
+      "note": "Matches once a container is extended over the unindented line that follows it, which Obsidian keeps inside and CommonMark does not."
     },
     "hunt/list-item-label-margin/0": {
       "id": "hunt/list-item-label-margin/0",
