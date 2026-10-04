@@ -499,6 +499,12 @@ describe("remark-obsidian", () => {
       ]);
     });
 
+    it("promotes prose legacy would read as a definition", () => {
+      const tree = processWithGfm("[a[b]: /url\n[^1]: x\n");
+      expect(rootTypes(tree)).toEqual(["definition", "footnoteDefinition"]);
+      expect(findNodes(tree, "definition")[0].label).toBe("a[b");
+    });
+
     it("leaves a definition legacy accepts alone", () => {
       const tree = processWithGfm("[foo]: /url\n\n[foo]\n");
       expect(findNodes(tree, "definition").length).toBe(1);

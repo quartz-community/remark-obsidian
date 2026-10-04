@@ -38,7 +38,10 @@ import { tableInterruptTransform } from "./lib/table-interrupt.js";
 import { setextDefinitionTransform } from "./lib/setext-definition.js";
 import { shortCommentTransform } from "./lib/short-comment.js";
 import { lrdFootnoteTransform } from "./lib/lrd-footnote.js";
-import { legacyDefinitionTransform } from "./lib/legacy-definition.js";
+import {
+  legacyDefinitionPromoteTransform,
+  legacyDefinitionTransform,
+} from "./lib/legacy-definition.js";
 import { quoteIndentedCodeTransform } from "./lib/quote-indented-code.js";
 import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 import { footnoteOrphanTransform } from "./lib/footnote-orphan.js";
@@ -238,6 +241,9 @@ export default function remarkObsidian(
     // After the footnote recovery above, so a `[^x]:` label is already out of
     // the way and only real link reference definitions are re-decided.
     legacyDefinitionTransform(tree, String(file), (markdown) =>
+      self.parse(markdown),
+    );
+    legacyDefinitionPromoteTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
     shortCommentTransform(tree);
