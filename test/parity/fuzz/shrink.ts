@@ -1,33 +1,18 @@
-import { execFileSync } from "node:child_process";
-import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
-
 import { compareCase } from "../compare.js";
-import type { GoldenCase } from "../types.js";
+import { recordBatch } from "./record.js";
 import { generate } from "./generate.js";
 
 /**
- * Reduce a failing document to the smallest one that still disagrees.
+ * Every way of making a document smaller, largest reduction first.
  *
- * A generated document is three blocks of nested, half-broken delimiters, and
- * "seed 3 disagrees" is not a bug report — most of those characters have
- * nothing to do with the disagreement. Shrinking turns it into something a
- * person can read and a corpus can keep.
- *
- * Candidates are recorded in one batch per round rather than one at a time.
- * Obsidian takes seconds to start and milliseconds per case, so a round of
- * fifty candidates costs about what a single candidate would, and three or
- * four rounds reduce most documents to a line or two.
- *
- *   npx tsx --conditions=development test/parity/fuzz/shrink.ts <seed>
+ * Deleting a block, deleting a line, halving a line. Halving matters: it finds
+ * the offending span of a long line in logarithmically many rounds, where
+ * deleting one character at a time would take hundreds.
  */
-
-/** Every way of making this document smaller, largest reduction first. */
-function candidates(markdown: string): string[] {
+export function candidates(markdown: string): string[] {
   const out = new Set<string>();
   const blocks = markdown.split("\n\n");
-  const lines = markdown.replace(/\n$/, "").split("\n");
+  const lines = markdown.replace(/\n$/u, "").split("\n");
 
   if (blocks.length > 1) {
     for (let i = 0; i < blocks.length; i++) {
@@ -37,8 +22,6 @@ function candidates(markdown: string): string[] {
   for (let i = 0; i < lines.length; i++) {
     out.add(lines.filter((_, j) => j !== i).join("\n"));
   }
-  // Halving a long line finds the offending span far faster than deleting
-  // one character at a time would.
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]!;
     if (line.length < 8) continue;
@@ -49,66 +32,83 @@ function candidates(markdown: string): string[] {
   }
 
   return [...out]
-    .map((text) => (text.endsWith("\n") ? text : text + "\n"))
+    .map((text) => (text.endsWith("\n") ? text : `${text}\n`))
     .filter((text) => text.trim() !== "" && text.length < markdown.length)
     .sort((a, b) => a.length - b.length);
 }
 
-function recordBatch(
-  entries: Array<{ id: string; markdown: string }>,
-): Record<string, GoldenCase> {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "shrink-"));
-  const input = path.join(dir, "cases.json");
-  const output = path.join(dir, "golden.json");
-  fs.writeFileSync(input, JSON.stringify(entries));
+/**
+ * Shrink many failing documents at once.
+ *
+ * Each round pools the candidates of every document still shrinking into a
+ * single recording, so the clock scales with the number of rounds rather than
+ * the number of failures: shrinking fifty documents costs about what
+ * shrinking one did.
+ *
+ * It stops when a round finds nothing smaller, and the round cap is generous
+ * because stopping early leaves compound documents behind -- a four-round cap
+ * was still shrinking sixteen of twenty documents when it ran out, and those
+ * unreduced leftovers are exactly what fails to deduplicate.
+ *
+ * This is what makes a wide sweep readable. Raw failures do not group — a
+ * generated document carries six to eight constructs, so its feature
+ * signature is nearly unique, and ninety-four failures came out as ninety
+ * distinct "classes". Reduced to minimal form they collapse onto each other,
+ * and the report becomes a list of causes rather than a list of seeds.
+ */
+export function shrinkAll(
+  documents: ReadonlyMap<string, string>,
+  options: { rounds?: number; perDocument?: number } = {},
+): Map<string, string> {
+  const rounds = options.rounds ?? 12;
+  const perDocument = options.perDocument ?? 12;
+  const current = new Map(documents);
 
-  execFileSync("npm", ["run", "parity:record"], {
-    env: {
-      ...process.env,
-      PARITY_FUZZ_FILE: input,
-      PARITY_GOLDEN_PATH: output,
-    },
-    stdio: "ignore",
-  });
+  for (let round = 1; round <= rounds; round++) {
+    const batch: Array<{ id: string; markdown: string; owner: string }> = [];
+    for (const [owner, markdown] of current) {
+      const reductions = candidates(markdown).slice(0, perDocument);
+      for (const [index, candidate] of reductions.entries()) {
+        batch.push({
+          id: `fuzz/${owner.replace(/\W+/gu, "-")}-r${round}c${index}`,
+          markdown: candidate,
+          owner,
+        });
+      }
+    }
+    if (batch.length === 0) break;
 
-  const file = JSON.parse(fs.readFileSync(output, "utf8")) as {
-    oracle?: { mathTex?: boolean };
-    cases: Record<string, GoldenCase>;
-  };
-  mathTex = file.oracle?.mathTex ?? false;
-  return file.cases;
-}
+    const { cases, mathTex } = recordBatch(
+      batch.map(({ id, markdown }) => ({ id, markdown })),
+    );
 
-let mathTex = false;
-
-const seedArg = process.argv[2];
-if (!seedArg) {
-  console.error("usage: shrink <seed>");
-  process.exit(2);
-}
-
-let current = generate(Number(seedArg));
-console.log(`seed ${seedArg}, ${current.length} chars`);
-
-for (let round = 1; round <= 6; round++) {
-  const batch = candidates(current)
-    .slice(0, 60)
-    .map((markdown, index) => ({ id: `fuzz/c${index}`, markdown }));
-  if (batch.length === 0) break;
-
-  const recorded = recordBatch(batch);
-  const stillFails = batch.find((entry) => {
-    const golden = recorded[entry.id];
-    return golden !== undefined && !compareCase(golden, mathTex).matched;
-  });
-
-  if (!stillFails) {
-    console.log(`round ${round}: nothing smaller still fails; done`);
-    break;
+    const taken = new Set<string>();
+    for (const entry of batch) {
+      if (taken.has(entry.owner)) continue;
+      const golden = cases[entry.id];
+      if (!golden || compareCase(golden, mathTex).matched) continue;
+      current.set(entry.owner, entry.markdown);
+      taken.add(entry.owner);
+    }
+    process.stderr.write(
+      `  round ${round}: ${taken.size} of ${current.size} shrank\n`,
+    );
+    if (taken.size === 0) break;
   }
-  current = stillFails.markdown;
-  console.log(`round ${round}: down to ${current.length} chars`);
+
+  return current;
 }
 
-console.log("\nminimal failing document:");
-console.log(JSON.stringify(current));
+/** Single-seed shrinking, for looking at one failure by hand. */
+if (process.argv[1]?.endsWith("shrink.ts")) {
+  const seed = process.argv[2];
+  if (!seed) {
+    console.error("usage: shrink <seed>");
+    process.exit(2);
+  }
+  const start = generate(Number(seed));
+  console.log(`seed ${seed}, ${start.length} chars`);
+  const result = shrinkAll(new Map([[`seed-${seed}`, start]]));
+  console.log("\nminimal failing document:");
+  console.log(JSON.stringify([...result.values()][0]));
+}

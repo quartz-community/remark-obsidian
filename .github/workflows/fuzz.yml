@@ -72,18 +72,18 @@ jobs:
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
           echo "Sweeping seeds $FROM..$((FROM + COUNT - 1))" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Record the sweep against Obsidian
-        env:
-          PARITY_FUZZ_FROM: ${{ steps.range.outputs.from }}
-          PARITY_FUZZ_COUNT: ${{ steps.range.outputs.count }}
-          PARITY_GOLDEN_PATH: fuzz-run.json
-        run: npm run parity:record
-
-      - name: Compare
+      # The sweep records, compares, shrinks every failure and groups by the
+      # reduced form, so the report is a list of causes rather than of seeds.
+      # Shrinking is what makes it readable: raw failures do not group, since a
+      # generated document carries six to eight constructs and its signature is
+      # nearly unique, while a reduced one is a couple of dozen characters.
+      - name: Sweep, shrink and group
         id: check
         run: |
           set +e
-          npx tsx --conditions=development test/parity/fuzz/check.ts fuzz-run.json | tee fuzz-report.txt
+          npx tsx --conditions=development test/parity/fuzz/sweep.ts \
+            "${{ steps.range.outputs.from }}" "${{ steps.range.outputs.count }}" \
+            | tee fuzz-report.txt
           echo "status=$?" >> "$GITHUB_OUTPUT"
           { echo '```'; cat fuzz-report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
@@ -92,9 +92,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: fuzz-${{ steps.range.outputs.from }}
-          path: |
-            fuzz-run.json
-            fuzz-report.txt
+          path: fuzz-report.txt
 
       - name: Open an issue naming the seeds
         if: steps.check.outputs.status != '0' && github.event_name == 'schedule'
@@ -119,8 +117,9 @@ jobs:
                 'npx tsx --conditions=development test/parity/fuzz/check.ts /tmp/fuzz.json',
                 '```',
                 '',
-                'A seed worth keeping belongs in `SEEDS` in `test/parity/corpus.ts`,',
-                'where it is recorded and triaged like any other case.',
+                'Each form below is already minimal and can be pasted straight',
+                'into `SEEDS` in `test/parity/corpus.ts`, where it is recorded and',
+                'triaged like any other case.',
                 '',
                 '<details><summary>Report</summary>',
                 '',
