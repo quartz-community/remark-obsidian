@@ -260,8 +260,8 @@
           "tex": ""
         }
       ],
-      "status": "divergent",
-      "note": "Obsidian pairs `$$` with the very next `$$`, so adjacent delimiters yield an empty body and the formula stays text. The fence template instead reads `$$$$` as a longer opening fence and captures the formula."
+      "status": "match",
+      "note": "Obsidian pairs `$$` with the very next `$$`, so adjacent delimiters yield an empty body and the formula stays text. Reproduced since the inline math opener stops at two markers instead of taking the whole run."
     },
     "token/display-math/doubled-close": {
       "markdown": "$$x^2$$$$\n",
@@ -305,8 +305,8 @@
           "tex": ""
         }
       ],
-      "status": "divergent",
-      "note": "Obsidian pairs `$$` with the very next `$$`, so adjacent delimiters yield an empty body and the formula stays text. The fence template instead reads `$$$$` as a longer opening fence and captures the formula."
+      "status": "match",
+      "note": "Obsidian pairs `$$` with the very next `$$`, so adjacent delimiters yield an empty body and the formula stays text. Reproduced since the inline math opener stops at two markers instead of taking the whole run."
     },
     "token/display-math/escaped-open": {
       "markdown": "\\$$x^2$$\n",

@@ -114,7 +114,11 @@ function tokenizeMathText(
   }
 
   function sequenceOpen(code: Code): State | undefined {
-    if (code === DOLLAR) {
+    // Take at most two. Obsidian's display delimiter is exactly `$$`, so an
+    // over-long run opens an empty span and leaves the rest as text: `$$$$x^2$$`
+    // is empty math followed by a literal `x^2$$`. Consuming the whole run
+    // instead made the opener four wide and nothing could close it.
+    if (code === DOLLAR && sizeOpen < 2) {
       effects.consume(code);
       sizeOpen++;
       return sequenceOpen;

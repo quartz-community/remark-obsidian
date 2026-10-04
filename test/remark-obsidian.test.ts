@@ -601,6 +601,28 @@ describe("remark-obsidian", () => {
     });
   });
 
+  describe("display math delimiter width", () => {
+    it("opens an empty span for an over-long `$$` run", () => {
+      // Obsidian pairs `$$` with the very next `$$`, so this is empty math
+      // followed by literal text rather than a formula.
+      const tree = processWithGfm("$$$$x^2$$\n");
+      expect(
+        findNodes(tree, "text")
+          .map((n) => n.value)
+          .join(""),
+      ).toContain("x^2");
+    });
+
+    it("still parses an ordinary display span", () => {
+      const tree = processWithGfm("$$x^2$$\n");
+      expect(
+        findNodes(tree, "text")
+          .map((n) => n.value)
+          .join(""),
+      ).not.toContain("x^2");
+    });
+  });
+
   describe("table delimiter width", () => {
     it("builds a table of the delimiter's width, dropping surplus header cells", () => {
       const tree = processWithGfm("| a | b |\n| --- |\n[^1]: x\n");

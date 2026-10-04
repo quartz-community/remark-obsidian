@@ -8158,32 +8158,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: `text $$x+1$$ text` and `# $$x^2$$` should NOT render as math at all; display `$$` is intended to work only on its own line/block. Both Obsidian's display-math and our inline-math are wrong, so do not mirror. Revisit when the upstream fix ships.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [
-            {
-              "display": true,
-              "tex": "x^2"
-            }
-          ],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "$$⟨math⟩",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "$$$$x^2$$"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/display-math/doubled-close": {
       "id": "token/display-math/doubled-close",
@@ -8334,32 +8309,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Team: `text $$x+1$$ text` and `# $$x^2$$` should NOT render as math at all; display `$$` is intended to work only on its own line/block. Both Obsidian's display-math and our inline-math are wrong, so do not mirror. Revisit when the upstream fix ships.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [
-            {
-              "display": true,
-              "tex": "x^2"
-            }
-          ],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "⟨math⟩",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "$$$$x^2$$$$"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/display-math/escaped-open": {
       "id": "token/display-math/escaped-open",
