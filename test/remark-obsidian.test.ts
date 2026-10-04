@@ -12,6 +12,7 @@ import {
   commentRegions,
   htmlCommentRegions,
 } from "../src/lib/comment-region.js";
+import { isLegacyDefinition } from "../src/lib/legacy-definition.js";
 
 function parse(md: string, opts?: RemarkObsidianOptions) {
   return unified().use(remarkParse).use(remarkObsidian, opts).parse(md);
@@ -413,6 +414,37 @@ describe("remark-obsidian", () => {
           .join(""),
       ).toContain(short);
     }
+  });
+
+  describe("legacy link reference definitions", () => {
+    // remark-parse@8's rules are the inverse of CommonMark's in both
+    // directions, so every row here contradicts the spec on purpose.
+    it.each([
+      ["[foo]: /url\n", true],
+      ["[a[b]: /url\n", true],
+      ['[foo]: /url "title"\n', true],
+      ["[foo]: [^9]\n", false],
+      ["[foo]: <[^9]>\n", false],
+      ['[foo]: /url\n"a \\" b"\n[^1]: x\n', false],
+      ["[foo]: /url\n(a(b))\n[^1]: x\n", false],
+    ])("decides %j the way legacy does", (md, expected) => {
+      expect(isLegacyDefinition(md as string)).toBe(expected);
+    });
+
+    it("turns a definition legacy would reject into prose", () => {
+      const tree = processWithGfm("[foo]: [^9]\n\nuse[^9]\n\n[^9]: nine\n");
+      expect(findNodes(tree, "definition").length).toBe(0);
+      expect(rootTypes(tree)).toEqual([
+        "paragraph",
+        "paragraph",
+        "footnoteDefinition",
+      ]);
+    });
+
+    it("leaves a definition legacy accepts alone", () => {
+      const tree = processWithGfm("[foo]: /url\n\n[foo]\n");
+      expect(findNodes(tree, "definition").length).toBe(1);
+    });
   });
 
   describe("lexically paired comment regions", () => {

@@ -32096,8 +32096,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/lrd-destination-reference/1": {
       "id": "hunt/lrd-destination-reference/1",
@@ -32149,8 +32148,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/masked-name-identity/0": {
       "id": "hunt/masked-name-identity/0",
@@ -42570,8 +42568,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/lrd-title-escapes/1": {
       "id": "hunt/lrd-title-escapes/1",
@@ -42641,8 +42638,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/lrd-without-destination/0": {
       "id": "hunt/lrd-without-destination/0",
