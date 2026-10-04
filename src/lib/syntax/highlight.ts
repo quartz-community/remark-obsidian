@@ -40,11 +40,15 @@ export function legacyHighlightQueue(value: string): string | null {
   while (index < value.length) {
     const character = value.charAt(index);
     if (character === MARKER && value.charAt(index + 1) === MARKER) {
-      // Content may not be blank, nor begin or end with whitespace: Obsidian
-      // highlights neither `== text==` nor `==text ==`. CommonMark attention
-      // gave that for free through flanking; a forward scan has to say it.
-      if (!queue.trim() || /^\s|\s$/u.test(queue)) return null;
-      return queue;
+      // Content may not be blank or begin with whitespace, and no later closer
+      // can repair either, so the attempt is over.
+      if (!queue.trim() || /^\s/u.test(queue)) return null;
+      // Trailing whitespace is different: the scan keeps going and may close
+      // further along. `===` / `[^2]: b` / `===` closes on the *last* two
+      // markers, because stopping at the first leaves `=⏎[^2]: b⏎` ending in a
+      // newline — carrying on takes the next `=` into the content and lands on
+      // a closer that does not.
+      if (!/\s$/u.test(queue)) return queue;
     }
     queue += character;
     index++;

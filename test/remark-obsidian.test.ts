@@ -13,6 +13,7 @@ import {
   htmlCommentRegions,
 } from "../src/lib/comment-region.js";
 import { isLegacyDefinition } from "../src/lib/legacy-definition.js";
+import { legacyHighlightQueue } from "../src/lib/syntax/highlight.js";
 
 function parse(md: string, opts?: RemarkObsidianOptions) {
   return unified().use(remarkParse).use(remarkObsidian, opts).parse(md);
@@ -803,6 +804,14 @@ describe("remark-obsidian", () => {
           .map((n) => n.value)
           .join(""),
       ).toBe("==text==");
+    });
+
+    it("keeps scanning past a closer that would end in whitespace", () => {
+      // Stopping at the first `==` leaves `=\n[^2]: b\n`, which ends in a
+      // newline; carrying on takes the next `=` into the content and lands on
+      // a closer that does not. Leading whitespace has no such remedy.
+      expect(legacyHighlightQueue("===\n[^2]: b\n===")).toBe("=\n[^2]: b\n=");
+      expect(legacyHighlightQueue("== text==")).toBe(null);
     });
 
     it("does not highlight content padded with whitespace", () => {
