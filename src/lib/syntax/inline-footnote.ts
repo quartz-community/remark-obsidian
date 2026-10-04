@@ -68,18 +68,59 @@ const nonLazyContinuation: Construct = {
   },
 };
 
+interface CloserMemo {
+  /** Offset from which no `]` remains, so no opener can close. */
+  noCloserFrom?: number;
+}
+
+/**
+ * Remember the point past which no closer exists, for the whole document.
+ *
+ * Every opener scans forward for a balanced `]`, so a run of openers with no
+ * `]` anywhere costs one full scan each: `^[` twenty thousand times took
+ * twenty-one seconds where the bare chain took a hundred and sixty
+ * milliseconds. That is quadratic, and a note anyone can write.
+ *
+ * The recorded fact is "no `]` remains from here", not "this attempt failed".
+ * The weaker condition would be unsound for a scanner that counts depth:
+ * `^[^[ ]` exhausts the input from the first caret, because the inner `[`
+ * raises the depth a single `]` cannot clear, and yet succeeds from the second
+ * -- so a failure says nothing about later positions. The absence of any `]`
+ * does, since a later opener searches a subset of the same region.
+ */
+function memoFor(parser: unknown): CloserMemo {
+  const host = parser as { inlineFootnoteCloserMemo?: CloserMemo };
+  host.inlineFootnoteCloserMemo ??= {};
+  return host.inlineFootnoteCloserMemo;
+}
+
 function tokenize(
   this: TokenizeContext,
   effects: Effects,
   ok: State,
   nok: State,
 ): State {
+  const self = this;
   let depth = 0;
+  let sawBracket = false;
+  let openerAt = 0;
 
   return start;
 
+  /** Exhausted the input; only a run that never met a `]` proves anything. */
+  function exhausted(code: Code): State | undefined {
+    if (!sawBracket) memoFor(self.parser).noCloserFrom = openerAt;
+    return nok(code);
+  }
+
   function start(code: Code): State | undefined {
     if (code !== CARET) return nok(code);
+    openerAt = self.now().offset ?? 0;
+    const memo = memoFor(self.parser);
+    if (memo.noCloserFrom !== undefined && openerAt >= memo.noCloserFrom) {
+      return nok(code);
+    }
+    sawBracket = false;
     effects.enter("inlineFootnote");
     effects.enter("inlineFootnoteMarker");
     effects.consume(code);
@@ -101,8 +142,11 @@ function tokenize(
    * read past its splice buffer.
    */
   function atBoundary(code: Code): State | undefined {
-    if (code === null) return nok(code);
-    if (code === RIGHT_BRACKET) return closeHere(code);
+    if (code === null) return exhausted(code);
+    if (code === RIGHT_BRACKET) {
+      sawBracket = true;
+      return closeHere(code);
+    }
     if (isLineEnding(code)) {
       return effects.attempt(nonLazyContinuation, atBoundary, nok)(code);
     }
@@ -113,7 +157,7 @@ function tokenize(
   function content(code: Code): State | undefined {
     if (code === null) {
       effects.exit("inlineFootnoteContent");
-      return nok(code);
+      return exhausted(code);
     }
 
     if (isLineEnding(code)) {
@@ -133,6 +177,7 @@ function tokenize(
     }
 
     if (code === RIGHT_BRACKET) {
+      sawBracket = true;
       depth--;
       if (depth === 0) {
         effects.exit("inlineFootnoteContent");
@@ -147,7 +192,11 @@ function tokenize(
   }
 
   function escaped(code: Code): State | undefined {
-    if (code === null || isLineEnding(code)) {
+    if (code === null) {
+      effects.exit("inlineFootnoteContent");
+      return exhausted(code);
+    }
+    if (isLineEnding(code)) {
       effects.exit("inlineFootnoteContent");
       return nok(code);
     }

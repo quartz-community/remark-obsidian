@@ -72,9 +72,7 @@ const UPSTREAM: Readonly<Record<string, string>> = {
  */
 const OURS_QUADRATIC: Readonly<Record<string, string>> = {
   "highlight-run":
-    "`=` x20000 around content. Bare chain 26ms, ours exceeds 20s. The legacy highlight scan retries every opener to end of input.",
-  "inline-footnote-open":
-    "`^[` x20000. Bare chain 160ms, ours 21008ms. The inline-footnote opener rescans for its closer on every attempt.",
+    "`=` x20000 around content. Bare chain 26ms, ours exceeds 20s. Not the no-closer case `inline-footnote-open` was: a run of `=` is full of `==` pairs, so every attempt finds a closer and the cost is the chunk scan reading to end of input before it can judge itself. Fixing it means stopping that scan at the decision point, which is a restructure of the legacy port rather than a memo.",
 };
 
 const gated = Object.keys(SIZES).filter(
@@ -87,10 +85,7 @@ describe("pathological input", () => {
   });
 
   it("keeps the exclusions to the ones documented above", () => {
-    expect(Object.keys(OURS_QUADRATIC).sort()).toEqual([
-      "highlight-run",
-      "inline-footnote-open",
-    ]);
+    expect(Object.keys(OURS_QUADRATIC).sort()).toEqual(["highlight-run"]);
     expect(Object.keys(UPSTREAM).length).toBe(5);
   });
 
