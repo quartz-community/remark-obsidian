@@ -267,6 +267,42 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["escape/backslash-run", "\\*not emphasis\\* and \\[\\[not a link\\]\\]\n"],
   ["breaks/single-newline", "line one\nline two\n"],
 
+  // Sent by the author of Obsidian Footnotes Shortcuts as places Obsidian
+  // deviates from stock remark-parse 8 + remark-footnotes 2 + remark-math 3.
+  // Every callout point in that list was already confirmed by goldens here,
+  // so the rest is recorded rather than taken on trust -- reading one rule's
+  // "EOL" as end-of-string instead of a newline had already broken every
+  // titleless callout once.
+  ["callout/line-after-title-is-fresh-block", "> [!note]\n> [^1]: x\n"],
+  ["callout/text-after-marker-is-block", "> [!note] [^1]: x\n"],
+  ["callout/only-first-line-is-title", "> a\n> [!note] T\n"],
+  ["callout/marker-in-list-defines", "- > [!note] [^1]: x\n"],
+  ["callout/marker-in-quote-defines", "> > [!note] [^1]: x\n"],
+  ["list/lazy-line-ignored-for-min-indent", "- a\nlazy\n\n    [^1]: x\n"],
+  ["list/indented-definition-in-item", "- a\n\n    [^1]: x\n"],
+  ["table/leading-space-breaks-pipe-style", " | a |\n| --- |\n"],
+  ["table/delimiter-leading-space", "| a |\n | --- |\n"],
+  ["table/first-non-row-ends-it", "| a |\n| --- |\n| b |\nnot a row\n| c |\n"],
+  ["table/definition-row-ends-piped-table", "| a |\n| --- |\n[^1]: x | y\n"],
+  ["wikilink/contents-are-inert", "[[a|[^1]]]\n\n[^1]: x\n"],
+  ["wikilink/second-open-moves-start", "[[a[[b]]\n"],
+  ["wikilink/does-not-span-lines", "[[a\nb]]\n"],
+  ["frontmatter/closing-tail-is-markdown", "---\na: b\n---[^2]: x\n"],
+  ["frontmatter/indented-opener-is-not", " ---\na: b\n---\n"],
+  ["frontmatter/closing-line-trailing-text", "---\na: b\n--- trailing\n"],
+  ["comment/other-percent-does-not-open", "%% 50%\nstill text\n"],
+  ["comment/triple-percent-does-not-open", "%%%\ntext\n"],
+  ["comment/closes-inside-backticks", "%%\na\n`%%`\nb\n"],
+  ["comment/does-not-end-a-definition", "[^1]: a\n%%\nb\n"],
+  ["comment/interrupts-a-paragraph", "a\n%%\nb\n"],
+  ["comment/indented-under-list-item", "- a\n    %%\n    b\n"],
+  ["comment/references-inside-are-counted", "%%\na [^1]\n%%\n\n[^1]: x\n"],
+  ["math/midparagraph-inline-across-lines", "x $$a\nb$$ y\n"],
+  ["math/midparagraph-stops-at-blank-line", "x $$a\n\nb$$ y\n"],
+  ["inline-footnote/reference-inside-is-dead", "^[see [^1]]\n\n[^1]: x\n"],
+  ["inline-footnote/label-inside-is-dead", "^[[^1]: x]\n"],
+  ["inline-footnote/nested-note-is-dead", "^[a ^[b] c]\n"],
+
   // Closing the colour-marker set. The circle and square families were
   // already exhaustive -- all nine of each -- so what was open is whether
   // any other colour-bearing family qualifies, and how the marker behaves

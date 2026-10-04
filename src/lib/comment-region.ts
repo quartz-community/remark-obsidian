@@ -59,8 +59,28 @@ function regionsFor(source: string, open: string, close: string): Region[] {
   return found;
 }
 
+/**
+ * A block comment opens on a line that is spaces, `%%`, and no further `%`.
+ *
+ * Measured: `%% 50%` and `%%%` are both ordinary paragraphs in Obsidian, so
+ * the opener is not simply "a line beginning with `%%`" -- any other percent
+ * on that line disqualifies it. That also, correctly, rejects a self-closing
+ * `%% a %%`, which is an inline comment and belongs to the text construct
+ * rather than to a block region.
+ *
+ * Container prefixes come first: `> %%` opens one inside a quote, which the
+ * first version of this anchor rejected and broke.
+ */
+const BLOCK_OPENER = /^(?:[ \t]*>)*[ \t]*%%[^%\n]*$/u;
+
 export function commentRegions(source: string): Region[] {
-  return regionsFor(source, "%%", "%%");
+  return regionsFor(source, "%%", "%%").filter((region) => {
+    const lineStart = source.lastIndexOf("\n", region.start - 1) + 1;
+    const lineEnd = source.indexOf("\n", region.start);
+    return BLOCK_OPENER.test(
+      source.slice(lineStart, lineEnd === -1 ? source.length : lineEnd),
+    );
+  });
 }
 
 /**
