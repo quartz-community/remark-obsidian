@@ -27587,8 +27587,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/indented-code-after-quoted-heading/0": {
       "id": "hunt/indented-code-after-quoted-heading/0",
@@ -45053,8 +45052,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/quoted-definition-column0-tail/5": {
       "id": "hunt/quoted-definition-column0-tail/5",

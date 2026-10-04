@@ -411,6 +411,17 @@ describe("remark-obsidian", () => {
     }
   });
 
+  it("opens a code block for an indented line below a quote", () => {
+    const tree = processWithGfm("> quote\n> more\n    code[^1]\n\nafter\n");
+    expect(rootTypes(tree)).toEqual(["blockquote", "code", "paragraph"]);
+    expect(findNodes(tree, "code")[0].value).toBe("code[^1]");
+  });
+
+  it("keeps an unindented lazy line inside the quote", () => {
+    const tree = processWithGfm("> quote\nlazy line\n");
+    expect(rootTypes(tree)).toEqual(["blockquote"]);
+  });
+
   it("folds a definition under prose inside a quote", () => {
     const tree = processWithGfm("> para\n> [^q]: quoted under prose\n");
     expect(findNodes(tree, "footnoteDefinition").length).toBe(0);

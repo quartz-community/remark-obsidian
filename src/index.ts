@@ -35,6 +35,7 @@ import { tableInterruptTransform } from "./lib/table-interrupt.js";
 import { setextDefinitionTransform } from "./lib/setext-definition.js";
 import { shortCommentTransform } from "./lib/short-comment.js";
 import { lrdFootnoteTransform } from "./lib/lrd-footnote.js";
+import { quoteIndentedCodeTransform } from "./lib/quote-indented-code.js";
 import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 import { footnoteOrphanTransform } from "./lib/footnote-orphan.js";
 import { calloutTransform } from "./lib/callout.js";
@@ -234,6 +235,9 @@ export default function remarkObsidian(
     if (opts.callouts) {
       calloutTransform(tree);
     }
+    quoteIndentedCodeTransform(tree, String(file), (markdown) =>
+      self.parse(markdown),
+    );
     containerLazyTransform(tree, String(file));
     // Before the bare-reference pass: a `[^1]` the fence swallows is code, and
     // code is literal, so it must stop looking like a reference first.
