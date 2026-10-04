@@ -10,7 +10,7 @@
 
 import type { Root } from "mdast";
 import type { Node } from "unist";
-import { visit } from "unist-util-visit";
+import { SKIP, visit } from "unist-util-visit";
 import { applyTextTransform, parseOurs, type ProfileName } from "./chain.js";
 import type {
   LinkItem,
@@ -260,6 +260,13 @@ export function projectMdast(
   source: string,
 ): Omit<Projections, "text" | "sections"> {
   const math: MathItem[] = [];
+  const referenced = new Set<string>();
+  visit(tree, "footnoteReference", (node: Node) => {
+    referenced.add(
+      String((node as unknown as { identifier: string }).identifier),
+    );
+  });
+
   const links: LinkItem[] = [];
   const tags: string[] = [];
   const headings: string[] = [];
@@ -268,6 +275,16 @@ export function projectMdast(
   const emphasis: string[] = [];
 
   visit(tree, (node: Node) => {
+    // An unreferenced definition is never rendered, so nothing inside it
+    // reaches the capture. A referenced one is rendered into
+    // `section.footnotes`: the recorder drops that for `text`, which is why
+    // `mdastText` skips definitions wholesale, but its math and links are
+    // still collected from the document. So the skip here is conditional on
+    // the reference, not on the node.
+    if (node.type === "footnoteDefinition") {
+      const id = String((node as unknown as { identifier: string }).identifier);
+      if (!referenced.has(id)) return SKIP;
+    }
     // `mdastText`, not `textOf`, so a wikilink or math span inside the emphasis
     // yields the same display text the DOM side reads off the rendered element.
     if (node.type === "strong" || node.type === "emphasis") {

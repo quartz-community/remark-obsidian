@@ -47,6 +47,29 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["math/in-table-pipe", "| Math |\n| --- |\n| $|x|$ |\n"],
   ["math/in-blockquote", "> $$\n> x^2\n> $$\n"],
 
+  // Where a `$$` sits on its line decides whether it opens a block, and the
+  // recorded cases disagree: `1. Hello $$` opens one, `> tail $$` does not.
+  // Two samples cannot separate "mid-line" from "inside a definition" from
+  // "inside a quote", so each axis is probed on its own.
+  ["math/midline-plain", "tail $$\nx\n$$\n"],
+  ["math/midline-quote", "> tail $$\n> x\n> $$\n"],
+  ["math/midline-list", "1. tail $$\n   x\n   $$\n"],
+  ["math/midline-definition", "[^1]: def $$\nx\n$$\n"],
+  ["math/midline-quoted-definition", "> [^1]: def\n> tail $$\n> x\n> $$\n"],
+  ["math/linestart-list", "1. x\n   $$\n   y\n   $$\n"],
+  ["math/linestart-definition", "[^1]: def\n    $$\n    y\n    $$\n"],
+  ["math/unclosed-quote-lazy", "> $$\nlazy\n"],
+  ["math/unclosed-plain", "$$\nlazy\n"],
+
+  // `^[` nesting: the doubled and nested forms both diverge, and neither is
+  // explicable without knowing where Obsidian's scan starts and stops.
+  ["footnote/inline-plain", "^[note]\n"],
+  ["footnote/inline-unclosed", "^[note\n"],
+  ["footnote/inline-bracket-body", "^[a [b] c]\n"],
+  ["footnote/inline-escaped-open", "\\^[note]\n"],
+  ["footnote/inline-triple", "^[^[^[x]]]\n"],
+  ["footnote/inline-ref-body", "^[see [^1]]\n\n[^1]: one\n"],
+
   ["wikilink/basic", "[[page]]\n"],
   ["wikilink/alias", "[[page|alias]]\n"],
   ["wikilink/heading", "[[page#heading]]\n"],

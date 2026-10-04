@@ -53,7 +53,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-04T10:14:41.691Z",
+  "recordedAt": "2026-10-04T10:25:53.823Z",
   "cases": {
     "math/list-boundary": {
       "id": "math/list-boundary",
@@ -732,6 +732,573 @@
         }
       },
       "triage": "match"
+    },
+    "math/midline-plain": {
+      "id": "math/midline-plain",
+      "layer": "seed",
+      "category": "math",
+      "markdown": "tail $$\nx\n$$\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">tail $$<br>\nx</p>\n<div class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" display=\"true\"><mjx-math display=\"true\" class=\"MJX-TEX\" style=\"margin-left: 0px; margin-right: 0px;\"></mjx-math></mjx-container></div>",
+        "projections": {
+          "text": "tail $$ x ⟨math⟩",
+          "math": [
+            {
+              "display": true
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "tail $$\nx"
+            },
+            {
+              "type": "math",
+              "text": "$$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "math/midline-quote": {
+      "id": "math/midline-quote",
+      "layer": "seed",
+      "category": "math",
+      "markdown": "> tail $$\n> x\n> $$\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>tail <span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" display=\"true\"><mjx-math display=\"true\" class=\"MJX-TEX\" style=\"margin-left: 0px; margin-right: 0px;\"><mjx-mi class=\"mjx-i\"><mjx-c class=\"mjx-c1D465 TEX-I\"></mjx-c></mjx-mi></mjx-math></mjx-container></span></p>\n</blockquote>",
+        "projections": {
+          "text": "tail ⟨math⟩",
+          "math": [
+            {
+              "display": true
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> tail $$\n> x\n> $$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "replicate"
+    },
+    "math/midline-list": {
+      "id": "math/midline-list",
+      "layer": "seed",
+      "category": "math",
+      "markdown": "1. tail $$\n   x\n   $$\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\">tail <span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" display=\"true\"><mjx-math display=\"true\" class=\"MJX-TEX\" style=\"margin-left: 0px; margin-right: 0px;\"><mjx-mi class=\"mjx-i\"><mjx-c class=\"mjx-c1D465 TEX-I\"></mjx-c></mjx-mi></mjx-math></mjx-container></span></li>\n</ol>",
+        "projections": {
+          "text": "tail ⟨math⟩",
+          "math": [
+            {
+              "display": true
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1. tail $$\n   x\n   $$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "replicate"
+    },
+    "math/midline-definition": {
+      "id": "math/midline-definition",
+      "layer": "seed",
+      "category": "math",
+      "markdown": "[^1]: def $$\nx\n$$\n",
+      "obsidian": {
+        "html": "<div class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" display=\"true\"><mjx-math display=\"true\" class=\"MJX-TEX\" style=\"margin-left: 0px; margin-right: 0px;\"></mjx-math></mjx-container></div>",
+        "projections": {
+          "text": "⟨math⟩",
+          "math": [
+            {
+              "display": true
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]: def $$\nx"
+            },
+            {
+              "type": "math",
+              "text": "$$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "math/midline-quoted-definition": {
+      "id": "math/midline-quoted-definition",
+      "layer": "seed",
+      "category": "math",
+      "markdown": "> [^1]: def\n> tail $$\n> x\n> $$\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n</blockquote>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> [^1]: def\n> tail $$\n> x\n> $$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "replicate"
+    },
+    "math/linestart-list": {
+      "id": "math/linestart-list",
+      "layer": "seed",
+      "category": "math",
+      "markdown": "1. x\n   $$\n   y\n   $$\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\">x\n<div class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" display=\"true\"><mjx-math display=\"true\" class=\"MJX-TEX\" style=\"margin-left: 0px; margin-right: 0px;\"><mjx-mi class=\"mjx-i\"><mjx-c class=\"mjx-c1D466 TEX-I\"></mjx-c></mjx-mi></mjx-math></mjx-container></div>\n</li>\n</ol>",
+        "projections": {
+          "text": "x ⟨math⟩",
+          "math": [
+            {
+              "display": true
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1. x\n   $$\n   y\n   $$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "math/linestart-definition": {
+      "id": "math/linestart-definition",
+      "layer": "seed",
+      "category": "math",
+      "markdown": "[^1]: def\n    $$\n    y\n    $$\n",
+      "obsidian": {
+        "html": "",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]: def\n    $$\n    y\n    $$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "math/unclosed-quote-lazy": {
+      "id": "math/unclosed-quote-lazy",
+      "layer": "seed",
+      "category": "math",
+      "markdown": "> $$\nlazy\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<div class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" display=\"true\"><mjx-math display=\"true\" class=\"MJX-TEX\" style=\"margin-left: 0px; margin-right: 0px;\"><mjx-mi class=\"mjx-i\"><mjx-c class=\"mjx-c1D459 TEX-I\"></mjx-c></mjx-mi><mjx-mi class=\"mjx-i\"><mjx-c class=\"mjx-c1D44E TEX-I\"></mjx-c></mjx-mi><mjx-mi class=\"mjx-i\"><mjx-c class=\"mjx-c1D467 TEX-I\"></mjx-c></mjx-mi><mjx-mi class=\"mjx-i\"><mjx-c class=\"mjx-c1D466 TEX-I\"></mjx-c></mjx-mi></mjx-math></mjx-container></div>\n</blockquote>",
+        "projections": {
+          "text": "⟨math⟩",
+          "math": [
+            {
+              "display": true
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> $$\nlazy"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "math/unclosed-plain": {
+      "id": "math/unclosed-plain",
+      "layer": "seed",
+      "category": "math",
+      "markdown": "$$\nlazy\n",
+      "obsidian": {
+        "html": "<div class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" display=\"true\"><mjx-math display=\"true\" class=\"MJX-TEX\" style=\"margin-left: 0px; margin-right: 0px;\"><mjx-mi class=\"mjx-i\"><mjx-c class=\"mjx-c1D459 TEX-I\"></mjx-c></mjx-mi><mjx-mi class=\"mjx-i\"><mjx-c class=\"mjx-c1D44E TEX-I\"></mjx-c></mjx-mi><mjx-mi class=\"mjx-i\"><mjx-c class=\"mjx-c1D467 TEX-I\"></mjx-c></mjx-mi><mjx-mi class=\"mjx-i\"><mjx-c class=\"mjx-c1D466 TEX-I\"></mjx-c></mjx-mi></mjx-math></mjx-container></div>",
+        "projections": {
+          "text": "⟨math⟩",
+          "math": [
+            {
+              "display": true
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "math",
+              "text": "$$\nlazy"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "footnote/inline-plain": {
+      "id": "footnote/inline-plain",
+      "layer": "seed",
+      "category": "footnote",
+      "markdown": "^[note]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"[inline0\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\">note<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+        "projections": {
+          "text": "⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "^[note]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "footnote/inline-unclosed": {
+      "id": "footnote/inline-unclosed",
+      "layer": "seed",
+      "category": "footnote",
+      "markdown": "^[note\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">^[note</p>",
+        "projections": {
+          "text": "^[note",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "^[note"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "footnote/inline-bracket-body": {
+      "id": "footnote/inline-bracket-body",
+      "layer": "seed",
+      "category": "footnote",
+      "markdown": "^[a [b] c]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"[inline0\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\">a [b] c<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+        "projections": {
+          "text": "⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "^[a [b] c]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "footnote/inline-escaped-open": {
+      "id": "footnote/inline-escaped-open",
+      "layer": "seed",
+      "category": "footnote",
+      "markdown": "\\^[note]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">^[note]</p>",
+        "projections": {
+          "text": "^[note]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "\\^[note]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "footnote/inline-triple": {
+      "id": "footnote/inline-triple",
+      "layer": "seed",
+      "category": "footnote",
+      "markdown": "^[^[^[x]]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"[inline0\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><sup id=\"fnref-1\"><a class=\"footnote-ref\" href=\"#fn-1\" target=\"_blank\" rel=\"noopener nofollow\">1</a></sup><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>\n<div class=\"footnotes\">\n<hr>\n<ol>\n<li id=\"fn-1\" dir=\"auto\"><sup id=\"fnref-2\"><a class=\"footnote-ref\" href=\"#fn-2\" target=\"_blank\" rel=\"noopener nofollow\">2</a></sup><a class=\"footnote-backref\" href=\"#fnref-1\" target=\"_blank\" rel=\"noopener nofollow\">↩</a></li>\n</ol>\n</div>",
+        "projections": {
+          "text": "⟨fn⟩ 2↩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "^[^[^[x]]]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "replicate"
+    },
+    "footnote/inline-ref-body": {
+      "id": "footnote/inline-ref-body",
+      "layer": "seed",
+      "category": "footnote",
+      "markdown": "^[see [^1]]\n\n[^1]: one\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"[inline0\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\">see <sup id=\"fnref-1\"><a class=\"footnote-ref\" href=\"#fn-1\" target=\"_blank\" rel=\"noopener nofollow\">1</a></sup><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>\n<div class=\"footnotes\">\n<hr>\n<ol>\n<li id=\"fn-1\" dir=\"auto\">one<a class=\"footnote-backref\" href=\"#fnref-1\" target=\"_blank\" rel=\"noopener nofollow\">↩</a></li>\n</ol>\n</div>",
+        "projections": {
+          "text": "⟨fn⟩ one↩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "^[see [^1]]"
+            },
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]: one"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "replicate"
     },
     "wikilink/basic": {
       "id": "wikilink/basic",
@@ -10067,82 +10634,6 @@
       },
       "triage": "match"
     },
-    "token/inline-footnote/balanced": {
-      "id": "token/inline-footnote/balanced",
-      "layer": "token",
-      "category": "inline-footnote",
-      "markdown": "^[note]\n",
-      "obsidian": {
-        "html": "<p dir=\"auto\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"[inline0\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\">note<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
-        "projections": {
-          "text": "⟨fn⟩",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "^[note]"
-            },
-            {
-              "type": "text",
-              "text": ""
-            },
-            {
-              "type": "element",
-              "text": ""
-            }
-          ]
-        },
-        "meta": {
-          "headings": [],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        }
-      },
-      "triage": "match",
-      "note": "Matches once `inlineFootnotes` parses Obsidian's `^[body]`, which GFM has no form for."
-    },
-    "token/inline-footnote/no-closer": {
-      "id": "token/inline-footnote/no-closer",
-      "layer": "token",
-      "category": "inline-footnote",
-      "markdown": "^[note\n",
-      "obsidian": {
-        "html": "<p dir=\"auto\">^[note</p>",
-        "projections": {
-          "text": "^[note",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "^[note"
-            }
-          ]
-        },
-        "meta": {
-          "headings": [],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        }
-      },
-      "triage": "match",
-      "note": "Matches once `inlineFootnotes` parses Obsidian's `^[body]`, which GFM has no form for."
-    },
     "token/inline-footnote/no-opener": {
       "id": "token/inline-footnote/no-opener",
       "layer": "token",
@@ -10380,40 +10871,6 @@
       },
       "triage": "replicate",
       "note": "Inline footnote with an unbalanced or nested `^[`. Obsidian's pairing differs from our balanced-bracket scan; obscure enough to leave for later."
-    },
-    "token/inline-footnote/escaped-open": {
-      "id": "token/inline-footnote/escaped-open",
-      "layer": "token",
-      "category": "inline-footnote",
-      "markdown": "\\^[note]\n",
-      "obsidian": {
-        "html": "<p dir=\"auto\">^[note]</p>",
-        "projections": {
-          "text": "^[note]",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "\\^[note]"
-            }
-          ]
-        },
-        "meta": {
-          "headings": [],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        }
-      },
-      "triage": "match",
-      "note": "Matches once `inlineFootnotes` parses Obsidian's `^[body]`, which GFM has no form for."
     },
     "token/inline-footnote/escaped-close": {
       "id": "token/inline-footnote/escaped-close",
@@ -22033,7 +22490,7 @@
       "category": "indented-code",
       "markdown": "b[^2] a[^1].\n\n[foo]: /url\n[^1]: body cites [^2]\n\n    code [^2]\n\n[^2]: two\n[^1]: one\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-b98bf7efa5b9a4d2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-b98bf7efa5b9a4d2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-d58e946063c1cab0\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-d58e946063c1cab0\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "b⟨fn⟩ a⟨fn⟩.",
           "math": [],
@@ -22096,7 +22553,7 @@
       "category": "indented-code",
       "markdown": "b[^2] a[^1].\n\n| a | b |\n| --- | --- |\n[^1]: body cites [^2]\n\n    code [^2]\n\n[^2]: two\n[^1]: one\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n<table>\n<thead>\n<tr>\n<th>a</th>\n<th>b</th>\n</tr>\n</thead>\n</table>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-ecbde8c6c01dc439\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-ecbde8c6c01dc439\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n<table>\n<thead>\n<tr>\n<th>a</th>\n<th>b</th>\n</tr>\n</thead>\n</table>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-c4b7ac3a4a97a9e7\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-c4b7ac3a4a97a9e7\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "b⟨fn⟩ a⟨fn⟩. a b",
           "math": [],
@@ -22159,7 +22616,7 @@
       "category": "indented-code",
       "markdown": "b[^2] a[^1].\n\n%%\nhidden\n%% [^1]: body cites [^2]\n\n    code [^2]\n\n[^2]: two\n[^1]: one\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-824c85eedfe51538\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-824c85eedfe51538\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-c3230e858074fc0b\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-c3230e858074fc0b\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "b⟨fn⟩ a⟨fn⟩.",
           "math": [],
@@ -22222,7 +22679,7 @@
       "category": "indented-code",
       "markdown": "b[^2] a[^1].\n\n[^1]: body cites [^2]\n\n    code [^2]\n\n[^2]: two\n[^1]: one\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-b7db0d2184d26a70\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-b7db0d2184d26a70\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-a41dd131bf1351f0\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-a41dd131bf1351f0\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "b⟨fn⟩ a⟨fn⟩.",
           "math": [],
@@ -29878,7 +30335,7 @@
       "category": "fenced-code",
       "markdown": "text[^2] here\n\n[^1]: body\n``` `x`\n[^2]: second\ntext[^2] tail\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">text<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> here</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>second<br>\ntext<sup data-footnote-id=\"fnref-1-1-0755fddb966c0897\" class=\"footnote-ref\" id=\"fnref-1-1-0755fddb966c0897\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup> tail<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-0755fddb966c0897\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">text<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> here</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>second<br>\ntext<sup data-footnote-id=\"fnref-1-1-6ef0113d3c7f5ada\" class=\"footnote-ref\" id=\"fnref-1-1-6ef0113d3c7f5ada\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup> tail<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-6ef0113d3c7f5ada\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "text⟨fn⟩ here",
           "math": [],
@@ -31996,7 +32453,7 @@
       "category": "footnote",
       "markdown": "[foo]: [^9]\n\nuse[^9]\n\n[^9]: nine\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">[foo]: <sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1-1-34bd7329e56240f2\" class=\"footnote-ref\" id=\"fnref-1-1-34bd7329e56240f2\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>nine<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-34bd7329e56240f2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">[foo]: <sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1-1-90e8c9126c52e695\" class=\"footnote-ref\" id=\"fnref-1-1-90e8c9126c52e695\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>nine<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-90e8c9126c52e695\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "[foo]: ⟨fn⟩ use⟨fn⟩",
           "math": [],
@@ -32048,7 +32505,7 @@
       "category": "footnote",
       "markdown": "[foo]: <[^9]>\n\nuse[^9]\n\n[^9]: nine\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">[foo]: &lt;<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup>&gt;</p>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1-1-e30de91c1ea60f9f\" class=\"footnote-ref\" id=\"fnref-1-1-e30de91c1ea60f9f\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>nine<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-e30de91c1ea60f9f\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">[foo]: &lt;<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup>&gt;</p>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1-1-45b2a925b284e13c\" class=\"footnote-ref\" id=\"fnref-1-1-45b2a925b284e13c\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>nine<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-45b2a925b284e13c\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "[foo]: <⟨fn⟩> use⟨fn⟩",
           "math": [],
@@ -32100,7 +32557,7 @@
       "category": "footnote",
       "markdown": "see[^a`b`c] twice[^a`b`c].\n\n[^a`b`c]: hi\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">see<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"a`b`c\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> twice<sup data-footnote-id=\"fnref-1-1-91e9ace745007ba9\" class=\"footnote-ref\" id=\"fnref-1-1-91e9ace745007ba9\"><a data-footref=\"a`b`c\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>hi<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-91e9ace745007ba9\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">see<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"a`b`c\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> twice<sup data-footnote-id=\"fnref-1-1-769df7ce977b8cff\" class=\"footnote-ref\" id=\"fnref-1-1-769df7ce977b8cff\"><a data-footref=\"a`b`c\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>hi<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-769df7ce977b8cff\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "see⟨fn⟩ twice⟨fn⟩.",
           "math": [],
@@ -40617,7 +41074,7 @@
       "category": "comment",
       "markdown": "a[^1]\n\n%%\n[^1]: copy\n%%\n\n[^1]: A\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>A<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-8b1f82cee98804f3\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>A<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-1c160cb7d7d8686d\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "a⟨fn⟩",
           "math": [],
@@ -40670,7 +41127,7 @@
       "category": "comment",
       "markdown": "see[^k]\n\n%%\n[^k]: hidden\n%%\n\n[^k]: real\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">see<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"k\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>real<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-51b11b294e7fd76b\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">see<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"k\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>real<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-f2a8e01d84a022de\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "see⟨fn⟩",
           "math": [],
@@ -43754,7 +44211,7 @@
       "category": "blockquote",
       "markdown": "x[^1]\n\n> %%\n> [^1]: dead\n\n[^1]: live\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">x<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n<blockquote dir=\"auto\">\n</blockquote>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>live<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-eb9b3d5dc797929b\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">x<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n<blockquote dir=\"auto\">\n</blockquote>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>live<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-d7bb2f25a085e0a6\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "x⟨fn⟩",
           "math": [],
