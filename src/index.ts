@@ -21,6 +21,7 @@ import { tagFromMarkdown } from "./lib/mdast/tag.js";
 import { inlineFootnoteFromMarkdown } from "./lib/mdast/inline-footnote.js";
 import { wikilinkToMarkdown } from "./lib/mdast/wikilink-to-markdown.js";
 import { highlightToMarkdown } from "./lib/mdast/highlight-to-markdown.js";
+import { calloutToMarkdown } from "./lib/mdast/callout-to-markdown.js";
 import { commentToMarkdown } from "./lib/mdast/comment-to-markdown.js";
 import { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 import { inlineFootnoteToMarkdown } from "./lib/mdast/inline-footnote-to-markdown.js";
@@ -181,6 +182,11 @@ export default function remarkObsidian(
     data.micromarkExtensions.push(tagSyntax());
     data.fromMarkdownExtensions.push(tagFromMarkdown());
     data.toMarkdownExtensions.push(tagToMarkdown());
+  }
+  // Callouts are a transform, not a syntax extension, so this is the only
+  // half there is -- without it any tree holding one cannot be serialised.
+  if (opts.callouts) {
+    data.toMarkdownExtensions.push(calloutToMarkdown());
   }
   if (opts.highlights) {
     data.micromarkExtensions.push(highlightSyntax());
