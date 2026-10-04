@@ -15,6 +15,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Build the sibling renderer, so the chain seam is covered
+        run: |
+          git clone --depth 1 https://github.com/quartz-community/rehype-obsidian.git ../rehype-obsidian || echo "sibling unavailable; seam tests will skip"
+          if [ -d ../rehype-obsidian ]; then (cd ../rehype-obsidian && npm install && npm run build); fi
+        continue-on-error: true
       - run: npm install
       - run: npm run typecheck --if-present
       - run: npm run lint --if-present

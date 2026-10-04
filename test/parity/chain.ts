@@ -217,6 +217,43 @@ export async function renderOurs(
   return String(file);
 }
 
+/**
+ * The same chain with `rehype-obsidian` loaded from somewhere else.
+ *
+ * `renderOurs` uses the released sibling, which is what `npm install`
+ * resolves. A change spanning both packages cannot be tested that way until
+ * it ships, so the seam test points this at a locally built sibling when one
+ * exists.
+ */
+export async function renderWith(
+  pluginPath: string,
+  markdown: string,
+  profileName: ProfileName = "quartz-default",
+  slug = "parity/fixture",
+): Promise<string> {
+  const profile = PROFILES[profileName];
+  const { default: plugin } = (await import(pluginPath)) as {
+    default: (options: RehypeObsidianOptions) => never;
+  };
+
+  const processor = unified()
+    .use(remarkParse)
+    .use(remarkObsidian, profile.remarkObsidian)
+    .use(remarkGfm)
+    .use(remarkBreaks)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeRaw)
+    .use(plugin, profile.rehypeObsidian)
+    .use(rehypeStringify, { allowDangerousHtml: true });
+
+  return String(
+    await processor.process({
+      value: applyTextTransform(markdown),
+      data: vfileData(slug),
+    }),
+  );
+}
+
 /** mdast for a case, useful when a divergence needs to be localized to parsing. */
 export function parseOurs(
   markdown: string,
