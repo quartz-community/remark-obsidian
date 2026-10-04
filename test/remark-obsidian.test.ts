@@ -416,6 +416,31 @@ describe("remark-obsidian", () => {
     }
   });
 
+  describe("setext underlines", () => {
+    it("needs the underline to stand alone", () => {
+      expect(rootTypes(processWithGfm("H\n===\n"))).toEqual(["heading"]);
+      expect(rootTypes(processWithGfm("H\n---\n"))).toEqual(["heading"]);
+      // CommonMark allows indent and trailing space here; remark-parse@8 does
+      // not, and Obsidian agrees with it on every variant measured.
+      for (const md of ["H\n  ===\n", "H\n=== \n", "H\n===\t\n"]) {
+        expect(rootTypes(processWithGfm(md))).toEqual(["paragraph"]);
+      }
+    });
+
+    it("lets a definition fold into the demoted paragraph", () => {
+      expect(rootTypes(processWithGfm("H\n  ===\n[^1]: real\n"))).toEqual([
+        "paragraph",
+      ]);
+    });
+
+    it("still ends a heading at a definition when the underline is clean", () => {
+      expect(rootTypes(processWithGfm("H\n===\n[^1]: real\n"))).toEqual([
+        "heading",
+        "footnoteDefinition",
+      ]);
+    });
+  });
+
   describe("table row pipe style", () => {
     it("ends a table at a body row that drops the outer pipes", () => {
       const tree = processWithGfm("| a | b |\n| --- | --- |\nc | d\n");

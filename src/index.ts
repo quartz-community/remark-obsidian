@@ -33,6 +33,7 @@ import { containerLazyTransform } from "./lib/container-lazy.js";
 import { fenceOutlivesTransform } from "./lib/fence-outlives.js";
 import { listUnderDefinitionTransform } from "./lib/list-under-definition.js";
 import { tableRowStyleTransform } from "./lib/table-row-style.js";
+import { setextUnderlineTransform } from "./lib/setext-underline.js";
 import { tableInterruptTransform } from "./lib/table-interrupt.js";
 import { setextDefinitionTransform } from "./lib/setext-definition.js";
 import { shortCommentTransform } from "./lib/short-comment.js";
@@ -258,6 +259,11 @@ export default function remarkObsidian(
     fenceOutlivesTransform(tree, String(file));
     listUnderDefinitionTransform(tree, String(file));
     tableRowStyleTransform(tree, String(file), (markdown) =>
+      self.parse(markdown),
+    );
+    // Before the interrupt fold: demoting the heading is what lets a definition
+    // on the next line continue it as prose.
+    setextUnderlineTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
     tableInterruptTransform(tree, String(file), (markdown) =>
