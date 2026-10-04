@@ -39229,8 +39229,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/table-under-label-after-block-line/3": {
       "id": "hunt/table-under-label-after-block-line/3",
@@ -41135,8 +41134,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/empty-list-item-label/1": {
       "id": "hunt/empty-list-item-label/1",

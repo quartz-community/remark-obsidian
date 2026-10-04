@@ -439,6 +439,28 @@ describe("remark-obsidian", () => {
     }
   });
 
+  describe("a list absorbing the line below it", () => {
+    it("absorbs a definition under an empty item", () => {
+      expect(rootTypes(processWithGfm("-\n[^3]: real definition\n"))).toEqual([
+        "list",
+      ]);
+    });
+
+    it("absorbs a definition and the table under it", () => {
+      const tree = processWithGfm(
+        "-      item\n[^1]: body\n| a | b |\n| --- | --- |\n",
+      );
+      expect(rootTypes(tree)).toEqual(["list"]);
+    });
+
+    it("still stops at a blank line", () => {
+      expect(rootTypes(processWithGfm("- item\n\n[^3]: real\n"))).toEqual([
+        "list",
+        "footnoteDefinition",
+      ]);
+    });
+  });
+
   describe("an unclosed block in a container", () => {
     it("lets a `$$` block in a quote swallow the lazy line", () => {
       const tree = processWithGfm("> $$\nlazy[^1]\n");

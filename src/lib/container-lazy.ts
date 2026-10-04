@@ -27,11 +27,7 @@ export function containerLazyTransform(tree: Root, source: string): void {
     if (!container || !next) continue;
     if (!CONTAINERS.has(container.type)) continue;
     if (next.type !== "paragraph") {
-      // A list keeps its definition folded into the item's own paragraph, which
-      // `footnoteInterruptTransform` does later; adding it as a sibling child
-      // here would render the body in the footnote list instead of inline.
-      if (next.type !== "footnoteDefinition") continue;
-      if (container.type === "list") continue;
+      if (next.type !== "footnoteDefinition" && next.type !== "table") continue;
     }
 
     // Measure the gap from the last non-whitespace character, not from the
