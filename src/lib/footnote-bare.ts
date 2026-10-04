@@ -75,11 +75,6 @@ function alignToSource(source: string, value: string): SourceAlignment | null {
 }
 
 export function bareFootnoteRefTransform(tree: Root, source = ""): void {
-  const defined = new Set<string>();
-  visit(tree, "footnoteDefinition", (node: Node) => {
-    defined.add(String((node as unknown as { identifier: string }).identifier));
-  });
-
   visit(tree, "text", (node: Node, index, parent) => {
     const text = node as Text;
     if (!text.value.includes("[^")) return;
