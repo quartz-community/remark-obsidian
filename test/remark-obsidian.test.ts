@@ -416,6 +416,26 @@ describe("remark-obsidian", () => {
     }
   });
 
+  describe("a list under a footnote definition", () => {
+    it("keeps an ordered list that cannot interrupt inside the definition", () => {
+      const tree = processWithGfm(
+        "text[^1] here\n\n[^1]: body\n2. item text\n",
+      );
+      expect(rootTypes(tree)).toEqual(["paragraph", "footnoteDefinition"]);
+    });
+
+    it("still ends the definition at a list that can interrupt", () => {
+      const tree = processWithGfm(
+        "text[^1] here\n\n[^1]: body\n1. item text\n",
+      );
+      expect(rootTypes(tree)).toEqual([
+        "paragraph",
+        "footnoteDefinition",
+        "list",
+      ]);
+    });
+  });
+
   describe("legacy link reference definitions", () => {
     // remark-parse@8's rules are the inverse of CommonMark's in both
     // directions, so every row here contradicts the spec on purpose.

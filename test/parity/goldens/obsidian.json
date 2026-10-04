@@ -44290,8 +44290,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/ordered-item-under-definition/1": {
       "id": "hunt/ordered-item-under-definition/1",
@@ -44338,8 +44337,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/ordered-item-under-definition/2": {
       "id": "hunt/ordered-item-under-definition/2",
