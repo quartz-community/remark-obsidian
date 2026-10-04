@@ -133,12 +133,16 @@ const CAPTURE = async (
     for (const el of Array.from(clone.querySelectorAll(".internal-embed"))) {
       el.replaceWith(document.createTextNode(el.getAttribute("src") ?? ""));
     }
-    // The renderer collects every footnote body into one `section.footnotes` at the
+    // The renderer collects every footnote body into a trailing container. A
+    // nested inline footnote produces a second one as a `div`, so match on the
+    // class rather than the tag or that copy survives and its body lands in the
+    // captured text.
+    // The renderer collects every footnote body into one `.footnotes` at the
     // end, with a `↩︎` backref appended. That placement is the view's, not the
     // source's, so leaving it in makes `text` compare a relocated tail against our
     // in-place mdast for any document that resolves a reference. `sections` and
     // `meta.footnotes` still carry the footnote structure.
-    for (const el of Array.from(clone.querySelectorAll("section.footnotes"))) {
+    for (const el of Array.from(clone.querySelectorAll(".footnotes"))) {
       el.remove();
     }
     // Obsidian renders frontmatter into `pre.frontmatter` with `display: none`, so
@@ -367,7 +371,7 @@ const CAPTURE_READING_VIEW = async (
   }
   // Must mirror `project`'s removals exactly, or the proxy check compares two
   // different reductions and fails for a reason that is not proxy drift.
-  for (const el of Array.from(clone.querySelectorAll("section.footnotes"))) {
+  for (const el of Array.from(clone.querySelectorAll(".footnotes"))) {
     el.remove();
   }
   for (const el of Array.from(clone.querySelectorAll("pre.frontmatter"))) {
