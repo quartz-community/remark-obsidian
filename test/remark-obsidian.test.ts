@@ -439,6 +439,16 @@ describe("remark-obsidian", () => {
     }
   });
 
+  it("folds a definition whose body spans several blocks", () => {
+    // The fence inside the definition makes its body two blocks, which has no
+    // inline form to splice; Obsidian just reads the whole thing as prose.
+    const tree = processWithGfm(
+      "prose\n[^1]: lazy label\n    ```\nlive[^9] text\n",
+    );
+    expect(rootTypes(tree)).toEqual(["paragraph"]);
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
+  });
+
   it("lets a tab continue a definition inside a quote", () => {
     const tree = processWithGfm(
       "para.\n\n> [^9]: stray\n>\n>\tbody cites[^b]\n\n[^b]: bee\n",

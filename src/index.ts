@@ -31,6 +31,7 @@ import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 import { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
 import { containerLazyTransform } from "./lib/container-lazy.js";
 import { quoteMergeTransform } from "./lib/quote-merge.js";
+import { paragraphMergeTransform } from "./lib/paragraph-merge.js";
 import { definitionTabTransform } from "./lib/definition-tab.js";
 import { fenceOutlivesTransform } from "./lib/fence-outlives.js";
 import { mathOutlivesTransform } from "./lib/math-outlives.js";
@@ -301,7 +302,7 @@ export default function remarkObsidian(
       // Order matters: a definition that is really lazy continuation must be
       // merged away first, or the table split fires on a definition that is
       // about to stop being one. A table cannot interrupt a paragraph either.
-      footnoteInterruptTransform(tree);
+      footnoteInterruptTransform(tree, String(file));
       footnoteTableSplitTransform(
         tree,
         String(file),
@@ -315,6 +316,7 @@ export default function remarkObsidian(
       // while parsing, leaving it orphaned.
       footnoteOrphanTransform(tree);
     }
+    paragraphMergeTransform(tree, String(file));
     if (opts.taskReparse) {
       taskReparseTransform(
         tree,

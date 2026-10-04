@@ -23,15 +23,15 @@ import type { Paragraph, Root, RootContent } from "mdast";
  */
 const CONTAINERS = new Set(["blockquote", "callout", "list", "listItem"]);
 
-export function footnoteInterruptTransform(tree: Root): void {
-  fold(tree.children);
+export function footnoteInterruptTransform(tree: Root, source = ""): void {
+  fold(tree.children, source);
 }
 
-function fold(children: RootContent[]): void {
+function fold(children: RootContent[], source: string): void {
   for (const child of children) {
     if (!CONTAINERS.has(child.type)) continue;
     const inner = (child as unknown as { children?: RootContent[] }).children;
-    if (Array.isArray(inner)) fold(inner);
+    if (Array.isArray(inner)) fold(inner, source);
   }
 
   // Forward, not backward: folding one definition extends the paragraph, which
@@ -67,16 +67,29 @@ function fold(children: RootContent[]): void {
     }
 
     const body = node.children;
-    if (body.length !== 1 || body[0]?.type !== "paragraph") {
+    const single = body.length === 1 && body[0]?.type === "paragraph";
+    const from = node.position?.start?.offset;
+    const to = node.position?.end?.offset;
+    if (!single && (source === "" || from === undefined || to === undefined)) {
       index++;
       continue;
     }
 
-    host.children.push(
-      { type: "break" },
-      { type: "text", value: `[^${node.identifier}]: ` },
-      ...(body[0] as Paragraph).children,
-    );
+    if (single) {
+      host.children.push(
+        { type: "break" },
+        { type: "text", value: `[^${node.identifier}]: ` },
+        ...(body[0] as Paragraph).children,
+      );
+    } else {
+      // A body of several blocks has no inline form to splice, but Obsidian
+      // does not need one: the whole thing is prose to it, so the source goes
+      // back verbatim and the bare-reference pass reduces the label as usual.
+      host.children.push(
+        { type: "break" },
+        { type: "text", value: source.slice(from!, to!) },
+      );
+    }
     for (const container of [host, previous]) {
       if (container.position && node.position?.end) {
         container.position.end = { ...node.position.end };
