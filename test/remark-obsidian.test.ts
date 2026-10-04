@@ -570,6 +570,19 @@ describe("remark-obsidian", () => {
     });
   });
 
+  describe("table delimiter width", () => {
+    it("builds a table of the delimiter's width, dropping surplus header cells", () => {
+      const tree = processWithGfm("| a | b |\n| --- |\n[^1]: x\n");
+      expect(rootTypes(tree)).toEqual(["table", "footnoteDefinition"]);
+      expect(findNodes(tree, "tableCell").length).toBe(1);
+    });
+
+    it("leaves a matching header and delimiter to the parser", () => {
+      const tree = processWithGfm("| a | b |\n| --- | --- |\n");
+      expect(findNodes(tree, "tableCell").length).toBe(2);
+    });
+  });
+
   describe("table row pipe style", () => {
     it("ends a table at a body row that drops the outer pipes", () => {
       const tree = processWithGfm("| a | b |\n| --- | --- |\nc | d\n");

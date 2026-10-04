@@ -36,6 +36,7 @@ import { fenceOutlivesTransform } from "./lib/fence-outlives.js";
 import { mathOutlivesTransform } from "./lib/math-outlives.js";
 import { listUnderDefinitionTransform } from "./lib/list-under-definition.js";
 import { tableRowStyleTransform } from "./lib/table-row-style.js";
+import { tableShortDelimiterTransform } from "./lib/table-short-delimiter.js";
 import { setextUnderlineTransform } from "./lib/setext-underline.js";
 import { footnoteLabelTransform } from "./lib/footnote-label.js";
 import { tableInterruptTransform } from "./lib/table-interrupt.js";
@@ -272,6 +273,9 @@ export default function remarkObsidian(
     mathOutlivesTransform(tree, String(file));
     listUnderDefinitionTransform(tree, String(file));
     tableRowStyleTransform(tree, String(file), (markdown) =>
+      self.parse(markdown),
+    );
+    tableShortDelimiterTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
     // Before the interrupt fold: demoting the heading is what lets a definition
