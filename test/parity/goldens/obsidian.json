@@ -22659,8 +22659,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/definition-block-owns-region-opener/2": {
       "id": "hunt/definition-block-owns-region-opener/2",
@@ -22764,8 +22763,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/definition-block-owns-region-opener/4": {
       "id": "hunt/definition-block-owns-region-opener/4",

@@ -8,7 +8,10 @@ import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
 import remarkObsidian, { type RemarkObsidianOptions } from "../src/index.js";
 import { visit } from "unist-util-visit";
-import { commentRegions } from "../src/lib/comment-region.js";
+import {
+  commentRegions,
+  htmlCommentRegions,
+} from "../src/lib/comment-region.js";
 
 function parse(md: string, opts?: RemarkObsidianOptions) {
   return unified().use(remarkParse).use(remarkObsidian, opts).parse(md);
@@ -436,6 +439,28 @@ describe("remark-obsidian", () => {
         "a[^1]\n\n[^9]: orphan\n    %%\n[^1]: one\n%%\n",
       );
       expect(findNodes(tree, "footnoteDefinition").length).toBe(2);
+    });
+
+    it("gives a definition the whole html comment its opener started", () => {
+      const tree = processWithGfm(
+        "x[^1] y[^2]\n\n[^1]: one\n    <!--\nhidden[^2] text\n-->\n\ntail\n",
+      );
+      expect(rootTypes(tree)).toEqual([
+        "paragraph",
+        "footnoteDefinition",
+        "paragraph",
+      ]);
+    });
+
+    it("does not pair an html comment across a blank line", () => {
+      expect(htmlCommentRegions("x <!--\n\nhidden\n\n--> after\n")).toEqual([]);
+    });
+
+    it("does not pair an html comment opened inside a label", () => {
+      expect(htmlCommentRegions("see[^a<!--x-->b].\n")).toEqual([]);
+      expect(
+        htmlCommentRegions("body [^c<!--d] ![i](u) tail\n--> end\n"),
+      ).toEqual([]);
     });
 
     it("resumes pairing on the next line after a mid-line closer", () => {
