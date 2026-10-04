@@ -151,6 +151,13 @@ const CAPTURE = async (
     for (const el of Array.from(clone.querySelectorAll("sup.footnote-ref"))) {
       el.replaceWith(document.createTextNode("\u27e8fn\u27e9"));
     }
+    // A reference inside a link cannot nest its anchor, so Obsidian renders an
+    // empty `sup` and puts the `[1]` beside it instead of within. Replacing the
+    // `sup` alone leaves that text in the capture, which no tree can produce.
+    // Runs after the loop above, which takes the nested anchors with it.
+    for (const el of Array.from(clone.querySelectorAll("a.footnote-link"))) {
+      el.remove();
+    }
     for (const el of Array.from(clone.querySelectorAll("svg"))) el.remove();
     const text = (clone.textContent ?? "").replace(/\s+/g, " ").trim();
 
@@ -368,6 +375,13 @@ const CAPTURE_READING_VIEW = async (
   }
   for (const el of Array.from(clone.querySelectorAll("sup.footnote-ref"))) {
     el.replaceWith(document.createTextNode("\u27e8fn\u27e9"));
+  }
+  // A reference inside a link cannot nest its anchor, so Obsidian renders an
+  // empty `sup` and puts the `[1]` beside it instead of within. Replacing the
+  // `sup` alone leaves that text in the capture, which no tree can produce.
+  // Runs after the loop above, which takes the nested anchors with it.
+  for (const el of Array.from(clone.querySelectorAll("a.footnote-link"))) {
+    el.remove();
   }
   for (const el of Array.from(clone.querySelectorAll("svg"))) el.remove();
   return (clone.textContent ?? "").replace(/\s+/g, " ").trim();
