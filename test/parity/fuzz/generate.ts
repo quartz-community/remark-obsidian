@@ -18,7 +18,16 @@ import { Rng } from "./random.js";
 /** Balanced inline constructs, each a delimiter pair the parser must pair up. */
 const INLINE: ReadonlyArray<readonly [string, string, string]> = [
   ["[[", "]]", "target"],
+  // The second-field forms, listed explicitly. They arose only by accident
+  // before, at 0.9% and 2.8% of documents, and no seed count fixes a
+  // distribution: these are exactly where the known divergences are.
+  ["[[", "]]", "a|b"],
+  ["[[", "]]", "a#h"],
+  ["[[", "]]", "a#^blk"],
   ["![[", "]]", "img.png"],
+  ["![[", "]]", "i.png|100"],
+  ["![[", "]]", "i.png|100x200"],
+  ["![[", "]]", "d.pdf#page=3"],
   ["==", "==", "mark"],
   ["%%", "%%", "note"],
   ["$", "$", "x^2"],
@@ -43,6 +52,9 @@ const ATOMS: readonly string[] = [
   "<br>",
   "^blk",
   "https://e.test/p",
+  // Unreachable before: nothing in the grammar could emit an autolink.
+  "<https://e.test>",
+  "<mailto:a@e.test>",
   "\u200b",
   "\u00a0",
 ];
