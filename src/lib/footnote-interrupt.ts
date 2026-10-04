@@ -14,12 +14,25 @@ import type { Paragraph, Root, RootContent } from "mdast";
  * flattened back to source. This has to run before `bareFootnoteRefTransform`,
  * which is what turns the re-inserted `[^1]:` into the `1:` Obsidian shows.
  *
- * Only top-level children are considered, and only a single-paragraph body is
- * folded: a definition carrying several blocks has no unambiguous inline form, so
- * it is left alone rather than guessed at.
+ * Every block container is considered, not just the document: a definition under
+ * prose inside a quote continues that prose the same way, so
+ * `> para` / `> [^q]: quoted` is one paragraph too.
+ *
+ * Only a single-paragraph body is folded: a definition carrying several blocks
+ * has no unambiguous inline form, so it is left alone rather than guessed at.
  */
+const CONTAINERS = new Set(["blockquote", "callout", "list", "listItem"]);
+
 export function footnoteInterruptTransform(tree: Root): void {
-  const children = tree.children;
+  fold(tree.children);
+}
+
+function fold(children: RootContent[]): void {
+  for (const child of children) {
+    if (!CONTAINERS.has(child.type)) continue;
+    const inner = (child as unknown as { children?: RootContent[] }).children;
+    if (Array.isArray(inner)) fold(inner);
+  }
 
   // Forward, not backward: folding one definition extends the paragraph, which
   // is what lets the next definition on the following line fold in turn. Going
@@ -33,14 +46,10 @@ export function footnoteInterruptTransform(tree: Root): void {
       continue;
     }
 
-    // A definition under a list item continues that item's paragraph, so the
-    // target is the paragraph at the end of the list rather than a sibling.
+    // A definition under a list item or a quote continues that block's own
+    // trailing paragraph, not a sibling of the block.
     const host =
-      previous.type === "paragraph"
-        ? previous
-        : previous.type === "list"
-          ? lastParagraphOf(previous)
-          : undefined;
+      previous.type === "paragraph" ? previous : lastParagraphOf(previous);
     if (!host) {
       index++;
       continue;
@@ -77,11 +86,16 @@ export function footnoteInterruptTransform(tree: Root): void {
   }
 }
 
-/** The paragraph a trailing definition would continue, if the list ends in one. */
-function lastParagraphOf(list: RootContent): Paragraph | undefined {
-  if (list.type !== "list") return undefined;
-  const item = list.children[list.children.length - 1];
-  if (!item || item.type !== "listItem") return undefined;
-  const last = item.children[item.children.length - 1];
+/** The paragraph a trailing definition would continue, if the block ends in one. */
+function lastParagraphOf(node: RootContent): Paragraph | undefined {
+  if (node.type === "list") {
+    const item = node.children[node.children.length - 1];
+    if (!item || item.type !== "listItem") return undefined;
+    const last = item.children[item.children.length - 1];
+    return last && last.type === "paragraph" ? last : undefined;
+  }
+  if (node.type !== "blockquote" && node.type !== "callout") return undefined;
+  const inner = (node as unknown as { children: RootContent[] }).children;
+  const last = inner[inner.length - 1];
   return last && last.type === "paragraph" ? last : undefined;
 }

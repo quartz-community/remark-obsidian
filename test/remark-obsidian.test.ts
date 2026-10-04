@@ -385,6 +385,21 @@ describe("remark-obsidian", () => {
     }
   });
 
+  it("folds a definition under prose inside a quote", () => {
+    const tree = processWithGfm("> para\n> [^q]: quoted under prose\n");
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
+    expect(
+      findNodes(findNodes(tree, "blockquote")[0], "text")
+        .map((n) => n.value)
+        .join(""),
+    ).toContain("q: quoted under prose");
+  });
+
+  it("still starts a definition after a blank line inside a quote", () => {
+    const tree = processWithGfm("> para\n>\n> [^q]: real\n");
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(1);
+  });
+
   it("carries a definition into a blockquote's lazy continuation", () => {
     const tree = processWithGfm(
       "> [^1]: quoted def\nplain column-0 line\n[^2]: second\n\ntail\n",

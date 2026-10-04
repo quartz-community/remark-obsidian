@@ -21424,8 +21424,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Previously deferred to another package. Callouts, frontmatter and footnotes are all handled here now, so this is an ordinary gap."
+      "triage": "match"
     },
     "hunt/column-zero-callout-title/3": {
       "id": "hunt/column-zero-callout-title/3",
@@ -27111,8 +27110,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/in-item-lazy-label-counted-as-definition/1": {
       "id": "hunt/in-item-lazy-label-counted-as-definition/1",
@@ -27149,8 +27147,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/in-item-lazy-label-counted-as-definition/2": {
       "id": "hunt/in-item-lazy-label-counted-as-definition/2",
@@ -29345,8 +29342,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/label-after-prose-line-is-prose/5": {
       "id": "hunt/label-after-prose-line-is-prose/5",
@@ -29775,8 +29771,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/label-after-prose-line-is-prose/15": {
       "id": "hunt/label-after-prose-line-is-prose/15",
@@ -34048,8 +34043,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/orphan-delete-comment-opener-residue/4": {
       "id": "hunt/orphan-delete-comment-opener-residue/4",
@@ -42749,8 +42743,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/lrd-title-escapes/2": {
       "id": "hunt/lrd-title-escapes/2",
