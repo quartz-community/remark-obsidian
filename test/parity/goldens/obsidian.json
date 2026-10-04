@@ -6844,8 +6844,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "From the Footnotes Shortcuts author's deviation list; recorded, not yet reproduced."
+      "triage": "match"
     },
     "frontmatter/indented-opener-is-not": {
       "id": "frontmatter/indented-opener-is-not",
@@ -6923,8 +6922,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "From the Footnotes Shortcuts author's deviation list; recorded, not yet reproduced."
+      "triage": "match"
     },
     "comment/other-percent-does-not-open": {
       "id": "comment/other-percent-does-not-open",

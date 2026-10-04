@@ -51,6 +51,7 @@ import { footnoteLabelTransform } from "./lib/footnote-label.js";
 import { tableInterruptTransform } from "./lib/table-interrupt.js";
 import { setextDefinitionTransform } from "./lib/setext-definition.js";
 import { shortCommentTransform } from "./lib/short-comment.js";
+import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
 import { lrdFootnoteTransform } from "./lib/lrd-footnote.js";
 import {
   legacyDefinitionPromoteTransform,
@@ -259,6 +260,13 @@ export default function remarkObsidian(
           hChildren: [],
         };
       });
+    }
+    // First, because it rewrites the whole document: a closing fence with a
+    // tail means there is no frontmatter in the tree yet at all.
+    if (opts.frontmatter) {
+      frontmatterTailTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
     }
     lrdFootnoteTransform(tree, String(file), (markdown) =>
       self.parse(markdown),

@@ -1095,6 +1095,26 @@ describe("remark-obsidian", () => {
     expect(findNodes(tree, "footnoteReference").length).toBe(1);
   });
 
+  it("closes frontmatter on a fence that carries a tail", () => {
+    const tree = processWithGfm("---\na: b\n---[^2]: x\n");
+    expect(rootTypes(tree)).toEqual(["yaml", "footnoteDefinition"]);
+    expect(findNodes(tree, "thematicBreak").length).toBe(0);
+  });
+
+  it("parses the tail as markdown", () => {
+    expect(rootTypes(processWithGfm("---\na: b\n--- trailing\n"))).toEqual([
+      "yaml",
+      "paragraph",
+    ]);
+  });
+
+  it("leaves a bare closing fence to the extension", () => {
+    expect(rootTypes(processWithGfm("---\na: b\n---\n\nBody\n"))).toEqual([
+      "yaml",
+      "paragraph",
+    ]);
+  });
+
   it("records the fold marker", () => {
     const [folded] = findNodes(processWithGfm("> [!note]- C\n> H"), "callout");
     const [open] = findNodes(processWithGfm("> [!note]+ E\n> S"), "callout");
