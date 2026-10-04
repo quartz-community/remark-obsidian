@@ -25,7 +25,41 @@ interface ParentNode extends Node {
  * Each match is therefore routed on whether the tree defines it: defined becomes a
  * real `footnoteReference`, undefined is reduced to its bare name as before.
  */
-export function bareFootnoteRefTransform(tree: Root): void {
+const PUNCTUATION = /[!-/:-@[-`{-~]/u;
+
+/**
+ * Which characters of a text node's value came from a backslash escape.
+ *
+ * By the time a text node exists the backslash is gone, so `literal \[^9]` and
+ * `literal [^9]` have identical values — and reducing the first would delete a
+ * marker the author escaped on purpose. Walking the source the node came from
+ * recovers the distinction.
+ *
+ * Returns `null` when the walk does not reproduce the value, which happens for
+ * character references and anything else that rewrites text. The caller then
+ * keeps its old behaviour rather than trusting a bad alignment.
+ */
+function escapedPositions(source: string, value: string): boolean[] | null {
+  const flags: boolean[] = [];
+  const rebuilt: string[] = [];
+
+  for (let index = 0; index < source.length; index++) {
+    const character = source[index]!;
+    const next = source[index + 1];
+    if (character === "\\" && next !== undefined && PUNCTUATION.test(next)) {
+      flags.push(true);
+      rebuilt.push(next);
+      index++;
+      continue;
+    }
+    flags.push(false);
+    rebuilt.push(character);
+  }
+
+  return rebuilt.join("") === value ? flags : null;
+}
+
+export function bareFootnoteRefTransform(tree: Root, source = ""): void {
   const defined = new Set<string>();
   visit(tree, "footnoteDefinition", (node: Node) => {
     defined.add(String((node as unknown as { identifier: string }).identifier));
@@ -34,6 +68,13 @@ export function bareFootnoteRefTransform(tree: Root): void {
   visit(tree, "text", (node: Node, index, parent) => {
     const text = node as Text;
     if (!text.value.includes("[^")) return;
+
+    const from = text.position?.start?.offset;
+    const to = text.position?.end?.offset;
+    const escaped =
+      source && from !== undefined && to !== undefined
+        ? escapedPositions(source.slice(from, to), text.value)
+        : null;
 
     const parts: Node[] = [];
     let cursor = 0;
@@ -56,6 +97,9 @@ export function bareFootnoteRefTransform(tree: Root): void {
       match = REFERENCE.exec(text.value)
     ) {
       const name = match[1]!;
+      // An escaped `\[` is a literal bracket, so this is not a reference at
+      // all and must survive as written.
+      if (escaped?.[match.index]) continue;
       // mdast lowercases a footnote identifier, and Obsidian shows that rather
       // than the label as written: `[^Cell]` reads `cell`.
       const identifier = name.toLowerCase();

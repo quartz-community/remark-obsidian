@@ -290,7 +290,7 @@ export default function remarkObsidian(
       // After the interrupt fold, or a definition about to be merged into the
       // paragraph above it would be turned into a heading instead.
       setextDefinitionTransform(tree, String(file));
-      bareFootnoteRefTransform(tree);
+      bareFootnoteRefTransform(tree, String(file));
       // Last: the folds above can remove the definition a reference was bound to
       // while parsing, leaving it orphaned.
       footnoteOrphanTransform(tree);

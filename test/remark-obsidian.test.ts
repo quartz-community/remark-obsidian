@@ -342,6 +342,16 @@ describe("remark-obsidian", () => {
     expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
   });
 
+  it("leaves an escaped marker written as the author escaped it", () => {
+    const tree = processWithGfm("literal \\[^9] real[^7]\n\n[^7]: real\n");
+    expect(
+      findNodes(tree, "text")
+        .map((n) => n.value)
+        .join(""),
+    ).toContain("[^9]");
+    expect(findNodes(tree, "footnoteReference").length).toBe(1);
+  });
+
   it("reduces a stripped reference to its lowercased identifier", () => {
     const tree = processWithGfm("x [^Cell] y\n");
     expect(
