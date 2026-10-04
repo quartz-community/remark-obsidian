@@ -10,7 +10,12 @@ const CONTAINERS = new Set(["list", "blockquote", "callout"]);
  * starts a new block. Obsidian keeps it inside: `> ```\n> x\n> ```\nreal` is one
  * blockquote to it, where we reported a blockquote plus a paragraph.
  *
- * Only a paragraph on the very next line is absorbed. A blank line between them
+ * A line that looks like a footnote definition is absorbed into a quote too. It
+ * does not interrupt the continuation any more than it interrupts a paragraph,
+ * so `> [^1]: quoted def` / `plain column-0 line` / `[^2]: second` is all one
+ * blockquote.
+ *
+ * Only a block on the very next line is absorbed. A blank line between them
  * still ends the container, which is what keeps ordinary documents untouched.
  */
 export function containerLazyTransform(tree: Root, source: string): void {
@@ -20,7 +25,14 @@ export function containerLazyTransform(tree: Root, source: string): void {
     const container = children[index];
     const next = children[index + 1];
     if (!container || !next) continue;
-    if (!CONTAINERS.has(container.type) || next.type !== "paragraph") continue;
+    if (!CONTAINERS.has(container.type)) continue;
+    if (next.type !== "paragraph") {
+      // A list keeps its definition folded into the item's own paragraph, which
+      // `footnoteInterruptTransform` does later; adding it as a sibling child
+      // here would render the body in the footnote list instead of inline.
+      if (next.type !== "footnoteDefinition") continue;
+      if (container.type === "list") continue;
+    }
 
     // Measure the gap from the last non-whitespace character, not from the
     // container's end offset. An unclosed fence inside a list item pulls the

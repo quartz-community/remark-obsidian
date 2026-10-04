@@ -381,6 +381,24 @@ describe("remark-obsidian", () => {
     }
   });
 
+  it("carries a definition into a blockquote's lazy continuation", () => {
+    const tree = processWithGfm(
+      "> [^1]: quoted def\nplain column-0 line\n[^2]: second\n\ntail\n",
+    );
+    expect(tree.children.map((n: { type: string }) => n.type)).toEqual([
+      "blockquote",
+      "paragraph",
+    ]);
+  });
+
+  it("still folds a definition under a list item into its paragraph", () => {
+    const tree = processWithGfm("- item\n[^3]: under the item\n");
+    expect(tree.children.map((n: { type: string }) => n.type)).toEqual([
+      "list",
+    ]);
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
+  });
+
   it("lets a definition freed from a comment read the line below it", () => {
     const tree = processWithGfm("%%\nhidden\n%%[^1]: def\ntext ref\n");
     const definitions = findNodes(tree, "footnoteDefinition");

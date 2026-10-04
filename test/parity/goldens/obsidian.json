@@ -30574,8 +30574,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Previously deferred to another package. Callouts, frontmatter and footnotes are all handled here now, so this is an ordinary gap."
+      "triage": "match"
     },
     "hunt/lazy-label-reference-is-live/5": {
       "id": "hunt/lazy-label-reference-is-live/5",
@@ -44873,8 +44872,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/quoted-definition-column0-tail/1": {
       "id": "hunt/quoted-definition-column0-tail/1",
@@ -45167,8 +45165,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/setext-legacy-heading-migration/0": {
       "id": "hunt/setext-legacy-heading-migration/0",
