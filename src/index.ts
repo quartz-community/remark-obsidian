@@ -20,6 +20,7 @@ import { commentFromMarkdown } from "./lib/mdast/comment.js";
 import { tagFromMarkdown } from "./lib/mdast/tag.js";
 import { inlineFootnoteFromMarkdown } from "./lib/mdast/inline-footnote.js";
 import { wikilinkToMarkdown } from "./lib/mdast/wikilink-to-markdown.js";
+import { breakToMarkdown } from "./lib/mdast/break-to-markdown.js";
 import { highlightToMarkdown } from "./lib/mdast/highlight-to-markdown.js";
 import { calloutToMarkdown } from "./lib/mdast/callout-to-markdown.js";
 import { commentToMarkdown } from "./lib/mdast/comment-to-markdown.js";
@@ -132,6 +133,15 @@ export interface RemarkObsidianOptions {
    * different emphasis from the app for any such run.
    */
   legacyEmphasis?: boolean;
+  /**
+   * Write a line break as a trailing backslash rather than a newline.
+   *
+   * Off by default, because this package is built for a chain that includes
+   * `remark-breaks`, where every soft line ending becomes a `break` and a
+   * newline writes it back unchanged. Turn it on when your chain has no
+   * `remark-breaks` and a `break` really is a hard break.
+   */
+  escapedLineBreaks?: boolean;
 }
 
 const defaultOptions: Required<RemarkObsidianOptions> = {
@@ -148,6 +158,7 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
   inlineFootnotes: true,
   callouts: true,
   legacyEmphasis: true,
+  escapedLineBreaks: false,
 };
 
 export default function remarkObsidian(
@@ -197,6 +208,9 @@ export default function remarkObsidian(
     data.fromMarkdownExtensions.push(highlightFromMarkdown());
     data.toMarkdownExtensions.push(highlightToMarkdown());
   }
+  // A line break is written as a newline, not a trailing backslash; see the
+  // handler for what the backslash costs.
+  data.toMarkdownExtensions.push(breakToMarkdown(opts.escapedLineBreaks));
   if (opts.math) {
     const base = mathSyntax();
     // Upstream applies no flanking rules, so `$5 and $10` parses as math. Keep its

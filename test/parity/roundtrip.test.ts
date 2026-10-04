@@ -68,6 +68,21 @@ describe("round-trip", () => {
     expect(threw).toEqual([]);
   });
 
+  it.each([
+    ["a line break", "a\nb\n", "a\nb\n"],
+    ["one inside a highlight", "==a\nb==\n", "==a\nb==\n"],
+    ["one inside strong", "**a\nb**\n", "**a\nb**\n"],
+    [
+      "an aliased wikilink in a cell",
+      "| L |\n| --- |\n| [[N\\|A]] |\n",
+      "[[N\\|A]]",
+    ],
+  ])("round-trips %s", (_name, markdown, expected) => {
+    const once = format(markdown);
+    expect(once).toContain(expected);
+    expect(format(once)).toBe(once);
+  });
+
   it("serialises a callout back to its blockquote", () => {
     expect(format("> [!note] Title\n> Body\n")).toBe(
       "> [!note] Title\n> Body\n",
@@ -90,6 +105,6 @@ describe("round-trip", () => {
    * represent a folded line, not in parsing less accurately.
    */
   it("does not grow the set of inputs formatting cannot settle", () => {
-    expect(unstable.length).toBeLessThanOrEqual(97);
+    expect(unstable.length).toBeLessThanOrEqual(24);
   });
 });
