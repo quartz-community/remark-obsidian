@@ -1115,6 +1115,17 @@ describe("remark-obsidian", () => {
     ]);
   });
 
+  it("does not let a %% end a footnote definition", () => {
+    const tree = processWithGfm("[^1]: a\n%%\nb\n");
+    expect(rootTypes(tree)).toEqual(["footnoteDefinition"]);
+    expect(findNodes(tree, "comment").length).toBe(0);
+  });
+
+  it("still opens a comment after a blank line", () => {
+    const tree = processWithGfm("[^1]: a\n\n%%\nb\n%%\n");
+    expect(findNodes(tree, "comment").length).toBe(1);
+  });
+
   it("records the fold marker", () => {
     const [folded] = findNodes(processWithGfm("> [!note]- C\n> H"), "callout");
     const [open] = findNodes(processWithGfm("> [!note]+ E\n> S"), "callout");

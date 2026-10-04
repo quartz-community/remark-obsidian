@@ -7058,8 +7058,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "From the Footnotes Shortcuts author's deviation list; recorded, not yet reproduced."
+      "triage": "match"
     },
     "comment/interrupts-a-paragraph": {
       "id": "comment/interrupts-a-paragraph",

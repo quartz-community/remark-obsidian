@@ -62,6 +62,7 @@ import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 import { calloutTransform } from "./lib/callout.js";
 import { commentHoistTransform } from "./lib/comment-hoist.js";
 import { commentTailTransform } from "./lib/comment-tail.js";
+import { commentInDefinitionTransform } from "./lib/comment-in-definition.js";
 import { commentRegionTransform } from "./lib/comment-region.js";
 import { definitionContinuationTransform } from "./lib/definition-continuation.js";
 import { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
@@ -253,6 +254,9 @@ export default function remarkObsidian(
       definitionContinuationTransform(tree, String(file), (markdown) =>
         self.parse(markdown),
       );
+      // After the continuation pass, so a definition that already grew is the
+      // one a stray `%%` gets folded back into.
+      commentInDefinitionTransform(tree, String(file));
       visit(tree, "comment", (node: any) => {
         node.data = {
           ...node.data,
