@@ -278,7 +278,9 @@ function headingName(node: Node, source: string): string {
   // Setext: the underline is inside the node's span but outside its name. Inside a
   // container the slice keeps the block prefix, so `para\n> ===` must lose the
   // whole final line, marker included.
-  const body = raw.replace(/\r?\n[ \t]*(?:>[ \t]*)*[=-]+[ \t]*$/, "");
+  const body = raw
+    .replace(/\r?\n[ \t]*(?:>[ \t]*)*[=-]+[ \t]*$/, "")
+    .replace(/(?:^|[ \t])\^[A-Za-z0-9-]+[ \t]*$/u, "");
   // A setext heading shares its content chunk with any link reference
   // definitions above it, so its span starts back at them: `[ref]: /url\npara\n===`
   // reports a heading named `para`, not `[ref]: /url\npara`.
@@ -471,12 +473,65 @@ export function metaOurs(tree: Root, source: string): MetaProjections {
   };
 }
 
+/**
+ * `^id` at the end of a block.
+ *
+ * Alphanumerics and hyphens only, which is narrower than the `[^\s^]+` a
+ * permissive reading suggests, and the corpus is what narrowed it: Obsidian
+ * keeps `x ^a_b` as text, so an underscore is not a block identifier at all.
+ * The tight class also keeps the pattern off `^[`, which opens an inline
+ * footnote -- the first attempt ate `^[[note]` and three other footnote cases.
+ */
+const TRAILING_BLOCK_ID = /(?:^|[ \t])\^[A-Za-z0-9-]+$/u;
+const ONLY_BLOCK_ID = /^[ \t]*\^[A-Za-z0-9-]+[ \t]*$/u;
+
+/**
+ * Drop block identifiers before projecting.
+ *
+ * `^block-id` is an anchor, not content: Obsidian renders neither the trailing
+ * form `A paragraph. ^id` nor the standalone one, where a `^id` on its own
+ * line names the block above it and produces no block of its own.
+ *
+ * The tree keeps it, which is the same split used for an undefined footnote
+ * reference and a surplus table cell -- the source said `^id`, so removing it
+ * from the tree would let a formatter delete an anchor other notes link to.
+ * `rehype-obsidian` strips it when rendering, and this mirrors that so the
+ * comparison measures the parse rather than the anchor.
+ */
+function stripBlockIds(tree: Root): Root {
+  visit(tree, (node: Node) => {
+    const parent = node as Partial<{ children: Node[] }>;
+    if (!Array.isArray(parent.children)) return;
+
+    for (let index = parent.children.length - 1; index >= 0; index--) {
+      const child = parent.children[index]!;
+      if (child.type !== "paragraph") continue;
+      const inner = (child as ParentNode).children;
+      const last = inner[inner.length - 1];
+      if (!last || last.type !== "text") continue;
+      const value = (last as ValueNode).value;
+
+      // A paragraph that is only an identifier is not a block at all.
+      if (inner.length === 1 && ONLY_BLOCK_ID.test(value)) {
+        parent.children.splice(index, 1);
+        continue;
+      }
+      const match = TRAILING_BLOCK_ID.exec(value);
+      if (match) (last as ValueNode).value = value.slice(0, match.index);
+    }
+  });
+
+  // A heading carries one too, and its name is sliced from the source rather
+  // than read off its children, so it is handled where that slicing happens.
+  return tree;
+}
+
 export function projectOurs(
   markdown: string,
   profile: ProfileName,
 ): Projections {
   const source = applyTextTransform(markdown);
-  const tree = alignTableCells(parseOurs(markdown, profile));
+  const tree = stripBlockIds(alignTableCells(parseOurs(markdown, profile)));
   return {
     ...projectMdast(tree, source),
     text: mdastText(tree, definedFootnotes(tree)),

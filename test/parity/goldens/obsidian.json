@@ -9573,8 +9573,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "block-ref/no-space-before": {
       "id": "block-ref/no-space-before",
@@ -9640,8 +9639,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "block-ref/own-line-after-paragraph": {
       "id": "block-ref/own-line-after-paragraph",
@@ -9674,8 +9672,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "block-ref/own-line-after-list": {
       "id": "block-ref/own-line-after-list",
@@ -9708,8 +9705,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "block-ref/own-line-after-table": {
       "id": "block-ref/own-line-after-table",
@@ -9742,8 +9738,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "block-ref/inside-quote": {
       "id": "block-ref/inside-quote",
@@ -9776,8 +9771,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "block-ref/on-list-item": {
       "id": "block-ref/on-list-item",
@@ -9810,8 +9804,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "block-ref/on-heading": {
       "id": "block-ref/on-heading",
@@ -9990,8 +9983,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "block-ref/after-wikilink": {
       "id": "block-ref/after-wikilink",
@@ -10032,8 +10024,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "block-ref/in-callout-list": {
       "id": "block-ref/in-callout-list",
@@ -10066,8 +10057,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "block-ref/heading-vs-explicit": {
       "id": "block-ref/heading-vs-explicit",
