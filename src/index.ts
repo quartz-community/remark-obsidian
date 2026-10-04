@@ -29,6 +29,7 @@ import { mathDisplayTransform } from "./lib/math-display.js";
 import { taskReparseTransform } from "./lib/task-reparse.js";
 import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 import { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
+import { inlineRefoldTransform } from "./lib/inline-refold.js";
 import { containerLazyTransform } from "./lib/container-lazy.js";
 import { quoteMergeTransform } from "./lib/quote-merge.js";
 import { paragraphMergeTransform } from "./lib/paragraph-merge.js";
@@ -319,6 +320,14 @@ export default function remarkObsidian(
       // After the interrupt fold, or a definition about to be merged into the
       // paragraph above it would be turned into a heading instead.
       setextDefinitionTransform(tree, String(file));
+      // Before the bare-reference pass, so a label this re-tokenizes is still
+      // literal text and gets converted with every other one.
+      // A plain parse, not the whole pipeline: the transforms splice nodes
+      // without positions, and the positions are what let the real characters
+      // be read back over the flattened copy.
+      inlineRefoldTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
       bareFootnoteRefTransform(tree, String(file));
     }
     paragraphMergeTransform(tree, String(file));

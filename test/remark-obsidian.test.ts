@@ -906,6 +906,18 @@ describe("remark-obsidian", () => {
     ).toContain(": quoted under prose");
   });
 
+  it("re-tokenizes a delimiter a fold pulled into a paragraph", () => {
+    // The `===` lines arrive after inline tokenizing has run, so the `==`
+    // highlight across them is only found by re-tokenizing the fold.
+    const tree = processWithGfm("para\n[^1]: a\n===\n[^2]: b\n===\n[^3]: c\n");
+    expect(findNodes(tree, "highlight").length).toBe(1);
+  });
+
+  it("leaves a paragraph the tokenizer already judged alone", () => {
+    const tree = processWithGfm("a == b\nc == d\n");
+    expect(findNodes(tree, "highlight").length).toBe(0);
+  });
+
   it("absorbs an indented continuation into a definition split off a closer", () => {
     const tree = processWithGfm("%%\nx\n%% [^1]: body\n\n    more\n");
     expect(findNodes(tree, "code").length).toBe(0);

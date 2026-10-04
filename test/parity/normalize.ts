@@ -53,11 +53,19 @@ const isType = <T extends Node>(node: Node, type: string): node is T =>
   node.type === type;
 
 /** Text descendants, with hard breaks kept so a multi-line highlight compares. */
-function textOf(node: Node): string {
+function textOf(node: Node, defined?: ReadonlySet<string>): string {
   let out = "";
   visit(node, (child: Node) => {
     if (child.type === "text") out += (child as ValueNode).value;
     else if (child.type === "break") out += "\n";
+    // Same rule as `mdastText`: a reference nothing defines is shown by
+    // Obsidian as its bare label, and the DOM side reads that text too.
+    else if (child.type === "footnoteReference") {
+      const id = String(
+        (child as unknown as { identifier: string }).identifier,
+      );
+      if (defined && !defined.has(id)) out += id;
+    }
   });
   return out;
 }
@@ -349,7 +357,7 @@ export function projectMdast(
       return;
     }
     if (node.type === "highlight") {
-      highlights.push(textOf(node));
+      highlights.push(textOf(node, defined));
       return;
     }
     if (node.type === "inlineMath") {
