@@ -325,6 +325,20 @@ describe("remark-obsidian", () => {
     expect(findNodes(tree, "text")[0].value).toBe("see gone");
   });
 
+  it("reduces a stripped reference to its lowercased identifier", () => {
+    const tree = processWithGfm("x [^Cell] y\n");
+    expect(
+      findNodes(tree, "text")
+        .map((n) => n.value)
+        .join(""),
+    ).toBe("x cell y");
+  });
+
+  it("matches a definition case-insensitively when reviving", () => {
+    const tree = processWithGfm("x[^Cell]\n\n%%\nhidden\n%% [^cell]: freed\n");
+    expect(findNodes(tree, "footnoteReference").length).toBe(1);
+  });
+
   it("lets an unclosed fence in a list item swallow the lazy line", () => {
     const tree = processWithGfm("- ```\n  code\nplain[^1]\n");
     const code = findNodes(tree, "code");

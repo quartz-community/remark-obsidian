@@ -30937,8 +30937,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Previously deferred to another package. Callouts, frontmatter and footnotes are all handled here now, so this is an ordinary gap."
+      "triage": "match"
     },
     "hunt/lint-prefix-quoted-numbered/0": {
       "id": "hunt/lint-prefix-quoted-numbered/0",
@@ -39959,8 +39958,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/wide-gap-quote-markers/0": {
       "id": "hunt/wide-gap-quote-markers/0",

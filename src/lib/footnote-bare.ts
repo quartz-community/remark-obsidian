@@ -56,16 +56,19 @@ export function bareFootnoteRefTransform(tree: Root): void {
       match = REFERENCE.exec(text.value)
     ) {
       const name = match[1]!;
+      // mdast lowercases a footnote identifier, and Obsidian shows that rather
+      // than the label as written: `[^Cell]` reads `cell`.
+      const identifier = name.toLowerCase();
       pushText(text.value.slice(cursor, match.index));
-      if (defined.has(name)) {
+      if (defined.has(identifier)) {
         parts.push({
           type: "footnoteReference",
-          identifier: name,
+          identifier,
           label: name,
         } as unknown as FootnoteReference);
         revived = true;
       } else {
-        pushText(name);
+        pushText(identifier);
       }
       cursor = match.index + match[0].length;
     }
