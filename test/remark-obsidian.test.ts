@@ -8,6 +8,7 @@ import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
 import remarkObsidian, { type RemarkObsidianOptions } from "../src/index.js";
 import { visit } from "unist-util-visit";
+import { commentRegions } from "../src/lib/comment-region.js";
 
 function parse(md: string, opts?: RemarkObsidianOptions) {
   return unified().use(remarkParse).use(remarkObsidian, opts).parse(md);
@@ -409,6 +410,45 @@ describe("remark-obsidian", () => {
           .join(""),
       ).toContain(short);
     }
+  });
+
+  describe("lexically paired comment regions", () => {
+    it("gives a definition the whole region its indented opener started", () => {
+      const tree = processWithGfm(
+        "x[^1] y[^2]\n\n[^1]: one\n    %%\nhidden[^2] text\n%%\n\ntail\n",
+      );
+      expect(rootTypes(tree)).toEqual([
+        "paragraph",
+        "footnoteDefinition",
+        "paragraph",
+      ]);
+    });
+
+    it("does not let an unclosed region swallow a later definition", () => {
+      const tree = processWithGfm(
+        "x[^1]\n\n> %%\n> [^1]: dead\n\n[^1]: live\n",
+      );
+      expect(findNodes(tree, "footnoteReference").length).toBe(1);
+    });
+
+    it("does not let a region swallow a line that opens a block", () => {
+      const tree = processWithGfm(
+        "a[^1]\n\n[^9]: orphan\n    %%\n[^1]: one\n%%\n",
+      );
+      expect(findNodes(tree, "footnoteDefinition").length).toBe(2);
+    });
+
+    it("resumes pairing on the next line after a mid-line closer", () => {
+      // The `%%` inside ` nested %% line` is prose, not an opener: scanning
+      // restarts on the line below the closer, so the next region is the `%%`
+      // on its own line.
+      expect(commentRegions("%%\nline %% nested %% line\n%%\nafter\n")).toEqual(
+        [
+          { start: 0, end: 10, closed: true },
+          { start: 26, end: 35, closed: false },
+        ],
+      );
+    });
   });
 
   describe("legacy highlight scanning", () => {
