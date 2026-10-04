@@ -44,29 +44,21 @@ describe("the rendered chain", () => {
   });
 
   /**
-   * A live bug, pinned so it cannot be forgotten.
+   * Was a live crash, and the reason this file exists.
    *
-   * Three transforms re-parse a fragment with
-   * `self.runSync(self.parse(md), md)`, and `self` is the whole processor.
-   * The moment that processor holds an async plugin — `rehype-obsidian` is
-   * one — `runSync` refuses, so a task list item or a `%%` comment with a
-   * tail throws in the real Quartz chain. Both are ordinary content.
-   *
-   * Nothing caught it because every other test projects from `parseOurs`,
-   * which builds a markdown-only processor where no async plugin exists. It
-   * is only reachable through the full chain.
-   *
-   * Fixing it means re-parsing through something narrower than `self`, which
-   * changes which transforms a fragment sees — `remark-breaks` among them —
-   * so it needs measuring against the corpus rather than a quick patch.
+   * Three transforms re-parsed a fragment with `self.runSync`, where `self`
+   * is the whole processor -- and `runSync` refuses the moment that processor
+   * holds an async plugin, which `rehype-obsidian` is. A task list therefore
+   * threw in the real Quartz chain while every mdast-level test passed, since
+   * the harness builds a markdown-only processor where nothing is async.
    */
   it.each([
-    ["a task list item", "- [x] done\n"],
-    ["a comment with a tail", "%%\nx\n%% tail\n"],
-  ])("still throws on %s, through the full chain", async (_name, markdown) => {
-    await expect(renderOurs(markdown)).rejects.toThrow(
-      "`runSync` finished async",
-    );
+    ["a task list item", "- [x] done\n", "task-list"],
+    ["a comment with a tail", "%%\nx\n%% tail\n", "tail"],
+    ["a definition under a table", "| a |\n| --- |\n[^1]: x\n", "table"],
+  ])("renders %s through the full chain", async (_name, markdown, expected) => {
+    const html = await renderOurs(markdown);
+    expect(html).toContain(expected);
   });
 });
 

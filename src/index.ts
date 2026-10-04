@@ -223,7 +223,7 @@ export default function remarkObsidian(
     opts.callouts;
   if (!needsTransform) return undefined;
 
-  return (tree: Root, file: any) => {
+  const transform = (tree: Root, file: unknown): void => {
     if (opts.comments && !opts.keepComments) {
       visit(
         tree,
@@ -238,11 +238,7 @@ export default function remarkObsidian(
       );
     } else if (opts.comments) {
       commentHoistTransform(tree);
-      commentTailTransform(
-        tree,
-        String(file),
-        (markdown) => self.runSync(self.parse(markdown), markdown) as Root,
-      );
+      commentTailTransform(tree, String(file), reparse);
       // After the hoist and tail passes, so a mis-paired region is a top-level
       // comment node by the time its signature is looked for.
       commentRegionTransform(tree, String(file), (markdown) =>
@@ -337,11 +333,7 @@ export default function remarkObsidian(
       // merged away first, or the table split fires on a definition that is
       // about to stop being one. A table cannot interrupt a paragraph either.
       footnoteInterruptTransform(tree, String(file));
-      footnoteTableSplitTransform(
-        tree,
-        String(file),
-        (markdown) => self.runSync(self.parse(markdown), markdown) as Root,
-      );
+      footnoteTableSplitTransform(tree, String(file), reparse);
       // After the interrupt fold, or a definition about to be merged into the
       // paragraph above it would be turned into a heading instead.
       setextDefinitionTransform(tree, String(file));
@@ -362,13 +354,30 @@ export default function remarkObsidian(
     }
     paragraphMergeTransform(tree, String(file));
     if (opts.taskReparse) {
-      taskReparseTransform(
-        tree,
-        String(file),
-        (markdown) => self.runSync(self.parse(markdown), markdown) as Root,
-      );
+      taskReparseTransform(tree, String(file), reparse);
     }
   };
+
+  /**
+   * Re-parse a fragment through this plugin's own passes.
+   *
+   * Never through `self.runSync`. `self` is the whole processor, and the
+   * moment it holds an asynchronous plugin -- `rehype-obsidian` is one in the
+   * Quartz chain -- `runSync` refuses with "finished async", so a task list
+   * or a `%%` comment with a tail threw outright. The harness never saw it
+   * because it builds a markdown-only processor where every plugin is sync.
+   *
+   * Recursing into `transform` runs the same passes on the fragment while
+   * staying synchronous. Fragments only ever shrink, so this terminates for
+   * the same reason the previous call did.
+   */
+  const reparse = (markdown: string): Root => {
+    const fragment = self.parse(markdown);
+    transform(fragment, markdown);
+    return fragment;
+  };
+
+  return transform;
 }
 
 export { wikilinkSyntax } from "./lib/syntax/wikilink.js";
