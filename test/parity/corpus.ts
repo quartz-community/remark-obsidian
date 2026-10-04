@@ -9,6 +9,8 @@
 
 import { HUNT_FIXTURES } from "./corpus-hunt.js";
 import { COMMONMARK_SPEC } from "./commonmark.js";
+import { readFileSync } from "node:fs";
+
 import { generateRange } from "./fuzz/generate.js";
 
 export type Layer =
@@ -704,6 +706,22 @@ const ADJACENCY_BASES: ReadonlyArray<readonly [string, string]> = [
  * complete reproduction on its own, so nothing is lost by isolating them.
  */
 function fuzzCases(): Case[] | undefined {
+  // Shrinking feeds candidate reductions back through the same recorder, so
+  // it needs to supply documents rather than seeds.
+  const file = process.env.PARITY_FUZZ_FILE;
+  if (file) {
+    const supplied = JSON.parse(readFileSync(file, "utf8")) as Array<{
+      id: string;
+      markdown: string;
+    }>;
+    return supplied.map((entry) => ({
+      id: entry.id,
+      layer: "fuzz" as Layer,
+      category: "fuzz",
+      markdown: entry.markdown,
+    }));
+  }
+
   const from = Number(process.env.PARITY_FUZZ_FROM);
   const count = Number(process.env.PARITY_FUZZ_COUNT);
   if (!Number.isInteger(from) || !Number.isInteger(count) || count <= 0) {
