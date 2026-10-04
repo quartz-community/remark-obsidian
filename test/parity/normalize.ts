@@ -79,8 +79,17 @@ const BLOCK_TYPES = new Set([
   "footnoteDefinition",
 ]);
 
+/** Identifiers the document defines, so a reference can be told from bare text. */
+export function definedFootnotes(tree: Node): Set<string> {
+  const defined = new Set<string>();
+  visit(tree, "footnoteDefinition", (node: Node) => {
+    defined.add(String((node as unknown as { identifier: string }).identifier));
+  });
+  return defined;
+}
+
 /** From mdast, not HTML: `wikilink`/`tag` have no hast handler and vanish when rendered. */
-export function mdastText(tree: Node): string {
+export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
   const parts: string[] = [];
 
   const walk = (node: Node): void => {
@@ -173,7 +182,18 @@ export function mdastText(tree: Node): string {
       // Obsidian renders the marker as `[n]`, other renderers as `n`. A
       // placeholder on both sides compares "a reference is here" without
       // comparing renderer styling, the same way math is handled.
-      case "footnoteReference":
+      //
+      // Unless nothing defines it: Obsidian consumes the delimiters anyway and
+      // shows the bare label, so `see [^x]` reads `see x` with no marker. The
+      // node still carries the reference -- dropping it is the renderer's doing,
+      // not the parser's -- so the drop belongs here, in the projection.
+      case "footnoteReference": {
+        const id = String(
+          (node as unknown as { identifier: string }).identifier,
+        );
+        parts.push(defined && !defined.has(id) ? id : "\u27e8fn\u27e9");
+        return;
+      }
       case "footnote":
         parts.push("\u27e8fn\u27e9");
         return;
@@ -265,6 +285,7 @@ export function projectMdast(
   source: string,
 ): Omit<Projections, "text" | "sections"> {
   const math: MathItem[] = [];
+  const defined = definedFootnotes(tree);
   const referenced = new Set<string>();
   visit(tree, "footnoteReference", (node: Node) => {
     referenced.add(
@@ -294,7 +315,7 @@ export function projectMdast(
     // yields the same display text the DOM side reads off the rendered element.
     if (node.type === "strong" || node.type === "emphasis") {
       const kind = node.type === "strong" ? "strong" : "em";
-      emphasis.push(`${kind}:${mdastText(node)}`);
+      emphasis.push(`${kind}:${mdastText(node, defined)}`);
       return;
     }
     if (isType<WikilinkNode>(node, "wikilink")) {
@@ -389,7 +410,7 @@ export function projectOurs(
   const tree = alignTableCells(parseOurs(markdown, profile));
   return {
     ...projectMdast(tree, source),
-    text: mdastText(tree),
+    text: mdastText(tree, definedFootnotes(tree)),
     sections: mdastSections(tree, source),
   };
 }

@@ -54,7 +54,6 @@ import {
 } from "./lib/legacy-definition.js";
 import { quoteIndentedCodeTransform } from "./lib/quote-indented-code.js";
 import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
-import { footnoteOrphanTransform } from "./lib/footnote-orphan.js";
 import { calloutTransform } from "./lib/callout.js";
 import { commentHoistTransform } from "./lib/comment-hoist.js";
 import { commentTailTransform } from "./lib/comment-tail.js";
@@ -314,9 +313,6 @@ export default function remarkObsidian(
       // paragraph above it would be turned into a heading instead.
       setextDefinitionTransform(tree, String(file));
       bareFootnoteRefTransform(tree, String(file));
-      // Last: the folds above can remove the definition a reference was bound to
-      // while parsing, leaving it orphaned.
-      footnoteOrphanTransform(tree);
     }
     paragraphMergeTransform(tree, String(file));
     if (opts.taskReparse) {
@@ -350,7 +346,6 @@ export { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 export { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
 export { containerLazyTransform } from "./lib/container-lazy.js";
 export { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
-export { footnoteOrphanTransform } from "./lib/footnote-orphan.js";
 export { calloutTransform } from "./lib/callout.js";
 export { commentHoistTransform } from "./lib/comment-hoist.js";
 export { commentTailTransform } from "./lib/comment-tail.js";

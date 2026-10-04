@@ -78,6 +78,41 @@ const lossyNodesIn = (tree: Root, markdown: string): string[] => {
 const lossyIn = (markdown: string): string[] =>
   lossyNodesIn(parseOurs(markdown, "quartz-default"), markdown);
 
+const MARKER = /\[\^[^[\]\s]+\]/g;
+
+/**
+ * Every footnote marker the tree still carries, lowercased because mdast
+ * lowercases an identifier. A reference and a definition each reconstruct
+ * theirs from the node; anything left as prose is found in the literal value.
+ */
+const markersIn = (tree: Root): Set<string> => {
+  const kept = new Set<string>();
+  visit(tree, (node: Root | { type: string }) => {
+    const candidate = node as {
+      type: string;
+      identifier?: string;
+      label?: string;
+      value?: string;
+      meta?: string;
+    };
+    if (
+      candidate.type === "footnoteReference" ||
+      candidate.type === "footnoteDefinition"
+    ) {
+      const name = candidate.label ?? candidate.identifier ?? "";
+      kept.add(`[^${name}]`.toLowerCase());
+    }
+    // `meta` as well as `value`: a `$$ b [^3]` fence puts everything after the
+    // opener in the info string, where the marker is still present.
+    for (const text of [candidate.value, candidate.meta]) {
+      if (typeof text !== "string") continue;
+      for (const marker of text.match(MARKER) ?? [])
+        kept.add(marker.toLowerCase());
+    }
+  });
+  return kept;
+};
+
 const family = (dropped: readonly string[]): string => {
   if (dropped.some((d) => d.includes("[!"))) return "callout marker";
   if (dropped.every((d) => /^[[\]^]+$/.test(d))) return "footnote brackets";
@@ -122,14 +157,37 @@ describe("source fidelity", () => {
       const key = family(dropped);
       counts[key] = (counts[key] ?? 0) + 1;
     }
-    expect(counts).toEqual({ "footnote brackets": 134, "callout marker": 12 });
+    expect(counts).toEqual({ "callout marker": 12 });
   });
 
-  it("keeps a defined footnote reference lossless", () => {
+  it("keeps a footnote reference lossless, defined or not", () => {
     expect(lossyIn("a[^1]\n\n[^1]: x\n")).toEqual([]);
+    expect(lossyIn("a[^1]\n")).toEqual([]);
   });
 
-  it("drops the brackets of an undefined footnote reference", () => {
-    expect(lossyIn("a[^1]\n")).toEqual(["[^]"]);
+  /**
+   * The span check above is a proxy: a parse could satisfy it by emitting
+   * nodes with no position at all. This measures the property itself, so the
+   * two cannot be traded against each other -- every `[^label]` the source
+   * wrote must still be reachable in the tree, whether it survived as a
+   * reference, a definition, or literal text.
+   */
+  it("keeps every footnote marker in the corpus reachable", () => {
+    const lost: string[] = [];
+    for (const entry of cases) {
+      // A marker preceded by `^` is the tail of an inline footnote opener, not
+      // a reference: `^[^9]` is one `^[...]` whose body is the text `^9`, so
+      // the source substring `[^9]` is never a marker to preserve.
+      const written = [...entry.markdown.matchAll(MARKER)]
+        .filter((match) => entry.markdown[match.index - 1] !== "^")
+        .map((match) => match[0]);
+      if (written.length === 0) continue;
+      const kept = markersIn(parseOurs(entry.markdown, "quartz-default"));
+      const missing = written.filter(
+        (marker) => !kept.has(marker.toLowerCase()),
+      );
+      if (missing.length > 0) lost.push(`${entry.id}: ${missing.join(" ")}`);
+    }
+    expect(lost).toEqual([]);
   });
 });

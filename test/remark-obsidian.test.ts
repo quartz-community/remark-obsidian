@@ -325,10 +325,12 @@ describe("remark-obsidian", () => {
     expect(findNodes(tree, "footnoteReference").length).toBe(1);
   });
 
-  it("still strips a reference nothing defines", () => {
+  it("keeps a reference nothing defines, rather than baring it in the tree", () => {
     const tree = processWithGfm("see [^gone]\n");
-    expect(findNodes(tree, "footnoteReference").length).toBe(0);
-    expect(findNodes(tree, "text")[0].value).toBe("see gone");
+    const refs = findNodes(tree, "footnoteReference");
+    expect(refs.length).toBe(1);
+    expect(refs[0].identifier).toBe("gone");
+    expect(findNodes(tree, "text")[0].value).toBe("see ");
   });
 
   it("keeps a footnote definition one after a leading ---", () => {
@@ -366,13 +368,11 @@ describe("remark-obsidian", () => {
     expect(findNodes(tree, "footnoteReference").length).toBe(1);
   });
 
-  it("reduces a stripped reference to its lowercased identifier", () => {
+  it("lowercases the identifier of a reference nothing defines, keeping the label", () => {
     const tree = processWithGfm("x [^Cell] y\n");
-    expect(
-      findNodes(tree, "text")
-        .map((n) => n.value)
-        .join(""),
-    ).toBe("x cell y");
+    const ref = findNodes(tree, "footnoteReference")[0];
+    expect(ref.identifier).toBe("cell");
+    expect(ref.label).toBe("Cell");
   });
 
   it("matches a definition case-insensitively when reviving", () => {
@@ -417,9 +417,11 @@ describe("remark-obsidian", () => {
     const heading = findNodes(tree, "heading");
     expect(heading.length).toBe(1);
     expect(heading[0].depth).toBe(1);
-    // The heading keeps the raw line; the bare-reference pass then reduces the
-    // label, which is how Obsidian shows it.
-    expect(heading[0].children[0].value).toBe("1: x");
+    // The heading keeps the raw line. The reference stays a node, so the
+    // heading reads `1: x` only once a renderer bares it.
+    expect(heading[0].children[0].type).toBe("footnoteReference");
+    expect(heading[0].children[0].identifier).toBe("1");
+    expect(heading[0].children[1].value).toBe(": x");
   });
 
   it("heads one sitting above a thematic break instead", () => {
@@ -895,11 +897,13 @@ describe("remark-obsidian", () => {
   it("folds a definition under prose inside a quote", () => {
     const tree = processWithGfm("> para\n> [^q]: quoted under prose\n");
     expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
+    const quote = findNodes(tree, "blockquote")[0];
+    expect(findNodes(quote, "footnoteReference")[0].identifier).toBe("q");
     expect(
-      findNodes(findNodes(tree, "blockquote")[0], "text")
+      findNodes(quote, "text")
         .map((n) => n.value)
         .join(""),
-    ).toContain("q: quoted under prose");
+    ).toContain(": quoted under prose");
   });
 
   it("still starts a definition after a blank line inside a quote", () => {
@@ -1142,18 +1146,17 @@ describe("remark-obsidian", () => {
     );
   });
 
-  it("bares a reference whose definition was folded away", () => {
+  it("keeps a reference whose definition was folded away", () => {
     // GFM binds references while parsing, so the node survives the fold that
     // turns the definition into lazy continuation. Obsidian never saw a
-    // definition there and renders the bare name.
+    // definition there and renders the bare name -- but that is the renderer's
+    // job. Baring it here would rewrite `[^1]` to `1` in the tree, and a
+    // formatter serialising that writes the loss back into the file.
     const tree = processWithGfm("para\n[^1]: a\n\nx[^1]");
     expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
-    expect(findNodes(tree, "footnoteReference").length).toBe(0);
     expect(
-      findNodes(tree, "text")
-        .map((n: any) => n.value)
-        .join(""),
-    ).toContain("x1");
+      findNodes(tree, "footnoteReference").map((n: any) => n.identifier),
+    ).toEqual(["1", "1"]);
   });
 
   it("keeps a reference bound when its definition survives", () => {

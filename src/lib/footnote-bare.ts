@@ -22,8 +22,13 @@ interface ParentNode extends Node {
  * live reference there, so a definition recovered after the fact has to revive its
  * references rather than have them flattened.
  *
- * Each match is therefore routed on whether the tree defines it: defined becomes a
- * real `footnoteReference`, undefined is reduced to its bare name as before.
+ * Both outcomes are a real `footnoteReference`; only the rendering differs. An
+ * undefined one used to be reduced here to its bare name, which is what Obsidian
+ * *displays* -- but a node value is not a rendering. Flattening `a[^1]` to the
+ * text `a1` left the node claiming a span it no longer reproduced, so a formatter
+ * serialising this tree wrote the shorter text back and destroyed a reference the
+ * author had merely not defined yet. The reference survives as a node, which
+ * round-trips to `[^1]`, and consumers render an undefined one as its bare label.
  */
 const PUNCTUATION = /[!-/:-@[-`{-~]/u;
 
@@ -89,7 +94,6 @@ export function bareFootnoteRefTransform(tree: Root, source = ""): void {
 
     const parts: Node[] = [];
     let cursor = 0;
-    let revived = false;
     REFERENCE.lastIndex = 0;
 
     const pushText = (value: string): void => {
@@ -126,26 +130,16 @@ export function bareFootnoteRefTransform(tree: Root, source = ""): void {
         : name;
       const identifier = written.toLowerCase();
       pushText(text.value.slice(cursor, match.index));
-      if (defined.has(identifier)) {
-        parts.push({
-          type: "footnoteReference",
-          identifier,
-          label: written,
-        } as unknown as FootnoteReference);
-        revived = true;
-      } else {
-        pushText(identifier);
-      }
+      parts.push({
+        type: "footnoteReference",
+        identifier,
+        label: written,
+      } as unknown as FootnoteReference);
       cursor = match.index + match[0].length;
     }
 
     if (parts.length === 0) return;
     pushText(text.value.slice(cursor));
-
-    if (!revived) {
-      text.value = parts.map((part) => (part as Text).value).join("");
-      return;
-    }
     if (!parent || typeof index !== "number") return;
 
     (parent as ParentNode).children.splice(index, 1, ...parts);
