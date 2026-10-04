@@ -113,12 +113,6 @@ const markersIn = (tree: Root): Set<string> => {
   return kept;
 };
 
-const family = (dropped: readonly string[]): string => {
-  if (dropped.some((d) => d.includes("[!"))) return "callout marker";
-  if (dropped.every((d) => /^[[\]^]+$/.test(d))) return "footnote brackets";
-  return "unclassified";
-};
-
 /**
  * A `text` node carries no delimiters of its own, so its value must reproduce
  * its own source slice. A value that silently drops characters makes the node
@@ -144,20 +138,11 @@ describe("source fidelity", () => {
     expect(cases.length).toBeGreaterThan(1000);
   });
 
-  it("drops source characters only in the two known families", () => {
-    const unclassified = [...lossy]
-      .filter(([, dropped]) => family(dropped) === "unclassified")
-      .map(([id, dropped]) => `${id}: ${JSON.stringify(dropped)}`);
-    expect(unclassified).toEqual([]);
-  });
-
-  it("does not grow the set of lossy cases", () => {
-    const counts: Record<string, number> = {};
-    for (const dropped of lossy.values()) {
-      const key = family(dropped);
-      counts[key] = (counts[key] ?? 0) + 1;
-    }
-    expect(counts).toEqual({ "callout marker": 12 });
+  it("never drops a source character from a text node", () => {
+    const offenders = [...lossy].map(
+      ([id, dropped]) => `${id}: ${JSON.stringify(dropped)}`,
+    );
+    expect(offenders).toEqual([]);
   });
 
   it("keeps a footnote reference lossless, defined or not", () => {

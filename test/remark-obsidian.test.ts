@@ -970,6 +970,26 @@ describe("remark-obsidian", () => {
     ).toEqual(["Body"]);
   });
 
+  it("spans the title and the body where they really are", () => {
+    const source = "> [!note] Title\n> Body";
+    const [callout] = findNodes(processWithGfm(source), "callout");
+    const slice = (n: any) =>
+      source.slice(n.position.start.offset, n.position.end.offset);
+    const [titleNode] = findNodes(callout, "calloutTitle");
+    const body = callout.children.find((c: any) => c.type === "paragraph");
+    expect(slice(titleNode)).toBe("Title");
+    expect(slice(body)).toBe("Body");
+  });
+
+  it("spans the body correctly when the callout is nested in a list", () => {
+    const source = "- item\n  > [!note]\n  > body";
+    const [callout] = findNodes(processWithGfm(source), "callout");
+    const body = callout.children.find((c: any) => c.type === "paragraph");
+    expect(
+      source.slice(body.position.start.offset, body.position.end.offset),
+    ).toBe("body");
+  });
+
   it("records the fold marker", () => {
     const [folded] = findNodes(processWithGfm("> [!note]- C\n> H"), "callout");
     const [open] = findNodes(processWithGfm("> [!note]+ E\n> S"), "callout");

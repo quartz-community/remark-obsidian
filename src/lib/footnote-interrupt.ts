@@ -12,7 +12,8 @@ import type { Paragraph, Root, RootContent } from "mdast";
  * The label is re-inserted as literal text and the body's own inline nodes are
  * spliced in after it, so a construct inside the body survives rather than being
  * flattened back to source. This has to run before `bareFootnoteRefTransform`,
- * which is what turns the re-inserted `[^1]:` into the `1:` Obsidian shows.
+ * which turns the re-inserted `[^1]:` back into a reference node; a renderer
+ * then bares it to the `1:` Obsidian shows.
  *
  * Every block container is considered, not just the document: a definition under
  * prose inside a quote continues that prose the same way, so
