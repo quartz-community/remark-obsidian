@@ -381,6 +381,17 @@ describe("remark-obsidian", () => {
     }
   });
 
+  it("lets a definition freed from a comment read the line below it", () => {
+    const tree = processWithGfm("%%\nhidden\n%%[^1]: def\ntext ref\n");
+    const definitions = findNodes(tree, "footnoteDefinition");
+    expect(definitions.length).toBe(1);
+    const inside = findNodes(definitions[0], "text")
+      .map((n) => n.value)
+      .join("");
+    expect(inside).toContain("def");
+    expect(inside).toContain("text ref");
+  });
+
   it("still treats a real html comment as html", () => {
     const tree = processWithGfm("x <!-- hidden -->\nreal\n");
     expect(findNodes(tree, "html").length).toBe(1);

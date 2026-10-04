@@ -88,5 +88,38 @@ export function commentTailTransform(
     }
 
     tree.children.splice(index + 1, 0, ...(parsed.children as RootContent[]));
+    absorbLazyLine(tree, index + parsed.children.length, source);
   }
+}
+
+/**
+ * A definition recovered from the tail keeps reading the line below it.
+ *
+ * The tail is parsed on its own, so it ends where the line does, but Obsidian
+ * treats it as a definition written normally — `%%\nhidden\n%%[^1]: def` followed
+ * by `text` is one definition holding both lines. Without this the second line
+ * stays a paragraph and renders in the body, where Obsidian shows nothing.
+ */
+function absorbLazyLine(tree: Root, index: number, source: string): void {
+  const definition = tree.children[index];
+  if (definition?.type !== "footnoteDefinition") return;
+
+  const next = tree.children[index + 1];
+  if (next?.type !== "paragraph") return;
+
+  const end = definition.position?.end?.offset;
+  const start = next.position?.start?.offset;
+  if (end === undefined || start === undefined) return;
+  if (source.slice(end, start) !== "\n") return;
+
+  const host = definition.children[definition.children.length - 1];
+  if (host?.type !== "paragraph") return;
+
+  host.children.push({ type: "text", value: "\n" }, ...next.children);
+  for (const node of [host, definition]) {
+    if (node.position && next.position?.end) {
+      node.position.end = { ...next.position.end };
+    }
+  }
+  tree.children.splice(index + 1, 1);
 }
