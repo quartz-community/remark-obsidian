@@ -39,24 +39,34 @@ const PUNCTUATION = /[!-/:-@[-`{-~]/u;
  * character references and anything else that rewrites text. The caller then
  * keeps its old behaviour rather than trusting a bad alignment.
  */
-function escapedPositions(source: string, value: string): boolean[] | null {
-  const flags: boolean[] = [];
+interface SourceAlignment {
+  /** Whether value character `i` arrived through a backslash escape. */
+  readonly escaped: boolean[];
+  /** Source offset of value character `i`, with a final entry for the end. */
+  readonly at: number[];
+}
+
+function alignToSource(source: string, value: string): SourceAlignment | null {
+  const escaped: boolean[] = [];
+  const at: number[] = [];
   const rebuilt: string[] = [];
 
   for (let index = 0; index < source.length; index++) {
     const character = source[index]!;
     const next = source[index + 1];
+    at.push(index);
     if (character === "\\" && next !== undefined && PUNCTUATION.test(next)) {
-      flags.push(true);
+      escaped.push(true);
       rebuilt.push(next);
       index++;
       continue;
     }
-    flags.push(false);
+    escaped.push(false);
     rebuilt.push(character);
   }
+  at.push(source.length);
 
-  return rebuilt.join("") === value ? flags : null;
+  return rebuilt.join("") === value ? { escaped, at } : null;
 }
 
 export function bareFootnoteRefTransform(tree: Root, source = ""): void {
@@ -71,10 +81,11 @@ export function bareFootnoteRefTransform(tree: Root, source = ""): void {
 
     const from = text.position?.start?.offset;
     const to = text.position?.end?.offset;
-    const escaped =
+    const slice =
       source && from !== undefined && to !== undefined
-        ? escapedPositions(source.slice(from, to), text.value)
-        : null;
+        ? source.slice(from, to)
+        : "";
+    const aligned = slice ? alignToSource(slice, text.value) : null;
 
     const parts: Node[] = [];
     let cursor = 0;
@@ -99,16 +110,27 @@ export function bareFootnoteRefTransform(tree: Root, source = ""): void {
       const name = match[1]!;
       // An escaped `\[` is a literal bracket, so this is not a reference at
       // all and must survive as written.
-      if (escaped?.[match.index]) continue;
+      if (aligned?.escaped[match.index]) continue;
       // mdast lowercases a footnote identifier, and Obsidian shows that rather
       // than the label as written: `[^Cell]` reads `cell`.
-      const identifier = name.toLowerCase();
+      // Read the label from the source, not the value: Obsidian does not apply
+      // escapes while scanning one, so `[^a\]` names `a\` and keeps the
+      // backslash the value had already dropped.
+      const written = aligned
+        ? slice
+            .slice(
+              aligned.at[match.index]! + 2,
+              aligned.at[match.index + match[0].length]! - 1,
+            )
+            .replace(/\\(?=[!-/:-@[-`{-~])/gu, "\\")
+        : name;
+      const identifier = written.toLowerCase();
       pushText(text.value.slice(cursor, match.index));
       if (defined.has(identifier)) {
         parts.push({
           type: "footnoteReference",
           identifier,
-          label: name,
+          label: written,
         } as unknown as FootnoteReference);
         revived = true;
       } else {

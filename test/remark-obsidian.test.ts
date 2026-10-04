@@ -342,6 +342,19 @@ describe("remark-obsidian", () => {
     expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
   });
 
+  it("ends a footnote label at the first bracket", () => {
+    // GFM reads this as a definition named `a]b`; Obsidian stops at the first
+    // `]`, finds `b` rather than `:`, and leaves the line as prose.
+    const tree = processWithGfm("Alpha.\n\n[^a\\]b]: body\n");
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
+    expect(rootTypes(tree)).toEqual(["paragraph", "paragraph"]);
+  });
+
+  it("still accepts a label with no bracket in it", () => {
+    const tree = processWithGfm("[^ab]: body\n");
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(1);
+  });
+
   it("leaves an escaped marker written as the author escaped it", () => {
     const tree = processWithGfm("literal \\[^9] real[^7]\n\n[^7]: real\n");
     expect(
