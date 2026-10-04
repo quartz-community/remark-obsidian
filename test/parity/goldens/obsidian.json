@@ -22955,8 +22955,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Obsidian ends a block comment at its closing `%%` and reparses that line's tail as its own block (here a footnote definition). Flow constructs own whole lines in micromark, so we absorb the tail into the comment instead: no content is lost and `text` agrees, but `sections` still differs by the tail's block. Closing it needs the compat-mode preprocessing hook."
+      "triage": "match"
     },
     "hunt/continuation-masked-under-foreign-label/3": {
       "id": "hunt/continuation-masked-under-foreign-label/3",

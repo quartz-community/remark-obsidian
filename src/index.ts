@@ -58,6 +58,7 @@ import { calloutTransform } from "./lib/callout.js";
 import { commentHoistTransform } from "./lib/comment-hoist.js";
 import { commentTailTransform } from "./lib/comment-tail.js";
 import { commentRegionTransform } from "./lib/comment-region.js";
+import { definitionContinuationTransform } from "./lib/definition-continuation.js";
 import { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 
 import { math as mathSyntax } from "micromark-extension-math";
@@ -234,6 +235,12 @@ export default function remarkObsidian(
       // After the hoist and tail passes, so a mis-paired region is a top-level
       // comment node by the time its signature is looked for.
       commentRegionTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+      // After the region pass: a definition split off a `%%` closer was never
+      // seen by the footnote parser, so its indented continuation is still a
+      // sibling at this point.
+      definitionContinuationTransform(tree, String(file), (markdown) =>
         self.parse(markdown),
       );
       visit(tree, "comment", (node: any) => {

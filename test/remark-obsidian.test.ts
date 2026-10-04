@@ -906,6 +906,20 @@ describe("remark-obsidian", () => {
     ).toContain(": quoted under prose");
   });
 
+  it("absorbs an indented continuation into a definition split off a closer", () => {
+    const tree = processWithGfm("%%\nx\n%% [^1]: body\n\n    more\n");
+    expect(findNodes(tree, "code").length).toBe(0);
+    const [definition] = findNodes(tree, "footnoteDefinition");
+    expect(findNodes(definition, "text").map((n: any) => n.value)).toContain(
+      "more",
+    );
+  });
+
+  it("leaves an unclosed fence after a definition where it is", () => {
+    const tree = processWithGfm("[^1]: def\n\n```\nfake\n");
+    expect(findNodes(tree, "code").length).toBe(1);
+  });
+
   it("still starts a definition after a blank line inside a quote", () => {
     const tree = processWithGfm("> para\n>\n> [^q]: real\n");
     expect(findNodes(tree, "footnoteDefinition").length).toBe(1);
