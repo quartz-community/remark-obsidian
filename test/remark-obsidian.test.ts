@@ -325,6 +325,18 @@ describe("remark-obsidian", () => {
     expect(findNodes(tree, "text")[0].value).toBe("see gone");
   });
 
+  it("keeps a footnote definition one after a leading ---", () => {
+    const tree = processWithGfm("---\n\nalpha\n\n[^Note]: alpha\n");
+    expect(findNodes(tree, "definition").length).toBe(0);
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(1);
+  });
+
+  it("leaves a real link reference definition alone", () => {
+    const tree = processWithGfm("---\n\n[foo]: /url\n\n[foo]\n");
+    expect(findNodes(tree, "definition").length).toBe(1);
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
+  });
+
   it("reduces a stripped reference to its lowercased identifier", () => {
     const tree = processWithGfm("x [^Cell] y\n");
     expect(

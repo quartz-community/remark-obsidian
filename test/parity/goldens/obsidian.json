@@ -35011,8 +35011,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Previously deferred to another package. Callouts, frontmatter and footnotes are all handled here now, so this is an ordinary gap."
+      "triage": "match"
     },
     "hunt/phantom-frontmatter/1": {
       "id": "hunt/phantom-frontmatter/1",
@@ -38157,8 +38156,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Upstream micromark interaction, not ours: with `micromark-extension-frontmatter` registered, `---\\npara\\n===\\n[^1]: x` parses the label as a link reference definition instead of a GFM footnote definition. Reproduces with the official `remark-frontmatter` in either registration order, and without this package: `unified().use(remarkParse).use(remarkFrontmatter, [\"yaml\"]).use(remarkGfm)`. Obsidian produces a footnoteDefinition."
+      "triage": "match"
     },
     "hunt/setext-paragraph-count-ignores-blocks/2": {
       "id": "hunt/setext-paragraph-count-ignores-blocks/2",
