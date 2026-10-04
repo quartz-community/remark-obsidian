@@ -33,6 +33,7 @@ import { containerLazyTransform } from "./lib/container-lazy.js";
 import { fenceOutlivesTransform } from "./lib/fence-outlives.js";
 import { tableInterruptTransform } from "./lib/table-interrupt.js";
 import { setextDefinitionTransform } from "./lib/setext-definition.js";
+import { shortCommentTransform } from "./lib/short-comment.js";
 import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 import { footnoteOrphanTransform } from "./lib/footnote-orphan.js";
 import { calloutTransform } from "./lib/callout.js";
@@ -219,6 +220,7 @@ export default function remarkObsidian(
         };
       });
     }
+    shortCommentTransform(tree);
     if (opts.customTaskChars) {
       customTaskCharTransform(tree, String(file));
     }

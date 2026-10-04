@@ -369,6 +369,23 @@ describe("remark-obsidian", () => {
     expect(findNodes(tree, "heading")[0].depth).toBe(2);
   });
 
+  it("shows the short-form html comments literally", () => {
+    for (const short of ["<!-->", "<!--->"]) {
+      const tree = processWithGfm(`x ${short}\nreal\n`);
+      expect(findNodes(tree, "html").length).toBe(0);
+      expect(
+        findNodes(tree, "text")
+          .map((n) => n.value)
+          .join(""),
+      ).toContain(short);
+    }
+  });
+
+  it("still treats a real html comment as html", () => {
+    const tree = processWithGfm("x <!-- hidden -->\nreal\n");
+    expect(findNodes(tree, "html").length).toBe(1);
+  });
+
   it("leaves a definition with a continuation line alone", () => {
     const tree = processWithGfm("[^1]: x\n    y\n--\n\nuse[^1]\n");
     expect(findNodes(tree, "heading").length).toBe(0);
