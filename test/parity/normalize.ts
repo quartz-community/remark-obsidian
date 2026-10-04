@@ -123,10 +123,15 @@ export function mdastText(tree: Node): string {
         // and friends out of reading view, so their content is not in the
         // rendered text at all, and stripping only the tags would surface a
         // body no renderer shows.
-        const raw = (node as ValueNode).value.replace(
-          /<(script|style|textarea|title)\b[\s\S]*?(?:<\/\1\s*>|$)/gi,
-          " ",
-        );
+        const raw = (node as ValueNode).value
+          .replace(
+            /<(script|style|textarea|title)\b[\s\S]*?(?:<\/\1\s*>|$)/gi,
+            " ",
+          )
+          // A comment renders nothing, and an unclosed one swallows the rest
+          // of the note. Tag-stripping alone leaves its body behind, because
+          // `<!--` has no `>` for that pattern to match.
+          .replace(/<!--[\s\S]*?(?:-->|$)/g, " ");
         parts.push(`${raw.replace(/<[^>]*>/g, " ")} `);
         return;
       }

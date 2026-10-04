@@ -61,6 +61,20 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["math/unclosed-quote-lazy", "> $$\nlazy\n"],
   ["math/unclosed-plain", "$$\nlazy\n"],
 
+  // An unclosed `<!--` hides the rest of the note. These measure the shapes
+  // the recorder can be trusted on.
+  //
+  // The container forms are deliberately absent. `> <!--` and `- <!--` were
+  // probed and the two renderers disagree: the detached one used for recording
+  // hides everything, a real Reading View renders what follows. Recording
+  // either would store a value Obsidian does not actually produce, so the
+  // question has to be settled through Reading View instead — see
+  // `hunt/blockquote-region-outlives-quote/1`, whose expectation came from the
+  // unfaithful path.
+  ["html/unclosed-comment-plain", "<!--\ndraft\n\nafter\n"],
+  ["html/unclosed-comment-inline", "x <!-- draft\n\nafter\n"],
+  ["html/closed-comment-quote", "> <!--\n> draft\n> -->\n\nafter\n"],
+
   // `^[` nesting: the doubled and nested forms both diverge, and neither is
   // explicable without knowing where Obsidian's scan starts and stops.
   ["footnote/inline-plain", "^[note]\n"],
