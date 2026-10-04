@@ -180,6 +180,48 @@ stamps `obsidian.app` from the running bundle's `apiVersion`, not from wdio's
 version getters — those report the _installer_, so an `OBSIDIAN_APP_PATH` override
 would otherwise label a 1.14 recording as 1.13.7.
 
+## Coloured highlights, coming in 1.14
+
+1.14 colours a highlight from a leading emoji, as Bear does. That is a **parse**
+change, not only a rendering one: the emoji is consumed, so it leaves both the
+rendered text and the highlight's content.
+
+Measured by recording the whole corpus against 1.13.7 and against the 1.14.4
+beta and diffing. Of 1503 cases **only the highlight probes differ**, so 1.14
+changes nothing else this harness can see.
+
+| Input          | 1.13.7 content | 1.14.4 content |
+| -------------- | -------------- | -------------- |
+| `==🔴 text==`  | `🔴 text`      | ` text`        |
+| `==🔴text==`   | `🔴text`       | `text`         |
+| `==🔴==`       | `🔴`           | `` (empty)     |
+| `==te🔴xt==`   | `te🔴xt`       | unchanged      |
+| `==🔴🟩text==` | `🔴🟩text`     | `🟩text`       |
+
+Four rules fall out of that, each measured rather than assumed:
+
+- Only a **leading** emoji is consumed; one mid-content is ordinary text.
+- Only **one** is consumed, so the second of two survives.
+- The separating space is **kept** — the content begins with it.
+- Exactly **twelve** pictographs count, the six rainbow circles and the six
+  rainbow squares: 🔴🟠🟡🟢🔵🟣 and 🟥🟧🟨🟩🟦🟪. Brown, black and white are
+  _not_ markers (🟤⚫⚪🟫⬛⬜ stay in the content), and neither is any other
+  pictograph tried — ❤ ⭐ ✅ 🔺 🌕 🔶 🚩, a variation-selector heart, or a ZWJ
+  family sequence.
+
+**This package needs no change for it.** The emoji is dropped when rendering
+while the file keeps its text, which is the same shape as an undefined footnote
+reference and a surplus table cell: reproducing the drop in the tree would let
+a formatter delete the author's emoji. So the mdast keeps the whole content and
+`rehype-obsidian` strips the marker and applies the colour, exactly where it
+already bares a dangling footnote reference.
+
+Nothing is implemented yet, deliberately — 1.13.7 does **not** consume the
+emoji, so stripping it now would be wrong for current Obsidian. The corpus
+cases are the tripwire instead: they are recorded against 1.13.7 and will start
+diverging the moment 1.14 becomes `latest`, which is precisely when the weekly
+drift job should raise it.
+
 ## The pinned chain
 
 Goldens are only comparable against a fixed pipeline. Quartz v5 has no built-in

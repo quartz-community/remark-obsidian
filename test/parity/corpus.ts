@@ -262,6 +262,53 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["escape/backslash-run", "\\*not emphasis\\* and \\[\\[not a link\\]\\]\n"],
   ["breaks/single-newline", "line one\nline two\n"],
 
+  // Pins which pictographs 1.14 treats as a colour marker: the diff showed
+  // the squares and the red circle consumed while a grinning face, a
+  // variation-selector heart and a ZWJ family were left alone.
+  ["highlight/set-circle-orange", "==\ud83d\udfe0 text==\n"],
+  ["highlight/set-circle-yellow", "==\ud83d\udfe1 text==\n"],
+  ["highlight/set-circle-green", "==\ud83d\udfe2 text==\n"],
+  ["highlight/set-circle-blue", "==\ud83d\udd35 text==\n"],
+  ["highlight/set-circle-purple", "==\ud83d\udfe3 text==\n"],
+  ["highlight/set-circle-brown", "==\ud83d\udfe4 text==\n"],
+  ["highlight/set-circle-black", "==\u26ab text==\n"],
+  ["highlight/set-circle-white", "==\u26aa text==\n"],
+  ["highlight/set-square-orange", "==\ud83d\udfe7 text==\n"],
+  ["highlight/set-square-purple", "==\ud83d\udfea text==\n"],
+  ["highlight/set-square-brown", "==\ud83d\udfeb text==\n"],
+  ["highlight/set-square-black", "==\u2b1b text==\n"],
+  ["highlight/set-square-white", "==\u2b1c text==\n"],
+  ["highlight/set-heart-red", "==\u2764 text==\n"],
+  ["highlight/set-star", "==\u2b50 text==\n"],
+  ["highlight/set-check", "==\u2705 text==\n"],
+  ["highlight/set-triangle", "==\ud83d\udd3a text==\n"],
+  ["highlight/set-moon", "==\ud83c\udf15 text==\n"],
+  ["highlight/set-diamond-orange", "==\ud83d\udd36 text==\n"],
+  ["highlight/set-flag", "==\ud83d\udea9 text==\n"],
+
+  // Obsidian 1.14 is reported to colour a highlight from a leading emoji,
+  // as Bear does. Whether that is a parse change or only a rendering one
+  // decides whether it concerns this package at all: if the emoji is
+  // consumed as a marker the highlight's content loses it, if it is left
+  // alone nothing here changes. Recorded against both 1.13.7 and 1.14.4.
+  ["highlight/emoji-space-text", "==\ud83d\udd34 text==\n"],
+  ["highlight/emoji-text-nospace", "==\ud83d\udd34text==\n"],
+  ["highlight/square-red", "==\ud83d\udfe5text==\n"],
+  ["highlight/square-yellow", "==\ud83d\udfe8 text==\n"],
+  ["highlight/square-green", "==\ud83d\udfe9 text==\n"],
+  ["highlight/square-blue", "==\ud83d\udfe6 text==\n"],
+  ["highlight/emoji-only-body", "==\ud83d\udd34==\n"],
+  ["highlight/emoji-midbody", "==te\ud83d\udd34xt==\n"],
+  ["highlight/emoji-doubled", "==\ud83d\udd34\ud83d\udfe9text==\n"],
+  ["highlight/emoji-noncolor", "==\ud83d\ude00text==\n"],
+  ["highlight/emoji-variation-selector", "==\u2764\ufe0f text==\n"],
+  [
+    "highlight/emoji-zwj-sequence",
+    "==\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67 text==\n",
+  ],
+  ["highlight/emoji-in-callout-title", "> [!note] ==\ud83d\udd34 T==\n"],
+  ["highlight/emoji-in-table-cell", "| a |\n| --- |\n| ==\ud83d\udd34 t== |\n"],
+
   // An edge-case sweep plus the test suites of other Obsidian-Markdown
   // implementations (obsidian-help, goldmark-obsidian, obsidian-export,
   // mdformat-obsidian, lezer-markdown-obsidian, remark-callout, quartz).

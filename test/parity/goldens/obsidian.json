@@ -53,7 +53,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-04T17:57:02.956Z",
+  "recordedAt": "2026-10-04T18:22:31.998Z",
   "cases": {
     "math/list-boundary": {
       "id": "math/list-boundary",
@@ -6305,6 +6305,1196 @@
             {
               "type": "paragraph",
               "text": "line one\nline two"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-circle-orange": {
+      "id": "highlight/set-circle-orange",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🟠 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🟠 text</mark></p>",
+        "projections": {
+          "text": "🟠 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🟠 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🟠 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-circle-yellow": {
+      "id": "highlight/set-circle-yellow",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🟡 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🟡 text</mark></p>",
+        "projections": {
+          "text": "🟡 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🟡 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🟡 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-circle-green": {
+      "id": "highlight/set-circle-green",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🟢 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🟢 text</mark></p>",
+        "projections": {
+          "text": "🟢 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🟢 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🟢 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-circle-blue": {
+      "id": "highlight/set-circle-blue",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🔵 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🔵 text</mark></p>",
+        "projections": {
+          "text": "🔵 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🔵 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🔵 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-circle-purple": {
+      "id": "highlight/set-circle-purple",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🟣 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🟣 text</mark></p>",
+        "projections": {
+          "text": "🟣 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🟣 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🟣 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-circle-brown": {
+      "id": "highlight/set-circle-brown",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🟤 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🟤 text</mark></p>",
+        "projections": {
+          "text": "🟤 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🟤 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🟤 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-circle-black": {
+      "id": "highlight/set-circle-black",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==⚫ text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>⚫ text</mark></p>",
+        "projections": {
+          "text": "⚫ text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "⚫ text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==⚫ text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-circle-white": {
+      "id": "highlight/set-circle-white",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==⚪ text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>⚪ text</mark></p>",
+        "projections": {
+          "text": "⚪ text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "⚪ text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==⚪ text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-square-orange": {
+      "id": "highlight/set-square-orange",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🟧 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🟧 text</mark></p>",
+        "projections": {
+          "text": "🟧 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🟧 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🟧 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-square-purple": {
+      "id": "highlight/set-square-purple",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🟪 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🟪 text</mark></p>",
+        "projections": {
+          "text": "🟪 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🟪 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🟪 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-square-brown": {
+      "id": "highlight/set-square-brown",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🟫 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🟫 text</mark></p>",
+        "projections": {
+          "text": "🟫 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🟫 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🟫 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-square-black": {
+      "id": "highlight/set-square-black",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==⬛ text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>⬛ text</mark></p>",
+        "projections": {
+          "text": "⬛ text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "⬛ text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==⬛ text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-square-white": {
+      "id": "highlight/set-square-white",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==⬜ text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>⬜ text</mark></p>",
+        "projections": {
+          "text": "⬜ text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "⬜ text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==⬜ text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-heart-red": {
+      "id": "highlight/set-heart-red",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==❤ text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>❤ text</mark></p>",
+        "projections": {
+          "text": "❤ text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "❤ text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==❤ text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-star": {
+      "id": "highlight/set-star",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==⭐ text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>⭐ text</mark></p>",
+        "projections": {
+          "text": "⭐ text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "⭐ text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==⭐ text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-check": {
+      "id": "highlight/set-check",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==✅ text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>✅ text</mark></p>",
+        "projections": {
+          "text": "✅ text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "✅ text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==✅ text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-triangle": {
+      "id": "highlight/set-triangle",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🔺 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🔺 text</mark></p>",
+        "projections": {
+          "text": "🔺 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🔺 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🔺 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-moon": {
+      "id": "highlight/set-moon",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🌕 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🌕 text</mark></p>",
+        "projections": {
+          "text": "🌕 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🌕 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🌕 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-diamond-orange": {
+      "id": "highlight/set-diamond-orange",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🔶 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🔶 text</mark></p>",
+        "projections": {
+          "text": "🔶 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🔶 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🔶 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/set-flag": {
+      "id": "highlight/set-flag",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🚩 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🚩 text</mark></p>",
+        "projections": {
+          "text": "🚩 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🚩 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🚩 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/emoji-space-text": {
+      "id": "highlight/emoji-space-text",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🔴 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🔴 text</mark></p>",
+        "projections": {
+          "text": "🔴 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🔴 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🔴 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/emoji-text-nospace": {
+      "id": "highlight/emoji-text-nospace",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🔴text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🔴text</mark></p>",
+        "projections": {
+          "text": "🔴text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🔴text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🔴text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/square-red": {
+      "id": "highlight/square-red",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🟥text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🟥text</mark></p>",
+        "projections": {
+          "text": "🟥text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🟥text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🟥text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/square-yellow": {
+      "id": "highlight/square-yellow",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🟨 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🟨 text</mark></p>",
+        "projections": {
+          "text": "🟨 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🟨 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🟨 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/square-green": {
+      "id": "highlight/square-green",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🟩 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🟩 text</mark></p>",
+        "projections": {
+          "text": "🟩 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🟩 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🟩 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/square-blue": {
+      "id": "highlight/square-blue",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🟦 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🟦 text</mark></p>",
+        "projections": {
+          "text": "🟦 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🟦 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🟦 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/emoji-only-body": {
+      "id": "highlight/emoji-only-body",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🔴==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🔴</mark></p>",
+        "projections": {
+          "text": "🔴",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🔴"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🔴=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/emoji-midbody": {
+      "id": "highlight/emoji-midbody",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==te🔴xt==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>te🔴xt</mark></p>",
+        "projections": {
+          "text": "te🔴xt",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "te🔴xt"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==te🔴xt=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/emoji-doubled": {
+      "id": "highlight/emoji-doubled",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==🔴🟩text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>🔴🟩text</mark></p>",
+        "projections": {
+          "text": "🔴🟩text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🔴🟩text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==🔴🟩text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/emoji-noncolor": {
+      "id": "highlight/emoji-noncolor",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==😀text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>😀text</mark></p>",
+        "projections": {
+          "text": "😀text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "😀text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==😀text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/emoji-variation-selector": {
+      "id": "highlight/emoji-variation-selector",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==❤️ text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>❤️ text</mark></p>",
+        "projections": {
+          "text": "❤️ text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "❤️ text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==❤️ text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/emoji-zwj-sequence": {
+      "id": "highlight/emoji-zwj-sequence",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "==👨‍👩‍👧 text==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark>👨‍👩‍👧 text</mark></p>",
+        "projections": {
+          "text": "👨‍👩‍👧 text",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "👨‍👩‍👧 text"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==👨‍👩‍👧 text=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/emoji-in-callout-title": {
+      "id": "highlight/emoji-in-callout-title",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "> [!note] ==🔴 T==\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\"><mark>🔴 T</mark></div></div></div>",
+        "projections": {
+          "text": "🔴 T",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🔴 T"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] ==🔴 T=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        }
+      },
+      "triage": "match"
+    },
+    "highlight/emoji-in-table-cell": {
+      "id": "highlight/emoji-in-table-cell",
+      "layer": "seed",
+      "category": "highlight",
+      "markdown": "| a |\n| --- |\n| ==🔴 t== |\n",
+      "obsidian": {
+        "html": "<table>\n<thead>\n<tr>\n<th dir=\"ltr\">a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td dir=\"ltr\"><mark>🔴 t</mark></td>\n</tr>\n</tbody>\n</table>",
+        "projections": {
+          "text": "a 🔴 t",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            "🔴 t"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "table",
+              "text": "| a |\n| --- |\n| ==🔴 t== |"
             }
           ]
         },
@@ -34960,7 +36150,7 @@
       "category": "indented-code",
       "markdown": "b[^2] a[^1].\n\n[foo]: /url\n[^1]: body cites [^2]\n\n    code [^2]\n\n[^2]: two\n[^1]: one\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-be861d8f7d288971\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-be861d8f7d288971\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-69855892c84addea\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-69855892c84addea\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "b⟨fn⟩ a⟨fn⟩.",
           "math": [],
@@ -35023,7 +36213,7 @@
       "category": "indented-code",
       "markdown": "b[^2] a[^1].\n\n| a | b |\n| --- | --- |\n[^1]: body cites [^2]\n\n    code [^2]\n\n[^2]: two\n[^1]: one\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n<table>\n<thead>\n<tr>\n<th>a</th>\n<th>b</th>\n</tr>\n</thead>\n</table>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-8d19a31b445240b3\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-8d19a31b445240b3\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n<table>\n<thead>\n<tr>\n<th>a</th>\n<th>b</th>\n</tr>\n</thead>\n</table>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-9c5d691b69bf34b7\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-9c5d691b69bf34b7\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "b⟨fn⟩ a⟨fn⟩. a b",
           "math": [],
@@ -35086,7 +36276,7 @@
       "category": "indented-code",
       "markdown": "b[^2] a[^1].\n\n%%\nhidden\n%% [^1]: body cites [^2]\n\n    code [^2]\n\n[^2]: two\n[^1]: one\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-b6e9f6238d0c0883\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-b6e9f6238d0c0883\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-b15759d1b0a2389e\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-b15759d1b0a2389e\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "b⟨fn⟩ a⟨fn⟩.",
           "math": [],
@@ -35148,7 +36338,7 @@
       "category": "indented-code",
       "markdown": "b[^2] a[^1].\n\n[^1]: body cites [^2]\n\n    code [^2]\n\n[^2]: two\n[^1]: one\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-321ed04d87a4ff3f\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-321ed04d87a4ff3f\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-2bc1f66e0c8b56c3\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-2bc1f66e0c8b56c3\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "b⟨fn⟩ a⟨fn⟩.",
           "math": [],
@@ -42802,7 +43992,7 @@
       "category": "fenced-code",
       "markdown": "text[^2] here\n\n[^1]: body\n``` `x`\n[^2]: second\ntext[^2] tail\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">text<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> here</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>second<br>\ntext<sup data-footnote-id=\"fnref-1-1-440e4a062609b212\" class=\"footnote-ref\" id=\"fnref-1-1-440e4a062609b212\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup> tail<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-440e4a062609b212\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">text<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> here</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>second<br>\ntext<sup data-footnote-id=\"fnref-1-1-91c762f29797fa64\" class=\"footnote-ref\" id=\"fnref-1-1-91c762f29797fa64\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup> tail<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-91c762f29797fa64\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "text⟨fn⟩ here",
           "math": [],
@@ -44920,7 +46110,7 @@
       "category": "footnote",
       "markdown": "[foo]: [^9]\n\nuse[^9]\n\n[^9]: nine\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">[foo]: <sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1-1-1f8fd18f6352f0ed\" class=\"footnote-ref\" id=\"fnref-1-1-1f8fd18f6352f0ed\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>nine<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-1f8fd18f6352f0ed\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">[foo]: <sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1-1-c72caa9604571bf4\" class=\"footnote-ref\" id=\"fnref-1-1-c72caa9604571bf4\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>nine<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-c72caa9604571bf4\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "[foo]: ⟨fn⟩ use⟨fn⟩",
           "math": [],
@@ -44972,7 +46162,7 @@
       "category": "footnote",
       "markdown": "[foo]: <[^9]>\n\nuse[^9]\n\n[^9]: nine\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">[foo]: &lt;<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup>&gt;</p>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1-1-6c52bd39970639f3\" class=\"footnote-ref\" id=\"fnref-1-1-6c52bd39970639f3\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>nine<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-6c52bd39970639f3\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">[foo]: &lt;<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup>&gt;</p>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1-1-0369256f6b727467\" class=\"footnote-ref\" id=\"fnref-1-1-0369256f6b727467\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>nine<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-0369256f6b727467\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "[foo]: <⟨fn⟩> use⟨fn⟩",
           "math": [],
@@ -45024,7 +46214,7 @@
       "category": "footnote",
       "markdown": "see[^a`b`c] twice[^a`b`c].\n\n[^a`b`c]: hi\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">see<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"a`b`c\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> twice<sup data-footnote-id=\"fnref-1-1-c169f4bf10c24ea8\" class=\"footnote-ref\" id=\"fnref-1-1-c169f4bf10c24ea8\"><a data-footref=\"a`b`c\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>hi<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-c169f4bf10c24ea8\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">see<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"a`b`c\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> twice<sup data-footnote-id=\"fnref-1-1-d51415f166d4b0c0\" class=\"footnote-ref\" id=\"fnref-1-1-d51415f166d4b0c0\"><a data-footref=\"a`b`c\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>hi<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-d51415f166d4b0c0\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "see⟨fn⟩ twice⟨fn⟩.",
           "math": [],
@@ -53540,7 +54730,7 @@
       "category": "comment",
       "markdown": "a[^1]\n\n%%\n[^1]: copy\n%%\n\n[^1]: A\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>A<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-b9d258aac9e5df50\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>A<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-7db3331b82234e33\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "a⟨fn⟩",
           "math": [],
@@ -53593,7 +54783,7 @@
       "category": "comment",
       "markdown": "see[^k]\n\n%%\n[^k]: hidden\n%%\n\n[^k]: real\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">see<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"k\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>real<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-ccccd7e373d8a6dc\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">see<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"k\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>real<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-34f29dfe678eb895\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "see⟨fn⟩",
           "math": [],
@@ -56677,7 +57867,7 @@
       "category": "blockquote",
       "markdown": "x[^1]\n\n> %%\n> [^1]: dead\n\n[^1]: live\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">x<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n<blockquote dir=\"auto\">\n</blockquote>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>live<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-f8a546cc4b5380f6\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">x<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n<blockquote dir=\"auto\">\n</blockquote>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>live<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-39c285af9e3044ee\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "x⟨fn⟩",
           "math": [],
