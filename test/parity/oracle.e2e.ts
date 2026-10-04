@@ -322,6 +322,18 @@ const DETECT_MATH_TEX = async ({
 };
 
 /** Reading View capture, used only to validate the detached renderer as a proxy. */
+/**
+ * Close every open note.
+ *
+ * The cross-check opens one per case and the reading-view capture finds it by
+ * scanning `getLeavesOfType("markdown")`. Left open they accumulate, so the
+ * scan lengthens with every case while each rendered preview stays live in the
+ * DOM — the sweep slows as it goes rather than costing a flat rate per note.
+ */
+const CLOSE_NOTES = async ({ app }: { app: any }): Promise<void> => {
+  app.workspace.detachLeavesOfType("markdown");
+};
+
 const CAPTURE_READING_VIEW = async (
   { app }: { app: any },
   filePath: string,
@@ -570,6 +582,8 @@ describe("Obsidian parity oracle", () => {
       );
       const detachedText = (JSON.parse(raw as string) as Captured[])[0]!
         .projections.text;
+
+      await browser.executeObsidian(CLOSE_NOTES as never);
 
       // Reading view concatenates top-level blocks with no separator while the
       // detached container yields one space, so compare ignoring whitespace.
