@@ -35142,8 +35142,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/pipeless-header-row-under-label/5": {
       "id": "hunt/pipeless-header-row-under-label/5",
@@ -38068,8 +38067,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/setext-paragraph-count-ignores-blocks/3": {
       "id": "hunt/setext-paragraph-count-ignores-blocks/3",

@@ -416,6 +416,19 @@ describe("remark-obsidian", () => {
     }
   });
 
+  describe("table row pipe style", () => {
+    it("ends a table at a body row that drops the outer pipes", () => {
+      const tree = processWithGfm("| a | b |\n| --- | --- |\nc | d\n");
+      expect(rootTypes(tree)).toEqual(["table", "paragraph"]);
+      expect(findNodes(tree, "tableRow").length).toBe(1);
+    });
+
+    it("keeps a pipeless body row under a pipeless header", () => {
+      const tree = processWithGfm("a | b\n--- | ---\nc | d\n");
+      expect(findNodes(tree, "tableRow").length).toBe(2);
+    });
+  });
+
   describe("a list under a footnote definition", () => {
     it("keeps an ordered list that cannot interrupt inside the definition", () => {
       const tree = processWithGfm(
