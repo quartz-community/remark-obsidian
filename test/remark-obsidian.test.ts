@@ -41,6 +41,10 @@ async function toHtml(md: string, opts?: RemarkObsidianOptions) {
   return String(result);
 }
 
+function rootTypes(tree: unknown): string[] {
+  return (tree as { children: { type: string }[] }).children.map((n) => n.type);
+}
+
 function findNodes(tree: any, type: string): any[] {
   const results: any[] = [];
   function walk(node: any) {
@@ -385,17 +389,12 @@ describe("remark-obsidian", () => {
     const tree = processWithGfm(
       "> [^1]: quoted def\nplain column-0 line\n[^2]: second\n\ntail\n",
     );
-    expect(tree.children.map((n: { type: string }) => n.type)).toEqual([
-      "blockquote",
-      "paragraph",
-    ]);
+    expect(rootTypes(tree)).toEqual(["blockquote", "paragraph"]);
   });
 
   it("still folds a definition under a list item into its paragraph", () => {
     const tree = processWithGfm("- item\n[^3]: under the item\n");
-    expect(tree.children.map((n: { type: string }) => n.type)).toEqual([
-      "list",
-    ]);
+    expect(rootTypes(tree)).toEqual(["list"]);
     expect(findNodes(tree, "footnoteDefinition").length).toBe(0);
   });
 
