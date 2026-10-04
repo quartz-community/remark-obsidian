@@ -3,7 +3,7 @@ import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 import type { Comment } from "./types.js";
 
-const OPENS_BLOCK = /\n\[\^[^\]]*\]:/u;
+const OPENS_BLOCK = /\n\[\^[^\]\n]*\]:/u;
 const BLANK_LINE = /\n[ \t]*\n/u;
 const SHIELDS = new Set(["inlineCode", "code"]);
 

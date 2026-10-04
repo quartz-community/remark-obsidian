@@ -43,8 +43,10 @@ export function containerLazyTransform(tree: Root, source: string): void {
     const gapEnd = next.position?.start?.offset;
     if (gapEnd === undefined) continue;
     const before = source.slice(0, gapEnd);
-    const trailing = /\s+$/.exec(before);
-    if (trailing && /\n[ \t]*\n/.test(trailing[0])) continue;
+    // `before.length - trimEnd().length` is the same trailing run `/\s+$/`
+    // would capture, without that pattern's quadratic failure path.
+    const trailing = before.slice(before.trimEnd().length);
+    if (/\n[ \t]*\n/.test(trailing)) continue;
 
     const parent = container as List | Blockquote;
     const target =

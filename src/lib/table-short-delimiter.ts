@@ -11,7 +11,7 @@ import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 
 const DELIMITER =
-  /^ {0,3}\|?[ \t]*:?-+:?[ \t]*(\|[ \t]*:?-+:?[ \t]*)*\|?[ \t]*$/u;
+  /^ {0,3}\|?[ \t]*:?-+:?[ \t]*(\|[ \t]*:?-+:?[ \t]*)*(?:\|[ \t]*)?$/u;
 
 /** Split a row into cells, with or without the outer pipes. */
 function cells(line: string): string[] {

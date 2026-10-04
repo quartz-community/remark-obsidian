@@ -6,7 +6,7 @@ interface ParentNode extends Node {
   children: RootContent[];
 }
 
-const UNDERLINE = /^[ \t]*>?[ \t]*(=+|-+)[ \t]*$/;
+const UNDERLINE = /^[ \t]*(?:>[ \t]*)?(=+|-+)[ \t]*$/;
 const QUOTE_PREFIX = /^[ \t]*>[ \t]?/;
 
 /**

@@ -76,7 +76,7 @@ export function planBody(body: string): Segment[] {
     while (end < body.length && body[end] !== "\n") end++;
 
     const run = body.slice(index, end);
-    const kept = run.replace(/\s+$/u, "");
+    const kept = run.trimEnd();
     const isLast = end >= body.length;
     if (isLast && kept.length < run.length) {
       if (kept.length > 0) segments.push({ kind: "text", length: kept.length });

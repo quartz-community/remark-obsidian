@@ -6,7 +6,7 @@ import { isLegacyDefinition } from "./legacy-definition.js";
 
 /** A GFM delimiter row, with or without the outer pipes. */
 const DELIMITER =
-  /^ {0,3}\|?[ \t]*:?-+:?[ \t]*(\|[ \t]*:?-+:?[ \t]*)*\|?[ \t]*$/;
+  /^ {0,3}\|?[ \t]*:?-+:?[ \t]*(\|[ \t]*:?-+:?[ \t]*)*(?:\|[ \t]*)?$/;
 
 /** A setext underline, which turns the line above it into a heading. */
 const SETEXT = /^ {0,3}(=+|-+)[ \t]*$/;
