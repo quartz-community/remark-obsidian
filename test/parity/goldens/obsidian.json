@@ -6384,8 +6384,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "From the Footnotes Shortcuts author's deviation list; recorded, not yet reproduced."
+      "triage": "match"
     },
     "callout/only-first-line-is-title": {
       "id": "callout/only-first-line-is-title",
@@ -6451,8 +6450,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "From the Footnotes Shortcuts author's deviation list; recorded, not yet reproduced."
+      "triage": "match"
     },
     "callout/marker-in-quote-defines": {
       "id": "callout/marker-in-quote-defines",
@@ -6485,8 +6483,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "From the Footnotes Shortcuts author's deviation list; recorded, not yet reproduced."
+      "triage": "match"
     },
     "list/lazy-line-ignored-for-min-indent": {
       "id": "list/lazy-line-ignored-for-min-indent",

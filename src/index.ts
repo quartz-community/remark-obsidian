@@ -278,7 +278,7 @@ export default function remarkObsidian(
       mathDisplayTransform(tree, String(file));
     }
     if (opts.callouts) {
-      calloutTransform(tree, String(file));
+      calloutTransform(tree, String(file), (markdown) => self.parse(markdown));
     }
     quoteIndentedCodeTransform(tree, String(file), (markdown) =>
       self.parse(markdown),

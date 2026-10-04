@@ -1060,6 +1060,25 @@ describe("remark-obsidian", () => {
     );
   });
 
+  it.each([
+    ["> [!note] [^1]: x\n", "the remainder is a definition, so no title"],
+    ["- > [!note] [^1]: x\n", "a list marker is container prefix too"],
+    ["> > [!note] [^1]: x\n", "and so is a second quote level"],
+  ])("%s makes the title line a block", (markdown) => {
+    const tree = processWithGfm(markdown);
+    expect(findNodes(tree, "callout").length).toBe(1);
+    expect(findNodes(tree, "footnoteDefinition").length).toBe(1);
+  });
+
+  it("still reads a prose remainder as the title", () => {
+    const [callout] = findNodes(
+      processWithGfm("> [!note] Title\n> B\n"),
+      "callout",
+    );
+    expect(callout.title).toBe("Title");
+    expect(findNodes(callout, "footnoteDefinition").length).toBe(0);
+  });
+
   it("records the fold marker", () => {
     const [folded] = findNodes(processWithGfm("> [!note]- C\n> H"), "callout");
     const [open] = findNodes(processWithGfm("> [!note]+ E\n> S"), "callout");

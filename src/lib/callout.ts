@@ -1,4 +1,4 @@
-import type { Blockquote, Paragraph, Root, Text } from "mdast";
+import type { Blockquote, Paragraph, Root, RootContent, Text } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 import type { Callout } from "./types.js";
@@ -21,8 +21,35 @@ const MARKER = /^\[!([^\]]+)\]([-+]?)(?=[ \t\n]|$)[ \t]?/;
  * a callout, and by the time the tree exists that second space is gone --
  * the blockquote tokenizer ate one and the paragraph begins at the other --
  * so this has to be read off the source line.
+ *
+ * List markers count as container prefix too: `- > [!note] ...` is a callout
+ * inside a list item, and anchoring on `>` alone missed it.
  */
-const MARKER_COLUMN = /^(?:[^\S\n]*>)+ ?\[!/;
+const QUOTE_MARKER = /^[ \t]{0,3}>/u;
+const LIST_MARKER = /^[ \t]{0,3}(?:[-*+]|\d{1,9}[.)])[ \t]+/u;
+const AT_MARKER = /^ ?\[!/u;
+
+/**
+ * Strip container markers one at a time rather than matching them all with a
+ * single pattern. One alternation of "whitespace then marker", repeated, is
+ * ambiguous about where each repetition begins, and the ReDoS gate rightly
+ * called the first attempt exponential. Each pattern here is anchored and
+ * bounded, and the loop is linear in the prefix.
+ */
+function atMarkerColumn(line: string): boolean {
+  let rest = line;
+  for (;;) {
+    const quote = QUOTE_MARKER.exec(rest);
+    if (quote) {
+      rest = rest.slice(quote[0].length);
+      continue;
+    }
+    const list = LIST_MARKER.exec(rest);
+    if (!list) break;
+    rest = rest.slice(list[0].length);
+  }
+  return AT_MARKER.test(rest);
+}
 
 interface ParentNode extends Node {
   children: Node[];
@@ -77,7 +104,36 @@ function moveStartTo(node: Node, source: string, offset: number, line: number) {
  * the capitalised type in that case (`> [!warning]` reads "Warning"), but that is
  * the view defaulting a missing value, so it is left to whatever renders this.
  */
-export function calloutTransform(tree: Root, source = ""): void {
+/**
+ * The remainder of the marker's line is block content, not a title.
+ *
+ * `> [!note] Title` reads as a title because a bare run of words is a
+ * paragraph, and `> [!note] [^1]: x` does not: measured, that renders no text
+ * at all, because the remainder is a footnote definition and a definition is
+ * relocated out of the callout rather than shown as its heading. So the test
+ * is what the remainder parses as, and only a lone paragraph becomes a title.
+ */
+function titleLineIsBlock(
+  remainder: string,
+  reparse: (markdown: string) => Root,
+): RootContent[] | undefined {
+  if (remainder.trim() === "") return undefined;
+  const parsed = reparse(remainder);
+  const only = parsed.children[0];
+  if (parsed.children.length === 1 && only?.type === "paragraph") {
+    return undefined;
+  }
+  return parsed.children as RootContent[];
+}
+
+export function calloutTransform(
+  tree: Root,
+  source = "",
+  reparse: (markdown: string) => Root = () => ({
+    type: "root",
+    children: [],
+  }),
+): void {
   visit(tree, "blockquote", (node: Node) => {
     const quote = node as Blockquote;
     const first = quote.children[0];
@@ -94,7 +150,12 @@ export function calloutTransform(tree: Root, source = ""): void {
     const from = paragraph.position?.start?.offset;
     if (source !== "" && from !== undefined) {
       const lineStart = source.lastIndexOf("\n", from - 1) + 1;
-      if (!MARKER_COLUMN.test(source.slice(lineStart))) return;
+      const lineEnd = source.indexOf("\n", lineStart);
+      const line = source.slice(
+        lineStart,
+        lineEnd === -1 ? undefined : lineEnd,
+      );
+      if (!atMarkerColumn(line)) return;
     }
 
     const [consumed, calloutType, fold] = match;
@@ -118,6 +179,35 @@ export function calloutTransform(tree: Root, source = ""): void {
     // value, which is where a break-only rule swallowed the body as the title.
     const leadText = lead as Text;
     const newlineAt = leadText.value.indexOf("\n");
+
+    // Before splitting title from body: if the rest of this line is a block
+    // rather than prose, the callout has no title and that block is its
+    // content.
+    const firstLine =
+      newlineAt === -1 ? leadText.value : leadText.value.slice(0, newlineAt);
+    const asBlock = titleLineIsBlock(firstLine, reparse);
+    if (asBlock) {
+      const rest = newlineAt === -1 ? [] : quote.children.slice(1);
+      // An empty `calloutTitle` rather than none. A callout with no title node
+      // displays the capitalised type -- `> [!note]` alone reads "Note" --
+      // but this one renders nothing at all, so the empty node is what says
+      // "it has a title, and the title is nowhere to be seen".
+      quote.children = [
+        {
+          type: "calloutTitle",
+          children: [],
+        } as unknown as (typeof quote.children)[number],
+        ...(asBlock as typeof quote.children),
+        ...rest,
+      ];
+      const callout = node as unknown as Callout;
+      callout.type = "callout";
+      callout.calloutType = (calloutType ?? "").trim();
+      callout.title = "";
+      callout.collapsed = fold === "-" ? true : fold === "+" ? false : null;
+      return;
+    }
+
     let titleNodes: Node[];
 
     if (newlineAt !== -1) {
