@@ -20608,8 +20608,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "triage": "match"
     },
     "hunt/blockquoted-label-counted-as-reference/0": {
       "id": "hunt/blockquoted-label-counted-as-reference/0",
@@ -41062,8 +41061,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Previously deferred to another package. Callouts, frontmatter and footnotes are all handled here now, so this is an ordinary gap."
+      "triage": "match"
     },
     "hunt/duplicate-prefix-keys/0": {
       "id": "hunt/duplicate-prefix-keys/0",

@@ -35,6 +35,8 @@ export function lrdFootnoteTransform(
   source: string,
   reparse: (markdown: string) => Root,
 ): void {
+  const recovered = new Set<string>();
+
   visit(tree, (node: Node) => {
     const parent = node as Partial<ParentNode>;
     if (!Array.isArray(parent.children)) return;
@@ -67,8 +69,33 @@ export function lrdFootnoteTransform(
       };
       if (definition.position) replacement.position = definition.position;
 
+      recovered.add(replacement.identifier);
       parent.children.splice(index, 1, replacement);
     }
+  });
+
+  if (recovered.size === 0) return;
+
+  // The mis-parse left more than the definition behind. With `[^1]: d` read as
+  // a link reference definition labelled `^1`, every `[^1]` elsewhere resolved
+  // against it and became a link reference rendering as `^1`. Those point at a
+  // definition that no longer exists, so they are references again too.
+  visit(tree, "linkReference", (node: Node, index, parent) => {
+    const reference = node as unknown as { identifier: string; label?: string };
+    if (!recovered.has(reference.identifier.replace(/^\^/u, ""))) return;
+    if (!parent || typeof index !== "number") return;
+
+    const replacement = {
+      type: "footnoteReference",
+      identifier: reference.identifier.replace(/^\^/u, ""),
+      label: reference.label?.replace(/^\^/u, "") ?? reference.identifier,
+      position: node.position,
+    };
+    (parent as unknown as ParentNode).children.splice(
+      index,
+      1,
+      replacement as unknown as RootContent,
+    );
   });
 }
 

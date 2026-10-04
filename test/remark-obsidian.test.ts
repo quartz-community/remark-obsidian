@@ -439,6 +439,32 @@ describe("remark-obsidian", () => {
     }
   });
 
+  describe("residue left by an earlier pass", () => {
+    it("follows a recovered definition with its references", () => {
+      // The frontmatter mis-parse labelled the definition `^1`, so `[^1]`
+      // elsewhere resolved against it as a link reference rendering as `^1`.
+      const tree = processWithGfm(
+        "---\nfootnote-prefix: 2.\n...\nbody[^1]\n\n[^1]: d\n",
+      );
+      expect(findNodes(tree, "linkReference").length).toBe(0);
+      expect(findNodes(tree, "footnoteReference").length).toBe(1);
+    });
+
+    it("merges two quotes with nothing between them", () => {
+      const tree = processWithGfm(
+        "> closing words[^1]\n[^9]: orphan\n> ---\n\n[^1]: used\n",
+      );
+      expect(rootTypes(tree)).toEqual(["blockquote", "footnoteDefinition"]);
+    });
+
+    it("keeps quotes separated by a blank line apart", () => {
+      expect(rootTypes(processWithGfm("> a\n\n> b\n"))).toEqual([
+        "blockquote",
+        "blockquote",
+      ]);
+    });
+  });
+
   describe("a list absorbing the line below it", () => {
     it("absorbs a definition under an empty item", () => {
       expect(rootTypes(processWithGfm("-\n[^3]: real definition\n"))).toEqual([
