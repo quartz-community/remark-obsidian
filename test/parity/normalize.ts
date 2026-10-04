@@ -290,6 +290,17 @@ export function projectMdast(
       }
       return;
     }
+    // Same resolution as the image above, one step along: Obsidian resolves a
+    // relative markdown destination against the vault and renders `[x](url)`
+    // as an internal link, which the recorder captures like a wikilink. An
+    // absolute URL stays an ordinary external link and is not a vault link.
+    if (isType<ImageNode>(node, "link")) {
+      const url = node.url ?? "";
+      if (url !== "" && !/^[a-z][a-z0-9+.-]*:|^\/\//i.test(url)) {
+        links.push({ path: url, heading: "", embedded: false });
+      }
+      // Children still walk: a wikilink or tag can sit inside the label.
+    }
     if (node.type === "tag") {
       tags.push((node as ValueNode).value);
       return;
