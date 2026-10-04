@@ -439,6 +439,16 @@ describe("remark-obsidian", () => {
     }
   });
 
+  it("lets a tab continue a definition inside a quote", () => {
+    const tree = processWithGfm(
+      "para.\n\n> [^9]: stray\n>\n>\tbody cites[^b]\n\n[^b]: bee\n",
+    );
+    const quoted = findNodes(tree, "footnoteDefinition")[0];
+    expect(quoted.children.length).toBe(2);
+    // Inside the definition it renders in the footnote list, not the body.
+    expect(findNodes(tree, "paragraph").length).toBe(4);
+  });
+
   describe("residue left by an earlier pass", () => {
     it("follows a recovered definition with its references", () => {
       // The frontmatter mis-parse labelled the definition `^1`, so `[^1]`
