@@ -10529,8 +10529,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "callout/uppercase-type": {
       "id": "callout/uppercase-type",
@@ -10601,8 +10600,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "callout/empty-type": {
       "id": "callout/empty-type",
@@ -10668,8 +10666,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "callout/fold-title-boundary": {
       "id": "callout/fold-title-boundary",
@@ -10706,8 +10703,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "callout/nonstandard-fold-markers": {
       "id": "callout/nonstandard-fold-markers",
@@ -10744,8 +10740,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "callout/custom-type": {
       "id": "callout/custom-type",
@@ -10812,8 +10807,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "callout/marker-on-second-line": {
       "id": "callout/marker-on-second-line",

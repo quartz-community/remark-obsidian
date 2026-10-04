@@ -3,8 +3,26 @@ import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 import type { Callout } from "./types.js";
 
-/** `[!type]`, then an optional fold marker, then an optional title on the same line. */
-const MARKER = /^\[!([^\]\s]+)\][ \t]*([-+]?)[ \t]*/;
+/**
+ * `[!type]`, an optional fold marker, then the end of the marker.
+ *
+ * Three details are measured rather than assumed, each against a recorded
+ * case. The type may hold inner whitespace -- `> [! note]` is a callout and
+ * reads "Note" -- but may not be empty, so `> [!]` is not one. The fold
+ * marker must touch the bracket. And the marker must end the line or be
+ * followed by a space or tab -- a titleless callout puts a newline there,
+ * since the whole quote arrives as one text value: `> [!note]x` and `> [!note]-x` are both
+ * ordinary quotes, which is why the title cannot simply start after `]`.
+ */
+const MARKER = /^\[!([^\]]+)\]([-+]?)(?=[ \t\n]|$)[ \t]?/;
+
+/**
+ * A marker binds to `>` plus at most one space. `>  [!note]` is a quote, not
+ * a callout, and by the time the tree exists that second space is gone --
+ * the blockquote tokenizer ate one and the paragraph begins at the other --
+ * so this has to be read off the source line.
+ */
+const MARKER_COLUMN = /^(?:[^\S\n]*>)+ ?\[!/;
 
 interface ParentNode extends Node {
   children: Node[];
@@ -71,6 +89,13 @@ export function calloutTransform(tree: Root, source = ""): void {
 
     const match = MARKER.exec((lead as Text).value);
     if (!match) return;
+    if (match[1]!.trim() === "") return;
+
+    const from = paragraph.position?.start?.offset;
+    if (source !== "" && from !== undefined) {
+      const lineStart = source.lastIndexOf("\n", from - 1) + 1;
+      if (!MARKER_COLUMN.test(source.slice(lineStart))) return;
+    }
 
     const [consumed, calloutType, fold] = match;
     (lead as Text).value = (lead as Text).value.slice(consumed.length);
@@ -187,7 +212,7 @@ export function calloutTransform(tree: Root, source = ""): void {
 
     const callout = node as unknown as Callout;
     callout.type = "callout";
-    callout.calloutType = calloutType ?? "";
+    callout.calloutType = (calloutType ?? "").trim();
     callout.title = title;
     callout.collapsed = fold === "-" ? true : fold === "+" ? false : null;
   });

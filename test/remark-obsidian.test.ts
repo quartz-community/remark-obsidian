@@ -1016,6 +1016,24 @@ describe("remark-obsidian", () => {
     ).toBe("body");
   });
 
+  it.each([
+    [">[!note] T\n> b\n", true, "one space is the most a marker may follow"],
+    [">  [!note] T\n> b\n", false, "two spaces put it past the marker column"],
+    [
+      "> [!note]x\n> y\n",
+      false,
+      "the marker must end the line or be followed by space",
+    ],
+    ["> [!note]-x\n> a\n", false, "a fold marker needs the same boundary"],
+    ["> [! note]\n> a\n", true, "the type may hold inner whitespace"],
+    ["> [!]\n> x\n", false, "the type may not be empty"],
+    ["> [!note]\n> b\n", true, "a titleless marker ends the line"],
+  ])("%s is a callout: %s", (markdown, expected) => {
+    expect(findNodes(processWithGfm(markdown), "callout").length > 0).toBe(
+      expected,
+    );
+  });
+
   it("records the fold marker", () => {
     const [folded] = findNodes(processWithGfm("> [!note]- C\n> H"), "callout");
     const [open] = findNodes(processWithGfm("> [!note]+ E\n> S"), "callout");
