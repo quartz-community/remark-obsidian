@@ -439,6 +439,22 @@ describe("remark-obsidian", () => {
     }
   });
 
+  describe("an unclosed block in a container", () => {
+    it("lets a `$$` block in a quote swallow the lazy line", () => {
+      const tree = processWithGfm("> $$\nlazy[^1]\n");
+      expect(findNodes(tree, "math").length).toBe(1);
+      // Swallowed, so the `[^1]` is formula text and never a reference.
+      expect(findNodes(tree, "footnoteReference").length).toBe(0);
+      expect(findNodes(tree, "paragraph").length).toBe(0);
+    });
+
+    it("leaves a closed `$$` block alone", () => {
+      const tree = processWithGfm("> $$\n> x\n> $$\n\nafter\n");
+      expect(findNodes(tree, "math").length).toBe(1);
+      expect(findNodes(tree, "paragraph").length).toBe(1);
+    });
+  });
+
   describe("splitting a definition inside a quote", () => {
     it("splits at a pipeless table", () => {
       const tree = processWithGfm(
