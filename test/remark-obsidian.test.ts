@@ -556,6 +556,27 @@ describe("remark-obsidian", () => {
       }
     });
 
+    it("keeps a one-line heading over a definition", () => {
+      expect(rootTypes(processWithGfm("H\n===\n[^1]: real\n"))).toEqual([
+        "heading",
+        "footnoteDefinition",
+      ]);
+    });
+
+    it("merges a multi-line one into the paragraph", () => {
+      expect(rootTypes(processWithGfm("para\nmore\n===\n[^2]: b\n"))).toEqual([
+        "paragraph",
+      ]);
+    });
+
+    it("measures content from the children, not the reported start", () => {
+      // micromark reports a setext heading starting at the block before it, so
+      // this one claims to begin inside the definition it never contained.
+      expect(
+        rootTypes(processWithGfm("[ref]: /url\npara\n===\n[^1]: x\n")),
+      ).toEqual(["definition", "heading", "footnoteDefinition"]);
+    });
+
     it("lets a definition fold into the demoted paragraph", () => {
       expect(rootTypes(processWithGfm("H\n  ===\n[^1]: real\n"))).toEqual([
         "paragraph",

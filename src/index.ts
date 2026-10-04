@@ -37,7 +37,10 @@ import { mathOutlivesTransform } from "./lib/math-outlives.js";
 import { listUnderDefinitionTransform } from "./lib/list-under-definition.js";
 import { tableRowStyleTransform } from "./lib/table-row-style.js";
 import { tableShortDelimiterTransform } from "./lib/table-short-delimiter.js";
-import { setextUnderlineTransform } from "./lib/setext-underline.js";
+import {
+  multilineSetextTransform,
+  setextUnderlineTransform,
+} from "./lib/setext-underline.js";
 import { footnoteLabelTransform } from "./lib/footnote-label.js";
 import { tableInterruptTransform } from "./lib/table-interrupt.js";
 import { setextDefinitionTransform } from "./lib/setext-definition.js";
@@ -284,6 +287,9 @@ export default function remarkObsidian(
       self.parse(markdown),
     );
     footnoteLabelTransform(tree, String(file), (markdown) =>
+      self.parse(markdown),
+    );
+    multilineSetextTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
     tableInterruptTransform(tree, String(file), (markdown) =>
