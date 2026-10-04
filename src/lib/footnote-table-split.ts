@@ -2,6 +2,7 @@ import type { Root, RootContent } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 import { mapLines, shiftByMap } from "./line-map.js";
+import { isLegacyDefinition } from "./legacy-definition.js";
 
 /** A GFM delimiter row, with or without the outer pipes. */
 const DELIMITER =
@@ -46,10 +47,20 @@ export function footnoteTableSplitTransform(
       const map = mapLines(source, start, end, startLine);
       const lines = map.text.split("\n");
 
+      // A link reference definition ends the footnote definition too: it is a
+      // block of its own, so the lazy continuation stops in front of it.
+      // Checked from line 1, since unlike a table it needs no header above it.
+      let split = -1;
+      for (let line = 1; line < lines.length; line++) {
+        if (isLegacyDefinition(lines.slice(line).join("\n"))) {
+          split = line;
+          break;
+        }
+      }
+
       // From line 2: the label's own line can never be a delimiter row, and a
       // header needs a line above it.
-      let split = -1;
-      for (let line = 2; line < lines.length; line++) {
+      for (let line = 2; split === -1 && line < lines.length; line++) {
         const delimiter = lines[line] ?? "";
         const header = lines[line - 1] ?? "";
         if (header.trim() === "") continue;
@@ -79,7 +90,10 @@ export function footnoteTableSplitTransform(
       const head = reparse(lines.slice(0, split).join("\n"));
       const tail = reparse(lines.slice(split).join("\n"));
       const opensABlock = tail.children.some(
-        (child) => child.type === "table" || child.type === "heading",
+        (child) =>
+          child.type === "table" ||
+          child.type === "heading" ||
+          child.type === "definition",
       );
       if (head.children.length === 0 || !opensABlock) continue;
 

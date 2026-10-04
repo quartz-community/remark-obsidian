@@ -449,6 +449,15 @@ describe("remark-obsidian", () => {
       expect(findNodes(quote, "footnoteDefinition").length).toBe(1);
     });
 
+    it("splits at a link reference definition", () => {
+      const tree = processWithGfm("[^1]: body\n[foo]: /url\nmore\n\nuse[^1]\n");
+      expect(rootTypes(tree).slice(0, 3)).toEqual([
+        "footnoteDefinition",
+        "definition",
+        "paragraph",
+      ]);
+    });
+
     it("splits at a setext underline", () => {
       const tree = processWithGfm("> [^2]: body\n> cont\n> ===\n");
       expect(findNodes(tree, "heading").length).toBe(1);
