@@ -40,6 +40,7 @@
     "@types/mdast": "^4.0.4",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^2.1.9",
     "@wdio/cli": "^9.32.0",
     "@wdio/globals": "^9.31.3",
     "@wdio/local-runner": "^9.32.0",

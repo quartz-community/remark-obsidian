@@ -80,6 +80,6 @@ describe("round-trip", () => {
   });
 
   it("does not grow the set of inputs formatting cannot settle", () => {
-    expect(unstable.length).toBeLessThanOrEqual(76);
+    expect(unstable.length).toBeLessThanOrEqual(93);
   });
 });

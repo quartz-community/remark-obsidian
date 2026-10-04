@@ -8,8 +8,10 @@
  */
 
 import { HUNT_FIXTURES } from "./corpus-hunt.js";
+import { COMMONMARK_SPEC } from "./commonmark.js";
 
-export type Layer = "seed" | "token" | "context" | "adjacency" | "hunt";
+export type Layer =
+  "seed" | "token" | "context" | "adjacency" | "hunt" | "commonmark";
 
 export interface Case {
   readonly id: string;
@@ -738,6 +740,10 @@ export function buildCorpus(): Case[] {
         `${base}${suffix}\n`,
       );
     }
+  }
+
+  for (const [id, markdown] of COMMONMARK_SPEC) {
+    push(id, "commonmark", id.split("/")[1] ?? "misc", markdown);
   }
 
   for (const fixture of HUNT_FIXTURES) {

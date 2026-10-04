@@ -39,10 +39,20 @@ const decodeReferences = (value: string): string =>
  * Whitespace goes too, since a node spanning a line break loses container
  * indentation that was never content.
  */
-const contentOf = (value: string): string =>
-  decodeReferences(value.replace(/\\([!-/:-@[-`{-~])/g, "$1"))
-    .replace(/^[ \t]*>[ \t]?/gm, "")
-    .replace(/\s+/g, "");
+const strip = (value: string): string =>
+  value.replace(/^[ \t]*>[ \t]?/gm, "").replace(/\s+/g, "");
+
+/** Source still carries its escapes and references; resolve them to compare. */
+const sourceContent = (slice: string): string =>
+  strip(decodeReferences(slice.replace(/\\([!-/:-@[-`{-~])/g, "$1")));
+
+/**
+ * A node value has both already resolved, so it must not be resolved again:
+ * `\\\]` reaches the value as a real backslash then a bracket, and
+ * unescaping a second time would eat the backslash and report a loss that
+ * never happened.
+ */
+const valueContent = (value: string): string => strip(value);
 
 /**
  * The characters a node's span claims but its value does not reproduce. Empty
@@ -50,8 +60,8 @@ const contentOf = (value: string): string =>
  * differs is not mistaken for one that drops content.
  */
 const droppedBy = (slice: string, value: string): string => {
-  const source = contentOf(slice);
-  const kept = contentOf(value);
+  const source = sourceContent(slice);
+  const kept = valueContent(value);
   let index = 0;
   let dropped = "";
   for (const character of source) {
