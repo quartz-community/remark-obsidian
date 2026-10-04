@@ -46,3 +46,5 @@ dist/
 test-vault/__parity__/
 test-vault/.obsidian/workspace.json
 test-vault/.obsidian/graph.json
+.stryker-tmp/
+reports/

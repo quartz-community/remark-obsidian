@@ -37,6 +37,8 @@
     "@changesets/cli": "^2.29.2",
     "@obsidian-typings/obsidian-public-latest": "^6.38.0",
     "@quartz-community/rehype-obsidian": "^1.0.0",
+    "@stryker-mutator/core": "^10.0.0",
+    "@stryker-mutator/vitest-runner": "^10.0.0",
     "@types/mdast": "^4.0.4",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.0.0",

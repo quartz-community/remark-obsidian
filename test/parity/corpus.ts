@@ -9,6 +9,7 @@
 
 import { HUNT_FIXTURES } from "./corpus-hunt.js";
 import { COMMONMARK_SPEC } from "./commonmark.js";
+import { generateRange } from "./fuzz/generate.js";
 
 export type Layer =
   "seed" | "token" | "context" | "adjacency" | "hunt" | "commonmark";
@@ -694,7 +695,32 @@ const ADJACENCY_BASES: ReadonlyArray<readonly [string, string]> = [
   ["inline-footnote", "^[note]"],
 ];
 
+/**
+ * A fuzz run replaces the corpus rather than extending it.
+ *
+ * The point of a run is to sweep a seed range against Obsidian and report
+ * which seeds disagree; re-recording 2182 known cases alongside them would
+ * cost minutes per sweep and tell us nothing new. A failing seed is a
+ * complete reproduction on its own, so nothing is lost by isolating them.
+ */
+function fuzzCases(): Case[] | undefined {
+  const from = Number(process.env.PARITY_FUZZ_FROM);
+  const count = Number(process.env.PARITY_FUZZ_COUNT);
+  if (!Number.isInteger(from) || !Number.isInteger(count) || count <= 0) {
+    return undefined;
+  }
+  return generateRange(from, count).map(([seed, markdown]) => ({
+    id: `fuzz/${seed}`,
+    layer: "fuzz" as Layer,
+    category: "fuzz",
+    markdown,
+  }));
+}
+
 export function buildCorpus(): Case[] {
+  const fuzz = fuzzCases();
+  if (fuzz) return fuzz;
+
   const cases: Case[] = [];
   const seenMarkdown = new Set<string>();
 
