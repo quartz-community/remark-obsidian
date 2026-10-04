@@ -36,16 +36,27 @@ Reading mode renders off `requestAnimationFrame`, which Chromium starves for
 windows that are not mapped and focused — without a window manager the render
 queue never drains and every capture comes back empty.
 
-On NixOS, `nix develop` provides Node, `Xvfb`, and `herbstluftwm`, and wires up
-`nix-ld` so the Obsidian binary that `wdio-obsidian-service` downloads can run:
+On NixOS, `nix develop` provides Node, `Xvfb` and `herbstluftwm`, wires up
+`nix-ld` so the Obsidian binary `wdio-obsidian-service` downloads can run, and
+supplies a `parity-record` wrapper. Use the wrapper:
 
 ```bash
 nix develop
-export DISPLAY=:99
-Xvfb :99 -screen 0 1280x1024x24 +extension GLX -noreset &
-herbstluftwm &
-npm run parity:record
+parity-record
 ```
+
+Driving `Xvfb` by hand works until it does not, and both failure modes are
+silent:
+
+- Obsidian's launcher leaves a `/tmp/obsidian-launcher-config-*` directory with
+  a cached asar behind on every run. They accumulate, and a few hundred are
+  enough to make the next launch hang before printing anything.
+- A server killed without cleanup leaves `/tmp/.X<n>-lock` with no process
+  behind it, and the next `Xvfb` silently refuses that display.
+
+The wrapper clears the scratch, picks a display whose lock is genuinely free,
+and tears down through a trap so the lock goes even when the recorder crashes
+or is interrupted.
 
 Environment variables:
 
@@ -250,6 +261,23 @@ re-renders every seed case through an actual Reading View and compares.
 display while agreeing on the parse, each with a reason. Any divergence outside
 that list fails: the proxy has stopped being faithful and the goldens cannot be
 trusted.
+
+Only the seed layer is checked on every recording, because it is small enough to
+stay cheap. `PARITY_FULL_PROXY_CHECK=1` widens the sweep to the whole corpus —
+about seven minutes against eighty seconds, so it is a deliberate audit rather
+than a default:
+
+```bash
+PARITY_FULL_PROXY_CHECK=1 parity-record
+```
+
+Run it when the goldens are re-recorded against a new Obsidian, or when a case
+resists explanation. It is worth doing: the sweep agrees on 1135 of 1137, and
+both exceptions turned out to be goldens that record detached-renderer
+behaviour Obsidian does not actually produce. One of them had defeated several
+attempts to find a parsing rule, because there was none to find. Both are listed
+in `KNOWN_PROXY_DIVERGENCES` with a reason separating them from the display-only
+entries, and carry a note in the goldens.
 
 ## Files
 
