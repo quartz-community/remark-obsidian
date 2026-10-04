@@ -129,6 +129,13 @@ function tokenize(
       effects.exit("wikilinkPath");
       return aliasMarker(code);
     }
+    // Obsidian does not let a backslash escape the closer, so `[[target\]]` is a
+    // link to `target\` rather than literal text. The escape is already ignored
+    // for `|` just above; this keeps `]` consistent with it and with the app.
+    if (code === RIGHT_BRACKET) {
+      effects.exit("wikilinkPath");
+      return closeFirst(code);
+    }
     if (code === null || isLineEnding(code)) return nok(code);
     effects.consume(code);
     return path;
@@ -186,6 +193,10 @@ function tokenize(
     if (code === PIPE) {
       effects.exit("wikilinkHeading");
       return aliasMarker(code);
+    }
+    if (code === RIGHT_BRACKET) {
+      effects.exit("wikilinkHeading");
+      return closeFirst(code);
     }
     if (code === null || isLineEnding(code)) return nok(code);
     effects.consume(code);

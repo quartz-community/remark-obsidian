@@ -40,11 +40,20 @@ export function wikilinkFromMarkdown(): Extension {
     exit: {
       wikilink(token) {
         const node = this.stack[this.stack.length - 1] as any;
-        if (node.alias) {
-          if (node.path.endsWith("\\")) node.path = node.path.slice(0, -1);
-          if (node.heading.endsWith("\\"))
-            node.heading = node.heading.slice(0, -1);
+        const written = node.path;
+
+        // A trailing backslash is not part of the target: Obsidian resolves
+        // `[[target\]]` to `target` while still displaying the backslash. The
+        // two therefore have to be carried separately — `path` is what a
+        // consumer resolves, `value` is what it should render.
+        if (node.path.endsWith("\\")) node.path = node.path.slice(0, -1);
+        if (node.heading.endsWith("\\")) {
+          node.heading = node.heading.slice(0, -1);
         }
+
+        node.value = node.embedded
+          ? node.path
+          : node.alias || [written, node.heading].filter(Boolean).join(" > ");
         this.exit(token);
       },
     },

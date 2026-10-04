@@ -26,6 +26,7 @@ interface WikilinkNode extends Node {
   heading: string;
   alias: string;
   embedded: boolean;
+  value: string;
 }
 
 interface ValueNode extends Node {
@@ -90,13 +91,14 @@ export function mdastText(tree: Node): string {
         return;
       case "wikilink": {
         const link = node as WikilinkNode;
-        // An embed shows its target; its alias slot holds dimensions, not display
-        // text. A plain link shows its alias, or "page > heading" when un-aliased.
+        // `value` is the display form the parser resolved, which can differ from
+        // `path`: `[[target\]]` resolves to `target` but shows `target\`.
         parts.push(
-          link.embedded
-            ? link.path
-            : link.alias ||
-                [link.path, link.heading].filter(Boolean).join(" > "),
+          link.value ||
+            (link.embedded
+              ? link.path
+              : link.alias ||
+                [link.path, link.heading].filter(Boolean).join(" > ")),
         );
         return;
       }

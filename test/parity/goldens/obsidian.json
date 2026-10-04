@@ -5786,27 +5786,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Obsidian ignores the backslash in the closing delimiter and closes anyway. Per CommonMark an escaped delimiter char is literal, which is what we produce, so ours is correct.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "[[target]]",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "[[target\\]]"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/wikilink/both-escaped": {
       "id": "token/wikilink/both-escaped",
@@ -6340,27 +6320,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Obsidian ignores the backslash in the closing delimiter and closes anyway. Per CommonMark an escaped delimiter char is literal, which is what we produce, so ours is correct.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "![[target]]",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "![[target\\]]"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/embed/both-escaped": {
       "id": "token/embed/both-escaped",
@@ -6401,27 +6361,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Obsidian ignores the backslash in the closing delimiter and closes anyway. Per CommonMark an escaped delimiter char is literal, which is what we produce, so ours is correct.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "![[target]]",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "\\![[target\\]]"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/embed/newline-escaped-close": {
       "id": "token/embed/newline-escaped-close",
@@ -6954,7 +6894,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "token/highlight/both-escaped": {
       "id": "token/highlight/both-escaped",
@@ -7022,27 +6962,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Obsidian ignores the backslash in the closing delimiter and closes anyway. Per CommonMark an escaped delimiter char is literal, which is what we produce, so ours is correct.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "==text text==",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "==text\ntext\\=="
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/highlight/newline-body": {
       "id": "token/highlight/newline-body",

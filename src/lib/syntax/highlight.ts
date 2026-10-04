@@ -1,5 +1,6 @@
 import type {
   Code,
+  Construct,
   Event,
   Extension,
   Resolver,
@@ -15,7 +16,80 @@ import { resolveAll } from "micromark-util-resolve-all";
 import { constants, types } from "micromark-util-symbol";
 
 const EQUALS = 61;
+const BACKSLASH = 92;
 const SEQUENCE_SIZE = 2;
+
+/**
+ * A backslash does not escape `=` in Obsidian, so `==text\==` is a highlight
+ * holding `text\` rather than literal text.
+ *
+ * CommonMark escapes any ASCII punctuation, which makes the `=` plain data and
+ * leaves the highlight unclosed. This runs ahead of the core escape and takes
+ * only a `\=` whose run would *close*, emitting the backslash as data so the
+ * `=` is still seen as a delimiter.
+ *
+ * The asymmetry is Obsidian's, and measured: `\==text==` opens nothing, so an
+ * escape before an opening run is still honoured and falls through to the core
+ * construct. Every other escape falls through untouched too.
+ */
+const unescapedEquals: Construct = {
+  name: "highlightEscape",
+  tokenize(
+    this: TokenizeContext,
+    effects: Effects,
+    ok: State,
+    nok: State,
+  ): State {
+    const opened = hasOpenSequence(this);
+    const closingRun: Construct = {
+      partial: true,
+      tokenize(scan, scanOk, scanNok) {
+        let size = 0;
+        return function enter(code: Code): State | undefined {
+          scan.enter("data");
+          return run(code);
+        };
+
+        function run(code: Code): State | undefined {
+          if (code === EQUALS && size < SEQUENCE_SIZE) {
+            scan.consume(code);
+            size++;
+            return run;
+          }
+          scan.exit("data");
+          if (size < SEQUENCE_SIZE) return scanNok(code);
+          // The character before the run is the backslash, so it always
+          // classifies as punctuation; only what follows decides. A run that
+          // would open is left to the core escape, which is the half of the
+          // asymmetry Obsidian does honour.
+          return classifyCharacter(code) ? scanOk(code) : scanNok(code);
+        }
+      },
+    };
+
+    return start;
+
+    function start(code: Code): State | undefined {
+      if (code !== BACKSLASH) return nok(code);
+      // With nothing open there is no closer to protect, and Obsidian escapes
+      // normally: `\==text\==` keeps neither backslash and highlights nothing.
+      if (!opened) return nok(code);
+      effects.enter("data");
+      effects.consume(code);
+      return after;
+    }
+
+    function after(code: Code): State | undefined {
+      if (code !== EQUALS) return nok(code);
+      return effects.check(closingRun, literal, nok)(code);
+    }
+
+    function literal(code: Code): State | undefined {
+      effects.exit("data");
+      return ok(code);
+    }
+  },
+};
 
 /**
  * `==highlight==` as an attention construct, matching how micromark implements
@@ -31,10 +105,23 @@ export function highlightSyntax(): Extension {
   };
 
   return {
-    text: { [EQUALS]: tokenizer },
+    text: { [EQUALS]: tokenizer, [BACKSLASH]: unescapedEquals },
     insideSpan: { null: [tokenizer] },
     attentionMarkers: { null: [EQUALS] },
   };
+}
+
+/** Whether an unresolved opening `==` run is already on the event stack. */
+function hasOpenSequence(context: TokenizeContext): boolean {
+  const events = context.events;
+  let index = events.length;
+  while (index--) {
+    const event = events[index];
+    if (!event || event[0] !== "exit") continue;
+    if (event[1].type !== "highlightSequenceTemporary") continue;
+    if ((event[1] as Token & { _open?: boolean })._open) return true;
+  }
+  return false;
 }
 
 function resolveAllHighlight(

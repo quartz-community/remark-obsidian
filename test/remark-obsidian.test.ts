@@ -411,6 +411,45 @@ describe("remark-obsidian", () => {
     }
   });
 
+  describe("escaped closing delimiters", () => {
+    it("does not let a backslash escape a closing highlight delimiter", () => {
+      const tree = processWithGfm("==text\\==\n");
+      expect(findNodes(tree, "highlight").length).toBe(1);
+      expect(
+        findNodes(findNodes(tree, "highlight")[0], "text")
+          .map((n) => n.value)
+          .join(""),
+      ).toBe("text\\");
+    });
+
+    it("still escapes an opening highlight delimiter", () => {
+      const tree = processWithGfm("\\==text==\n");
+      expect(findNodes(tree, "highlight").length).toBe(0);
+    });
+
+    it("escapes both delimiters when nothing is open", () => {
+      const tree = processWithGfm("\\==text\\==\n");
+      expect(findNodes(tree, "highlight").length).toBe(0);
+      expect(
+        findNodes(tree, "text")
+          .map((n) => n.value)
+          .join(""),
+      ).toBe("==text==");
+    });
+
+    it("closes a wikilink on an escaped bracket", () => {
+      const link = findNodes(processWithGfm("[[target\\]]\n"), "wikilink")[0];
+      expect(link.path).toBe("target");
+      expect(link.value).toBe("target\\");
+    });
+
+    it("closes an embed on an escaped bracket", () => {
+      const link = findNodes(processWithGfm("![[target\\]]\n"), "wikilink")[0];
+      expect(link.embedded).toBe(true);
+      expect(link.path).toBe("target");
+    });
+  });
+
   it("opens a code block for an indented line below a quote", () => {
     const tree = processWithGfm("> quote\n> more\n    code[^1]\n\nafter\n");
     expect(rootTypes(tree)).toEqual(["blockquote", "code", "paragraph"]);

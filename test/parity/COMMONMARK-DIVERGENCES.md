@@ -157,8 +157,22 @@ Obsidian's four extension delimiters close anyway.
 
 The last row is the useful part: inline math honours the escape while wikilinks,
 highlights and comments do not. Since all four are Obsidian's own constructs, that
-asymmetry looks like independent implementations rather than a deliberate rule,
-which is why we are raising it rather than mirroring it.
+asymmetry looks like independent implementations rather than a deliberate rule.
+
+Reproducing it exposed a second asymmetry inside the first, which is sharper
+evidence for the same conclusion. For highlights the escape is honoured on an
+**opening** run and ignored on a **closing** one, and ignored on the closer only
+while a highlight is actually open:
+
+| input        | Obsidian             | reading                            |
+| ------------ | -------------------- | ---------------------------------- |
+| `==text\==`  | `<mark>text\</mark>` | closer: escape ignored             |
+| `\==text==`  | `==text==`, no mark  | opener: escape honoured            |
+| `\==text\==` | `==text==`, no mark  | nothing open, so both are honoured |
+
+A single rule — "the escape does not apply to this delimiter" — cannot produce
+all three. The behaviour is what a scanning tokenizer does when it looks for a
+closer without re-checking escapes, and it is unlikely to be deliberate.
 
 Version note: we could not bisect this further. It is identical on 1.13.7 and 1.14.2,
 so it is not new in 1.14; confirming whether it changed at 1.13.x or earlier needs
@@ -207,6 +221,18 @@ miss the rest. `legacyEmphasis: false` restores micromark's CommonMark attention
 for consumers that want spec behaviour.
 
 Group F is likewise mirrored, being narrow and specific to Obsidian's own task
-handling. On Group G we are waiting on the team, because the inline-math exception
-suggests the current behaviour is unintended; those 8 cases remain triaged
-`report-upstream` with our output pinned so the divergence cannot drift silently.
+handling.
+
+**Group G's escape handling is mirrored as well**, including the asymmetry. The
+earlier plan was to wait for the team, on the reasoning that the inline-math
+exception suggests the behaviour is unintended — but that conflates two separate
+questions. Whether Obsidian should change is for the team; whether this package
+reproduces today's Obsidian is not, and the answer is the same as everywhere else
+in compat mode. A note whose `[[target\]]` resolves in the app has to resolve
+here too, however the app came to decide that. Reporting it and reproducing it
+are independent, and both are now done.
+
+What remains `report-upstream` is the narrower set this package does not yet
+reproduce for implementation reasons rather than policy: over-long opening runs
+for highlights and display math (`====text==`, `$$$$x^2$$`). Those four keep
+their pinned output so the divergence cannot drift silently.
