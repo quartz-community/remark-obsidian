@@ -10,9 +10,7 @@ import {
 } from "./types.js";
 
 /** `metadataCache` fields are namespaced, so a report says which oracle spoke. */
-export type DivergenceKey =
-  | keyof Projections
-  | `meta.${keyof MetaProjections}`;
+export type DivergenceKey = keyof Projections | `meta.${keyof MetaProjections}`;
 
 export interface Divergence {
   readonly key: DivergenceKey;
@@ -88,7 +86,11 @@ function diffMeta(
     const a = JSON.stringify(obsidian[key] ?? []);
     const b = JSON.stringify(ours[key] ?? []);
     if (a !== b) {
-      out.push({ key: `meta.${key}`, obsidian: obsidian[key], ours: ours[key] });
+      out.push({
+        key: `meta.${key}`,
+        obsidian: obsidian[key],
+        ours: ours[key],
+      });
     }
   }
   return out;
