@@ -19561,7 +19561,8 @@
           "footnotes": []
         }
       },
-      "triage": "match"
+      "triage": "replicate",
+      "note": "Divergence seen only by the block-attribute oracle derived from the recorded HTML."
     },
     "token/strikethrough/doubled-close": {
       "id": "token/strikethrough/doubled-close",
@@ -19694,7 +19695,8 @@
           "footnotes": []
         }
       },
-      "triage": "match"
+      "triage": "replicate",
+      "note": "Divergence seen only by the block-attribute oracle derived from the recorded HTML."
     },
     "token/strikethrough/escaped-open": {
       "id": "token/strikethrough/escaped-open",

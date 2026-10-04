@@ -2,6 +2,12 @@ import { PROFILES, type ProfileName } from "./chain.js";
 import { metaOurs, projectOurs } from "./normalize.js";
 import { applyTextTransform, parseOurs } from "./chain.js";
 import {
+  STRUCTURE_KEYS,
+  structureFromHtml,
+  structureFromMdast,
+  type Structure,
+} from "./structure.js";
+import {
   PINNED_STATES,
   PROJECTION_KEYS,
   type GoldenCase,
@@ -10,7 +16,10 @@ import {
 } from "./types.js";
 
 /** `metadataCache` fields are namespaced, so a report says which oracle spoke. */
-export type DivergenceKey = keyof Projections | `meta.${keyof MetaProjections}`;
+export type DivergenceKey =
+  | keyof Projections
+  | `meta.${keyof MetaProjections}`
+  | `html.${keyof Structure}`;
 
 export interface Divergence {
   readonly key: DivergenceKey;
@@ -96,6 +105,27 @@ function diffMeta(
   return out;
 }
 
+/**
+ * Block attributes no projection reads: a table's alignment, a fence's
+ * language, a list's starting number. Obsidian's side is recovered from the
+ * HTML already stored in every golden, so this needs no re-recording.
+ */
+function diffStructure(obsidian: Structure, ours: Structure): Divergence[] {
+  const out: Divergence[] = [];
+  for (const key of STRUCTURE_KEYS) {
+    const a = JSON.stringify(obsidian[key]);
+    const b = JSON.stringify(ours[key]);
+    if (a !== b) {
+      out.push({
+        key: `html.${key}`,
+        obsidian: obsidian[key],
+        ours: ours[key],
+      });
+    }
+  }
+  return out;
+}
+
 function diffProjections(
   obsidian: Projections,
   ours: Projections,
@@ -125,12 +155,20 @@ export function compareCase(golden: GoldenCase, mathTex = false): CaseResult {
     try {
       const ours = projectOurs(golden.markdown, profile);
       divergences = diffProjections(golden.obsidian.projections, ours, mathTex);
+      const tree = parseOurs(golden.markdown, profile);
       if (golden.obsidian.meta) {
-        const source = applyTextTransform(golden.markdown);
         divergences = divergences.concat(
           diffMeta(
             golden.obsidian.meta,
-            metaOurs(parseOurs(golden.markdown, profile), source),
+            metaOurs(tree, applyTextTransform(golden.markdown)),
+          ),
+        );
+      }
+      if (typeof golden.obsidian.html === "string") {
+        divergences = divergences.concat(
+          diffStructure(
+            structureFromHtml(golden.obsidian.html),
+            structureFromMdast(tree),
           ),
         );
       }
