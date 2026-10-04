@@ -416,6 +416,29 @@ describe("remark-obsidian", () => {
     }
   });
 
+  describe("splitting a definition inside a quote", () => {
+    it("splits at a pipeless table", () => {
+      const tree = processWithGfm(
+        "> [^1]: body\n> a | b\n> --- | ---\n\ntext[^1]\n",
+      );
+      const quote = findNodes(tree, "blockquote")[0];
+      expect(findNodes(quote, "table").length).toBe(1);
+      expect(findNodes(quote, "footnoteDefinition").length).toBe(1);
+    });
+
+    it("splits at a setext underline", () => {
+      const tree = processWithGfm("> [^2]: body\n> cont\n> ===\n");
+      expect(findNodes(tree, "heading").length).toBe(1);
+      expect(findNodes(tree, "footnoteDefinition").length).toBe(1);
+    });
+
+    it("keeps the split halves on their real source lines", () => {
+      const tree = processWithGfm("> [^2]: body\n> cont\n> ===\n");
+      const heading = findNodes(tree, "heading")[0];
+      expect(heading.position.start.line).toBe(2);
+    });
+  });
+
   describe("setext underlines", () => {
     it("needs the underline to stand alone", () => {
       expect(rootTypes(processWithGfm("H\n===\n"))).toEqual(["heading"]);
