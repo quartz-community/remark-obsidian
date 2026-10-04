@@ -114,12 +114,22 @@ export function mdastText(tree: Node): string {
       case "code":
         parts.push(`${(node as ValueNode).value} `);
         return;
-      case "html":
+      case "html": {
         // Obsidian's textContent has no markup, so compare inner text only. The
         // trailing space is the block separator every other block type gets from
         // BLOCK_TYPES below, which this early return would otherwise skip.
-        parts.push(`${(node as ValueNode).value.replace(/<[^>]*>/g, " ")} `);
+        //
+        // A raw-text element contributes nothing: Obsidian sanitises `script`
+        // and friends out of reading view, so their content is not in the
+        // rendered text at all, and stripping only the tags would surface a
+        // body no renderer shows.
+        const raw = (node as ValueNode).value.replace(
+          /<(script|style|textarea|title)\b[\s\S]*?(?:<\/\1\s*>|$)/gi,
+          " ",
+        );
+        parts.push(`${raw.replace(/<[^>]*>/g, " ")} `);
         return;
+      }
       case "break":
         parts.push("\n");
         return;
