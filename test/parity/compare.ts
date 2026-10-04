@@ -1,14 +1,21 @@
 import { PROFILES, type ProfileName } from "./chain.js";
-import { projectOurs } from "./normalize.js";
+import { metaOurs, projectOurs } from "./normalize.js";
+import { applyTextTransform, parseOurs } from "./chain.js";
 import {
   PINNED_STATES,
   PROJECTION_KEYS,
   type GoldenCase,
+  type MetaProjections,
   type Projections,
 } from "./types.js";
 
+/** `metadataCache` fields are namespaced, so a report says which oracle spoke. */
+export type DivergenceKey =
+  | keyof Projections
+  | `meta.${keyof MetaProjections}`;
+
 export interface Divergence {
-  readonly key: keyof Projections;
+  readonly key: DivergenceKey;
   readonly obsidian: unknown;
   readonly ours: unknown;
 }
@@ -57,6 +64,36 @@ function alignSections(projections: Projections): Projections {
     : { ...projections, sections };
 }
 
+const META_KEYS = [
+  "headings",
+  "links",
+  "embeds",
+  "tags",
+  "footnotes",
+] as const satisfies ReadonlyArray<keyof MetaProjections>;
+
+/**
+ * `metadataCache` is a second oracle, built by Obsidian from its own parse
+ * rather than read off the rendered DOM, so it sees what the renderer discards
+ * -- a link inside an unreferenced footnote definition, a heading the view
+ * never paints. It was recorded into every golden from the start and compared
+ * by nothing.
+ */
+function diffMeta(
+  obsidian: MetaProjections,
+  ours: MetaProjections,
+): Divergence[] {
+  const out: Divergence[] = [];
+  for (const key of META_KEYS) {
+    const a = JSON.stringify(obsidian[key] ?? []);
+    const b = JSON.stringify(ours[key] ?? []);
+    if (a !== b) {
+      out.push({ key: `meta.${key}`, obsidian: obsidian[key], ours: ours[key] });
+    }
+  }
+  return out;
+}
+
 function diffProjections(
   obsidian: Projections,
   ours: Projections,
@@ -86,6 +123,15 @@ export function compareCase(golden: GoldenCase, mathTex = false): CaseResult {
     try {
       const ours = projectOurs(golden.markdown, profile);
       divergences = diffProjections(golden.obsidian.projections, ours, mathTex);
+      if (golden.obsidian.meta) {
+        const source = applyTextTransform(golden.markdown);
+        divergences = divergences.concat(
+          diffMeta(
+            golden.obsidian.meta,
+            metaOurs(parseOurs(golden.markdown, profile), source),
+          ),
+        );
+      }
     } catch (error) {
       return {
         id: golden.id,

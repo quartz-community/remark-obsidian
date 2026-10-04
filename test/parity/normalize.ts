@@ -14,6 +14,7 @@ import { SKIP, visit } from "unist-util-visit";
 import { applyTextTransform, parseOurs, type ProfileName } from "./chain.js";
 import type {
   LinkItem,
+  MetaProjections,
   MathItem,
   Projections,
   SectionItem,
@@ -291,7 +292,9 @@ function headingName(node: Node, source: string): string {
 export function projectMdast(
   tree: Root,
   source: string,
+  options: { readonly skipUnreferencedDefinitions?: boolean } = {},
 ): Omit<Projections, "text" | "sections"> {
+  const skipUnreferenced = options.skipUnreferencedDefinitions ?? true;
   const math: MathItem[] = [];
   const defined = definedFootnotes(tree);
   const referenced = new Set<string>();
@@ -317,7 +320,7 @@ export function projectMdast(
     // the reference, not on the node.
     if (node.type === "footnoteDefinition") {
       const id = String((node as unknown as { identifier: string }).identifier);
-      if (!referenced.has(id)) return SKIP;
+      if (skipUnreferenced && !referenced.has(id)) return SKIP;
     }
     // `mdastText`, not `textOf`, so a wikilink or math span inside the emphasis
     // yields the same display text the DOM side reads off the rendered element.
@@ -414,6 +417,45 @@ function alignTableCells(tree: Root): Root {
     }
   });
   return tree;
+}
+
+/**
+ * Our side of `metadataCache`, the oracle recorded alongside every golden and
+ * until now never compared. It is independent of the DOM: Obsidian builds it
+ * from its own parse rather than from what the renderer produced, so it can
+ * disagree with the rendered text and catch what a text projection cannot.
+ *
+ * `link` and `embed` are one string, the target with its fragment appended,
+ * which is how the cache spells them -- `[[a#b#c|d]]` is recorded as `a#b#c`,
+ * alias dropped. A reference nothing defines is absent entirely, matching the
+ * cache, and so is an inline `^[...]`, which the cache does not treat as a
+ * reference.
+ */
+export function metaOurs(tree: Root, source: string): MetaProjections {
+  // The cache indexes the source, so a definition nothing references is still
+  // indexed -- unlike the rendered text, where it never appears.
+  const projected = projectMdast(tree, source, {
+    skipUnreferencedDefinitions: false,
+  });
+  const defined = definedFootnotes(tree);
+  const target = (link: LinkItem): string =>
+    link.heading === "" ? link.path : `${link.path}#${link.heading}`;
+
+  // Only a resolved `[^x]`. An inline `^[...]` is not a reference to the
+  // cache at all, and neither is a `[^x]` nothing defines.
+  const footnotes: string[] = [];
+  visit(tree, "footnoteReference", (node: Node) => {
+    const id = String((node as unknown as { identifier: string }).identifier);
+    if (defined.has(id)) footnotes.push(id);
+  });
+
+  return {
+    headings: projected.headings,
+    links: projected.links.filter((l) => !l.embedded).map(target),
+    embeds: projected.links.filter((l) => l.embedded).map(target),
+    tags: projected.tags,
+    footnotes,
+  };
 }
 
 export function projectOurs(

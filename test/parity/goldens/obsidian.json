@@ -1565,7 +1565,8 @@
           "footnotes": []
         }
       },
-      "triage": "match"
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "wikilink/basic": {
       "id": "wikilink/basic",
@@ -2091,7 +2092,8 @@
           "footnotes": []
         }
       },
-      "triage": "match"
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "wikilink/self-heading": {
       "id": "wikilink/self-heading",
@@ -13456,7 +13458,8 @@
           "footnotes": []
         }
       },
-      "triage": "match"
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "document/invisible-delimiter-content": {
       "id": "document/invisible-delimiter-content",
@@ -19114,8 +19117,8 @@
           ]
         }
       },
-      "triage": "match",
-      "note": "Matches once `inlineFootnotes` parses Obsidian's `^[body]`, which GFM has no form for."
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "token/inline-footnote/whitespace-body": {
       "id": "token/inline-footnote/whitespace-body",
@@ -42559,7 +42562,8 @@
           "footnotes": []
         }
       },
-      "triage": "match"
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "hunt/indented-code-after-table/0": {
       "id": "hunt/indented-code-after-table/0",
@@ -50808,8 +50812,8 @@
           ]
         }
       },
-      "triage": "match",
-      "note": "Matches once footnote references project as a neutral marker on both sides (Obsidian renders `[n]`, other renderers `n`) and `bareFootnoteRefs` strips the delimiters from a reference nothing defines, as Obsidian does."
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "hunt/quoted-definition-own-block/1": {
       "id": "hunt/quoted-definition-own-block/1",
@@ -50974,7 +50978,8 @@
           ]
         }
       },
-      "triage": "match"
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "hunt/quoted-definition-tab-continuation/0": {
       "id": "hunt/quoted-definition-tab-continuation/0",
@@ -51214,7 +51219,8 @@
           "footnotes": []
         }
       },
-      "triage": "match"
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "hunt/quoted-orphan-deletion-strands-body/0": {
       "id": "hunt/quoted-orphan-deletion-strands-body/0",
@@ -53177,7 +53183,8 @@
           "footnotes": []
         }
       },
-      "triage": "match"
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "hunt/setext-underline-makes-heading/0": {
       "id": "hunt/setext-underline-makes-heading/0",
@@ -53298,7 +53305,8 @@
           "footnotes": []
         }
       },
-      "triage": "match"
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "hunt/setext-underline-makes-heading/3": {
       "id": "hunt/setext-underline-makes-heading/3",
@@ -55638,8 +55646,8 @@
           ]
         }
       },
-      "triage": "match",
-      "note": "Matches once `keepComments` is on: the comment node stays in the tree so the block-level projection reports it."
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "hunt/commented-label-is-a-reference/2": {
       "id": "hunt/commented-label-is-a-reference/2",
@@ -55748,8 +55756,8 @@
           ]
         }
       },
-      "triage": "match",
-      "note": "Matches once footnote references project as a neutral marker on both sides (Obsidian renders `[n]`, other renderers `n`) and `bareFootnoteRefs` strips the delimiters from a reference nothing defines, as Obsidian does."
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "hunt/commented-label-is-a-reference/4": {
       "id": "hunt/commented-label-is-a-reference/4",
@@ -55801,8 +55809,8 @@
           ]
         }
       },
-      "triage": "match",
-      "note": "Matches once footnote references project as a neutral marker on both sides (Obsidian renders `[n]`, other renderers `n`) and `bareFootnoteRefs` strips the delimiters from a reference nothing defines, as Obsidian does."
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "hunt/commented-label-is-a-reference/5": {
       "id": "hunt/commented-label-is-a-reference/5",
@@ -57997,8 +58005,8 @@
           ]
         }
       },
-      "triage": "match",
-      "note": "Matches once footnote references project as a neutral marker on both sides (Obsidian renders `[n]`, other renderers `n`) and `bareFootnoteRefs` strips the delimiters from a reference nothing defines, as Obsidian does."
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "hunt/obsidian-comments/3": {
       "id": "hunt/obsidian-comments/3",
@@ -58054,8 +58062,8 @@
           ]
         }
       },
-      "triage": "match",
-      "note": "Matches once footnote references project as a neutral marker on both sides (Obsidian renders `[n]`, other renderers `n`) and `bareFootnoteRefs` strips the delimiters from a reference nothing defines, as Obsidian does."
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "hunt/obsidian-comments/4": {
       "id": "hunt/obsidian-comments/4",
@@ -58107,8 +58115,8 @@
           ]
         }
       },
-      "triage": "match",
-      "note": "Matches once footnote references project as a neutral marker on both sides (Obsidian renders `[n]`, other renderers `n`) and `bareFootnoteRefs` strips the delimiters from a reference nothing defines, as Obsidian does."
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "hunt/obsidian-comments/5": {
       "id": "hunt/obsidian-comments/5",
@@ -58885,8 +58893,8 @@
           ]
         }
       },
-      "triage": "match",
-      "note": "Matches once footnote references project as a neutral marker on both sides (Obsidian renders `[n]`, other renderers `n`) and `bareFootnoteRefs` strips the delimiters from a reference nothing defines, as Obsidian does."
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "hunt/obsidian-comments/22": {
       "id": "hunt/obsidian-comments/22",
@@ -58976,8 +58984,8 @@
           ]
         }
       },
-      "triage": "match",
-      "note": "Matches once footnote references project as a neutral marker on both sides (Obsidian renders `[n]`, other renderers `n`) and `bareFootnoteRefs` strips the delimiters from a reference nothing defines, as Obsidian does."
+      "triage": "replicate",
+      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
     },
     "hunt/obsidian-comments/24": {
       "id": "hunt/obsidian-comments/24",
