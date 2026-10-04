@@ -392,7 +392,13 @@ interface ParentNode extends Node {
 function alignTableCells(tree: Root): Root {
   visit(tree, "table", (table: Node) => {
     const rows = (table as ParentNode).children;
-    const columns = (rows[0] as ParentNode | undefined)?.children.length;
+    // The delimiter row declares the columns, so `align` is the count to
+    // truncate to. It only differs from the header when the delimiter runs
+    // short, which Obsidian renders as the narrower table while the tree
+    // keeps every cell it parsed.
+    const declared = (table as { align?: unknown[] }).align?.length;
+    const columns =
+      declared ?? (rows[0] as ParentNode | undefined)?.children.length;
     if (columns === undefined) return;
     for (const row of rows) {
       const cells = (row as ParentNode).children;

@@ -560,12 +560,19 @@ describe("Obsidian parity oracle", () => {
   const fullProxyCheck = process.env.PARITY_FULL_PROXY_CHECK === "1";
 
   it("agrees with a real Reading View on the seed layer", async () => {
+    // The known-divergent cases join the sweep whatever layer they are in.
+    // They are the ones already shown to need the faithful oracle, so leaving
+    // them to a seven-minute audit nobody runs by default is what let two
+    // goldens sit in the backlog recording behaviour Obsidian never produced.
     const seeds = fullProxyCheck
       ? buildCorpus()
-      : buildCorpus().filter((c) => c.layer === "seed");
+      : buildCorpus().filter(
+          (c) => c.layer === "seed" || KNOWN_PROXY_DIVERGENCES.has(c.id),
+        );
     let agreed = 0;
     const mismatches: string[] = [];
     const unexpected: string[] = [];
+    const corrections = new Map<string, string>();
 
     for (const c of seeds) {
       const filePath = `${FIXTURE_DIR}/${caseFileName(c.id)}`;
@@ -596,7 +603,10 @@ describe("Obsidian parity oracle", () => {
         `${c.id}\n    reading:  ${readingText}\n    detached: ${detachedText}`,
       );
       if (!KNOWN_PROXY_DIVERGENCES.has(c.id)) unexpected.push(c.id);
+      else corrections.set(c.id, readingText);
     }
+
+    await applyReadingViewCorrections(corrections);
 
     console.log(
       `  reading-view agreement: ${agreed}/${seeds.length}` +
@@ -612,6 +622,46 @@ describe("Obsidian parity oracle", () => {
     }
   });
 });
+
+/**
+ * Let the faithful oracle win where the proxy disagrees.
+ *
+ * The goldens are captured through a detached `MarkdownRenderer.render()`,
+ * which is fast enough to batch the whole corpus. Where that proxy and a real
+ * Reading View disagree, the proxy is simply wrong about Obsidian, and gating
+ * on it asserts behaviour the application does not have — which is how two
+ * cases came to sit in the backlog as divergences with no rule behind them.
+ *
+ * Only `text` is corrected, because Reading View is captured as text; the
+ * remaining projections stay as recorded. The note says so, so a reader can
+ * tell a corrected case from a plain one.
+ */
+async function applyReadingViewCorrections(
+  corrections: ReadonlyMap<string, string>,
+): Promise<void> {
+  if (corrections.size === 0) return;
+
+  const raw = await fs.readFile(GOLDEN_PATH, "utf8");
+  const file = JSON.parse(raw) as {
+    cases: Record<string, GoldenCase>;
+  } & Record<string, unknown>;
+
+  let changed = 0;
+  for (const [id, text] of corrections) {
+    const entry = file.cases[id];
+    if (!entry || entry.obsidian.projections.text === text) continue;
+    (entry.obsidian.projections as { text: string }).text = text;
+    entry.note =
+      "`text` re-measured through a real Reading View: the detached renderer " +
+      "the recorder batches disagreed with the application, so its capture " +
+      "was not Obsidian behaviour. Other projections are as recorded.";
+    changed += 1;
+  }
+
+  if (changed === 0) return;
+  await fs.writeFile(GOLDEN_PATH, `${JSON.stringify(file, null, 2)}\n`, "utf8");
+  console.log(`  corrected ${changed} golden(s) from Reading View`);
+}
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));

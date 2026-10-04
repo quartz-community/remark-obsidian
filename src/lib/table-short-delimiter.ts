@@ -74,12 +74,15 @@ export function tableShortDelimiterTransform(
       if (headerCells.length === delimiterCells.length) continue;
       if (delimiterCells.length === 0) continue;
 
-      // Every header cell is kept. The delimiter only supplies alignment, and
-      // it running short does not drop a column: a real Reading View renders
-      // `| a | b |` over `| --- |` as two cells. The detached renderer the
-      // recorder uses drops the surplus, which is a rendering difference the
-      // harness already documents for other over-long rows -- building one
-      // column to match it would lose a cell a rewrite then cannot restore.
+      // Every header cell is kept in the tree, but the delimiter is what
+      // declares the columns, so `align` follows it rather than the header.
+      // A real Reading View renders `| a | b |` over `| --- |` as `a` alone,
+      // measured against the application rather than the detached renderer
+      // the recorder batches -- both agree here.
+      //
+      // The surplus cell is therefore dropped when rendering, not when
+      // parsing: `align` being short is what truncates the projection, while
+      // the cell stays in the tree so a rewrite can still restore it.
       const row = (line: string): TableRow => ({
         type: "tableRow",
         children: cells(line).map((cell): TableCell => {
@@ -96,11 +99,7 @@ export function tableShortDelimiterTransform(
 
       const table: Table = {
         type: "table",
-        align: headerCells.map((_, column) =>
-          column < delimiterCells.length
-            ? alignOf(delimiterCells[column]!)
-            : null,
-        ),
+        align: delimiterCells.map((cell) => alignOf(cell)),
         children: [row(header)],
         position: {
           start: { ...paragraph.position!.start },

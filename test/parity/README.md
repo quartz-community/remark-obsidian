@@ -272,12 +272,22 @@ PARITY_FULL_PROXY_CHECK=1 parity-record
 ```
 
 Run it when the goldens are re-recorded against a new Obsidian, or when a case
-resists explanation. It is worth doing: the sweep agrees on 1135 of 1137, and
-both exceptions turned out to be goldens that record detached-renderer
-behaviour Obsidian does not actually produce. One of them had defeated several
-attempts to find a parsing rule, because there was none to find. Both are listed
-in `KNOWN_PROXY_DIVERGENCES` with a reason separating them from the display-only
-entries, and carry a note in the goldens.
+resists explanation. It is worth doing: it found a golden recording
+detached-renderer behaviour Obsidian does not produce, which had defeated
+several attempts to find a parsing rule because there was none to find.
+
+Every id in `KNOWN_PROXY_DIVERGENCES` is now re-checked on **every** recording
+whatever layer it is in, and where Reading View disagrees its `text` is written
+into the golden with a note saying so. A proxy that is wrong about Obsidian
+should not be what the gate asserts, and leaving the correction to an opt-in
+seven-minute sweep is what let one sit in the backlog as a divergence with no
+rule behind it.
+
+That cuts both ways, so re-measure before assuming. `hunt/table-delimiter-cell-count/0`
+was annotated as another unfaithful capture; when the check was made automatic
+the two renderers agreed, and `| a | b |` over `| --- |` really does render as
+`a` alone. The delimiter declares the columns — the surplus cell stays in the
+tree and is dropped only when rendering.
 
 ## Files
 
