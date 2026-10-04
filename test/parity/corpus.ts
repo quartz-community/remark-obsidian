@@ -75,6 +75,17 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["html/unclosed-comment-inline", "x <!-- draft\n\nafter\n"],
   ["html/closed-comment-quote", "> <!--\n> draft\n> -->\n\nafter\n"],
 
+  // `^[^[note]` renders as literal `^[note` with no footnote element at all,
+  // while `^[^[note]]` makes one. Two readings fit: the outer scan balances
+  // brackets and the odd `]` fails it, or the scan simply never restarts
+  // inside a failed opener the way micromark retries. These separate them —
+  // an unbalanced body with no inner `^[` tests the first, and a doubled
+  // opener surrounded by text tests the second.
+  ["footnote/inline-unbalanced-bracket", "^[a [b]\n"],
+  ["footnote/inline-bracket-open-body", "^[[note]\n"],
+  ["footnote/inline-doubled-with-text", "x ^[^[note] y\n"],
+  ["footnote/inline-extra-close", "^[^[note]]]\n"],
+
   // `^[` nesting: the doubled and nested forms both diverge, and neither is
   // explicable without knowing where Obsidian's scan starts and stops.
   ["footnote/inline-plain", "^[note]\n"],
