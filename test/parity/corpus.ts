@@ -262,6 +262,39 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["escape/backslash-run", "\\*not emphasis\\* and \\[\\[not a link\\]\\]\n"],
   ["breaks/single-newline", "line one\nline two\n"],
 
+  // Closing the colour-marker set. The circle and square families were
+  // already exhaustive -- all nine of each -- so what was open is whether
+  // any other colour-bearing family qualifies, and how the marker behaves
+  // against whitespace, nesting and an escaped opener.
+  ["highlight/fam-heart-orange", "==\ud83e\udde1 text==\n"],
+  ["highlight/fam-heart-yellow", "==\ud83d\udc9b text==\n"],
+  ["highlight/fam-heart-green", "==\ud83d\udc9a text==\n"],
+  ["highlight/fam-heart-blue", "==\ud83d\udc99 text==\n"],
+  ["highlight/fam-heart-purple", "==\ud83d\udc9c text==\n"],
+  ["highlight/fam-heart-black", "==\ud83d\udda4 text==\n"],
+  ["highlight/fam-book-red", "==\ud83d\udcd5 text==\n"],
+  ["highlight/fam-book-green", "==\ud83d\udcd7 text==\n"],
+  ["highlight/fam-book-blue", "==\ud83d\udcd8 text==\n"],
+  ["highlight/fam-book-orange", "==\ud83d\udcd9 text==\n"],
+  ["highlight/fam-sq-med-black", "==\u25fc text==\n"],
+  ["highlight/fam-sq-med-white", "==\u25fb text==\n"],
+  ["highlight/fam-sq-small-black", "==\u25fe text==\n"],
+  ["highlight/fam-sq-small-white", "==\u25fd text==\n"],
+  ["highlight/fam-sq-tiny-black", "==\u25aa text==\n"],
+  ["highlight/fam-sq-tiny-white", "==\u25ab text==\n"],
+  ["highlight/fam-diamond-blue-lg", "==\ud83d\udd37 text==\n"],
+  ["highlight/fam-diamond-blue-sm", "==\ud83d\udd39 text==\n"],
+  ["highlight/fam-diamond-orange-sm", "==\ud83d\udd38 text==\n"],
+  ["highlight/fam-triangle-down", "==\ud83d\udd3b text==\n"],
+  ["highlight/fam-radio-button", "==\ud83d\udd18 text==\n"],
+  ["highlight/fam-circle-red-vs", "==\ud83d\udd34\ufe0f text==\n"],
+  ["highlight/emoji-space-before", "== \ud83d\udd34 text==\n"],
+  ["highlight/emoji-nested", "==\ud83d\udd34 a ==\ud83d\udfe2 b== c==\n"],
+  ["highlight/emoji-escaped-opener", "\\==\ud83d\udd34 text==\n"],
+  ["highlight/emoji-in-comment", "%%==\ud83d\udd34 text==%%\n"],
+  ["highlight/emoji-tab-after", "==\ud83d\udd34\ttext==\n"],
+  ["highlight/emoji-newline-after", "==\ud83d\udd34\ntext==\n"],
+
   // Pins which pictographs 1.14 treats as a colour marker: the diff showed
   // the squares and the red circle consumed while a grinning face, a
   // variation-selector heart and a ZWJ family were left alone.

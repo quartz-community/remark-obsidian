@@ -204,10 +204,26 @@ Four rules fall out of that, each measured rather than assumed:
 - Only **one** is consumed, so the second of two survives.
 - The separating space is **kept** — the content begins with it.
 - Exactly **twelve** pictographs count, the six rainbow circles and the six
-  rainbow squares: 🔴🟠🟡🟢🔵🟣 and 🟥🟧🟨🟩🟦🟪. Brown, black and white are
-  _not_ markers (🟤⚫⚪🟫⬛⬜ stay in the content), and neither is any other
-  pictograph tried — ❤ ⭐ ✅ 🔺 🌕 🔶 🚩, a variation-selector heart, or a ZWJ
-  family sequence.
+  rainbow squares: 🔴🟠🟡🟢🔵🟣 and 🟥🟧🟨🟩🟦🟪.
+
+The set is closed, not a sample. Both families were probed in full — all nine
+circles and all nine squares — and brown, black and white are _not_ markers in
+either (🟤⚫⚪🟫⬛⬜ stay in the content). Twenty-two further candidates from
+every other colour-bearing family were tried and **none** qualified: the six
+coloured hearts, the four coloured books, the six geometric squares outside the
+large block (◼◻◾◽▪▫), the diamonds 🔷🔹🔸, 🔻, 🔘, and earlier ❤ ⭐ ✅ 🔺 🌕 🔶
+🚩, a variation-selector heart and a ZWJ family sequence.
+
+Three details matter for implementing it:
+
+- The strip is by **codepoint, not grapheme**. `==🔴\uFE0F text==` consumes the
+  circle and leaves the variation selector orphaned at the front of the
+  content, so a grapheme-aware strip would not reproduce Obsidian.
+- Any whitespace after the marker survives, including a tab and a newline:
+  `==🔴\ttext==` keeps the tab, `==🔴\ntext==` keeps the line ending.
+- The marker does not rescue a highlight that would not form anyway. `== 🔴
+text==` is not a highlight at all, because the content may not begin with
+  whitespace, and `\==🔴 text==` stays escaped.
 
 **This package needs no change for it.** The emoji is dropped when rendering
 while the file keeps its text, which is the same shape as an undefined footnote
