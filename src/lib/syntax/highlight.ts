@@ -1,251 +1,147 @@
 import type {
   Code,
   Construct,
-  Event,
-  Extension,
-  Resolver,
-  State,
-  Token,
-  TokenizeContext,
-  Tokenizer,
   Effects,
+  Extension,
+  State,
+  TokenizeContext,
 } from "micromark-util-types";
-import { splice } from "micromark-util-chunked";
-import { classifyCharacter } from "micromark-util-classify-character";
-import { resolveAll } from "micromark-util-resolve-all";
-import { constants, types } from "micromark-util-symbol";
+import { createChunkScan, planBody, type Segment } from "./legacy-scan.js";
+import { types } from "micromark-util-symbol";
 
 const EQUALS = 61;
-const BACKSLASH = 92;
-const SEQUENCE_SIZE = 2;
+const MARKER = "=";
+const MARKER_LENGTH = 2;
 
 /**
- * A backslash does not escape `=` in Obsidian, so `==text\==` is a highlight
- * holding `text\` rather than literal text.
+ * `==highlight==` as Obsidian tokenizes it, which is a forward scan rather than
+ * CommonMark attention.
  *
- * CommonMark escapes any ASCII punctuation, which makes the `=` plain data and
- * leaves the highlight unclosed. This runs ahead of the core escape and takes
- * only a `\=` whose run would *close*, emitting the backslash as data so the
- * `=` is still seen as a delimiter.
+ * The algorithm is `remark-parse@8`'s `strong.js` without its
+ * `charAt(index + 2) !== marker` guard: close at the first `==`, and fail the
+ * whole attempt when the content would be empty. That failure is what makes an
+ * over-long run behave — in `====text==` the attempt at the first `=` dies on
+ * empty content, so the retry one character along leaves a literal `=` and
+ * highlights `=text`, which is what Obsidian shows.
  *
- * The asymmetry is Obsidian's, and measured: `\==text==` opens nothing, so an
- * escape before an opening run is still honoured and falls through to the core
- * construct. Every other escape falls through untouched too.
+ * Scanning raw codes also makes backslashes fall out without special handling.
+ * `==text\==` closes on the escaped run and keeps `text\` as content, because
+ * the scan never consults CommonMark's escape rules; `\==text==` never opens,
+ * because micromark's own escape consumes that `=` before this construct is
+ * tried; and `\==text\==` produces no highlight for the same reason. All three
+ * match Obsidian, and the asymmetry between them needs no code of its own.
  */
-const unescapedEquals: Construct = {
-  name: "highlightEscape",
+export function legacyHighlightQueue(value: string): string | null {
+  if (value.charAt(0) !== MARKER || value.charAt(1) !== MARKER) return null;
+
+  let index = MARKER_LENGTH;
+  let queue = "";
+
+  while (index < value.length) {
+    const character = value.charAt(index);
+    if (character === MARKER && value.charAt(index + 1) === MARKER) {
+      // Content may not be blank, nor begin or end with whitespace: Obsidian
+      // highlights neither `== text==` nor `==text ==`. CommonMark attention
+      // gave that for free through flanking; a forward scan has to say it.
+      if (!queue.trim() || /^\s|\s$/u.test(queue)) return null;
+      return queue;
+    }
+    queue += character;
+    index++;
+  }
+
+  return null;
+}
+
+const highlight: Construct = {
+  name: "highlight",
   tokenize(
     this: TokenizeContext,
     effects: Effects,
     ok: State,
     nok: State,
   ): State {
-    const opened = hasOpenSequence(this);
-    const closingRun: Construct = {
-      partial: true,
-      tokenize(scan, scanOk, scanNok) {
-        let size = 0;
-        return function enter(code: Code): State | undefined {
-          scan.enter("data");
-          return run(code);
-        };
+    const characters: string[] = [];
+    const scan = createChunkScan(characters);
+    const TEXT_TOKEN = "highlightText" as const;
+    let queue = "";
+    let segments: Segment[] = [];
+    let index = 0;
+    let remaining = 0;
 
-        function run(code: Code): State | undefined {
-          if (code === EQUALS && size < SEQUENCE_SIZE) {
-            scan.consume(code);
-            size++;
-            return run;
-          }
-          scan.exit("data");
-          if (size < SEQUENCE_SIZE) return scanNok(code);
-          // The character before the run is the backslash, so it always
-          // classifies as punctuation; only what follows decides. A run that
-          // would open is left to the core escape, which is the half of the
-          // asymmetry Obsidian does honour.
-          return classifyCharacter(code) ? scanOk(code) : scanNok(code);
-        }
-      },
-    };
+    function startBody(code: Code): State | undefined {
+      segments = planBody(queue);
+      index = 0;
+      return nextSegment(code);
+    }
+
+    function nextSegment(code: Code): State | undefined {
+      const segment = segments[index];
+      if (!segment) return closeStart(code);
+      remaining = segment.length;
+      if (segment.kind === "eol") effects.enter(types.lineEnding);
+      else if (segment.kind === "data") effects.enter("data");
+      else effects.enter(TEXT_TOKEN, { contentType: "text" });
+      return consumeSegment(code);
+    }
+
+    function consumeSegment(code: Code): State | undefined {
+      effects.consume(code);
+      if (--remaining > 0) return consumeSegment;
+      const segment = segments[index]!;
+      effects.exit(
+        segment.kind === "eol"
+          ? types.lineEnding
+          : segment.kind === "data"
+            ? "data"
+            : TEXT_TOKEN,
+      );
+      index++;
+      return nextSegment;
+    }
 
     return start;
 
     function start(code: Code): State | undefined {
-      if (code !== BACKSLASH) return nok(code);
-      // With nothing open there is no closer to protect, and Obsidian escapes
-      // normally: `\==text\==` keeps neither backslash and highlights nothing.
-      if (!opened) return nok(code);
-      effects.enter("data");
-      effects.consume(code);
-      return after;
-    }
-
-    function after(code: Code): State | undefined {
       if (code !== EQUALS) return nok(code);
-      return effects.check(closingRun, literal, nok)(code);
+      characters.length = 0;
+      return effects.check(scan, decide, decide)(code);
     }
 
-    function literal(code: Code): State | undefined {
-      effects.exit("data");
-      return ok(code);
+    function decide(code: Code): State | undefined {
+      const found = legacyHighlightQueue(characters.join(""));
+      if (found === null) return nok(code);
+
+      queue = found;
+      effects.enter("highlight");
+      effects.enter("highlightSequence");
+      remaining = MARKER_LENGTH;
+      return openSequence(code);
+    }
+
+    function openSequence(code: Code): State | undefined {
+      effects.consume(code);
+      if (--remaining > 0) return openSequence;
+      effects.exit("highlightSequence");
+      return startBody;
+    }
+
+    function closeStart(code: Code): State | undefined {
+      effects.enter("highlightSequence");
+      remaining = MARKER_LENGTH;
+      return closeSequence(code);
+    }
+
+    function closeSequence(code: Code): State | undefined {
+      effects.consume(code);
+      if (--remaining > 0) return closeSequence;
+      effects.exit("highlightSequence");
+      effects.exit("highlight");
+      return ok;
     }
   },
 };
 
-/**
- * `==highlight==` as an attention construct, matching how micromark implements
- * emphasis and strikethrough. Scanning for a closer inline instead would keep the
- * content as one opaque token, which cannot span lines and leaves nested syntax
- * such as `==a **b** c==` unparsed.
- */
 export function highlightSyntax(): Extension {
-  const tokenizer = {
-    name: "highlight",
-    tokenize: tokenizeHighlight as Tokenizer,
-    resolveAll: resolveAllHighlight as Resolver,
-  };
-
-  return {
-    text: { [EQUALS]: tokenizer, [BACKSLASH]: unescapedEquals },
-    insideSpan: { null: [tokenizer] },
-    attentionMarkers: { null: [EQUALS] },
-  };
-}
-
-/** Whether an unresolved opening `==` run is already on the event stack. */
-function hasOpenSequence(context: TokenizeContext): boolean {
-  const events = context.events;
-  let index = events.length;
-  while (index--) {
-    const event = events[index];
-    if (!event || event[0] !== "exit") continue;
-    if (event[1].type !== "highlightSequenceTemporary") continue;
-    if ((event[1] as Token & { _open?: boolean })._open) return true;
-  }
-  return false;
-}
-
-function resolveAllHighlight(
-  events: Event[],
-  context: TokenizeContext,
-): Event[] {
-  let index = -1;
-
-  while (++index < events.length) {
-    if (
-      events[index][0] === "enter" &&
-      events[index][1].type === "highlightSequenceTemporary" &&
-      (events[index][1] as Token & { _close?: boolean })._close
-    ) {
-      let open = index;
-
-      while (open--) {
-        const candidate = events[open][1] as Token & { _open?: boolean };
-        if (
-          events[open][0] === "exit" &&
-          candidate.type === "highlightSequenceTemporary" &&
-          candidate._open &&
-          events[index][1].end.offset - events[index][1].start.offset ===
-            candidate.end.offset - candidate.start.offset
-        ) {
-          // `====` would otherwise pair into a highlight with no content.
-          if (candidate.end.offset === events[index][1].start.offset) continue;
-
-          events[index][1].type = "highlightSequence";
-          candidate.type = "highlightSequence";
-
-          const highlight: Token = {
-            type: "highlight",
-            start: Object.assign({}, candidate.start),
-            end: Object.assign({}, events[index][1].end),
-          };
-
-          const text: Token = {
-            type: "highlightText",
-            start: Object.assign({}, candidate.end),
-            end: Object.assign({}, events[index][1].start),
-          };
-
-          const nextEvents: Event[] = [
-            ["enter", highlight, context],
-            ["enter", candidate, context],
-            ["exit", candidate, context],
-            ["enter", text, context],
-          ];
-
-          const insideSpan = context.parser.constructs.insideSpan.null;
-          if (insideSpan) {
-            splice(
-              nextEvents,
-              nextEvents.length,
-              0,
-              resolveAll(insideSpan, events.slice(open + 1, index), context),
-            );
-          }
-
-          splice(nextEvents, nextEvents.length, 0, [
-            ["exit", text, context],
-            ["enter", events[index][1], context],
-            ["exit", events[index][1], context],
-            ["exit", highlight, context],
-          ]);
-
-          splice(events, open - 1, index - open + 3, nextEvents);
-          index = open + nextEvents.length - 2;
-          break;
-        }
-      }
-    }
-  }
-
-  index = -1;
-  while (++index < events.length) {
-    if (events[index][1].type === "highlightSequenceTemporary") {
-      events[index][1].type = types.data;
-    }
-  }
-
-  return events;
-}
-
-function tokenizeHighlight(
-  this: TokenizeContext,
-  effects: Effects,
-  ok: State,
-  nok: State,
-): State {
-  const previous = this.previous;
-  let size = 0;
-
-  return start;
-
-  function start(code: Code): State | undefined {
-    if (code !== EQUALS) return nok(code);
-    effects.enter("highlightSequenceTemporary");
-    return more(code);
-  }
-
-  function more(code: Code): State | undefined {
-    const before = classifyCharacter(previous);
-
-    // Take exactly two and leave further `=` as data: consuming the whole run
-    // would pair the *last* `==` of `==x====` instead of the first.
-    if (code === EQUALS && size < SEQUENCE_SIZE) {
-      effects.consume(code);
-      size++;
-      return more;
-    }
-
-    if (size < SEQUENCE_SIZE) return nok(code);
-
-    const token = effects.exit("highlightSequenceTemporary") as Token & {
-      _open?: boolean;
-      _close?: boolean;
-    };
-    const after = classifyCharacter(code);
-    token._open =
-      !after || (after === constants.attentionSideAfter && Boolean(before));
-    token._close =
-      !before || (before === constants.attentionSideAfter && Boolean(after));
-    return ok(code);
-  }
+  return { text: { [EQUALS]: highlight } };
 }

@@ -95,6 +95,6 @@ declare module "micromark-util-types" {
     inlineFootnote: "inlineFootnote";
     inlineFootnoteMarker: "inlineFootnoteMarker";
     inlineFootnoteContent: "inlineFootnoteContent";
-    legacyAttentionScan: "legacyAttentionScan";
+    legacyChunkScan: "legacyChunkScan";
   }
 }

@@ -6,6 +6,8 @@ import type {
   State,
   TokenizeContext,
 } from "micromark-util-types";
+import { createChunkScan, planBody, type Segment } from "./legacy-scan.js";
+import { types } from "micromark-util-symbol";
 
 const ASTERISK = 42;
 const UNDERSCORE = 95;
@@ -118,54 +120,23 @@ export function legacyEmphasisQueue(value: string): string | null {
   return null;
 }
 
-/** Materialise a micromark code as the source character legacy would have seen. */
-function codeToCharacter(code: Code): string {
-  if (code === -5 || code === -4 || code === -3) return "\n";
-  if (code === -2) return "\t";
-  if (code === -1) return " ";
-  return String.fromCodePoint(code as number);
-}
-
 const legacyAttention: Construct = {
   name: "legacyAttention",
   tokenize(this: TokenizeContext, effects: Effects, ok: State): State {
-    let characters: string[] = [];
+    const characters: string[] = [];
     let name: "strong" | "emphasis" = "strong";
     let markerLength = 2;
     let queue = "";
     let remaining = 0;
-    let trailing = 0;
+    let segments: Segment[] = [];
+    let index = 0;
 
-    /**
-     * Materialises the rest of the text chunk so the ported tokenizers can run
-     * on a plain string. `check` rewinds afterwards, so nothing is really eaten.
-     * The consumes must sit inside an open token or micromark's token stack
-     * desynchronises on restore.
-     */
-    const scan: Construct = {
-      partial: true,
-      tokenize(scanEffects, scanOk) {
-        return function enter(code: Code): State | undefined {
-          scanEffects.enter("legacyAttentionScan");
-          return step(code);
-        };
-
-        function step(code: Code): State | undefined {
-          if (code === null) {
-            scanEffects.exit("legacyAttentionScan");
-            return scanOk(code);
-          }
-          characters.push(codeToCharacter(code));
-          scanEffects.consume(code);
-          return step;
-        }
-      },
-    };
+    const scan = createChunkScan(characters);
 
     return start;
 
     function start(code: Code): State | undefined {
-      characters = [];
+      characters.length = 0;
       return effects.check(scan, decide, decide)(code);
     }
 
@@ -185,12 +156,6 @@ const legacyAttention: Construct = {
         markerLength = 1;
         queue = emphasis;
       }
-
-      // A `text` chunk ending in whitespace loses it: micromark reads a trailing
-      // run as a line suffix and drops it. CommonMark emphasis can never end in
-      // whitespace, so core attention never hits this, but legacy emphasis does —
-      // `a* b *c` holds ` b `. Consume that run as data inside the span instead.
-      trailing = queue.length - queue.replace(/\s+$/u, "").length;
 
       effects.enter(name);
       effects.enter(`${name}Sequence`);
@@ -214,32 +179,38 @@ const legacyAttention: Construct = {
       effects.consume(code);
       if (--remaining > 0) return openSequence;
       effects.exit(`${name}Sequence`);
-      effects.enter(`${name}Text`, { contentType: "text" });
-      remaining = queue.length - trailing;
-      return body;
+      segments = planBody(queue);
+      index = 0;
+      return nextSegment;
     }
 
-    function body(code: Code): State | undefined {
-      effects.consume(code);
-      if (--remaining > 0) return body;
-      effects.exit(`${name}Text`);
-      if (trailing > 0) {
-        effects.enter("data");
-        remaining = trailing;
-        return trailingWhitespace;
+    function nextSegment(code: Code): State | undefined {
+      const segment = segments[index];
+      if (!segment) {
+        effects.enter(`${name}Sequence`);
+        remaining = markerLength;
+        return closeSequence(code);
       }
-      effects.enter(`${name}Sequence`);
-      remaining = markerLength;
-      return closeSequence;
+      remaining = segment.length;
+      if (segment.kind === "eol") effects.enter(types.lineEnding);
+      else if (segment.kind === "data") effects.enter("data");
+      else effects.enter(`${name}Text`, { contentType: "text" });
+      return consumeSegment(code);
     }
 
-    function trailingWhitespace(code: Code): State | undefined {
+    function consumeSegment(code: Code): State | undefined {
       effects.consume(code);
-      if (--remaining > 0) return trailingWhitespace;
-      effects.exit("data");
-      effects.enter(`${name}Sequence`);
-      remaining = markerLength;
-      return closeSequence;
+      if (--remaining > 0) return consumeSegment;
+      const segment = segments[index]!;
+      effects.exit(
+        segment.kind === "eol"
+          ? types.lineEnding
+          : segment.kind === "data"
+            ? "data"
+            : `${name}Text`,
+      );
+      index++;
+      return nextSegment;
     }
 
     function closeSequence(code: Code): State | undefined {

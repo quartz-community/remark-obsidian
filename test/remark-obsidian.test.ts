@@ -411,6 +411,44 @@ describe("remark-obsidian", () => {
     }
   });
 
+  describe("legacy highlight scanning", () => {
+    const content = (md: string): string =>
+      findNodes(findNodes(processWithGfm(md), "highlight")[0], "text")
+        .map((n) => n.value)
+        .join("");
+
+    it("leaves the first marker of an over-long opening run literal", () => {
+      expect(content("====text==\n")).toBe("=text");
+      expect(content("====text====\n")).toBe("=text");
+    });
+
+    it("leaves a surplus closing run literal", () => {
+      expect(
+        findNodes(processWithGfm("====text====\n"), "text")
+          .map((n) => n.value)
+          .join(""),
+      ).toBe("==text==");
+    });
+
+    it("does not highlight content padded with whitespace", () => {
+      for (const md of [
+        "before == text== after\n",
+        "before ==text == after\n",
+      ]) {
+        expect(findNodes(processWithGfm(md), "highlight").length).toBe(0);
+      }
+    });
+
+    it("still nests inline syntax and spans lines", () => {
+      const nested = processWithGfm("==a **b** c==\n");
+      expect(findNodes(nested, "highlight").length).toBe(1);
+      expect(findNodes(nested, "strong").length).toBe(1);
+      expect(findNodes(processWithGfm("==a\nb==\n"), "highlight").length).toBe(
+        1,
+      );
+    });
+  });
+
   describe("escaped closing delimiters", () => {
     it("does not let a backslash escape a closing highlight delimiter", () => {
       const tree = processWithGfm("==text\\==\n");
@@ -820,6 +858,18 @@ describe("remark-obsidian", () => {
     expect(() => parse("a==b\r\nc\r\nd==")).not.toThrow();
     expect(() => parse("a==b\r\nc\r\nd\r\ne==")).not.toThrow();
     expect(() => parse("a==b\nc\nd==")).not.toThrow();
+  });
+
+  // Regression: the legacy ports decide a whole match up front and then consume
+  // it, which swallowed line endings inside the span's text token. That
+  // desynchronizes micromark's chunked token chain and surfaces as
+  // `expected no next token` from `subtokenize`, nowhere near the construct.
+  it("does not crash on emphasis spanning line endings", () => {
+    for (const eol of ["\n", "\r\n"]) {
+      expect(() => parse(`a*b${eol}c${eol}d*`)).not.toThrow();
+      expect(() => parse(`a**b${eol}c${eol}d**`)).not.toThrow();
+      expect(() => parse(`a*b${eol}c${eol}d${eol}e*`)).not.toThrow();
+    }
   });
 
   it("does not crash on wikilinks spanning CRLF line endings", () => {

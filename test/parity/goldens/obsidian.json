@@ -6645,29 +6645,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Nested same-delimiter runs: we nest like CommonMark `****x****`; Obsidian flattens to one highlight containing a stray `=`.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [
-            "text"
-          ],
-          "emphasis": [],
-          "text": "==text",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "====text=="
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/highlight/doubled-close": {
       "id": "token/highlight/doubled-close",
@@ -6803,30 +6781,7 @@
           "footnotes": []
         }
       },
-      "triage": "report-upstream",
-      "note": "Nested same-delimiter runs: we nest like CommonMark `****x****`; Obsidian flattens to one highlight containing a stray `=`.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [
-            "text",
-            "text"
-          ],
-          "emphasis": [],
-          "text": "text",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "====text===="
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/highlight/escaped-open": {
       "id": "token/highlight/escaped-open",
