@@ -160,11 +160,15 @@ describe("source fidelity", () => {
   it("keeps every footnote marker in the corpus reachable", () => {
     const lost: string[] = [];
     for (const entry of cases) {
-      // A marker preceded by `^` is the tail of an inline footnote opener, not
-      // a reference: `^[^9]` is one `^[...]` whose body is the text `^9`, so
-      // the source substring `[^9]` is never a marker to preserve.
+      // The character before decides whether this is a reference at all.
+      // `^[^9]` is one inline footnote whose body is the text `^9`; `\[^1\]`
+      // is an escaped literal; `[[^1]]` is a wikilink targeting `^1`. In each
+      // the brackets belong to another construct, so the substring was never
+      // a marker to preserve.
       const written = [...entry.markdown.matchAll(MARKER)]
-        .filter((match) => entry.markdown[match.index - 1] !== "^")
+        .filter(
+          (match) => !"^\\[".includes(entry.markdown[match.index - 1] ?? ""),
+        )
         .map((match) => match[0]);
       if (written.length === 0) continue;
       const kept = markersIn(parseOurs(entry.markdown, "quartz-default"));
