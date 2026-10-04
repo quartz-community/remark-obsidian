@@ -90,7 +90,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "math/text-after-close": {
       "id": "math/text-after-close",
@@ -809,7 +809,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "math/midline-list": {
       "id": "math/midline-list",
@@ -846,7 +846,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "math/midline-definition": {
       "id": "math/midline-definition",

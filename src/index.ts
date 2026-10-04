@@ -35,6 +35,7 @@ import { paragraphMergeTransform } from "./lib/paragraph-merge.js";
 import { definitionTabTransform } from "./lib/definition-tab.js";
 import { fenceOutlivesTransform } from "./lib/fence-outlives.js";
 import { mathOutlivesTransform } from "./lib/math-outlives.js";
+import { mathMidlineTransform } from "./lib/math-midline.js";
 import { listUnderDefinitionTransform } from "./lib/list-under-definition.js";
 import { tableRowStyleTransform } from "./lib/table-row-style.js";
 import { tableShortDelimiterTransform } from "./lib/table-short-delimiter.js";
@@ -275,6 +276,7 @@ export default function remarkObsidian(
     // code is literal, so it must stop looking like a reference first.
     fenceOutlivesTransform(tree, String(file));
     mathOutlivesTransform(tree, String(file));
+    mathMidlineTransform(tree, String(file));
     listUnderDefinitionTransform(tree, String(file));
     tableRowStyleTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
