@@ -74,26 +74,33 @@ export function tableShortDelimiterTransform(
       if (headerCells.length === delimiterCells.length) continue;
       if (delimiterCells.length === 0) continue;
 
-      const width = delimiterCells.length;
+      // Every header cell is kept. The delimiter only supplies alignment, and
+      // it running short does not drop a column: a real Reading View renders
+      // `| a | b |` over `| --- |` as two cells. The detached renderer the
+      // recorder uses drops the surplus, which is a rendering difference the
+      // harness already documents for other over-long rows -- building one
+      // column to match it would lose a cell a rewrite then cannot restore.
       const row = (line: string): TableRow => ({
         type: "tableRow",
-        children: cells(line)
-          .slice(0, width)
-          .map((cell): TableCell => {
-            const parsed = reparse(cell).children[0];
-            return {
-              type: "tableCell",
-              children:
-                parsed?.type === "paragraph"
-                  ? parsed.children
-                  : ([{ type: "text", value: cell }] as PhrasingContent[]),
-            };
-          }),
+        children: cells(line).map((cell): TableCell => {
+          const parsed = reparse(cell).children[0];
+          return {
+            type: "tableCell",
+            children:
+              parsed?.type === "paragraph"
+                ? parsed.children
+                : ([{ type: "text", value: cell }] as PhrasingContent[]),
+          };
+        }),
       });
 
       const table: Table = {
         type: "table",
-        align: delimiterCells.map(alignOf),
+        align: headerCells.map((_, column) =>
+          column < delimiterCells.length
+            ? alignOf(delimiterCells[column]!)
+            : null,
+        ),
         children: [row(header)],
         position: {
           start: { ...paragraph.position!.start },

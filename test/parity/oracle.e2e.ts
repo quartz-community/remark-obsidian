@@ -516,13 +516,41 @@ describe("Obsidian parity oracle", () => {
   const SURPLUS_TABLE_CELLS =
     "An unescaped pipe splits the row into more cells than the header declares. Reading View renders the surplus cells, the detached container drops them. Both parses agree (metadataCache reports no link and no math respectively), so this is rendering, not parsing.";
 
+  /**
+   * Unlike the entries above, these two are not display-only: the renderers
+   * disagree about the parse, so the recorded golden is not Obsidian behaviour
+   * and the case cannot be gated on it. Listed so the full-corpus audit stays
+   * repeatable, and noted in the goldens so nobody chases a rule that is not
+   * there.
+   */
+  const UNFAITHFUL_CAPTURE =
+    "The detached renderer and Reading View disagree about the parse itself, not just its display, so the recorded expectation is not Obsidian behaviour. The golden carries a note; re-measure through Reading View before treating it as a divergence.";
+
   const KNOWN_PROXY_DIVERGENCES = new Map<string, string>([
     ["wikilink/table-unescaped", SURPLUS_TABLE_CELLS],
     ["math/in-table-pipe", SURPLUS_TABLE_CELLS],
+    ["hunt/table-delimiter-cell-count/0", SURPLUS_TABLE_CELLS],
+    ["hunt/blockquote-region-outlives-quote/1", UNFAITHFUL_CAPTURE],
   ]);
 
+  /**
+   * The seed layer is checked on every recording because it is small enough to
+   * stay cheap. That leaves the generated layers unverified, and the gap is not
+   * theoretical: `hunt/blockquote-region-outlives-quote/1` expects `""` for an
+   * unclosed `<!--` inside a quote, which only the detached renderer produces —
+   * a real Reading View renders what follows. The same shape, probed as a seed,
+   * is what exposed it.
+   *
+   * `PARITY_FULL_PROXY_CHECK=1` widens the sweep to the whole corpus so the
+   * rest can be audited deliberately. It costs minutes rather than seconds,
+   * which is why it is not the default.
+   */
+  const fullProxyCheck = process.env.PARITY_FULL_PROXY_CHECK === "1";
+
   it("agrees with a real Reading View on the seed layer", async () => {
-    const seeds = buildCorpus().filter((c) => c.layer === "seed");
+    const seeds = fullProxyCheck
+      ? buildCorpus()
+      : buildCorpus().filter((c) => c.layer === "seed");
     let agreed = 0;
     const mismatches: string[] = [];
     const unexpected: string[] = [];
@@ -558,6 +586,7 @@ describe("Obsidian parity oracle", () => {
 
     console.log(
       `  reading-view agreement: ${agreed}/${seeds.length}` +
+        `${fullProxyCheck ? " (full corpus)" : ""}` +
         ` (${KNOWN_PROXY_DIVERGENCES.size} known display-only divergence(s))`,
     );
     for (const m of mismatches.slice(0, 15)) console.log(`  ! ${m}`);

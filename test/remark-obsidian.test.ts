@@ -644,10 +644,13 @@ describe("remark-obsidian", () => {
   });
 
   describe("table delimiter width", () => {
-    it("builds a table of the delimiter's width, dropping surplus header cells", () => {
+    it("builds a table and keeps every header cell", () => {
       const tree = processWithGfm("| a | b |\n| --- |\n[^1]: x\n");
       expect(rootTypes(tree)).toEqual(["table", "footnoteDefinition"]);
-      expect(findNodes(tree, "tableCell").length).toBe(1);
+      // A short delimiter supplies alignment, it does not drop a column: a
+      // real Reading View renders both cells. The detached renderer the
+      // recorder uses shows one, which is a rendering difference.
+      expect(findNodes(tree, "tableCell").length).toBe(2);
     });
 
     it("leaves a matching header and delimiter to the parser", () => {

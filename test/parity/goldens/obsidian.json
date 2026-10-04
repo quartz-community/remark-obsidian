@@ -20963,7 +20963,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Block-structure divergence surfaced by the obsidian-footnotes hunt corpus: lazy continuation, definition-block extent, setext underlines, or Obsidian's lenient table delimiter row. Ours to close."
+      "note": "Golden recorded through the detached renderer, which hides everything after an unclosed `<!--` inside a container. A real Reading View renders `after1`. The full-corpus proxy audit flags both this and table-delimiter-cell-count/0; neither expectation is Obsidian behaviour."
     },
     "hunt/blockquote-region-outlives-quote/2": {
       "id": "hunt/blockquote-region-outlives-quote/2",
@@ -45851,7 +45851,8 @@
           "footnotes": []
         }
       },
-      "triage": "match"
+      "triage": "replicate",
+      "note": "Golden recorded through the detached renderer, which drops a table row's surplus cells. A real Reading View renders `a b`, which is what we now produce, so this expectation cannot be matched without dropping a cell a rewrite could not restore. Re-measure through Reading View before treating it as a divergence."
     },
     "hunt/table-rows-on-label-line/0": {
       "id": "hunt/table-rows-on-label-line/0",
