@@ -601,6 +601,25 @@ describe("remark-obsidian", () => {
     });
   });
 
+  describe("a `$$` ending a line inside a container", () => {
+    it("opens a block in a quote but not at the document level", () => {
+      expect(
+        findNodes(processWithGfm("> tail $$\n> x\n> $$\n"), "math")[0].value,
+      ).toBe("x");
+      // At root the same three lines stay prose plus an empty formula.
+      expect(
+        findNodes(processWithGfm("tail $$\nx\n$$\n"), "math")[0].value,
+      ).toBe("");
+    });
+
+    it("reaches an opener inside a definition nested in a quote", () => {
+      const tree = processWithGfm("> [^1]: def\n> tail $$\n> x\n> $$\n");
+      const definition = findNodes(tree, "footnoteDefinition")[0];
+      // Inside the definition, so an unreferenced one hides it as Obsidian does.
+      expect(findNodes(definition, "math").length).toBe(1);
+    });
+  });
+
   describe("display math delimiter width", () => {
     it("opens an empty span for an over-long `$$` run", () => {
       // Obsidian pairs `$$` with the very next `$$`, so this is empty math

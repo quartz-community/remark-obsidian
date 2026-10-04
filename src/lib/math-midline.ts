@@ -34,10 +34,25 @@ export function mathMidlineTransform(tree: Root, source: string): void {
     if (!Array.isArray(parent.children)) return;
 
     for (let index = 0; index < parent.children.length - 1; index++) {
-      const paragraph = parent.children[index];
+      const block = parent.children[index];
       const math = parent.children[index + 1];
-      if (paragraph?.type !== "paragraph" || math?.type !== "math") continue;
+      if (math?.type !== "math") continue;
       if ((math as unknown as MathNode).value !== "") continue;
+
+      // The opener can sit one level further in. A definition inside a quote
+      // holds the paragraph while the empty `math` is the definition's
+      // sibling, so the pair is not in one child list. Reaching through keeps
+      // the block where Obsidian puts it: inside the definition, whose body is
+      // not rendered unless something references it.
+      const host =
+        block?.type === "paragraph"
+          ? block
+          : (block as unknown as { children?: RootContent[] })?.children?.at(
+              -1,
+            );
+      if (host?.type !== "paragraph") continue;
+      const paragraph = host;
+      const nested = block !== host;
 
       const start = paragraph.position?.start?.offset;
       const end = paragraph.position?.end?.offset;
@@ -70,8 +85,24 @@ export function mathMidlineTransform(tree: Root, source: string): void {
         };
       }
 
+      if (nested) {
+        // Move the block inside, so it shares the definition's visibility.
+        const inner = (block as unknown as { children: RootContent[] })
+          .children;
+        inner.push(math);
+        parent.children.splice(index + 1, 1);
+        if (block?.position && math.position?.end) {
+          block.position.end = { ...math.position.end };
+        }
+      }
+
       if (kept.trim() === "") {
-        parent.children.splice(index, 1);
+        if (!nested) parent.children.splice(index, 1);
+        else {
+          const inner = (block as unknown as { children: RootContent[] })
+            .children;
+          inner.splice(inner.indexOf(paragraph), 1);
+        }
         return;
       }
 
