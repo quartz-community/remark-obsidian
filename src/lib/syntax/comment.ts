@@ -32,10 +32,13 @@ const nonLazyContinuation: Construct = {
 };
 
 /**
- * Rewindable lookahead for a second `%%` later on the opening line. Obsidian
- * prefers an inline comment whenever one could close on the same line, so
- * `%%text%%` is a paragraph containing a hidden comment rather than a block
- * comment. A block comment only wins when the construct spans lines.
+ * Rewindable lookahead for any further percent on the opening line.
+ *
+ * Obsidian prefers an inline comment whenever one could close on the same
+ * line, so `%%text%%` is a paragraph holding a hidden comment rather than a
+ * block comment -- a block one only wins when the construct spans lines. The
+ * test is stricter than that implies: a single stray `%` disqualifies the
+ * opener too, which is why `%% 50%` and `%%%` are plain paragraphs.
  */
 const noCloserOnOpeningLine: Construct = {
   partial: true,
@@ -60,22 +63,13 @@ const noCloserOnOpeningLine: Construct = {
         effects.exit("chunkString");
         return ok(code);
       }
-      if (code === PERCENT) {
-        effects.consume(code);
-        return maybeCloser;
-      }
-      effects.consume(code);
-      return scan;
-    }
-
-    function maybeCloser(code: Code): State | undefined {
+      // Any further percent at all, not just a second `%%`. Measured: `%% 50%`
+      // and `%%%` are ordinary paragraphs in Obsidian, so one stray `%` is
+      // enough to disqualify the opener -- which also covers the closer case
+      // this used to check separately, since `%%text%%` stays inline.
       if (code === PERCENT) {
         effects.exit("chunkString");
         return nok(code);
-      }
-      if (code === null || isLineEnding(code)) {
-        effects.exit("chunkString");
-        return ok(code);
       }
       effects.consume(code);
       return scan;

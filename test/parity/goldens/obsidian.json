@@ -6585,8 +6585,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "From the Footnotes Shortcuts author's deviation list; recorded, not yet reproduced."
+      "triage": "match"
     },
     "table/delimiter-leading-space": {
       "id": "table/delimiter-leading-space",
@@ -6619,8 +6618,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "From the Footnotes Shortcuts author's deviation list; recorded, not yet reproduced."
+      "triage": "match"
     },
     "table/first-non-row-ends-it": {
       "id": "table/first-non-row-ends-it",
@@ -6963,8 +6961,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "From the Footnotes Shortcuts author's deviation list; recorded, not yet reproduced."
+      "triage": "match"
     },
     "comment/triple-percent-does-not-open": {
       "id": "comment/triple-percent-does-not-open",
@@ -6997,8 +6994,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "From the Footnotes Shortcuts author's deviation list; recorded, not yet reproduced."
+      "triage": "match"
     },
     "comment/closes-inside-backticks": {
       "id": "comment/closes-inside-backticks",

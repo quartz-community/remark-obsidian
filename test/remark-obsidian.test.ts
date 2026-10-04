@@ -1034,6 +1034,32 @@ describe("remark-obsidian", () => {
     );
   });
 
+  it.each([
+    ["%% 50%\nstill text\n", false, "a stray percent disqualifies the opener"],
+    ["%%%\ntext\n", false, "so does a third percent"],
+    ["%%\nhidden\n%%\n", true, "a clean opener still opens"],
+    ["> %%\n> hidden\n> %%\n", true, "container prefixes come first"],
+  ])("%s opens a block comment: %s", (markdown, expected) => {
+    expect(findNodes(processWithGfm(markdown), "comment").length > 0).toBe(
+      expected,
+    );
+  });
+
+  it.each([
+    [" | a |\n| --- |\n", false, "a leading space means no pipe"],
+    ["| a |\n | --- |\n", false, "the delimiter must match the header"],
+    ["| a |\n| --- |\n", true, "agreeing rows build a table"],
+    [
+      "> [!note]\n> | a |\n> | --- |\n",
+      true,
+      "a container prefix is not content",
+    ],
+  ])("%s builds a table: %s", (markdown, expected) => {
+    expect(findNodes(processWithGfm(markdown), "table").length > 0).toBe(
+      expected,
+    );
+  });
+
   it("records the fold marker", () => {
     const [folded] = findNodes(processWithGfm("> [!note]- C\n> H"), "callout");
     const [open] = findNodes(processWithGfm("> [!note]+ E\n> S"), "callout");

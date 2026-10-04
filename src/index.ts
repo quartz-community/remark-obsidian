@@ -40,6 +40,7 @@ import { mathOutlivesTransform } from "./lib/math-outlives.js";
 import { mathMidlineTransform } from "./lib/math-midline.js";
 import { listUnderDefinitionTransform } from "./lib/list-under-definition.js";
 import { tableRowStyleTransform } from "./lib/table-row-style.js";
+import { tablePipeStyleTransform } from "./lib/table-pipe-style.js";
 import { tableShortDelimiterTransform } from "./lib/table-short-delimiter.js";
 import {
   multilineSetextTransform,
@@ -292,6 +293,11 @@ export default function remarkObsidian(
     mathMidlineTransform(tree, String(file));
     listUnderDefinitionTransform(tree, String(file));
     tableRowStyleTransform(tree, String(file), (markdown) =>
+      self.parse(markdown),
+    );
+    // Before the short-delimiter pass: a table whose rows disagree on the
+    // leading pipe is not a table at all, so there is nothing to widen.
+    tablePipeStyleTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
     tableShortDelimiterTransform(tree, String(file), (markdown) =>
