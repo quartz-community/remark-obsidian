@@ -1079,6 +1079,22 @@ describe("remark-obsidian", () => {
     expect(findNodes(callout, "footnoteDefinition").length).toBe(0);
   });
 
+  it("makes a footnote reference inside an inline note inert", () => {
+    const tree = processWithGfm("^[see [^1]]\n\n[^1]: x\n");
+    const [note] = findNodes(tree, "footnote");
+    expect(findNodes(note, "footnoteReference").length).toBe(0);
+    expect(
+      findNodes(note, "text")
+        .map((n: any) => n.value)
+        .join(""),
+    ).toContain("[^1]");
+  });
+
+  it("leaves a reference outside an inline note alone", () => {
+    const tree = processWithGfm("see [^1]\n\n[^1]: x\n");
+    expect(findNodes(tree, "footnoteReference").length).toBe(1);
+  });
+
   it("records the fold marker", () => {
     const [folded] = findNodes(processWithGfm("> [!note]- C\n> H"), "callout");
     const [open] = findNodes(processWithGfm("> [!note]+ E\n> S"), "callout");

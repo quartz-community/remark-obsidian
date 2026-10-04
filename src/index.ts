@@ -30,6 +30,7 @@ import { mathDisplayTransform } from "./lib/math-display.js";
 import { taskReparseTransform } from "./lib/task-reparse.js";
 import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 import { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
+import { inlineFootnoteInertTransform } from "./lib/inline-footnote-inert.js";
 import { inlineRefoldTransform } from "./lib/inline-refold.js";
 import { containerLazyTransform } from "./lib/container-lazy.js";
 import { quoteMergeTransform } from "./lib/quote-merge.js";
@@ -341,6 +342,11 @@ export default function remarkObsidian(
         self.parse(markdown),
       );
       bareFootnoteRefTransform(tree, String(file));
+      // After the bare pass, so a reference it revives inside an inline note is
+      // demoted too.
+      if (opts.inlineFootnotes) {
+        inlineFootnoteInertTransform(tree);
+      }
     }
     paragraphMergeTransform(tree, String(file));
     if (opts.taskReparse) {

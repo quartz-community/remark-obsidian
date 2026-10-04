@@ -444,9 +444,22 @@ export function metaOurs(tree: Root, source: string): MetaProjections {
   // Only a resolved `[^x]`. An inline `^[...]` is not a reference to the
   // cache at all, and neither is a `[^x]` nothing defines.
   const footnotes: string[] = [];
-  visit(tree, "footnoteReference", (node: Node) => {
-    const id = String((node as unknown as { identifier: string }).identifier);
-    if (defined.has(id)) footnotes.push(id);
+  visit(tree, (node: Node) => {
+    if (node.type === "footnoteReference") {
+      const id = String((node as unknown as { identifier: string }).identifier);
+      if (defined.has(id)) footnotes.push(id);
+      return;
+    }
+    // Obsidian indexes the text inside a `%%` comment: a reference written
+    // there is recorded even though nothing renders it. Our tree keeps the
+    // comment as one opaque value, so the references have to be read out of
+    // it rather than walked.
+    if (node.type !== "comment") return;
+    const value = String((node as unknown as { value: string }).value);
+    for (const match of value.matchAll(/\[\^([^[\]\s]+)\]/gu)) {
+      const id = match[1]!.toLowerCase();
+      if (defined.has(id)) footnotes.push(id);
+    }
   });
 
   return {

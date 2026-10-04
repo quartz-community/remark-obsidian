@@ -1565,8 +1565,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "wikilink/basic": {
       "id": "wikilink/basic",
@@ -7179,8 +7178,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "From the Footnotes Shortcuts author's deviation list; recorded, not yet reproduced."
+      "triage": "match"
     },
     "math/midparagraph-inline-across-lines": {
       "id": "math/midparagraph-inline-across-lines",
@@ -7299,8 +7297,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "From the Footnotes Shortcuts author's deviation list; recorded, not yet reproduced."
+      "triage": "match"
     },
     "inline-footnote/label-inside-is-dead": {
       "id": "inline-footnote/label-inside-is-dead",
@@ -80138,8 +80135,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "hunt/commented-label-is-a-reference/2": {
       "id": "hunt/commented-label-is-a-reference/2",
@@ -80248,8 +80244,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "hunt/commented-label-is-a-reference/4": {
       "id": "hunt/commented-label-is-a-reference/4",
@@ -80301,8 +80296,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "hunt/commented-label-is-a-reference/5": {
       "id": "hunt/commented-label-is-a-reference/5",
@@ -82497,8 +82491,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "hunt/obsidian-comments/3": {
       "id": "hunt/obsidian-comments/3",
@@ -82554,8 +82547,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "hunt/obsidian-comments/4": {
       "id": "hunt/obsidian-comments/4",
@@ -82607,8 +82599,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "hunt/obsidian-comments/5": {
       "id": "hunt/obsidian-comments/5",
@@ -83385,8 +83376,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "hunt/obsidian-comments/22": {
       "id": "hunt/obsidian-comments/22",
@@ -83476,8 +83466,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "hunt/obsidian-comments/24": {
       "id": "hunt/obsidian-comments/24",
