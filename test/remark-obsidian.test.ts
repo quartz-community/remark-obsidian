@@ -500,6 +500,12 @@ describe("remark-obsidian", () => {
       expect(rootTypes(tree)).toEqual(["list"]);
     });
 
+    it("absorbs a math block opened on a lazy line", () => {
+      expect(rootTypes(processWithGfm("- item\nx $$\n$$ tail\n"))).toEqual([
+        "list",
+      ]);
+    });
+
     it("still stops at a blank line", () => {
       expect(rootTypes(processWithGfm("- item\n\n[^3]: real\n"))).toEqual([
         "list",

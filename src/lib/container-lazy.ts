@@ -27,7 +27,13 @@ export function containerLazyTransform(tree: Root, source: string): void {
     if (!container || !next) continue;
     if (!CONTAINERS.has(container.type)) continue;
     if (next.type !== "paragraph") {
-      if (next.type !== "footnoteDefinition" && next.type !== "table") continue;
+      if (
+        next.type !== "footnoteDefinition" &&
+        next.type !== "table" &&
+        next.type !== "math"
+      ) {
+        continue;
+      }
     }
 
     // Measure the gap from the last non-whitespace character, not from the
