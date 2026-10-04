@@ -1,5 +1,5 @@
 ---
-"@quartz-community/remark-obsidian": minor
+"@quartz-community/remark-obsidian": major
 ---
 
 Keep a footnote reference nothing defines, instead of baring it in the tree.
@@ -20,5 +20,7 @@ An undefined reference now stays a `footnoteReference`, which round-trips to
 undefined reference one layer later, and did so from the label rather than the
 identifier, which showed the wrong case.
 
-Consumers reading `text` nodes to find bare references must read
-`footnoteReference` nodes instead.
+Breaking twice over, which is why this is a major: an undefined reference used
+to arrive as a `text` node and now arrives as a `footnoteReference`, so a
+consumer matching on bare text must match on the node instead; and
+`footnoteOrphanTransform` is gone from the public exports.
