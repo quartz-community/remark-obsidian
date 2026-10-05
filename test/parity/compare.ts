@@ -41,12 +41,43 @@ export interface CaseResult {
 
 const PROFILE_NAMES = Object.keys(PROFILES) as ProfileName[];
 
-/** Drop `tex` from both sides when the recording Obsidian could not supply it. */
+/**
+ * Line up the `math` projection with what the recording can actually show.
+ *
+ * Before 1.14 Obsidian discarded the LaTeX source, so `tex` is dropped from
+ * both sides when `mathTex` says the recording could not supply it.
+ *
+ * Where it can, the formula is compared with its surrounding whitespace
+ * normalised. Obsidian reports `$$\nx\n$$` as `"\nx\n"` and keeps a container's
+ * indentation out of it, while `remark-math` reports `"x"` and a fragment
+ * re-parse can leave the indent in -- three ways of writing a formula that
+ * renders identically, since TeX treats a run of whitespace as a single space.
+ * Normalising here rather than changing the node value keeps `remark-math`'s
+ * own representation intact for every other consumer, and it still fails on a
+ * formula whose *characters* differ: `$$\nMath$$` reports `Math` while we
+ * report `Math$$`, which is a real divergence and stays one.
+ */
 function alignMath(projections: Projections, mathTex: boolean): Projections {
-  if (mathTex) return projections;
+  if (!mathTex) {
+    return {
+      ...projections,
+      math: projections.math.map(({ display }) => ({ display })),
+    };
+  }
   return {
     ...projections,
-    math: projections.math.map(({ display }) => ({ display })),
+    math: projections.math.map((item) => ({
+      ...item,
+      ...(item.tex === undefined
+        ? {}
+        : {
+            tex: item.tex
+              .split("\n")
+              .map((line) => line.replace(/^[ \t]*(?:>[ \t]*)*/u, ""))
+              .join("\n")
+              .trim(),
+          }),
+    })),
   };
 }
 
