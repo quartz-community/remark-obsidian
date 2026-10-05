@@ -62,6 +62,38 @@ export interface MetaProjections {
   readonly footnotes: readonly string[];
 }
 
+/**
+ * The same parser's answer about a string rather than a file, with positions.
+ *
+ * Recorded from the undocumented `metadataCache.computeMetadataAsync`, so it is
+ * optional: a build without it records nothing rather than an empty answer that
+ * would read as "Obsidian found none of these".
+ */
+export interface ComputedMeta {
+  readonly footnotes: readonly string[];
+  readonly footnoteRefs: readonly string[];
+  readonly headings: readonly string[];
+  readonly sections: readonly string[];
+  /**
+   * The eight dimensions the answer also carries, recorded ahead of being
+   * compared. Optional because our own projection does not produce them yet,
+   * and recording is what makes comparing them a day's work rather than a
+   * recording run plus a day: the answer is one call either way.
+   *
+   * `blocks` is the authoritative block-identifier index, which replaces an
+   * inferred rule about which characters an identifier accepts.
+   * `frontmatterLinks` is a construct class no oracle here has ever looked at.
+   */
+  readonly links?: readonly string[];
+  readonly embeds?: readonly string[];
+  readonly tags?: readonly string[];
+  readonly listItems?: readonly string[];
+  readonly blocks?: readonly string[];
+  readonly frontmatter?: string;
+  readonly frontmatterPosition?: string;
+  readonly frontmatterLinks?: readonly string[];
+}
+
 export type TriageState =
   | "match"
   | "replicate"
@@ -90,6 +122,7 @@ export interface GoldenCase {
     readonly html: string;
     readonly projections: Projections;
     readonly meta: MetaProjections;
+    readonly compute?: ComputedMeta;
   };
   triage: TriageState;
   note?: string;

@@ -98,6 +98,9 @@ export function structureFromMdast(tree: Root): Structure {
     // definition's blocks move there, so they are not part of the document
     // this compares.
     if (node.type === "footnoteDefinition") return SKIP;
+    // A comment's body is parsed but never rendered, so the blocks inside one
+    // produce no element: `%%` / `- [ ] Hidden task` / `%%` has no list.
+    if (node.type === "comment") return SKIP;
     if (node.type === "table") {
       const align = (node as TableNode).align ?? [];
       tableAlign.push(align.map((a) => a ?? "null").join(","));

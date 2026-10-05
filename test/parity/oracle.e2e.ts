@@ -20,6 +20,7 @@ import { projectOurs } from "./normalize.js";
 import { buildCorpus, caseFileName, type Case } from "./corpus.js";
 import {
   PINNED_STATES,
+  type ComputedMeta,
   type GoldenCase,
   type MetaProjections,
   type Projections,
@@ -49,6 +50,8 @@ interface Captured {
   readonly projections: Omit<Projections, "sections">;
   readonly sectionOffsets: readonly SectionOffset[];
   readonly meta: MetaProjections;
+  /** `null` when the build does not expose the undocumented entry point. */
+  readonly compute: ComputedMeta | null;
   readonly error?: string;
 }
 
@@ -207,6 +210,78 @@ const CAPTURE = async (
     };
   };
 
+  /**
+   * Obsidian's own parse of a string, positioned.
+   *
+   * `getFileCache` above answers for a file that has been written and indexed,
+   * and names identifiers without saying where they sit. The undocumented
+   * `computeMetadataAsync` runs the same parser -- the one behind both Reading
+   * View and the cache -- directly on a buffer, and its answer carries a line
+   * and a column for every footnote, heading and section. So it is both sharper
+   * for anything position-shaped and far cheaper: no file to write, no index to
+   * wait for, no leaf to mount. It does not replace the DOM capture, which is
+   * still the only source of rendered text, math and emphasis.
+   *
+   * Guarded rather than assumed: being undocumented it may vanish, and a build
+   * without it has to record a recognisable `null` rather than an empty answer
+   * that would read as "Obsidian found none of these".
+   */
+  const computeOf = async (markdown: string): Promise<ComputedMeta | null> => {
+    if (typeof app.metadataCache?.computeMetadataAsync !== "function") {
+      return null;
+    }
+    const at = (point: any) => `${point?.line ?? 0}:${point?.col ?? 0}`;
+    const span = (position: any) =>
+      `${at(position?.start)}-${at(position?.end)}`;
+    const answer = await app.metadataCache.computeMetadataAsync(
+      new TextEncoder().encode(markdown).buffer,
+    );
+    // A reference is `original => resolved | displayText`, because the three
+    // disagree exactly where an alias or a fragment is involved and that is
+    // what an identifier-only projection cannot see.
+    const reference = (l: any) =>
+      `${l.original}=>${l.link}|${l.displayText}@${span(l.position)}`;
+    return {
+      footnotes: (answer?.footnotes ?? []).map(
+        (f: any) => `${f.id}@${span(f.position)}`,
+      ),
+      footnoteRefs: (answer?.footnoteRefs ?? []).map(
+        (f: any) => `${f.id}@${at(f.position?.start)}`,
+      ),
+      headings: (answer?.headings ?? []).map(
+        (h: any) => `${h.level}:${h.heading}@${at(h.position?.start)}`,
+      ),
+      sections: (answer?.sections ?? []).map(
+        (s: any) => `${s.type}@${span(s.position)}`,
+      ),
+      links: (answer?.links ?? []).map(reference),
+      embeds: (answer?.embeds ?? []).map(reference),
+      tags: (answer?.tags ?? []).map(
+        (t: any) => `${t.tag}@${span(t.position)}`,
+      ),
+      // `parent` is how the cache spells nesting, and `task` the checkbox
+      // character -- neither survives the DOM projection of a task list.
+      listItems: (answer?.listItems ?? []).map(
+        (i: any) =>
+          `${i.task === undefined ? "-" : JSON.stringify(i.task)}|parent:${i.parent}@${span(i.position)}`,
+      ),
+      // An object keyed by identifier rather than an array.
+      blocks: Object.values(answer?.blocks ?? {}).map(
+        (b: any) => `${b.id}@${span(b.position)}`,
+      ),
+      frontmatter:
+        answer?.frontmatter === undefined
+          ? undefined
+          : JSON.stringify(answer.frontmatter),
+      frontmatterPosition: answer?.frontmatterPosition
+        ? span(answer.frontmatterPosition)
+        : undefined,
+      frontmatterLinks: (answer?.frontmatterLinks ?? []).map(
+        (l: any) => `${l.key}:${l.original}=>${l.link}|${l.displayText}`,
+      ),
+    };
+  };
+
   const out: Captured[] = [];
 
   for (const item of batch) {
@@ -252,6 +327,7 @@ const CAPTURE = async (
         projections: project(host),
         sectionOffsets: sectionsOf(`${dir}/${item.file}`),
         meta: metaOf(`${dir}/${item.file}`),
+        compute: await computeOf(item.markdown),
       });
     } catch (error) {
       out.push({
@@ -269,6 +345,7 @@ const CAPTURE = async (
         },
         sectionOffsets: [],
         meta: { headings: [], links: [], embeds: [], tags: [], footnotes: [] },
+        compute: null,
         error: String((error as Error)?.message ?? error),
       });
     } finally {
@@ -464,6 +541,7 @@ describe("Obsidian parity oracle", () => {
             })),
           },
           meta: c.meta,
+          ...(c.compute ? { compute: c.compute } : {}),
         },
         triage: previous[c.id]?.triage ?? "unreviewed",
         ...(previous[c.id]?.note ? { note: previous[c.id]!.note } : {}),
@@ -541,11 +619,23 @@ describe("Obsidian parity oracle", () => {
   const UNFAITHFUL_CAPTURE =
     "The detached renderer and Reading View disagree about the parse itself, not just its display, so the recorded expectation is not Obsidian behaviour. The golden carries a note; re-measure through Reading View before treating it as a divergence.";
 
+  /**
+   * Found by the first full-corpus audit that ran to completion, and classified
+   * by the positioned oracle rather than by argument: `computeMetadataAsync`
+   * reports the two paragraphs as sections of their own, so Obsidian's parser
+   * does not fold them into the html block and Reading View is the faithful
+   * side. Without that answer this case looks exactly like the pair above,
+   * where the renderers really do disagree about the parse.
+   */
+  const RAW_TEXT_ELEMENT =
+    "`<textarea>` is a raw-text element, so in the detached container the blocks after it re-parse as its literal content (`<p><em>foo</em></p>`) while Reading View renders them as paragraphs (`foobar`). The parse sides with Reading View: `computeMetadataAsync` reports `html`, `paragraph`, `paragraph`, `html` as four separate sections. Rendering, not parsing.";
+
   const KNOWN_PROXY_DIVERGENCES = new Map<string, string>([
     ["wikilink/table-unescaped", SURPLUS_TABLE_CELLS],
     ["math/in-table-pipe", SURPLUS_TABLE_CELLS],
     ["hunt/table-delimiter-cell-count/0", SURPLUS_TABLE_CELLS],
     ["hunt/blockquote-region-outlives-quote/1", UNFAITHFUL_CAPTURE],
+    ["commonmark/html-blocks/171", RAW_TEXT_ELEMENT],
   ]);
 
   /**
@@ -579,6 +669,32 @@ describe("Obsidian parity oracle", () => {
 
     const unopenable: string[] = [];
 
+    /**
+     * Fail a stuck mount fast instead of waiting out the helper's own retries.
+     *
+     * `openFile` waits for the leaf to appear and retries while it does not, so
+     * a document Reading View never mounts does not throw promptly -- it spends
+     * the sweep's whole budget before it gives up, and the run dies on the
+     * suite timeout with the cross-check half done. Racing it against a short
+     * timer turns that into one skipped case.
+     */
+    const bounded = async <T>(work: Promise<T>, ms: number): Promise<T> => {
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      try {
+        return await Promise.race([
+          work,
+          new Promise<never>((_resolve, reject) => {
+            timer = setTimeout(
+              () => reject(new Error(`timed out after ${ms}ms`)),
+              ms,
+            );
+          }),
+        ]);
+      } finally {
+        if (timer) clearTimeout(timer);
+      }
+    };
+
     for (const c of seeds) {
       const filePath = `${FIXTURE_DIR}/${caseFileName(c.id)}`;
       // A fuzz-reduced document can be odd enough that Reading View never
@@ -587,7 +703,7 @@ describe("Obsidian parity oracle", () => {
       // throws away the cross-check for every other case.
       let readingText: string;
       try {
-        await obsidianPage.openFile(filePath);
+        await bounded(obsidianPage.openFile(filePath), 30_000);
         readingText = (await browser.executeObsidian(
           CAPTURE_READING_VIEW as never,
           filePath,

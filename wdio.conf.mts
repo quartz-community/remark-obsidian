@@ -43,7 +43,16 @@ export const config: WebdriverIO.Config = {
 
   mochaOpts: {
     ui: "bdd",
-    timeout: 900_000,
+    /**
+     * The default recording is a minute and a half, so fifteen minutes is a
+     * generous ceiling that still surfaces a genuine hang quickly in CI. The
+     * full cross-check is a different job -- it mounts a real Reading View for
+     * every case in the corpus, and at 2631 cases it ran past that ceiling and
+     * was killed mid-sweep, which reads exactly like a parity failure while
+     * being nothing of the kind. The audit gets its own budget rather than
+     * loosening the default.
+     */
+    timeout: process.env.PARITY_FULL_PROXY_CHECK === "1" ? 5_400_000 : 900_000,
   },
 
   waitforInterval: 250,

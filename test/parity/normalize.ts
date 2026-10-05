@@ -13,6 +13,7 @@ import type { Node } from "unist";
 import { SKIP, visit } from "unist-util-visit";
 import { applyTextTransform, parseOurs, type ProfileName } from "./chain.js";
 import type {
+  ComputedMeta,
   LinkItem,
   MetaProjections,
   MathItem,
@@ -54,6 +55,37 @@ const isType = <T extends Node>(node: Node, type: string): node is T =>
   node.type === type;
 
 /** Text descendants, with hard breaks kept so a multi-line highlight compares. */
+/**
+ * The twelve pictographs Obsidian 1.14 reads as a highlight's colour: the six
+ * rainbow circles and the six rainbow squares. Closed rather than sampled --
+ * both families were probed in full, and brown, black and white are not
+ * markers in either.
+ */
+const COLOUR_MARKERS = new Set([
+  0x1f534, 0x1f7e0, 0x1f7e1, 0x1f7e2, 0x1f535, 0x1f7e3, 0x1f7e5, 0x1f7e7,
+  0x1f7e8, 0x1f7e9, 0x1f7e6, 0x1f7ea,
+]);
+
+/**
+ * Drop a leading colour marker, as 1.14 does when it parses one.
+ *
+ * By **codepoint**, not grapheme: `==🔴\uFE0F text==` consumes the circle and
+ * leaves the variation selector orphaned at the front of the content, which a
+ * grapheme-aware strip would swallow too. Only the first is taken, so the
+ * second of two survives, and whatever whitespace followed stays -- the marker
+ * is removed, not the separator.
+ *
+ * This belongs to the projection and never to the tree. Obsidian drops the
+ * character when rendering while the file keeps it, so reproducing the drop in
+ * a node value would let a formatter delete the author's emoji -- the same rule
+ * that keeps an undefined footnote reference and a surplus table cell intact.
+ */
+function stripColourMarker(content: string): string {
+  const first = content.codePointAt(0);
+  if (first === undefined || !COLOUR_MARKERS.has(first)) return content;
+  return content.slice(String.fromCodePoint(first).length);
+}
+
 function textOf(node: Node, defined?: ReadonlySet<string>): string {
   let out = "";
   visit(node, (child: Node) => {
@@ -91,8 +123,19 @@ const BLOCK_TYPES = new Set([
 /** Identifiers the document defines, so a reference can be told from bare text. */
 export function definedFootnotes(tree: Node): Set<string> {
   const defined = new Set<string>();
-  visit(tree, "footnoteDefinition", (node: Node) => {
-    defined.add(String((node as unknown as { identifier: string }).identifier));
+  visit(tree, (node: Node) => {
+    // A definition written inside a `%%` comment does not define. Measured:
+    // `%%` / `[^1]: buried` / `%%` / `text[^1] ref` renders `text1 ref`, the
+    // bare label of an *undefined* reference. The asymmetry is Obsidian's --
+    // a reference inside a comment is still indexed by `metadataCache`, while
+    // a definition inside one binds nothing.
+    if (node.type === "comment") return SKIP;
+    if (node.type === "footnoteDefinition") {
+      defined.add(
+        String((node as unknown as { identifier: string }).identifier),
+      );
+    }
+    return;
   });
   return defined;
 }
@@ -125,6 +168,12 @@ export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
       }
       case "tag":
         parts.push(`#${(node as ValueNode).value}`);
+        return;
+      // A `%%` comment renders nothing. It carries its body parsed as children
+      // as well as text now, so returning here is what keeps that body out of
+      // the rendered projection -- without it the comment's own contents are
+      // walked and appear as visible text.
+      case "comment":
         return;
       case "inlineMath":
         parts.push("\u27e8math\u27e9");
@@ -172,6 +221,20 @@ export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
       // Obsidian shows the callout's title, defaulting a missing one to the
       // capitalised type (`> [!warning]` reads "Warning"). A present title lives
       // in a `calloutTitle` child, so walking the children emits it.
+      // 1.14 consumes a leading colour marker, so neither the rendered text nor
+      // the highlight's own content holds it. Stripped after the children are
+      // walked, which keeps every other construct inside the highlight -- a
+      // wikilink, math, a bare reference -- handled exactly as it is elsewhere.
+      case "highlight": {
+        const mark = parts.length;
+        for (const child of (node as unknown as { children: Node[] })
+          .children) {
+          walk(child);
+        }
+        const first = parts[mark];
+        if (typeof first === "string") parts[mark] = stripColourMarker(first);
+        return;
+      }
       case "callout": {
         const callout = node as unknown as {
           calloutType: string;
@@ -289,7 +352,7 @@ export function mdastSections(tree: Root, source: string): SectionItem[] {
  * child would contribute nothing at all. Slicing also makes this assert the
  * heading's own position, which nothing else here does.
  */
-function headingName(node: Node, source: string): string {
+export function headingName(node: Node, source: string): string {
   const start = node.position?.start?.offset;
   const end = node.position?.end?.offset;
   if (start === undefined || end === undefined) return "";
@@ -303,9 +366,14 @@ function headingName(node: Node, source: string): string {
   // Setext: the underline is inside the node's span but outside its name. Inside a
   // container the slice keeps the block prefix, so `para\n> ===` must lose the
   // whole final line, marker included.
-  const body = raw
-    .replace(/\r?\n[ \t]*(?:>[ \t]*)*[=-]+[ \t]*$/, "")
-    .replace(/(?:^|[ \t])\^[A-Za-z0-9-]+[ \t]*$/u, "");
+  const underlined = raw.replace(/\r?\n[ \t]*(?:>[ \t]*)*[=-]+[ \t]*$/, "");
+  // A trailing block identifier is not part of the name, but it only counts as
+  // one when it trails something: `para ^blk` is named `para`, while a heading
+  // whose whole content is `^blk` keeps it. Measured against
+  // `computeMetadataAsync`, which reports `^blk\n---` as the heading `^blk` --
+  // stripping unconditionally named it the empty string.
+  const stripped = underlined.replace(/(?:^|[ \t])\^[A-Za-z0-9-]+[ \t]*$/u, "");
+  const body = stripped.trim() === "" ? underlined : stripped;
   // A setext heading shares its content chunk with any link reference
   // definitions above it, so its span starts back at them: `[ref]: /url\npara\n===`
   // reports a heading named `para`, not `[ref]: /url\npara`.
@@ -339,6 +407,11 @@ export function projectMdast(
   const emphasis: string[] = [];
 
   visit(tree, (node: Node) => {
+    // Nothing inside a `%%` comment renders, so nothing inside one is
+    // projected either. The body is parsed into children now, and without this
+    // a wikilink or a tag written inside a comment would be collected as
+    // though the document displayed it.
+    if (node.type === "comment") return SKIP;
     // An unreferenced definition is never rendered, so nothing inside it
     // reaches the capture. A referenced one is rendered into
     // `section.footnotes`: the recorder drops that for `text`, which is why
@@ -387,7 +460,7 @@ export function projectMdast(
       return;
     }
     if (node.type === "highlight") {
-      highlights.push(textOf(node, defined));
+      highlights.push(stripColourMarker(textOf(node, defined)));
       return;
     }
     if (node.type === "inlineMath") {
@@ -468,14 +541,34 @@ export function metaOurs(tree: Root, source: string): MetaProjections {
   const target = (link: LinkItem): string =>
     link.heading === "" ? link.path : `${link.path}#${link.heading}`;
 
-  // Only a resolved `[^x]`. An inline `^[...]` is not a reference to the
-  // cache at all, and neither is a `[^x]` nothing defines.
+  // Only a resolved `[^x]`, never a `[^x]` nothing defines. An inline `^[...]`
+  // is not a reference either -- with one exception, measured rather than
+  // assumed: an *empty* one is recorded with an empty name. `^[] and ^[x]`
+  // reports a reference named `""` beside a definition named `[inline1`, so the
+  // empty body is both indexed and counted.
   const footnotes: string[] = [];
   visit(tree, (node: Node) => {
     if (node.type === "footnoteReference") {
       const id = String((node as unknown as { identifier: string }).identifier);
       if (defined.has(id)) footnotes.push(id);
       return;
+    }
+    // `footnote` is the inline form. Nothing inside one is indexed, so the
+    // subtree is skipped rather than walked.
+    //
+    // Emptiness is read from the source between `^[` and `]`, not from the
+    // node's children: a whitespace-only body produces no children either, yet
+    // `^[ ]` is a *definition* to the cache (`[inline0`) while only a truly
+    // empty `^[]` becomes the empty-named reference.
+    if (node.type === "footnote") {
+      const start = node.position?.start?.offset;
+      const end = node.position?.end?.offset;
+      const body =
+        start === undefined || end === undefined
+          ? ""
+          : source.slice(start + 2, end - 1);
+      if (body === "") footnotes.push("");
+      return SKIP;
     }
     // Obsidian indexes the text inside a `%%` comment: a reference written
     // there is recorded even though nothing renders it. Our tree keeps the
@@ -487,6 +580,9 @@ export function metaOurs(tree: Root, source: string): MetaProjections {
       const id = match[1]!.toLowerCase();
       if (defined.has(id)) footnotes.push(id);
     }
+    // The body is also parsed into children, so walking on would find the same
+    // references a second time through their real nodes.
+    return SKIP;
   });
 
   // Only the document's own headings. Obsidian renders one inside a container
@@ -576,5 +672,284 @@ export function projectOurs(
     ...projectMdast(tree, source),
     text: mdastText(tree, definedFootnotes(tree)),
     sections: mdastSections(tree, source),
+  };
+}
+
+/**
+ * Our side of the positioned oracle, in `computeMetadataAsync`'s own shape.
+ *
+ * Separate from `metaOurs` because the two answer different questions. That one
+ * mirrors `getFileCache`, which names identifiers; this one mirrors the parser
+ * called on a string, which also says where each sits -- so it is the only
+ * projection that can catch a node placed on the wrong line.
+ *
+ * Every rule here was measured against recorded answers, and the inline
+ * footnote is the subtle one. `^[body]` is reported as a *definition* named
+ * `[inline<n>` spanning the body alone, never the `^[` or the `]`; `^[]` is
+ * reported as a *reference* with an empty name at the caret. The index counts
+ * both kinds in document order and does not restart in a new block, which is
+ * why `^[] and ^[x]` names its definition `[inline1`.
+ */
+export function computeOurs(tree: Root, source: string): ComputedMeta {
+  const defined = definedFootnotes(tree);
+  const lineStarts = [0];
+  for (let index = 0; index < source.length; index++) {
+    if (source[index] === "\n") lineStarts.push(index + 1);
+  }
+  /** `line:col`, both counting from zero as the cache reports them. */
+  const atOffset = (offset: number): string => {
+    let line = 0;
+    while (line + 1 < lineStarts.length && lineStarts[line + 1]! <= offset) {
+      line++;
+    }
+    return `${line}:${offset - lineStarts[line]!}`;
+  };
+  const atPoint = (point: { line: number; column: number }): string =>
+    `${point.line - 1}:${point.column - 1}`;
+
+  const footnotes: string[] = [];
+  const footnoteRefs: string[] = [];
+  const headings: string[] = [];
+  /**
+   * The number of footnote markers seen so far, which is what names an inline
+   * footnote's synthetic definition.
+   *
+   * Shared between references and inline footnotes rather than counted per
+   * kind, and advanced only by a reference something *defines*. Four probes
+   * pin each half: `a[^1] and ^[x]` with `[^1]` defined names the inline
+   * `[inline1`, while `a[^nodef] and ^[x]` names it `[inline0`; and
+   * `^[a] b[^1] ^[c]` names them `[inline0` and `[inline2`, the reference
+   * between taking 1. So the counter numbers the markers Obsidian will
+   * render -- exactly the set `footnoteRefs` records, plus the inline ones.
+   */
+  let markerIndex = 0;
+
+  visit(tree, (node: Node, _index, parent) => {
+    if (node.type === "footnote") {
+      const start = node.position?.start?.offset;
+      const end = node.position?.end?.offset;
+      if (start === undefined || end === undefined) return SKIP;
+      // The body, which is what the reported span covers.
+      const from = start + 2;
+      const to = end - 1;
+      const name = `[inline${markerIndex}`;
+      markerIndex++;
+      if (source.slice(from, to) === "") {
+        footnoteRefs.push(`@${atOffset(start)}`);
+      } else {
+        footnotes.push(`${name}@${atOffset(from)}-${atOffset(to)}`);
+      }
+      // A nested `^[...]` is part of the outer body, not a second footnote:
+      // `^[^[note]]]` is reported once, as `[inline0` spanning `^[note]`.
+      return SKIP;
+    }
+
+    if (node.type === "footnoteDefinition" && node.position) {
+      const id = String((node as unknown as { identifier: string }).identifier);
+      footnotes.push(
+        `${id}@${atPoint(node.position.start)}-${atPoint(node.position.end)}`,
+      );
+      return;
+    }
+
+    if (node.type === "footnoteReference" && node.position) {
+      const id = String((node as unknown as { identifier: string }).identifier);
+      // The cache records only a reference something defines -- and only such a
+      // reference is a marker, so only it advances the counter.
+      if (defined.has(id)) {
+        footnoteRefs.push(`${id}@${atPoint(node.position.start)}`);
+        markerIndex++;
+      }
+      return;
+    }
+
+    // A reference written inside a `%%` comment is indexed even though nothing
+    // renders it, and our tree keeps the comment as one opaque value rather
+    // than nodes -- so the references have to be read out as text.
+    //
+    // Read from the comment's *source slice*, not its value: inside a
+    // container the value has each line's `> ` stripped, so a value index no
+    // longer tells you where the match sits and the reference lands at the
+    // wrong column. A match in the slice is at a real offset by construction.
+    if (
+      node.type === "comment" &&
+      node.position?.start?.offset !== undefined &&
+      node.position?.end?.offset !== undefined
+    ) {
+      const from = node.position.start.offset;
+      const slice = source.slice(from, node.position.end.offset);
+      for (const match of slice.matchAll(/\[\^([^[\]\s]+)\]/gu)) {
+        const id = match[1]!.toLowerCase();
+        if (defined.has(id)) {
+          footnoteRefs.push(`${id}@${atOffset(from + match.index)}`);
+        }
+      }
+      return SKIP;
+    }
+
+    // Only the document's own headings, as `metaOurs` explains.
+    if (
+      isType<HeadingNode>(node, "heading") &&
+      parent === tree &&
+      node.position
+    ) {
+      headings.push(
+        `${node.depth}:${headingName(node, source)}@${atPoint(node.position.start)}`,
+      );
+    }
+    return;
+  });
+
+  // Obsidian reports only top-level blocks as sections -- a list inside a
+  // quote is part of the quote's section, not one of its own -- so the
+  // document's own children are the whole projection.
+  const sections = tree.children
+    .filter((child) => child.position)
+    .map(
+      (child) =>
+        `${child.type}@${atPoint(child.position!.start)}-${atPoint(child.position!.end)}`,
+    );
+
+  const spanOf = (node: Node): string =>
+    `${atPoint(node.position!.start)}-${atPoint(node.position!.end)}`;
+
+  const links: string[] = [];
+  const embeds: string[] = [];
+  const tags: string[] = [];
+  visit(tree, (node: Node) => {
+    if (node.type === "comment") return SKIP;
+    if (!node.position) return;
+    if (isType<ValueNode>(node, "tag")) {
+      tags.push(`#${node.value}@${spanOf(node)}`);
+      return;
+    }
+    if (!isType<WikilinkNode>(node, "wikilink")) return;
+    const target =
+      node.heading === "" ? node.path : `${node.path}#${node.heading}`;
+    // `original` is the source as written, which is what the cache reports and
+    // what no field of the node reproduces on its own.
+    const original = source.slice(
+      node.position.start.offset!,
+      node.position.end.offset!,
+    );
+    // The cache joins a path and a fragment with ` > `, as `mdastText` does
+    // for the rendered text: `[[page#heading]]` displays `page > heading`, not
+    // the fragment alone. An alias replaces the whole thing.
+    const shown =
+      node.alias || [node.path, node.heading].filter(Boolean).join(" > ");
+    (node.embedded ? embeds : links).push(
+      `${original}=>${target}|${shown}@${spanOf(node)}`,
+    );
+  });
+
+  /**
+   * A block identifier names the block it trails, and twelve probes fix every
+   * part of the rule.
+   *
+   * It is read from the block's own *lines*, not from the node's span: ` ^blk`
+   * registers while `^blk` does not, and the only difference is a leading space
+   * the paragraph's position excludes. That also makes the reported span start
+   * at the line, as Obsidian reports it.
+   *
+   * The identifier must trail at least one character, hold only alphanumerics
+   * and hyphens (`^a_b` registers nothing at all), and end its line exactly
+   * (`^blk ` registers nothing). Where a line holds two, the last wins. A
+   * setext underline is dropped first, since `^blk` over `---` registers from
+   * the content line above it.
+   */
+  const blocks: string[] = [];
+  for (const child of tree.children) {
+    const from = child.position?.start?.offset;
+    const to = child.position?.end?.offset;
+    if (from === undefined || to === undefined) continue;
+    const lineStart = source.lastIndexOf("\n", from - 1) + 1;
+    const lineEnd = source.indexOf("\n", to);
+    const full = source.slice(
+      lineStart,
+      lineEnd === -1 ? source.length : lineEnd,
+    );
+    const raw = full.replace(/\r?\n[ \t]*(?:>[ \t]*)*[=-]+[ \t]*$/u, "");
+    const id = /\^([A-Za-z0-9-]+)$/u.exec(raw);
+    if (!id) continue;
+    // The caret must follow whitespace. Without that `$x^2` reports the block
+    // `2`, `[^1` reports `1` and `[[a#^blk` reports `blk` -- six false
+    // identifiers in the corpus, all of them a caret inside another construct.
+    // A setext heading is the measured exception: `^blk` over `---` registers
+    // from column zero, where the same line alone registers nothing.
+    const before = raw[id.index - 1];
+    const setext = raw !== full;
+    if (!(setext && id.index === 0) && !(before && /\s/u.test(before))) {
+      continue;
+    }
+    blocks.push(
+      `${id[1]}@${atOffset(lineStart)}-${atPoint(child.position!.end)}`,
+    );
+  }
+
+  /**
+   * List items, as `listItems` reports them.
+   *
+   * `parent` is a real line number for a nested item -- its parent's -- and
+   * the negative of the line its list begins on for a root item, with a list
+   * on line 0 reported as -1 rather than -0. Seven probes agree, including one
+   * list starting on line 2 reported as -2.
+   *
+   * `task` is the character between the brackets rather than a boolean, so a
+   * custom marker survives; an item that is not a task has none.
+   */
+  const listItems: string[] = [];
+  // An item's span covers its own content only: `- a` over `  - b` ends at the
+  // `a`, not after the nested list, so the end comes from the last child that
+  // is not itself a list.
+  const itemEnd = (item: Node) => {
+    const children = (item as unknown as { children: Node[] }).children;
+    for (let index = children.length - 1; index >= 0; index--) {
+      const child = children[index]!;
+      if (child.type !== "list" && child.position) return child.position.end;
+    }
+    return item.position!.end;
+  };
+  const walkList = (list: Node, parent: number): void => {
+    for (const item of (list as unknown as { children: Node[] }).children) {
+      if (item.type !== "listItem" || !item.position) continue;
+      const marker = /^[-*+]\s*\[(.)\]/u.exec(
+        source.slice(item.position.start.offset!),
+      );
+      listItems.push(
+        `${marker ? JSON.stringify(marker[1]) : "-"}|parent:${parent}@${atPoint(item.position.start)}-${atPoint(itemEnd(item))}`,
+      );
+      const own = item.position.start.line - 1;
+      for (const nested of (item as unknown as { children: Node[] }).children) {
+        if (nested.type === "list") walkList(nested, own);
+      }
+    }
+  };
+  // Any list that is not itself inside an item, so a list in a blockquote is
+  // reached too -- looking only at the document's own children reported nothing
+  // at all for `> - a`.
+  visit(tree, "list", (node: Node, _index, parent) => {
+    if ((parent as Node | null)?.type === "listItem") return;
+    if (!node.position) return;
+    const line = node.position.start.line - 1;
+    walkList(node, line === 0 ? -1 : -line);
+  });
+
+  const yaml = tree.children.find((child) => child.type === "yaml");
+  const frontmatterPosition =
+    yaml?.position && yaml.position.start.offset !== undefined
+      ? spanOf(yaml)
+      : undefined;
+
+  return {
+    footnotes,
+    footnoteRefs,
+    headings,
+    sections,
+    links,
+    embeds,
+    tags,
+    blocks,
+    listItems,
+    ...(frontmatterPosition === undefined ? {} : { frontmatterPosition }),
   };
 }
