@@ -10,10 +10,10 @@
  *   80  @quartz-community/latex                       (renders only; see 3 below)
  *   90  @quartz-community/hard-line-breaks            remarkBreaks
  *
- * **Those first two are deliberately swapped from what Quartz ships today, and the
- * goldens assume the swap.** `remark-gfm` has to register *before* this package: a
- * combined micromark extension prepends its constructs, so for a code both claim
- * the later-registered plugin wins. With gfm second it owned `~` outright and
+ * **Those first two were swapped from Quartz's original 30/40, and the goldens
+ * assume the swap.** `remark-gfm` has to register *before* this package: a combined
+ * micromark extension prepends its constructs, so for a code both claim the
+ * later-registered plugin wins. With gfm second it owned `~` outright and
  * Obsidian's own strikethrough could not run at all — `legacyStrikethrough` was
  * dead code until this order changed.
  *
@@ -23,10 +23,10 @@
  * our wikilink). Adding the legacy tokenizer on top of it fixed 21 cases with 0
  * regressions.
  *
- * So `@quartz-community/obsidian-flavored-markdown` must order *after*
- * `@quartz-community/github-flavored-markdown` upstream. Until it does, this file
- * and Quartz disagree, and the goldens describe the chain Quartz should have rather
- * than the one it has.
+ * The swap has landed upstream, so this file and Quartz agree: both packages'
+ * `quartz.defaultOrder` were exchanged and `quartz.config.default.yaml` now lists
+ * gfm at 30 and this package at 40. A config that omits `order` gets the same
+ * result from the manifests alone.
  *
  * then `remarkRehype({allowDangerousHtml:true})` -> `rehypeRaw` -> `rehypeObsidian`.
  *
