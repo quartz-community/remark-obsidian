@@ -370,30 +370,32 @@ PARITY_REFEREE_DIR=/tmp/of/test/obsidian-answers \
   npx tsx --conditions=development test/parity/referee.mts
 ```
 
-It took this package from 41.1% to 59.0% agreement, and five of the rules in
+It took this package from 41.1% to 60.8% agreement, and six of the rules in
 `src/lib` exist because of it. What it reports now, and what is known about each
 remaining family:
 
-| disagreement            | count | state                                                             |
-| ----------------------- | ----: | ----------------------------------------------------------------- |
-| same names, wrong spans |   902 | definition spans; two families, both open — see below             |
-| reference set differs   |   825 | mostly cascades from a missing or invented definition             |
-| both sets differ        |   717 | as above, compounded                                              |
-| definition set differs  |   346 | the directly actionable bucket; 89.7% of documents already agree  |
-| our parse threw         |     2 | **unexamined**, and the only crash signal anywhere in the harness |
+| disagreement            | count | state                                                            |
+| ----------------------- | ----: | ---------------------------------------------------------------- |
+| same names, wrong spans |   776 | definition spans; the column family is the open one — see below  |
+| reference set differs   |   850 | mostly cascades from a missing or invented definition            |
+| both sets differ        |   693 | as above, compounded                                             |
+| definition set differs  |   346 | the directly actionable bucket; 89.7% of documents already agree |
 
-Reference _positions_ are essentially exact: across the whole corpus only three
-differ, and all three are known — one byte-order-mark document, and two of the
+Reference _positions_ are essentially exact: nine differ across the whole
+corpus, and the distinct causes are known — one byte-order-mark document, and two of the
 author's `P1`, where Obsidian's cache reports a column short by the width of a
 `%%` marker. Fixing those two would be a regression.
 
-Definition spans are the open ground, in two families measured at ~1160 together:
+Definition spans are the open ground, now ~810 across two families:
 
-- **End line** (~553). We absorb a line Obsidian does not. The clearest shape is
-  a definition in a nested quote followed by a deeper container —
-  `> > [^x]: body` / `> >  continuation` / `> > > [!note]` — where Obsidian ends
-  the definition before the callout and we take it in.
-- **Start column** (~477). Obsidian reports a column _short_ of where the `[`
+- **End line** (310, was ~553). Obsidian ends a definition at an unclosed opener
+  inside it while we let the construct run on. The trailing-blank half is fixed —
+  micromark let an unclosed indented fence consume the blank after it and grow the
+  span by a line — and `%%` and the remaining fence cases need their own evidence.
+  Group by the line _we wrongly include_ against the one _Obsidian ends on_:
+  grouping by what follows Obsidian's end reports "blank" for most of them
+  whatever the cause, and sent me after a rule the legacy stack then refused.
+- **Start column** (440, with 62 more differing on both ends). Obsidian reports a column _short_ of where the `[`
   actually is, by no constant amount: `    [^12]:` is column 2 to it and 4 to us,
   `- [ ]    [^x]:` is 6 against 9, `- [ ]  [^x]:` is 6 against 7. This may be a
   third instance of the class the author documented as `P1`/`P2` — a column
