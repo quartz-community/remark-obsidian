@@ -42,6 +42,20 @@ describe.skipIf(!goldens)("Obsidian parity", () => {
     expect(file.chain).toEqual(JSON.parse(JSON.stringify(CHAIN_MANIFEST)));
   });
 
+  /**
+   * Ids must be unique, and the failure mode is why this is its own test.
+   * `buildCorpus` deduplicates by markdown, so a collision leaves the case
+   * count looking right while the recorder -- which keys its output by id --
+   * silently overwrites one case with another. A harvest that restarted its
+   * numbering cost 174 cases their identity and their triage exactly that way.
+   */
+  it("gives every corpus case a unique id", () => {
+    const ids = buildCorpus().map((c) => c.id);
+    const seen = new Set<string>();
+    const collided = ids.filter((id) => !seen.add(id) || false);
+    expect(collided).toEqual([]);
+  });
+
   it("goldens cover the current corpus", () => {
     const corpusIds = buildCorpus().map((c) => c.id);
     const missing = corpusIds.filter((id) => !(id in file.cases));

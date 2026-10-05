@@ -87,7 +87,21 @@ const novel = forms.filter(
   (form) => !known.has(form) && !corpus.includes(JSON.stringify(form)),
 );
 
+/**
+ * Continue each category's numbering from what the corpus already holds.
+ *
+ * Restarting at one collides with an earlier harvest, and the collision is
+ * quiet in the worst way: `buildCorpus` deduplicates by markdown so the count
+ * looks right, while the recorder keys its output by id and silently
+ * overwrites. One sweep cost 174 cases their identity and their triage that
+ * way, and only the recorder's own "captured N of M" check caught it.
+ */
 const counts = new Map<string, number>();
+for (const match of corpus.matchAll(/"fuzz\/([a-z-]+)\/(\d+)"/gu)) {
+  const category = match[1]!;
+  const used = Number(match[2]);
+  counts.set(category, Math.max(counts.get(category) ?? 0, used));
+}
 const entries = novel.map((form) => {
   const category = categorise(form);
   const next = (counts.get(category) ?? 0) + 1;
@@ -97,10 +111,6 @@ const entries = novel.map((form) => {
 
 console.log(
   `${forms.length} forms in the report, ${novel.length} not already covered`,
-);
-console.log(
-  "by category: " +
-    JSON.stringify(Object.fromEntries([...counts].sort((a, b) => b[1] - a[1]))),
 );
 
 if (entries.length === 0) process.exit(0);

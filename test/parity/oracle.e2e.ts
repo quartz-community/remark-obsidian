@@ -574,13 +574,26 @@ describe("Obsidian parity oracle", () => {
     const unexpected: string[] = [];
     const corrections = new Map<string, string>();
 
+    const unopenable: string[] = [];
+
     for (const c of seeds) {
       const filePath = `${FIXTURE_DIR}/${caseFileName(c.id)}`;
-      await obsidianPage.openFile(filePath);
-      const readingText = (await browser.executeObsidian(
-        CAPTURE_READING_VIEW as never,
-        filePath,
-      )) as string;
+      // A fuzz-reduced document can be odd enough that Reading View never
+      // mounts a leaf for it -- `u)[[$[^]$]]` is one. That is a property of
+      // the viewer, not of the parse, and aborting the whole sweep over it
+      // throws away the cross-check for every other case.
+      let readingText: string;
+      try {
+        await obsidianPage.openFile(filePath);
+        readingText = (await browser.executeObsidian(
+          CAPTURE_READING_VIEW as never,
+          filePath,
+        )) as string;
+      } catch {
+        unopenable.push(c.id);
+        await browser.executeObsidian(CLOSE_NOTES as never);
+        continue;
+      }
 
       const raw = await browser.executeObsidian(
         CAPTURE as never,
@@ -614,6 +627,13 @@ describe("Obsidian parity oracle", () => {
         ` (${KNOWN_PROXY_DIVERGENCES.size} known display-only divergence(s))`,
     );
     for (const m of mismatches.slice(0, 15)) console.log(`  ! ${m}`);
+
+    if (unopenable.length > 0) {
+      console.log(
+        `  ${unopenable.length} case(s) Reading View would not open: ` +
+          unopenable.slice(0, 8).join(", "),
+      );
+    }
 
     if (unexpected.length > 0) {
       throw new Error(
