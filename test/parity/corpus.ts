@@ -51,6 +51,24 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
     "probe/inline-footnote/definition-first",
     "[^1]: body\n\nuse[^1] and ^[x]\n",
   ],
+  // `%%` is Obsidian's own construct, so the legacy stack cannot arbitrate it
+  // the way it settles a tab or a fence -- and inferring a rule from the
+  // recorded corpus instead went wrong once already: documents matching
+  // "`%%`, blank line, definition" looked like evidence for a blank-line
+  // terminator until `hunt/obsidian-comments/22` showed an unclosed `%%` at the
+  // top level running to end of file, blank lines and all. The apparent
+  // evidence was openers that were never openers (`%% %` holds a second `%`)
+  // and comments sitting inside a container.
+  //
+  // So these are recorded rather than reasoned. They isolate one question: what
+  // does a comment opened inside a quote do with the lines after it?
+  ["probe/quote-comment/crossing-definition", "> %%\n[^1]: def\n"],
+  ["probe/quote-comment/crossing-text", "> %%\ntext\n"],
+  ["probe/quote-comment/quoted-definition", "> %%\n> [^1]: def\n"],
+  ["probe/quote-comment/blank-then-definition", "> %%\n\n[^1]: def\n"],
+  ["probe/quote-comment/continues-then-blank", "> %%\n> more\n\n[^1]: def\n"],
+  ["probe/quote-comment/root-then-quoted", "%%\n> [^1]: def\n"],
+  ["probe/quote-comment/midline-opener", "> a %%\n[^1]: def\n"],
   // Enumerating Obsidian's tokenizers rather than sampling them found no
   // construct at zero coverage, but three were thin enough to be untested in
   // practice -- and bare autolinking is the risky one. remark-parse 8 has its

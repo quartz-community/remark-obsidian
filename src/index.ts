@@ -42,6 +42,7 @@ import { quoteTabTransform } from "./lib/quote-tab.js";
 import { paragraphMergeTransform } from "./lib/paragraph-merge.js";
 import { normalizePointsTransform } from "./lib/normalize-points.js";
 import { commentParseTransform } from "./lib/comment-parse.js";
+import { commentQuoteExtentTransform } from "./lib/comment-quote-extent.js";
 import {
   ensureLineOffsets,
   lineOffsetsFromMarkdown,
@@ -355,6 +356,10 @@ export default function remarkObsidian(
     // After the quote passes have settled the block, since this reads its lines.
     quoteTabTransform(tree, String(file));
     listTabTransform(tree, String(file));
+    // After the quote passes have settled the block, since this reads the
+    // quote's own extent, and before the footnote passes that would bind a
+    // definition it swallows.
+    if (opts.comments) commentQuoteExtentTransform(tree, String(file));
     // Before the footnote passes, so a definition this recovers is one they see.
     indentTabTransform(tree, String(file), (markdown) => reparse(markdown));
     definitionTabTransform(tree, String(file));

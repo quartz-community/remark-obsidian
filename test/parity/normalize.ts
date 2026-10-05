@@ -771,13 +771,15 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     // container the value has each line's `> ` stripped, so a value index no
     // longer tells you where the match sits and the reference lands at the
     // wrong column. A match in the slice is at a real offset by construction.
-    if (
-      node.type === "comment" &&
-      node.position?.start?.offset !== undefined &&
-      node.position?.end?.offset !== undefined
-    ) {
-      const from = node.position.start.offset;
-      const slice = source.slice(from, node.position.end.offset);
+    // Guarded on the type alone, so a comment without offsets still stops the
+    // walk. Requiring them meant one could fall through and have its children
+    // counted -- a definition inside a `%%` comment reported as defining, which
+    // is the opposite of the rule.
+    if (node.type === "comment") {
+      const from = node.position?.start?.offset;
+      const to = node.position?.end?.offset;
+      if (from === undefined || to === undefined) return SKIP;
+      const slice = source.slice(from, to);
       for (const match of slice.matchAll(/\[\^([^[\]\s]+)\]/gu)) {
         const id = match[1]!.toLowerCase();
         if (defined.has(id)) {
