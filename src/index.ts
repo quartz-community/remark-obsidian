@@ -48,6 +48,7 @@ import {
   lineOffsetsFromMarkdown,
 } from "./lib/mdast/line-offsets.js";
 import { definitionTabTransform } from "./lib/definition-tab.js";
+import { definitionTrimTransform } from "./lib/definition-trim.js";
 import { fenceOutlivesTransform } from "./lib/fence-outlives.js";
 import { mathOutlivesTransform } from "./lib/math-outlives.js";
 import { mathMidlineTransform } from "./lib/math-midline.js";
@@ -437,6 +438,9 @@ export default function remarkObsidian(
     if (opts.keepComments && opts.parseComments) {
       commentParseTransform(tree, String(file), reparse);
     }
+    // After every pass that can extend a definition, and before points are
+    // normalised from the offsets this corrects.
+    definitionTrimTransform(tree, String(file));
     // Last, so every pass above only has to keep its offsets honest.
     normalizePointsTransform(tree, String(file));
   };
