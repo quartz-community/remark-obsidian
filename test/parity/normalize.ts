@@ -212,6 +212,25 @@ export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
       case "footnote":
         parts.push("\u27e8fn\u27e9");
         return;
+      // An email autolink shows the address without its scheme: Obsidian
+      // renders `<mailto:a@e.test>` as `a@e.test`, while `<https://x>` keeps
+      // `https://` -- measured, and only `mailto:` is dropped.
+      case "link": {
+        const link = node as unknown as { url?: string; children?: Node[] };
+        const url = link.url ?? "";
+        const children = link.children ?? [];
+        const only = children.length === 1 ? children[0] : undefined;
+        if (
+          only &&
+          only.type === "text" &&
+          (only as ValueNode).value === url &&
+          url.startsWith("mailto:")
+        ) {
+          parts.push(url.slice("mailto:".length));
+          return;
+        }
+        break;
+      }
       default:
         break;
     }
