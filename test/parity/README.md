@@ -407,6 +407,33 @@ A corollary worth keeping: the letter-case hypothesis for this same bucket died 
 one measurement — **zero** documents differ only by case, because Obsidian
 lowercases a label exactly as mdast does (`[^Note]:` is recorded as `note`).
 
+### References, once the definitions agree
+
+Fixing the walk exposed the family underneath it: **1011** documents whose
+definitions now agree _exactly_ while their references do not. It splits 809 "we
+miss refs", 167 "we report extra", 27 both, and 8 same-name-different-column — so
+missing references are the largest open ground in this corpus.
+
+It is **not one rule**, and two attractive readings of it are already dead:
+
+- **Not undefined references being dropped.** 1131 of the 1157 missed names are
+  undefined, which looks decisive until you notice these fuzz documents define
+  almost nothing, so it is true of most references whatever the cause. Tested
+  directly instead: `text[^1]` with nothing defined still yields a reference node.
+  It has to — dropping a dangling reference from the tree is the renderer's job,
+  the same governing rule that keeps a surplus table cell and a colour marker.
+- **Not blockquotes.** `> text[^1]` places its reference correctly, defined or not.
+
+One narrow family _is_ confirmed: a reference nested in a link label.
+`a [text][[^9]] b` yields no reference where Obsidian indexes one, which is the
+same shape as the recorded rule that Obsidian indexes a reference in a link
+reference definition's **destination** (`[foo]: [^9]`).
+
+Grouping by the source line the missed reference sits on was too coarse to go
+further, because a fuzzed document stacks many constructs and the per-line shape
+attributes a miss to whichever construct happens to be on that line. A document
+holding exactly one candidate construct is what the next pass needs.
+
 Reference _positions_ are essentially exact: nine differ across the whole
 corpus, and the distinct causes are known — one byte-order-mark document, and two of the
 author's `P1`, where Obsidian's cache reports a column short by the width of a
