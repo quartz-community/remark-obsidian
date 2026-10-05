@@ -76,6 +76,7 @@ import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 import { calloutTransform } from "./lib/callout.js";
 import { commentHoistTransform } from "./lib/comment-hoist.js";
 import { commentTailTransform } from "./lib/comment-tail.js";
+import { commentDefinitionExtentTransform } from "./lib/comment-definition-extent.js";
 import { commentInDefinitionTransform } from "./lib/comment-in-definition.js";
 import { commentRegionTransform } from "./lib/comment-region.js";
 import { definitionContinuationTransform } from "./lib/definition-continuation.js";
@@ -309,6 +310,11 @@ export default function remarkObsidian(
       );
       // After the continuation pass, so a definition that already grew is the
       // one a stray `%%` gets folded back into.
+      // Before the pass that turns such a comment back into prose, which is
+      // what would otherwise leave nothing here to clamp.
+      commentDefinitionExtentTransform(tree, String(file), (markdown) =>
+        reparse(markdown),
+      );
       commentInDefinitionTransform(tree, String(file));
       visit(tree, "comment", (node: any) => {
         node.data = {

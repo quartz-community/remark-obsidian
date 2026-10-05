@@ -51,6 +51,21 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
     "probe/inline-footnote/definition-first",
     "[^1]: body\n\nuse[^1] and ^[x]\n",
   ],
+  // An unclosed `%%` inside a footnote definition: how far does it reach? The
+  // recorded corpus says Obsidian ends the definition *at* the `%%` line where
+  // we run past it, which would follow if the comment were bounded by the
+  // definition and the definition by its blank line -- the same shape as the
+  // quote rule. But `commentInDefinitionTransform` exists because a `%%` does
+  // *not* end a definition when the next line continues it lazily, so the two
+  // readings have to be separated by evidence rather than argument.
+  ["probe/definition-comment/blank-after", "[^1]: one\n%%\n\nuse[^1]\n"],
+  ["probe/definition-comment/lazy-after", "[^1]: one\n%%\nb\n"],
+  [
+    "probe/definition-comment/closed-then-blank",
+    "[^1]: one\n%% x %%\n\nuse[^1]\n",
+  ],
+  ["probe/definition-comment/indented-open", "[^1]: one\n    %%\n\nuse[^1]\n"],
+  ["probe/definition-comment/two-definitions", "[^1]: one\n%%\n\n[^2]: two\n"],
   // The column `metadataCache` reports for a definition is short of where the
   // `[` actually sits, by no constant amount: `    [^12]:` is column 2 to it and
   // 4 to us, `- [ ]    [^x]:` is 6 against 9, `- [ ]  [^x]:` is 6 against 7.
