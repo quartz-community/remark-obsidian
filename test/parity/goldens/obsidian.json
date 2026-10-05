@@ -14057,8 +14057,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "fuzz/highlight/46": {
       "id": "fuzz/highlight/46",
@@ -14220,8 +14220,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "fuzz/comment/10": {
       "id": "fuzz/comment/10",
@@ -15061,8 +15061,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "fuzz/callout/8": {
       "id": "fuzz/callout/8",
@@ -15728,8 +15728,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "fuzz/embed/78": {
       "id": "fuzz/embed/78",
@@ -16450,8 +16450,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "fuzz/table/13": {
       "id": "fuzz/table/13",
@@ -17621,8 +17621,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "fuzz/embed/90": {
       "id": "fuzz/embed/90",
@@ -20527,8 +20527,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "fuzz/highlight/63": {
       "id": "fuzz/highlight/63",
@@ -21395,8 +21395,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "fuzz/setext/5": {
       "id": "fuzz/setext/5",
@@ -21728,8 +21728,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "fuzz/math/15": {
       "id": "fuzz/math/15",
@@ -23859,8 +23859,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "fuzz/highlight/2": {
       "id": "fuzz/highlight/2",
@@ -24514,8 +24514,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "fuzz/footnote/3": {
       "id": "fuzz/footnote/3",
@@ -28249,8 +28249,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "fuzz/html/6": {
       "id": "fuzz/html/6",
@@ -28412,8 +28412,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "fuzz/embed/28": {
       "id": "fuzz/embed/28",
@@ -33957,8 +33957,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "fuzz/footnote/19": {
       "id": "fuzz/footnote/19",
@@ -58634,8 +58634,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "token/footnote-ref/doubled-close": {
       "id": "token/footnote-ref/doubled-close",
@@ -58823,8 +58823,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "report-upstream",
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
     },
     "token/footnote-ref/escaped-open": {
       "id": "token/footnote-ref/escaped-open",

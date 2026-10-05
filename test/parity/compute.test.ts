@@ -159,9 +159,17 @@ describe("positioned oracle", () => {
 
   /**
    * `footnotes` is dominated by the doubled inline opener: Obsidian consumes
-   * characters in `^[^[note]` and reports no footnote at all, which is the
-   * divergence the two `report-upstream` cases deliberately do not mirror, and
-   * the rest of that family is tracked as `replicate`.
+   * characters in `^[^[note]` and reports no footnote at all, showing the body as
+   * literal text. The whole family is `report-upstream` -- 18 cases, found by
+   * testing the signature rather than by listing ids: Obsidian's text is ours with
+   * the footnote placeholder replaced by the footnote's own body.
+   *
+   * They are not `replicate`, because no permissible fix reaches `match`.
+   * Suppressing our spurious `footnote` node would leave Obsidian's character drop
+   * behind, and reproducing that drop in the tree would let a formatter delete the
+   * author's `^[` and `]` -- the rule that also keeps a surplus table cell and a
+   * colour marker. Balance decides whether Obsidian forms one at all: `^[^[note]]`
+   * and `^[^[^[x]]]` close evenly and do match.
    *
    * `headings` is dominated by a raw HTML line over a setext underline —
    * `<br>` / `===` is a heading named `<br>` to Obsidian, while the html block

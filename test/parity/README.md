@@ -299,6 +299,37 @@ tracked separately from confirmed bugs.
 FrontMatter plugin, with `remark-frontmatter` absent from the pinned chain. Those
 cases would otherwise look like parity bugs forever.
 
+### When `replicate` is the wrong state
+
+`replicate` claims we intend to close the gap, so a case **no permissible fix can
+close** does not belong there — left alone it blocks the backlog forever while
+looking like ordinary debt.
+
+The worked example is the doubled inline-footnote opener. Obsidian consumes `^[` and
+its `]`, emits no footnote at all, and shows the body as literal text:
+
+| source       | Obsidian | us       |
+| ------------ | -------- | -------- |
+| `^[^[note]`  | `^[note` | `^[⟨fn⟩` |
+| `[^[^1]`     | `[^1`    | `[⟨fn⟩`  |
+| `^[^[note]]` | `⟨fn⟩`   | agrees   |
+
+The first was already `report-upstream` and the second was `replicate`, though they
+are the same thing: Obsidian drops characters and makes no node. Reaching `match`
+would need us to drop them too, and a formatter would then write the author's `^[`
+and `]` out of their file — the rule that also keeps a surplus table cell and a
+colour marker. Suppressing only our spurious node would not reach `match` either,
+since the character drop would remain. So the whole family is `report-upstream`: 18
+cases, all of which satisfy one mechanical signature — Obsidian's text is ours with
+the footnote placeholder replaced by that footnote's own body.
+
+Note what the third row shows: this is a real parse rule, not blanket breakage.
+Balance decides whether Obsidian forms a footnote at all, so `^[^[note]]` and
+`^[^[^[x]]]` close evenly and match outright.
+
+Re-triaging on this ground is only legitimate with the impossibility argument
+attached. Without one, moving a case out of `replicate` is just hiding it.
+
 ## When goldens drift
 
 The scheduled workflow never commits. It uploads the freshly recorded goldens as
