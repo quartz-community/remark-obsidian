@@ -370,16 +370,42 @@ PARITY_REFEREE_DIR=/tmp/of/test/obsidian-answers \
   npx tsx --conditions=development test/parity/referee.mts
 ```
 
-It took this package from 41.1% to 60.8% agreement, and six of the rules in
+It took this package from 41.1% to 61.8% agreement, and seven of the rules in
 `src/lib` exist because of it. What it reports now, and what is known about each
 remaining family:
 
 | disagreement            | count | state                                                            |
 | ----------------------- | ----: | ---------------------------------------------------------------- |
-| same names, wrong spans |   776 | definition spans; the column family is the open one — see below  |
-| reference set differs   |   850 | mostly cascades from a missing or invented definition            |
-| both sets differ        |   693 | as above, compounded                                             |
-| definition set differs  |   346 | the directly actionable bucket; 89.7% of documents already agree |
+| reference set differs   |  1003 | mostly cascades from a missing or invented definition            |
+| same names, wrong spans |   721 | definition spans; the column family is the open one — see below  |
+| both sets differ        |   538 | as above, compounded                                             |
+| definition set differs  |   340 | the directly actionable bucket; 90.0% of documents already agree |
+
+### A `%%` comment defines nothing, but its references still count
+
+Two opposite rules, and the referee needs both to measure anything here at all:
+
+- A **definition** inside a comment does not define.
+- A **reference** inside one is still indexed.
+
+The asymmetry is measured, not assumed. Across the 2119 corpus documents holding
+a `%%`, counting in-comment references makes **710** of them agree that would
+otherwise not, against **28** that agree only when those references are excluded —
+so the references are indexed and the 28 are a separate family.
+
+The definition half was a bug **in this measurement**, not in the package.
+`parseComments` puts a comment's body in its `children` as real nodes, so the
+referee's plain `visit` counted the buried definition and reported every such
+document as one where we invent a definition Obsidian lacks: **247** of them, none
+real. `normalize.ts`'s `definedFootnotes` had the rule right all along and the
+gate was never wrong. Fixing the walk moved 146 documents out of `both sets
+differ`, whose definition halves were already correct.
+
+That is the third time an oracle's first findings have included bugs in the oracle
+rather than the package, which is why a new one is measured before it is gated.
+A corollary worth keeping: the letter-case hypothesis for this same bucket died in
+one measurement — **zero** documents differ only by case, because Obsidian
+lowercases a label exactly as mdast does (`[^Note]:` is recorded as `note`).
 
 Reference _positions_ are essentially exact: nine differ across the whole
 corpus, and the distinct causes are known — one byte-order-mark document, and two of the

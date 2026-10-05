@@ -23,9 +23,13 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { visit } from "unist-util-visit";
-
 import { parseOurs } from "./chain.js";
+
+interface Point {
+  readonly line: number;
+  readonly column: number;
+  readonly offset?: number;
+}
 
 interface Entry {
   readonly id: string;
@@ -46,30 +50,56 @@ if (!fs.existsSync(dir)) {
   process.exit(0);
 }
 
-/** Our answer in the recorded shape: zero-based, and only what Obsidian records. */
+/**
+ * Our answer in the recorded shape: zero-based, and only what Obsidian records.
+ *
+ * A definition inside a `%%` comment does not define, while a reference inside
+ * one is still indexed -- `%%⏎[^1]: buried⏎%%⏎text[^1]` renders `text1`, so the
+ * reference resolves against nothing. Both halves are recorded rules, and the
+ * asymmetry is why this walks with a flag instead of pruning the subtree.
+ *
+ * It has to be stated here because `parseComments` puts a comment's body in its
+ * `children` as real nodes, so a plain `visit` counts the buried definition and
+ * reports every such document as one where we invent a definition Obsidian
+ * lacks. That was 247 of this corpus's disagreements and none of them were real.
+ */
 function ours(text: string) {
   const tree = parseOurs(text, "all-features");
   const defs: [string, number, number, number][] = [];
   const refs: [string, number, number][] = [];
   let unplaced = 0;
-  visit(tree, (node) => {
-    const at = node.position;
-    const id = () =>
-      String((node as unknown as { identifier: string }).identifier);
-    if (node.type === "footnoteDefinition") {
-      if (!at) unplaced++;
-      else
-        defs.push([
-          id(),
-          at.start.line - 1,
-          at.start.column - 1,
-          at.end.line - 1,
-        ]);
-    } else if (node.type === "footnoteReference") {
+
+  const walk = (node: unknown, inComment: boolean): void => {
+    const candidate = node as {
+      type?: string;
+      identifier?: string;
+      position?: { start: Point; end: Point };
+      children?: unknown[];
+    };
+    const at = candidate.position;
+    const id = () => String(candidate.identifier);
+
+    if (candidate.type === "footnoteDefinition") {
+      if (!inComment) {
+        if (!at) unplaced++;
+        else
+          defs.push([
+            id(),
+            at.start.line - 1,
+            at.start.column - 1,
+            at.end.line - 1,
+          ]);
+      }
+    } else if (candidate.type === "footnoteReference") {
       if (!at) unplaced++;
       else refs.push([id(), at.start.line - 1, at.start.column - 1]);
     }
-  });
+
+    const buried = inComment || candidate.type === "comment";
+    for (const child of candidate.children ?? []) walk(child, buried);
+  };
+
+  walk(tree, false);
   return { defs, refs, unplaced };
 }
 
