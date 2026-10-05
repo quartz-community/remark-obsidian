@@ -484,6 +484,32 @@ Definition spans are the open ground, now ~810 across two families:
   pattern-matched corpus data has already produced a wrong answer once, which is
   why the `%%` rules in `corpus.ts` are recorded instead.
 
+## The legacy stack is an arbiter, not an oracle
+
+Obsidian runs a **fork** of `remark-parse@8`, so a local install of
+`remark-parse@8.0.3` + `remark-footnotes@2` + `remark-math@3` settles most
+core-Markdown questions the recorded corpus cannot — but it is not the authority.
+Where the two disagree, **the goldens win**.
+
+That distinction is not academic; ignoring it cost a whole implementation. Stock
+remark-parse 8 takes its escape list from `markdown-escapes`, whose `defaults` plus
+gfm's `~` and `|` come to 18 characters, and the legacy stack confirms it character
+by character: `a \& b` keeps its backslash there, where micromark escapes every
+ASCII punctuation mark. Replacing micromark's `characterEscape` with that shorter
+list produced **27 regressions and 0 fixes** — `\$`, `\==`, `\%%`, `\$$` and three
+of CommonMark's own backslash-escape examples all stopped matching.
+
+So Obsidian's fork escapes `$`, `=` and `%`, which stock's list excludes: its escape
+set is CommonMark's, and ours already agreed. The 21 backslash cases that prompted
+this have narrower causes — a wikilink's content and strikethrough's closing run —
+not a global escape set.
+
+Two lessons worth keeping. A rule the arbiter confirms can still be wrong about
+Obsidian, so **measure before keeping, with regressions counted and not just
+fixes**. And micromark's combined extensions **prepend**, so a construct returning
+`nok` does not win — it falls through to the stock construct, which here undid the
+entire change. `legacy-emphasis.ts` documents the same trap for attention.
+
 ## Files
 
 | File                    | Role                                         |
