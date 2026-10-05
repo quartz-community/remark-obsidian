@@ -15680,8 +15680,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rendering a wikilink's heading as written: a trailing backslash is dropped from the resolved heading but kept in the displayed value, the pair the path already had."
     },
     "fuzz/inline-footnote/21": {
       "id": "fuzz/inline-footnote/21",
@@ -16556,8 +16556,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rendering a wikilink's heading as written: a trailing backslash is dropped from the resolved heading but kept in the displayed value, the pair the path already had."
     },
     "fuzz/embed/82": {
       "id": "fuzz/embed/82",
@@ -18336,8 +18336,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rendering a wikilink's heading as written: a trailing backslash is dropped from the resolved heading but kept in the displayed value, the pair the path already had."
     },
     "fuzz/embed/94": {
       "id": "fuzz/embed/94",
@@ -18800,8 +18800,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rendering a wikilink's heading as written: a trailing backslash is dropped from the resolved heading but kept in the displayed value, the pair the path already had."
     },
     "fuzz/embed/99": {
       "id": "fuzz/embed/99",
@@ -20660,8 +20660,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rendering a wikilink's heading as written: a trailing backslash is dropped from the resolved heading but kept in the displayed value, the pair the path already had."
     },
     "fuzz/embed/111": {
       "id": "fuzz/embed/111",
@@ -20718,8 +20718,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rendering a wikilink's heading as written: a trailing backslash is dropped from the resolved heading but kept in the displayed value, the pair the path already had."
     },
     "fuzz/table/16": {
       "id": "fuzz/table/16",
@@ -26259,8 +26259,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rendering a wikilink's heading as written: a trailing backslash is dropped from the resolved heading but kept in the displayed value, the pair the path already had."
     },
     "fuzz/footnote/7": {
       "id": "fuzz/footnote/7",
@@ -27506,8 +27506,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rendering a wikilink's heading as written: a trailing backslash is dropped from the resolved heading but kept in the displayed value, the pair the path already had."
     },
     "fuzz/comment/4": {
       "id": "fuzz/comment/4",
@@ -29839,8 +29839,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rendering a wikilink's heading as written: a trailing backslash is dropped from the resolved heading but kept in the displayed value, the pair the path already had."
     },
     "fuzz/embed/38": {
       "id": "fuzz/embed/38",
@@ -30069,8 +30069,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rendering a wikilink's heading as written: a trailing backslash is dropped from the resolved heading but kept in the displayed value, the pair the path already had."
     },
     "fuzz/tag/4": {
       "id": "fuzz/tag/4",
@@ -31046,8 +31046,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rendering a wikilink's heading as written: a trailing backslash is dropped from the resolved heading but kept in the displayed value, the pair the path already had."
     },
     "fuzz/table/6": {
       "id": "fuzz/table/6",
@@ -31604,8 +31604,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rendering a wikilink's heading as written: a trailing backslash is dropped from the resolved heading but kept in the displayed value, the pair the path already had."
     },
     "fuzz/highlight/26": {
       "id": "fuzz/highlight/26",
@@ -58246,8 +58246,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by rendering a wikilink's heading as written: a trailing backslash is dropped from the resolved heading but kept in the displayed value, the pair the path already had."
     },
     "token/wikilink-heading/both-escaped": {
       "id": "token/wikilink-heading/both-escaped",
