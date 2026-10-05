@@ -51,6 +51,24 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
     "probe/inline-footnote/definition-first",
     "[^1]: body\n\nuse[^1] and ^[x]\n",
   ],
+  // The column `metadataCache` reports for a definition is short of where the
+  // `[` actually sits, by no constant amount: `    [^12]:` is column 2 to it and
+  // 4 to us, `- [ ]    [^x]:` is 6 against 9, `- [ ]  [^x]:` is 6 against 7.
+  // That is ~500 of the recorded corpus's span disagreements and the largest
+  // family left. What a cache reports is not something the legacy stack can
+  // arbitrate, so these span indentation and container type to pin the
+  // convention -- or to show it is a defect like the author's `P1`/`P2`, in which
+  // case reproducing it would be wrong.
+  ["probe/definition-column/flush", "[^1]: def\n"],
+  ["probe/definition-column/one-space", " [^1]: def\n"],
+  ["probe/definition-column/two-spaces", "  [^1]: def\n"],
+  ["probe/definition-column/three-spaces", "   [^1]: def\n"],
+  ["probe/definition-column/in-quote", "> [^1]: def\n"],
+  ["probe/definition-column/in-quote-padded", ">  [^1]: def\n"],
+  ["probe/definition-column/in-list", "- [^1]: def\n"],
+  ["probe/definition-column/in-list-padded", "-  [^1]: def\n"],
+  ["probe/definition-column/in-task", "- [ ] [^1]: def\n"],
+  ["probe/definition-column/in-task-padded", "- [ ]  [^1]: def\n"],
   // `%%` is Obsidian's own construct, so the legacy stack cannot arbitrate it
   // the way it settles a tab or a fence -- and inferring a rule from the
   // recorded corpus instead went wrong once already: documents matching

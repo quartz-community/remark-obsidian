@@ -182,6 +182,16 @@ describe("positioned oracle", () => {
    * `tags`: a tag we miss entirely inside a callout or after a tab, and one
    * whose column is short by a nested quote's prefix.
    *
+   * `footnotes` and `sections` each carry the ten `probe/definition-column`
+   * cases, which match on every other projection and differ only on the column a
+   * definition reports. That column is where the containing block's content
+   * begins -- `   [^1]:` is 0 whatever the indent, `>  [^1]:` is 2, `-  [^1]:` is
+   * 3, `- [ ]  [^1]:` is 6 -- and it is deliberately not reproduced: the node has
+   * to keep pointing at the `[` so a consumer can edit by offset. A projection
+   * modelled on container prefix plus checkbox fits all ten probes and still
+   * fails real documents, where `    [^Note]:` reports 4 rather than 0, so the
+   * convention is only partly understood and guessing it would be worse.
+   *
    * `blocks` fell from 15 once twelve probes settled its rule: the caret must
    * follow whitespace, which is why `^blk` alone registers nothing and ` ^blk`
    * registers, and why `$x^2`, `[^1` and `[[a#^blk` are not identifiers at all.
@@ -202,10 +212,10 @@ describe("positioned oracle", () => {
    * these are out of reach here rather than unimplemented.
    */
   const CEILING = {
-    footnotes: 42,
+    footnotes: 47,
     footnoteRefs: 2,
     headings: 25,
-    sections: 164,
+    sections: 167,
     links: 103,
     embeds: 41,
     tags: 16,

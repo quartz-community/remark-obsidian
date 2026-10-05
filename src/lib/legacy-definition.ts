@@ -331,6 +331,13 @@ export function legacyDefinitionPromoteTransform(
 
       const match = matchLegacyDefinition(source.slice(start, end));
       if (!match) continue;
+      // A `^` label is never a link reference definition. `remark-footnotes`
+      // registers its block tokenizer ahead of `definition` in the legacy stack,
+      // so it claims `[^1]: def` first -- `- [ ] [^1]: def` is a
+      // `footnoteDefinition` there, where promoting it here produced a
+      // `definition` named `^1` and lost the footnote entirely. The nested
+      // bracket this pass exists for, `[a[b]: /url`, is untouched.
+      if (match.identifier.startsWith("^")) continue;
 
       const split = start + match.length;
       const definition: Definition = {
