@@ -81,24 +81,78 @@ export function bareFootnoteRefTransform(tree: Root, source = ""): void {
 
     const from = text.position?.start?.offset;
     const to = text.position?.end?.offset;
+    const startPoint = text.position?.start;
     const slice =
       source && from !== undefined && to !== undefined
         ? source.slice(from, to)
         : "";
     const aligned = slice ? alignToSource(slice, text.value) : null;
 
+    /**
+     * Where a value index sits in the document.
+     *
+     * A spliced node has to carry a position: without one a formatter cannot
+     * place its edit, and the metadata oracle comparing a reference's line and
+     * column against Obsidian's own answer has nothing to compare. `at[]` maps
+     * a value index to its source offset, so the span is exact rather than
+     * estimated -- including inside a folded paragraph, where one text node
+     * spans several lines.
+     */
+    const pointAt =
+      aligned && from !== undefined && startPoint
+        ? (valueIndex: number) => {
+            const sliceIndex = aligned.at[valueIndex] ?? slice.length;
+            const before = slice.slice(0, sliceIndex);
+            const lastBreak = before.lastIndexOf("\n");
+            const newlines = before.split("\n").length - 1;
+            return {
+              line: startPoint.line + newlines,
+              // After a line break the next character is column 1, so the
+              // distance from the break is the column; on the node's own first
+              // line the column continues from where the node started.
+              column:
+                newlines === 0
+                  ? startPoint.column + sliceIndex
+                  : sliceIndex - lastBreak,
+              offset: from + sliceIndex,
+            };
+          }
+        : null;
+
+    const positioned = <T extends Node>(
+      candidate: T,
+      valueFrom: number,
+      valueTo: number,
+    ): T => {
+      if (pointAt) {
+        candidate.position = {
+          start: pointAt(valueFrom),
+          end: pointAt(valueTo),
+        };
+      }
+      return candidate;
+    };
+
     const parts: Node[] = [];
     let cursor = 0;
     REFERENCE.lastIndex = 0;
 
-    const pushText = (value: string): void => {
-      if (value === "") return;
+    const pushText = (valueFrom: number, valueTo: number): void => {
+      if (valueTo <= valueFrom) return;
+      const value = text.value.slice(valueFrom, valueTo);
       const previous = parts[parts.length - 1];
       if (previous && previous.type === "text") {
         (previous as Text).value += value;
+        // Merged text keeps the earlier start and takes the later end, so the
+        // joined node still reproduces its own source slice.
+        if (pointAt && previous.position) {
+          previous.position.end = pointAt(valueTo);
+        }
         return;
       }
-      parts.push({ type: "text", value } as Text);
+      parts.push(
+        positioned({ type: "text", value } as Text, valueFrom, valueTo),
+      );
     };
 
     for (
@@ -124,17 +178,23 @@ export function bareFootnoteRefTransform(tree: Root, source = ""): void {
             .replace(/\\(?=[!-/:-@[-`{-~])/gu, "\\")
         : name;
       const identifier = written.toLowerCase();
-      pushText(text.value.slice(cursor, match.index));
-      parts.push({
-        type: "footnoteReference",
-        identifier,
-        label: written,
-      } as unknown as FootnoteReference);
+      pushText(cursor, match.index);
+      parts.push(
+        positioned(
+          {
+            type: "footnoteReference",
+            identifier,
+            label: written,
+          } as unknown as FootnoteReference,
+          match.index,
+          match.index + match[0].length,
+        ),
+      );
       cursor = match.index + match[0].length;
     }
 
     if (parts.length === 0) return;
-    pushText(text.value.slice(cursor));
+    pushText(cursor, text.value.length);
     if (!parent || typeof index !== "number") return;
 
     (parent as ParentNode).children.splice(index, 1, ...parts);

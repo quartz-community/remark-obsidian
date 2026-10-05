@@ -1,4 +1,6 @@
-import type { Paragraph, Root, Text } from "mdast";
+import type { Break, Paragraph, Root, Text } from "mdast";
+
+import { span } from "./normalize-points.js";
 
 interface CommentNode {
   readonly type: "comment";
@@ -51,11 +53,28 @@ export function commentInDefinitionTransform(tree: Root, source: string): void {
     const from = last.position?.start?.offset;
     const to = last.position?.end?.offset;
     definition.children.pop();
-    host.children.push({ type: "break" }, {
-      type: "text",
-      value:
-        from === undefined || to === undefined ? "%%" : source.slice(from, to),
-    } as Text);
+    // The text covers the comment's own span, so it reproduces the characters
+    // it claims; the break covers the newline before it.
+    host.children.push(
+      span<Break>(
+        { type: "break" },
+        source,
+        from === undefined ? undefined : from - 1,
+        from,
+      ),
+      span<Text>(
+        {
+          type: "text",
+          value:
+            from === undefined || to === undefined
+              ? "%%"
+              : source.slice(from, to),
+        } as Text,
+        source,
+        from,
+        to,
+      ),
+    );
 
     // Then every block the comment cut loose, while each is still lazy
     // continuation: one newline between, never a blank line.
@@ -71,7 +90,10 @@ export function commentInDefinitionTransform(tree: Root, source: string): void {
       ) {
         break;
       }
-      host.children.push({ type: "break" }, ...next.children);
+      host.children.push(
+        span<Break>({ type: "break" }, source, gapFrom, gapTo),
+        ...next.children,
+      );
       if (definition.position && next.position) {
         definition.position.end = { ...next.position.end };
       }

@@ -4,9 +4,12 @@ import type {
   PhrasingContent,
   Root,
   RootContent,
+  Text,
 } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
+
+import { span } from "./normalize-points.js";
 
 const WHITESPACE = /\s/u;
 
@@ -255,7 +258,14 @@ export function legacyDefinitionTransform(
       let offset = start;
       for (const line of source.slice(start, end).split("\n")) {
         if (children.length > 0) {
-          children.push({ type: "text", value: "\n" } as PhrasingContent);
+          children.push(
+            span<Text>(
+              { type: "text", value: "\n" } as Text,
+              source,
+              offset - 1,
+              offset,
+            ) as PhrasingContent,
+          );
         }
         const block = reparse(line).children[0];
         if (block?.type === "paragraph") {
@@ -264,7 +274,18 @@ export function legacyDefinitionTransform(
           }
           children.push(...block.children);
         } else {
-          children.push({ type: "text", value: line } as PhrasingContent);
+          // A line that is still not a paragraph on its own -- `[o]:[^1]` parses
+          // as a definition again -- keeps its text verbatim, and that text is
+          // what the bare-reference pass reads a label's span out of. Unplaced,
+          // it left every reference the line carries unplaceable too.
+          children.push(
+            span<Text>(
+              { type: "text", value: line } as Text,
+              source,
+              offset,
+              offset + line.length,
+            ) as PhrasingContent,
+          );
         }
         offset += line.length + 1;
       }

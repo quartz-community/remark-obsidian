@@ -1,6 +1,8 @@
-import type { Paragraph, Root, RootContent } from "mdast";
+import type { Break, Paragraph, Root, RootContent } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
+
+import { span } from "./normalize-points.js";
 
 /**
  * Two paragraphs with a single newline between them are one paragraph.
@@ -29,8 +31,10 @@ export function paragraphMergeTransform(tree: Root, source: string): void {
       if (end === undefined || start === undefined) continue;
       if (source.slice(end, start) !== "\n") continue;
 
+      // The break *is* the newline between the two paragraphs, which this pass
+      // has already read to decide they merge at all.
       (first as Paragraph).children.push(
-        { type: "break" },
+        span<Break>({ type: "break" }, source, end, start),
         ...(second as Paragraph).children,
       );
       if (first.position && second.position?.end) {

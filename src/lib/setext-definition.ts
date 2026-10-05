@@ -2,6 +2,8 @@ import type { Heading, Root, RootContent, Text } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 
+import { span } from "./normalize-points.js";
+
 interface ParentNode extends Node {
   children: RootContent[];
 }
@@ -67,10 +69,22 @@ export function setextDefinitionTransform(tree: Root, source: string): void {
         .map((line) => line.replace(QUOTE_PREFIX, ""))
         .join("\n");
 
+      // The bare-reference pass reads a label's written form out of the source
+      // through its host's span, so a `[^1]` inside this heading is placeable
+      // only if the text carrying it is. The span ends before the underline,
+      // the one line the heading's text does not include.
+      const contentEnd = start + lines.slice(0, -1).join("\n").length;
       const heading: Heading = {
         type: "heading",
         depth: marker.startsWith("=") ? 1 : 2,
-        children: [{ type: "text", value: content } as Text],
+        children: [
+          span<Text>(
+            { type: "text", value: content } as Text,
+            source,
+            start,
+            contentEnd,
+          ),
+        ],
       };
       if (definition.position) {
         heading.position = {

@@ -1,4 +1,6 @@
-import type { Paragraph, Root, RootContent } from "mdast";
+import type { Break, Paragraph, Root, RootContent, Text } from "mdast";
+
+import { span } from "./normalize-points.js";
 
 /**
  * A footnote definition may not interrupt a paragraph.
@@ -76,10 +78,19 @@ function fold(children: RootContent[], source: string): void {
       continue;
     }
 
+    const breakFrom = previous.position?.end?.offset;
     if (single) {
+      // The label as written, not as folded: the identifier mdast carries is
+      // lowercased, so rebuilding the text from it renamed `[^Note]` to
+      // `[^note]` and left the node unable to reproduce its own span.
+      const bodyFrom = (body[0] as Paragraph).position?.start?.offset;
+      const written =
+        source !== "" && from !== undefined && bodyFrom !== undefined
+          ? source.slice(from, bodyFrom)
+          : `[^${node.identifier}]: `;
       host.children.push(
-        { type: "break" },
-        { type: "text", value: `[^${node.identifier}]: ` },
+        span<Break>({ type: "break" }, source, breakFrom, from),
+        span<Text>({ type: "text", value: written }, source, from, bodyFrom),
         ...(body[0] as Paragraph).children,
       );
     } else {
@@ -87,8 +98,13 @@ function fold(children: RootContent[], source: string): void {
       // does not need one: the whole thing is prose to it, so the source goes
       // back verbatim and the bare-reference pass reduces the label as usual.
       host.children.push(
-        { type: "break" },
-        { type: "text", value: source.slice(from!, to!) },
+        span<Break>({ type: "break" }, source, breakFrom, from),
+        span<Text>(
+          { type: "text", value: source.slice(from!, to!) },
+          source,
+          from,
+          to,
+        ),
       );
     }
     for (const container of [host, previous]) {

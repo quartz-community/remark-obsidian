@@ -1,4 +1,14 @@
-import type { Paragraph, PhrasingContent, Root, RootContent } from "mdast";
+import type {
+  Break,
+  Paragraph,
+  PhrasingContent,
+  Root,
+  RootContent,
+  Text,
+} from "mdast";
+
+import { mapLines, shiftByMap } from "./line-map.js";
+import { span } from "./normalize-points.js";
 /**
  * A table's header and delimiter rows must agree on the leading pipe.
  *
@@ -47,13 +57,41 @@ export function tablePipeStyleTransform(
       if (header === undefined || delimiter === undefined) continue;
       if (piped(header) === piped(delimiter)) continue;
 
+      // Each line is parsed on its own, so its nodes come back numbered from
+      // the start of that line and have to be placed back on the document.
+      // Spliced unshifted they claimed the top of the file -- worse than having
+      // no position, because an offset that is merely wrong still looks usable.
       const children: PhrasingContent[] = [];
-      for (const line of lines) {
-        if (children.length > 0) children.push({ type: "break" });
-        const parsed = reparse(line);
+      let lineFrom = lineStart;
+      const startLine = table.position!.start.line;
+      for (const [offset, line] of lines.entries()) {
+        if (children.length > 0) {
+          children.push(
+            span<Break>({ type: "break" }, source, lineFrom - 1, lineFrom),
+          );
+        }
+        const map = mapLines(
+          source,
+          lineFrom,
+          lineFrom + line.length,
+          startLine + offset,
+        );
+        const parsed = reparse(map.text);
         const block = parsed.children[0];
-        if (block?.type === "paragraph") children.push(...block.children);
-        else children.push({ type: "text", value: line });
+        if (block?.type === "paragraph") {
+          for (const child of block.children) shiftByMap(child, map, 0);
+          children.push(...block.children);
+        } else {
+          children.push(
+            span<Text>(
+              { type: "text", value: line },
+              source,
+              lineFrom,
+              lineFrom + line.length,
+            ),
+          );
+        }
+        lineFrom += line.length + 1;
       }
 
       const paragraph: Paragraph = {
