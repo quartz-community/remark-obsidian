@@ -27841,8 +27841,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by reading a tab after a quote marker as indentation: `remark-parse@8` consumes the `>` and at most one space, so the tab survives and makes the line indented code."
     },
     "fuzz/highlight/16": {
       "id": "fuzz/highlight/16",
@@ -30793,8 +30793,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by reading a tab after a quote marker as indentation: `remark-parse@8` consumes the `>` and at most one space, so the tab survives and makes the line indented code."
     },
     "fuzz/embed/49": {
       "id": "fuzz/embed/49",

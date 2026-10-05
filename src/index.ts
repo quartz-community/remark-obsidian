@@ -36,6 +36,7 @@ import { inlineFootnoteInertTransform } from "./lib/inline-footnote-inert.js";
 import { inlineRefoldTransform } from "./lib/inline-refold.js";
 import { containerLazyTransform } from "./lib/container-lazy.js";
 import { quoteMergeTransform } from "./lib/quote-merge.js";
+import { quoteTabTransform } from "./lib/quote-tab.js";
 import { paragraphMergeTransform } from "./lib/paragraph-merge.js";
 import { normalizePointsTransform } from "./lib/normalize-points.js";
 import { commentParseTransform } from "./lib/comment-parse.js";
@@ -349,6 +350,8 @@ export default function remarkObsidian(
     );
     containerLazyTransform(tree, String(file));
     quoteMergeTransform(tree, String(file));
+    // After the quote passes have settled the block, since this reads its lines.
+    quoteTabTransform(tree, String(file));
     definitionTabTransform(tree, String(file));
     // Before the bare-reference pass: a `[^1]` the fence swallows is code, and
     // code is literal, so it must stop looking like a reference first.
