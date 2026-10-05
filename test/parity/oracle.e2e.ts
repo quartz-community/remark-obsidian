@@ -95,9 +95,8 @@ const CAPTURE = async (
       const embedded = !el.classList.contains("internal-link");
       if (embedded && el.parentElement?.closest(".internal-embed")) continue;
       const target =
-        (embedded
-          ? el.getAttribute("src")
-          : el.getAttribute("data-href")) ?? "";
+        (embedded ? el.getAttribute("src") : el.getAttribute("data-href")) ??
+        "";
       const hash = target.indexOf("#");
       links.push({
         path: hash === -1 ? target : target.slice(0, hash),
