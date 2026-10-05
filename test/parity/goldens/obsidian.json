@@ -9841,8 +9841,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "block-ref/on-setext": {
       "id": "block-ref/on-setext",
@@ -10100,8 +10099,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "wikilink/heading-chain": {
       "id": "wikilink/heading-chain",
@@ -10803,8 +10801,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "embed/pdf-page": {
       "id": "embed/pdf-page",
@@ -10845,8 +10842,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "embed/pdf-height": {
       "id": "embed/pdf-height",
@@ -10887,8 +10883,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "embed/pdf-page-with-size": {
       "id": "embed/pdf-page-with-size",
@@ -10929,8 +10924,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "embed/block-list-transclusion": {
       "id": "embed/block-list-transclusion",
@@ -10971,8 +10965,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "embed/wikilink-in-alias": {
       "id": "embed/wikilink-in-alias",
@@ -11055,8 +11048,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "embed/unclosed": {
       "id": "embed/unclosed",
@@ -11610,8 +11602,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "callout/type-inner-whitespace": {
       "id": "callout/type-inner-whitespace",
@@ -11821,8 +11812,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "callout/type-with-spaces": {
       "id": "callout/type-with-spaces",

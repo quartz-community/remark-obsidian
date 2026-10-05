@@ -112,11 +112,14 @@ export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
         // `value` is the display form the parser resolved, which can differ from
         // `path`: `[[target\]]` resolves to `target` but shows `target\`.
         parts.push(
-          link.value ||
-            (link.embedded
-              ? link.path
-              : link.alias ||
-                [link.path, link.heading].filter(Boolean).join(" > ")),
+          link.embedded
+            ? // An unresolved embed shows the target as written, fragment and
+              // all: `![[Document.pdf#page=3]]` reads `Document.pdf#page=3`,
+              // where a plain link would read only its path.
+              [link.path, link.heading].filter(Boolean).join("#")
+            : link.value ||
+                link.alias ||
+                [link.path, link.heading].filter(Boolean).join(" > "),
         );
         return;
       }
@@ -176,7 +179,10 @@ export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
         };
         const children = callout.children ?? [];
         if (!children.some((c) => c.type === "calloutTitle")) {
-          const type = callout.calloutType;
+          // Humanised, not merely capitalised: `[!NOTE]` reads "Note" and
+          // `[!project-status]` reads "Project status", so the rest is
+          // lowercased and hyphens become spaces.
+          const type = callout.calloutType.toLowerCase().replace(/-/gu, " ");
           parts.push(`${type.charAt(0).toUpperCase()}${type.slice(1)} `);
         }
         for (const child of children) walk(child);
@@ -505,14 +511,20 @@ function stripBlockIds(tree: Root): Root {
 
     for (let index = parent.children.length - 1; index >= 0; index--) {
       const child = parent.children[index]!;
-      if (child.type !== "paragraph") continue;
+      // A heading carries one as readily as a paragraph: `## Heading ^id`.
+      if (child.type !== "paragraph" && child.type !== "heading") continue;
       const inner = (child as ParentNode).children;
       const last = inner[inner.length - 1];
       if (!last || last.type !== "text") continue;
       const value = (last as ValueNode).value;
 
-      // A paragraph that is only an identifier is not a block at all.
-      if (inner.length === 1 && ONLY_BLOCK_ID.test(value)) {
+      // A paragraph that is only an identifier is not a block at all. A
+      // heading always is one, however little is left of it.
+      if (
+        child.type === "paragraph" &&
+        inner.length === 1 &&
+        ONLY_BLOCK_ID.test(value)
+      ) {
         parent.children.splice(index, 1);
         continue;
       }
@@ -521,8 +533,6 @@ function stripBlockIds(tree: Root): Root {
     }
   });
 
-  // A heading carries one too, and its name is sliced from the source rather
-  // than read off its children, so it is handled where that slicing happens.
   return tree;
 }
 
