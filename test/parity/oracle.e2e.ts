@@ -76,29 +76,33 @@ const CAPTURE = async (
       };
     });
 
-    const links = Array.from(root.querySelectorAll("a.internal-link")).map(
-      (el) => {
-        const href = el.getAttribute("data-href") ?? "";
-        const hash = href.indexOf("#");
-        return {
-          path: hash === -1 ? href : href.slice(0, hash),
-          heading: hash === -1 ? "" : href.slice(hash + 1),
-          embedded: false,
-        };
-      },
-    );
-
-    // Only source-level embeds count. A transcluded note renders its own embeds
-    // inside the outer one, and a self-embed nests several deep, so counting
-    // descendants would report three embeds for a single `![[ ]]`.
-    for (const el of Array.from(root.querySelectorAll(".internal-embed"))) {
-      if (el.parentElement?.closest(".internal-embed")) continue;
-      const src = el.getAttribute("src") ?? "";
-      const hash = src.indexOf("#");
+    // One query, so the list comes back in document order. Collecting links
+    // and embeds separately put every link before every embed regardless of
+    // where they sat, which made 46 cases differ on ordering alone while both
+    // sides had found exactly the same targets.
+    //
+    // Only source-level embeds count. A transcluded note renders its own
+    // embeds inside the outer one, and a self-embed nests several deep, so
+    // counting descendants would report three embeds for a single `![[ ]]`.
+    const links: Array<{
+      path: string;
+      heading: string;
+      embedded: boolean;
+    }> = [];
+    for (const el of Array.from(
+      root.querySelectorAll("a.internal-link, .internal-embed"),
+    )) {
+      const embedded = !el.classList.contains("internal-link");
+      if (embedded && el.parentElement?.closest(".internal-embed")) continue;
+      const target =
+        (embedded
+          ? el.getAttribute("src")
+          : el.getAttribute("data-href")) ?? "";
+      const hash = target.indexOf("#");
       links.push({
-        path: hash === -1 ? src : src.slice(0, hash),
-        heading: hash === -1 ? "" : src.slice(hash + 1),
-        embedded: true,
+        path: hash === -1 ? target : target.slice(0, hash),
+        heading: hash === -1 ? "" : target.slice(hash + 1),
+        embedded,
       });
     }
 
