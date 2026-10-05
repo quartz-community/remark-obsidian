@@ -1,5 +1,10 @@
 import type { Options, State } from "mdast-util-to-markdown";
 import type { Parents } from "mdast";
+// `tableCell` reaches `ConstructName` only through this package's declaration
+// merging, so the augmentation has to be in scope here. `npm run typecheck`
+// pulls it in transitively and passed without this; the `tsup` dts pass does
+// not, which is why the build broke where the typecheck did not.
+import type {} from "mdast-util-gfm-table";
 import type { Wikilink } from "../types.js";
 
 export function wikilinkToMarkdown(): Options {
