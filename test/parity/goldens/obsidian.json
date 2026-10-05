@@ -7811,8 +7811,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/76": {
       "id": "fuzz/embed/76",
@@ -11130,8 +11129,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/wikilink/18": {
       "id": "fuzz/wikilink/18",
@@ -11563,8 +11561,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/110": {
       "id": "fuzz/embed/110",
@@ -12074,8 +12071,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/block-ref/13": {
       "id": "fuzz/block-ref/13",
@@ -12595,8 +12591,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/comment/13": {
       "id": "fuzz/comment/13",
@@ -13299,8 +13294,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/footnote/43": {
       "id": "fuzz/footnote/43",
@@ -14035,8 +14029,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/comment/1": {
       "id": "fuzz/comment/1",
@@ -17870,8 +17863,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/35": {
       "id": "fuzz/embed/35",
@@ -18810,8 +18802,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/math/6": {
       "id": "fuzz/math/6",
@@ -18935,8 +18926,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/comment/6": {
       "id": "fuzz/comment/6",
@@ -20156,8 +20146,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/wikilink/9": {
       "id": "fuzz/wikilink/9",
@@ -20232,8 +20221,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/50": {
       "id": "fuzz/embed/50",
@@ -21032,8 +21020,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/57": {
       "id": "fuzz/embed/57",
@@ -21145,8 +21132,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/highlight/34": {
       "id": "fuzz/highlight/34",
@@ -21224,8 +21210,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/58": {
       "id": "fuzz/embed/58",
@@ -21376,8 +21361,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/block-ref/9": {
       "id": "fuzz/block-ref/9",
@@ -22163,8 +22147,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/footnote/26": {
       "id": "fuzz/footnote/26",

@@ -41,7 +41,8 @@ function shiftTo(node: unknown, offset: number): void {
 }
 
 /**
- * A setext underline has to stand alone to make a heading.
+ * A setext underline has to stand alone, over a single line, to make a
+ * heading.
  *
  * CommonMark allows up to three spaces of indent before the run and any
  * whitespace after it. `remark-parse@8` allows neither, so `H` over `  ===` and
@@ -74,7 +75,13 @@ export function setextUnderlineTransform(
       const lines = source.slice(start, end).split("\n");
       const underline = lines[lines.length - 1];
       if (lines.length < 2 || underline === undefined) continue;
-      if (!LOOSE.test(underline) || STRICT.test(underline)) continue;
+      if (!LOOSE.test(underline)) continue;
+      // Sloppy underline, or more than one content line above it. The second
+      // is where Obsidian parts company with CommonMark: the spec's own
+      // examples 81 and 82 are multi-line setext headings, and Obsidian
+      // reports no heading for either -- `Foo *bar` / `baz*` / `====` is one
+      // paragraph. Only a single content line makes a heading.
+      if (STRICT.test(underline) && lines.length <= 2) continue;
 
       const children: PhrasingContent[] = [];
       let offset = start;
