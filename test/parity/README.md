@@ -424,10 +424,37 @@ It is **not one rule**, and two attractive readings of it are already dead:
   the same governing rule that keeps a surplus table cell and a colour marker.
 - **Not blockquotes.** `> text[^1]` places its reference correctly, defined or not.
 
-One narrow family _is_ confirmed: a reference nested in a link label.
-`a [text][[^9]] b` yields no reference where Obsidian indexes one, which is the
-same shape as the recorded rule that Obsidian indexes a reference in a link
-reference definition's **destination** (`[foo]: [^9]`).
+One narrow family _is_ confirmed, and recording it corrected the guess that led to
+it. Eight `probe/reference-in-link/*` cases settle where a reference survives
+inside a link construct, and the answer is **almost nowhere**: not in an inline
+link's title, not in an image's alt text, not in a link reference definition's
+title, and not in `[[^9]]`, which is a **wikilink** to `^9` exactly as we read it.
+
+The rule they do establish is one thing seen from two sides — **a `[` right after a
+link text's `]` opens a link label, so it is neither a wikilink opener nor the
+start of a footnote reference:**
+
+| input              | Obsidian                           | us                   |
+| ------------------ | ---------------------------------- | -------------------- |
+| `a [text][[^9]] b` | label `[^9]`, reference at `0:9`   | a wikilink to `^9`   |
+| `a [text][^9] b`   | collapsed link, label `^9`, no ref | a reference at `0:8` |
+
+So we miss one reference and invent another for the same reason. Both are tracked
+`replicate` and enumerated in `KNOWN_REFERENCE_GAPS`.
+
+Closing it means tokenizer precedence between the wikilink extension and
+CommonMark's link label, not a repair pass over the tree — and the referee measures
+the family at **44 of 6806 documents**, with the `][^` half appearing zero times
+there. That ratio is why it is recorded rather than implemented.
+
+A probe lesson worth keeping: the first recording of these eight cases defined
+nothing, so every answer was an empty `footnoteRefs` that agreed with anything.
+`footnoteRefs` lists only references whose name has a definition, so a probe for
+reference behaviour **must define the name** or it proves nothing. The sibling
+project hit the same wall and solved it differently, by re-parsing each note with a
+synthesized definition for every undefined name and keeping whichever probe left
+the note's own parse unchanged — which is what makes its `refs` field a real oracle
+for undefined names, and the 1131 above real data rather than noise.
 
 Grouping by the source line the missed reference sits on was too coarse to go
 further, because a fuzzed document stacks many constructs and the per-line shape

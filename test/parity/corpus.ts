@@ -51,6 +51,33 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
     "probe/inline-footnote/definition-first",
     "[^1]: body\n\nuse[^1] and ^[x]\n",
   ],
+  // Where does a footnote reference survive inside a link construct? Obsidian
+  // indexes one in a link reference definition's *destination* (`[foo]: [^9]`),
+  // which is recorded, and the referee shows it also indexing one in a reference
+  // link's label where we yield nothing at all. `[[^9]]` is the interesting case
+  // because it is two readings at once -- a wikilink targeting `^9`, or a bracket
+  // around the footnote reference `[^9]` -- so this is a precedence question
+  // between an Obsidian construct and a CommonMark one, and only Obsidian can say.
+  // Each case defines `^9` deliberately: `footnoteRefs` lists only references whose
+  // name has a definition, so without one every answer is an empty list that agrees
+  // with anything and proves nothing.
+  [
+    "probe/reference-in-link/collection-label",
+    "a [text][[^9]] b\n\n[^9]: def\n",
+  ],
+  ["probe/reference-in-link/bare-wikilink", "a [[^9]] b\n\n[^9]: def\n"],
+  ["probe/reference-in-link/link-text", "a [[^9]][text] b\n\n[^9]: def\n"],
+  ["probe/reference-in-link/inline-text", "a [[^9]](/url) b\n\n[^9]: def\n"],
+  [
+    "probe/reference-in-link/inline-title",
+    'a [text](/url "[^9]") b\n\n[^9]: def\n',
+  ],
+  ["probe/reference-in-link/image-alt", "a ![alt [^9]](/url) b\n\n[^9]: def\n"],
+  ["probe/reference-in-link/shortcut", "a [text][^9] b\n\n[^9]: def\n"],
+  [
+    "probe/reference-in-link/definition-title",
+    '[foo]: /url "[^9]"\n\n[^9]: def\n',
+  ],
   // An unclosed `%%` inside a footnote definition: how far does it reach? The
   // recorded corpus says Obsidian ends the definition *at* the `%%` line where
   // we run past it, which would follow if the comment were bounded by the
