@@ -28,6 +28,104 @@ export interface Case {
  * quartz-community/remark-obsidian#4 and the forum thread it links.
  */
 const SEEDS: ReadonlyArray<readonly [string, string]> = [
+  // `metadataCache` reports a well-formed `^[body]` as a *definition* named
+  // `[inline0`, spanning the body alone, and an empty `^[]` as a *reference*
+  // with an empty name at the caret. Every case in the corpus held at most one
+  // inline footnote, so the `0` could be a counter or a constant and nothing
+  // here could tell. These five settle it: whether the name increments, whether
+  // it restarts in a new block, and whether an empty body takes a number too.
+  // The five below settled how inline footnotes are numbered among
+  // themselves, and that was not enough: a probe mixing one with an ordinary
+  // reference named it `[inline1` where our counter, which advances only on
+  // inline footnotes, says `[inline0`. Nothing in 2636 cases discriminated the
+  // two rules, because no case put a reference before an inline footnote.
+  // These four do, with the reference defined and undefined, before and
+  // between -- so the counter's real alphabet is measured rather than assumed.
+  ["probe/inline-footnote/ref-then-inline", "a[^1] and ^[x]\n\n[^1]: body\n"],
+  ["probe/inline-footnote/undefined-ref-then-inline", "a[^nodef] and ^[x]\n"],
+  [
+    "probe/inline-footnote/inline-ref-inline",
+    "^[a] b[^1] ^[c]\n\n[^1]: body\n",
+  ],
+  [
+    "probe/inline-footnote/definition-first",
+    "[^1]: body\n\nuse[^1] and ^[x]\n",
+  ],
+  // Enumerating Obsidian's tokenizers rather than sampling them found no
+  // construct at zero coverage, but three were thin enough to be untested in
+  // practice -- and bare autolinking is the risky one. remark-parse 8 has its
+  // own `url` and `email` inline tokenizers while our side gets literal
+  // autolinks from GFM, so the two are independent implementations that agree
+  // only by coincidence. `www.` is the sharpest probe: GFM autolinks it and
+  // remark-parse 8 has no rule for it at all.
+  ["probe/autolink/bare-email", "write a@b.com now\n"],
+  ["probe/autolink/email-subdomain", "write a.b@c.co.uk now\n"],
+  ["probe/autolink/email-plus", "write a+tag@b.com now\n"],
+  ["probe/autolink/email-underscore-domain", "write a@b_c.com now\n"],
+  ["probe/autolink/email-no-tld", "write a@b now\n"],
+  ["probe/autolink/email-trailing-dot", "write a@b.com. now\n"],
+  ["probe/autolink/bare-url", "see http://a.com now\n"],
+  ["probe/autolink/url-www", "see www.example.com now\n"],
+  ["probe/autolink/url-trailing-punctuation", "see http://a.com/x. now\n"],
+  ["probe/autolink/url-parens", "see http://a.com/x_(y) now\n"],
+  ["probe/autolink/url-in-parens", "see (http://a.com) now\n"],
+  ["probe/autolink/url-query", "see http://a.com?q=1&b=2 now\n"],
+  // The other two thin tokenizers: a backslash at end of line, and a
+  // reference-style link, which is not the same construct as the definition
+  // that resolves it.
+  ["probe/break/backslash", "one\\\ntwo\n"],
+  ["probe/break/backslash-in-quote", "> one\\\n> two\n"],
+  ["probe/reference/full", "[text][label]\n\n[label]: /url\n"],
+  ["probe/reference/collapsed", "[label][]\n\n[label]: /url\n"],
+  ["probe/reference/shortcut", "[label]\n\n[label]: /url\n"],
+  ["probe/reference/image", "![alt][label]\n\n[label]: /img.png\n"],
+  // Two recorded answers about block identifiers contradict each other under
+  // any single rule: `^blk` alone registers *no* block, while ` ^blk` -- the
+  // same line with one leading space -- registers one, and `^blk` over `---`
+  // registers one too. So "preceded by whitespace" explains the first pair and
+  // not the third. These isolate what the identifier must trail, which
+  // characters it may hold, and where its span begins.
+  ["probe/block-id/alone", "^blk\n"],
+  ["probe/block-id/leading-space", " ^blk\n"],
+  ["probe/block-id/after-text", "text ^blk\n"],
+  ["probe/block-id/own-line-after-text", "text\n^blk\n"],
+  ["probe/block-id/setext", "^blk\n---\n"],
+  ["probe/block-id/heading", "# head ^blk\n"],
+  ["probe/block-id/in-quote", "> text ^blk\n"],
+  ["probe/block-id/in-list", "- item ^blk\n"],
+  ["probe/block-id/underscore", "text ^a_b\n"],
+  ["probe/block-id/uppercase", "text ^BLK\n"],
+  ["probe/block-id/trailing-space", "text ^blk \n"],
+  ["probe/block-id/two-ids", "text ^one ^two\n"],
+  // `listItems[].parent` encodes nesting as a negative number for a root item,
+  // and the two values recorded so far -- -1 for an item on line 0 and -10 for
+  // one on line 10 -- fit no formula yet. A child's value should be a real line
+  // number, which is what makes the root encoding readable by contrast.
+  ["probe/list-item/two-roots", "- a\n- b\n"],
+  ["probe/list-item/one-child", "- a\n  - b\n"],
+  ["probe/list-item/three-deep", "- a\n  - b\n    - c\n"],
+  ["probe/list-item/offset-by-two", "text\n\n- a\n  - b\n"],
+  ["probe/list-item/ordered", "1. a\n2. b\n"],
+  ["probe/list-item/in-quote", "> - a\n>   - b\n"],
+  ["probe/list-item/tasks", "- [ ] todo\n- [x] done\n- plain\n"],
+  // Obsidian runs on Windows and our tokenizers handle a carriage return, but
+  // at fourteen cases the corpus barely exercised one and nothing at all
+  // covered a lone CR or a byte-order mark. The axis becomes deliberate here.
+  ["probe/line-ending/crlf-paragraph", "a\r\nb\r\n"],
+  ["probe/line-ending/crlf-quote-list", "> - a\r\n>   b\r\n"],
+  ["probe/line-ending/crlf-footnote", "x[^1]\r\n\r\n[^1]: body\r\n"],
+  ["probe/line-ending/crlf-setext", "para\r\n===\r\n"],
+  [
+    "probe/line-ending/crlf-comment",
+    "%%\r\nhidden [^1]\r\n%%\r\n\r\n[^1]: d\r\n",
+  ],
+  ["probe/line-ending/lone-cr", "a\rb\r"],
+  ["probe/line-ending/bom-heading", "\ufeff# H\n\ntext\n"],
+  ["probe/inline-footnote/two-inline", "^[one] and ^[two]\n"],
+  ["probe/inline-footnote/three-inline", "^[a] ^[b] ^[c]\n"],
+  ["probe/inline-footnote/two-blocks", "^[a]\n\n^[b]\n"],
+  ["probe/inline-footnote/empty-then-body", "^[] and ^[x]\n"],
+  ["probe/inline-footnote/body-then-empty", "^[x] and ^[]\n"],
   ["math/list-boundary", "1. Hello $$\n   Math\n   $$\n2.\n"],
   [
     "math/text-after-close",

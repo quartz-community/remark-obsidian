@@ -61,6 +61,25 @@ function findNodes(tree: any, type: string): any[] {
   return results;
 }
 
+/**
+ * Like `findNodes`, but blind to what a `%%` comment contains.
+ *
+ * A comment's body is parsed into children on purpose, so it *is* in the tree
+ * and a plain walk finds it. What "hidden" means is that none of it reaches the
+ * reader, so an assertion about hiding has to ask the question the renderer
+ * asks: everything outside a comment.
+ */
+function findRendered(tree: any, type: string): any[] {
+  const results: any[] = [];
+  function walk(node: any) {
+    if (node.type === "comment") return;
+    if (node.type === type) results.push(node);
+    if (node.children) node.children.forEach(walk);
+  }
+  walk(tree);
+  return results;
+}
+
 describe("remark-obsidian", () => {
   it("parses wikilinks", () => {
     const basic = parse("[[page]]");
@@ -165,13 +184,94 @@ describe("remark-obsidian", () => {
     const single = processWithGfm("%%comment%%");
     expect(findNodes(single, "comment").length).toBeGreaterThan(0);
     expect(
-      findNodes(single, "text")
+      findRendered(single, "text")
         .map((n: any) => n.value)
         .join(" "),
     ).not.toContain("comment");
 
     const multi = processWithGfm("%%multi\nline%%");
     expect(findNodes(multi, "comment").length).toBeGreaterThan(0);
+  });
+
+  it("records how many characters each line's containers consume", () => {
+    const table = (md: string, opts?: RemarkObsidianOptions) =>
+      (processWithGfm(md, opts) as any).data?.lineOffsets;
+
+    // A continuation line re-states the prefix without starting any node, so
+    // no node position carries its width -- which is the reason this exists.
+    expect(table("> - a\n>   b\n")).toEqual({ 1: 4, 2: 4 });
+
+    // Nested list indentation, including the line that is only indent.
+    expect(table("- x\n  - y\n    z\n")).toEqual({ 1: 2, 2: 4, 3: 4 });
+
+    // Nested quotes contribute one prefix each on the same line.
+    expect(table(">> deep\n")).toEqual({ 1: 3 });
+
+    // An ordered marker is as wide as it is written.
+    expect(table("1. one\n   cont\n")).toEqual({ 1: 3, 2: 3 });
+
+    // Indenting a paragraph at the top level is content, not a container, so
+    // the line is absent rather than zero.
+    expect(table("plain\n\n   indented para\n")).toEqual({});
+
+    expect(table("> - a\n", { lineOffsets: false })).toBeUndefined();
+  });
+
+  it("splits each line at its recorded offset", () => {
+    // The table's contract: slicing a line at its offset separates the
+    // containers from the content.
+    const source = "> - a\n>   b\n\n- x\n  - y\n    z\n";
+    const offsets = (processWithGfm(source) as any).data.lineOffsets;
+    const lines = source.split("\n");
+    const content = Object.entries(offsets).map(([line, width]) =>
+      (lines[Number(line) - 1] ?? "").slice(Number(width)),
+    );
+    expect(content).toEqual(["a", "b", "x", "y", "z"]);
+  });
+
+  it("parses a comment's body into placed children", () => {
+    const source = "a %%note [^1] **b**%% c\n\n[^1]: d\n";
+    const [inline] = findNodes(processWithGfm(source), "comment");
+    // Inline, so the body is phrasing and sits where the comment sits rather
+    // than being wrapped in a block it does not occupy.
+    expect(inline.children.map((c: any) => c.type)).toEqual([
+      "text",
+      "footnoteReference",
+      "text",
+      "strong",
+    ]);
+    expect(inline.value).toBe("note [^1] **b**");
+
+    const [reference] = findNodes(inline, "footnoteReference");
+    const { start, end } = reference.position;
+    // The position has to be the document's, not the fragment's: a consumer
+    // placing an edit reads the source back through it.
+    expect(source.slice(start.offset, end.offset)).toBe("[^1]");
+
+    const quoted = "> %%\n> quoted [^1]\n> %%\n\n[^1]: d\n";
+    const [inQuote] = findNodes(processWithGfm(quoted), "comment");
+    // Every line after the first carries a `> ` that is not part of the body,
+    // so a constant shift would misplace this by a growing amount.
+    const nested = findNodes(inQuote, "footnoteReference")[0].position;
+    expect(quoted.slice(nested.start.offset, nested.end.offset)).toBe("[^1]");
+
+    const off = processWithGfm(source, { parseComments: false });
+    const [plain] = findNodes(off, "comment");
+    expect(plain.children).toBeUndefined();
+    expect(plain.value).toBe("note [^1] **b**");
+  });
+
+  it("does not let a definition inside a comment define", async () => {
+    // Obsidian indexes a *reference* written in a comment but a definition
+    // inside one binds nothing, so the reference stays undefined and renders
+    // as its bare label.
+    const tree = processWithGfm("%%\n[^1]: buried\n%%\ntext[^1] ref\n");
+    const outside = findRendered(tree, "footnoteDefinition");
+    expect(outside).toHaveLength(0);
+    // The definition is still reachable inside the comment, which is the point
+    // of parsing the body at all.
+    const [comment] = findNodes(tree, "comment");
+    expect(findNodes(comment, "footnoteDefinition")).toHaveLength(1);
   });
 
   it("hides block comments spanning multiple lines", () => {
@@ -190,9 +290,9 @@ describe("remark-obsidian", () => {
       "before\n%%\nfirst line\n\nsecond line\n%%\nafter",
     );
     expect(findNodes(block, "comment").length).toBeGreaterThan(0);
-    const paragraphs = findNodes(block, "paragraph");
+    const paragraphs = findRendered(block, "paragraph");
     const texts = paragraphs.flatMap((p: any) =>
-      findNodes(p, "text").map((n: any) => n.value),
+      findRendered(p, "text").map((n: any) => n.value),
     );
     expect(texts).toContain("before");
     expect(texts).toContain("after");
@@ -240,7 +340,7 @@ describe("remark-obsidian", () => {
     // `%%` opens a fresh comment. Rejecting mid-line is what reproduces this, so
     // the line-start fix above must not apply here.
     const tree = processWithGfm("%%\nline %% nested %% line\n%%\nafter");
-    const texts = findNodes(tree, "text").map((n: any) => n.value);
+    const texts = findRendered(tree, "text").map((n: any) => n.value);
     expect(texts.join("")).toContain("nested %% line");
     expect(texts.join("")).not.toContain("after");
   });
@@ -1532,7 +1632,7 @@ describe("remark-obsidian", () => {
   it("hides inline comments spanning multiple line endings", () => {
     const block = processWithGfm("before a%%\nhidden\nmore hidden%% after");
     expect(findNodes(block, "comment").length).toBeGreaterThan(0);
-    const texts = findNodes(block, "text").map((n: any) => n.value);
+    const texts = findRendered(block, "text").map((n: any) => n.value);
     expect(texts.join(" ")).toContain("before a");
     expect(texts.join(" ")).toContain("after");
     expect(texts.join(" ")).not.toContain("hidden");

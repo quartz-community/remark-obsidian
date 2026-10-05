@@ -149,13 +149,15 @@ describe("source fidelity", () => {
   });
 
   /**
-   * One known offender, enumerated rather than counted so it cannot be joined
-   * quietly. `- [ ]  ` under a `===` builds a heading whose position starts at
-   * the list marker instead of the task content, so a text node spans `- [`
-   * while holding `[ ]`. Obsidian reports an empty heading there; the parity
-   * backlog tracks the divergence, and this records the span that lies.
+   * Empty, and it took a root-cause fix to get there rather than an exception.
+   *
+   * The one offender was `- [ ]  ` under a `===`, whose text node spanned `- [`
+   * while holding `[ ]`. The cause turned out to be `taskReparseTransform`
+   * placing a re-parsed body at the fragment's own offsets instead of the
+   * document's, so the node claimed the task marker it never held. Fixing the
+   * position cleared the loss, and the case now matches Obsidian outright.
    */
-  const KNOWN_LOSSY = ['fuzz/highlight/8: ["-"]'];
+  const KNOWN_LOSSY: string[] = [];
 
   it("never drops a source character from a text node", () => {
     const offenders = [...lossy].map(

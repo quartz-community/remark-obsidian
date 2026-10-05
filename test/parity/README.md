@@ -147,38 +147,34 @@ projection would report an empty string for every wikilink case.
 `math[].tex` is conditional. Obsidian 1.14 exposes the LaTeX source in
 `data-latex`; 1.13 and earlier discard it irrecoverably. The recorder probes for
 the capability and stores it as `oracle.mathTex`, and the comparison drops `tex`
-from both sides when it is false. Recording against 1.14 or later sharpens the
-math assertions with no code change.
+from both sides when it is false.
 
-## The math-content oracle
+Since **1.14.4 became `latest`** the main golden records `mathTex: true`, so the
+formula itself is compared for every case. That retired a second oracle: while
+1.14 was beta-only a full golden recorded from it would have made the weekly
+drift job fire, so `goldens/math-content.json` held the math projection for the
+76 math cases separately. The main golden is now a strict superset of it — same
+capability, every case, one triage state per case — and both it and
+`math-content.test.ts` are gone. The root causes those entries carried were
+moved into the corresponding notes in `goldens/obsidian.json`.
 
-Dropping `tex` is not free: it left **seven wrong `$$` delimitations behind a green
-gate**, agreeing only on the `display` flag. `$$x^2` is the clearest — stock
-`mathFlow` follows the code-fence template, so the formula lands in the node's
-`meta` (an info string, as a code fence's language would be) and the math body is
-empty, while Obsidian renders `x^2`.
+Turning `tex` on was not free, which is the point of having done it: it had left
+**wrong `$$` delimitations behind a green gate**, agreeing only on the `display`
+flag. `$$x^2` is the clearest — stock `mathFlow` follows the code-fence
+template, so the formula lands in the node's `meta` (an info string, as a code
+fence's language would be) and the math body is empty, while Obsidian renders
+`x^2`. Twelve such cases moved from `match` to `replicate` on adoption.
 
-1.14 can see all seven, but it is not `latest`, so a full golden recorded from it
-would make the weekly drift job fire. `goldens/math-content.json` is therefore a
-second, separately stamped oracle holding only the math projection for the 76 cases
-that involve math, and `math-content.test.ts` gates it with the same two-way policy
-as the main gate: a `match` case that stops matching fails, and a `divergent` case
-that starts matching fails so the backlog cannot rot. Every `divergent` entry
-carries the root cause.
+The comparison normalises the whitespace _around_ a formula, because Obsidian
+reports `$$\nx\n$$` as `"\nx\n"` while `remark-math` reports `"x"` and a
+container's indentation can survive a fragment re-parse — three spellings that
+render identically, since TeX collapses a run of whitespace. A formula whose
+characters differ still fails: `$$\nMath$$` reports `Math` where we report
+`Math$$`.
 
-Re-record it against a 1.14 build, which needs `PARITY_GOLDEN_PATH` so the
-committed gate is not overwritten:
-
-```bash
-OBSIDIAN_APP_PATH=~/.config/obsidian/obsidian-1.14.2.asar \
-PARITY_GOLDEN_PATH=/tmp/golden-1.14.json \
-npm run parity:record
-```
-
-then regenerate `goldens/math-content.json` from that file. Note the recorder
-stamps `obsidian.app` from the running bundle's `apiVersion`, not from wdio's
-version getters — those report the _installer_, so an `OBSIDIAN_APP_PATH` override
-would otherwise label a 1.14 recording as 1.13.7.
+Note the recorder stamps `obsidian.app` from the running bundle's `apiVersion`,
+not from wdio's version getters — those report the _installer_, so an
+`OBSIDIAN_APP_PATH` override would otherwise mislabel a recording.
 
 ## Coloured highlights, coming in 1.14
 
@@ -232,11 +228,20 @@ a formatter delete the author's emoji. So the mdast keeps the whole content and
 `rehype-obsidian` strips the marker and applies the colour, exactly where it
 already bares a dangling footnote reference.
 
-Nothing is implemented yet, deliberately — 1.13.7 does **not** consume the
-emoji, so stripping it now would be wrong for current Obsidian. The corpus
-cases are the tripwire instead: they are recorded against 1.13.7 and will start
-diverging the moment 1.14 becomes `latest`, which is precisely when the weekly
-drift job should raise it.
+**The tripwire fired as designed.** While 1.13.7 was `latest` nothing was
+implemented, deliberately: 1.13.7 does **not** consume the emoji, so stripping it
+then would have been wrong for current Obsidian. The probe cases carried the
+characterisation instead, recorded against 1.13.7 and waiting.
+
+1.14.4 became `latest` and 21 of them diverged on `text` and `highlights` at
+once. Re-recording confirmed the scope held on a corpus four times the size it
+was measured on: across 2680 cases **only** the highlight probes and the newly
+visible `math[].tex` moved, so 1.14 still changes nothing else this harness can
+see.
+
+What landed is the projection half — `stripColourMarker` in `normalize.ts`, by
+codepoint so an orphaned variation selector survives. The tree is untouched, as
+above: `rehype-obsidian` owns stripping the marker and applying the colour.
 
 ## The pinned chain
 
