@@ -13,6 +13,7 @@ import { commentSyntax } from "./lib/syntax/comment.js";
 import { tagSyntax } from "./lib/syntax/tag.js";
 import { inlineFootnoteSyntax } from "./lib/syntax/inline-footnote.js";
 import { legacyEmphasisSyntax } from "./lib/syntax/legacy-emphasis.js";
+import { legacyDeleteSyntax } from "./lib/syntax/legacy-delete.js";
 
 import { wikilinkFromMarkdown } from "./lib/mdast/wikilink.js";
 import { highlightFromMarkdown } from "./lib/mdast/highlight.js";
@@ -173,6 +174,21 @@ export interface RemarkObsidianOptions {
    */
   legacyEmphasis?: boolean;
   /**
+   * Parse `~~` the way `remark-parse@8.0.3` does, which is what Obsidian ships,
+   * instead of GFM's strikethrough. Legacy closes on the first `~~` it reaches and
+   * honours no escape at all, so `~~del\~~` is a `delete` holding `del\` where GFM
+   * reads `\~` as an escaped tilde and leaves the run literal, and `]]~~~~` renders
+   * `]]` because `~~~~` is an empty `delete` rather than four tildes.
+   *
+   * Needs `remark-gfm` registered *before* this package, which is what the chain
+   * does: a combined micromark extension prepends its constructs, so the later
+   * extension wins a shared code.
+   *
+   * On by default, because leaving it off is not neutral -- it silently produces
+   * different strikethrough from the app for any such run.
+   */
+  legacyStrikethrough?: boolean;
+  /**
    * Write a line break as a trailing backslash rather than a newline.
    *
    * Off by default, because this package is built for a chain that includes
@@ -199,6 +215,7 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
   inlineFootnotes: true,
   callouts: true,
   legacyEmphasis: true,
+  legacyStrikethrough: true,
   escapedLineBreaks: false,
 };
 
@@ -266,6 +283,10 @@ export default function remarkObsidian(
 
   if (opts.legacyEmphasis) {
     data.micromarkExtensions.push(legacyEmphasisSyntax());
+  }
+
+  if (opts.legacyStrikethrough) {
+    data.micromarkExtensions.push(legacyDeleteSyntax());
   }
 
   if (opts.customTaskChars) {

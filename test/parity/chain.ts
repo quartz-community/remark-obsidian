@@ -5,10 +5,28 @@
  * `export {}`); every transformer is an external package ordered in
  * `quartz.config.yaml`. The parse-affecting subset, in `order`:
  *
- *   30  @quartz-community/obsidian-flavored-markdown  remarkObsidian (+ wikilink visitor)
- *   40  @quartz-community/github-flavored-markdown    remarkGfm
+ *   30  @quartz-community/github-flavored-markdown    remarkGfm
+ *   40  @quartz-community/obsidian-flavored-markdown  remarkObsidian (+ wikilink visitor)
  *   80  @quartz-community/latex                       (renders only; see 3 below)
  *   90  @quartz-community/hard-line-breaks            remarkBreaks
+ *
+ * **Those first two are deliberately swapped from what Quartz ships today, and the
+ * goldens assume the swap.** `remark-gfm` has to register *before* this package: a
+ * combined micromark extension prepends its constructs, so for a code both claim
+ * the later-registered plugin wins. With gfm second it owned `~` outright and
+ * Obsidian's own strikethrough could not run at all — `legacyStrikethrough` was
+ * dead code until this order changed.
+ *
+ * Measured in two steps so the risk is separable. The reorder *alone* is
+ * behaviour-neutral: 0 cases fixed and 0 broken across the corpus, which also
+ * settles the one real worry, that both plugins claim `[` (gfm's footnote against
+ * our wikilink). Adding the legacy tokenizer on top of it fixed 21 cases with 0
+ * regressions.
+ *
+ * So `@quartz-community/obsidian-flavored-markdown` must order *after*
+ * `@quartz-community/github-flavored-markdown` upstream. Until it does, this file
+ * and Quartz disagree, and the goldens describe the chain Quartz should have rather
+ * than the one it has.
  *
  * then `remarkRehype({allowDangerousHtml:true})` -> `rehypeRaw` -> `rehypeObsidian`.
  *
@@ -85,6 +103,7 @@ const QUARTZ_DEFAULT: ChainProfile = {
     inlineFootnotes: true,
     callouts: true,
     legacyEmphasis: true,
+    legacyStrikethrough: true,
     escapedLineBreaks: false,
   },
   rehypeObsidian: {
@@ -115,6 +134,7 @@ const ALL_FEATURES: ChainProfile = {
     inlineFootnotes: true,
     callouts: true,
     legacyEmphasis: true,
+    legacyStrikethrough: true,
     escapedLineBreaks: false,
   },
   rehypeObsidian: {
@@ -207,8 +227,8 @@ export async function renderOurs(
 
   const processor = unified()
     .use(remarkParse)
-    .use(remarkObsidian, profile.remarkObsidian)
     .use(remarkGfm)
+    .use(remarkObsidian, profile.remarkObsidian)
     .use(remarkBreaks)
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
@@ -244,8 +264,8 @@ export async function renderWith(
 
   const processor = unified()
     .use(remarkParse)
-    .use(remarkObsidian, profile.remarkObsidian)
     .use(remarkGfm)
+    .use(remarkObsidian, profile.remarkObsidian)
     .use(remarkBreaks)
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
@@ -267,8 +287,8 @@ export function parseOurs(
 ): MdRoot {
   const processor = unified()
     .use(remarkParse)
-    .use(remarkObsidian, PROFILES[profileName].remarkObsidian)
     .use(remarkGfm)
+    .use(remarkObsidian, PROFILES[profileName].remarkObsidian)
     .use(remarkBreaks);
   // The source must be passed: transforms that need the original text, such as
   // custom task characters and display-math classification, read it off the file.

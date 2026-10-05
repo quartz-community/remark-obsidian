@@ -13668,8 +13668,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "fuzz/embed/67": {
       "id": "fuzz/embed/67",
@@ -14902,8 +14902,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "fuzz/highlight/47": {
       "id": "fuzz/highlight/47",
@@ -16498,8 +16498,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "fuzz/wikilink/14": {
       "id": "fuzz/wikilink/14",
@@ -21924,8 +21924,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "fuzz/html/23": {
       "id": "fuzz/html/23",
@@ -22260,8 +22260,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "fuzz/embed/119": {
       "id": "fuzz/embed/119",
@@ -22884,8 +22884,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "fuzz/embed/124": {
       "id": "fuzz/embed/124",
@@ -28732,8 +28732,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "fuzz/misc/2": {
       "id": "fuzz/misc/2",
@@ -31094,8 +31094,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "fuzz/embed/41": {
       "id": "fuzz/embed/41",
@@ -31301,8 +31301,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "fuzz/embed/43": {
       "id": "fuzz/embed/43",
@@ -31540,8 +31540,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "fuzz/table/7": {
       "id": "fuzz/table/7",
@@ -31828,8 +31828,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "fuzz/highlight/27": {
       "id": "fuzz/highlight/27",
@@ -32558,8 +32558,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "fuzz/highlight/29": {
       "id": "fuzz/highlight/29",
@@ -33532,8 +33532,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "fuzz/embed/55": {
       "id": "fuzz/embed/55",
@@ -34501,8 +34501,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "fuzz/html/12": {
       "id": "fuzz/html/12",
@@ -34918,8 +34918,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "fuzz/embed/59": {
       "id": "fuzz/embed/59",
@@ -47090,8 +47090,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "strikethrough/crossing-emphasis": {
       "id": "strikethrough/crossing-emphasis",
@@ -47138,8 +47138,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "heading/atx-recognition-limits": {
       "id": "heading/atx-recognition-limits",
@@ -56721,8 +56721,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "token/strikethrough/empty": {
       "id": "token/strikethrough/empty",
@@ -56958,8 +56958,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "token/strikethrough/both-escaped": {
       "id": "token/strikethrough/both-escaped",
@@ -57006,8 +57006,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "token/strikethrough/newline-escaped-close": {
       "id": "token/strikethrough/newline-escaped-close",
@@ -57054,8 +57054,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
     "token/strikethrough/newline-body": {
       "id": "token/strikethrough/newline-body",
