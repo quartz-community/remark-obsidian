@@ -1,4 +1,4 @@
-import type { Code, List, ListItem, Root } from "mdast";
+import type { Code, ListItem, Root } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 
@@ -61,14 +61,5 @@ export function listTabTransform(tree: Root, source: string): void {
     // A task marker cannot survive inside code, and the checkbox was never one:
     // `- \t[ ] x` is four columns of indent followed by text.
     item.checked = null;
-  });
-
-  // An item that holds only code holds no paragraph, so a list of them is not
-  // loose however the blank lines fall.
-  visit(tree, "list", (node: Node) => {
-    const list = node as List;
-    if (list.children.every((child) => child.children[0]?.type === "code")) {
-      list.spread = false;
-    }
   });
 }
