@@ -16,7 +16,7 @@ whatever it looks like:
 - 	[^1]: def   -> code, and so no definition
 ```
 
-The distinction is the *second* whitespace: `-\titem` spends its tab separating
+The distinction is the _second_ whitespace: `-\titem` spends its tab separating
 the marker, while `- \titem` has already spent a space.
 
 The same shape as the quote-marker rule beside it, verified the same way against
