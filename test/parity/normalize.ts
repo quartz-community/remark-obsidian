@@ -470,8 +470,19 @@ export function metaOurs(tree: Root, source: string): MetaProjections {
     }
   });
 
+  // Only the document's own headings. Obsidian renders one inside a container
+  // -- `> # Foo` paints a heading, and so does `- $x` over `===` -- but does
+  // not index it, which four independent cases agree on while every indexed
+  // heading sits at the top level, indented or not.
+  const topLevel: string[] = [];
+  for (const child of tree.children) {
+    const node = child as Node;
+    if (!isType<HeadingNode>(node, "heading")) continue;
+    topLevel.push(`${node.depth}:${headingName(node, source)}`);
+  }
+
   return {
-    headings: projected.headings,
+    headings: topLevel,
     links: projected.links.filter((l) => !l.embedded).map(target),
     embeds: projected.links.filter((l) => l.embedded).map(target),
     tags: projected.tags,

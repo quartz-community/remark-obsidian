@@ -50,6 +50,7 @@ import {
 } from "./lib/setext-underline.js";
 import { footnoteLabelTransform } from "./lib/footnote-label.js";
 import { tableInterruptTransform } from "./lib/table-interrupt.js";
+import { containerSetextTransform } from "./lib/container-setext.js";
 import { setextDefinitionTransform } from "./lib/setext-definition.js";
 import { shortCommentTransform } from "./lib/short-comment.js";
 import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
@@ -328,6 +329,11 @@ export default function remarkObsidian(
     );
     // Before the interrupt fold: demoting the heading is what lets a definition
     // on the next line continue it as prose.
+    // Before the demoting pass, which only looks at headings that already
+    // exist: inside a container there is none yet.
+    containerSetextTransform(tree, String(file), (markdown) =>
+      self.parse(markdown),
+    );
     setextUnderlineTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );

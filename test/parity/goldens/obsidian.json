@@ -6673,8 +6673,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/4": {
       "id": "fuzz/embed/4",
@@ -6950,8 +6949,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/inline-footnote/2": {
       "id": "fuzz/inline-footnote/2",
@@ -7092,8 +7090,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/footnote/2": {
       "id": "fuzz/footnote/2",
@@ -7126,8 +7123,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/html/3": {
       "id": "fuzz/html/3",
@@ -7236,8 +7232,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/wikilink/1": {
       "id": "fuzz/wikilink/1",
@@ -7416,8 +7411,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/footnote/4": {
       "id": "fuzz/footnote/4",
@@ -7484,8 +7478,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/callout/2": {
       "id": "fuzz/callout/2",
@@ -7825,8 +7818,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/footnote/6": {
       "id": "fuzz/footnote/6",
@@ -7861,8 +7853,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/highlight/6": {
       "id": "fuzz/highlight/6",
@@ -7897,8 +7888,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/strikethrough/1": {
       "id": "fuzz/strikethrough/1",
@@ -8180,8 +8170,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/math/2": {
       "id": "fuzz/math/2",
@@ -8809,8 +8798,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/13": {
       "id": "fuzz/embed/13",
@@ -8891,8 +8879,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/highlight/10": {
       "id": "fuzz/highlight/10",
@@ -8931,8 +8918,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/html/5": {
       "id": "fuzz/html/5",
@@ -9035,8 +9021,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/footnote/9": {
       "id": "fuzz/footnote/9",
@@ -9602,8 +9587,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/highlight/12": {
       "id": "fuzz/highlight/12",
@@ -9638,8 +9622,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/footnote/10": {
       "id": "fuzz/footnote/10",
@@ -9977,8 +9960,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/highlight/14": {
       "id": "fuzz/highlight/14",
@@ -10013,8 +9995,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/inline-footnote/5": {
       "id": "fuzz/inline-footnote/5",
@@ -10787,8 +10768,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/math/4": {
       "id": "fuzz/math/4",
@@ -10970,8 +10950,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/callout/5": {
       "id": "fuzz/callout/5",
@@ -11006,8 +10985,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/36": {
       "id": "fuzz/embed/36",
@@ -11141,8 +11119,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/37": {
       "id": "fuzz/embed/37",
@@ -11464,8 +11441,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/inline-footnote/9": {
       "id": "fuzz/inline-footnote/9",
@@ -11574,8 +11550,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/highlight/21": {
       "id": "fuzz/highlight/21",
@@ -11610,8 +11585,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/39": {
       "id": "fuzz/embed/39",
@@ -12006,8 +11980,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/callout/6": {
       "id": "fuzz/callout/6",
@@ -12310,8 +12283,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/44": {
       "id": "fuzz/embed/44",
@@ -12483,8 +12455,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/45": {
       "id": "fuzz/embed/45",
@@ -12640,8 +12611,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/46": {
       "id": "fuzz/embed/46",
@@ -13598,8 +13568,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/53": {
       "id": "fuzz/embed/53",
@@ -13752,8 +13721,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/callout/7": {
       "id": "fuzz/callout/7",
@@ -13788,8 +13756,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/strikethrough/7": {
       "id": "fuzz/strikethrough/7",
@@ -13900,8 +13867,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/table/8": {
       "id": "fuzz/table/8",
@@ -14356,8 +14322,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/highlight/36": {
       "id": "fuzz/highlight/36",
@@ -15002,8 +14967,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/footnote/25": {
       "id": "fuzz/footnote/25",
@@ -15036,8 +15000,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/61": {
       "id": "fuzz/embed/61",
@@ -15388,8 +15351,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/html/13": {
       "id": "fuzz/html/13",
@@ -15650,8 +15612,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/table/11": {
       "id": "fuzz/table/11",
@@ -15724,8 +15685,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/64": {
       "id": "fuzz/embed/64",
@@ -24083,8 +24043,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "document/invisible-delimiter-content": {
       "id": "document/invisible-delimiter-content",
@@ -53636,8 +53595,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/block-quotes/229": {
       "id": "commonmark/block-quotes/229",
@@ -53672,8 +53630,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/block-quotes/230": {
       "id": "commonmark/block-quotes/230",
@@ -53708,8 +53665,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/block-quotes/231": {
       "id": "commonmark/block-quotes/231",
@@ -53777,8 +53733,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/block-quotes/233": {
       "id": "commonmark/block-quotes/233",
@@ -76622,8 +76577,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "hunt/indented-code-after-table/0": {
       "id": "hunt/indented-code-after-table/0",
@@ -84872,8 +84826,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "hunt/quoted-definition-own-block/1": {
       "id": "hunt/quoted-definition-own-block/1",
@@ -85038,8 +84991,7 @@
           ]
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "hunt/quoted-definition-tab-continuation/0": {
       "id": "hunt/quoted-definition-tab-continuation/0",
@@ -85279,8 +85231,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "hunt/quoted-orphan-deletion-strands-body/0": {
       "id": "hunt/quoted-orphan-deletion-strands-body/0",
@@ -87243,8 +87194,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "hunt/setext-underline-makes-heading/0": {
       "id": "hunt/setext-underline-makes-heading/0",
@@ -87365,8 +87315,7 @@
           "footnotes": []
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "hunt/setext-underline-makes-heading/3": {
       "id": "hunt/setext-underline-makes-heading/3",
