@@ -4,7 +4,7 @@
 
 Render a wikilink's heading as written, keeping a trailing backslash
 
-Obsidian resolves `[[a#^blk\]]` to the heading `^blk` while still *displaying*
+Obsidian resolves `[[a#^blk\]]` to the heading `^blk` while still _displaying_
 `a > ^blk\`. The path already carried that pair — the resolved target stripped and
 the written form kept for rendering — but the heading did not, so `value` was built
 from the stripped heading and dropped a character the app shows.
