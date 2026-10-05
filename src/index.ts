@@ -28,6 +28,7 @@ import { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 import { inlineFootnoteToMarkdown } from "./lib/mdast/inline-footnote-to-markdown.js";
 import { customTaskCharTransform } from "./lib/task-char.js";
 import { mathDisplayTransform } from "./lib/math-display.js";
+import { mathFenceTransform } from "./lib/math-fence.js";
 import { taskReparseTransform } from "./lib/task-reparse.js";
 import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 import { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
@@ -36,6 +37,12 @@ import { inlineRefoldTransform } from "./lib/inline-refold.js";
 import { containerLazyTransform } from "./lib/container-lazy.js";
 import { quoteMergeTransform } from "./lib/quote-merge.js";
 import { paragraphMergeTransform } from "./lib/paragraph-merge.js";
+import { normalizePointsTransform } from "./lib/normalize-points.js";
+import { commentParseTransform } from "./lib/comment-parse.js";
+import {
+  ensureLineOffsets,
+  lineOffsetsFromMarkdown,
+} from "./lib/mdast/line-offsets.js";
 import { definitionTabTransform } from "./lib/definition-tab.js";
 import { fenceOutlivesTransform } from "./lib/fence-outlives.js";
 import { mathOutlivesTransform } from "./lib/math-outlives.js";
@@ -109,6 +116,31 @@ export interface RemarkObsidianOptions {
    * without it shows a stray empty tag, never the comment text.
    */
   keepComments?: boolean;
+
+  /**
+   * Parse a kept comment's body into `children`, beside the `value` it already
+   * carries. Obsidian indexes what a comment contains without rendering it, so
+   * a reference written inside one is live to `metadataCache` while nothing in
+   * the document shows it; this is what lets a consumer find and place an edit
+   * on such a node instead of re-scanning a string.
+   *
+   * Additive: `value` is untouched and the serialiser still writes from it, so
+   * round-tripping is unchanged. Needs `keepComments`, since there is no node
+   * to parse into otherwise.
+   */
+  parseComments?: boolean;
+
+  /**
+   * Record `remark-parse@8`'s `offset` table on the root as
+   * `data.lineOffsets`: how many characters each line's containers consume,
+   * keyed by one-based line number, with a line no container owns absent.
+   *
+   * It is what converts a column inside a stripped line back into a column in
+   * the file, and no node position carries it for a continuation line -- `> b`
+   * below `> a` re-states the prefix without starting a node. Obsidian's own
+   * parser keeps the same table, so reproducing its reported columns needs it.
+   */
+  lineOffsets?: boolean;
   /**
    * Strip the delimiters from a footnote reference nothing defines, so `see [^x]`
    * reads `see x` as Obsidian renders it. GFM keeps an unmatched reference literal,
@@ -155,6 +187,8 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
   taskReparse: true,
   frontmatter: true,
   keepComments: true,
+  parseComments: true,
+  lineOffsets: true,
   bareFootnoteRefs: true,
   inlineFootnotes: true,
   callouts: true,
@@ -174,6 +208,9 @@ export default function remarkObsidian(
   data.fromMarkdownExtensions ??= [];
   data.toMarkdownExtensions ??= [];
 
+  if (opts.lineOffsets) {
+    data.fromMarkdownExtensions.push(lineOffsetsFromMarkdown());
+  }
   if (opts.frontmatter) {
     data.micromarkExtensions.push(frontmatterSyntax(["yaml"]));
     data.fromMarkdownExtensions.push(frontmatterFromMarkdown(["yaml"]));
@@ -299,6 +336,9 @@ export default function remarkObsidian(
       customTaskCharTransform(tree, String(file));
     }
     if (opts.math) {
+      // Before the display pass, which only annotates: this decides what the
+      // formula is.
+      mathFenceTransform(tree, String(file));
       mathDisplayTransform(tree, String(file));
     }
     if (opts.callouts) {
@@ -376,6 +416,16 @@ export default function remarkObsidian(
     if (opts.taskReparse) {
       taskReparseTransform(tree, String(file), reparse);
     }
+    // Presence of the table means it was recorded, so it is started even for a
+    // document holding no container at all.
+    if (opts.lineOffsets) ensureLineOffsets(tree);
+    // After every pass that can move, split or replace a comment node, so the
+    // body is parsed from the span the comment finally claims.
+    if (opts.keepComments && opts.parseComments) {
+      commentParseTransform(tree, String(file), reparse);
+    }
+    // Last, so every pass above only has to keep its offsets honest.
+    normalizePointsTransform(tree, String(file));
   };
 
   /**
