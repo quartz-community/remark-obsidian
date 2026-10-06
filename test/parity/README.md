@@ -282,6 +282,38 @@ What landed is the projection half — `stripColourMarker` in `normalize.ts`, by
 codepoint so an orphaned variation selector survives. The tree is untouched, as
 above: `rehype-obsidian` owns stripping the marker and applying the colour.
 
+## The backtick retry
+
+CommonMark requires an inline-code closer of **exactly** the opener's length; with no
+such closer the whole run stays literal. Obsidian instead **retries with a shorter
+opener**, shedding backticks from the left down to the widest closer that does occur
+ahead:
+
+````
+``code`          ->  `<code>code</code>            opener 2, closer 1: one literal tick
+```code`         ->  ``<code>code</code>           opener 3, closer 1: two literal ticks
+``a⏎b`           ->  `<code>a b</code>             the line ending becomes a space
+````
+
+A short opener never **grows**, which is the asymmetry that makes this a rule rather
+than a tolerance: `` `code`` `and` `code``` `` stay wholly literal. And where a
+closer of the opener's own width exists the retry never happens -- `` ``a` and ``b` ``
+is stock behaviour, a code span holding ``a` and ``.
+
+**Context is irrelevant**, which is the strongest evidence that it belongs in the
+tokenizer rather than in any container's handling. All seven contexts probed render
+identically to the bare case: emphasis, tight emphasis, strong, table cell,
+blockquote, heading, list item and link label. Note the heading keeps the raw source
+in its attribute while rendering the span -- `# ``code` `gives`<h1 data-heading="``code`">`, so `metadataCache` and the DOM disagree by design.
+
+The implementation hazard is lookahead cost, and the budget will not catch it.
+`backtick-run` and `backtick-retry` in `pathological/shapes.ts` record the baseline
+measured **before** any attempt: micromark is already linear here -- 20,000 backticks
+in 16ms bare, an opener of 20,000 against one closer in 9ms -- so unlike cmark it
+needs no precomputed map of run positions, and any retry must preserve that. The
+20s pathological budget demonstrably passes a 254x quadratic, so linearity needs an
+argument, not just a green test.
+
 ## The pinned chain
 
 Goldens are only comparable against a fixed pipeline. Quartz v5 has no built-in
