@@ -101,6 +101,37 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/table-pipes/short-delimiter-unclosed", "| a | b |\n| --- \n"],
   ["probe/table-pipes/unclosed-header-short", "| a | b\n| --- \n"],
   ["probe/table-pipes/long-delimiter-unclosed", "| a |\n| --- | ---\n"],
+  // The two construction sites still leaving nodes unplaced, probed to find out
+  // whether their six and four nodes are isolated or a family seen in part. Both
+  // constructs are thin: a callout title carrying emphasis had zero designed probes
+  // against twelve incidental, and the whole autolink construct had one against
+  // fifty-six. That ratio is what the tag bugs and the raw-HTML conclusion both came
+  // out of, so it is worth asking before deciding these are singletons.
+  ["probe/callout-title/plain", "> [!note] title\n"],
+  ["probe/callout-title/empty", "> [!note]\n"],
+  ["probe/callout-title/fold-collapsed", "> [!note]-\n"],
+  ["probe/callout-title/fold-expanded", "> [!note]+ title\n"],
+  ["probe/callout-title/emphasis", "> [!note] *em*\n"],
+  ["probe/callout-title/strong-unbalanced", "> [!note] ****strong**\n"],
+  ["probe/callout-title/definition", "> [!note] [^1]: x\n"],
+  ["probe/callout-title/list", "> [!note] - item\n"],
+  ["probe/callout-title/heading", "> [!note] # h\n"],
+  ["probe/callout-title/quote", "> [!note] > inner\n"],
+  ["probe/callout-title/fence", "> [!note] ```\n"],
+  ["probe/callout-title/pipes", "> [!note] | a |\n"],
+  // Autolinks, which one probe has been standing in for.
+  ["probe/autolink/scheme", "<https://e.test/p>\n"],
+  ["probe/autolink/email", "<a@b.test>\n"],
+  ["probe/autolink/email-escaped", "<foo\\+@bar.example.com>\n"],
+  ["probe/autolink/escaped-closer", "<a\\>b>\n"],
+  ["probe/autolink/mailto", "<mailto:a@e.test>\n"],
+  ["probe/autolink/uppercase-scheme", "<HTTPS://E.TEST>\n"],
+  ["probe/autolink/space-inside", "<not a url>\n"],
+  ["probe/autolink/empty", "<>\n"],
+  ["probe/autolink/query-ampersand", "<https://e.test/?q=1&x=2>\n"],
+  ["probe/autolink/fragment", "<https://e.test/#frag>\n"],
+  ["probe/autolink/adjacent-text", "a<https://e.test>b\n"],
+  ["probe/autolink/in-callout-title", "> [!note] <https://e.test>\n"],
   // The contexts a change to inline code would reach. `probe/code-run/*` pins the
   // opener/closer matrix, but the retry would live in the tokenizer, so its blast
   // radius is every container a code span can sit in -- and that dimension was the

@@ -369,6 +369,22 @@ Balance decides whether Obsidian forms a footnote at all, so `^[^[note]]` and
 Re-triaging on this ground is only legitimate with the impossibility argument
 attached. Without one, moving a case out of `replicate` is just hiding it.
 
+### One recording flake, with a signature worth knowing
+
+Twice now a case has come back with a different `text` while its `html` was
+**byte-identical**, and that combination is the tell: same DOM, different reading, so
+the capture raced rather than the parse changing.
+
+Both were the same shape — a pipe inside an inline construct inside a one-column
+table, `| Math |`/`| --- |`/`| $|x|$ |` and `| Link |`/`| --- |`/`| [[Note|Alias]] |`.
+Both reverted on the next recording, and the stable value is the correct one: the
+delimiter declares one column, so the surplus cells are dropped.
+
+So if a `match` case fails after a re-record, compare `html` first. Unchanged html with
+changed projections is a flake — re-record and it will come back. Do not assume the
+older value was right, though: `| $|x|$ |` arguably _should_ split into three cells, and
+only the html settled which reading was real.
+
 ## When goldens drift
 
 The scheduled workflow never commits. It uploads the freshly recorded goldens as

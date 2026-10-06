@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-06T11:35:46.808Z",
+  "recordedAt": "2026-10-06T13:38:10.690Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -1728,6 +1728,1147 @@
           "headings": [],
           "sections": [
             "table@0:0-1:11"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/callout-title/plain": {
+      "id": "probe/callout-title/plain",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] title\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">title</div></div></div>",
+        "projections": {
+          "text": "title",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] title"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:15"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/callout-title/empty": {
+      "id": "probe/callout-title/empty",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note]\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">Note</div></div></div>",
+        "projections": {
+          "text": "Note",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:9"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/callout-title/fold-collapsed": {
+      "id": "probe/callout-title/fold-collapsed",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note]-\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"-\" data-callout=\"note\" class=\"callout is-collapsible\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">Note</div></div></div>",
+        "projections": {
+          "text": "Note",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note]-"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:10"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/callout-title/fold-expanded": {
+      "id": "probe/callout-title/fold-expanded",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note]+ title\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"+\" data-callout=\"note\" class=\"callout is-collapsible\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">title</div></div></div>",
+        "projections": {
+          "text": "title",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note]+ title"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:16"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/callout-title/emphasis": {
+      "id": "probe/callout-title/emphasis",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] *em*\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\"><em>em</em></div></div></div>",
+        "projections": {
+          "text": "em",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:em"
+          ],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] *em*"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:14"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/callout-title/strong-unbalanced": {
+      "id": "probe/callout-title/strong-unbalanced",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] ****strong**\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">*<strong>*strong</strong></div></div></div>",
+        "projections": {
+          "text": "**strong",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "strong:*strong"
+          ],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] ****strong**"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:22"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "An unbalanced strong run in a callout title is title content to Obsidian, which reports `**strong` and one `strong` span. We read the line as a block instead and build a list, so the title comes out empty."
+    },
+    "probe/callout-title/definition": {
+      "id": "probe/callout-title/definition",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] [^1]: x\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\"></div></div></div>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] [^1]: x"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [
+            "1@0:10-0:17"
+          ],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:17"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/callout-title/list": {
+      "id": "probe/callout-title/list",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] - item\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\"><ul>\n<li dir=\"auto\">item</li>\n</ul></div></div></div>",
+        "projections": {
+          "text": "item",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] - item"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:16"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:10-0:16"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/callout-title/heading": {
+      "id": "probe/callout-title/heading",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] # h\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\"><h1 data-heading=\"h\" dir=\"auto\">h</h1></div></div></div>",
+        "projections": {
+          "text": "h",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:h"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] # h"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:13"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "An ATX heading as a callout title is indexed by its own text, `1:h`. We report `1:> [`, which is the raw line read from the wrong offset rather than the heading's content."
+    },
+    "probe/callout-title/quote": {
+      "id": "probe/callout-title/quote",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] > inner\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\"><blockquote dir=\"auto\">\n<p>inner</p>\n</blockquote></div></div></div>",
+        "projections": {
+          "text": "inner",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] > inner"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:17"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/callout-title/fence": {
+      "id": "probe/callout-title/fence",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] ```\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\"><pre><code></code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre></div></div></div>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] ```"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:13"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/callout-title/pipes": {
+      "id": "probe/callout-title/pipes",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] | a |\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">| a |</div></div></div>",
+        "projections": {
+          "text": "| a |",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] | a |"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:15"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink/scheme": {
+      "id": "probe/autolink/scheme",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<https://e.test/p>\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p\" target=\"_blank\">https://e.test/p</a></p>",
+        "projections": {
+          "text": "https://e.test/p",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "<https://e.test/p>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:18"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink/email": {
+      "id": "probe/autolink/email",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<a@b.test>\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-tooltip-position=\"top\" aria-label=\"mailto:a@b.test\" rel=\"noopener nofollow\" class=\"external-link\" href=\"mailto:a@b.test\" target=\"_blank\">a@b.test</a></p>",
+        "projections": {
+          "text": "a@b.test",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "<a@b.test>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:10"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink/email-escaped": {
+      "id": "probe/autolink/email-escaped",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<foo\\+@bar.example.com>\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-tooltip-position=\"top\" aria-label=\"mailto:foo%5C+@bar.example.com\" rel=\"noopener nofollow\" class=\"external-link\" href=\"mailto:foo%5C+@bar.example.com\" target=\"_blank\">foo\\+@bar.example.com</a></p>",
+        "projections": {
+          "text": "foo\\+@bar.example.com",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "<foo\\+@bar.example.com>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:23"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A backslash inside an autolink is literal, so `<foo\\+@bar.example.com>` is an autolink to `foo\\+@bar.example.com`. We treat `\\+` as an escape, which stops the autolink forming and leaves the angle brackets as text. Same shape as the wikilink target, where a backslash is also content."
+    },
+    "probe/autolink/escaped-closer": {
+      "id": "probe/autolink/escaped-closer",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<a\\>b>\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">&lt;a&gt;b&gt;</p>",
+        "projections": {
+          "text": "<a>b>",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "<a\\>b>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink/mailto": {
+      "id": "probe/autolink/mailto",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<mailto:a@e.test>\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-tooltip-position=\"top\" aria-label=\"mailto:a@e.test\" rel=\"noopener nofollow\" class=\"external-link\" href=\"mailto:a@e.test\" target=\"_blank\">a@e.test</a></p>",
+        "projections": {
+          "text": "a@e.test",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "<mailto:a@e.test>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:17"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink/uppercase-scheme": {
+      "id": "probe/autolink/uppercase-scheme",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<HTTPS://E.TEST>\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a rel=\"noopener nofollow\" class=\"external-link\" href=\"HTTPS://E.TEST\" target=\"_blank\">HTTPS://E.TEST</a></p>",
+        "projections": {
+          "text": "HTTPS://E.TEST",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "<HTTPS://E.TEST>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:16"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink/space-inside": {
+      "id": "probe/autolink/space-inside",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<not a url>\n",
+      "obsidian": {
+        "html": "",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "html",
+              "text": "<not a url>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "html@0:0-0:11"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink/empty": {
+      "id": "probe/autolink/empty",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<>\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">&lt;&gt;</p>",
+        "projections": {
+          "text": "<>",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "<>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:2"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink/query-ampersand": {
+      "id": "probe/autolink/query-ampersand",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<https://e.test/?q=1&x=2>\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/?q=1&amp;x=2\" target=\"_blank\">https://e.test/?q=1&amp;x=2</a></p>",
+        "projections": {
+          "text": "https://e.test/?q=1&x=2",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "<https://e.test/?q=1&x=2>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:25"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink/fragment": {
+      "id": "probe/autolink/fragment",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<https://e.test/#frag>\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/#frag\" target=\"_blank\">https://e.test/#frag</a></p>",
+        "projections": {
+          "text": "https://e.test/#frag",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "<https://e.test/#frag>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:22"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink/adjacent-text": {
+      "id": "probe/autolink/adjacent-text",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "a<https://e.test>b\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">a<a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test\" target=\"_blank\">https://e.test</a>b</p>",
+        "projections": {
+          "text": "ahttps://e.testb",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "a<https://e.test>b"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:18"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink/in-callout-title": {
+      "id": "probe/autolink/in-callout-title",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] <https://e.test>\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\"><a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test\" target=\"_blank\">https://e.test</a></div></div></div>",
+        "projections": {
+          "text": "https://e.test",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] <https://e.test>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:26"
           ],
           "links": [],
           "embeds": [],
@@ -12856,7 +13997,7 @@
         }
       },
       "triage": "match",
-      "note": "Both sides agree. Our mdast splits the row on the unescaped pipe and our HTML drops the surplus cell exactly as Obsidian does; the divergence was projectOurs reading mdast, which retains cells that GFM 4.10 discards only at render time."
+      "note": "`text` re-measured through a real Reading View: the detached renderer the recorder batches disagreed with the application, so its capture was not Obsidian behaviour. Other projections are as recorded."
     },
     "wikilink/table-escaped": {
       "id": "wikilink/table-escaped",
@@ -28620,53 +29761,6 @@
       },
       "triage": "match"
     },
-    "fuzz/html/1": {
-      "id": "fuzz/html/1",
-      "layer": "seed",
-      "category": "fuzz",
-      "markdown": "<mailto:a@e.test>\n",
-      "obsidian": {
-        "html": "<p dir=\"auto\"><a data-tooltip-position=\"top\" aria-label=\"mailto:a@e.test\" rel=\"noopener nofollow\" class=\"external-link\" href=\"mailto:a@e.test\" target=\"_blank\">a@e.test</a></p>",
-        "projections": {
-          "text": "a@e.test",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "<mailto:a@e.test>"
-            }
-          ]
-        },
-        "meta": {
-          "headings": [],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        },
-        "compute": {
-          "footnotes": [],
-          "footnoteRefs": [],
-          "headings": [],
-          "sections": [
-            "paragraph@0:0-0:17"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "listItems": [],
-          "blocks": [],
-          "frontmatterLinks": []
-        }
-      },
-      "triage": "match"
-    },
     "fuzz/embed/3": {
       "id": "fuzz/embed/3",
       "layer": "seed",
@@ -41925,55 +43019,6 @@
           "headings": [],
           "sections": [
             "callout@0:0-1:9"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "listItems": [],
-          "blocks": [],
-          "frontmatterLinks": []
-        }
-      },
-      "triage": "match"
-    },
-    "callout/text-after-marker-is-block": {
-      "id": "callout/text-after-marker-is-block",
-      "layer": "seed",
-      "category": "callout",
-      "markdown": "> [!note] [^1]: x\n",
-      "obsidian": {
-        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\"></div></div></div>",
-        "projections": {
-          "text": "",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "callout",
-              "text": "> [!note] [^1]: x"
-            }
-          ]
-        },
-        "meta": {
-          "headings": [],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        },
-        "compute": {
-          "footnotes": [
-            "1@0:10-0:17"
-          ],
-          "footnoteRefs": [],
-          "headings": [],
-          "sections": [
-            "callout@0:0-0:17"
           ],
           "links": [],
           "embeds": [],
@@ -114459,101 +115504,6 @@
           "headings": [],
           "sections": [
             "paragraph@0:0-0:30"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "listItems": [],
-          "blocks": [],
-          "frontmatterLinks": []
-        }
-      },
-      "triage": "match"
-    },
-    "commonmark/autolinks/606": {
-      "id": "commonmark/autolinks/606",
-      "layer": "commonmark",
-      "category": "autolinks",
-      "markdown": "<foo\\+@bar.example.com>\n",
-      "obsidian": {
-        "html": "<p dir=\"auto\"><a data-tooltip-position=\"top\" aria-label=\"mailto:foo%5C+@bar.example.com\" rel=\"noopener nofollow\" class=\"external-link\" href=\"mailto:foo%5C+@bar.example.com\" target=\"_blank\">foo\\+@bar.example.com</a></p>",
-        "projections": {
-          "text": "foo\\+@bar.example.com",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "<foo\\+@bar.example.com>"
-            }
-          ]
-        },
-        "meta": {
-          "headings": [],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        },
-        "compute": {
-          "footnotes": [],
-          "footnoteRefs": [],
-          "headings": [],
-          "sections": [
-            "paragraph@0:0-0:23"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "listItems": [],
-          "blocks": [],
-          "frontmatterLinks": []
-        }
-      },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
-    },
-    "commonmark/autolinks/607": {
-      "id": "commonmark/autolinks/607",
-      "layer": "commonmark",
-      "category": "autolinks",
-      "markdown": "<>\n",
-      "obsidian": {
-        "html": "<p dir=\"auto\">&lt;&gt;</p>",
-        "projections": {
-          "text": "<>",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "<>"
-            }
-          ]
-        },
-        "meta": {
-          "headings": [],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        },
-        "compute": {
-          "footnotes": [],
-          "footnoteRefs": [],
-          "headings": [],
-          "sections": [
-            "paragraph@0:0-0:2"
           ],
           "links": [],
           "embeds": [],

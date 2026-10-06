@@ -165,7 +165,7 @@ describe("node positions", () => {
    * fragment-relative positions before that rule was written down.
    */
   const UNPLACED_CEILING = {
-    "callout > calloutTitle": 6,
+    "callout > calloutTitle": 11,
     "heading > footnoteReference": 2,
     "link > text": 2,
     "paragraph > break": 7,
