@@ -163,14 +163,15 @@ export const CHAIN_MANIFEST = {
   markdown: [
     {
       order: 30,
-      plugin: "remark-obsidian",
-      source: "@quartz-community/obsidian-flavored-markdown",
-      note: "parses frontmatter as of the frontmatter option; omitting it let the `---` become a thematic break and leaked the YAML body in as a list",
+      plugin: "remark-gfm",
+      source: "@quartz-community/github-flavored-markdown",
+      note: "ordered before remark-obsidian so the later-registered extension wins a shared code; with it second, GFM owned `~` and Obsidian's own strikethrough could not run",
     },
     {
       order: 40,
-      plugin: "remark-gfm",
-      source: "@quartz-community/github-flavored-markdown",
+      plugin: "remark-obsidian",
+      source: "@quartz-community/obsidian-flavored-markdown",
+      note: "parses frontmatter as of the frontmatter option; omitting it let the `---` become a thematic break and leaked the YAML body in as a list",
     },
     {
       order: 80,
