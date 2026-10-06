@@ -2171,7 +2171,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
+      "triage": "match",
       "note": "An ATX heading as a callout title is indexed by its own text, `1:h`. We report `1:> [`, which is the raw line read from the wrong offset rather than the heading's content."
     },
     "probe/callout-title/quote": {

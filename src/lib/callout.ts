@@ -74,6 +74,34 @@ const LINE_PREFIX = /^[ \t]*(?:>[ \t]?)*/u;
  * splice by position and delete the part that was consumed. The marker sits on
  * one line, so the column moves with the offset.
  */
+/**
+ * Place a block reparsed from the title line onto the document.
+ *
+ * `titleLineIsBlock` reparses that line on its own, so what comes back is numbered
+ * from the line rather than from the note. An offset that is merely wrong still looks
+ * usable, which is how `> [!note] # h` came to be indexed as `1:> [` -- the heading
+ * kept offset 0 and its name was sliced from the top of the document.
+ *
+ * Offsets are what matter; `normalizePointsTransform` rebuilds every line and column
+ * from them afterwards.
+ */
+function shiftOnto(node: unknown, offset: number, line: number): void {
+  const candidate = node as {
+    position?: {
+      start: { line: number; column: number; offset?: number };
+      end: { line: number; column: number; offset?: number };
+    };
+    children?: unknown[];
+  };
+  if (candidate.position) {
+    for (const point of [candidate.position.start, candidate.position.end]) {
+      point.offset = offset + (point.offset ?? 0);
+      point.line = line + point.line - 1;
+    }
+  }
+  for (const child of candidate.children ?? []) shiftOnto(child, offset, line);
+}
+
 function advanceStart(node: Node, by: number): void {
   const start = (node as Positioned).position?.start;
   if (!start || start.offset === undefined) return;
@@ -187,6 +215,12 @@ export function calloutTransform(
       newlineAt === -1 ? leadText.value : leadText.value.slice(0, newlineAt);
     const asBlock = titleLineIsBlock(firstLine, reparse);
     if (asBlock) {
+      const titleStart = (leadText as unknown as Positioned).position?.start;
+      if (titleStart?.offset !== undefined) {
+        for (const block of asBlock) {
+          shiftOnto(block, titleStart.offset, titleStart.line);
+        }
+      }
       const rest = newlineAt === -1 ? [] : quote.children.slice(1);
       // An empty `calloutTitle` rather than none. A callout with no title node
       // displays the capitalised type -- `> [!note]` alone reads "Note" --
