@@ -15,6 +15,7 @@ import { inlineFootnoteSyntax } from "./lib/syntax/inline-footnote.js";
 import { legacyEmphasisSyntax } from "./lib/syntax/legacy-emphasis.js";
 import { legacyDeleteSyntax } from "./lib/syntax/legacy-delete.js";
 import { legacyAutolinkSyntax } from "./lib/syntax/legacy-autolink.js";
+import { legacyCodeTextSyntax } from "./lib/syntax/legacy-code-text.js";
 import { legacyEntitySyntax } from "./lib/syntax/legacy-entity.js";
 
 import { wikilinkFromMarkdown } from "./lib/mdast/wikilink.js";
@@ -223,6 +224,19 @@ export interface RemarkObsidianOptions {
    */
   legacyAutolinks?: boolean;
   /**
+   * Let an inline-code opener retry with a shorter width, as Obsidian does.
+   * `` ``code` `` renders a literal backtick followed by a code span holding
+   * `code`, where CommonMark requires a closer of the opener's own width and
+   * leaves the whole run literal without one. A short opener never grows, so
+   * `` `code`` `` stays literal either way.
+   *
+   * On by default. It also makes a pathological document *faster*: an opener with
+   * no usable closer is settled from a cached run index instead of stock's
+   * end-of-context scan, which is the scan that makes cmark's increasing-run
+   * shape superlinear.
+   */
+  legacyCodeSpans?: boolean;
+  /**
    * Convert a soft line ending into a positioned `break`, so `remark-breaks` has
    * nothing left to do.
    *
@@ -267,6 +281,7 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
   legacyStrikethrough: true,
   legacyEntities: true,
   legacyAutolinks: true,
+  legacyCodeSpans: true,
   positionedBreaks: true,
   escapedLineBreaks: false,
 };
@@ -347,6 +362,10 @@ export default function remarkObsidian(
 
   if (opts.legacyAutolinks) {
     data.micromarkExtensions.push(legacyAutolinkSyntax());
+  }
+
+  if (opts.legacyCodeSpans) {
+    data.micromarkExtensions.push(legacyCodeTextSyntax());
   }
 
   if (opts.customTaskChars) {

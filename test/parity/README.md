@@ -316,23 +316,28 @@ cmark's actual backtick pathology is run widths that **increase**, so no opener 
 finds its own width ahead and each one scans to EOF and fails. Stock micromark is
 superlinear on it -- time grows as roughly bytes^1.5:
 
-| runs `k` |     bytes |      bare |    ours |
-| -------: | --------: | --------: | ------: |
-|      250 |    31,625 |     291ms |   263ms |
-|      500 |   125,750 |   2,103ms | 2,106ms |
-|     1000 |   501,500 |  16,730ms |       — |
-|     2000 | 2,003,000 | 133,330ms |       — |
+| runs `k` |     bytes |      bare |  ours | speedup |
+| -------: | --------: | --------: | ----: | ------: |
+|      250 |    31,625 |     283ms |  17ms |     17x |
+|      500 |   125,750 |   2,084ms |  44ms |     47x |
+|     1000 |   501,500 |  16,219ms | 155ms |    104x |
+|     2000 | 2,003,000 | 130,322ms | 620ms |    210x |
 
-Doubling `k` quadruples the bytes and **octuples** the time. We track bare exactly,
-adding nothing and inheriting all of it, so `backtick-increasing` is gated at `k=500`
-where there is still headroom.
+Doubling `k` quadruples the bytes and **octuples** bare's time. Ours grows x4, exactly
+with the bytes.
 
-This reframes the retry rather than merely constraining it. The runs stock scans to
-EOF and fails on are _precisely_ the openers a retry has to decide, so a retry that
-consults a cached run index answers them without stock ever rescanning -- which
-should make our side of this table sublinear while bare stays where it is. The 20s
-budget cannot adjudicate any of that: it demonstrably passes a 254x quadratic, so
-linearity needs a deterministic counter, not a green test.
+The retry is what fixed that, rather than merely surviving it. The openers stock scans
+to EOF and fails on are _precisely_ the ones the retry must decide, so
+`legacy-code-text.ts` settles them from a run index built once per text context, and
+stock never runs the failing scan at all. `backtick-increasing` is gated at `k=2000`
+**because** ours is fast there: losing the index puts it back at 132s against a 20s
+budget, so the guard fails loudly rather than drifting quietly.
+
+One caution the attribution exposed. ` `a `` x14000 is 110ms bare against 982ms
+ours, and the retry construct accounts for **none** of it -- the same document with
+`legacyCodeSpans: false` is 982ms too. That superlinearity is somewhere in the
+transform chain, on a single paragraph holding thousands of inline spans, and it
+predates this work.
 
 ## The pinned chain
 

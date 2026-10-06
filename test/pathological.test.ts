@@ -41,7 +41,7 @@ const SIZES: Readonly<Record<string, number>> = {
   "autolink-email": 5_000,
   "backtick-run": 20_000,
   "backtick-retry": 7_000,
-  "backtick-increasing": 500,
+  "backtick-increasing": 2_000,
 };
 
 /**

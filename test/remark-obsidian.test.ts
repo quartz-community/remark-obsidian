@@ -2172,3 +2172,92 @@ describe("legacy autolinks", () => {
     expect(legacyEmailAutolink("<a\\b@c.test>")).toBe("a\\b@c.test");
   });
 });
+
+describe("legacy code spans", () => {
+  const code = async (md: string, opts?: RemarkObsidianOptions) =>
+    (await toHtml(md, { wikilinks: false, highlights: false, ...opts }))
+      .trim()
+      .replace(/\n/g, "");
+
+  it("retries a wider opener against a shorter closer", async () => {
+    // One backtick is shed, and it renders as itself.
+    expect(await code("``code`")).toBe("<p>`<code>code</code></p>");
+    // The opener drops straight to the closer's width rather than by one.
+    expect(await code("```code`")).toBe("<p>``<code>code</code></p>");
+  });
+
+  /**
+   * The asymmetry that makes this a rule: an opener shrinks, never grows. Without
+   * it the retry would happily "fix" input Obsidian leaves alone.
+   */
+  it("never grows a short opener", async () => {
+    expect(await code("`code``")).toBe("<p>`code``</p>");
+    expect(await code("`code```")).toBe("<p>`code```</p>");
+  });
+
+  /**
+   * The first control to check, because an exact-width closer must outrank the
+   * retry even when a shorter run appears earlier. Here the width-2 closer sits
+   * after a width-1 run, so a retry that fired on the first candidate it saw
+   * would produce a code span holding `a` and lose the rest.
+   */
+  it("prefers an exact-width closer over a retry", async () => {
+    expect(await code("``a` and ``b`")).toBe("<p><code>a` and </code>b`</p>");
+    expect(await code("`a``b`")).toBe("<p><code>a``b</code></p>");
+    expect(await code("``a`b``")).toBe("<p><code>a`b</code></p>");
+  });
+
+  /**
+   * The property that decides this belongs in the tokenizer. A repair pass over
+   * the tree would meet an `emphasis` node that must not exist, because the span
+   * shields its own body.
+   */
+  it("shields the retried span's body from other constructs", async () => {
+    expect(await code("``a *b* c`")).toBe("<p>`<code>a *b* c</code></p>");
+    expect(await code("``a&amp;b`")).toBe("<p>`<code>a&#x26;amp;b</code></p>");
+    expect(await code("``a\\b`")).toBe("<p>`<code>a\\b</code></p>");
+  });
+
+  /**
+   * The line ending is consumed inside the span, so it becomes a space rather
+   * than reaching `breakPositionsTransform` and turning into a `break`.
+   */
+  it("keeps a line ending inside a retried span", async () => {
+    expect(await code("``a\nb`")).toBe("<p>`<code>a b</code></p>");
+    expect(await code("``a\r\nb`")).toBe("<p>`<code>a b</code></p>");
+    expect(await code("> ``a\n> b`")).toBe(
+      "<blockquote><p>`<code>a b</code></p></blockquote>",
+    );
+  });
+
+  it("leaves stock padding and normalisation alone", async () => {
+    expect(await code("`` a ``")).toBe("<p><code>a</code></p>");
+    expect(await code("`` ` ``")).toBe("<p><code>`</code></p>");
+    expect(await code("` `` `")).toBe("<p><code>``</code></p>");
+    expect(await code("` foo `` bar `")).toBe("<p><code>foo `` bar</code></p>");
+    expect(await code("`a\nb`")).toBe("<p><code>a b</code></p>");
+  });
+
+  it("leaves a run with no usable closer literal", async () => {
+    expect(await code("`code")).toBe("<p>`code</p>");
+    expect(await code("`")).toBe("<p>`</p>");
+    expect(await code("``")).toBe("<p>``</p>");
+  });
+
+  it("retries in every context, since the rule is context-free", async () => {
+    expect(await code("*``code`*")).toBe("<p><em>`<code>code</code></em></p>");
+    expect(await code("**``code`**")).toBe(
+      "<p><strong>`<code>code</code></strong></p>",
+    );
+    expect(await code("# ``code`")).toBe("<h1>`<code>code</code></h1>");
+    expect(await code("- ``code`")).toBe(
+      "<ul><li>`<code>code</code></li></ul>",
+    );
+  });
+
+  it("can be turned off", async () => {
+    expect(await code("``code`", { legacyCodeSpans: false })).toBe(
+      "<p>``code`</p>",
+    );
+  });
+});

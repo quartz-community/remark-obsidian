@@ -2927,7 +2927,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "probe/code-context/in-emphasis-tight": {
       "id": "probe/code-context/in-emphasis-tight",
@@ -2976,7 +2977,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "probe/code-context/in-strong": {
       "id": "probe/code-context/in-strong",
@@ -3025,7 +3027,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "probe/code-context/in-table-cell": {
       "id": "probe/code-context/in-table-cell",
@@ -3072,7 +3075,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "probe/code-context/in-blockquote": {
       "id": "probe/code-context/in-blockquote",
@@ -3119,7 +3123,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "probe/code-context/in-link-label": {
       "id": "probe/code-context/in-link-label",
@@ -3176,7 +3181,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "probe/code-context/in-heading": {
       "id": "probe/code-context/in-heading",
@@ -3229,7 +3235,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "probe/code-context/in-list-item": {
       "id": "probe/code-context/in-list-item",
@@ -3278,7 +3285,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "probe/code-context/two-retries": {
       "id": "probe/code-context/two-retries",
@@ -3654,7 +3662,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "probe/code-run/balanced-one": {
       "id": "probe/code-run/balanced-one",
@@ -3795,7 +3804,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "probe/code-run/open-one-close-two": {
       "id": "probe/code-run/open-one-close-two",
@@ -3889,7 +3899,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "probe/code-run/open-one-close-three": {
       "id": "probe/code-run/open-one-close-three",
@@ -23397,8 +23408,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "fuzz/embed/84": {
       "id": "fuzz/embed/84",
@@ -23742,8 +23753,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "fuzz/html/19": {
       "id": "fuzz/html/19",
@@ -29120,8 +29131,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "fuzz/highlight/66": {
       "id": "fuzz/highlight/66",
@@ -41354,8 +41365,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "fuzz/comment/9": {
       "id": "fuzz/comment/9",
@@ -102239,8 +102250,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by legacy-code-text.ts: an inline-code opener with no closer of its own width sheds backticks from the left down to the widest closer ahead. Decided from a run index built once per text context, which also removes stock micromark's superlinear scan on cmark's increasing-run shape."
     },
     "commonmark/code-spans/348": {
       "id": "commonmark/code-spans/348",

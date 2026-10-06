@@ -64,11 +64,24 @@ export const SHAPES: Readonly<Record<string, (n: number) => string>> = {
   /**
    * cmark's real backtick case, and the one that bites: widths that *increase*,
    * so no opener ever finds its own width ahead and each scans to EOF and fails.
-   * Stock micromark is superlinear here -- roughly bytes^1.5, with time x8 for
-   * every doubling of `n` -- and we track it exactly, adding nothing.
+   * Stock micromark is superlinear here, roughly bytes^1.5 -- 2.1s at 125KB and
+   * **132s at 2MB**.
    *
-   * `n` counts runs, not bytes: n=500 is 125,750 bytes and ~2.1s, against 16.7s
-   * at n=1000 and 133s at n=2000. Gated where there is still headroom.
+   * `legacy-code-text.ts` settles those openers from a cached run index instead,
+   * so stock never runs the scan it would fail:
+   *
+   *       n     bytes      bare      ours
+   *     250    31,625     283ms      17ms
+   *     500   125,750   2,084ms      44ms
+   *    1000   501,500  16,219ms     155ms
+   *    2000 2,003,000 130,322ms     620ms
+   *
+   * Ours grows x4 per doubling of `n`, which is exactly how the bytes grow -- so
+   * linear where stock is not, and 210x faster at the top of that table.
+   *
+   * Gated at n=2000 *because* ours is fast there. Losing the index would put this
+   * back at 132s against a 20s budget, so the guard fails loudly instead of
+   * drifting.
    */
   "backtick-increasing": (n) =>
     Array.from({ length: n }, (_, i) => "`".repeat(i + 1) + "a").join(""),
