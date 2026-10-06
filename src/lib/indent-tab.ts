@@ -68,7 +68,13 @@ export function indentTabTransform(
       // legacy tokenizer effectively saw.
       const parsed = reparse(line.slice(indent[1]!.length));
       if (parsed.children.length === 0) continue;
-      for (const child of parsed.children) shift(child, lineStart, code);
+      // Anchored past the whitespace that was stripped, not at the line start.
+      // Shifting by `lineStart` alone put the content back on top of its own
+      // indent: `  ⇥foo` reported a paragraph spanning `  ⇥` and named the
+      // section after it, losing `foo` entirely.
+      for (const child of parsed.children) {
+        shift(child, lineStart + indent[1]!.length, lineStart, code);
+      }
 
       parent.children.splice(index, 1, ...(parsed.children as RootContent[]));
       index += parsed.children.length - 1;
@@ -83,20 +89,31 @@ interface Point {
 }
 
 /**
- * Place a fragment parsed from one line back onto that line. The whole block is
- * a single line, so its own start is the only anchor needed.
+ * Place a fragment parsed from one line back onto that line.
+ *
+ * Two anchors, because the fragment was re-parsed with its indentation removed:
+ * `contentStart` is where that text really begins, and `lineStart` is what columns
+ * are measured from. `normalizePointsTransform` recomputes line and column from the
+ * offsets afterwards, so the offset is the part that has to be right.
  */
-function shift(node: unknown, lineStart: number, code: RootContent): void {
+function shift(
+  node: unknown,
+  contentStart: number,
+  lineStart: number,
+  code: RootContent,
+): void {
   const candidate = node as {
     position?: { start: Point; end: Point };
     children?: unknown[];
   };
   if (candidate.position && code.position) {
     for (const point of [candidate.position.start, candidate.position.end]) {
-      point.offset = lineStart + (point.offset ?? 0);
+      point.offset = contentStart + (point.offset ?? 0);
       point.line = code.position.start.line;
-      point.column = (point.offset ?? lineStart) - lineStart + 1;
+      point.column = point.offset - lineStart + 1;
     }
   }
-  for (const child of candidate.children ?? []) shift(child, lineStart, code);
+  for (const child of candidate.children ?? []) {
+    shift(child, contentStart, lineStart, code);
+  }
 }

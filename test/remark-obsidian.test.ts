@@ -2354,3 +2354,28 @@ describe("empty list item continuation", () => {
     );
   });
 });
+
+describe("short indent with a tab", () => {
+  const spans = (md: string) =>
+    (processWithGfm(md) as any).children.map(
+      (c: any) =>
+        `${c.type}@${c.position?.start?.offset}..${c.position?.end?.offset}`,
+    );
+
+  /**
+   * `remark-parse@8` does not count a tab that follows a space, so one to three
+   * spaces plus a tab is content rather than indented code. The block is re-parsed
+   * without that whitespace, and it has to be placed back *past* it.
+   */
+  it("places the reparsed line past its own indent", () => {
+    expect(spans("  \tfoo\n")).toEqual(["paragraph@3..6"]);
+    expect(spans("   \tfoo\n")).toEqual(["paragraph@4..7"]);
+    expect(spans("  \tfoo\tbaz\t\tbim\n")).toEqual(["paragraph@3..15"]);
+    expect(spans(" \t[^1]: def\n")).toEqual(["footnoteDefinition@2..11"]);
+  });
+
+  it("leaves real indented code alone", () => {
+    expect(spans("\tfoo\n")).toEqual(["code@0..4"]);
+    expect(spans("    foo\n")).toEqual(["code@0..7"]);
+  });
+});
