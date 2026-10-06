@@ -53,6 +53,15 @@ export const SHAPES: Readonly<Record<string, (n: number) => string>> = {
   "autolink-open": (n) => "<".repeat(n),
   /** The same construct on input it actually claims, backslash and all. */
   "autolink-email": (n) => "<a\\b@c.test>".repeat(n),
+  /**
+   * cmark's backtick cases, which it made linear by precomputing a map of run
+   * positions. micromark needs no such help -- 20,000 backticks parse in 16ms
+   * bare -- so these are a *baseline*, recorded before any work on the backtick
+   * retry so the guard predates the change rather than following it.
+   */
+  "backtick-run": (n) => "`".repeat(n),
+  /** The shape a retry must examine: an opener that never finds its closer. */
+  "backtick-retry": (n) => "``a".repeat(n),
 };
 
 export type ShapeName = keyof typeof SHAPES;

@@ -39,6 +39,8 @@ const SIZES: Readonly<Record<string, number>> = {
   "block-ref-run": 20_000,
   "autolink-open": 20_000,
   "autolink-email": 5_000,
+  "backtick-run": 20_000,
+  "backtick-retry": 7_000,
 };
 
 /**
