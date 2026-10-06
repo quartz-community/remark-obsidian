@@ -434,9 +434,13 @@ export function headingName(node: Node, source: string): string {
 export function projectMdast(
   tree: Root,
   source: string,
-  options: { readonly skipUnreferencedDefinitions?: boolean } = {},
+  options: {
+    readonly skipUnreferencedDefinitions?: boolean;
+    readonly skipComments?: boolean;
+  } = {},
 ): Omit<Projections, "text" | "sections"> {
   const skipUnreferenced = options.skipUnreferencedDefinitions ?? true;
+  const skipComments = options.skipComments ?? true;
   const math: MathItem[] = [];
   const defined = definedFootnotes(tree);
   const referenced = new Set<string>();
@@ -454,11 +458,16 @@ export function projectMdast(
   const emphasis: string[] = [];
 
   visit(tree, (node: Node) => {
-    // Nothing inside a `%%` comment renders, so nothing inside one is
-    // projected either. The body is parsed into children now, and without this
-    // a wikilink or a tag written inside a comment would be collected as
+    // Nothing inside a `%%` comment renders, so nothing inside one reaches a
+    // *rendered* projection. The body is parsed into children now, and without
+    // this a wikilink or a tag written inside a comment would be collected as
     // though the document displayed it.
-    if (node.type === "comment") return SKIP;
+    //
+    // `metadataCache` is the other half of that asymmetry and indexes the
+    // comment's contents anyway, so it clears this flag: `%%[[target]]%%`
+    // reports a link to `target` while rendering nothing at all. The same split
+    // already governs footnote references.
+    if (skipComments && node.type === "comment") return SKIP;
     // An unreferenced definition is never rendered, so nothing inside it
     // reaches the capture. A referenced one is rendered into
     // `section.footnotes`: the recorder drops that for `text`, which is why
@@ -583,6 +592,7 @@ export function metaOurs(tree: Root, source: string): MetaProjections {
   // indexed -- unlike the rendered text, where it never appears.
   const projected = projectMdast(tree, source, {
     skipUnreferencedDefinitions: false,
+    skipComments: false,
   });
   const defined = definedFootnotes(tree);
   const target = (link: LinkItem): string =>

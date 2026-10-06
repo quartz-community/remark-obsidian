@@ -16608,8 +16608,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: metadataCache indexes a %% comment's contents even though nothing in it renders, so the meta projection no longer skips comment subtrees. The same asymmetry already governs footnote references."
     },
     "fuzz/comment/11": {
       "id": "fuzz/comment/11",
@@ -16660,8 +16660,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: metadataCache indexes a %% comment's contents even though nothing in it renders, so the meta projection no longer skips comment subtrees. The same asymmetry already governs footnote references."
     },
     "fuzz/setext/4": {
       "id": "fuzz/setext/4",
@@ -26878,8 +26878,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: metadataCache indexes a %% comment's contents even though nothing in it renders, so the meta projection no longer skips comment subtrees. The same asymmetry already governs footnote references."
     },
     "fuzz/table/4": {
       "id": "fuzz/table/4",
@@ -27565,8 +27565,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: metadataCache indexes a %% comment's contents even though nothing in it renders, so the meta projection no longer skips comment subtrees. The same asymmetry already governs footnote references."
     },
     "fuzz/highlight/11": {
       "id": "fuzz/highlight/11",
@@ -27918,8 +27918,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: metadataCache indexes a %% comment's contents even though nothing in it renders, so the meta projection no longer skips comment subtrees. The same asymmetry already governs footnote references."
     },
     "fuzz/footnote/11": {
       "id": "fuzz/footnote/11",
@@ -29019,8 +29019,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: metadataCache indexes a %% comment's contents even though nothing in it renders, so the meta projection no longer skips comment subtrees. The same asymmetry already governs footnote references."
     },
     "fuzz/embed/32": {
       "id": "fuzz/embed/32",
@@ -30939,8 +30939,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: metadataCache indexes a %% comment's contents even though nothing in it renders, so the meta projection no longer skips comment subtrees. The same asymmetry already governs footnote references."
     },
     "fuzz/highlight/23": {
       "id": "fuzz/highlight/23",
@@ -31776,8 +31776,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: metadataCache indexes a %% comment's contents even though nothing in it renders, so the meta projection no longer skips comment subtrees. The same asymmetry already governs footnote references."
     },
     "fuzz/strikethrough/4": {
       "id": "fuzz/strikethrough/4",
