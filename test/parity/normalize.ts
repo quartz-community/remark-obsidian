@@ -533,6 +533,14 @@ export function projectMdast(
   const skipComments = options.skipComments ?? true;
   const math: MathItem[] = [];
   const defined = definedFootnotes(tree);
+  /** Every node under a footnote definition or an inline footnote. */
+  const inFootnote = new Set<Node>();
+  visit(tree, (node: Node) => {
+    if (node.type !== "footnoteDefinition" && node.type !== "footnote") return;
+    visit(node, (inner: Node) => {
+      inFootnote.add(inner);
+    });
+  });
   const referenced = new Set<string>();
   visit(tree, "footnoteReference", (node: Node) => {
     referenced.add(
@@ -571,6 +579,13 @@ export function projectMdast(
     // `mdastText`, not `textOf`, so a wikilink or math span inside the emphasis
     // yields the same display text the DOM side reads off the rendered element.
     if (node.type === "strong" || node.type === "emphasis") {
+      // Not inside a footnote. The recorder removes `.footnotes` from the clone it
+      // reads `text` and `emphasis` off, because the renderer relocates every
+      // footnote body to a trailing section -- so Obsidian reports no emphasis there
+      // and cannot report any. `math`, `links`, `tags` and `highlights` are read
+      // from the undisturbed root and do see those bodies, which is why only this
+      // branch skips them.
+      if (inFootnote.has(node)) return;
       const kind = node.type === "strong" ? "strong" : "em";
       emphasis.push(`${kind}:${mdastText(node, defined)}`);
       return;

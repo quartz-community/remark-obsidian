@@ -1532,6 +1532,69 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/footnote-embed/ref-then-embed", "[^1]![[img.png]]\n\n[^1]: x\n"],
   ["probe/footnote-embed/embed-then-ref", "![[img.png]][^1]\n\n[^1]: x\n"],
   ["probe/footnote-embed/definition-embed", "[^1]: ![[img.png]]\n"],
+  // Math, which had **no** designed probes at all against 221 incidental hits and 15
+  // diverging -- the worst coverage ratio of anything open, by four times. Every one
+  // of those 15 is a fuzz document carrying six other constructs, so not one of them
+  // can attribute a cause. These cross the delimiter forms with padding, line
+  // endings, adjacency and the constructs that might or might not parse inside.
+  ["probe/math/inline-simple", "$x^2$\n"],
+  ["probe/math/inline-padded", "$ x $\n"],
+  ["probe/math/inline-empty", "$ $\n"],
+  ["probe/math/inline-across-line", "$y^2\ny^2$\n"],
+  ["probe/math/inline-blank-between", "$y^2\n\ny^2$\n"],
+  ["probe/math/lone-closer", "y^2$\n"],
+  ["probe/math/adjacent-text", "a$x$b\n"],
+  ["probe/math/currency-pair", "costs $5 and $6 total\n"],
+  ["probe/math/escaped-dollar", "\\$x\\$\n"],
+  ["probe/math/display-own-lines", "$$\nx^2\n$$\n"],
+  // Recorded as needing a re-tokenise rather than a repair pass; this pins what it
+  // would have to produce.
+  ["probe/math/display-same-line", "$$x^2$$\n"],
+  ["probe/math/display-open-only", "$$x^2\n"],
+  ["probe/math/display-tab-after", "$$\t[\n"],
+  ["probe/math/display-four", "$$$$\n"],
+  ["probe/math/emphasis-inside", "$_under_$\n"],
+  ["probe/math/strong-inside", "$**strong**$\n"],
+  ["probe/math/wikilink-inside", "$[[target]]$\n"],
+  ["probe/math/code-inside", "$`code`$\n"],
+  ["probe/math/in-wikilink", "[[$x^2$]]\n"],
+  ["probe/math/in-highlight", "==$x^2$==\n"],
+  ["probe/math/in-callout-title", "> [!note] $x^2$\n"],
+  ["probe/math/in-table-cell", "| $x^2$ |\n| --- |\n"],
+  // Emphasis across a line ending. `Foo *bar⏎baz*⏎====` reports `em:bar baz` to
+  // Obsidian, and the 35 open cases holding a `*` or `_` are the largest single
+  // group left -- against nine designed probes, all of them about delimiter runs
+  // rather than extent. The container forms are here because a callout title
+  // reportedly does *not* carry emphasis across its boundary.
+  ["probe/emphasis-span/across-line", "*bar\nbaz*\n"],
+  ["probe/emphasis-span/across-line-strong", "**bar\nbaz**\n"],
+  ["probe/emphasis-span/across-line-underscore", "_bar\nbaz_\n"],
+  ["probe/emphasis-span/three-lines", "*a\nb\nc*\n"],
+  ["probe/emphasis-span/blank-between", "*bar\n\nbaz*\n"],
+  ["probe/emphasis-span/in-setext-equals", "Foo *bar\nbaz*\n====\n"],
+  ["probe/emphasis-span/in-setext-dash", "Foo *bar\nbaz*\n----\n"],
+  ["probe/emphasis-span/in-quote", "> *bar\n> baz*\n"],
+  ["probe/emphasis-span/in-quote-lazy", "> *bar\nbaz*\n"],
+  ["probe/emphasis-span/in-list", "- *bar\n  baz*\n"],
+  ["probe/emphasis-span/in-callout-title", "> [!note] *em\nem*\n"],
+  ["probe/emphasis-span/unclosed", "*bar\n"],
+  ["probe/emphasis-span/tab-separated", "*\t*\t*\t\n"],
+  // What parses inside a footnote. `rejoinSplitReferences` established that a
+  // *reference* label is literal; these ask whether an inline footnote's body is too,
+  // which the recorded `^[**strong**]` reporting no emphasis suggests. If it holds,
+  // the rule is about footnotes generally rather than about labels.
+  ["probe/footnote-content/inline-plain", "^[plain]\n"],
+  ["probe/footnote-content/inline-strong", "^[a **strong** b]\n"],
+  ["probe/footnote-content/inline-emphasis", "^[*em*]\n"],
+  ["probe/footnote-content/inline-code", "^[`code`]\n"],
+  ["probe/footnote-content/inline-math", "^[$x^2$]\n"],
+  ["probe/footnote-content/inline-highlight", "^[==mark==]\n"],
+  ["probe/footnote-content/inline-tag", "^[#tag]\n"],
+  ["probe/footnote-content/ref-strong", "[^**strong**]\n"],
+  ["probe/footnote-content/ref-code", "[^`code`]\n"],
+  ["probe/footnote-content/ref-tag", "[^#tag]\n"],
+  ["probe/footnote-content/definition-strong", "use[^1]\n\n[^1]: **strong**\n"],
+  ["probe/footnote-content/definition-math", "use[^1]\n\n[^1]: $x^2$\n"],
 ];
 
 /** Inline tokens, each crossed with a set of malformed delimiter states. */

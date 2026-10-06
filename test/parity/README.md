@@ -442,6 +442,25 @@ changed projections is a flake — re-record and it will come back. Do not assum
 older value was right, though: `| $|x|$ |` arguably _should_ split into three cells, and
 only the html settled which reading was real.
 
+### The two sides must exclude the same things
+
+The recorder reads `text` and `emphasis` off a **clone** with `.footnotes` removed,
+because the renderer relocates every footnote body to a trailing section and comparing a
+relocated tail against our in-place mdast proves nothing. `math`, `links`, `tags`,
+`headings`, `tasks` and `highlights` are read from the undisturbed root and _do_ see
+those bodies.
+
+That asymmetry is deliberate and it has to be mirrored exactly. Our `emphasis`
+projection walked into footnote definitions and inline footnotes, so it reported
+`strong`/`em` that Obsidian not only did not report but could not: `^[*em*]` and
+`[^1]: **strong**` were tracked as parity divergences for emphasis the other side had
+already thrown away.
+
+Three cases, and the general rule is worth stating because this is the fifth time one of
+the harness's own asymmetries has been triaged as a package bug: **before implementing a
+projection divergence, check what the recorder does to the DOM it reads that projection
+from.** The answer is in `oracle.e2e.ts`, usually in a comment next to the `remove()`.
+
 ### A rendered divergence can hide the character that caused it
 
 `commonmark/links/507` reads `[link](/url "title")` and the two sides disagree about
