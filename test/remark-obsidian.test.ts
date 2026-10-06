@@ -2063,3 +2063,34 @@ describe("remark-obsidian", () => {
     });
   });
 });
+
+describe("reparse recursion", () => {
+  /**
+   * A pass that locates a body by matching a marker hands back the text it was
+   * given when the match fails, and the chain then re-enters itself on identical
+   * input. `taskReparseTransform` does that for a nested item whose paragraph
+   * already starts past its own marker.
+   *
+   * Found by sweeping the fuzz generator: 55 of 4000 documents overflowed the
+   * stack, 37 frames deep. The depth bound in `reparse` is what stops it, and a
+   * crash is worse than any divergence, so this guards the invariant directly
+   * rather than through the parity corpus.
+   */
+  it("does not overflow the stack on a self-reproducing fragment", () => {
+    const markdown =
+      "- [ ] [[target]]\n" +
+      "- [ ] [[a#^blk\na#^blk]] [[a#h\\]]](<https://e.test>\t\\$$y^2$$\n" +
+      "- [ ] [\\![[d.pdf#page=3]]](u)\n" +
+      "===\n";
+    expect(() => processWithGfm(markdown)).not.toThrow();
+  });
+
+  it("still nests the blocks a task body reparses into", () => {
+    const tree = processWithGfm("- [ ] 1.\n");
+    const kinds: string[] = [];
+    visit(tree, (node) => {
+      kinds.push(node.type);
+    });
+    expect(kinds).toContain("list");
+  });
+});

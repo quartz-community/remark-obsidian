@@ -93,6 +93,15 @@ import {
   frontmatterToMarkdown,
 } from "mdast-util-frontmatter";
 
+/**
+ * How deep the transform chain may re-enter itself through `reparse`.
+ *
+ * Genuine nesting shrinks the fragment each time, so a handful of levels is more
+ * than real documents reach; the bound exists only to stop a pass that hands back
+ * the text it was given from recursing forever.
+ */
+const MAX_REPARSE_DEPTH = 8;
+
 /** Marker element a kept comment renders as, which `rehype-obsidian` removes. */
 export const COMMENT_ELEMENT = "obsidian-comment";
 
@@ -486,12 +495,30 @@ export default function remarkObsidian(
    * because it builds a markdown-only processor where every plugin is sync.
    *
    * Recursing into `transform` runs the same passes on the fragment while
-   * staying synchronous. Fragments only ever shrink, so this terminates for
-   * the same reason the previous call did.
+   * staying synchronous.
+   *
+   * Fragments do *not* only ever shrink, which this used to claim. A pass that
+   * locates a body by matching a marker hands back the text it was given when the
+   * match fails -- `taskReparseTransform` does exactly that for a nested item whose
+   * paragraph already starts past its own marker -- and the chain then re-enters
+   * itself on identical input. 55 of 4000 generated documents overflowed the stack
+   * that way, 37 frames deep, and a crash is worse than any divergence.
+   *
+   * So the depth is bounded rather than assumed. At the bound the fragment is still
+   * parsed, just not transformed, which keeps it well-formed while cutting the
+   * cycle. Bounding it here covers all 19 passes that take a reparse callback
+   * instead of each of them guarding separately.
    */
+  let depth = 0;
   const reparse = (markdown: string): Root => {
     const fragment = self.parse(markdown);
-    transform(fragment, markdown);
+    if (depth >= MAX_REPARSE_DEPTH) return fragment;
+    depth++;
+    try {
+      transform(fragment, markdown);
+    } finally {
+      depth--;
+    }
     return fragment;
   };
 
