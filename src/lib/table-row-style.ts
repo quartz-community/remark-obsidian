@@ -2,6 +2,8 @@ import type { Root, RootContent } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 
+import { delimits } from "./table-pipe-style.js";
+
 interface Point {
   line: number;
   column: number;
@@ -62,7 +64,15 @@ export function tableRowStyleTransform(
 
       let cut = -1;
       for (let line = 2; line < lines.length; line++) {
-        if (outerPiped(lines[line]!) !== outerPiped(header)) {
+        // Two ways a body row ends the table: it disagrees with the header on
+        // the outer pipes, or it delimits no cells at all. The second is the
+        // same rule the header and delimiter rows obey -- a leading pipe alone
+        // separates nothing -- so `| a |` / `| --- |` / `| b` is a table plus a
+        // paragraph.
+        if (
+          outerPiped(lines[line]!) !== outerPiped(header) ||
+          !delimits(lines[line]!)
+        ) {
           cut = line;
           break;
         }

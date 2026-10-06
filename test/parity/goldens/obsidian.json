@@ -843,7 +843,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by applying the delimits rule to body rows too: a row that separates no cells ends the table, so '| a |' / '| --- |' / '| b' is a table plus a paragraph."
     },
     "probe/table-pipes/two-columns-unclosed": {
       "id": "probe/table-pipes/two-columns-unclosed",

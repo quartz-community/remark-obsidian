@@ -127,7 +127,7 @@ function piped(line: string): boolean {
  * delimits nothing and Obsidian reads it as prose. A row with no leading pipe needs
  * just one, which is why `a | b` is a row and `| a` is not.
  */
-function delimits(line: string): boolean {
+export function delimits(line: string): boolean {
   if (!piped(line)) return true;
   return (line.match(/\|/gu) ?? []).length >= 2;
 }
