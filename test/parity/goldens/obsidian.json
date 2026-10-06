@@ -14537,8 +14537,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/math/12": {
       "id": "fuzz/math/12",
@@ -15442,8 +15442,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/math/13": {
       "id": "fuzz/math/13",
@@ -16825,8 +16825,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/embed/83": {
       "id": "fuzz/embed/83",
@@ -18145,8 +18145,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/highlight/54": {
       "id": "fuzz/highlight/54",
@@ -18406,8 +18406,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/wikilink/16": {
       "id": "fuzz/wikilink/16",
@@ -19937,8 +19937,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/html/21": {
       "id": "fuzz/html/21",
@@ -21171,8 +21171,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/embed/114": {
       "id": "fuzz/embed/114",
@@ -21229,8 +21229,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/embed/115": {
       "id": "fuzz/embed/115",
@@ -21494,8 +21494,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/inline-footnote/29": {
       "id": "fuzz/inline-footnote/29",
@@ -21966,8 +21966,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/html/22": {
       "id": "fuzz/html/22",
@@ -22564,8 +22564,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/html/24": {
       "id": "fuzz/html/24",
@@ -22666,8 +22666,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/embed/121": {
       "id": "fuzz/embed/121",
@@ -26356,8 +26356,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/embed/11": {
       "id": "fuzz/embed/11",
@@ -27151,8 +27151,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/embed/15": {
       "id": "fuzz/embed/15",
@@ -30541,8 +30541,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/highlight/19": {
       "id": "fuzz/highlight/19",
@@ -32482,8 +32482,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/wikilink/8": {
       "id": "fuzz/wikilink/8",
@@ -33575,8 +33575,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/embed/54": {
       "id": "fuzz/embed/54",
@@ -33947,8 +33947,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/embed/56": {
       "id": "fuzz/embed/56",
@@ -35245,8 +35245,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/embed/60": {
       "id": "fuzz/embed/60",
@@ -36664,8 +36664,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "fuzz/tag/8": {
       "id": "fuzz/tag/8",
@@ -83441,8 +83441,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by splitting a dash underline off as a thematic break: over more than one content line Obsidian reports paragraph plus thematicBreak, where the underline was being folded into the paragraph as text."
     },
     "commonmark/setext-headings/96": {
       "id": "commonmark/setext-headings/96",

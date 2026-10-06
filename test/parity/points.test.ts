@@ -147,7 +147,7 @@ describe("node positions", () => {
     "paragraph > break": 361,
     "paragraph > footnoteReference": 8,
     "paragraph > link": 2,
-    "paragraph > text": 315,
+    "paragraph > text": 294,
     "strong > break": 6,
     "strong > text": 6,
     "table > tableRow": 4,

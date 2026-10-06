@@ -83,9 +83,17 @@ export function setextUnderlineTransform(
       // paragraph. Only a single content line makes a heading.
       if (STRICT.test(underline) && lines.length <= 2) continue;
 
+      // A dash underline over more than one content line is a thematic break of
+      // its own, not paragraph text: Obsidian reports `paragraph` plus
+      // `thematicBreak` for `a` / `b` / `---`. `===` has no block form, so it
+      // stays text there, which is what we already did for both.
+      const dashes = /^-{3,}$/u.test(underline.replace(/[ \t]/gu, ""));
+      const broken = dashes && lines.length >= 3;
+      const content = broken ? lines.slice(0, -1) : lines;
+
       const children: PhrasingContent[] = [];
       let offset = start;
-      for (const line of lines) {
+      for (const line of content) {
         if (children.length > 0) {
           children.push({ type: "text", value: "\n" } as PhrasingContent);
         }
@@ -99,14 +107,31 @@ export function setextUnderlineTransform(
         offset += line.length + 1;
       }
 
-      parent.children.splice(index, 1, {
+      const contentEnd = start + content.join("\n").length;
+      const paragraph = {
         type: "paragraph",
         children,
         position: {
           start: { line: 0, column: 1, offset: start },
+          end: broken
+            ? { line: 0, column: 1, offset: contentEnd }
+            : { ...heading.position!.end },
+        },
+      } as Paragraph;
+
+      if (!broken) {
+        parent.children.splice(index, 1, paragraph);
+        continue;
+      }
+
+      parent.children.splice(index, 1, paragraph, {
+        type: "thematicBreak",
+        position: {
+          start: { line: 0, column: 1, offset: contentEnd + 1 },
           end: { ...heading.position!.end },
         },
-      } as Paragraph);
+      } as RootContent);
+      index++;
     }
   });
 }
