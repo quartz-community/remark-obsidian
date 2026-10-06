@@ -86,20 +86,67 @@ function stripColourMarker(content: string): string {
   return content.slice(String.fromCodePoint(first).length);
 }
 
+/**
+ * Display text with whitespace kept exactly as written.
+ *
+ * `mdastText` ends in `.replace(/\s+/g, " ").trim()`, which is right for comparing
+ * against a DOM `textContent` but destroys the only thing the 1.14 highlight rules
+ * turn on: `==🔴\ttext==` keeps its tab, `==🔴\ntext==` keeps its line ending, and
+ * the space after a colour marker survives. Switching the highlight projection to
+ * `mdastText` fixed 8 cases and broke 20 for exactly that reason.
+ *
+ * So the node-type handling is deliberately duplicated from `mdastText` rather than
+ * shared: the two agree on what each node *shows* and disagree on whitespace, and
+ * that disagreement is the point.
+ */
 function textOf(node: Node, defined?: ReadonlySet<string>): string {
   let out = "";
-  visit(node, (child: Node) => {
-    if (child.type === "text") out += (child as ValueNode).value;
-    else if (child.type === "break") out += "\n";
-    // Same rule as `mdastText`: a reference nothing defines is shown by
-    // Obsidian as its bare label, and the DOM side reads that text too.
-    else if (child.type === "footnoteReference") {
-      const id = String(
-        (child as unknown as { identifier: string }).identifier,
-      );
-      if (defined && !defined.has(id)) out += id;
+
+  const walk = (child: Node): void => {
+    switch (child.type) {
+      case "text":
+      case "inlineCode":
+        out += (child as ValueNode).value;
+        return;
+      case "break":
+        out += "\n";
+        return;
+      case "wikilink": {
+        const link = child as WikilinkNode;
+        out += link.embedded
+          ? [link.path, link.heading].filter(Boolean).join("#")
+          : link.value ||
+            link.alias ||
+            [link.path, link.heading].filter(Boolean).join(" > ");
+        return;
+      }
+      case "tag":
+        out += `#${(child as ValueNode).value}`;
+        return;
+      case "inlineMath":
+        out += "\u27e8math\u27e9";
+        return;
+      // Renders nothing, and it carries its parsed body as children.
+      case "comment":
+        return;
+      // Same rule as `mdastText`: a reference nothing defines is shown by
+      // Obsidian as its bare label, and the DOM side reads that text too.
+      case "footnoteReference": {
+        const id = String(
+          (child as unknown as { identifier: string }).identifier,
+        );
+        if (defined && !defined.has(id)) out += id;
+        return;
+      }
+      default:
+        break;
     }
-  });
+
+    const children = (child as { children?: Node[] }).children;
+    if (children) for (const grandchild of children) walk(grandchild);
+  };
+
+  walk(node);
   return out;
 }
 

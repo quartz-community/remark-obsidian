@@ -14338,8 +14338,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the highlight's text collected only text nodes, so a wikilink, tag or code span inside one projected as empty. textOf now handles those node types while keeping whitespace exactly as written, which the 1.14 colour-marker rules depend on."
     },
     "fuzz/footnote/28": {
       "id": "fuzz/footnote/28",
@@ -15190,8 +15190,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the highlight's text collected only text nodes, so a wikilink, tag or code span inside one projected as empty. textOf now handles those node types while keeping whitespace exactly as written, which the 1.14 colour-marker rules depend on."
     },
     "fuzz/embed/75": {
       "id": "fuzz/embed/75",
@@ -19694,8 +19694,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the highlight's text collected only text nodes, so a wikilink, tag or code span inside one projected as empty. textOf now handles those node types while keeping whitespace exactly as written, which the 1.14 colour-marker rules depend on."
     },
     "fuzz/highlight/58": {
       "id": "fuzz/highlight/58",
@@ -19754,8 +19754,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the highlight's text collected only text nodes, so a wikilink, tag or code span inside one projected as empty. textOf now handles those node types while keeping whitespace exactly as written, which the 1.14 colour-marker rules depend on."
     },
     "fuzz/wikilink/17": {
       "id": "fuzz/wikilink/17",
@@ -24419,8 +24419,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the highlight's text collected only text nodes, so a wikilink, tag or code span inside one projected as empty. textOf now handles those node types while keeping whitespace exactly as written, which the 1.14 colour-marker rules depend on."
     },
     "fuzz/table/3": {
       "id": "fuzz/table/3",
@@ -29732,8 +29732,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the highlight's text collected only text nodes, so a wikilink, tag or code span inside one projected as empty. textOf now handles those node types while keeping whitespace exactly as written, which the 1.14 colour-marker rules depend on."
     },
     "fuzz/highlight/18": {
       "id": "fuzz/highlight/18",
@@ -34443,8 +34443,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the highlight's text collected only text nodes, so a wikilink, tag or code span inside one projected as empty. textOf now handles those node types while keeping whitespace exactly as written, which the 1.14 colour-marker rules depend on."
     },
     "fuzz/wikilink/10": {
       "id": "fuzz/wikilink/10",
@@ -48695,8 +48695,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the highlight's text collected only text nodes, so a wikilink, tag or code span inside one projected as empty. textOf now handles those node types while keeping whitespace exactly as written, which the 1.14 colour-marker rules depend on."
     },
     "precedence/html-obsidian-comments": {
       "id": "precedence/html-obsidian-comments",
