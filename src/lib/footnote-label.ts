@@ -1,6 +1,14 @@
-import type { Paragraph, PhrasingContent, Root, RootContent } from "mdast";
+import type {
+  Paragraph,
+  PhrasingContent,
+  Root,
+  RootContent,
+  Text,
+} from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
+
+import { span } from "./normalize-points.js";
 
 function shiftTo(node: unknown, offset: number): void {
   const candidate = node as {
@@ -57,14 +65,28 @@ export function footnoteLabelTransform(
       let offset = start;
       for (const line of slice.split("\n")) {
         if (children.length > 0) {
-          children.push({ type: "text", value: "\n" } as PhrasingContent);
+          children.push(
+            span<Text>(
+              { type: "text", value: "\n" } as Text,
+              source,
+              offset - 1,
+              offset,
+            ) as PhrasingContent,
+          );
         }
         const block = reparse(line).children[0];
         if (block?.type === "paragraph") {
           for (const child of block.children) shiftTo(child, offset);
           children.push(...block.children);
         } else {
-          children.push({ type: "text", value: line } as PhrasingContent);
+          children.push(
+            span<Text>(
+              { type: "text", value: line } as Text,
+              source,
+              offset,
+              offset + line.length,
+            ) as PhrasingContent,
+          );
         }
         offset += line.length + 1;
       }

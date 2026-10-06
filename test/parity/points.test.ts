@@ -135,10 +135,10 @@ describe("node positions", () => {
     "heading > footnoteReference": 3,
     "heading > text": 1,
     "link > text": 2,
-    "paragraph > break": 67,
+    "paragraph > break": 7,
     "paragraph > footnoteReference": 8,
     "paragraph > link": 2,
-    "paragraph > text": 17,
+    "paragraph > text": 10,
     "table > tableRow": 6,
     "tableRow > tableCell": 6,
   };

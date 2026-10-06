@@ -1,6 +1,14 @@
-import type { Paragraph, PhrasingContent, Root, RootContent } from "mdast";
+import type {
+  Paragraph,
+  PhrasingContent,
+  Root,
+  RootContent,
+  Text,
+} from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
+
+import { span } from "./normalize-points.js";
 
 /** A setext underline exactly as `remark-parse@8` accepts it: nothing around it. */
 const STRICT = /^(=+|-+)$/u;
@@ -95,14 +103,30 @@ export function setextUnderlineTransform(
       let offset = start;
       for (const line of content) {
         if (children.length > 0) {
-          children.push({ type: "text", value: "\n" } as PhrasingContent);
+          // The newline this stands for sits just before the current line, and
+          // `breakPositionsTransform` turns a placed one into a placed `break`.
+          children.push(
+            span<Text>(
+              { type: "text", value: "\n" } as Text,
+              source,
+              offset - 1,
+              offset,
+            ) as PhrasingContent,
+          );
         }
         const block = reparse(line).children[0];
         if (block?.type === "paragraph") {
           for (const child of block.children) shiftTo(child, offset);
           children.push(...block.children);
         } else {
-          children.push({ type: "text", value: line } as PhrasingContent);
+          children.push(
+            span<Text>(
+              { type: "text", value: line } as Text,
+              source,
+              offset,
+              offset + line.length,
+            ) as PhrasingContent,
+          );
         }
         offset += line.length + 1;
       }
@@ -184,14 +208,30 @@ export function multilineSetextTransform(
       let offset = start;
       for (const line of source.slice(start, end).split("\n")) {
         if (children.length > 0) {
-          children.push({ type: "text", value: "\n" } as PhrasingContent);
+          // The newline this stands for sits just before the current line, and
+          // `breakPositionsTransform` turns a placed one into a placed `break`.
+          children.push(
+            span<Text>(
+              { type: "text", value: "\n" } as Text,
+              source,
+              offset - 1,
+              offset,
+            ) as PhrasingContent,
+          );
         }
         const block = reparse(line).children[0];
         if (block?.type === "paragraph") {
           for (const child of block.children) shiftTo(child, offset);
           children.push(...block.children);
         } else {
-          children.push({ type: "text", value: line } as PhrasingContent);
+          children.push(
+            span<Text>(
+              { type: "text", value: line } as Text,
+              source,
+              offset,
+              offset + line.length,
+            ) as PhrasingContent,
+          );
         }
         offset += line.length + 1;
       }

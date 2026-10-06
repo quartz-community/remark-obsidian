@@ -1,5 +1,6 @@
-import type { Root, RootContent } from "mdast";
+import type { Root, RootContent, Text } from "mdast";
 import type { Comment } from "./types.js";
+import { span } from "./normalize-points.js";
 
 /**
  * Re-parse whatever follows a block comment's closing `%%` on the same line.
@@ -115,7 +116,12 @@ function absorbLazyLine(tree: Root, index: number, source: string): void {
   const host = definition.children[definition.children.length - 1];
   if (host?.type !== "paragraph") return;
 
-  host.children.push({ type: "text", value: "\n" }, ...next.children);
+  // The guard above proves the gap is exactly one newline, so it spans `end` to
+  // `start` and `breakPositionsTransform` can turn it into a placed `break`.
+  host.children.push(
+    span<Text>({ type: "text", value: "\n" } as Text, source, end, start),
+    ...next.children,
+  );
   for (const node of [host, definition]) {
     if (node.position && next.position?.end) {
       node.position.end = { ...next.position.end };

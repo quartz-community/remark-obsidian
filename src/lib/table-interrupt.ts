@@ -1,6 +1,14 @@
-import type { Paragraph, PhrasingContent, Root, RootContent } from "mdast";
+import type {
+  Paragraph,
+  PhrasingContent,
+  Root,
+  RootContent,
+  Text,
+} from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
+
+import { span } from "./normalize-points.js";
 
 interface ParentNode extends Node {
   children: RootContent[];
@@ -61,7 +69,12 @@ export function tableInterruptTransform(
 
         for (const child of children) shift(child, lineOffset, lineNumber);
         (paragraph as Paragraph).children.push(
-          { type: "text", value: "\n" } as PhrasingContent,
+          span<Text>(
+            { type: "text", value: "\n" } as Text,
+            source,
+            lineOffset - 1,
+            lineOffset,
+          ) as PhrasingContent,
           ...children,
         );
 
