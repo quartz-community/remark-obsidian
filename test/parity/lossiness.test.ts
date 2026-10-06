@@ -228,19 +228,20 @@ describe("source fidelity", () => {
       if (missing.length > 0) lost.push(`${entry.id}: ${missing.join(" ")}`);
     }
     /**
-     * 8 labels another construct claims before the footnote pass sees
-     * them, each already tracked as a parity divergence: `[^_under_]` becomes
-     * emphasis, since the underscores pair first; the others hold a
-     * backslash, a `%%` run, a character reference and a URL. Listed rather
-     * than counted so a sixth cannot arrive unnoticed.
+     * Two labels still unreachable, down from seven: `rejoinSplitReferences` now
+     * recovers a reference whose closing bracket a construct inside the label had
+     * taken out of reach, which covered the emphasis, highlight, html, math and
+     * `%%` cases listed here before.
+     *
+     * What is left is a different shape in each case. `[^1\]` ends in a backslash,
+     * so the label the author wrote and the label the value holds differ. And
+     * `[^https://e.test/p]` has GFM's bare-URL autolink claim the whole label, so
+     * the text node the scan needs never exists.
+     *
+     * Listed rather than counted so a third cannot arrive unnoticed.
      */
     expect(lost).toEqual([
-      "fuzz/footnote/38: [^==mark==]",
-      "fuzz/footnote/41: [^$https://e.test/p$]",
-      "fuzz/footnote/43: [^<br>]",
-      "fuzz/footnote/4: [^_under_]",
       "fuzz/embed/12: [^1\\]",
-      "fuzz/footnote/15: [^%%note%%%%]",
       "fuzz/footnote/24: [^https://e.test/p]",
     ]);
   });

@@ -2149,8 +2149,12 @@ describe("legacy autolinks", () => {
   it("can be turned off", () => {
     const off = (md: string) => {
       const found: string[] = [];
-      visit(processWithGfm(md, { legacyAutolinks: false }), "link", (n: any) =>
-        found.push(n.url),
+      visit(
+        processWithGfm(md, { legacyAutolinks: false }),
+        "link",
+        (n: any) => {
+          found.push(n.url);
+        },
       );
       return found;
     };
@@ -2377,5 +2381,43 @@ describe("short indent with a tab", () => {
   it("leaves real indented code alone", () => {
     expect(spans("\tfoo\n")).toEqual(["code@0..4"]);
     expect(spans("    foo\n")).toEqual(["code@0..7"]);
+  });
+});
+
+describe("footnote reference labels", () => {
+  const refs = (md: string) => {
+    const found: string[] = [];
+    // A block body on purpose: `found.push` returns a number, and
+    // `unist-util-visit` reads a numeric return as the index to continue from, so
+    // an expression body makes it revisit and report every node twice.
+    visit(processWithGfm(md), "footnoteReference", (n: any) => {
+      found.push(
+        `${n.identifier}@${n.position?.start?.offset}..${n.position?.end?.offset}`,
+      );
+    });
+    return found;
+  };
+
+  /**
+   * Obsidian parses nothing inside a reference's label, so the label is whatever the
+   * source holds. We let it tokenise, and whatever formed there took the closing
+   * bracket out of reach -- leaving no reference at all rather than a wrong one.
+   */
+  it("rejoins a reference a construct split apart", () => {
+    expect(refs("[^%%note%%]\n")).toEqual(["%%note%%@0..11"]);
+    expect(refs("[^==mark==]\n")).toEqual(["==mark==@0..11"]);
+    expect(refs("[^<br>]\n")).toEqual(["<br>@0..7"]);
+    expect(refs("[^$x$]\n")).toEqual(["$x$@0..6"]);
+    expect(refs("([^_under_]\n")).toEqual(["_under_@1..11"]);
+  });
+
+  it("leaves an ordinary reference alone", () => {
+    expect(refs("[^1]\n")).toEqual(["1@0..4"]);
+    expect(refs("a[^1]b\n\n[^1]: d\n")).toEqual(["1@1..5"]);
+  });
+
+  /** A label may hold no bracket, so an embed inside one is still unresolved. */
+  it("does not claim a label containing brackets", () => {
+    expect(refs("[^![[img.png]]]\n")).toEqual([]);
   });
 });

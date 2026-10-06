@@ -140,7 +140,117 @@ function alignToSource(source: string, value: string): SourceAlignment | null {
   return rebuilt.join("") === value ? { escaped, at } : null;
 }
 
+/** A `[^label` left hanging at the end of a text node, with no closer in it. */
+const HANGING_OPENER = /\[\^[^[\]\s]*$/u;
+/** The label rule, applied to what the source holds between the delimiters. */
+const LABEL = /^[^[\]\s]+$/u;
+
+/**
+ * Rejoin a reference whose delimiters an inline construct split apart.
+ *
+ * Obsidian parses nothing inside a footnote reference's label, so `[^%%note%%]` is a
+ * reference to the label `%%note%%` and renders as that text. We let the label's
+ * contents tokenise, and whatever forms there takes the `]` out of reach of the pass
+ * above -- which only ever sees one text node:
+ *
+ *     [^%%note%%]      text "[^" + comment + text "]"      no reference at all
+ *     [^==mark==]      text "[^" + highlight + text "]"
+ *     [^<br>]          text "[^" + html + text "]"
+ *     [^_under_]       text "[^" + emphasis + text "]"
+ *
+ * Deliberately narrow, because 699 cases in this corpus hold a `[^`. It fires only
+ * where a run is *currently* split, which is exactly where no reference exists now:
+ * a reference GFM resolved is already a node, and one the pass above handled never
+ * had its closer taken away.
+ *
+ * Both delimiter offsets are computed from the text nodes and then checked against
+ * the source before anything is replaced, so an escape or a character reference in
+ * the surrounding text makes this stand aside rather than guess.
+ */
+function rejoinSplitReferences(tree: Root, source: string): void {
+  visit(tree, (node: Node) => {
+    const parent = node as Partial<ParentNode>;
+    const children = parent.children;
+    if (!Array.isArray(children)) return;
+
+    for (let index = 0; index < children.length; index++) {
+      const opener = children[index];
+      if (opener?.type !== "text") continue;
+      const value = (opener as Text).value;
+      const hanging = HANGING_OPENER.exec(value);
+      if (!hanging) continue;
+      const openerEnd = (opener as Text).position?.end?.offset;
+      if (openerEnd === undefined) continue;
+      const markerAt = openerEnd - hanging[0].length;
+      if (source.slice(markerAt, markerAt + 2) !== "[^") continue;
+
+      // The closer is the next text sibling holding a `]`; the constructs between
+      // are what took it out of reach.
+      let closerIndex = -1;
+      let closerAt = -1;
+      for (let scan = index + 1; scan < children.length; scan++) {
+        const candidate = children[scan];
+        if (candidate?.type !== "text") continue;
+        const bracket = (candidate as Text).value.indexOf("]");
+        if (bracket === -1) continue;
+        const start = (candidate as Text).position?.start?.offset;
+        if (start === undefined) break;
+        if (source[start + bracket] !== "]") break;
+        closerIndex = scan;
+        closerAt = start + bracket;
+        break;
+      }
+      if (closerIndex === -1) continue;
+
+      const written = source.slice(markerAt + 2, closerAt);
+      if (!LABEL.test(written)) continue;
+
+      const before = value.slice(0, value.length - hanging[0].length);
+      const closer = children[closerIndex] as Text;
+      const after = closer.value.slice(closer.value.indexOf("]") + 1);
+
+      const reference = {
+        type: "footnoteReference",
+        identifier: written.toLowerCase(),
+        label: written,
+        position: {
+          start: { line: 0, column: 0, offset: markerAt },
+          end: { line: 0, column: 0, offset: closerAt + 1 },
+        },
+      } as unknown as Node;
+
+      const replacement: Node[] = [];
+      if (before !== "") {
+        replacement.push({
+          type: "text",
+          value: before,
+          position: {
+            start: { ...(opener as Text).position!.start },
+            end: { line: 0, column: 0, offset: markerAt },
+          },
+        } as unknown as Node);
+      }
+      replacement.push(reference);
+      if (after !== "") {
+        replacement.push({
+          type: "text",
+          value: after,
+          position: {
+            start: { line: 0, column: 0, offset: closerAt + 1 },
+            end: { ...closer.position!.end },
+          },
+        } as unknown as Node);
+      }
+
+      children.splice(index, closerIndex - index + 1, ...replacement);
+      index += replacement.length - 1;
+    }
+  });
+}
+
 export function bareFootnoteRefTransform(tree: Root, source = ""): void {
+  if (source !== "") rejoinSplitReferences(tree, source);
+
   visit(tree, "text", (node: Node, index, parent) => {
     const text = node as Text;
     if (!text.value.includes("[^")) return;

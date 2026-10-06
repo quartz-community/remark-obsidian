@@ -22622,8 +22622,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rejoinSplitReferences: Obsidian parses nothing inside a footnote reference's label, so a construct forming there took the closing bracket out of reach of the bare-reference pass and no reference formed at all."
     },
     "fuzz/embed/80": {
       "id": "fuzz/embed/80",
@@ -24452,8 +24452,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rejoinSplitReferences: Obsidian parses nothing inside a footnote reference's label, so a construct forming there took the closing bracket out of reach of the bare-reference pass and no reference formed at all."
     },
     "fuzz/entity/2": {
       "id": "fuzz/entity/2",
@@ -25456,8 +25456,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rejoinSplitReferences: Obsidian parses nothing inside a footnote reference's label, so a construct forming there took the closing bracket out of reach of the bare-reference pass and no reference formed at all."
     },
     "fuzz/inline-footnote/25": {
       "id": "fuzz/inline-footnote/25",
@@ -29606,8 +29606,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rejoinSplitReferences: Obsidian parses nothing inside a footnote reference's label, so a construct forming there took the closing bracket out of reach of the bare-reference pass and no reference formed at all."
     },
     "fuzz/embed/125": {
       "id": "fuzz/embed/125",
@@ -31107,8 +31107,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rejoinSplitReferences: Obsidian parses nothing inside a footnote reference's label, so a construct forming there took the closing bracket out of reach of the bare-reference pass and no reference formed at all."
     },
     "fuzz/footnote/5": {
       "id": "fuzz/footnote/5",
@@ -36710,8 +36710,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by rejoinSplitReferences: Obsidian parses nothing inside a footnote reference's label, so a construct forming there took the closing bracket out of reach of the bare-reference pass and no reference formed at all."
     },
     "fuzz/footnote/16": {
       "id": "fuzz/footnote/16",
