@@ -51,6 +51,28 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
     "probe/inline-footnote/definition-first",
     "[^1]: body\n\nuse[^1] and ^[x]\n",
   ],
+  // How does a backtick run find its closer? micromark takes the maximal opening
+  // run and gives up when no run of equal length follows, so ` ``code` ` stays
+  // literal; Obsidian reports `` `code ``, which is what retrying one position along
+  // produces -- the second backtick opens and the trailing one closes, leaving the
+  // first as text. Inline code was thin on designed coverage at 57 probes against 61
+  // incidental hits, and the retry is the kind of rule only a full run matrix pins
+  // down, so these cross opener and closer lengths deliberately.
+  ["probe/code-run/balanced-one", "`code`\n"],
+  ["probe/code-run/balanced-two", "``code``\n"],
+  ["probe/code-run/open-two-close-one", "``code`\n"],
+  ["probe/code-run/open-one-close-two", "`code``\n"],
+  ["probe/code-run/open-three-close-one", "```code`\n"],
+  ["probe/code-run/open-one-close-three", "`code```\n"],
+  ["probe/code-run/interior-run", "`a``b`\n"],
+  ["probe/code-run/interior-single", "``a`b``\n"],
+  ["probe/code-run/unclosed", "`code\n"],
+  ["probe/code-run/lone-marker", "`\n"],
+  ["probe/code-run/two-markers", "``\n"],
+  ["probe/code-run/three-markers", "```\n"],
+  ["probe/code-run/escaped-inside", "`a\\`b`\n"],
+  ["probe/code-run/adjacent-text", "a`b`c\n"],
+  ["probe/code-run/padded", "`` a ``\n"],
   // Which tags start a raw HTML block? `remark-parse@8` starts one only for a
   // block-level tag, so `<br>` lands in a paragraph and a setext underline then
   // makes a heading of it, while `<div>` opens a block that swallows the underline.
