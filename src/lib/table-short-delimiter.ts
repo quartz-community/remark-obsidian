@@ -6,11 +6,13 @@ import type {
   Table,
   TableCell,
   TableRow,
+  Text,
 } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 
 import { delimits } from "./table-pipe-style.js";
+import { span } from "./normalize-points.js";
 
 const DELIMITER =
   /^ {0,3}\|?[ \t]*:?-+:?[ \t]*(\|[ \t]*:?-+:?[ \t]*)*(?:\|[ \t]*)?$/u;
@@ -19,6 +21,38 @@ const DELIMITER =
 function cells(line: string): string[] {
   const trimmed = line.trim().replace(/^\|/u, "").replace(/\|$/u, "");
   return trimmed.split("|").map((cell) => cell.trim());
+}
+
+/**
+ * The same split as `cells`, carrying where each one sits in the document.
+ *
+ * A row and its cells are nodes a consumer edits by, so they need spans, and the
+ * reparsed contents need shifting onto the document rather than keeping the offsets
+ * they came back with -- a fragment-relative position is worse than none, because it
+ * still looks usable.
+ */
+function cellSpans(
+  line: string,
+  lineStart: number,
+): Array<{ text: string; from: number; to: number }> {
+  let body = line.trim();
+  let base = lineStart + (line.length - line.trimStart().length);
+  if (body.startsWith("|")) {
+    body = body.slice(1);
+    base += 1;
+  }
+  if (body.endsWith("|")) body = body.slice(0, -1);
+
+  const found: Array<{ text: string; from: number; to: number }> = [];
+  let at = 0;
+  for (const piece of body.split("|")) {
+    const lead = piece.length - piece.trimStart().length;
+    const text = piece.trim();
+    const from = base + at + lead;
+    found.push({ text, from, to: from + text.length });
+    at += piece.length + 1;
+  }
+  return found;
 }
 
 function alignOf(cell: string): AlignType {
@@ -90,24 +124,46 @@ export function tableShortDelimiterTransform(
       // The surplus cell is therefore dropped when rendering, not when
       // parsing: `align` being short is what truncates the projection, while
       // the cell stays in the tree so a rewrite can still restore it.
-      const row = (line: string): TableRow => ({
-        type: "tableRow",
-        children: cells(line).map((cell): TableCell => {
-          const parsed = reparse(cell).children[0];
-          return {
-            type: "tableCell",
-            children:
-              parsed?.type === "paragraph"
-                ? parsed.children
-                : ([{ type: "text", value: cell }] as PhrasingContent[]),
-          };
-        }),
-      });
+      const row = (line: string, lineStart: number): TableRow =>
+        span<TableRow>(
+          {
+            type: "tableRow",
+            children: cellSpans(line, lineStart).map(
+              ({ text, from, to }): TableCell => {
+                const parsed = reparse(text).children[0];
+                let children: PhrasingContent[];
+                if (parsed?.type === "paragraph") {
+                  children = parsed.children;
+                  // Reparsed on its own, so numbered from the cell until shifted.
+                  for (const child of children) shift(child, from, startLine);
+                } else {
+                  children = [
+                    span<Text>(
+                      { type: "text", value: text } as Text,
+                      source,
+                      from,
+                      to,
+                    ),
+                  ];
+                }
+                return span<TableCell>(
+                  { type: "tableCell", children } as TableCell,
+                  source,
+                  from,
+                  to,
+                );
+              },
+            ),
+          } as TableRow,
+          source,
+          lineStart,
+          lineStart + line.length,
+        );
 
       const table: Table = {
         type: "table",
         align: delimiterCells.map((cell) => alignOf(cell)),
-        children: [row(header)],
+        children: [row(header, start)],
         position: {
           start: { ...paragraph.position!.start },
           end: {
