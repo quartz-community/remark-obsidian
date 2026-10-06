@@ -16989,7 +16989,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "A setext underline under a raw HTML line is a heading, because `remark-parse@8` starts an HTML block only for a block-level tag. The discriminator is the tag, not the line count: the legacy stack reads `<br>⏎===` as a heading named `<br>` and `<pre>⏎---⏎</pre>` as a heading plus `</pre>`, while `<div>⏎a⏎===` stays one html block. micromark starts a type-7 block for any complete tag alone on a line, so the underline is swallowed. Closing it means replicating legacy's block-tag list for html-block starts, which is tokenizer-level and affects every document with raw HTML -- not worth it for the two cases here."
     },
     "fuzz/embed/84": {
       "id": "fuzz/embed/84",
@@ -21616,7 +21616,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "A setext underline under a raw HTML line is a heading, because `remark-parse@8` starts an HTML block only for a block-level tag. The discriminator is the tag, not the line count: the legacy stack reads `<br>⏎===` as a heading named `<br>` and `<pre>⏎---⏎</pre>` as a heading plus `</pre>`, while `<div>⏎a⏎===` stays one html block. micromark starts a type-7 block for any complete tag alone on a line, so the underline is swallowed. Closing it means replicating legacy's block-tag list for html-block starts, which is tokenizer-level and affects every document with raw HTML -- not worth it for the two cases here."
     },
     "fuzz/embed/117": {
       "id": "fuzz/embed/117",
