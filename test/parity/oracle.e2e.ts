@@ -112,12 +112,15 @@ const CAPTURE = async (
       (el.textContent ?? "").replace(/^#/, ""),
     );
 
-    const headings = Array.from(root.querySelectorAll("h1,h2,h3,h4,h5,h6")).map(
-      (el) => {
+    // A heading inside an embed belongs to the note the embed expanded, not to
+    // this one, and `metadataCache` counts it that way too. The outer heading of
+    // `# ![[#tag]]` is kept, since the embed sits inside it rather than around it.
+    const headings = Array.from(root.querySelectorAll("h1,h2,h3,h4,h5,h6"))
+      .filter((el) => !el.closest(".internal-embed"))
+      .map((el) => {
         const text = el.getAttribute("data-heading") ?? el.textContent ?? "";
         return `${el.tagName.slice(1)}:${text.trim()}`;
-      },
-    );
+      });
 
     const tasks = Array.from(root.querySelectorAll("li[data-task]")).map(
       (el) => ({

@@ -53,7 +53,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-05T22:29:09.033Z",
+  "recordedAt": "2026-10-06T00:57:23.098Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -14058,7 +14058,35 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [
+            {
+              "display": true,
+              "tex": "x^2"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:\\[[a|b]] | $$x^2$$_under_ | [^[^1]"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:under"
+          ],
+          "text": "[[a|b]] | ⟨math⟩under | [⟨fn⟩",
+          "sections": [
+            {
+              "type": "heading",
+              "text": "# \\[[a|b]] | $$x^2$$_under_ | [^[^1]"
+            }
+          ]
+        }
+      }
     },
     "fuzz/highlight/46": {
       "id": "fuzz/highlight/46",
@@ -14221,7 +14249,26 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "text": "| ^[⟨fn⟩",
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "| ^[^[inline]"
+            }
+          ]
+        }
+      }
     },
     "fuzz/comment/10": {
       "id": "fuzz/comment/10",
@@ -15062,7 +15109,28 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:em"
+          ],
+          "text": "^[⟨fn⟩em",
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "^[^[inline]*em*"
+            }
+          ]
+        }
+      }
     },
     "fuzz/callout/8": {
       "id": "fuzz/callout/8",
@@ -15729,7 +15797,26 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "text": "]] [⟨fn⟩]",
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "]]\t[^[^]]"
+            }
+          ]
+        }
+      }
     },
     "fuzz/embed/78": {
       "id": "fuzz/embed/78",
@@ -16451,7 +16538,28 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [],
+          "links": [],
+          "tags": [
+            "tag"
+          ],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "text": "#tag. ^[⟨fn⟩[[",
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> #tag. ^[^[inline][["
+            }
+          ]
+        }
+      }
     },
     "fuzz/table/13": {
       "id": "fuzz/table/13",
@@ -17622,7 +17730,26 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "text": "| [[⟨fn⟩",
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "|   [[^[inline]"
+            }
+          ]
+        }
+      }
     },
     "fuzz/embed/90": {
       "id": "fuzz/embed/90",
@@ -20528,7 +20655,26 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "text": "[⟨fn⟩]",
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[^[[a#^blk]]] "
+            }
+          ]
+        }
+      }
     },
     "fuzz/highlight/63": {
       "id": "fuzz/highlight/63",
@@ -21396,7 +21542,26 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "text": "& [⟨fn⟩]^",
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> > &amp;\t[^[^1]]^"
+            }
+          ]
+        }
+      }
     },
     "fuzz/setext/5": {
       "id": "fuzz/setext/5",
@@ -21729,7 +21894,26 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "text": "(u)%% | [⟨fn⟩(u)]",
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "(u)%% | [^[link](u)]"
+            }
+          ]
+        }
+      }
     },
     "fuzz/math/15": {
       "id": "fuzz/math/15",
@@ -23860,7 +24044,28 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:^[^[inline]!"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "text": "^[⟨fn⟩!",
+          "sections": [
+            {
+              "type": "heading",
+              "text": "# ^[^[inline]!"
+            }
+          ]
+        }
+      }
     },
     "fuzz/highlight/2": {
       "id": "fuzz/highlight/2",
@@ -24515,7 +24720,26 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "text": "| # [[a|b # ^blk [⟨fn⟩ 1 1] # [[a#^blk",
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "| # [[a|b # [^^blk] [^[^1] [^1]\t1] # [[a#^blk"
+            }
+          ]
+        }
+      }
     },
     "fuzz/footnote/3": {
       "id": "fuzz/footnote/3",
@@ -25988,11 +26212,6 @@
           ],
           "tags": [],
           "headings": [
-            "1:![[#tag]]",
-            "1:![[#tag]]",
-            "1:![[#tag]]",
-            "1:![[#tag]]",
-            "1:![[#tag]]",
             "1:![[#tag]]"
           ],
           "tasks": [],
@@ -28250,7 +28469,26 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "text": "[⟨fn⟩]",
+          "sections": [
+            {
+              "type": "list",
+              "text": "1. [^[[a#^blk]]]"
+            }
+          ]
+        }
+      }
     },
     "fuzz/html/6": {
       "id": "fuzz/html/6",
@@ -28413,7 +28651,26 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "text": "lk]]]]. [⟨fn⟩]",
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "lk\\]]]]. [^[[target]]]"
+            }
+          ]
+        }
+      }
     },
     "fuzz/embed/28": {
       "id": "fuzz/embed/28",
@@ -31364,8 +31621,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the oracle: an embed renders another note's content inside this one, so its headings and fences are not this document's structure. A self-referential embed made it visible - the DOM held six copies of one heading where metadataCache reported one."
     },
     "fuzz/highlight/24": {
       "id": "fuzz/highlight/24",
@@ -31437,11 +31694,6 @@
           ],
           "tags": [],
           "headings": [
-            "1:![[ ]]",
-            "1:![[ ]]",
-            "1:![[ ]]",
-            "1:![[ ]]",
-            "1:![[ ]]",
             "1:![[ ]]"
           ],
           "tasks": [],
@@ -31484,8 +31736,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the oracle: an embed renders another note's content inside this one, so its headings and fences are not this document's structure. A self-referential embed made it visible - the DOM held six copies of one heading where metadataCache reported one."
     },
     "fuzz/highlight/25": {
       "id": "fuzz/highlight/25",
@@ -33958,7 +34210,28 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:^[^[inline]\t<"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "text": "^[⟨fn⟩ <",
+          "sections": [
+            {
+              "type": "heading",
+              "text": "# ^[^[inline]\t<"
+            }
+          ]
+        }
+      }
     },
     "fuzz/footnote/19": {
       "id": "fuzz/footnote/19",
@@ -58635,7 +58908,26 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "text": "[⟨fn⟩",
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[^[^1]"
+            }
+          ]
+        }
+      }
     },
     "token/footnote-ref/doubled-close": {
       "id": "token/footnote-ref/doubled-close",
@@ -58824,7 +59116,26 @@
         }
       },
       "triage": "report-upstream",
-      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker."
+      "note": "Obsidian consumes `^[` and its `]` and emits no inline footnote at all, showing the body as literal text. Structurally identical to token/inline-footnote/doubled-open, already report-upstream. No permissible fix reaches `match`: suppressing our spurious footnote node still leaves Obsidian's character drop, and reproducing that drop in the tree would let a formatter delete the author's `^[` and `]` -- the same rule that keeps a surplus table cell and a colour marker.",
+      "ours": {
+        "profile": "quartz-default",
+        "projections": {
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "text": "[⟨fn⟩]",
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[^[^1]]"
+            }
+          ]
+        }
+      }
     },
     "token/footnote-ref/escaped-open": {
       "id": "token/footnote-ref/escaped-open",
@@ -114779,7 +115090,7 @@
       "category": "indented-code",
       "markdown": "b[^2] a[^1].\n\n[foo]: /url\n[^1]: body cites [^2]\n\n    code [^2]\n\n[^2]: two\n[^1]: one\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-1b08e9ed76e95132\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-1b08e9ed76e95132\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-703c3b47c0c2b1cf\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-703c3b47c0c2b1cf\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "b⟨fn⟩ a⟨fn⟩.",
           "math": [],
@@ -114871,7 +115182,7 @@
       "category": "indented-code",
       "markdown": "b[^2] a[^1].\n\n| a | b |\n| --- | --- |\n[^1]: body cites [^2]\n\n    code [^2]\n\n[^2]: two\n[^1]: one\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n<table>\n<thead>\n<tr>\n<th>a</th>\n<th>b</th>\n</tr>\n</thead>\n</table>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-3706b7bd5b761686\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-3706b7bd5b761686\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n<table>\n<thead>\n<tr>\n<th>a</th>\n<th>b</th>\n</tr>\n</thead>\n</table>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-125f5dbe9a8d0287\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-125f5dbe9a8d0287\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "b⟨fn⟩ a⟨fn⟩. a b",
           "math": [],
@@ -114963,7 +115274,7 @@
       "category": "indented-code",
       "markdown": "b[^2] a[^1].\n\n%%\nhidden\n%% [^1]: body cites [^2]\n\n    code [^2]\n\n[^2]: two\n[^1]: one\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-22b35beaf5cca88c\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-22b35beaf5cca88c\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-74c90981ffd2d61b\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-74c90981ffd2d61b\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "b⟨fn⟩ a⟨fn⟩.",
           "math": [],
@@ -115054,7 +115365,7 @@
       "category": "indented-code",
       "markdown": "b[^2] a[^1].\n\n[^1]: body cites [^2]\n\n    code [^2]\n\n[^2]: two\n[^1]: one\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-00b975a1827fff95\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-00b975a1827fff95\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">b<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> a<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>two<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-d245d4cb8bb5805d\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-2-d245d4cb8bb5805d\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>one<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "b⟨fn⟩ a⟨fn⟩.",
           "math": [],
@@ -126024,7 +126335,7 @@
       "category": "fenced-code",
       "markdown": "text[^2] here\n\n[^1]: body\n``` `x`\n[^2]: second\ntext[^2] tail\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">text<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> here</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>second<br>\ntext<sup data-footnote-id=\"fnref-1-1-3a8f7532e0d1276e\" class=\"footnote-ref\" id=\"fnref-1-1-3a8f7532e0d1276e\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup> tail<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-3a8f7532e0d1276e\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">text<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> here</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>second<br>\ntext<sup data-footnote-id=\"fnref-1-1-907aba31744a1055\" class=\"footnote-ref\" id=\"fnref-1-1-907aba31744a1055\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup> tail<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-907aba31744a1055\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "text⟨fn⟩ here",
           "math": [],
@@ -129088,7 +129399,7 @@
       "category": "footnote",
       "markdown": "[foo]: [^9]\n\nuse[^9]\n\n[^9]: nine\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">[foo]: <sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1-1-0a8b4fc7e27daf8b\" class=\"footnote-ref\" id=\"fnref-1-1-0a8b4fc7e27daf8b\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>nine<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-0a8b4fc7e27daf8b\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">[foo]: <sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1-1-cd09c48b79fd4ff3\" class=\"footnote-ref\" id=\"fnref-1-1-cd09c48b79fd4ff3\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>nine<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-cd09c48b79fd4ff3\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "[foo]: ⟨fn⟩ use⟨fn⟩",
           "math": [],
@@ -129163,7 +129474,7 @@
       "category": "footnote",
       "markdown": "[foo]: <[^9]>\n\nuse[^9]\n\n[^9]: nine\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">[foo]: &lt;<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup>&gt;</p>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1-1-6b4110139a53aefd\" class=\"footnote-ref\" id=\"fnref-1-1-6b4110139a53aefd\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>nine<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-6b4110139a53aefd\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">[foo]: &lt;<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup>&gt;</p>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1-1-85d6b97e75caa969\" class=\"footnote-ref\" id=\"fnref-1-1-85d6b97e75caa969\"><a data-footref=\"9\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>nine<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-85d6b97e75caa969\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "[foo]: <⟨fn⟩> use⟨fn⟩",
           "math": [],
@@ -129238,7 +129549,7 @@
       "category": "footnote",
       "markdown": "see[^a`b`c] twice[^a`b`c].\n\n[^a`b`c]: hi\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">see<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"a`b`c\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> twice<sup data-footnote-id=\"fnref-1-1-553e53ef4c070e00\" class=\"footnote-ref\" id=\"fnref-1-1-553e53ef4c070e00\"><a data-footref=\"a`b`c\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>hi<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-553e53ef4c070e00\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">see<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"a`b`c\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> twice<sup data-footnote-id=\"fnref-1-1-6cb7d5d324b1612e\" class=\"footnote-ref\" id=\"fnref-1-1-6cb7d5d324b1612e\"><a data-footref=\"a`b`c\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1-1]</a></sup>.</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>hi<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-6cb7d5d324b1612e\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "see⟨fn⟩ twice⟨fn⟩.",
           "math": [],
@@ -141442,7 +141753,7 @@
       "category": "comment",
       "markdown": "a[^1]\n\n%%\n[^1]: copy\n%%\n\n[^1]: A\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>A<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-19a2fae9e7d2dc60\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>A<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-4c3284b54af7b4d0\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "a⟨fn⟩",
           "math": [],
@@ -141517,7 +141828,7 @@
       "category": "comment",
       "markdown": "see[^k]\n\n%%\n[^k]: hidden\n%%\n\n[^k]: real\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">see<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"k\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>real<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-908fb32506e74c2c\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">see<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"k\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>real<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-3bce811a27af9699\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "see⟨fn⟩",
           "math": [],
@@ -145920,7 +146231,7 @@
       "category": "blockquote",
       "markdown": "x[^1]\n\n> %%\n> [^1]: dead\n\n[^1]: live\n",
       "obsidian": {
-        "html": "<p dir=\"auto\">x<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n<blockquote dir=\"auto\">\n</blockquote>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>live<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-631af87c1b173686\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "html": "<p dir=\"auto\">x<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n<blockquote dir=\"auto\">\n</blockquote>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>live<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-1-1-6c336fe4d991820b\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
         "projections": {
           "text": "x⟨fn⟩",
           "math": [],

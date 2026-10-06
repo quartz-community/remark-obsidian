@@ -40,6 +40,36 @@ export const STRUCTURE_KEYS = [
 const FOOTNOTE_SECTION =
   /<(section|div)\b[^>]*\bclass="[^"]*\bfootnotes\b[^"]*"[\s\S]*?<\/\1>/gi;
 
+/**
+ * Remove every `internal-embed` span, with the note it expanded to.
+ *
+ * An embed renders another note's content inside this one, so its fences, tables and
+ * lists are not this document's structure. `metadataCache` excludes them too.
+ *
+ * Balanced rather than regex-matched, because embeds nest: a pattern stopping at the
+ * first `</span>` would leave the outer embed's tail behind.
+ */
+function stripEmbeds(html: string): string {
+  const OPEN = /<span\b[^>]*\bclass="[^"]*\binternal-embed\b[^"]*"[^>]*>/i;
+  let out = html;
+
+  for (;;) {
+    const found = OPEN.exec(out);
+    if (!found) return out;
+
+    const from = found.index;
+    let at = from + found[0].length;
+    let depth = 1;
+    while (depth > 0 && at < out.length) {
+      const next = /<\/?span\b[^>]*>/i.exec(out.slice(at));
+      if (!next) return out.slice(0, from);
+      at += next.index + next[0].length;
+      depth += next[0].startsWith("</") ? -1 : 1;
+    }
+    out = out.slice(0, from) + out.slice(at);
+  }
+}
+
 const TABLE = /<table\b[\s\S]*?<\/table>/gi;
 const HEADER_CELL = /<th\b([^>]*)>/gi;
 const ALIGN = /\balign="([^"]*)"/i;
@@ -87,7 +117,7 @@ const LIST = /<(ol|ul)\b([^>]*)>/gi;
 const START = /\bstart="(\d+)"/i;
 
 export function structureFromHtml(raw: string): Structure {
-  const html = raw.replace(FOOTNOTE_SECTION, "");
+  const html = stripEmbeds(raw.replace(FOOTNOTE_SECTION, ""));
   const tableAlign: string[] = [];
   for (const table of html.match(TABLE) ?? []) {
     const cells: string[] = [];
