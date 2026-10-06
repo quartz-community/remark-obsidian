@@ -19187,8 +19187,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the language was read from <pre>, which carries the grammar Prism will highlight with, so an info string it has no grammar for appeared as an empty language. Obsidian records the parsed info string on <code>."
     },
     "fuzz/embed/101": {
       "id": "fuzz/embed/101",
@@ -21974,8 +21974,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the language was read from <pre>, which carries the grammar Prism will highlight with, so an info string it has no grammar for appeared as an empty language. Obsidian records the parsed info string on <code>."
     },
     "fuzz/inline-footnote/32": {
       "id": "fuzz/inline-footnote/32",
@@ -25283,8 +25283,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the language was read from <pre>, which carries the grammar Prism will highlight with, so an info string it has no grammar for appeared as an empty language. Obsidian records the parsed info string on <code>."
     },
     "fuzz/embed/7": {
       "id": "fuzz/embed/7",
@@ -30551,8 +30551,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the language was read from <pre>, which carries the grammar Prism will highlight with, so an info string it has no grammar for appeared as an empty language. Obsidian records the parsed info string on <code>."
     },
     "fuzz/inline-footnote/10": {
       "id": "fuzz/inline-footnote/10",
@@ -56673,8 +56673,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the block-attribute oracle derived from the recorded HTML."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the language was read from <pre>, which carries the grammar Prism will highlight with, so an info string it has no grammar for appeared as an empty language. Obsidian records the parsed info string on <code>."
     },
     "token/strikethrough/doubled-close": {
       "id": "token/strikethrough/doubled-close",
@@ -56863,8 +56863,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the block-attribute oracle derived from the recorded HTML."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the language was read from <pre>, which carries the grammar Prism will highlight with, so an info string it has no grammar for appeared as an empty language. Obsidian records the parsed info string on <code>."
     },
     "token/strikethrough/escaped-open": {
       "id": "token/strikethrough/escaped-open",
@@ -79319,8 +79319,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the language was read from <pre>, which carries the grammar Prism will highlight with, so an info string it has no grammar for appeared as an empty language. Obsidian records the parsed info string on <code>."
     },
     "commonmark/entity-and-numeric-character-references/25": {
       "id": "commonmark/entity-and-numeric-character-references/25",
@@ -79807,8 +79807,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the language was read from <pre>, which carries the grammar Prism will highlight with, so an info string it has no grammar for appeared as an empty language. Obsidian records the parsed info string on <code>."
     },
     "commonmark/entity-and-numeric-character-references/35": {
       "id": "commonmark/entity-and-numeric-character-references/35",
@@ -85581,8 +85581,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: the language was read from <pre>, which carries the grammar Prism will highlight with, so an info string it has no grammar for appeared as an empty language. Obsidian records the parsed info string on <code>."
     },
     "commonmark/fenced-code-blocks/145": {
       "id": "commonmark/fenced-code-blocks/145",

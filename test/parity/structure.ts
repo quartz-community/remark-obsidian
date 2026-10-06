@@ -43,8 +43,46 @@ const FOOTNOTE_SECTION =
 const TABLE = /<table\b[\s\S]*?<\/table>/gi;
 const HEADER_CELL = /<th\b([^>]*)>/gi;
 const ALIGN = /\balign="([^"]*)"/i;
-const PRE = /<pre\b([^>]*)>/gi;
-const LANGUAGE = /\blanguage-([A-Za-z0-9_+-]+)/;
+/**
+ * Each `<pre>` with the `<code>` that opens it, so the language can be read off
+ * whichever of the two actually records it. One entry per `<pre>` either way.
+ */
+const PRE = /<pre\b([^>]*)>(?:\s*<code\b([^>]*)>)?/gi;
+/** A class token, up to whitespace or the attribute's quote. */
+const LANGUAGE = /\blanguage-([^\s"']+)/;
+const ENTITIES: ReadonlyArray<readonly [RegExp, string]> = [
+  [/&lt;/g, "<"],
+  [/&gt;/g, ">"],
+  [/&quot;/g, '"'],
+  [/&#0*39;/g, "'"],
+  [/&amp;/g, "&"],
+];
+
+/**
+ * The info string Obsidian parsed, which is on the `<code>` element.
+ *
+ * `<pre>` carries the language Prism will *highlight* with, so an info string it
+ * has no grammar for lands there as `language-none` while `<code>` still records
+ * it verbatim:
+ *
+ *     ``` foo\+bar
+ *     <pre class="language-none"><code class="language-foo+bar language-none ...">
+ *
+ * Reading `<pre>` therefore measures Prism's grammar registry rather than the
+ * parse, and reported an empty language for nine cases whose info string Obsidian
+ * had recorded perfectly well. `<code>` lists the real one first, then its
+ * fallbacks, so the first token is the answer.
+ *
+ * The class is HTML-escaped, since an info string may hold `<` or `&`.
+ */
+function languageOf(code: string | undefined, pre: string | undefined): string {
+  const found = LANGUAGE.exec(code ?? "") ?? LANGUAGE.exec(pre ?? "");
+  let language = found?.[1] ?? "";
+  for (const [pattern, character] of ENTITIES) {
+    language = language.replace(pattern, character);
+  }
+  return language === "none" ? "" : language;
+}
 const LIST = /<(ol|ul)\b([^>]*)>/gi;
 const START = /\bstart="(\d+)"/i;
 
@@ -61,8 +99,7 @@ export function structureFromHtml(raw: string): Structure {
 
   const codeLang: string[] = [];
   for (const pre of html.matchAll(PRE)) {
-    const language = LANGUAGE.exec(pre[1] ?? "")?.[1] ?? "";
-    codeLang.push(language === "none" ? "" : language);
+    codeLang.push(languageOf(pre[2], pre[1]));
   }
 
   const listShape: string[] = [];
