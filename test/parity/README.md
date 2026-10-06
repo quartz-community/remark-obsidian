@@ -580,6 +580,45 @@ fixes**. And micromark's combined extensions **prepend**, so a construct returni
 `nok` does not win — it falls through to the stock construct, which here undid the
 entire change. `legacy-emphasis.ts` documents the same trap for attention.
 
+## The fuzz sweep finds causes, not progress
+
+`fuzz/sweep.ts` generates documents from a seed range, records them against Obsidian,
+shrinks what fails, and groups by the reduced form:
+
+```bash
+nix develop -c /path/to/with-display.sh \
+  npx tsx --conditions=development test/parity/fuzz/sweep.ts <from> <count>
+```
+
+The repo's `parity-record` cannot launch it — that wrapper forwards its arguments to
+`npm run parity:record`, so they end up appended to the wdio command. A sweep needs
+the Xvfb and window-manager setup without the recording command.
+
+**Its agreement rate is not a progress metric, and treating it as one produced a
+wrong number.** A generated document carries six to eight constructs and usually
+several divergences, so fixing one cause rarely flips a document. Measured directly:
+the same 400-seed range gave 272 agreements before a day's fixes and 272 after,
+including a crash fix that removed five crashes outright — those documents simply
+fail for other reasons now. Two different ranges gave 68% and 72%, which is range
+variation and nothing else. Use the corpus match rate for progress; its cases are
+small enough that one cause is one case.
+
+What the sweep is genuinely good for is **triage**:
+
+- **Crashes.** The parity gate only compares successful parses, so a stack overflow
+  is invisible to it. A sweep found one in 55 of 4000 documents, which was the first
+  crash any oracle here had surfaced.
+- **Frequency.** 128 failures reducing to 118 causes says most are singletons, but the
+  cluster of eight that landed on `| a ⏎| --- ` identified a table rule the corpus held
+  as one unremarkable case. That is what tells you which "isolated fragment" deserves
+  a probe family.
+
+Two cautions. The reduced form is **a** cause of that document's failure, not the only
+one — shrinking has drifted to a rarer cause every time it has been checked, so treat
+a minimal form as a lead and confirm the rule with recorded probes. And a fixed
+cluster disappears from later reports while its documents keep failing, which looks
+like the fix not working until you test the minimal form directly.
+
 ## Files
 
 | File                    | Role                                         |
