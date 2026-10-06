@@ -129,6 +129,40 @@ describe("node positions", () => {
    * regression: a comment's body is parsed now, so the same passes that splice
    * an unplaced `break` run over those blocks too. Recorded here rather than
    * absorbed, because a ceiling that moves without a reason is not a ceiling.
+   *
+   * Four rounds then took the total from 1188 nodes to 49, each by finding where a
+   * node is built rather than by widening this list:
+   *
+   * - `remark-breaks` is four lines that replace a newline with a bare
+   *   `{type: "break"}` and rebuild the surrounding text unplaced.
+   *   `breakPositionsTransform` does the same conversion first, with positions,
+   *   leaving its regular expression nothing to match. 1188 -> 168.
+   * - Five passes that fold lines back into a paragraph pushed an unplaced
+   *   newline separator each, which `remark-breaks` then turned into an unplaced
+   *   `break`. 168 -> 68.
+   * - `tableShortDelimiterTransform` built rows and cells from the line text with
+   *   no offset to place them by. 68 -> 52.
+   * - `bareFootnoteRefTransform`'s value-to-source aligner modelled escapes but
+   *   not character references, so a text node holding an entity could not align
+   *   and everything spliced out of it lost its position *and* its written label.
+   *   52 -> 49, and two parity cases with it.
+   *
+   * What is left is no longer one mechanism, and the causes are known:
+   *
+   * - `foo&#10;&#10;bar` is declined on purpose. A newline written as a reference
+   *   puts one in the value with none in the source, so the counts stop
+   *   corresponding and any offset would be a guess.
+   * - The six `calloutTitle`s come from two sites. One builds an empty title when
+   *   the title line is a block, so there are no children to derive a span from;
+   *   the other derives one from its children and gets nothing when they have
+   *   none. Both would need the title's own span, and the marker is stripped from
+   *   the lead text's value while its position still covers it.
+   * - The rest are individual cases rather than a family: a lazily continued
+   *   indented line, an autolink holding an escape.
+   *
+   * Worth knowing before widening any of these: a wrong offset is worse than a
+   * missing one, because it still looks usable. Two passes shipped
+   * fragment-relative positions before that rule was written down.
    */
   const UNPLACED_CEILING = {
     "callout > calloutTitle": 6,
