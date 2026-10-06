@@ -71,6 +71,15 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/table-pipes/with-body-row", "| a |\n| --- |\n| b |\n"],
   ["probe/table-pipes/body-row-unclosed", "| a |\n| --- |\n| b\n"],
   ["probe/table-pipes/two-columns-unclosed", "| a | b\n| --- | ---\n"],
+  // A short delimiter row builds a table of its own width, which
+  // `tableShortDelimiterTransform` reproduces -- but that promotion has to obey the
+  // same precondition as everything else here, and `| a | b |` over `| --- ` is the
+  // combination neither rule had evidence for. Two seeds of the second sweep landed
+  // on it, and GFM declines it while we promote it, so the two cannot both be right.
+  ["probe/table-pipes/short-delimiter-closed", "| a | b |\n| --- |\n"],
+  ["probe/table-pipes/short-delimiter-unclosed", "| a | b |\n| --- \n"],
+  ["probe/table-pipes/unclosed-header-short", "| a | b\n| --- \n"],
+  ["probe/table-pipes/long-delimiter-unclosed", "| a |\n| --- | ---\n"],
   // How does a backtick run find its closer? micromark takes the maximal opening
   // run and gives up when no run of equal length follows, so ` ``code` ` stays
   // literal; Obsidian reports `` `code ``, which is what retrying one position along

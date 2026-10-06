@@ -144,14 +144,14 @@ describe("node positions", () => {
     "highlight > text": 6,
     "link > break": 1,
     "link > text": 3,
-    "paragraph > break": 362,
+    "paragraph > break": 364,
     "paragraph > footnoteReference": 8,
     "paragraph > link": 2,
-    "paragraph > text": 295,
+    "paragraph > text": 297,
+    "table > tableRow": 6,
+    "tableRow > tableCell": 6,
     "strong > break": 6,
     "strong > text": 6,
-    "table > tableRow": 4,
-    "tableRow > tableCell": 4,
   };
 
   it("does not splice more unplaced nodes than the recorded ceiling", () => {

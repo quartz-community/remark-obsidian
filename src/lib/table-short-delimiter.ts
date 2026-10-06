@@ -10,6 +10,8 @@ import type {
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 
+import { delimits } from "./table-pipe-style.js";
+
 const DELIMITER =
   /^ {0,3}\|?[ \t]*:?-+:?[ \t]*(\|[ \t]*:?-+:?[ \t]*)*(?:\|[ \t]*)?$/u;
 
@@ -68,6 +70,11 @@ export function tableShortDelimiterTransform(
       const delimiter = lines[1];
       if (header === undefined || delimiter === undefined) continue;
       if (!header.includes("|") || !DELIMITER.test(delimiter)) continue;
+      // The promotion obeys the same precondition as every other rule here: a row
+      // whose only pipe is the leading one delimits nothing. Recorded both ways --
+      // `| a | b |` over `| --- |` is a table rendering `a`, and over `| --- ` it is
+      // a paragraph. GFM declines both, so only the first needed promoting.
+      if (!delimits(header) || !delimits(delimiter)) continue;
 
       const headerCells = cells(header);
       const delimiterCells = cells(delimiter);
