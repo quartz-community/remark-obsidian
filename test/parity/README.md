@@ -95,9 +95,48 @@ see [`COMMONMARK-DIVERGENCES.md`](COMMONMARK-DIVERGENCES.md).
 4. **adjacency** — what follows a closing delimiter, which is often what decides
    whether the closer is recognised at all.
 
+5. **probe** — a `probe/<question>/*` family enumerating one open question, added
+   when a rule has to be settled rather than sampled. Each carries a comment
+   naming the question, because a probe whose purpose is forgotten gets deleted.
+
 Add a case by editing `SEEDS`, or a whole family by extending `TOKENS`,
 `CONTEXTS`, or `ADJACENCY`. Re-record afterwards; new cases arrive as
-`unreviewed` and the gate fails until they are triaged.
+`unreviewed` and the gate fails until they are triaged. Cases are deduplicated by
+markdown, so a designed probe replaces an incidental fuzz case with the same source
+— which is an improvement, and worth checking after a corpus change that no case
+kept its id while changing content, since that would move a triage state onto a
+different document.
+
+### Coverage is not uniform, and the gaps are where the backlog lives
+
+Measure it before concluding anything about a family's size. Counting designed
+probes against incidental hits (fuzz and borrowed CommonMark cases):
+
+| construct           | designed | incidental | open |
+| ------------------- | -------: | ---------: | ---: |
+| wikilink `[[`       |      149 |        281 |   51 |
+| comment `%%`        |      130 |         46 |    8 |
+| highlight `==`      |      102 |        187 |   18 |
+| raw html tag        |       25 |        146 |   22 |
+| tag `#`             |       12 |         35 |    2 |
+| nested bracket pair |        3 |         27 |    6 |
+
+Obsidian's own constructs are probed heavily; the borrowed ones are not, and that is
+exactly where the remaining divergences sit. Two concrete costs of relying on
+incidental coverage:
+
+- The tag tokenizer had two independent bugs — a tab before `#`, and slash-shaped
+  paths — found only because the fuzzer stumbled into them, behind 12 designed probes.
+- Reasoning from **three** accidental nested-bracket cases, the raw-HTML/setext rule
+  was written off as a tag-list problem needing a tokenizer port. 17 designed probes
+  showed the tag is irrelevant and it was a bounded repair pass, which then landed in
+  one commit. The probe that decided it was the one the first attempt lacked.
+
+So when a family looks small or a fix looks too invasive, check whether the corpus
+can actually adjudicate it first. And prefer measuring a blast radius to estimating
+one: "6 cases at risk of breaking 21" was reasoning, not measurement, and it was
+wrong — a rule both oracles agree on cannot break a case that already agrees with
+Obsidian.
 
 ## What is compared
 
