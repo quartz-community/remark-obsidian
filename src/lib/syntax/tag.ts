@@ -19,6 +19,11 @@ function isWhitespace(code: Code): boolean {
   return (
     code === codes.space ||
     code === codes.horizontalTab ||
+    // micromark expands a tab to `horizontalTab` plus `virtualSpace` fillers up
+    // to the next tab stop, so the code immediately before the `#` is the filler
+    // and not the tab. Without this, `rd⇥#tag` yields no tag while `rd #tag`
+    // does -- six recorded cases turned on this one code.
+    code === codes.virtualSpace ||
     code === codes.lineFeed ||
     code === codes.carriageReturn ||
     code === codes.carriageReturnLineFeed
@@ -93,9 +98,14 @@ function tokenize(
   }
 
   function tagContent(code: Code): State | undefined {
+    // A slash is ordinary content, and it counts as the non-digit a tag needs.
+    // Recorded: `#123` is not a tag to Obsidian while `#123/456` is, and a slash
+    // needs nothing after it -- `#a/` and `#a//b` are both tags. Requiring a tag
+    // character after one rejected all three.
     if (code === SLASH) {
+      hasNonDigit = true;
       effects.consume(code);
-      return afterSlash;
+      return tagContent;
     }
 
     if (isTagChar(code)) {
@@ -105,13 +115,6 @@ function tokenize(
     }
 
     return end(code);
-  }
-
-  function afterSlash(code: Code): State | undefined {
-    if (!isTagChar(code)) return nok(code);
-    if (isNonDigit(code)) hasNonDigit = true;
-    effects.consume(code);
-    return tagContent;
   }
 
   function end(code: Code): State | undefined {

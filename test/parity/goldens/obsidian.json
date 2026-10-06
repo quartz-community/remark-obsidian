@@ -25734,8 +25734,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the tag tokenizer: micromark expands a tab into horizontalTab plus virtualSpace fillers, so the code before the # is the filler; and a slash is ordinary content that counts as the non-digit a tag requires."
     },
     "fuzz/html/4": {
       "id": "fuzz/html/4",
@@ -28636,8 +28636,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the tag tokenizer: micromark expands a tab into horizontalTab plus virtualSpace fillers, so the code before the # is the filler; and a slash is ordinary content that counts as the non-digit a tag requires."
     },
     "fuzz/footnote/13": {
       "id": "fuzz/footnote/13",
@@ -30128,8 +30128,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the tag tokenizer: micromark expands a tab into horizontalTab plus virtualSpace fillers, so the code before the # is the filler; and a slash is ordinary content that counts as the non-digit a tag requires."
     },
     "fuzz/footnote/15": {
       "id": "fuzz/footnote/15",
@@ -35382,8 +35382,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the tag tokenizer: micromark expands a tab into horizontalTab plus virtualSpace fillers, so the code before the # is the filler; and a slash is ordinary content that counts as the non-digit a tag requires."
     },
     "fuzz/highlight/38": {
       "id": "fuzz/highlight/38",
@@ -35603,8 +35603,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the tag tokenizer: micromark expands a tab into horizontalTab plus virtualSpace fillers, so the code before the # is the filler; and a slash is ordinary content that counts as the non-digit a tag requires."
     },
     "fuzz/embed/62": {
       "id": "fuzz/embed/62",
@@ -35820,8 +35820,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the tag tokenizer: micromark expands a tab into horizontalTab plus virtualSpace fillers, so the code before the # is the filler; and a slash is ordinary content that counts as the non-digit a tag requires."
     },
     "fuzz/embed/63": {
       "id": "fuzz/embed/63",
@@ -36036,8 +36036,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the tag tokenizer: micromark expands a tab into horizontalTab plus virtualSpace fillers, so the code before the # is the filler; and a slash is ordinary content that counts as the non-digit a tag requires."
     },
     "fuzz/highlight/40": {
       "id": "fuzz/highlight/40",
@@ -36444,8 +36444,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the tag tokenizer: micromark expands a tab into horizontalTab plus virtualSpace fillers, so the code before the # is the filler; and a slash is ordinary content that counts as the non-digit a tag requires."
     },
     "callout/line-after-title-is-fresh-block": {
       "id": "callout/line-after-title-is-fresh-block",
@@ -43256,8 +43256,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in the tag tokenizer: micromark expands a tab into horizontalTab plus virtualSpace fillers, so the code before the # is the filler; and a slash is ordinary content that counts as the non-digit a tag requires."
     },
     "tag/digit-leading-mixed": {
       "id": "tag/digit-leading-mixed",
@@ -43363,8 +43363,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in the tag tokenizer: micromark expands a tab into horizontalTab plus virtualSpace fillers, so the code before the # is the filler; and a slash is ordinary content that counts as the non-digit a tag requires."
     },
     "tag/combining-mark": {
       "id": "tag/combining-mark",
