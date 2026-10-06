@@ -14,6 +14,7 @@ import { tagSyntax } from "./lib/syntax/tag.js";
 import { inlineFootnoteSyntax } from "./lib/syntax/inline-footnote.js";
 import { legacyEmphasisSyntax } from "./lib/syntax/legacy-emphasis.js";
 import { legacyDeleteSyntax } from "./lib/syntax/legacy-delete.js";
+import { legacyEntitySyntax } from "./lib/syntax/legacy-entity.js";
 
 import { wikilinkFromMarkdown } from "./lib/mdast/wikilink.js";
 import { highlightFromMarkdown } from "./lib/mdast/highlight.js";
@@ -199,6 +200,16 @@ export interface RemarkObsidianOptions {
    */
   legacyStrikethrough?: boolean;
   /**
+   * Resolve a character reference written without its semicolon, as HTML and
+   * Obsidian both do. CommonMark requires the terminator, so `&amp` stays four
+   * characters without this while the app renders `&`. Matching is greedy against
+   * HTML's legacy table, so `&notreal` is `¬real`, and numeric references resolve
+   * bare too.
+   *
+   * On by default, because leaving it off silently shows markup the app resolves.
+   */
+  legacyEntities?: boolean;
+  /**
    * Write a line break as a trailing backslash rather than a newline.
    *
    * Off by default, because this package is built for a chain that includes
@@ -226,6 +237,7 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
   callouts: true,
   legacyEmphasis: true,
   legacyStrikethrough: true,
+  legacyEntities: true,
   escapedLineBreaks: false,
 };
 
@@ -297,6 +309,10 @@ export default function remarkObsidian(
 
   if (opts.legacyStrikethrough) {
     data.micromarkExtensions.push(legacyDeleteSyntax());
+  }
+
+  if (opts.legacyEntities) {
+    data.micromarkExtensions.push(legacyEntitySyntax());
   }
 
   if (opts.customTaskChars) {

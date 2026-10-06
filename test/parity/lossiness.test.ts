@@ -7,6 +7,8 @@ import type { Root, Text } from "mdast";
 
 import { parseOurs } from "./chain.js";
 import type { GoldenCase } from "./types.js";
+import { characterEntitiesLegacy } from "character-entities-legacy";
+import { decodeNamedCharacterReference } from "decode-named-character-reference";
 
 const goldenPath = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -14,22 +16,37 @@ const goldenPath = path.join(
   "obsidian.json",
 );
 
-const ENTITIES: Record<string, string> = {
-  amp: "&",
-  lt: "<",
-  gt: ">",
-  quot: '"',
-  apos: "'",
-  nbsp: "\u00a0",
-};
+const LEGACY = new Set<string>(characterEntitiesLegacy);
+const MAX_LEGACY = Math.max(...[...LEGACY].map((name) => name.length));
 
+/**
+ * Resolve references the way the parser does, which includes the semicolon-less
+ * form: `&amp` is `&` and `&notreal` is `¬real`, because HTML's legacy names match
+ * greedily without a terminator. A hand-kept table of six names was both narrower
+ * than the parser and wrong about `&copy;`, so this uses micromark's own.
+ */
 const decodeReferences = (value: string): string =>
   value.replace(
-    /&(?:#x([0-9a-f]+)|#(\d+)|([a-z][a-z0-9]*));/gi,
-    (whole, hex: string, dec: string, name: string) => {
+    /&(?:#[Xx]([\dA-Fa-f]+)|#(\d+)|([A-Za-z][\dA-Za-z]*))(;?)/gu,
+    (whole, hex: string, dec: string, name: string, semi: string) => {
       if (hex) return String.fromCodePoint(Number.parseInt(hex, 16));
       if (dec) return String.fromCodePoint(Number(dec));
-      return ENTITIES[name.toLowerCase()] ?? whole;
+      if (!name) return whole;
+      if (semi) {
+        const full = decodeNamedCharacterReference(name);
+        return full === false ? whole : full;
+      }
+      for (
+        let length = Math.min(name.length, MAX_LEGACY);
+        length > 0;
+        length--
+      ) {
+        const candidate = name.slice(0, length);
+        if (!LEGACY.has(candidate)) continue;
+        const decoded = decodeNamedCharacterReference(candidate);
+        if (decoded !== false) return decoded + name.slice(length);
+      }
+      return whole;
     },
   );
 

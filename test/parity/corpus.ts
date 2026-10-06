@@ -51,6 +51,27 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
     "probe/inline-footnote/definition-first",
     "[^1]: body\n\nuse[^1] and ^[x]\n",
   ],
+  // Does a character reference need its semicolon? CommonMark says yes, so micromark
+  // leaves `&amp` as four characters. The legacy stack decodes it, and decodes
+  // `&notreal` to `¬real` -- which is HTML's own rule rather than a quirk: the
+  // historical named references resolve without a terminator and match greedily. Two
+  // seeds of the second sweep landed on `&amp`, so the shape is common in prose where
+  // someone simply forgot the semicolon. These separate "no semicolon needed" from
+  // "longest match wins", which the single `&amp` case cannot.
+  ["probe/entity/semicolon-named", "&amp;\n"],
+  ["probe/entity/bare-named", "&amp\n"],
+  ["probe/entity/bare-copy", "&copy\n"],
+  ["probe/entity/bare-nbsp-then-text", "&nbsp x\n"],
+  ["probe/entity/bare-prefix-of-longer", "&notreal\n"],
+  ["probe/entity/bare-then-semicolon", "&amp&amp;\n"],
+  ["probe/entity/bare-then-letter", "&ampx\n"],
+  ["probe/entity/numeric-bare", "&#35\n"],
+  ["probe/entity/numeric-semicolon", "&#35;\n"],
+  ["probe/entity/hex-bare", "&#x23\n"],
+  ["probe/entity/uppercase-name", "&AMP\n"],
+  ["probe/entity/unknown-name", "&nosuchthing\n"],
+  ["probe/entity/empty-reference", "&;\n"],
+  ["probe/entity/in-code-span", "`&amp`\n"],
   // What makes a pipe row a table? GFM treats the outer pipes as optional, so
   // `| a` over `| ---` is a table to micromark -- Obsidian reads it as a paragraph.
   // A fuzz sweep reduced 128 failures to 118 causes and this was the one real

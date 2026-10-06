@@ -104,6 +104,7 @@ const QUARTZ_DEFAULT: ChainProfile = {
     callouts: true,
     legacyEmphasis: true,
     legacyStrikethrough: true,
+    legacyEntities: true,
     escapedLineBreaks: false,
   },
   rehypeObsidian: {
@@ -135,6 +136,7 @@ const ALL_FEATURES: ChainProfile = {
     callouts: true,
     legacyEmphasis: true,
     legacyStrikethrough: true,
+    legacyEntities: true,
     escapedLineBreaks: false,
   },
   rehypeObsidian: {
