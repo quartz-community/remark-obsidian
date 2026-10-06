@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-06T13:38:10.690Z",
+  "recordedAt": "2026-10-06T20:15:47.427Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -55838,6 +55838,2207 @@
       },
       "triage": "match"
     },
+    "probe/tab/leading-one": {
+      "id": "probe/tab/leading-one",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "\tfoo\n",
+      "obsidian": {
+        "html": "<pre><code>foo\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "code",
+              "text": "\tfoo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "code@0:0-0:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tab/two-spaces-then-tab": {
+      "id": "probe/tab/two-spaces-then-tab",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "  \tfoo\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">  \tfoo</p>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "  \tfoo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A tab that completes an indentation run to the four-column stop. 16 of 18 probes match, so this is a boundary bug rather than a tab problem."
+    },
+    "probe/tab/three-spaces-then-tab": {
+      "id": "probe/tab/three-spaces-then-tab",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "   \tfoo\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">   \tfoo</p>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "   \tfoo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A tab that completes an indentation run to the four-column stop. 16 of 18 probes match, so this is a boundary bug rather than a tab problem."
+    },
+    "probe/tab/interior-single": {
+      "id": "probe/tab/interior-single",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "a\tb\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">a\tb</p>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "a\tb"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tab/interior-double": {
+      "id": "probe/tab/interior-double",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "a\t\tb\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">a\t\tb</p>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "a\t\tb"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tab/interior-runs": {
+      "id": "probe/tab/interior-runs",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "a\tb\tc\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">a\tb\tc</p>",
+        "projections": {
+          "text": "a b c",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "a\tb\tc"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tab/after-double-run": {
+      "id": "probe/tab/after-double-run",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "a\t\tb\tc\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">a\t\tb\tc</p>",
+        "projections": {
+          "text": "a b c",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "a\t\tb\tc"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tab/trailing-one": {
+      "id": "probe/tab/trailing-one",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "a\t\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">a\t</p>",
+        "projections": {
+          "text": "a",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "a\t"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:2"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tab/trailing-double": {
+      "id": "probe/tab/trailing-double",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "a\t\t\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">a\t\t</p>",
+        "projections": {
+          "text": "a",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "a\t\t"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tab/only-tabs": {
+      "id": "probe/tab/only-tabs",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "\t\t\n",
+      "obsidian": {
+        "html": "",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": []
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tab/list-marker": {
+      "id": "probe/tab/list-marker",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "-\tfoo\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">foo</li>\n</ul>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "-\tfoo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:5"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tab/quote-marker": {
+      "id": "probe/tab/quote-marker",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": ">\tfoo\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<pre><code>foo\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</blockquote>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": ">\tfoo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tab/heading-marker": {
+      "id": "probe/tab/heading-marker",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "#\tfoo\n",
+      "obsidian": {
+        "html": "<h1 data-heading=\"foo\" dir=\"auto\">foo</h1>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:foo"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "#\tfoo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "1:foo"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "1:foo@0:0"
+          ],
+          "sections": [
+            "heading@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tab/heading-before-closer": {
+      "id": "probe/tab/heading-before-closer",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "# foo\t#\n",
+      "obsidian": {
+        "html": "<h1 data-heading=\"foo\" dir=\"auto\">foo</h1>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:foo"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "# foo\t#"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "1:foo"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "1:foo@0:0"
+          ],
+          "sections": [
+            "heading@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tab/table-cell": {
+      "id": "probe/tab/table-cell",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "| a\tb |\n| --- |\n",
+      "obsidian": {
+        "html": "<table>\n<thead>\n<tr>\n<th dir=\"ltr\">a\tb</th>\n</tr>\n</thead>\n</table>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "table",
+              "text": "| a\tb |\n| --- |"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "table@0:0-1:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tab/code-span": {
+      "id": "probe/tab/code-span",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "`a\tb`\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><code>a\tb</code></p>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "`a\tb`"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tab/definition-body": {
+      "id": "probe/tab/definition-body",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^1]:\tbody\n",
+      "obsidian": {
+        "html": "",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]:\tbody"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [
+            "1@0:0-0:10"
+          ],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "footnoteDefinition@0:0-0:10"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tab/wikilink-target": {
+      "id": "probe/tab/wikilink-target",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a\tb]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"a\tb\" href=\"a\tb\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a\tb</a></p>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [
+            {
+              "path": "a\tb",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a\tb]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a\tb"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:7"
+          ],
+          "links": [
+            "[[a\tb]]=>a\tb|a\tb@0:0-0:7"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/empty-container/list-blank-indented": {
+      "id": "probe/empty-container/list-blank-indented",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "-\n\n  foo\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p> foo</p>\n</li>\n</ul>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "-\n\n  foo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:5"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "An empty list item absorbs an indented block after a blank line, where CommonMark does not -- cmark's own example 280 splits them. The no-blank variants already match."
+    },
+    "probe/empty-container/list-indented": {
+      "id": "probe/empty-container/list-indented",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "-\n  foo\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\"> foo</li>\n</ul>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "-\n  foo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:5"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/empty-container/list-lazy": {
+      "id": "probe/empty-container/list-lazy",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "-\nfoo\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">foo</li>\n</ul>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "-\nfoo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/empty-container/list-marker-space": {
+      "id": "probe/empty-container/list-marker-space",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- \n\n  foo\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>foo</p>\n</li>\n</ul>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- \n\n  foo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:5"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "An empty list item absorbs an indented block after a blank line, where CommonMark does not -- cmark's own example 280 splits them. The no-blank variants already match."
+    },
+    "probe/empty-container/list-two-blanks": {
+      "id": "probe/empty-container/list-two-blanks",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "-\n\n\n  foo\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p> foo</p>\n</li>\n</ul>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "-\n\n\n  foo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-3:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-3:5"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "An empty list item absorbs an indented block after a blank line, where CommonMark does not -- cmark's own example 280 splits them. The no-blank variants already match."
+    },
+    "probe/empty-container/list-then-item": {
+      "id": "probe/empty-container/list-then-item",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "-\n\n- b\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\"></li>\n<li dir=\"auto\">\n<p>b</p>\n</li>\n</ul>",
+        "projections": {
+          "text": "b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "-\n\n- b"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:0",
+            "-|parent:-1@2:0-2:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/empty-container/list-content-then-blank": {
+      "id": "probe/empty-container/list-content-then-blank",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\n\n  foo\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>a</p>\n<p>foo</p>\n</li>\n</ul>",
+        "projections": {
+          "text": "a foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\n\n  foo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:5"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/empty-container/ordered": {
+      "id": "probe/empty-container/ordered",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "1.\n\n   foo\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\">\n<p> foo</p>\n</li>\n</ol>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1.\n\n   foo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:6"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "An empty list item absorbs an indented block after a blank line, where CommonMark does not -- cmark's own example 280 splits them. The no-blank variants already match."
+    },
+    "probe/empty-container/ordered-lazy": {
+      "id": "probe/empty-container/ordered-lazy",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "1.\nfoo\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\">foo</li>\n</ol>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1.\nfoo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/empty-container/task-empty": {
+      "id": "probe/empty-container/task-empty",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- [ ]\n\n  foo\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>[ ]</p>\n<p>foo</p>\n</li>\n</ul>",
+        "projections": {
+          "text": "[ ] foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- [ ]\n\n  foo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:5"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/empty-container/quote-blank": {
+      "id": "probe/empty-container/quote-blank",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": ">\n\nfoo\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n</blockquote>\n<p dir=\"auto\">foo</p>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": ">"
+            },
+            {
+              "type": "paragraph",
+              "text": "foo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:1",
+            "paragraph@2:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/empty-container/quote-indented": {
+      "id": "probe/empty-container/quote-indented",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": ">\n  foo\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>  foo</p>\n</blockquote>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": ">\n  foo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/empty-container/quote-lazy": {
+      "id": "probe/empty-container/quote-lazy",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": ">\nfoo\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>foo</p>\n</blockquote>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": ">\nfoo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/empty-container/nested-list": {
+      "id": "probe/empty-container/nested-list",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "-\n\n  -\n\n    foo\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<ul>\n<li dir=\"auto\">\n<p> foo</p>\n</li>\n</ul>\n</li>\n</ul>",
+        "projections": {
+          "text": "foo",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "-\n\n  -\n\n    foo"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-4:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-4:7",
+            "-|parent:-2@2:1-4:7"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "An empty list item absorbs an indented block after a blank line, where CommonMark does not -- cmark's own example 280 splits them. The no-blank variants already match."
+    },
+    "probe/footnote-embed/ref-wikilink": {
+      "id": "probe/footnote-embed/ref-wikilink",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^[[target]]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[[target]]</p>",
+        "projections": {
+          "text": "[[target]]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[^[[target]]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:13"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A footnote reference whose label holds a wikilink or an embed. Designed to replace five fuzz documents that each carried six other constructs."
+    },
+    "probe/footnote-embed/ref-embed-defined": {
+      "id": "probe/footnote-embed/ref-embed-defined",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^![[img.png]]]\n\n[^1]: x\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">![[img.png]]</p>",
+        "projections": {
+          "text": "![[img.png]]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[^![[img.png]]]"
+            },
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]: x"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [
+            "1@2:0-2:7"
+          ],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:15",
+            "footnoteDefinition@2:0-2:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A footnote reference whose label holds a wikilink or an embed. Designed to replace five fuzz documents that each carried six other constructs."
+    },
+    "probe/footnote-embed/inline-embed": {
+      "id": "probe/footnote-embed/inline-embed",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "^[![[img.png]]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"[inline0\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><span alt=\"img.png\" src=\"img.png\" class=\"internal-embed is-loaded file-embed mod-empty-attachment\">“img.png” could not be found.</span><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+        "projections": {
+          "text": "⟨fn⟩",
+          "math": [],
+          "links": [
+            {
+              "path": "img.png",
+              "heading": "",
+              "embedded": true
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "^[![[img.png]]]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [
+            "img.png"
+          ],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [
+            "[inline0@0:2-0:14"
+          ],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:15",
+            "text@1:0-1:0",
+            "element@1:0-1:0"
+          ],
+          "links": [],
+          "embeds": [
+            "![[img.png]]=>img.png|img.png@0:2-0:14"
+          ],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/footnote-embed/inline-wikilink": {
+      "id": "probe/footnote-embed/inline-wikilink",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "^[[[target]]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"[inline0\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a data-href=\"target\" href=\"target\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">target</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+        "projections": {
+          "text": "⟨fn⟩",
+          "math": [],
+          "links": [
+            {
+              "path": "target",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "^[[[target]]]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "target"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [
+            "[inline0@0:2-0:12"
+          ],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:13",
+            "text@1:0-1:0",
+            "element@1:0-1:0"
+          ],
+          "links": [
+            "[[target]]=>target|target@0:2-0:12"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/footnote-embed/label-alias": {
+      "id": "probe/footnote-embed/label-alias",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^![[i.png|100]]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">![[i.png|100]]</p>",
+        "projections": {
+          "text": "![[i.png|100]]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[^![[i.png|100]]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:17"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A footnote reference whose label holds a wikilink or an embed. Designed to replace five fuzz documents that each carried six other constructs."
+    },
+    "probe/footnote-embed/label-heading": {
+      "id": "probe/footnote-embed/label-heading",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^[[a#h]]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[[a#h]]</p>",
+        "projections": {
+          "text": "[[a#h]]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[^[[a#h]]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:10"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A footnote reference whose label holds a wikilink or an embed. Designed to replace five fuzz documents that each carried six other constructs."
+    },
+    "probe/footnote-embed/label-block-id": {
+      "id": "probe/footnote-embed/label-block-id",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^[[a#^blk]]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[[a#^blk]]</p>",
+        "projections": {
+          "text": "[[a#^blk]]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[^[[a#^blk]]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:13"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A footnote reference whose label holds a wikilink or an embed. Designed to replace five fuzz documents that each carried six other constructs."
+    },
+    "probe/footnote-embed/nested-embed": {
+      "id": "probe/footnote-embed/nested-embed",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^[[![[i.png]]]]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[[![[i.png]]]]</p>",
+        "projections": {
+          "text": "[[![[i.png]]]]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[^[[![[i.png]]]]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:17"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A footnote reference whose label holds a wikilink or an embed. Designed to replace five fuzz documents that each carried six other constructs."
+    },
+    "probe/footnote-embed/ref-then-embed": {
+      "id": "probe/footnote-embed/ref-then-embed",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^1]![[img.png]]\n\n[^1]: x\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup><span alt=\"img.png\" src=\"img.png\" class=\"internal-embed is-loaded file-embed mod-empty-attachment\">“img.png” could not be found.</span></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>x<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "⟨fn⟩img.png",
+          "math": [],
+          "links": [
+            {
+              "path": "img.png",
+              "heading": "",
+              "embedded": true
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[^1]![[img.png]]"
+            },
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]: x"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [
+            "img.png"
+          ],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "footnotes": [
+            "1@2:0-2:7"
+          ],
+          "footnoteRefs": [
+            "1@0:0"
+          ],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:16",
+            "footnoteDefinition@2:0-2:7",
+            "text@3:0-3:0",
+            "element@3:0-3:0"
+          ],
+          "links": [],
+          "embeds": [
+            "![[img.png]]=>img.png|img.png@0:4-0:16"
+          ],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/footnote-embed/embed-then-ref": {
+      "id": "probe/footnote-embed/embed-then-ref",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "![[img.png]][^1]\n\n[^1]: x\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><span alt=\"img.png\" src=\"img.png\" class=\"internal-embed is-loaded file-embed mod-empty-attachment\">“img.png” could not be found.</span><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>x<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "img.png⟨fn⟩",
+          "math": [],
+          "links": [
+            {
+              "path": "img.png",
+              "heading": "",
+              "embedded": true
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "![[img.png]][^1]"
+            },
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]: x"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [
+            "img.png"
+          ],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "footnotes": [
+            "1@2:0-2:7"
+          ],
+          "footnoteRefs": [
+            "1@0:12"
+          ],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:16",
+            "footnoteDefinition@2:0-2:7",
+            "text@3:0-3:0",
+            "element@3:0-3:0"
+          ],
+          "links": [],
+          "embeds": [
+            "![[img.png]]=>img.png|img.png@0:0-0:12"
+          ],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/footnote-embed/definition-embed": {
+      "id": "probe/footnote-embed/definition-embed",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^1]: ![[img.png]]\n",
+      "obsidian": {
+        "html": "",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]: ![[img.png]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [
+            "img.png"
+          ],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [
+            "1@0:0-0:18"
+          ],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "footnoteDefinition@0:0-0:18"
+          ],
+          "links": [],
+          "embeds": [
+            "![[img.png]]=>img.png|img.png@0:6-0:18"
+          ],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
     "token/wikilink/balanced": {
       "id": "token/wikilink/balanced",
       "layer": "token",
@@ -98867,56 +101068,6 @@
         }
       },
       "triage": "match"
-    },
-    "commonmark/list-items/280": {
-      "id": "commonmark/list-items/280",
-      "layer": "commonmark",
-      "category": "list-items",
-      "markdown": "-\n\n  foo\n",
-      "obsidian": {
-        "html": "<ul>\n<li dir=\"auto\">\n<p> foo</p>\n</li>\n</ul>",
-        "projections": {
-          "text": "foo",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "list",
-              "text": "-\n\n  foo"
-            }
-          ]
-        },
-        "meta": {
-          "headings": [],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        },
-        "compute": {
-          "footnotes": [],
-          "footnoteRefs": [],
-          "headings": [],
-          "sections": [
-            "list@0:0-2:5"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "listItems": [
-            "-|parent:-1@0:0-2:5"
-          ],
-          "blocks": [],
-          "frontmatterLinks": []
-        }
-      },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
     },
     "commonmark/list-items/281": {
       "id": "commonmark/list-items/281",

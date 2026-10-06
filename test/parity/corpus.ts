@@ -1469,6 +1469,69 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
     "a <span>*b*</span>\n\n<div>\n*c*\n</div>\n*d*\n",
   ],
   ["html/comment-around-block", "<!--\n- [ ] hidden\n-->\n\n- [ ] visible\n"],
+  // Where does a tab count as indentation and where as content? The worst designed
+  // coverage of anything still open: 66 incidental hits, 7 of them diverging, and not
+  // one probe. That is the profile that hid both tag bugs. The seed is
+  // `commonmark/tabs/2`, where our section text loses `bim` outright -- content
+  // vanishing after a double tab, which no rule here predicts. Tabs also expand to a
+  // four-column stop before block structure is decided, so the same character is
+  // indentation in one column and content in the next.
+  ["probe/tab/leading-one", "\tfoo\n"],
+  ["probe/tab/two-spaces-then-tab", "  \tfoo\n"],
+  ["probe/tab/three-spaces-then-tab", "   \tfoo\n"],
+  ["probe/tab/interior-single", "a\tb\n"],
+  ["probe/tab/interior-double", "a\t\tb\n"],
+  ["probe/tab/interior-runs", "a\tb\tc\n"],
+  ["probe/tab/after-double-run", "a\t\tb\tc\n"],
+  ["probe/tab/trailing-one", "a\t\n"],
+  ["probe/tab/trailing-double", "a\t\t\n"],
+  ["probe/tab/only-tabs", "\t\t\n"],
+  ["probe/tab/list-marker", "-\tfoo\n"],
+  ["probe/tab/quote-marker", ">\tfoo\n"],
+  ["probe/tab/heading-marker", "#\tfoo\n"],
+  ["probe/tab/heading-before-closer", "# foo\t#\n"],
+  ["probe/tab/table-cell", "| a\tb |\n| --- |\n"],
+  ["probe/tab/code-span", "`a\tb`\n"],
+  ["probe/tab/definition-body", "[^1]:\tbody\n"],
+  ["probe/tab/wikilink-target", "[[a\tb]]\n"],
+  // An empty container's continuation, which is the shape that just turned out to be
+  // wrong for footnote definitions: lazy continuation needs an open paragraph, and a
+  // bare marker opens none. `commonmark/list-items/280` is the seed -- Obsidian reads
+  // `-` / blank / `  foo` as one list where we leave the paragraph behind -- and the
+  // question is whether the rule generalises past the definition case already fixed.
+  // 13 incidental hits, 3 diverging, no probes.
+  ["probe/empty-container/list-blank-indented", "-\n\n  foo\n"],
+  ["probe/empty-container/list-indented", "-\n  foo\n"],
+  ["probe/empty-container/list-lazy", "-\nfoo\n"],
+  ["probe/empty-container/list-marker-space", "- \n\n  foo\n"],
+  ["probe/empty-container/list-two-blanks", "-\n\n\n  foo\n"],
+  ["probe/empty-container/list-then-item", "-\n\n- b\n"],
+  ["probe/empty-container/list-content-then-blank", "- a\n\n  foo\n"],
+  ["probe/empty-container/ordered", "1.\n\n   foo\n"],
+  ["probe/empty-container/ordered-lazy", "1.\nfoo\n"],
+  ["probe/empty-container/task-empty", "- [ ]\n\n  foo\n"],
+  ["probe/empty-container/quote-blank", ">\n\nfoo\n"],
+  ["probe/empty-container/quote-indented", ">\n  foo\n"],
+  ["probe/empty-container/quote-lazy", ">\nfoo\n"],
+  ["probe/empty-container/nested-list", "-\n\n  -\n\n    foo\n"],
+  // A footnote reference whose label holds a wikilink or an embed. Five of the eight
+  // incidental hits diverge and none is designed, so the family is measured entirely
+  // by accident -- and every one of those five is a fuzz document carrying six other
+  // constructs, which is exactly the shape the README warns cannot attribute a cause.
+  // Definitions are supplied where a name could resolve, since `footnoteRefs` lists
+  // only defined names and a probe without one proves nothing.
+  ["probe/footnote-embed/ref-embed", "[^![[img.png]]]\n"],
+  ["probe/footnote-embed/ref-wikilink", "[^[[target]]]\n"],
+  ["probe/footnote-embed/ref-embed-defined", "[^![[img.png]]]\n\n[^1]: x\n"],
+  ["probe/footnote-embed/inline-embed", "^[![[img.png]]]\n"],
+  ["probe/footnote-embed/inline-wikilink", "^[[[target]]]\n"],
+  ["probe/footnote-embed/label-alias", "[^![[i.png|100]]]\n"],
+  ["probe/footnote-embed/label-heading", "[^[[a#h]]]\n"],
+  ["probe/footnote-embed/label-block-id", "[^[[a#^blk]]]\n"],
+  ["probe/footnote-embed/nested-embed", "[^[[![[i.png]]]]]\n"],
+  ["probe/footnote-embed/ref-then-embed", "[^1]![[img.png]]\n\n[^1]: x\n"],
+  ["probe/footnote-embed/embed-then-ref", "![[img.png]][^1]\n\n[^1]: x\n"],
+  ["probe/footnote-embed/definition-embed", "[^1]: ![[img.png]]\n"],
 ];
 
 /** Inline tokens, each crossed with a set of malformed delimiter states. */
