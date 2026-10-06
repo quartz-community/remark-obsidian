@@ -17285,8 +17285,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: an embed shows its target as written, so a target that is only a fragment keeps its hash. Joining the parts with filter(Boolean) dropped the empty path and the separator with it."
     },
     "fuzz/misc/6": {
       "id": "fuzz/misc/6",
@@ -21287,8 +21287,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: an embed shows its target as written, so a target that is only a fragment keeps its hash. Joining the parts with filter(Boolean) dropped the empty path and the separator with it."
     },
     "fuzz/highlight/64": {
       "id": "fuzz/highlight/64",
@@ -26255,8 +26255,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: an embed shows its target as written, so a target that is only a fragment keeps its hash. Joining the parts with filter(Boolean) dropped the empty path and the separator with it."
     },
     "fuzz/wikilink/3": {
       "id": "fuzz/wikilink/3",
@@ -28082,8 +28082,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: an embed shows its target as written, so a target that is only a fragment keeps its hash. Joining the parts with filter(Boolean) dropped the empty path and the separator with it."
     },
     "fuzz/embed/24": {
       "id": "fuzz/embed/24",
@@ -33843,8 +33843,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: an embed shows its target as written, so a target that is only a fragment keeps its hash. Joining the parts with filter(Boolean) dropped the empty path and the separator with it."
     },
     "fuzz/highlight/33": {
       "id": "fuzz/highlight/33",

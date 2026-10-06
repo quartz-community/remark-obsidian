@@ -147,7 +147,9 @@ function textOf(node: Node, defined?: ReadonlySet<string>): string {
       case "wikilink": {
         const link = child as WikilinkNode;
         out += link.embedded
-          ? [link.path, link.heading].filter(Boolean).join("#")
+          ? link.heading
+            ? `${link.path}#${link.heading}`
+            : link.path
           : link.value ||
             link.alias ||
             [link.path, link.heading].filter(Boolean).join(" > ");
@@ -247,7 +249,9 @@ export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
             ? // An unresolved embed shows the target as written, fragment and
               // all: `![[Document.pdf#page=3]]` reads `Document.pdf#page=3`,
               // where a plain link would read only its path.
-              [link.path, link.heading].filter(Boolean).join("#")
+              link.heading
+              ? `${link.path}#${link.heading}`
+              : link.path
             : link.value ||
                 link.alias ||
                 [link.path, link.heading].filter(Boolean).join(" > "),
