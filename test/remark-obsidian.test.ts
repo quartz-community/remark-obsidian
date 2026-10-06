@@ -14,6 +14,7 @@ import {
 } from "../src/lib/comment-region.js";
 import { isLegacyDefinition } from "../src/lib/legacy-definition.js";
 import { legacyHighlightQueue } from "../src/lib/syntax/highlight.js";
+import { legacyEmailAutolink } from "../src/lib/syntax/legacy-autolink.js";
 
 function parse(md: string, opts?: RemarkObsidianOptions) {
   return unified().use(remarkParse).use(remarkObsidian, opts).parse(md);
@@ -2092,5 +2093,82 @@ describe("reparse recursion", () => {
       kinds.push(node.type);
     });
     expect(kinds).toContain("list");
+  });
+});
+
+describe("legacy autolinks", () => {
+  const links = (md: string) => {
+    const found: { url: string; text: string }[] = [];
+    visit(processWithGfm(md), "link", (node: any) => {
+      found.push({
+        url: node.url,
+        text: (node.children ?? []).map((c: any) => c.value).join(""),
+      });
+    });
+    return found;
+  };
+
+  it("keeps a backslash inside an email autolink", () => {
+    expect(links("<foo\\+@bar.example.com>")).toEqual([
+      {
+        url: "mailto:foo\\+@bar.example.com",
+        text: "foo\\+@bar.example.com",
+      },
+    ]);
+  });
+
+  /**
+   * The reason this is on by default. CommonMark escapes the `b`, leaves `<a\` as
+   * text, and GFM then autolinks the remaining `b@c.test` -- a working link to an
+   * address that is not in the document. Runs with gfm registered because that
+   * bare-email extension is what makes the wrong link reachable.
+   */
+  it("does not leave a bare email behind after an escape", () => {
+    expect(links("<a\\b@c.test>")).toEqual([
+      { url: "mailto:a\\b@c.test", text: "a\\b@c.test" },
+    ]);
+  });
+
+  it("does not let a backslash escape the closing bracket", () => {
+    // `<a\>b>` ends its first run at the `>`, which is neither `@` nor `://`,
+    // so legacy forms no autolink either and the line stays literal.
+    expect(links("<a\\>b>")).toEqual([]);
+  });
+
+  it("leaves every autolink without a backslash to micromark", () => {
+    expect(links("<a@b.test>")).toEqual([
+      { url: "mailto:a@b.test", text: "a@b.test" },
+    ]);
+    expect(links("<https://e.test/a\\+b>")).toEqual([
+      { url: "https://e.test/a\\+b", text: "https://e.test/a\\+b" },
+    ]);
+    expect(links("<not a url>")).toEqual([]);
+    expect(links("<>")).toEqual([]);
+  });
+
+  it("can be turned off", () => {
+    const off = (md: string) => {
+      const found: string[] = [];
+      visit(processWithGfm(md, { legacyAutolinks: false }), "link", (n: any) =>
+        found.push(n.url),
+      );
+      return found;
+    };
+    // Not "no link": CommonMark escapes the plus, the brackets stay literal, and
+    // GFM then autolinks the bare email inside them. The backslash is what is lost.
+    const urls = off("<foo\\+@bar.example.com>");
+    expect(urls).toContain("mailto:foo+@bar.example.com");
+    expect(urls.every((url) => !url.includes("\\"))).toBe(true);
+  });
+
+  it("stands aside unless it owns the case", () => {
+    // Nothing to add without a backslash, and `mailto:` is already right by the
+    // protocol route, which keeps the prefix in the text as Obsidian does.
+    expect(legacyEmailAutolink("<a@b.test>")).toBeNull();
+    expect(legacyEmailAutolink("<mailto:a\\+@e.test>")).toBeNull();
+    expect(legacyEmailAutolink("<a\\>b>")).toBeNull();
+    expect(legacyEmailAutolink("<@b.test>")).toBeNull();
+    expect(legacyEmailAutolink("<a\\@>")).toBeNull();
+    expect(legacyEmailAutolink("<a\\b@c.test>")).toBe("a\\b@c.test");
   });
 });

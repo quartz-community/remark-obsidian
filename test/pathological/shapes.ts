@@ -41,6 +41,18 @@ export const SHAPES: Readonly<Record<string, (n: number) => string>> = {
   "table-pipes": (n) => `|${"a|".repeat(n)}\n|${"-|".repeat(n)}\n`,
   "footnote-refs": (n) => "[^a]".repeat(n),
   "block-ref-run": (n) => "a ^b\n".repeat(n),
+  /**
+   * `<` is common enough that an unbounded lookahead from it is ruinous: the
+   * first draft of `legacy-autolink.ts` scanned to end of chunk and took 16.2s
+   * here against 64ms bare, a 254x slowdown.
+   *
+   * Worth recording that this gate would have *passed* it -- 16.2s is inside the
+   * 20s budget. The budget catches a hang, not a quadratic, so the construct
+   * bounds its own scan and `legacy-autolink.ts` records the ratio.
+   */
+  "autolink-open": (n) => "<".repeat(n),
+  /** The same construct on input it actually claims, backslash and all. */
+  "autolink-email": (n) => "<a\\b@c.test>".repeat(n),
 };
 
 export type ShapeName = keyof typeof SHAPES;

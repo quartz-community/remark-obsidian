@@ -14,6 +14,7 @@ import { tagSyntax } from "./lib/syntax/tag.js";
 import { inlineFootnoteSyntax } from "./lib/syntax/inline-footnote.js";
 import { legacyEmphasisSyntax } from "./lib/syntax/legacy-emphasis.js";
 import { legacyDeleteSyntax } from "./lib/syntax/legacy-delete.js";
+import { legacyAutolinkSyntax } from "./lib/syntax/legacy-autolink.js";
 import { legacyEntitySyntax } from "./lib/syntax/legacy-entity.js";
 
 import { wikilinkFromMarkdown } from "./lib/mdast/wikilink.js";
@@ -211,6 +212,17 @@ export interface RemarkObsidianOptions {
    */
   legacyEntities?: boolean;
   /**
+   * Let an email autolink hold a backslash, as `remark-parse@8` does.
+   * `<foo\+@bar.example.com>` links to `mailto:foo\+@bar.example.com` and shows
+   * the backslash; CommonMark reads `\+` as an escaped plus, fails the email
+   * pattern, and leaves the brackets as text.
+   *
+   * On by default, because the failure is worse than a missing link:
+   * `<a\b@c.test>` escapes the `b`, drops `<a\` as text, and autolinks the
+   * remaining `b@c.test` -- a working link to the wrong address.
+   */
+  legacyAutolinks?: boolean;
+  /**
    * Convert a soft line ending into a positioned `break`, so `remark-breaks` has
    * nothing left to do.
    *
@@ -254,6 +266,7 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
   legacyEmphasis: true,
   legacyStrikethrough: true,
   legacyEntities: true,
+  legacyAutolinks: true,
   positionedBreaks: true,
   escapedLineBreaks: false,
 };
@@ -330,6 +343,10 @@ export default function remarkObsidian(
 
   if (opts.legacyEntities) {
     data.micromarkExtensions.push(legacyEntitySyntax());
+  }
+
+  if (opts.legacyAutolinks) {
+    data.micromarkExtensions.push(legacyAutolinkSyntax());
   }
 
   if (opts.customTaskChars) {

@@ -37,6 +37,8 @@ const SIZES: Readonly<Record<string, number>> = {
   "table-pipes": 5_000,
   "footnote-refs": 20_000,
   "block-ref-run": 20_000,
+  "autolink-open": 20_000,
+  "autolink-email": 5_000,
 };
 
 /**

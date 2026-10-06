@@ -2454,8 +2454,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A backslash inside an autolink is literal, so `<foo\\+@bar.example.com>` is an autolink to `foo\\+@bar.example.com`. We treat `\\+` as an escape, which stops the autolink forming and leaves the angle brackets as text. Same shape as the wikilink target, where a backslash is also content."
+      "triage": "match",
+      "note": "Fixed by porting remark-parse@8's auto-link.js email branch: a backslash inside an autolink is content, not an escape. Scoped to the email branch because a URI autolink and mailto: already keep theirs."
     },
     "probe/autolink/escaped-closer": {
       "id": "probe/autolink/escaped-closer",

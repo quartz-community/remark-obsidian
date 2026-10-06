@@ -20,7 +20,10 @@ export function codeToCharacter(code: Code): string {
  * stack desynchronises when `check` restores, which surfaces much later as
  * `expected last token to be open`.
  */
-export function createChunkScan(sink: string[]): Construct {
+export function createChunkScan(
+  sink: string[],
+  stopAfter?: (character: string) => boolean,
+): Construct {
   return {
     partial: true,
     tokenize(effects, ok) {
@@ -34,8 +37,13 @@ export function createChunkScan(sink: string[]): Construct {
           effects.exit("legacyChunkScan");
           return ok(code);
         }
-        sink.push(codeToCharacter(code));
+        const character = codeToCharacter(code);
+        sink.push(character);
         effects.consume(code);
+        if (stopAfter?.(character) === true) {
+          effects.exit("legacyChunkScan");
+          return ok;
+        }
         return step;
       }
     },
