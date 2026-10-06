@@ -2453,3 +2453,42 @@ describe("wikilink whitespace", () => {
     expect(parts("[[a#^blk\\]]\n")).toEqual(["a|^blk|"]);
   });
 });
+
+describe("demoted setext heading content", () => {
+  const shape = (md: string) => {
+    const f = (n: any): string => {
+      const kids = (n.children ?? []).map(f).join(" ");
+      return n.type + (kids ? `(${kids})` : "");
+    };
+    return (processWithGfm(md) as any).children.map(f).join(" + ");
+  };
+
+  /**
+   * Only one content line makes a setext heading in Obsidian, so a multi-line one
+   * is demoted to a paragraph. Rebuilding it line by line gave each `*` no partner
+   * to pair with, losing emphasis CommonMark's own examples 81 and 82 carry.
+   */
+  it("keeps an inline construct spanning the demoted lines", () => {
+    expect(shape("Foo *bar\nbaz*\n====\n")).toBe(
+      "paragraph(text emphasis(text break text) break text)",
+    );
+    expect(shape("Foo *bar\nbaz*\n----\n")).toBe(
+      "paragraph(text emphasis(text break text)) + thematicBreak",
+    );
+  });
+
+  it("leaves the underline's own handling alone", () => {
+    // Reparsed on its own, so the indent is still dropped from the text.
+    expect(shape("H\n  ===\n")).toBe("paragraph(text break text)");
+    expect(shape("H\n===\t\n")).toBe("paragraph(text break text)");
+    expect(shape("a\nb\n---\n")).toBe(
+      "paragraph(text break text) + thematicBreak",
+    );
+  });
+
+  it("still makes a heading inside a container", () => {
+    expect(shape("> a\n> b\n> ===\n")).toBe(
+      "blockquote(heading(text break text))",
+    );
+  });
+});

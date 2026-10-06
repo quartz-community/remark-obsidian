@@ -25687,8 +25687,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by reparsing a demoted setext heading's content as one fragment instead of line by line: an inline construct may span the lines, and each line alone gave its delimiters no partner."
     },
     "fuzz/strikethrough/11": {
       "id": "fuzz/strikethrough/11",
@@ -36862,8 +36862,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by reparsing a demoted setext heading's content as one fragment instead of line by line: an inline construct may span the lines, and each line alone gave its delimiters no partner."
     },
     "fuzz/highlight/20": {
       "id": "fuzz/highlight/20",
@@ -38869,8 +38869,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by reparsing a demoted setext heading's content as one fragment instead of line by line: an inline construct may span the lines, and each line alone gave its delimiters no partner."
     },
     "fuzz/block-ref/8": {
       "id": "fuzz/block-ref/8",
@@ -59461,8 +59461,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Emphasis across a line ending works in general -- 9 of 13 probes match, including the bare, quote and list forms. The open ones are where a fragment is reparsed (setext) or a boundary is crossed (callout title), plus a tab-separated run Obsidian reads as nested lists rather than a thematic break."
+      "triage": "match",
+      "note": "Fixed by reparsing a demoted setext heading's content as one fragment instead of line by line: an inline construct may span the lines, and each line alone gave its delimiters no partner."
     },
     "probe/emphasis-span/in-setext-dash": {
       "id": "probe/emphasis-span/in-setext-dash",
@@ -59516,8 +59516,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Emphasis across a line ending works in general -- 9 of 13 probes match, including the bare, quote and list forms. The open ones are where a fragment is reparsed (setext) or a boundary is crossed (callout title), plus a tab-separated run Obsidian reads as nested lists rather than a thematic break."
+      "triage": "match",
+      "note": "Fixed by reparsing a demoted setext heading's content as one fragment instead of line by line: an inline construct may span the lines, and each line alone gave its delimiters no partner."
     },
     "probe/emphasis-span/in-quote": {
       "id": "probe/emphasis-span/in-quote",
@@ -93210,8 +93210,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by reparsing a demoted setext heading's content as one fragment instead of line by line: an inline construct may span the lines, and each line alone gave its delimiters no partner."
     },
     "commonmark/setext-headings/83": {
       "id": "commonmark/setext-headings/83",

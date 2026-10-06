@@ -9,6 +9,7 @@ import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 
 import { span } from "./normalize-points.js";
+import { mapLines, shiftByMap } from "./line-map.js";
 
 /** A setext underline exactly as `remark-parse@8` accepts it: nothing around it. */
 const STRICT = /^(=+|-+)$/u;
@@ -63,6 +64,80 @@ function shiftTo(node: unknown, offset: number): void {
  * definition folds into it — which is how `H` / `  ===` / `[^1]: real` becomes
  * the single paragraph Obsidian reports.
  */
+/**
+ * Rebuild a demoted heading's lines as paragraph content.
+ *
+ * Reparsed as **one fragment**, because an inline construct may span the lines.
+ * Doing it line by line -- which this did -- gave each `*` no partner to pair with,
+ * so `Foo *bar` / `baz*` / `====` reported no emphasis where Obsidian reports
+ * `em:bar baz`. CommonMark's own examples 81 and 82 are that shape.
+ *
+ * `mapLines` carries the per-line offsets, so a fragment inside a blockquote is
+ * placed back correctly even though stripping `> ` shortens each continuation line
+ * by a different amount. The line endings are left for
+ * `breakPositionsTransform` to turn into placed `break` nodes, exactly as it does
+ * for a paragraph the parser built itself.
+ *
+ * Falls back to the per-line walk when the fragment does not reparse to a single
+ * paragraph -- a demoted heading whose content is a list or a fence is not
+ * phrasing content, and the fallback is what used to handle it.
+ */
+function rebuild(
+  content: readonly string[],
+  source: string,
+  start: number,
+  reparse: (markdown: string) => Root,
+): PhrasingContent[] {
+  if (content.length === 0) return [];
+  const startLine = source.slice(0, start).split("\n").length;
+  const map = mapLines(
+    source,
+    start,
+    start + content.join("\n").length,
+    startLine,
+  );
+  const parsed = reparse(map.text);
+  if (
+    parsed.children.length === 1 &&
+    parsed.children[0]?.type === "paragraph"
+  ) {
+    const paragraph = parsed.children[0];
+    for (const child of paragraph.children) shiftByMap(child, map, 0);
+    return paragraph.children;
+  }
+
+  const children: PhrasingContent[] = [];
+  let offset = start;
+  for (const line of content) {
+    if (children.length > 0) {
+      children.push(
+        span<Text>(
+          { type: "text", value: "\n" } as Text,
+          source,
+          offset - 1,
+          offset,
+        ) as PhrasingContent,
+      );
+    }
+    const block = reparse(line).children[0];
+    if (block?.type === "paragraph") {
+      for (const child of block.children) shiftTo(child, offset);
+      children.push(...block.children);
+    } else {
+      children.push(
+        span<Text>(
+          { type: "text", value: line } as Text,
+          source,
+          offset,
+          offset + line.length,
+        ) as PhrasingContent,
+      );
+    }
+    offset += line.length + 1;
+  }
+  return children;
+}
+
 export function setextUnderlineTransform(
   tree: Root,
   source: string,
@@ -99,39 +174,32 @@ export function setextUnderlineTransform(
       const broken = dashes && lines.length >= 3;
       const content = broken ? lines.slice(0, -1) : lines;
 
-      const children: PhrasingContent[] = [];
-      let offset = start;
-      for (const line of content) {
+      const contentEnd = start + content.join("\n").length;
+      // The underline is never part of the reparsed fragment: including it would
+      // rebuild the very heading being demoted, and the fallback would then run on
+      // every case. When it stays as text it is reparsed on its own, exactly as
+      // before, so `H` / `  ===` still reports `===` without its indent.
+      const children = rebuild(
+        broken ? content : content.slice(0, -1),
+        source,
+        start,
+        reparse,
+      );
+      if (!broken) {
+        const underlineStart =
+          start + content.slice(0, -1).join("\n").length + 1;
         if (children.length > 0) {
-          // The newline this stands for sits just before the current line, and
-          // `breakPositionsTransform` turns a placed one into a placed `break`.
           children.push(
             span<Text>(
               { type: "text", value: "\n" } as Text,
               source,
-              offset - 1,
-              offset,
+              underlineStart - 1,
+              underlineStart,
             ) as PhrasingContent,
           );
         }
-        const block = reparse(line).children[0];
-        if (block?.type === "paragraph") {
-          for (const child of block.children) shiftTo(child, offset);
-          children.push(...block.children);
-        } else {
-          children.push(
-            span<Text>(
-              { type: "text", value: line } as Text,
-              source,
-              offset,
-              offset + line.length,
-            ) as PhrasingContent,
-          );
-        }
-        offset += line.length + 1;
+        children.push(...rebuild([underline], source, underlineStart, reparse));
       }
-
-      const contentEnd = start + content.join("\n").length;
       const paragraph = {
         type: "paragraph",
         children,
