@@ -54,14 +54,24 @@ export const SHAPES: Readonly<Record<string, (n: number) => string>> = {
   /** The same construct on input it actually claims, backslash and all. */
   "autolink-email": (n) => "<a\\b@c.test>".repeat(n),
   /**
-   * cmark's backtick cases, which it made linear by precomputing a map of run
-   * positions. micromark needs no such help -- 20,000 backticks parse in 16ms
-   * bare -- so these are a *baseline*, recorded before any work on the backtick
-   * retry so the guard predates the change rather than following it.
+   * Two shapes that look like a backtick baseline and measure nothing. A single
+   * run has nothing to rescan, and runs that are all width 2 let every opener
+   * find its own width immediately -- so both are fast for reasons that have
+   * nothing to do with the pathology. Kept as controls, honestly labelled.
    */
   "backtick-run": (n) => "`".repeat(n),
-  /** The shape a retry must examine: an opener that never finds its closer. */
   "backtick-retry": (n) => "``a".repeat(n),
+  /**
+   * cmark's real backtick case, and the one that bites: widths that *increase*,
+   * so no opener ever finds its own width ahead and each scans to EOF and fails.
+   * Stock micromark is superlinear here -- roughly bytes^1.5, with time x8 for
+   * every doubling of `n` -- and we track it exactly, adding nothing.
+   *
+   * `n` counts runs, not bytes: n=500 is 125,750 bytes and ~2.1s, against 16.7s
+   * at n=1000 and 133s at n=2000. Gated where there is still headroom.
+   */
+  "backtick-increasing": (n) =>
+    Array.from({ length: n }, (_, i) => "`".repeat(i + 1) + "a").join(""),
 };
 
 export type ShapeName = keyof typeof SHAPES;

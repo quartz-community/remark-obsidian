@@ -306,13 +306,33 @@ identically to the bare case: emphasis, tight emphasis, strong, table cell,
 blockquote, heading, list item and link label. Note the heading keeps the raw source
 in its attribute while rendering the span -- `# ``code` `gives`<h1 data-heading="``code`">`, so `metadataCache` and the DOM disagree by design.
 
-The implementation hazard is lookahead cost, and the budget will not catch it.
-`backtick-run` and `backtick-retry` in `pathological/shapes.ts` record the baseline
-measured **before** any attempt: micromark is already linear here -- 20,000 backticks
-in 16ms bare, an opener of 20,000 against one closer in 9ms -- so unlike cmark it
-needs no precomputed map of run positions, and any retry must preserve that. The
-20s pathological budget demonstrably passes a 254x quadratic, so linearity needs an
-argument, not just a green test.
+The implementation hazard is lookahead cost, and **a uniform-width probe will not
+find it**. `` ` ``x20000 parses in 16ms bare and ` `a ``x7000 in 44ms, which reads
+as linear and is not: a single run has nothing to rescan, and a document whose runs
+are all width 2 lets every opener find its own width immediately. Both were recorded
+here as a baseline and both were measuring nothing.
+
+cmark's actual backtick pathology is run widths that **increase**, so no opener ever
+finds its own width ahead and each one scans to EOF and fails. Stock micromark is
+superlinear on it -- time grows as roughly bytes^1.5:
+
+| runs `k` |     bytes |      bare |    ours |
+| -------: | --------: | --------: | ------: |
+|      250 |    31,625 |     291ms |   263ms |
+|      500 |   125,750 |   2,103ms | 2,106ms |
+|     1000 |   501,500 |  16,730ms |       — |
+|     2000 | 2,003,000 | 133,330ms |       — |
+
+Doubling `k` quadruples the bytes and **octuples** the time. We track bare exactly,
+adding nothing and inheriting all of it, so `backtick-increasing` is gated at `k=500`
+where there is still headroom.
+
+This reframes the retry rather than merely constraining it. The runs stock scans to
+EOF and fails on are _precisely_ the openers a retry has to decide, so a retry that
+consults a cached run index answers them without stock ever rescanning -- which
+should make our side of this table sublinear while bare stays where it is. The 20s
+budget cannot adjudicate any of that: it demonstrably passes a 254x quadratic, so
+linearity needs a deterministic counter, not a green test.
 
 ## The pinned chain
 
