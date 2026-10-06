@@ -151,6 +151,29 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/html-block/br-interrupts-paragraph", "text\n<br>\nmore\n"],
   ["probe/html-block/div-interrupts-paragraph", "text\n<div>\nmore\n"],
   ["probe/html-block/script-body", "<script>\na\n</script>\n"],
+  // The rest of what `remark-parse@8`'s `link.js` decides, which nothing here probes.
+  // Porting that tokenizer is the largest scoped item left, and a port replaces the
+  // whole construct -- so its blast radius is this entire surface, not the bracket
+  // nesting that motivated it. Six of these features had zero designed probes and
+  // were covered only by accidental fuzz hits: both minority title styles, angle and
+  // empty destinations, nested and escaped parens. Probing first is also how the
+  // html/setext "port" turned out to be a bounded transform.
+  ["probe/link-surface/plain-destination", "[a](u)\n"],
+  ["probe/link-surface/angle-destination", "[a](<u>)\n"],
+  ["probe/link-surface/angle-with-space", "[a](<u v>)\n"],
+  ["probe/link-surface/empty-destination", "[a]()\n"],
+  ["probe/link-surface/empty-angle", "[a](<>)\n"],
+  ["probe/link-surface/nested-parens", "[a](u(v))\n"],
+  ["probe/link-surface/escaped-parens", "[a](u\\(v\\))\n"],
+  ["probe/link-surface/bare-space", "[a](u v)\n"],
+  ["probe/link-surface/title-double", '[a](u "t")\n'],
+  ["probe/link-surface/title-single", "[a](u 't')\n"],
+  ["probe/link-surface/title-parenthesis", "[a](u (t))\n"],
+  ["probe/link-surface/title-unterminated", '[a](u "t)\n'],
+  ["probe/link-surface/title-then-junk", '[a](u "t" x)\n'],
+  ["probe/link-surface/full-reference", "[a][b]\n\n[b]: /u\n"],
+  ["probe/link-surface/collapsed-reference", "[a][]\n\n[a]: /u\n"],
+  ["probe/link-surface/shortcut-reference", "[a]\n\n[a]: /u\n"],
   // Which bracket pair wins when one encloses another? Obsidian takes the OUTER
   // and leaves the inner literal, where CommonMark takes the inner -- both oracles
   // agree on that for `[foo [bar](/uri)](/uri)`. Reproducing it means replacing
