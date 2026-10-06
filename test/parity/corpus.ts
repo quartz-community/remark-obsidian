@@ -1595,6 +1595,44 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/footnote-content/ref-tag", "[^#tag]\n"],
   ["probe/footnote-content/definition-strong", "use[^1]\n\n[^1]: **strong**\n"],
   ["probe/footnote-content/definition-math", "use[^1]\n\n[^1]: $x^2$\n"],
+  // A tab between thematic-break markers. The legacy stack is unambiguous --
+  // `*⇥*⇥*⇥` is three nested lists there and a thematic break in CommonMark -- and
+  // Obsidian agrees with legacy, reporting `ul,ul,ul`. The corpus holds exactly one
+  // case of it, so the extent is probed before a fix is attempted: suppressing the
+  // break means replacing micromark's construct wholesale, and one case does not
+  // justify that blast radius while twelve might.
+  //
+  // The canonical `*⇥*⇥*⇥` is not repeated here: it is already
+  // `probe/emphasis-span/tab-separated`, which is where the rule surfaced. The
+  // escaped closer is likewise already covered among the legacy-delete cases.
+  ["probe/thematic-break/spaces", "* * *\n"],
+  ["probe/thematic-break/double-spaces", "*  *  *\n"],
+  ["probe/thematic-break/tight", "***\n"],
+  ["probe/thematic-break/tab-inner", "*\t*\t*\n"],
+  ["probe/thematic-break/tab-one", "* *\t*\n"],
+  ["probe/thematic-break/tab-trailing", "* * *\t\n"],
+  ["probe/thematic-break/dash-tab", "-\t-\t-\t\n"],
+  ["probe/thematic-break/dash-spaces", "- - -\n"],
+  ["probe/thematic-break/underscore-tab", "_\t_\t_\t\n"],
+  ["probe/thematic-break/underscore-spaces", "_ _ _\n"],
+  ["probe/thematic-break/five-tab", "*\t*\t*\t*\t*\t\n"],
+  // Strikethrough, which also had zero designed probes against 81 incidental hits.
+  // `legacy-delete.ts` ported `remark-parse@8`'s tokenizer here, and nothing pins
+  // that port: these lock the closing-run rule, the escape it does not honour, and
+  // the empty form `~~~~`.
+  ["probe/strikethrough/simple", "~~del~~\n"],
+  ["probe/strikethrough/single-tilde", "~x~\n"],
+  ["probe/strikethrough/four-tildes", "~~~~\n"],
+  ["probe/strikethrough/six-tildes", "~~~~~~\n"],
+  ["probe/strikethrough/unclosed", "~~del\n"],
+  ["probe/strikethrough/space-after-open", "~~ del~~\n"],
+  ["probe/strikethrough/space-before-close", "~~del ~~\n"],
+  ["probe/strikethrough/across-line", "~~del\nmore~~\n"],
+  ["probe/strikethrough/nested-emphasis", "~~*em*~~\n"],
+  ["probe/strikethrough/in-emphasis", "*~~del~~*\n"],
+  ["probe/strikethrough/adjacent-text", "a~~del~~b\n"],
+  ["probe/strikethrough/interior-single", "~~a~b~~\n"],
+  ["probe/strikethrough/in-table-cell", "| ~~del~~ |\n| --- |\n"],
 ];
 
 /** Inline tokens, each crossed with a set of malformed delimiter states. */

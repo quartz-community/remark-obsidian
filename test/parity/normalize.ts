@@ -579,12 +579,10 @@ export function projectMdast(
     // `mdastText`, not `textOf`, so a wikilink or math span inside the emphasis
     // yields the same display text the DOM side reads off the rendered element.
     if (node.type === "strong" || node.type === "emphasis") {
-      // Not inside a footnote. The recorder removes `.footnotes` from the clone it
-      // reads `text` and `emphasis` off, because the renderer relocates every
-      // footnote body to a trailing section -- so Obsidian reports no emphasis there
-      // and cannot report any. `math`, `links`, `tags` and `highlights` are read
-      // from the undisturbed root and do see those bodies, which is why only this
-      // branch skips them.
+      // Not inside a footnote, for the reason given at the `highlight` branch
+      // above: the recorder reads `text`, `highlights` and `emphasis` off a clone
+      // with `.footnotes` removed, because the renderer relocates every footnote
+      // body to a trailing section.
       if (inFootnote.has(node)) return;
       const kind = node.type === "strong" ? "strong" : "em";
       emphasis.push(`${kind}:${mdastText(node, defined)}`);
@@ -621,6 +619,11 @@ export function projectMdast(
       return;
     }
     if (node.type === "highlight") {
+      // Same reason as `emphasis` below: read off the clone, which has `.footnotes`
+      // removed, so a highlight inside a footnote body is one Obsidian cannot
+      // report. `math`, `links`, `tags`, `headings` and `tasks` come from the
+      // undisturbed root and are not restricted this way.
+      if (inFootnote.has(node)) return;
       highlights.push(stripColourMarker(textOf(node, defined)));
       return;
     }

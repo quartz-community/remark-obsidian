@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-06T21:42:31.565Z",
+  "recordedAt": "2026-10-06T23:38:31.252Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -25601,7 +25601,7 @@
           "headings": [],
           "tasks": [],
           "highlights": [
-            "“$x^2$” is not created yet. Click to create."
+            "$x^2$"
           ],
           "emphasis": [],
           "sections": [
@@ -25637,8 +25637,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the harness: the recorder read highlights off the undisturbed root, so math inside a highlight came back as rendered KaTeX where our tree says the placeholder. It now reads the substituted clone, as emphasis already did."
     },
     "fuzz/highlight/55": {
       "id": "fuzz/highlight/55",
@@ -59027,7 +59027,7 @@
           "headings": [],
           "tasks": [],
           "highlights": [
-            "𝑥2"
+            "⟨math⟩"
           ],
           "emphasis": [],
           "sections": [
@@ -59059,8 +59059,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Math projects a placeholder where Obsidian's DOM gives rendered KaTeX text. The parse agrees; only the representation differs."
+      "triage": "match",
+      "note": "Fixed in the harness: the recorder read highlights off the undisturbed root, so math inside a highlight came back as rendered KaTeX where our tree says the placeholder. It now reads the substituted clone, as emphasis already did."
     },
     "probe/math/in-callout-title": {
       "id": "probe/math/in-callout-title",
@@ -60129,9 +60129,7 @@
           "tags": [],
           "headings": [],
           "tasks": [],
-          "highlights": [
-            "mark"
-          ],
+          "highlights": [],
           "emphasis": [],
           "sections": [
             {
@@ -60512,6 +60510,1166 @@
             "footnoteDefinition@2:0-2:11",
             "text@3:0-3:0",
             "element@3:0-3:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/thematic-break/spaces": {
+      "id": "probe/thematic-break/spaces",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "* * *\n",
+      "obsidian": {
+        "html": "<hr>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "thematicBreak",
+              "text": "* * *"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "thematicBreak@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/thematic-break/double-spaces": {
+      "id": "probe/thematic-break/double-spaces",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "*  *  *\n",
+      "obsidian": {
+        "html": "<hr>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "thematicBreak",
+              "text": "*  *  *"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "thematicBreak@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/thematic-break/tight": {
+      "id": "probe/thematic-break/tight",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "***\n",
+      "obsidian": {
+        "html": "<hr>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "thematicBreak",
+              "text": "***"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "thematicBreak@0:0-0:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/thematic-break/tab-inner": {
+      "id": "probe/thematic-break/tab-inner",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "*\t*\t*\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<ul>\n<li dir=\"auto\">\n<ul>\n<li dir=\"auto\"></li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "*\t*\t*"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:5",
+            "-|parent:-1@0:2-0:5",
+            "-|parent:-1@0:4-0:5"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A tab anywhere between the markers cancels the break -- even a trailing one -- and the line falls through to the list tokenizer as nested items. Confirmed against the legacy stack, which agrees with Obsidian on every variant. Suppressing the break means replacing micromark's thematicBreak wholesale, which these seven cases now justify where one did not."
+    },
+    "probe/thematic-break/tab-one": {
+      "id": "probe/thematic-break/tab-one",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "* *\t*\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<ul>\n<li dir=\"auto\">\n<ul>\n<li dir=\"auto\"></li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "* *\t*"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:5",
+            "-|parent:-1@0:2-0:5",
+            "-|parent:-1@0:4-0:5"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A tab anywhere between the markers cancels the break -- even a trailing one -- and the line falls through to the list tokenizer as nested items. Confirmed against the legacy stack, which agrees with Obsidian on every variant. Suppressing the break means replacing micromark's thematicBreak wholesale, which these seven cases now justify where one did not."
+    },
+    "probe/thematic-break/tab-trailing": {
+      "id": "probe/thematic-break/tab-trailing",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "* * *\t\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<ul>\n<li dir=\"auto\">\n<ul>\n<li dir=\"auto\"></li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "* * *\t"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:6",
+            "-|parent:-1@0:2-0:6",
+            "-|parent:-1@0:4-0:6"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A tab anywhere between the markers cancels the break -- even a trailing one -- and the line falls through to the list tokenizer as nested items. Confirmed against the legacy stack, which agrees with Obsidian on every variant. Suppressing the break means replacing micromark's thematicBreak wholesale, which these seven cases now justify where one did not."
+    },
+    "probe/thematic-break/dash-tab": {
+      "id": "probe/thematic-break/dash-tab",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "-\t-\t-\t\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<ul>\n<li dir=\"auto\">\n<ul>\n<li dir=\"auto\"></li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "-\t-\t-\t"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:6",
+            "-|parent:-1@0:2-0:6",
+            "-|parent:-1@0:4-0:6"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A tab anywhere between the markers cancels the break -- even a trailing one -- and the line falls through to the list tokenizer as nested items. Confirmed against the legacy stack, which agrees with Obsidian on every variant. Suppressing the break means replacing micromark's thematicBreak wholesale, which these seven cases now justify where one did not."
+    },
+    "probe/thematic-break/dash-spaces": {
+      "id": "probe/thematic-break/dash-spaces",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- - -\n",
+      "obsidian": {
+        "html": "<hr>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "thematicBreak",
+              "text": "- - -"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "thematicBreak@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/thematic-break/underscore-tab": {
+      "id": "probe/thematic-break/underscore-tab",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "_\t_\t_\t\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">_\t_\t_\t</p>",
+        "projections": {
+          "text": "_ _ _",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "_\t_\t_\t"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A tab anywhere between the markers cancels the break -- even a trailing one -- and the line falls through to the list tokenizer as nested items. Confirmed against the legacy stack, which agrees with Obsidian on every variant. Suppressing the break means replacing micromark's thematicBreak wholesale, which these seven cases now justify where one did not."
+    },
+    "probe/thematic-break/underscore-spaces": {
+      "id": "probe/thematic-break/underscore-spaces",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "_ _ _\n",
+      "obsidian": {
+        "html": "<hr>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "thematicBreak",
+              "text": "_ _ _"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "thematicBreak@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/thematic-break/five-tab": {
+      "id": "probe/thematic-break/five-tab",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "*\t*\t*\t*\t*\t\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<ul>\n<li dir=\"auto\">\n<ul>\n<li dir=\"auto\">\n<ul>\n<li dir=\"auto\">\n<ul>\n<li dir=\"auto\"></li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>\n</li>\n</ul>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "*\t*\t*\t*\t*\t"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:10"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:10",
+            "-|parent:-1@0:2-0:10",
+            "-|parent:-1@0:4-0:10",
+            "-|parent:-1@0:6-0:10",
+            "-|parent:-1@0:8-0:10"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A tab anywhere between the markers cancels the break -- even a trailing one -- and the line falls through to the list tokenizer as nested items. Confirmed against the legacy stack, which agrees with Obsidian on every variant. Suppressing the break means replacing micromark's thematicBreak wholesale, which these seven cases now justify where one did not."
+    },
+    "probe/strikethrough/simple": {
+      "id": "probe/strikethrough/simple",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "~~del~~\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><del>del</del></p>",
+        "projections": {
+          "text": "del",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "~~del~~"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/strikethrough/single-tilde": {
+      "id": "probe/strikethrough/single-tilde",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "~x~\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">~x~</p>",
+        "projections": {
+          "text": "~x~",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "~x~"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/strikethrough/four-tildes": {
+      "id": "probe/strikethrough/four-tildes",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "~~~~\n",
+      "obsidian": {
+        "html": "<pre><code></code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "code",
+              "text": "~~~~"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "code@0:0-1:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/strikethrough/six-tildes": {
+      "id": "probe/strikethrough/six-tildes",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "~~~~~~\n",
+      "obsidian": {
+        "html": "<pre><code></code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "code",
+              "text": "~~~~~~"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "code@0:0-1:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/strikethrough/unclosed": {
+      "id": "probe/strikethrough/unclosed",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "~~del\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">~~del</p>",
+        "projections": {
+          "text": "~~del",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "~~del"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/strikethrough/space-after-open": {
+      "id": "probe/strikethrough/space-after-open",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "~~ del~~\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">~~ del~~</p>",
+        "projections": {
+          "text": "~~ del~~",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "~~ del~~"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/strikethrough/space-before-close": {
+      "id": "probe/strikethrough/space-before-close",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "~~del ~~\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">~~del ~~</p>",
+        "projections": {
+          "text": "~~del ~~",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "~~del ~~"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/strikethrough/across-line": {
+      "id": "probe/strikethrough/across-line",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "~~del\nmore~~\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><del>del<br>\nmore</del></p>",
+        "projections": {
+          "text": "del more",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "~~del\nmore~~"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-1:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/strikethrough/nested-emphasis": {
+      "id": "probe/strikethrough/nested-emphasis",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "~~*em*~~\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><del><em>em</em></del></p>",
+        "projections": {
+          "text": "em",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:em"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "~~*em*~~"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/strikethrough/in-emphasis": {
+      "id": "probe/strikethrough/in-emphasis",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "*~~del~~*\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><em><del>del</del></em></p>",
+        "projections": {
+          "text": "del",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:del"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "*~~del~~*"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:9"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/strikethrough/adjacent-text": {
+      "id": "probe/strikethrough/adjacent-text",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "a~~del~~b\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">a<del>del</del>b</p>",
+        "projections": {
+          "text": "adelb",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "a~~del~~b"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:9"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/strikethrough/interior-single": {
+      "id": "probe/strikethrough/interior-single",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "~~a~b~~\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><del>a~b</del></p>",
+        "projections": {
+          "text": "a~b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "~~a~b~~"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/strikethrough/in-table-cell": {
+      "id": "probe/strikethrough/in-table-cell",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "| ~~del~~ |\n| --- |\n",
+      "obsidian": {
+        "html": "<table>\n<thead>\n<tr>\n<th dir=\"ltr\"><del>del</del></th>\n</tr>\n</thead>\n</table>",
+        "projections": {
+          "text": "del",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "table",
+              "text": "| ~~del~~ |\n| --- |"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "table@0:0-1:7"
           ],
           "links": [],
           "embeds": [],
@@ -67647,53 +68805,6 @@
       },
       "triage": "match",
       "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
-    },
-    "token/strikethrough/empty": {
-      "id": "token/strikethrough/empty",
-      "layer": "token",
-      "category": "strikethrough",
-      "markdown": "~~~~\n",
-      "obsidian": {
-        "html": "<pre><code></code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>",
-        "projections": {
-          "text": "",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "code",
-              "text": "~~~~"
-            }
-          ]
-        },
-        "meta": {
-          "headings": [],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        },
-        "compute": {
-          "footnotes": [],
-          "footnoteRefs": [],
-          "headings": [],
-          "sections": [
-            "code@0:0-1:0"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "listItems": [],
-          "blocks": [],
-          "frontmatterLinks": []
-        }
-      },
-      "triage": "match"
     },
     "token/strikethrough/whitespace-body": {
       "id": "token/strikethrough/whitespace-body",

@@ -129,10 +129,6 @@ const CAPTURE = async (
       }),
     );
 
-    const highlights = Array.from(root.querySelectorAll("mark")).map(
-      (el) => el.textContent ?? "",
-    );
-
     const clone = root.cloneNode(true) as Element;
     for (const el of Array.from(clone.querySelectorAll(".math"))) {
       el.replaceWith(document.createTextNode("\u27e8math\u27e9"));
@@ -173,6 +169,15 @@ const CAPTURE = async (
     }
     for (const el of Array.from(clone.querySelectorAll("svg"))) el.remove();
     const text = (clone.textContent ?? "").replace(/\s+/g, " ").trim();
+
+    // Read off the substituted clone, not `root`, so math and embeds inside a
+    // highlight reduce the same way our mdast side reduces them -- `==$x^2$==` gave
+    // the rendered KaTeX `𝑥2` from `root` where our tree says `⟨math⟩`. This used to
+    // run before the clone existed, which is the whole bug: `emphasis` below had the
+    // argument in a comment and `highlights` did not have it applied.
+    const highlights = Array.from(clone.querySelectorAll("mark")).map(
+      (el) => el.textContent ?? "",
+    );
 
     // Read off the substituted clone, not `root`, so math and embeds inside an
     // emphasis reduce the same way our mdast side reduces them. `querySelectorAll`
