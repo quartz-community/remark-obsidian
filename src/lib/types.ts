@@ -109,6 +109,7 @@ declare module "micromark-util-types" {
     wikilinkHeading: "wikilinkHeading";
     wikilinkAliasMarker: "wikilinkAliasMarker";
     wikilinkAlias: "wikilinkAlias";
+    wikilinkCloserCheck: "wikilinkCloserCheck";
     highlight: "highlight";
     highlightMarker: "highlightMarker";
     highlightContent: "highlightContent";

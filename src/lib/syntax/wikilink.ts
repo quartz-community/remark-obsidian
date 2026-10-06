@@ -1,5 +1,6 @@
 import type {
   Code,
+  Construct,
   Effects,
   Extension,
   State,
@@ -21,6 +22,40 @@ function isLineEnding(code: Code): boolean {
     code === codes.carriageReturnLineFeed
   );
 }
+
+/**
+ * Lookahead for `]]`, so a single `]` can stay in the path.
+ *
+ * Only a doubled bracket closes a wikilink, and Obsidian reads a lone one as part
+ * of the target: `[[[](u)]]` links to `[](u)`. Consuming the first `]` as a marker
+ * and rejecting when the second is missing made the whole wikilink fail, and
+ * CommonMark's link construct then claimed `[](u)` instead -- so we reported a link
+ * to `u` where Obsidian reports a wikilink.
+ *
+ * It has to be a `check`: the decision needs the character *after* the bracket, and
+ * by the time a tokenizer has seen it the bracket is already consumed. `check`
+ * rewinds, so both branches resume on the `]` itself.
+ */
+const closerAhead: Construct = {
+  partial: true,
+  tokenize(effects: Effects, ok: State, nok: State): State {
+    return first;
+
+    function first(code: Code): State | undefined {
+      if (code !== RIGHT_BRACKET) return nok(code);
+      effects.enter("wikilinkCloserCheck");
+      effects.consume(code);
+      return second;
+    }
+
+    function second(code: Code): State | undefined {
+      if (code !== RIGHT_BRACKET) return nok(code);
+      effects.consume(code);
+      effects.exit("wikilinkCloserCheck");
+      return ok(code);
+    }
+  },
+};
 
 export function wikilinkSyntax(): Extension {
   return {
@@ -109,12 +144,22 @@ function tokenize(
     }
 
     if (code === RIGHT_BRACKET) {
-      effects.exit("wikilinkPath");
-      return closeFirst(code);
+      return effects.check(closerAhead, pathCloses, pathLiteralBracket)(code);
     }
 
     if (code === null || isLineEnding(code)) return nok(code);
 
+    effects.consume(code);
+    return path;
+  }
+
+  function pathCloses(code: Code): State | undefined {
+    effects.exit("wikilinkPath");
+    return closeFirst(code);
+  }
+
+  /** A lone `]` belongs to the target, so it stays in the path. */
+  function pathLiteralBracket(code: Code): State | undefined {
     effects.consume(code);
     return path;
   }

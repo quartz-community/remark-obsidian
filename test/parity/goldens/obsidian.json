@@ -13442,8 +13442,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by looking ahead for the doubled bracket: only ]] closes a wikilink, so a lone ] stays in the target. Consuming the first ] as a marker and rejecting when the second was missing failed the whole wikilink and let CommonMark's link claim the inner text instead."
     },
     "fuzz/highlight/43": {
       "id": "fuzz/highlight/43",
@@ -13556,8 +13556,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by looking ahead for the doubled bracket: only ]] closes a wikilink, so a lone ] stays in the target. Consuming the first ] as a marker and rejecting when the second was missing failed the whole wikilink and let CommonMark's link claim the inner text instead."
     },
     "fuzz/inline-footnote/16": {
       "id": "fuzz/inline-footnote/16",
@@ -15011,8 +15011,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by looking ahead for the doubled bracket: only ]] closes a wikilink, so a lone ] stays in the target. Consuming the first ] as a marker and rejecting when the second was missing failed the whole wikilink and let CommonMark's link claim the inner text instead."
     },
     "fuzz/inline-footnote/20": {
       "id": "fuzz/inline-footnote/20",
@@ -15792,8 +15792,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by looking ahead for the doubled bracket: only ]] closes a wikilink, so a lone ] stays in the target. Consuming the first ] as a marker and rejecting when the second was missing failed the whole wikilink and let CommonMark's link claim the inner text instead."
     },
     "fuzz/block-ref/11": {
       "id": "fuzz/block-ref/11",
@@ -18860,8 +18860,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by looking ahead for the doubled bracket: only ]] closes a wikilink, so a lone ] stays in the target. Consuming the first ] as a marker and rejecting when the second was missing failed the whole wikilink and let CommonMark's link claim the inner text instead."
     },
     "fuzz/footnote/41": {
       "id": "fuzz/footnote/41",
@@ -19628,8 +19628,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by looking ahead for the doubled bracket: only ]] closes a wikilink, so a lone ] stays in the target. Consuming the first ] as a marker and rejecting when the second was missing failed the whole wikilink and let CommonMark's link claim the inner text instead."
     },
     "fuzz/embed/106": {
       "id": "fuzz/embed/106",
@@ -24369,8 +24369,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by looking ahead for the doubled bracket: only ]] closes a wikilink, so a lone ] stays in the target. Consuming the first ] as a marker and rejecting when the second was missing failed the whole wikilink and let CommonMark's link claim the inner text instead."
     },
     "fuzz/highlight/4": {
       "id": "fuzz/highlight/4",
@@ -32287,8 +32287,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by looking ahead for the doubled bracket: only ]] closes a wikilink, so a lone ] stays in the target. Consuming the first ] as a marker and rejecting when the second was missing failed the whole wikilink and let CommonMark's link claim the inner text instead."
     },
     "fuzz/math/8": {
       "id": "fuzz/math/8",
@@ -32508,8 +32508,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by looking ahead for the doubled bracket: only ]] closes a wikilink, so a lone ] stays in the target. Consuming the first ] as a marker and rejecting when the second was missing failed the whole wikilink and let CommonMark's link claim the inner text instead."
     },
     "fuzz/strikethrough/6": {
       "id": "fuzz/strikethrough/6",
@@ -35487,8 +35487,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by looking ahead for the doubled bracket: only ]] closes a wikilink, so a lone ] stays in the target. Consuming the first ] as a marker and rejecting when the second was missing failed the whole wikilink and let CommonMark's link claim the inner text instead."
     },
     "fuzz/misc/4": {
       "id": "fuzz/misc/4",
