@@ -238,9 +238,9 @@ describe("positioned oracle", () => {
     sections: 140,
     links: 117,
     embeds: 39,
-    tags: 6,
+    tags: 5,
     blocks: 11,
-    listItems: 68,
+    listItems: 65,
     frontmatterPosition: 7,
   };
 

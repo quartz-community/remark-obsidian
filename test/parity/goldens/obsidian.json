@@ -2023,8 +2023,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "An unbalanced strong run in a callout title is title content to Obsidian, which reports `**strong` and one `strong` span. We read the line as a block instead and build a list, so the title comes out empty."
+      "triage": "match",
+      "note": "Fixed by judging 'the title line is a block' on the source line rather than on the lead node's value: the inline tokenizer may already have taken part of the title into a sibling, and what remains can read as something it is not."
     },
     "probe/callout-title/definition": {
       "id": "probe/callout-title/definition",
@@ -28752,8 +28752,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by judging 'the title line is a block' on the source line rather than on the lead node's value: the inline tokenizer may already have taken part of the title into a sibling, and what remains can read as something it is not."
     },
     "fuzz/strikethrough/13": {
       "id": "fuzz/strikethrough/13",
@@ -31201,8 +31201,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by judging 'the title line is a block' on the source line rather than on the lead node's value: the inline tokenizer may already have taken part of the title into a sibling, and what remains can read as something it is not."
     },
     "fuzz/misc/1": {
       "id": "fuzz/misc/1",

@@ -211,8 +211,20 @@ export function calloutTransform(
     // Before splitting title from body: if the rest of this line is a block
     // rather than prose, the callout has no title and that block is its
     // content.
-    const firstLine =
+    // Judged on the source line, not on the lead node's value. The inline
+    // tokenizer may already have taken part of the title into a sibling, and what
+    // is left can read as something it is not: `> [!note] ****strong**` leaves a
+    // lone `*` here, `*` alone parses as a list, so the title was declared a block
+    // and the `strong` holding the rest of it was dropped. Obsidian shows
+    // `**strong`, and our own emphasis had it right before this threw it away.
+    const titleFrom = (leadText as unknown as Positioned).position?.start
+      ?.offset;
+    let firstLine =
       newlineAt === -1 ? leadText.value : leadText.value.slice(0, newlineAt);
+    if (source !== "" && titleFrom !== undefined) {
+      const breakAt = source.indexOf("\n", titleFrom);
+      firstLine = source.slice(titleFrom, breakAt === -1 ? undefined : breakAt);
+    }
     const asBlock = titleLineIsBlock(firstLine, reparse);
     if (asBlock) {
       const titleStart = (leadText as unknown as Positioned).position?.start;
