@@ -55,7 +55,18 @@ export function tablePipeStyleTransform(
       const header = lines[0];
       const delimiter = lines[1];
       if (header === undefined || delimiter === undefined) continue;
-      if (piped(header) === piped(delimiter)) continue;
+      // Two reasons to demote. The rows may disagree on the leading pipe, or
+      // either may be a row that delimits nothing: a leading pipe on its own
+      // separates no cells, so `| a` over `| ---` is prose while `| a | b` over
+      // `| --- | ---` is a table. Recorded across all four corners of leading and
+      // trailing pipe, and a fuzz sweep put eight independent seeds on the first.
+      if (
+        piped(header) === piped(delimiter) &&
+        delimits(header) &&
+        delimits(delimiter)
+      ) {
+        continue;
+      }
 
       // Each line is parsed on its own, so its nodes come back numbered from
       // the start of that line and have to be placed back on the document.
@@ -107,4 +118,16 @@ export function tablePipeStyleTransform(
 /** The row's very first character, so one leading space already means no pipe. */
 function piped(line: string): boolean {
   return line.startsWith("|");
+}
+
+/**
+ * Whether the row's pipes actually separate cells.
+ *
+ * A leading pipe is a wall, not a separator, so a row carrying only that one
+ * delimits nothing and Obsidian reads it as prose. A row with no leading pipe needs
+ * just one, which is why `a | b` is a row and `| a` is not.
+ */
+function delimits(line: string): boolean {
+  if (!piped(line)) return true;
+  return (line.match(/\|/gu) ?? []).length >= 2;
 }

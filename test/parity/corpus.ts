@@ -51,6 +51,26 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
     "probe/inline-footnote/definition-first",
     "[^1]: body\n\nuse[^1] and ^[x]\n",
   ],
+  // What makes a pipe row a table? GFM treats the outer pipes as optional, so
+  // `| a` over `| ---` is a table to micromark -- Obsidian reads it as a paragraph.
+  // A fuzz sweep reduced 128 failures to 118 causes and this was the one real
+  // cluster, eight independent seeds landing on `| a ⏎| --- `, so it is a frequent
+  // shape rather than the isolated fragment its single corpus case suggested. The
+  // recorded cases hinted that a trailing pipe is what decides it but covered only
+  // two of the four corners, so these cross the leading and trailing pipe with
+  // trailing whitespace.
+  ["probe/table-pipes/both-closed", "| a |\n| --- |\n"],
+  ["probe/table-pipes/neither-closed", "| a\n| ---\n"],
+  ["probe/table-pipes/header-closed-only", "| a |\n| ---\n"],
+  ["probe/table-pipes/delimiter-closed-only", "| a\n| --- |\n"],
+  ["probe/table-pipes/trailing-space-no-pipe", "| a \n| --- \n"],
+  ["probe/table-pipes/trailing-space-with-pipe", "| a | \n| --- | \n"],
+  ["probe/table-pipes/no-leading-pipe", "a | b\n--- | ---\n"],
+  ["probe/table-pipes/bare-minimal", "a|b\n-|-\n"],
+  ["probe/table-pipes/tight-closed", "|a|\n|---|\n"],
+  ["probe/table-pipes/with-body-row", "| a |\n| --- |\n| b |\n"],
+  ["probe/table-pipes/body-row-unclosed", "| a |\n| --- |\n| b\n"],
+  ["probe/table-pipes/two-columns-unclosed", "| a | b\n| --- | ---\n"],
   // How does a backtick run find its closer? micromark takes the maximal opening
   // run and gives up when no run of equal length follows, so ` ``code` ` stays
   // literal; Obsidian reports `` `code ``, which is what retrying one position along
