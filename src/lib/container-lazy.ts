@@ -15,6 +15,16 @@ const CONTAINERS = new Set(["list", "blockquote", "callout"]);
  * so `> [^1]: quoted def` / `plain column-0 line` / `[^2]: second` is all one
  * blockquote.
  *
+ * An HTML line is absorbed for the same reason, and the legacy stack draws the
+ * boundary sharply -- it is the container that matters, not the construct:
+ *
+ *     - x⏎</div>        one `list`
+ *     para⏎</div>       a `paragraph` *and* an `html`, so html does interrupt at root
+ *     - x⏎⏎</div>       `list` then `html`, since the blank line ends the container
+ *
+ * Obsidian agrees on all three, and five recorded cases reported a stray `html`
+ * section after a list before this.
+ *
  * Only a block on the very next line is absorbed. A blank line between them
  * still ends the container, which is what keeps ordinary documents untouched.
  */
@@ -30,7 +40,8 @@ export function containerLazyTransform(tree: Root, source: string): void {
       if (
         next.type !== "footnoteDefinition" &&
         next.type !== "table" &&
-        next.type !== "math"
+        next.type !== "math" &&
+        next.type !== "html"
       ) {
         continue;
       }

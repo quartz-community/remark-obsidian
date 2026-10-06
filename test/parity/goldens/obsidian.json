@@ -17954,8 +17954,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by absorbing an HTML line as lazy continuation into a container: the legacy stack reads '- x\\n</div>' as one list, while 'para\\n</div>' is a paragraph plus an html and a blank line still ends the container."
     },
     "fuzz/table/15": {
       "id": "fuzz/table/15",
@@ -24766,8 +24766,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by absorbing an HTML line as lazy continuation into a container: the legacy stack reads '- x\\n</div>' as one list, while 'para\\n</div>' is a paragraph plus an html and a blank line still ends the container."
     },
     "fuzz/callout/3": {
       "id": "fuzz/callout/3",
@@ -28462,8 +28462,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by absorbing an HTML line as lazy continuation into a container: the legacy stack reads '- x\\n</div>' as one list, while 'para\\n</div>' is a paragraph plus an html and a blank line still ends the container."
     },
     "fuzz/embed/29": {
       "id": "fuzz/embed/29",
@@ -32003,8 +32003,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by absorbing an HTML line as lazy continuation into a container: the legacy stack reads '- x\\n</div>' as one list, while 'para\\n</div>' is a paragraph plus an html and a blank line still ends the container."
     },
     "fuzz/embed/47": {
       "id": "fuzz/embed/47",
@@ -35537,8 +35537,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by absorbing an HTML line as lazy continuation into a container: the legacy stack reads '- x\\n</div>' as one list, while 'para\\n</div>' is a paragraph plus an html and a blank line still ends the container."
     },
     "fuzz/wikilink/11": {
       "id": "fuzz/wikilink/11",
