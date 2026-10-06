@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-06T07:20:52.018Z",
+  "recordedAt": "2026-10-06T07:40:57.378Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -312,6 +312,874 @@
             "paragraph@2:0-2:16",
             "text@3:0-3:0",
             "element@3:0-3:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/br-setext-equals": {
+      "id": "probe/html-block/br-setext-equals",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<br>\n===\n",
+      "obsidian": {
+        "html": "<h1 data-heading=\"&lt;br&gt;\" dir=\"auto\"><br></h1>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:<br>"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "<br>\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "1:<br>"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "1:<br>@0:0"
+          ],
+          "sections": [
+            "heading@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/br-setext-dash": {
+      "id": "probe/html-block/br-setext-dash",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<br>\n---\n",
+      "obsidian": {
+        "html": "<h2 data-heading=\"&lt;br&gt;\" dir=\"auto\"><br></h2>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "2:<br>"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "<br>\n---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "2:<br>"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "2:<br>@0:0"
+          ],
+          "sections": [
+            "heading@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/div-setext": {
+      "id": "probe/html-block/div-setext",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<div>\na\n===\n",
+      "obsidian": {
+        "html": "<div>\na\n===</div>",
+        "projections": {
+          "text": "a ===",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "html",
+              "text": "<div>\na\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "html@0:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/div-setext-direct": {
+      "id": "probe/html-block/div-setext-direct",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<div>\n===\n",
+      "obsidian": {
+        "html": "<h1 data-heading=\"&lt;div&gt;\" dir=\"auto\"><div></div></h1>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:<div>"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "<div>\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "1:<div>"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "1:<div>@0:0"
+          ],
+          "sections": [
+            "heading@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/div-setext-dash-direct": {
+      "id": "probe/html-block/div-setext-dash-direct",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<div>\n---\n",
+      "obsidian": {
+        "html": "<h2 data-heading=\"&lt;div&gt;\" dir=\"auto\"><div></div></h2>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "2:<div>"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "<div>\n---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "2:<div>"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "2:<div>@0:0"
+          ],
+          "sections": [
+            "heading@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/span-then-text": {
+      "id": "probe/html-block/span-then-text",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<span>\nplain\n",
+      "obsidian": {
+        "html": "<span>\nplain</span>",
+        "projections": {
+          "text": "plain",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "html",
+              "text": "<span>\nplain"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "html@0:0-1:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/pre-setext": {
+      "id": "probe/html-block/pre-setext",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<pre>\n---\n</pre>\n",
+      "obsidian": {
+        "html": "<h2 data-heading=\"&lt;pre&gt;\" dir=\"auto\"><pre></pre></h2>\n",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "2:<pre>"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "<pre>\n---"
+            },
+            {
+              "type": "html",
+              "text": "</pre>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "2:<pre>"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "2:<pre>@0:0"
+          ],
+          "sections": [
+            "heading@0:0-1:3",
+            "html@2:0-2:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate"
+    },
+    "probe/html-block/span-setext": {
+      "id": "probe/html-block/span-setext",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<span>\n===\n",
+      "obsidian": {
+        "html": "<h1 data-heading=\"&lt;span&gt;\" dir=\"auto\"><span></span></h1>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:<span>"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "<span>\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "1:<span>"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "1:<span>@0:0"
+          ],
+          "sections": [
+            "heading@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/p-setext": {
+      "id": "probe/html-block/p-setext",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<p>\n===\n",
+      "obsidian": {
+        "html": "<h1 data-heading=\"&lt;p&gt;\" dir=\"auto\"><p></p></h1>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:<p>"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "<p>\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "1:<p>"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "1:<p>@0:0"
+          ],
+          "sections": [
+            "heading@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/custom-setext": {
+      "id": "probe/html-block/custom-setext",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<x-tag>\n===\n",
+      "obsidian": {
+        "html": "<h1 data-heading=\"&lt;x-tag&gt;\" dir=\"auto\"></h1>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:<x-tag>"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "<x-tag>\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "1:<x-tag>"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "1:<x-tag>@0:0"
+          ],
+          "sections": [
+            "heading@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/closing-div-setext": {
+      "id": "probe/html-block/closing-div-setext",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "</div>\n===\n",
+      "obsidian": {
+        "html": "<h1 data-heading=\"&lt;/div&gt;\" dir=\"auto\"></h1>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:</div>"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "</div>\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "1:</div>"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "1:</div>@0:0"
+          ],
+          "sections": [
+            "heading@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/br-blank-then-underline": {
+      "id": "probe/html-block/br-blank-then-underline",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<br>\n\n===\n",
+      "obsidian": {
+        "html": "<br>\n<p dir=\"auto\">===</p>",
+        "projections": {
+          "text": "===",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "html",
+              "text": "<br>"
+            },
+            {
+              "type": "paragraph",
+              "text": "==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "html@0:0-0:4",
+            "paragraph@2:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/br-then-text": {
+      "id": "probe/html-block/br-then-text",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<br>\nplain\n",
+      "obsidian": {
+        "html": "<br>\nplain",
+        "projections": {
+          "text": "plain",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "html",
+              "text": "<br>\nplain"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "html@0:0-1:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/div-then-text": {
+      "id": "probe/html-block/div-then-text",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<div>\nplain\n",
+      "obsidian": {
+        "html": "<div>\nplain</div>",
+        "projections": {
+          "text": "plain",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "html",
+              "text": "<div>\nplain"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "html@0:0-1:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/br-interrupts-paragraph": {
+      "id": "probe/html-block/br-interrupts-paragraph",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "text\n<br>\nmore\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">text<br>\n<br><br>\nmore</p>",
+        "projections": {
+          "text": "text more",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "text\n<br>\nmore"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-2:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/div-interrupts-paragraph": {
+      "id": "probe/html-block/div-interrupts-paragraph",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "text\n<div>\nmore\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">text</p>\n<div>\nmore</div>",
+        "projections": {
+          "text": "text more",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "text"
+            },
+            {
+              "type": "html",
+              "text": "<div>\nmore"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:4",
+            "html@1:0-2:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/html-block/script-body": {
+      "id": "probe/html-block/script-body",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<script>\na\n</script>\n",
+      "obsidian": {
+        "html": "",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "html",
+              "text": "<script>\na\n</script>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "html@0:0-2:9"
           ],
           "links": [],
           "embeds": [],
@@ -17751,60 +18619,6 @@
       "triage": "replicate",
       "note": "Reduced by the fuzz shrinker from a randomly composed document."
     },
-    "fuzz/highlight/53": {
-      "id": "fuzz/highlight/53",
-      "layer": "seed",
-      "category": "fuzz",
-      "markdown": "<br>\n===\n",
-      "obsidian": {
-        "html": "<h1 data-heading=\"&lt;br&gt;\" dir=\"auto\"><br></h1>",
-        "projections": {
-          "text": "",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [
-            "1:<br>"
-          ],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "heading",
-              "text": "<br>\n==="
-            }
-          ]
-        },
-        "meta": {
-          "headings": [
-            "1:<br>"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        },
-        "compute": {
-          "footnotes": [],
-          "footnoteRefs": [],
-          "headings": [
-            "1:<br>@0:0"
-          ],
-          "sections": [
-            "heading@0:0-1:3"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "listItems": [],
-          "blocks": [],
-          "frontmatterLinks": []
-        }
-      },
-      "triage": "replicate",
-      "note": "A setext underline under a raw HTML line is a heading, because `remark-parse@8` starts an HTML block only for a block-level tag. The discriminator is the tag, not the line count: the legacy stack reads `<br>⏎===` as a heading named `<br>` and `<pre>⏎---⏎</pre>` as a heading plus `</pre>`, while `<div>⏎a⏎===` stays one html block. micromark starts a type-7 block for any complete tag alone on a line, so the underline is swallowed. Closing it means replicating legacy's block-tag list for html-block starts, which is tokenizer-level and affects every document with raw HTML -- not worth it for the two cases here."
-    },
     "fuzz/embed/84": {
       "id": "fuzz/embed/84",
       "layer": "seed",
@@ -22377,60 +23191,6 @@
           ]
         }
       }
-    },
-    "fuzz/setext/5": {
-      "id": "fuzz/setext/5",
-      "layer": "seed",
-      "category": "fuzz",
-      "markdown": "<br>\n---\n",
-      "obsidian": {
-        "html": "<h2 data-heading=\"&lt;br&gt;\" dir=\"auto\"><br></h2>",
-        "projections": {
-          "text": "",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [
-            "2:<br>"
-          ],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "heading",
-              "text": "<br>\n---"
-            }
-          ]
-        },
-        "meta": {
-          "headings": [
-            "2:<br>"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        },
-        "compute": {
-          "footnotes": [],
-          "footnoteRefs": [],
-          "headings": [
-            "2:<br>@0:0"
-          ],
-          "sections": [
-            "heading@0:0-1:3"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "listItems": [],
-          "blocks": [],
-          "frontmatterLinks": []
-        }
-      },
-      "triage": "replicate",
-      "note": "A setext underline under a raw HTML line is a heading, because `remark-parse@8` starts an HTML block only for a block-level tag. The discriminator is the tag, not the line count: the legacy stack reads `<br>⏎===` as a heading named `<br>` and `<pre>⏎---⏎</pre>` as a heading plus `</pre>`, while `<div>⏎a⏎===` stays one html block. micromark starts a type-7 block for any complete tag alone on a line, so the underline is swallowed. Closing it means replicating legacy's block-tag list for html-block starts, which is tokenizer-level and affects every document with raw HTML -- not worth it for the two cases here."
     },
     "fuzz/embed/117": {
       "id": "fuzz/embed/117",

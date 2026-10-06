@@ -51,6 +51,34 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
     "probe/inline-footnote/definition-first",
     "[^1]: body\n\nuse[^1] and ^[x]\n",
   ],
+  // Which tags start a raw HTML block? `remark-parse@8` starts one only for a
+  // block-level tag, so `<br>` lands in a paragraph and a setext underline then
+  // makes a heading of it, while `<div>` opens a block that swallows the underline.
+  // The legacy stack reads `<br>⏎===` as a heading, `<pre>⏎---⏎</pre>` as a heading
+  // plus `</pre>`, and `<div>⏎a⏎===` as one block -- so the discriminator is the tag
+  // and not the line count, which three probes found only by accident. Raw html was
+  // the worst-covered construct in the corpus at 25 designed probes against 146
+  // incidental hits and 22 open cases, which is why these enumerate the tag classes.
+  ["probe/html-block/br-setext-equals", "<br>\n===\n"],
+  ["probe/html-block/br-setext-dash", "<br>\n---\n"],
+  // `div-setext` has an intervening line, so it tests the block's extent rather
+  // than the opener -- keep both, because the pair is what separates "the tag
+  // decides" from "an underline on the very next line decides".
+  ["probe/html-block/div-setext", "<div>\na\n===\n"],
+  ["probe/html-block/div-setext-direct", "<div>\n===\n"],
+  ["probe/html-block/div-setext-dash-direct", "<div>\n---\n"],
+  ["probe/html-block/span-then-text", "<span>\nplain\n"],
+  ["probe/html-block/pre-setext", "<pre>\n---\n</pre>\n"],
+  ["probe/html-block/span-setext", "<span>\n===\n"],
+  ["probe/html-block/p-setext", "<p>\n===\n"],
+  ["probe/html-block/custom-setext", "<x-tag>\n===\n"],
+  ["probe/html-block/closing-div-setext", "</div>\n===\n"],
+  ["probe/html-block/br-blank-then-underline", "<br>\n\n===\n"],
+  ["probe/html-block/br-then-text", "<br>\nplain\n"],
+  ["probe/html-block/div-then-text", "<div>\nplain\n"],
+  ["probe/html-block/br-interrupts-paragraph", "text\n<br>\nmore\n"],
+  ["probe/html-block/div-interrupts-paragraph", "text\n<div>\nmore\n"],
+  ["probe/html-block/script-body", "<script>\na\n</script>\n"],
   // Which bracket pair wins when one encloses another? Obsidian takes the OUTER
   // and leaves the inner literal, where CommonMark takes the inner -- both oracles
   // agree on that for `[foo [bar](/uri)](/uri)`. Reproducing it means replacing

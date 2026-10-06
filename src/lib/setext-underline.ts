@@ -207,3 +207,93 @@ export function multilineSetextTransform(
     }
   });
 }
+
+/**
+ * A setext underline directly under a raw HTML line makes a heading of that line.
+ *
+ * Obsidian reads `<br>` over `===` as a heading named `<br>`, and the tag is
+ * irrelevant -- `<div>`, `<span>`, `<p>`, `</div>` and an unknown `<x-tag>` all
+ * behave the same way, which 17 recorded probes establish. What matters is that the
+ * underline is the *second* line: `<div>` / `a` / `===` keeps its html block, and
+ * `<pre>` / `---` / `</pre>` becomes a heading plus an html block holding `</pre>`.
+ *
+ * micromark opens an HTML block for the whole run instead, so the underline is
+ * swallowed and no heading appears. The heading keeps the raw line as its text,
+ * because that is what Obsidian displays and indexes.
+ */
+export function htmlSetextTransform(tree: Root, source: string): void {
+  visit(tree, (node: Node) => {
+    const parent = node as Partial<{ children: RootContent[] }>;
+    if (!Array.isArray(parent.children)) return;
+
+    for (let index = 0; index < parent.children.length; index++) {
+      const html = parent.children[index];
+      if (html?.type !== "html") continue;
+
+      const start = html.position?.start?.offset;
+      const end = html.position?.end?.offset;
+      const startLine = html.position?.start?.line;
+      if (start === undefined || end === undefined || startLine === undefined) {
+        continue;
+      }
+
+      const lines = source.slice(start, end).split("\n");
+      const underline = lines[1];
+      if (lines.length < 2 || underline === undefined) continue;
+      if (!LOOSE.test(underline)) continue;
+
+      const first = lines[0]!;
+      const marker = STRICT.exec(underline.trim())?.[1] ?? underline.trim();
+      const firstEnd = start + first.length;
+      const consumed = firstEnd + 1 + underline.length;
+
+      const replacement: RootContent[] = [
+        {
+          type: "heading",
+          depth: marker.startsWith("=") ? 1 : 2,
+          children: [
+            {
+              // Inline html, not text: the browser renders `<br>` as an element,
+              // so the heading's `textContent` is empty while `metadataCache`
+              // still reports the raw `<br>` it read from the source.
+              type: "html",
+              value: first,
+              position: {
+                start: { line: startLine, column: 1, offset: start },
+                end: {
+                  line: startLine,
+                  column: first.length + 1,
+                  offset: firstEnd,
+                },
+              },
+            },
+          ],
+          position: {
+            start: { line: startLine, column: 1, offset: start },
+            end: {
+              line: startLine + 1,
+              column: underline.length + 1,
+              offset: consumed,
+            },
+          },
+        } as RootContent,
+      ];
+
+      // Whatever followed the underline is still an html block of its own.
+      const tail = lines.slice(2).join("\n");
+      if (tail !== "") {
+        replacement.push({
+          type: "html",
+          value: tail,
+          position: {
+            start: { line: startLine + 2, column: 1, offset: consumed + 1 },
+            end: { ...html.position!.end },
+          },
+        } as RootContent);
+      }
+
+      parent.children.splice(index, 1, ...replacement);
+      index += replacement.length - 1;
+    }
+  });
+}

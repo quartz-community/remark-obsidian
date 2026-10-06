@@ -58,6 +58,7 @@ import { tableRowStyleTransform } from "./lib/table-row-style.js";
 import { tablePipeStyleTransform } from "./lib/table-pipe-style.js";
 import { tableShortDelimiterTransform } from "./lib/table-short-delimiter.js";
 import {
+  htmlSetextTransform,
   multilineSetextTransform,
   setextUnderlineTransform,
 } from "./lib/setext-underline.js";
@@ -418,6 +419,9 @@ export default function remarkObsidian(
     setextUnderlineTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
+    // After the paragraph-based setext passes: this one claims an underline the
+    // html block swallowed, which those never see.
+    htmlSetextTransform(tree, String(file));
     footnoteLabelTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
