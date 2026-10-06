@@ -8,6 +8,7 @@
  * fail for a reason that is not a parity bug.
  */
 
+import { decodeNamedCharacterReference } from "decode-named-character-reference";
 import type { Root } from "mdast";
 import type { Node } from "unist";
 import { SKIP, visit } from "unist-util-visit";
@@ -84,6 +85,38 @@ function stripColourMarker(content: string): string {
   const first = content.codePointAt(0);
   if (first === undefined || !COLOUR_MARKERS.has(first)) return content;
   return content.slice(String.fromCodePoint(first).length);
+}
+
+/**
+ * Resolve character references the way a browser does when it parses raw HTML.
+ *
+ * An `html` node holds its source verbatim, so `<div>` over `&amp;` still carries
+ * the four characters `&amp;`. Obsidian hands that string to the DOM, which decodes
+ * it, and the `textContent` the recorder reads is therefore `&`.
+ *
+ * `decodeNamedCharacterReference` is micromark's own table, so the names resolve
+ * exactly as the parser resolves them elsewhere. An out-of-range code point becomes
+ * U+FFFD, which is what Obsidian reports for `&#87654321;`.
+ */
+function decodeEntities(value: string): string {
+  return value.replace(
+    /&(?:#(\d{1,7})|#[Xx]([\dA-Fa-f]{1,6})|([A-Za-z][\dA-Za-z]{1,31}));/gu,
+    (whole: string, decimal?: string, hex?: string, name?: string): string => {
+      // An unknown name gives `false`, not `undefined`, so `??` would keep it.
+      if (name !== undefined) {
+        const named = decodeNamedCharacterReference(name);
+        return named === false ? whole : named;
+      }
+      const code = Number.parseInt(
+        (decimal ?? hex)!,
+        decimal === undefined ? 16 : 10,
+      );
+      if (code === 0 || code > 0x10ffff || (code >= 0xd800 && code <= 0xdfff)) {
+        return "\uFFFD";
+      }
+      return String.fromCodePoint(code);
+    },
+  );
 }
 
 /**
@@ -249,7 +282,7 @@ export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
           // of the note. Tag-stripping alone leaves its body behind, because
           // `<!--` has no `>` for that pattern to match.
           .replace(/<!--[\s\S]*?(?:-->|$)/g, " ");
-        parts.push(`${raw.replace(/<[^>]*>/g, " ")} `);
+        parts.push(`${decodeEntities(raw.replace(/<[^>]*>/g, " "))} `);
         return;
       }
       case "break":

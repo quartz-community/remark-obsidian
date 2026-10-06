@@ -16484,8 +16484,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: an html node holds its source verbatim, so the entity survived tag-stripping. Obsidian hands that string to the DOM, which decodes it, and the textContent the recorder reads is the decoded character."
     },
     "fuzz/inline-footnote/22": {
       "id": "fuzz/inline-footnote/22",
@@ -17381,8 +17381,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: an html node holds its source verbatim, so the entity survived tag-stripping. Obsidian hands that string to the DOM, which decodes it, and the textContent the recorder reads is the decoded character."
     },
     "fuzz/footnote/36": {
       "id": "fuzz/footnote/36",
@@ -23603,8 +23603,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: an html node holds its source verbatim, so the entity survived tag-stripping. Obsidian hands that string to the DOM, which decodes it, and the textContent the recorder reads is the decoded character."
     },
     "fuzz/highlight/1": {
       "id": "fuzz/highlight/1",
@@ -30919,8 +30919,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: an html node holds its source verbatim, so the entity survived tag-stripping. Obsidian hands that string to the DOM, which decodes it, and the textContent the recorder reads is the decoded character."
     },
     "fuzz/block-ref/7": {
       "id": "fuzz/block-ref/7",
@@ -36040,8 +36040,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: an html node holds its source verbatim, so the entity survived tag-stripping. Obsidian hands that string to the DOM, which decodes it, and the textContent the recorder reads is the decoded character."
     },
     "fuzz/tag/6": {
       "id": "fuzz/tag/6",
