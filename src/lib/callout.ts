@@ -2,6 +2,7 @@ import type { Blockquote, Paragraph, Root, RootContent, Text } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 import type { Callout } from "./types.js";
+import { mapLines, shiftByMap } from "./line-map.js";
 
 /**
  * `[!type]`, an optional fold marker, then the end of the marker.
@@ -254,6 +255,57 @@ export function calloutTransform(
       return;
     }
 
+    /**
+     * Split a title from a body when the boundary falls *inside* an inline
+     * construct.
+     *
+     * The `break` the branch below looks for is a direct child of the paragraph,
+     * but a construct that spans the title's line ending swallows it:
+     * `> [!note] *em` / `em*` arrives as one `emphasis` holding the break, so no
+     * top-level break exists and the whole construct was taken as the title.
+     *
+     * Obsidian forms no such construct -- it reports the text `*em em*` with no
+     * emphasis at all -- because the title ends at the line ending and the two
+     * markers are then in different blocks. So each side is reparsed on its own,
+     * which is the mirror of `setext-underline.ts`: there a demoted heading's lines
+     * had to be parsed *together*, and here a title and its body have to be parsed
+     * *apart*. Both bugs were one reparse boundary in the wrong place.
+     *
+     * Only when the paragraph really does span lines. A single-line title has no
+     * boundary to fall inside and keeps its own children untouched.
+     */
+    function splitAcrossConstruct():
+      { title: Node[]; body: Node[] } | undefined {
+      const from = (leadText as Positioned).position?.start?.offset;
+      const to = (paragraph as Positioned).position?.end?.offset;
+      if (from === undefined || to === undefined) return undefined;
+      const breakAtSource = source.indexOf("\n", from);
+      if (breakAtSource === -1 || breakAtSource >= to) return undefined;
+
+      const titleLine = source.slice(from, breakAtSource);
+      const bodyFrom =
+        breakAtSource +
+        1 +
+        (LINE_PREFIX.exec(source.slice(breakAtSource + 1))?.[0].length ?? 0);
+      if (bodyFrom >= to) return undefined;
+
+      const titleBlock = reparse(titleLine).children[0];
+      const bodyMap = mapLines(
+        source,
+        bodyFrom,
+        to,
+        source.slice(0, bodyFrom).split("\n").length,
+      );
+      const bodyBlock = reparse(bodyMap.text).children[0];
+      if (titleBlock?.type !== "paragraph" || bodyBlock?.type !== "paragraph") {
+        return undefined;
+      }
+
+      for (const child of titleBlock.children) shiftOnto(child, from, 1);
+      for (const child of bodyBlock.children) shiftByMap(child, bodyMap, 0);
+      return { title: titleBlock.children, body: bodyBlock.children };
+    }
+
     let titleNodes: Node[];
 
     if (newlineAt !== -1) {
@@ -303,12 +355,17 @@ export function calloutTransform(
       }
     } else {
       const breakAt = paragraph.children.findIndex((c) => c.type === "break");
+      const split = breakAt === -1 ? splitAcrossConstruct() : undefined;
       titleNodes =
-        breakAt === -1
+        split?.title ??
+        (breakAt === -1
           ? paragraph.children.slice()
-          : paragraph.children.slice(0, breakAt);
-      paragraph.children =
-        breakAt === -1 ? [] : paragraph.children.slice(breakAt + 1);
+          : paragraph.children.slice(0, breakAt));
+      if (split) paragraph.children = split.body as typeof paragraph.children;
+      if (!split) {
+        paragraph.children =
+          breakAt === -1 ? [] : paragraph.children.slice(breakAt + 1);
+      }
       // The kept children carry their own spans, so the paragraph follows the
       // first of them rather than still beginning at the marker.
       const first = paragraph.children[0] as Positioned | undefined;

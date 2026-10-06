@@ -2492,3 +2492,51 @@ describe("demoted setext heading content", () => {
     );
   });
 });
+
+describe("callout title boundary", () => {
+  const shape = (md: string) => {
+    const f = (n: any): string => {
+      const kids = (n.children ?? []).map(f).join(" ");
+      return n.type + (kids ? `(${kids})` : "");
+    };
+    return (processWithGfm(md) as any).children.map(f).join(" + ");
+  };
+
+  /**
+   * A construct spanning the title's line ending swallows the `break` the split
+   * looks for, so no top-level break exists and the whole construct was taken as
+   * the title. Obsidian forms no such construct: the title ends at the line ending
+   * and the two markers land in different blocks.
+   */
+  it("does not carry a construct across the boundary", () => {
+    expect(shape("> [!note] *em\nem*\n")).toBe(
+      "callout(calloutTitle(text) paragraph(text))",
+    );
+    expect(shape("> [!note] _under\nunder_\n")).toBe(
+      "callout(calloutTitle(text) paragraph(text))",
+    );
+  });
+
+  it("keeps a construct that fits on the title line", () => {
+    expect(shape("> [!note] *em*\nbody\n")).toBe(
+      "callout(calloutTitle(emphasis(text)) paragraph(text))",
+    );
+  });
+
+  /** A quoted body is its own block, so a construct inside it is untouched. */
+  it("leaves a quoted body alone", () => {
+    expect(shape("> [!note] t\n> *em\n> em*\n")).toBe(
+      "callout(calloutTitle(text) paragraph(emphasis(text break text)))",
+    );
+  });
+
+  it("leaves the ordinary forms alone", () => {
+    expect(shape("> [!note] title\n")).toBe("callout(calloutTitle(text))");
+    expect(shape("> [!note] a\nb\n")).toBe(
+      "callout(calloutTitle(text) paragraph(text))",
+    );
+    expect(shape("> [!note] # h\n")).toBe(
+      "callout(calloutTitle heading(text))",
+    );
+  });
+});

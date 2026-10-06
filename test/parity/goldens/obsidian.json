@@ -28103,8 +28103,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a callout title from its body at the source line ending and reparsing each side: the break the split looked for was nested inside an inline construct that spanned the boundary, so no top-level break existed."
     },
     "fuzz/inline-footnote/30": {
       "id": "fuzz/inline-footnote/30",
@@ -37728,8 +37728,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by splitting a callout title from its body at the source line ending and reparsing each side: the break the split looked for was nested inside an inline construct that spanned the boundary, so no top-level break existed."
     },
     "fuzz/math/7": {
       "id": "fuzz/math/7",
@@ -59713,8 +59713,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Emphasis across a line ending works in general -- 9 of 13 probes match, including the bare, quote and list forms. The open ones are where a fragment is reparsed (setext) or a boundary is crossed (callout title), plus a tab-separated run Obsidian reads as nested lists rather than a thematic break."
+      "triage": "match",
+      "note": "Fixed by splitting a callout title from its body at the source line ending and reparsing each side: the break the split looked for was nested inside an inline construct that spanned the boundary, so no top-level break existed."
     },
     "probe/emphasis-span/unclosed": {
       "id": "probe/emphasis-span/unclosed",
