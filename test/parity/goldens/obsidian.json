@@ -25097,7 +25097,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "Obsidian takes the OUTER bracket pair as the link and leaves the inner one literal; CommonMark takes the inner. `[foo [bar](/uri)](/uri)` is one link whose content reads `foo [bar](/uri)`, which the legacy stack confirms exactly -- both oracles agree. Closing it means replacing micromark's label resolver with legacy's balanced-bracket scan, and the corpus argues against it: 6 replicate cases have this shape against 21 that already match and would be at risk. Measured, not assumed."
     },
     "fuzz/comment/3": {
       "id": "fuzz/comment/3",
@@ -104763,7 +104763,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "Obsidian takes the OUTER bracket pair as the link and leaves the inner one literal; CommonMark takes the inner. `[foo [bar](/uri)](/uri)` is one link whose content reads `foo [bar](/uri)`, which the legacy stack confirms exactly -- both oracles agree. Closing it means replacing micromark's label resolver with legacy's balanced-bracket scan, and the corpus argues against it: 6 replicate cases have this shape against 21 that already match and would be at risk. Measured, not assumed."
     },
     "commonmark/links/519": {
       "id": "commonmark/links/519",
@@ -104823,7 +104823,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "Obsidian takes the OUTER bracket pair as the link and leaves the inner one literal; CommonMark takes the inner. `[foo [bar](/uri)](/uri)` is one link whose content reads `foo [bar](/uri)`, which the legacy stack confirms exactly -- both oracles agree. Closing it means replacing micromark's label resolver with legacy's balanced-bracket scan, and the corpus argues against it: 6 replicate cases have this shape against 21 that already match and would be at risk. Measured, not assumed."
     },
     "commonmark/links/520": {
       "id": "commonmark/links/520",
@@ -105536,7 +105536,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "Obsidian takes the OUTER bracket pair as the link and leaves the inner one literal; CommonMark takes the inner. `[foo [bar](/uri)](/uri)` is one link whose content reads `foo [bar](/uri)`, which the legacy stack confirms exactly -- both oracles agree. Closing it means replacing micromark's label resolver with legacy's balanced-bracket scan, and the corpus argues against it: 6 replicate cases have this shape against 21 that already match and would be at risk. Measured, not assumed."
     },
     "commonmark/links/533": {
       "id": "commonmark/links/533",
@@ -105591,7 +105591,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "Obsidian takes the OUTER bracket pair as the link and leaves the inner one literal; CommonMark takes the inner. `[foo [bar](/uri)](/uri)` is one link whose content reads `foo [bar](/uri)`, which the legacy stack confirms exactly -- both oracles agree. Closing it means replacing micromark's label resolver with legacy's balanced-bracket scan, and the corpus argues against it: 6 replicate cases have this shape against 21 that already match and would be at risk. Measured, not assumed."
     },
     "commonmark/links/534": {
       "id": "commonmark/links/534",
@@ -106280,7 +106280,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "Obsidian takes the OUTER bracket pair as the link and leaves the inner one literal; CommonMark takes the inner. `[foo [bar](/uri)](/uri)` is one link whose content reads `foo [bar](/uri)`, which the legacy stack confirms exactly -- both oracles agree. Closing it means replacing micromark's label resolver with legacy's balanced-bracket scan, and the corpus argues against it: 6 replicate cases have this shape against 21 that already match and would be at risk. Measured, not assumed."
     },
     "commonmark/links/547": {
       "id": "commonmark/links/547",
