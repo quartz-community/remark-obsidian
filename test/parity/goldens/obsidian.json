@@ -14201,8 +14201,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: a tag contributes nothing to textContent, and an inline html node is not a block boundary. Replacing a tag with a space and then appending a block separator invented two word boundaries the DOM has no equivalent for."
     },
     "fuzz/inline-footnote/18": {
       "id": "fuzz/inline-footnote/18",
@@ -22014,8 +22014,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: a tag contributes nothing to textContent, and an inline html node is not a block boundary. Replacing a tag with a space and then appending a block separator invented two word boundaries the DOM has no equivalent for."
     },
     "fuzz/table/17": {
       "id": "fuzz/table/17",
@@ -25144,8 +25144,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: a tag contributes nothing to textContent, and an inline html node is not a block boundary. Replacing a tag with a space and then appending a block separator invented two word boundaries the DOM has no equivalent for."
     },
     "fuzz/callout/4": {
       "id": "fuzz/callout/4",
@@ -49379,8 +49379,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: a tag contributes nothing to textContent, and an inline html node is not a block boundary. Replacing a tag with a space and then appending a block separator invented two word boundaries the DOM has no equivalent for."
     },
     "html/script-block": {
       "id": "html/script-block",
@@ -103240,8 +103240,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: a tag contributes nothing to textContent, and an inline html node is not a block boundary. Replacing a tag with a space and then appending a block separator invented two word boundaries the DOM has no equivalent for."
     },
     "commonmark/links/492": {
       "id": "commonmark/links/492",
@@ -103403,8 +103403,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in the projection, not the package: a tag contributes nothing to textContent, and an inline html node is not a block boundary. Replacing a tag with a space and then appending a block separator invented two word boundaries the DOM has no equivalent for."
     },
     "commonmark/links/495": {
       "id": "commonmark/links/495",

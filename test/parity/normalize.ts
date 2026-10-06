@@ -183,6 +183,14 @@ function textOf(node: Node, defined?: ReadonlySet<string>): string {
   return out;
 }
 
+/** Once inside one of these, no descendant is a block boundary. */
+const PHRASING_HOSTS = new Set([
+  "paragraph",
+  "heading",
+  "tableCell",
+  "calloutTitle",
+]);
+
 const BLOCK_TYPES = new Set([
   "callout",
   "calloutTitle",
@@ -224,7 +232,7 @@ export function definedFootnotes(tree: Node): Set<string> {
 export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
   const parts: string[] = [];
 
-  const walk = (node: Node): void => {
+  const walk = (node: Node, phrasing = false): void => {
     switch (node.type) {
       case "text":
       case "inlineCode":
@@ -282,7 +290,13 @@ export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
           // of the note. Tag-stripping alone leaves its body behind, because
           // `<!--` has no `>` for that pattern to match.
           .replace(/<!--[\s\S]*?(?:-->|$)/g, " ");
-        parts.push(`${decodeEntities(raw.replace(/<[^>]*>/g, " "))} `);
+        // A tag contributes nothing to `textContent`, so it is removed rather
+        // than separated: `a<br>b` reads `ab`, and `~~<br>~~` reads `~~~~`.
+        // Replacing one with a space invented a word boundary the DOM has no
+        // equivalent for.
+        parts.push(
+          `${decodeEntities(raw.replace(/<[^>]*>/g, ""))}${phrasing ? "" : " "}`,
+        );
         return;
       }
       case "break":
@@ -309,7 +323,7 @@ export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
         const mark = parts.length;
         for (const child of (node as unknown as { children: Node[] })
           .children) {
-          walk(child);
+          walk(child, phrasing);
         }
         const first = parts[mark];
         if (typeof first === "string") parts[mark] = stripColourMarker(first);
@@ -328,7 +342,7 @@ export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
           const type = callout.calloutType.toLowerCase().replace(/-/gu, " ");
           parts.push(`${type.charAt(0).toUpperCase()}${type.slice(1)} `);
         }
-        for (const child of children) walk(child);
+        for (const child of children) walk(child, phrasing);
         parts.push(" ");
         return;
       }
@@ -379,8 +393,9 @@ export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
     }
 
     const children = (node as { children?: Node[] }).children;
-    if (children) for (const child of children) walk(child);
-    if (BLOCK_TYPES.has(node.type)) parts.push(" ");
+    const inner = phrasing || PHRASING_HOSTS.has(node.type);
+    if (children) for (const child of children) walk(child, inner);
+    if (!phrasing && BLOCK_TYPES.has(node.type)) parts.push(" ");
   };
 
   walk(tree);
