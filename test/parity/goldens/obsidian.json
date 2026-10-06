@@ -48012,8 +48012,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in the harness, not the package: headingName stripped an ATX closing sequence unconditionally and a trailing block identifier that Obsidian keeps. Our mdast was correct for all five throughout."
     },
     "block-ref/caret-only-line": {
       "id": "block-ref/caret-only-line",
@@ -53704,8 +53704,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in the harness, not the package: headingName stripped an ATX closing sequence unconditionally and a trailing block identifier that Obsidian keeps. Our mdast was correct for all five throughout."
     },
     "heading/closing-hash-rich-content": {
       "id": "heading/closing-hash-rich-content",
@@ -88454,8 +88454,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in the harness, not the package: headingName stripped an ATX closing sequence unconditionally and a trailing block identifier that Obsidian keeps. Our mdast was correct for all five throughout."
     },
     "commonmark/atx-headings/76": {
       "id": "commonmark/atx-headings/76",
@@ -88524,8 +88524,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in the harness, not the package: headingName stripped an ATX closing sequence unconditionally and a trailing block identifier that Obsidian keeps. Our mdast was correct for all five throughout."
     },
     "commonmark/atx-headings/77": {
       "id": "commonmark/atx-headings/77",
@@ -88720,8 +88720,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in the harness, not the package: headingName stripped an ATX closing sequence unconditionally and a trailing block identifier that Obsidian keeps. Our mdast was correct for all five throughout."
     },
     "commonmark/setext-headings/80": {
       "id": "commonmark/setext-headings/80",

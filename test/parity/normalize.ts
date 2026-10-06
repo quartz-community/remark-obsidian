@@ -456,23 +456,31 @@ export function headingName(node: Node, source: string): string {
   const end = node.position?.end?.offset;
   if (start === undefined || end === undefined) return "";
   const raw = source.slice(start, end);
-  const atx = /^#{1,6}[ \t]+/.exec(raw);
+  // `[ \t]*$` as well as `[ \t]+`, or an empty heading never matches at all and
+  // falls through to the setext branch below, which then reports its own marker:
+  // `#` was named `#` and `## ⏎#⏎### ###` named its middle heading `#`.
+  const atx = /^#{1,6}(?:[ \t]+|[ \t]*$)/.exec(raw);
   if (atx)
-    return raw
-      .slice(atx[0].length)
-      .replace(/[ \t]*#*[ \t]*$/, "")
-      .trim();
+    return (
+      raw
+        .slice(atx[0].length)
+        // A closing sequence has to be *preceded by whitespace*, or be the whole
+        // content, and an escaped run is not one at all. Stripping `#*$`
+        // unconditionally renamed `# foo#` to `foo` and `### foo \###` to `foo \`,
+        // neither of which Obsidian or CommonMark does.
+        .replace(/(?:^|[ \t]+)#+[ \t]*$/, "")
+        .trim()
+    );
   // Setext: the underline is inside the node's span but outside its name. Inside a
   // container the slice keeps the block prefix, so `para\n> ===` must lose the
   // whole final line, marker included.
   const underlined = raw.replace(/\r?\n[ \t]*(?:>[ \t]*)*[=-]+[ \t]*$/, "");
-  // A trailing block identifier is not part of the name, but it only counts as
-  // one when it trails something: `para ^blk` is named `para`, while a heading
-  // whose whole content is `^blk` keeps it. Measured against
-  // `computeMetadataAsync`, which reports `^blk\n---` as the heading `^blk` --
-  // stripping unconditionally named it the empty string.
-  const stripped = underlined.replace(/(?:^|[ \t])\^[A-Za-z0-9-]+[ \t]*$/u, "");
-  const body = stripped.trim() === "" ? underlined : stripped;
+  // A heading keeps a trailing block identifier, always. There used to be a strip
+  // here with a carve-out for the case where it ate everything, because `^blk\n---`
+  // is named `^blk`; the carve-out was the clue that the rule was wrong rather than
+  // incomplete. `Setext heading ^setext-id\n---` is named in full, and removing the
+  // strip fixes that while leaving every other case alone -- 1 case gained, 0 lost.
+  const body = underlined;
   // A setext heading shares its content chunk with any link reference
   // definitions above it, so its span starts back at them: `[ref]: /url\npara\n===`
   // reports a heading named `para`, not `[ref]: /url\npara`.
