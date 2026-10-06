@@ -85,7 +85,10 @@ import { commentTailTransform } from "./lib/comment-tail.js";
 import { commentDefinitionExtentTransform } from "./lib/comment-definition-extent.js";
 import { commentInDefinitionTransform } from "./lib/comment-in-definition.js";
 import { commentRegionTransform } from "./lib/comment-region.js";
-import { definitionContinuationTransform } from "./lib/definition-continuation.js";
+import {
+  definitionContinuationTransform,
+  definitionLazyTransform,
+} from "./lib/definition-continuation.js";
 import { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 
 import { math as mathSyntax } from "micromark-extension-math";
@@ -469,6 +472,10 @@ export default function remarkObsidian(
     if (opts.comments) commentQuoteExtentTransform(tree, String(file));
     // Before the footnote passes, so a definition this recovers is one they see.
     indentTabTransform(tree, String(file), (markdown) => reparse(markdown));
+    // Unconditional, unlike the continuation pass above it: a definition whose
+    // first line opened nothing to continue leaves its next line behind whether
+    // comments are on or not.
+    definitionLazyTransform(tree, String(file));
     definitionTabTransform(tree, String(file));
     // Before the bare-reference pass: a `[^1]` the fence swallows is code, and
     // code is literal, so it must stop looking like a reference first.

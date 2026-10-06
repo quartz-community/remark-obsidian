@@ -2261,3 +2261,49 @@ describe("legacy code spans", () => {
     );
   });
 });
+
+describe("footnote definition lazy continuation", () => {
+  const blocks = (md: string) =>
+    (processWithGfm(md) as any).children.map((c: any) => c.type);
+
+  /**
+   * Lazy continuation needs an open paragraph to continue, and a definition whose
+   * first line is empty or a bare container opener has none -- so micromark ends
+   * the definition and leaves the next line behind as a sibling.
+   */
+  it("takes the next line into a definition that opened nothing", () => {
+    expect(blocks("[^1]: \nb\n")).toEqual(["footnoteDefinition"]);
+    expect(blocks("[^1]: >\nb\n")).toEqual(["footnoteDefinition"]);
+    expect(blocks("[^1]: -\nb\n")).toEqual(["footnoteDefinition"]);
+    expect(blocks("[^1]: > >\nb\n")).toEqual(["footnoteDefinition"]);
+  });
+
+  it("leaves alone what already continues", () => {
+    expect(blocks("[^1]: one\nb\n")).toEqual(["footnoteDefinition"]);
+    expect(blocks("[^1]: > x\nb\n")).toEqual(["footnoteDefinition"]);
+    expect(blocks("[^1]: - x\nb\n")).toEqual(["footnoteDefinition"]);
+  });
+
+  it("stops at a blank line", () => {
+    expect(blocks("[^1]: one\n\nb\n")).toEqual([
+      "footnoteDefinition",
+      "paragraph",
+    ]);
+    expect(blocks("[^1]: >\n\nb\n")).toEqual([
+      "footnoteDefinition",
+      "paragraph",
+    ]);
+  });
+
+  /**
+   * Only a paragraph. Widening this to any block gains nothing and breaks 16 parity
+   * cases, because an interrupting block genuinely ends a definition.
+   */
+  it("does not absorb an interrupting block", () => {
+    expect(blocks("[^1]: >\n# h\n")).toEqual(["footnoteDefinition", "heading"]);
+    expect(blocks("[^1]: >\n[^2]: x\n")).toEqual([
+      "footnoteDefinition",
+      "footnoteDefinition",
+    ]);
+  });
+});

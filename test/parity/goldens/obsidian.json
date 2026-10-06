@@ -23851,8 +23851,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by definitionLazyTransform: a definition whose first line is empty or a bare container opener has no paragraph for the next line to continue lazily, so micromark ends it and leaves a sibling. Absorbed when no blank line separates them."
     },
     "fuzz/embed/87": {
       "id": "fuzz/embed/87",
@@ -26858,8 +26858,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by definitionLazyTransform: a definition whose first line is empty or a bare container opener has no paragraph for the next line to continue lazily, so micromark ends it and leaves a sibling. Absorbed when no blank line separates them."
     },
     "fuzz/inline-footnote/26": {
       "id": "fuzz/inline-footnote/26",
@@ -35725,8 +35725,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by definitionLazyTransform: a definition whose first line is empty or a bare container opener has no paragraph for the next line to continue lazily, so micromark ends it and leaves a sibling. Absorbed when no blank line separates them."
     },
     "fuzz/html/7": {
       "id": "fuzz/html/7",
@@ -39506,8 +39506,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by definitionLazyTransform: a definition whose first line is empty or a bare container opener has no paragraph for the next line to continue lazily, so micromark ends it and leaves a sibling. Absorbed when no blank line separates them."
     },
     "fuzz/html/10": {
       "id": "fuzz/html/10",
@@ -41151,8 +41151,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by definitionLazyTransform: a definition whose first line is empty or a bare container opener has no paragraph for the next line to continue lazily, so micromark ends it and leaves a sibling. Absorbed when no blank line separates them."
     },
     "fuzz/table/9": {
       "id": "fuzz/table/9",
@@ -41623,8 +41623,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by definitionLazyTransform: a definition whose first line is empty or a bare container opener has no paragraph for the next line to continue lazily, so micromark ends it and leaves a sibling. Absorbed when no blank line separates them."
     },
     "fuzz/footnote/24": {
       "id": "fuzz/footnote/24",

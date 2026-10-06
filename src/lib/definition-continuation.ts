@@ -67,6 +67,61 @@ export function definitionContinuationTransform(
   });
 }
 
+/**
+ * Take the line immediately below a footnote definition into it.
+ *
+ * A definition whose first line carries content already absorbs what follows, by
+ * ordinary lazy continuation: `[^1]: one` / `b` is one definition and needs nothing
+ * here. But lazy continuation needs an open paragraph to continue, and there is none
+ * when the first line is empty or is a bare container opener, so micromark ends the
+ * definition and leaves a sibling:
+ *
+ *     [^1]: ⏎b          definition, then a paragraph -- Obsidian has one definition
+ *     [^1]: >⏎b         the blockquote opens nothing to continue
+ *     [^1]: -⏎b         the same for a list
+ *     [^1]: > >⏎b       and for a nested one
+ *
+ * Only a block with no blank line before it, because a blank line ends a definition
+ * -- `[^1]: one` / blank / `b` really is two blocks, and
+ * `comment-definition-extent.ts` relies on that same boundary.
+ *
+ * Restricted to a paragraph, and measured rather than assumed: widening it to any
+ * block gains nothing and breaks **16** cases, among them
+ * `hunt/interrupting-block-keeps-definition-open` and
+ * `hunt/lazy-continuation-paragraph-lines`. An interrupting block really does end a
+ * definition; only a paragraph continues one. The absorbed block is appended to the definition
+ * rather than pushed inside a trailing container: Obsidian renders an unreferenced
+ * definition as nothing, so its `html` is empty and the only evidence available --
+ * the definition's `sections` span and an empty rendered `text` -- is satisfied
+ * either way. Nesting it would be inventing structure nothing measures.
+ */
+export function definitionLazyTransform(tree: Root, source: string): void {
+  if (source === "") return;
+
+  visit(tree, (node: Node) => {
+    const parent = node as Partial<{ children: RootContent[] }>;
+    if (!Array.isArray(parent.children)) return;
+
+    for (let index = parent.children.length - 1; index > 0; index--) {
+      const block = parent.children[index];
+      const definition = parent.children[index - 1];
+      if (block?.type !== "paragraph") continue;
+      if (definition?.type !== "footnoteDefinition") continue;
+
+      const definitionEnd = definition.position?.end?.offset;
+      const from = block.position?.start?.offset;
+      if (definitionEnd === undefined || from === undefined) continue;
+      if (source.slice(definitionEnd, from) !== "\n") continue;
+
+      definition.children.push(block as never);
+      if (definition.position && block.position) {
+        definition.position.end = { ...block.position.end };
+      }
+      parent.children.splice(index, 1);
+    }
+  });
+}
+
 /** Strip the continuation indent, remembering where each line really began. */
 function dedent(
   source: string,
