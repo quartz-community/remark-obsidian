@@ -101,6 +101,29 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/table-pipes/short-delimiter-unclosed", "| a | b |\n| --- \n"],
   ["probe/table-pipes/unclosed-header-short", "| a | b\n| --- \n"],
   ["probe/table-pipes/long-delimiter-unclosed", "| a |\n| --- | ---\n"],
+  // The contexts a change to inline code would reach. `probe/code-run/*` pins the
+  // opener/closer matrix, but the retry would live in the tokenizer, so its blast
+  // radius is every container a code span can sit in -- and that dimension was the
+  // thin one: zero designed probes for a span inside emphasis or a table cell, one
+  // each for a link label, a blockquote and the padding rule. Probing the surface
+  // before touching the tokenizer is what shrank the link port from 367 lines to a
+  // single decision, so the same order applies here.
+  ["probe/code-context/in-emphasis", "*a ``code` b*\n"],
+  ["probe/code-context/in-emphasis-tight", "*``code`*\n"],
+  ["probe/code-context/in-strong", "**``code`**\n"],
+  ["probe/code-context/in-table-cell", "| ``code` | c |\n| --- | --- |\n"],
+  ["probe/code-context/in-blockquote", "> ``code`\n"],
+  ["probe/code-context/in-link-label", "[``code`](u)\n"],
+  ["probe/code-context/in-heading", "# ``code`\n"],
+  ["probe/code-context/in-list-item", "- ``code`\n"],
+  ["probe/code-context/two-retries", "``a` and ``b`\n"],
+  ["probe/code-context/padded-both", "`` a ``\n"],
+  ["probe/code-context/padded-backtick", "`` ` ``\n"],
+  ["probe/code-context/padded-double", "``  a  ``\n"],
+  ["probe/code-context/padded-single-run", "` a `\n"],
+  ["probe/code-context/across-line", "`a\nb`\n"],
+  ["probe/code-context/across-line-double", "``a\nb``\n"],
+  ["probe/code-context/retry-across-line", "``a\nb`\n"],
   // How does a backtick run find its closer? micromark takes the maximal opening
   // run and gives up when no run of equal length follows, so ` ``code` ` stays
   // literal; Obsidian reports `` `code ``, which is what retrying one position along
