@@ -1,4 +1,6 @@
-import type { Blockquote, List, Paragraph, Root } from "mdast";
+import type { Blockquote, List, ListItem, Paragraph, Root } from "mdast";
+
+import { shiftByMap, type LineMap } from "./line-map.js";
 
 const CONTAINERS = new Set(["list", "blockquote", "callout"]);
 
@@ -72,6 +74,138 @@ export function containerLazyTransform(tree: Root, source: string): void {
     }
     if (target !== parent && target.position && next.position?.end) {
       target.position.end = { ...next.position.end };
+    }
+    children.splice(index + 1, 1);
+  }
+}
+
+/**
+ * The deepest trailing list item that holds nothing, with everything enclosing it.
+ *
+ * The chain comes back because each container on the path has to be stretched over
+ * the absorbed block, not just the item that receives it.
+ */
+function trailingEmptyItem(
+  list: List,
+): { item: ListItem; chain: (List | ListItem)[] } | undefined {
+  const item = list.children[list.children.length - 1];
+  if (!item) return undefined;
+  const last = item.children[item.children.length - 1];
+  if (last?.type === "list") {
+    const deeper = trailingEmptyItem(last);
+    if (deeper)
+      return { item: deeper.item, chain: [list, item, ...deeper.chain] };
+  }
+  return item.children.length === 0 ? { item, chain: [list, item] } : undefined;
+}
+
+/** Where an item's content column is: past its marker and the space after it. */
+function contentIndent(item: ListItem, source: string): number | undefined {
+  const start = item.position?.start?.offset;
+  const column = item.position?.start?.column;
+  if (start === undefined || column === undefined) return undefined;
+  const lineEnd = source.indexOf("\n", start);
+  const line = source.slice(start, lineEnd === -1 ? undefined : lineEnd);
+  const marker = /^(?:[-*+]|\d{1,9}[.)])/u.exec(line);
+  if (!marker) return undefined;
+  return column - 1 + marker[0].length + 1;
+}
+
+/** Strip up to `indent` leading spaces a line, remembering the real offsets. */
+function dedentBy(
+  source: string,
+  start: number,
+  end: number,
+  startLine: number,
+  indent: number,
+): LineMap {
+  const raw = source.slice(start, end).split("\n");
+  const text: string[] = [];
+  const starts: number[] = [];
+  const lines: number[] = [];
+  let offset = start;
+
+  for (let index = 0; index < raw.length; index++) {
+    const line = raw[index]!;
+    let strip = 0;
+    while (strip < indent && line[strip] === " ") strip++;
+    starts.push(offset + strip);
+    lines.push(startLine + index);
+    text.push(line.slice(strip));
+    offset += line.length + 1;
+  }
+
+  return { text: text.join("\n"), starts, lines };
+}
+
+/**
+ * Extend a list over an indented block that follows a blank line.
+ *
+ * The mirror of the pass above, which absorbs only when there is *no* blank line.
+ * Here the blank line is the whole point. CommonMark says an empty list item takes
+ * no further content -- cmark's own example 280 reads `-` / blank / `  foo` as a
+ * list *and* a paragraph -- and Obsidian reads it as one list:
+ *
+ *     -⏎⏎  foo           one list, where we reported list + paragraph
+ *     1.⏎⏎   foo         the same, at an ordered marker's wider content column
+ *     -⏎⏎⏎  foo          a second blank line changes nothing
+ *     -⏎⏎  -⏎⏎    foo    the *inner* item takes it, so the shape is `ul > ul`
+ *
+ * Only a trailing item that is empty, which is measured rather than assumed: every
+ * probed variant whose item carries content already matches, because micromark takes
+ * the continuation itself. Both quote forms match too -- `>` / blank / `foo` really
+ * is a blockquote and a paragraph to Obsidian -- so this is a list rule, not a
+ * container one, and that is why it does not reuse `CONTAINERS` above.
+ *
+ * The block is re-parsed dedented by the item's content column, so `    foo` under a
+ * nested item becomes a paragraph rather than staying the indented code block we
+ * reported before. Offsets come back through `shiftByMap`, since the dedent removes a
+ * different number of characters on each line.
+ */
+export function listEmptyItemTransform(
+  tree: Root,
+  source: string,
+  reparse: (markdown: string) => Root,
+): void {
+  if (source === "") return;
+  const children = tree.children;
+
+  for (let index = children.length - 2; index >= 0; index--) {
+    const list = children[index];
+    const next = children[index + 1];
+    if (list?.type !== "list" || !next) continue;
+
+    const from = next.position?.start?.offset;
+    const to = next.position?.end?.offset;
+    const startLine = next.position?.start?.line;
+    const listEnd = list.position?.end?.offset;
+    if (from === undefined || to === undefined) continue;
+    if (startLine === undefined || listEnd === undefined) continue;
+
+    // A blank line is required here, which is exactly what the pass above rejects.
+    if (!/\n[ \t]*\n/.test(source.slice(listEnd, from))) continue;
+
+    const found = trailingEmptyItem(list);
+    if (!found) continue;
+    const { item, chain } = found;
+    const indent = contentIndent(item, source);
+    if (indent === undefined) continue;
+
+    const lineStart = source.lastIndexOf("\n", from - 1) + 1;
+    const available = (/^ */u.exec(source.slice(lineStart)) ?? [""])[0].length;
+    if (available < indent) continue;
+
+    const map = dedentBy(source, lineStart, to, startLine, indent);
+    const parsed = reparse(map.text);
+    if (parsed.children.length === 0) continue;
+    for (const child of parsed.children) shiftByMap(child, map, 0);
+
+    (item.children as unknown[]).push(...parsed.children);
+    // Every container on the path to the item now ends where the block does.
+    for (const node of chain) {
+      if (node.position && next.position?.end) {
+        node.position.end = { ...next.position.end };
+      }
     }
     children.splice(index + 1, 1);
   }

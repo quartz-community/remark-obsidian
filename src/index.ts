@@ -38,7 +38,10 @@ import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 import { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
 import { inlineFootnoteInertTransform } from "./lib/inline-footnote-inert.js";
 import { inlineRefoldTransform } from "./lib/inline-refold.js";
-import { containerLazyTransform } from "./lib/container-lazy.js";
+import {
+  containerLazyTransform,
+  listEmptyItemTransform,
+} from "./lib/container-lazy.js";
 import { quoteMergeTransform } from "./lib/quote-merge.js";
 import { indentTabTransform } from "./lib/indent-tab.js";
 import { listTabTransform } from "./lib/list-tab.js";
@@ -462,6 +465,9 @@ export default function remarkObsidian(
       self.parse(markdown),
     );
     containerLazyTransform(tree, String(file));
+    // The complement of the pass above: that one needs no blank line, this one
+    // needs exactly the blank line it rejects.
+    listEmptyItemTransform(tree, String(file), (markdown) => reparse(markdown));
     quoteMergeTransform(tree, String(file));
     // After the quote passes have settled the block, since this reads its lines.
     quoteTabTransform(tree, String(file));

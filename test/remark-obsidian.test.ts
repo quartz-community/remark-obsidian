@@ -2307,3 +2307,50 @@ describe("footnote definition lazy continuation", () => {
     ]);
   });
 });
+
+describe("empty list item continuation", () => {
+  const shape = (md: string) => {
+    const f = (n: any): string => {
+      const kids = (n.children ?? []).map(f).join(" ");
+      return n.type + (kids ? `(${kids})` : "");
+    };
+    return (processWithGfm(md) as any).children.map(f).join(" + ");
+  };
+
+  /**
+   * CommonMark says an empty list item takes no further content -- cmark's example
+   * 280 reads this as a list *and* a paragraph. Obsidian reads one list.
+   */
+  it("absorbs an indented block after a blank line", () => {
+    expect(shape("-\n\n  foo\n")).toBe("list(listItem(paragraph(text)))");
+    expect(shape("- \n\n  foo\n")).toBe("list(listItem(paragraph(text)))");
+    expect(shape("-\n\n\n  foo\n")).toBe("list(listItem(paragraph(text)))");
+    expect(shape("1.\n\n   foo\n")).toBe("list(listItem(paragraph(text)))");
+  });
+
+  /**
+   * Dedented by the item's content column, so what was an indented code block at
+   * root becomes the paragraph it is inside the item.
+   */
+  it("reparses the block at the item's content column", () => {
+    expect(shape("-\n\n    deep\n")).toBe("list(listItem(paragraph(text)))");
+  });
+
+  it("needs the indent to reach the content column", () => {
+    expect(shape("-\n\nfoo\n")).toBe("list(listItem) + paragraph(text)");
+  });
+
+  /** A list rule, not a container rule: both quote forms are left alone. */
+  it("does not touch a blockquote", () => {
+    expect(shape(">\n\nfoo\n")).toBe("blockquote + paragraph(text)");
+  });
+
+  it("leaves alone an item that already has content", () => {
+    expect(shape("- a\n\n  foo\n")).toBe(
+      "list(listItem(paragraph(text) paragraph(text)))",
+    );
+    expect(shape("-\n\n- b\n")).toBe(
+      "list(listItem listItem(paragraph(text)))",
+    );
+  });
+});
