@@ -16713,8 +16713,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by not closing a wikilink on an empty target: the bracket becomes content and the scan continues, so [[]]] links to ']' while [[]] still rejects and [[ ]] stays a link with an empty path."
     },
     "fuzz/embed/70": {
       "id": "fuzz/embed/70",
@@ -22891,8 +22891,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by not closing a wikilink on an empty target: the bracket becomes content and the scan continues, so [[]]] links to ']' while [[]] still rejects and [[ ]] stays a link with an empty path."
     },
     "fuzz/highlight/62": {
       "id": "fuzz/highlight/62",
@@ -23968,8 +23968,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by not closing a wikilink on an empty target: the bracket becomes content and the scan continues, so [[]]] links to ']' while [[]] still rejects and [[ ]] stays a link with an empty path."
     },
     "fuzz/callout/11": {
       "id": "fuzz/callout/11",
@@ -35201,8 +35201,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by not closing a wikilink on an empty target: the bracket becomes content and the scan continues, so [[]]] links to ']' while [[]] still rejects and [[ ]] stays a link with an empty path."
     },
     "fuzz/highlight/30": {
       "id": "fuzz/highlight/30",

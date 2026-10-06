@@ -73,6 +73,7 @@ function tokenize(
   nok: State,
 ): State {
   let hasPath = false;
+  let pathChars = 0;
   let hasHeading = false;
   let hasAlias = false;
 
@@ -112,8 +113,7 @@ function tokenize(
   function pathStart(code: Code): State | undefined {
     if (code === HASH) return headingMarker(code);
     if (code === PIPE) return nok(code);
-    if (code === RIGHT_BRACKET || code === null || isLineEnding(code))
-      return nok(code);
+    if (code === null || isLineEnding(code)) return nok(code);
     effects.enter("wikilinkPath");
     hasPath = true;
     return path(code);
@@ -121,6 +121,7 @@ function tokenize(
 
   function path(code: Code): State | undefined {
     if (code === BACKSLASH) {
+      pathChars++;
       effects.consume(code);
       return pathEscape;
     }
@@ -129,6 +130,7 @@ function tokenize(
     // path of `[x` and `![[![[x]]]]` resolves the inner embed. Rejecting here lets
     // micromark retry one position along until the path is clean.
     if (code === LEFT_BRACKET) {
+      pathChars++;
       effects.consume(code);
       return pathBracket;
     }
@@ -149,17 +151,28 @@ function tokenize(
 
     if (code === null || isLineEnding(code)) return nok(code);
 
+    pathChars++;
     effects.consume(code);
     return path;
   }
 
+  /**
+   * An empty target is not a link, so a `]]` reached with nothing consumed does not
+   * close -- the bracket becomes content and the scan goes on. That is what makes
+   * `[[]]]` a link to `]`: the first bracket is taken in, and the second and third
+   * then close it. `[[]]` still rejects, because the scan runs out of line with no
+   * closer left. `[[ ]]` is unaffected and stays a link with an empty path, since a
+   * space is a character.
+   */
   function pathCloses(code: Code): State | undefined {
+    if (pathChars === 0) return pathLiteralBracket(code);
     effects.exit("wikilinkPath");
     return closeFirst(code);
   }
 
   /** A lone `]` belongs to the target, so it stays in the path. */
   function pathLiteralBracket(code: Code): State | undefined {
+    pathChars++;
     effects.consume(code);
     return path;
   }
