@@ -491,6 +491,36 @@ export function headingName(node: Node, source: string): string {
   return lines.join("\n").trim();
 }
 
+/**
+ * An internal destination as `data-href` reports it: path and subpath apart, and
+ * percent-decoded.
+ *
+ * A wikilink arrives already split by the tokenizer, but `[x](a.md#^b)` does not,
+ * and Obsidian resolves it the same way -- the recorder captures both as
+ * `a.internal-link`. Reporting the raw destination named the whole of `a.md#^b` as
+ * the path and left the heading empty, so a block reference written in the ordinary
+ * link syntax looked like a parse divergence.
+ *
+ * Split before decoding, so a `%23` in a path cannot invent a subpath that the
+ * author did not write. `decodeURIComponent` throws on a malformed escape, and a
+ * lone `%` is ordinary in a filename, so the raw text stands in when it does.
+ */
+function splitTarget(url: string): { path: string; heading: string } {
+  const hash = url.indexOf("#");
+  const path = hash === -1 ? url : url.slice(0, hash);
+  const heading = hash === -1 ? "" : url.slice(hash + 1);
+  return { path: percentDecode(path), heading: percentDecode(heading) };
+}
+
+function percentDecode(value: string): string {
+  if (!value.includes("%")) return value;
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 export function projectMdast(
   tree: Root,
   source: string,
@@ -556,7 +586,7 @@ export function projectMdast(
     if (isType<ImageNode>(node, "image")) {
       const url = node.url ?? "";
       if (url !== "" && !/^[a-z][a-z0-9+.-]*:|^\/\//i.test(url)) {
-        links.push({ path: url, heading: "", embedded: true });
+        links.push({ ...splitTarget(url), embedded: true });
       }
       return;
     }
@@ -567,7 +597,7 @@ export function projectMdast(
     if (isType<ImageNode>(node, "link")) {
       const url = node.url ?? "";
       if (url !== "" && !/^[a-z][a-z0-9+.-]*:|^\/\//i.test(url)) {
-        links.push({ path: url, heading: "", embedded: false });
+        links.push({ ...splitTarget(url), embedded: false });
       }
       // Children still walk: a wikilink or tag can sit inside the label.
     }

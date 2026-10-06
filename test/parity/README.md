@@ -442,6 +442,32 @@ changed projections is a flake — re-record and it will come back. Do not assum
 older value was right, though: `| $|x|$ |` arguably _should_ split into three cells, and
 only the html settled which reading was real.
 
+### A rendered divergence can hide the character that caused it
+
+`commonmark/links/507` reads `[link](/url "title")` and the two sides disagree about
+whether there is a title. Three plausible projection bugs were investigated before a
+byte dump showed the space is **U+00A0**: CommonMark says a no-break space is not
+whitespace, so the destination really is the whole `/url "title"`, and Obsidian
+treats it as a separator. Nothing was wrong on our side at all.
+
+Every display in the chain renders it as a space -- the divergence report, a terminal,
+`JSON.stringify`. So when a divergence makes no sense, dump the code points before
+theorising:
+
+```js
+[...markdown]
+  .filter((c) => c.codePointAt(0) > 126)
+  .map((c) => "U+" + c.codePointAt(0).toString(16));
+```
+
+21 corpus cases hold a U+00A0 and the fuzzer put it there on purpose, so this is a
+character the corpus deliberately exercises and not a transcription slip.
+
+A second habit from the same episode: `pick.mts` truncates long markdown, and one of
+those three false leads came from reading a truncated multi-link document as a
+single-link one. Read the golden's own `markdown` before concluding anything from a
+summary of it.
+
 ## When goldens drift
 
 The scheduled workflow never commits. It uploads the freshly recorded goldens as
