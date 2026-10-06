@@ -2421,3 +2421,35 @@ describe("footnote reference labels", () => {
     expect(refs("[^![[img.png]]]\n")).toEqual([]);
   });
 });
+
+describe("wikilink whitespace", () => {
+  const parts = (md: string) => {
+    const found: string[] = [];
+    visit(processWithGfm(md), "wikilink", (n: any) => {
+      found.push(`${n.path}|${n.heading}|${n.alias}`);
+    });
+    return found;
+  };
+
+  /**
+   * Obsidian trims the inner text once, as a whole, and splits afterwards -- so the
+   * first part present loses only its leading whitespace and the last only its
+   * trailing. Trimming each part separately ate two spaces Obsidian keeps.
+   */
+  it("trims the inner text as a whole", () => {
+    expect(parts("[[  Note  #^id  ]]\n")).toEqual(["Note  |^id|"]);
+    expect(parts("[[a#  h  ]]\n")).toEqual(["a|  h|"]);
+    expect(parts("[[  a  |  b  ]]\n")).toEqual(["a  ||  b"]);
+  });
+
+  /** A lone path is both first and last, so it is trimmed at both ends. */
+  it("still trims a lone path at both ends", () => {
+    expect(parts("[[ page ]]\n")).toEqual(["page||"]);
+    expect(parts("[[ ]]\n")).toEqual(["||"]);
+  });
+
+  it("keeps the trailing-backslash rule", () => {
+    expect(parts("[[target\\]]\n")).toEqual(["target||"]);
+    expect(parts("[[a#^blk\\]]\n")).toEqual(["a|^blk|"]);
+  });
+});
