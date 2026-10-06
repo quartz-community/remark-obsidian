@@ -132,26 +132,15 @@ describe("node positions", () => {
    */
   const UNPLACED_CEILING = {
     "callout > calloutTitle": 6,
-    "calloutTitle > break": 1,
-    "calloutTitle > text": 1,
-    "delete > break": 2,
-    "delete > text": 2,
-    "emphasis > break": 8,
-    "emphasis > text": 8,
     "heading > footnoteReference": 3,
     "heading > text": 1,
-    "highlight > break": 6,
-    "highlight > text": 6,
-    "link > break": 1,
-    "link > text": 3,
-    "paragraph > break": 365,
+    "link > text": 2,
+    "paragraph > break": 67,
     "paragraph > footnoteReference": 8,
     "paragraph > link": 2,
-    "paragraph > text": 298,
+    "paragraph > text": 17,
     "table > tableRow": 6,
     "tableRow > tableCell": 6,
-    "strong > break": 6,
-    "strong > text": 6,
   };
 
   it("does not splice more unplaced nodes than the recorded ceiling", () => {

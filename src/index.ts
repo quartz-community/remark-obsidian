@@ -43,6 +43,7 @@ import { listTabTransform } from "./lib/list-tab.js";
 import { quoteTabTransform } from "./lib/quote-tab.js";
 import { paragraphMergeTransform } from "./lib/paragraph-merge.js";
 import { normalizePointsTransform } from "./lib/normalize-points.js";
+import { breakPositionsTransform } from "./lib/break-positions.js";
 import { commentParseTransform } from "./lib/comment-parse.js";
 import { commentQuoteExtentTransform } from "./lib/comment-quote-extent.js";
 import {
@@ -210,6 +211,21 @@ export interface RemarkObsidianOptions {
    */
   legacyEntities?: boolean;
   /**
+   * Convert a soft line ending into a positioned `break`, so `remark-breaks` has
+   * nothing left to do.
+   *
+   * That package is four lines which throw positions away: `newlineToBreak` is
+   * `findAndReplace(tree, [/\r?\n|\r/g, replace])`, `replace` returns a bare
+   * `{type: "break"}`, and `findAndReplace` rebuilds the surrounding text without
+   * positions either. Doing the same conversion first leaves its regular expression
+   * nothing to match, so the tree is identical and every node keeps its place.
+   *
+   * On by default, because this package is built for a chain that includes
+   * `remark-breaks` and is ordered before it. Turn it off for a chain that has no
+   * `remark-breaks`, where a soft line ending is not a `break` at all.
+   */
+  positionedBreaks?: boolean;
+  /**
    * Write a line break as a trailing backslash rather than a newline.
    *
    * Off by default, because this package is built for a chain that includes
@@ -238,6 +254,7 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
   legacyEmphasis: true,
   legacyStrikethrough: true,
   legacyEntities: true,
+  positionedBreaks: true,
   escapedLineBreaks: false,
 };
 
@@ -497,6 +514,9 @@ export default function remarkObsidian(
     // After every pass that can extend a definition, and before points are
     // normalised from the offsets this corrects.
     definitionTrimTransform(tree, String(file));
+    // After every pass that reads a newline out of a text value, and before points
+    // are normalised from the offsets it sets.
+    if (opts.positionedBreaks) breakPositionsTransform(tree, String(file));
     // Last, so every pass above only has to keep its offsets honest.
     normalizePointsTransform(tree, String(file));
   };

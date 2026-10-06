@@ -16,6 +16,11 @@ const goldenPath = path.join(
   "obsidian.json",
 );
 
+const codePoint = (code: number): string =>
+  code === 0 || code > 0x10ffff || (code >= 0xd800 && code <= 0xdfff)
+    ? "\uFFFD"
+    : String.fromCodePoint(code);
+
 const LEGACY = new Set<string>(characterEntitiesLegacy);
 const MAX_LEGACY = Math.max(...[...LEGACY].map((name) => name.length));
 
@@ -29,8 +34,10 @@ const decodeReferences = (value: string): string =>
   value.replace(
     /&(?:#[Xx]([\dA-Fa-f]+)|#(\d+)|([A-Za-z][\dA-Za-z]*))(;?)/gu,
     (whole, hex: string, dec: string, name: string, semi: string) => {
-      if (hex) return String.fromCodePoint(Number.parseInt(hex, 16));
-      if (dec) return String.fromCodePoint(Number(dec));
+      // Out of range, a surrogate half or NUL becomes U+FFFD, as the parser does
+      // -- `&#87654321;` is in the corpus and `String.fromCodePoint` throws on it.
+      if (hex) return codePoint(Number.parseInt(hex, 16));
+      if (dec) return codePoint(Number(dec));
       if (!name) return whole;
       if (semi) {
         const full = decodeNamedCharacterReference(name);
@@ -53,11 +60,16 @@ const decodeReferences = (value: string): string =>
 /**
  * Escapes, character references and blockquote markers are the only things
  * that legitimately separate a `text` node's value from its own source slice.
+ *
+ * Every marker on a line goes, not just the first: a continuation line inside a
+ * nested quote carries one per level, and none of them is content. That only became
+ * visible once soft line endings kept their positions, because the nodes carrying
+ * such a line had none before and were skipped.
  * Whitespace goes too, since a node spanning a line break loses container
  * indentation that was never content.
  */
 const strip = (value: string): string =>
-  value.replace(/^[ \t]*>[ \t]?/gm, "").replace(/\s+/g, "");
+  value.replace(/^(?:[ \t]*>[ \t]?)+/gm, "").replace(/\s+/g, "");
 
 /** Source still carries its escapes and references; resolve them to compare. */
 const sourceContent = (slice: string): string =>
