@@ -319,8 +319,12 @@ const CAPTURE = async (
 
       // Footnote anchors carry a fresh random suffix per render, so the stored HTML
       // would differ on every recording and the drift detector would cry wolf.
+      //
+      // The index is one or more segments, not one: a reference Obsidian numbers
+      // twice is `fnref-1-1-<hex>`, and matching a single `-\d+` left that whole
+      // suffix in place. Eleven cases drifted on every recording because of it.
       const html = host.innerHTML.replace(
-        /(fn(?:ref)?-\d+)-[0-9a-f]{8,}/g,
+        /(fn(?:ref)?(?:-\d+)+)-[0-9a-f]{8,}/g,
         "$1",
       );
 
