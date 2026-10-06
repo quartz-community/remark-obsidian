@@ -241,7 +241,6 @@ describe("source fidelity", () => {
       "fuzz/footnote/4: [^_under_]",
       "fuzz/embed/12: [^1\\]",
       "fuzz/footnote/15: [^%%note%%%%]",
-      "fuzz/footnote/17: [^&amp;]",
       "fuzz/footnote/24: [^https://e.test/p]",
     ]);
   });

@@ -132,11 +132,10 @@ describe("node positions", () => {
    */
   const UNPLACED_CEILING = {
     "callout > calloutTitle": 6,
-    "heading > footnoteReference": 3,
-    "heading > text": 1,
+    "heading > footnoteReference": 2,
     "link > text": 2,
     "paragraph > break": 7,
-    "paragraph > footnoteReference": 8,
+    "paragraph > footnoteReference": 7,
     "paragraph > link": 2,
     "paragraph > text": 10,
   };

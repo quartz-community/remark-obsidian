@@ -34108,8 +34108,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by resolving character references in the value-to-source alignment: a text node holding an entity could not be aligned, so every node spliced out of it lost its position and its written form."
     },
     "fuzz/table/5": {
       "id": "fuzz/table/5",
@@ -38248,8 +38248,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match",
+      "note": "Fixed by resolving character references in the value-to-source alignment: a text node holding an entity could not be aligned, so every node spliced out of it lost its position and its written form."
     },
     "fuzz/embed/51": {
       "id": "fuzz/embed/51",

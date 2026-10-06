@@ -1,6 +1,8 @@
 import type { FootnoteReference, Root, Text } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
+import { characterEntitiesLegacy } from "character-entities-legacy";
+import { decodeNamedCharacterReference } from "decode-named-character-reference";
 
 const REFERENCE = /\[\^([^[\]\s]+)\]/g;
 
@@ -51,6 +53,56 @@ interface SourceAlignment {
   readonly at: number[];
 }
 
+/** The longest name HTML resolves without a semicolon, bounding the scan. */
+const LEGACY = new Set<string>(characterEntitiesLegacy);
+const MAX_NAME = Math.max(...[...LEGACY].map((name) => name.length));
+
+/**
+ * The character reference beginning at `index`, if there is one.
+ *
+ * The aligner has to resolve these because the value it is matching against has
+ * already resolved them: `[^&amp;]` reaches a text node as `[^&]`, so modelling only
+ * escapes left the two strings different lengths, the alignment returned `null`, and
+ * every node spliced out of that text lost its position. Eight bare references and
+ * part of the surrounding text, across this corpus.
+ *
+ * The same rule the parser applies in `legacy-entity.ts` -- a semicolon is optional for
+ * HTML's legacy names, which match greedily, and for numeric references.
+ */
+function referenceAt(
+  source: string,
+  index: number,
+): { text: string; length: number } | undefined {
+  const rest = source.slice(index + 1, index + 2 + MAX_NAME);
+  const numeric = /^#([Xx])?([\dA-Fa-f]+)(;?)/u.exec(rest);
+  if (numeric) {
+    const hex = numeric[1] !== undefined;
+    const digits = numeric[2]!;
+    if (!hex && !/^\d+$/u.test(digits)) return undefined;
+    const code = Number.parseInt(digits, hex ? 16 : 10);
+    const text =
+      code === 0 || code > 0x10ffff || (code >= 0xd800 && code <= 0xdfff)
+        ? "\uFFFD"
+        : String.fromCodePoint(code);
+    return { text, length: 1 + numeric[0].length };
+  }
+
+  const named = /^([A-Za-z][\dA-Za-z]*)(;?)/u.exec(rest);
+  if (!named) return undefined;
+  const name = named[1]!;
+  if (named[2] === ";") {
+    const full = decodeNamedCharacterReference(name);
+    return full === false ? undefined : { text: full, length: name.length + 2 };
+  }
+  for (let length = Math.min(name.length, MAX_NAME); length > 0; length--) {
+    const candidate = name.slice(0, length);
+    if (!LEGACY.has(candidate)) continue;
+    const decoded = decodeNamedCharacterReference(candidate);
+    if (decoded !== false) return { text: decoded, length: length + 1 };
+  }
+  return undefined;
+}
+
 function alignToSource(source: string, value: string): SourceAlignment | null {
   const escaped: boolean[] = [];
   const at: number[] = [];
@@ -65,6 +117,20 @@ function alignToSource(source: string, value: string): SourceAlignment | null {
       rebuilt.push(next);
       index++;
       continue;
+    }
+    if (character === "&") {
+      const reference = referenceAt(source, index);
+      if (reference) {
+        // Every character the reference decodes to maps back to where it started.
+        at.pop();
+        for (const decoded of reference.text) {
+          at.push(index);
+          escaped.push(false);
+          rebuilt.push(decoded);
+        }
+        index += reference.length - 1;
+        continue;
+      }
     }
     escaped.push(false);
     rebuilt.push(character);
