@@ -51,6 +51,37 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
     "probe/inline-footnote/definition-first",
     "[^1]: body\n\nuse[^1] and ^[x]\n",
   ],
+  // Which bracket pair wins when one encloses another? Obsidian takes the OUTER
+  // and leaves the inner literal, where CommonMark takes the inner -- both oracles
+  // agree on that for `[foo [bar](/uri)](/uri)`. Reproducing it means replacing
+  // micromark's label resolver with legacy's balanced-bracket scan, and the corpus
+  // could not adjudicate that: three designed probes covered nested brackets
+  // against twenty-seven incidental fuzz hits, so the blast radius was guesswork.
+  // These probe the precedence systematically, including every construct that can
+  // cross a label boundary, so the port can be measured rather than feared.
+  ["probe/label-precedence/plain", "[a](u)\n"],
+  ["probe/label-precedence/nested-inline", "[foo [bar](u)](v)\n"],
+  [
+    "probe/label-precedence/nested-reference",
+    "[foo [bar](u)][ref]\n\n[ref]: /r\n",
+  ],
+  [
+    "probe/label-precedence/reference-inside",
+    "[foo [bar][ref]](u)\n\n[ref]: /r\n",
+  ],
+  ["probe/label-precedence/bracket-no-link", "[a [b] c](u)\n"],
+  ["probe/label-precedence/image-inside", "[a ![b](u) c](v)\n"],
+  ["probe/label-precedence/image-outside", "![foo [bar](u)](v)\n"],
+  ["probe/label-precedence/trailing-destination", "[foo](u)](v)\n"],
+  ["probe/label-precedence/double-open", "[[a](u)](v)\n"],
+  ["probe/label-precedence/code-crosses", "[foo`](u)`\n"],
+  ["probe/label-precedence/html-attr-crosses", '[foo <b attr="](u)">\n'],
+  ["probe/label-precedence/emphasis-crosses", "[foo *bar](u)*\n"],
+  ["probe/label-precedence/wikilink-inside", "[foo [[target]] bar](u)\n"],
+  [
+    "probe/label-precedence/autolink-crosses",
+    "[foo <https://e.test/?q=](u)>\n",
+  ],
   // Where does a footnote reference survive inside a link construct? Obsidian
   // indexes one in a link reference definition's *destination* (`[foo]: [^9]`),
   // which is recorded, and the referee shows it also indexing one in a reference
