@@ -817,6 +817,13 @@ recorded cases and **39% of independently discovered causes**.
 Only 4 of the 244 appear in the corpus verbatim, so this is new ground rather than a
 replay of known cases — which is what makes the share meaningful.
 
+A third thing it does not say: the **share is not a progress metric either**. The second
+range was measured after all 14 label-precedence cases were fixed and still came back at
+36%, three points off the 39% from before them. That is range variation, not a fix
+failing -- the share describes what the generator produces, and 14 cases out of 3100
+cannot move a 1000-seed distribution. It is the same trap as the agreement rate above,
+one level up: use the share to pick a family, never to check whether the family closed.
+
 Two things it does not say. A reduced form is one cause of its document's failure, so
 closing the family does not flip 39% of documents. And 37% involve no bracket at all, so
 a complete bracket fix still leaves a large, genuinely diverse remainder.
