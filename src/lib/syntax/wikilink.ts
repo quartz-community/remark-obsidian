@@ -210,6 +210,15 @@ function tokenize(
       return headingMarker(code);
     }
     if (code === null || isLineEnding(code)) return nok(code);
+    // A `[` after the backslash is still a `[`, so `[[\[[a|b]]]]` holds a doubled
+    // bracket in its target and cancels exactly as `[[[[a|b]]]]` does -- Obsidian
+    // reports no link there and shows the whole run as text. Consuming it here
+    // instead let the backslash smuggle the bracket past `pathBracket`.
+    if (code === LEFT_BRACKET) {
+      pathChars++;
+      effects.consume(code);
+      return pathBracket;
+    }
     effects.consume(code);
     return path;
   }
