@@ -868,6 +868,48 @@ a tab-indented sibling, where `containerState.size` counts **characters** while
 under-indented continuation, which needs legacy's whole-item minimum-indent scan rather
 than a different limit.
 
+### The two list cases that did not close, and why they are different
+
+Both were attempted rather than assumed, and the measurements are worth more than the
+predictions were.
+
+**The tab half, `commonmark/tabs/9`.** The cause recorded from the prediction was wrong:
+it said `containerState.size` counts characters while `factorySpace` counts columns. The
+real boundary is a threshold. Probing the third line of ` - foo` / `   - bar` / `<pad>- baz`:
+
+| pad     | columns | our result         |
+| ------- | ------: | ------------------ |
+| `···`   |       3 | sibling of `bar`   |
+| `····`  |       4 | sibling of `bar`   |
+| `⇥`     |       4 | sibling of `bar`   |
+| `·····` |       5 | nested under `bar` |
+| `⇥·`    |       5 | nested under `bar` |
+
+So we nest at five columns and `⇥·` is exactly five, while Obsidian puts `⇥·` below the
+boundary. Note `bar` is itself a nested item whose own `size` is **2**, not 5, so the outer
+list consumes three of the tab's four virtual columns and the inner item sees the
+remainder: a tab straddling a container boundary gets **split**, and half a tab has no
+character count at all. Comparing the indent unexpanded is refuted at **0 gains and 4
+regressions** -- `task/nested-tab`, `document/tab-indentation`, `commonmark/tabs/4` and
+`tabs/5` all need the column width for ordinary continuation.
+
+**The under-indented half, `commonmark/list-items/257`.** `remark-parse@8` strips the
+minimum indentation across the _whole item_, which a streaming tokenizer cannot see. Two
+floors were tried and both are refuted, and together they pin the answer from both sides:
+
+| floor                      | gains | costs                                             |
+| -------------------------- | ----: | ------------------------------------------------- |
+| one column past the marker |     1 | **1** -- `commonmark/list-items/276`              |
+| the prefix width           |     1 | **7** -- including the staircase cases just fixed |
+
+`-    foo` / blank / `  bar` must leave `bar` a paragraph of its own, and a nested item has
+`initialSize` 0 so the lower floor swallows sibling markers. No constant satisfies both
+cases, so this one genuinely needs the whole-item scan rather than a different limit.
+
+The general point is the one the `%%` detour made too: **an attempt that fails with counts
+is worth more than a prediction that sounds right.** The predicted cause for the tab case
+was plausible and wrong, and only probing the threshold showed it.
+
 ## The legacy stack is an arbiter, not an oracle
 
 Obsidian runs a **fork** of `remark-parse@8`, so a local install of
