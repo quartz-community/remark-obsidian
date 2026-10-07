@@ -22077,8 +22077,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Setext underline versus a container lazy continuation, and the corpus contradicts the obvious reading. \"> [!\" / \"[[a|b]]\" / \"---\" gives blockquote(line 0) then heading(lines 1-2), so line 1 is NOT lazily continued. But \"> [!no\" / \"===\" gives blockquote@0:0-1:3 spanning BOTH lines, and \"> [!n\" / \"note]\" likewise - so a lazy continuation IS absorbed when it is the last line. The incomplete callout marker is therefore NOT the discriminator (5 cases with one match on that shape); the third line is. Candidate rule: a setext underline binds its preceding line more tightly than a blockquote lazy continuation does, so line 1 belongs to the heading rather than the quote. fuzz/setext/1 appears to contradict even that - there a LIST absorbs the lazy line and the --- becomes a thematic break - so the container type or the intervening html block matters too. Needs a designed probe family enumerating container x lazy line x underline before any of it is implemented."
+      "triage": "match"
     },
     "fuzz/embed/74": {
       "id": "fuzz/embed/74",
@@ -25918,8 +25917,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Setext underline versus a container lazy continuation, and the corpus contradicts the obvious reading. \"> [!\" / \"[[a|b]]\" / \"---\" gives blockquote(line 0) then heading(lines 1-2), so line 1 is NOT lazily continued. But \"> [!no\" / \"===\" gives blockquote@0:0-1:3 spanning BOTH lines, and \"> [!n\" / \"note]\" likewise - so a lazy continuation IS absorbed when it is the last line. The incomplete callout marker is therefore NOT the discriminator (5 cases with one match on that shape); the third line is. Candidate rule: a setext underline binds its preceding line more tightly than a blockquote lazy continuation does, so line 1 belongs to the heading rather than the quote. fuzz/setext/1 appears to contradict even that - there a LIST absorbs the lazy line and the --- becomes a thematic break - so the container type or the intervening html block matters too. Needs a designed probe family enumerating container x lazy line x underline before any of it is implemented."
+      "triage": "match"
     },
     "fuzz/embed/100": {
       "id": "fuzz/embed/100",
@@ -41434,8 +41432,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/math/10": {
       "id": "fuzz/math/10",
@@ -63810,8 +63807,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Measured by probe/lazy-setext/*, 14 probes. A blockquote or callout gives up its LAST lazy line to a setext underline: \"> a\" / \"b\" / \"---\" is blockquote(line 0) plus heading(1-2). With two lazy lines the earlier one stays in the quote (\"> a\" / \"b\" / \"c\" / \"---\" is blockquote@0:0-1:1 plus heading(2-3)). A LIST never gives one up: \"- a\" / \"b\" / \"---\" absorbs b and leaves the --- a thematic break. And when the underline is itself the lazy line the marker decides: --- is a thematic break, === is absorbed as content. We currently invert both halves - no heading for a quote, a heading for a list."
+      "triage": "match"
     },
     "probe/lazy-setext/quote-lazy-equals": {
       "id": "probe/lazy-setext/quote-lazy-equals",
@@ -63869,8 +63865,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Measured by probe/lazy-setext/*, 14 probes. A blockquote or callout gives up its LAST lazy line to a setext underline: \"> a\" / \"b\" / \"---\" is blockquote(line 0) plus heading(1-2). With two lazy lines the earlier one stays in the quote (\"> a\" / \"b\" / \"c\" / \"---\" is blockquote@0:0-1:1 plus heading(2-3)). A LIST never gives one up: \"- a\" / \"b\" / \"---\" absorbs b and leaves the --- a thematic break. And when the underline is itself the lazy line the marker decides: --- is a thematic break, === is absorbed as content. We currently invert both halves - no heading for a quote, a heading for a list."
+      "triage": "match"
     },
     "probe/lazy-setext/quote-underline-is-lazy-dash": {
       "id": "probe/lazy-setext/quote-underline-is-lazy-dash",
@@ -64029,8 +64024,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Measured by probe/lazy-setext/*, 14 probes. A blockquote or callout gives up its LAST lazy line to a setext underline: \"> a\" / \"b\" / \"---\" is blockquote(line 0) plus heading(1-2). With two lazy lines the earlier one stays in the quote (\"> a\" / \"b\" / \"c\" / \"---\" is blockquote@0:0-1:1 plus heading(2-3)). A LIST never gives one up: \"- a\" / \"b\" / \"---\" absorbs b and leaves the --- a thematic break. And when the underline is itself the lazy line the marker decides: --- is a thematic break, === is absorbed as content. We currently invert both halves - no heading for a quote, a heading for a list."
+      "triage": "match"
     },
     "probe/lazy-setext/quote-blank-then-underline": {
       "id": "probe/lazy-setext/quote-blank-then-underline",
@@ -64146,8 +64140,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Measured by probe/lazy-setext/*, 14 probes. A blockquote or callout gives up its LAST lazy line to a setext underline: \"> a\" / \"b\" / \"---\" is blockquote(line 0) plus heading(1-2). With two lazy lines the earlier one stays in the quote (\"> a\" / \"b\" / \"c\" / \"---\" is blockquote@0:0-1:1 plus heading(2-3)). A LIST never gives one up: \"- a\" / \"b\" / \"---\" absorbs b and leaves the --- a thematic break. And when the underline is itself the lazy line the marker decides: --- is a thematic break, === is absorbed as content. We currently invert both halves - no heading for a quote, a heading for a list."
+      "triage": "match"
     },
     "probe/lazy-setext/callout-underline-is-lazy": {
       "id": "probe/lazy-setext/callout-underline-is-lazy",
@@ -64257,8 +64250,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Measured by probe/lazy-setext/*, 14 probes. A blockquote or callout gives up its LAST lazy line to a setext underline: \"> a\" / \"b\" / \"---\" is blockquote(line 0) plus heading(1-2). With two lazy lines the earlier one stays in the quote (\"> a\" / \"b\" / \"c\" / \"---\" is blockquote@0:0-1:1 plus heading(2-3)). A LIST never gives one up: \"- a\" / \"b\" / \"---\" absorbs b and leaves the --- a thematic break. And when the underline is itself the lazy line the marker decides: --- is a thematic break, === is absorbed as content. We currently invert both halves - no heading for a quote, a heading for a list."
+      "triage": "match"
     },
     "probe/lazy-setext/list-lazy-dash": {
       "id": "probe/lazy-setext/list-lazy-dash",
@@ -103928,8 +103920,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/setext-headings/94": {
       "id": "commonmark/setext-headings/94",

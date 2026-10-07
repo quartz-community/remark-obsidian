@@ -74,6 +74,7 @@ import {
 import { footnoteLabelTransform } from "./lib/footnote-label.js";
 import { tableInterruptTransform } from "./lib/table-interrupt.js";
 import { containerSetextTransform } from "./lib/container-setext.js";
+import { lazySetextTransform } from "./lib/lazy-setext.js";
 import { thematicBreakTabTransform } from "./lib/thematic-break-tab.js";
 import { labelPrecedenceTransform } from "./lib/label-precedence.js";
 import { setextDefinitionTransform } from "./lib/setext-definition.js";
@@ -556,6 +557,10 @@ export default function remarkObsidian(
       );
     }
     thematicBreakTabTransform(tree, String(file));
+    // Before `containerSetextTransform`: that pass rebuilds a two-line container
+    // paragraph in place, and the lazy line has to leave first or it folds into a
+    // heading inside the quote instead of one at root.
+    lazySetextTransform(tree, String(file), (markdown) => self.parse(markdown));
     containerSetextTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
