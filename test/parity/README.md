@@ -824,6 +824,50 @@ Definition spans are the open ground, now ~810 across two families:
   pattern-matched corpus data has already produced a wrong answer once, which is
   why the `%%` rules in `corpus.ts` are recorded instead.
 
+## A container cannot be overridden the way a text construct can
+
+Five cases closed by replacing micromark's `list` container, and the reason it had to be
+replaced _whole_ is worth keeping, because the cheaper shape that works elsewhere in this
+package does not work here.
+
+`legacyCodeSpans` and `legacyAutolinks` both prepend a construct that handles the cases
+Obsidian reads differently and declines the rest -- and one of them goes further, consuming
+its trigger character as **data** so the stock construct never sees it. Neither shape
+transfers to a container:
+
+- A container owns its own continuation. Once stock `list` opens an item, every later line
+  is handed to **that construct's** `continuation` directly, not to the registered
+  `document` map, and its `notInCurrentItem` retries stock `list` by direct reference. A
+  declining construct therefore never sees the second item of a list stock opened.
+- So the custom construct has to accept ordinary lists too, and the single structural edit
+  in the port is that recursive retry: point it at the copy, or every divergence applies
+  to the first item only.
+- Repairing the tree afterwards is worse, not merely different. `lineOffsets` is populated
+  from `listItemPrefix` and `listItemIndent` token exits, which happen **before** any
+  transform runs, so synthesised list items would need a parallel set of hand-maintained
+  offsets -- and a wrong offset is worse than a missing one.
+- Mutating the exported construct object reaches every processor in the process, not just
+  ours.
+
+The procedure mattered as much as the route. **The vendored copy landed unchanged first**
+and had to measure exactly 0 gains and 0 regressions before any semantics moved; that is
+what distinguishes "the registration works and the copy is faithful" from "the extension
+is silently not registered", which a neutral result looks identical to otherwise. Only
+then did the digit ceiling come out -- and because it changed behaviour, it doubled as the
+liveness check the neutral measurement could not provide.
+
+Two corrections fell out. `)` was not a second divergence: micromark already accepts it,
+and the nine-digit cap was the whole story for both long-marker cases. And
+`commonmark/lists/313` was scheduled as a separate experiment on the assumption that an
+under-indented continuation across blank lines needed legacy's whole-item minimum-indent
+scan; the relative sibling-indent cap covered it.
+
+What remains is genuinely harder, and both halves were predicted before the work started:
+a tab-indented sibling, where `containerState.size` counts **characters** while
+`factorySpace` consumes **columns** so `⇥ ` is two of one and five of the other; and an
+under-indented continuation, which needs legacy's whole-item minimum-indent scan rather
+than a different limit.
+
 ## The legacy stack is an arbiter, not an oracle
 
 Obsidian runs a **fork** of `remark-parse@8`, so a local install of
