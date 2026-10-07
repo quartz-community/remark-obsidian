@@ -68311,8 +68311,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Label precedence. A footnote label and a link label are the same mechanism, not two: `[^[a]]` is a reference to Obsidian while `[^[note]](url)` is a *link* whose label holds an inline footnote -- the discriminator is whether the outer link succeeds. So the footnote half cannot be closed on its own, and both wait on balanced-bracket label scanning."
+      "triage": "match",
+      "note": "Fixed by retractLinks: a ] inside a code span, html attribute, math span or comment closes the label to Obsidian, so the link either shrinks to that label or does not form at all."
     },
     "probe/bracket-nest/label-autolink-closer": {
       "id": "probe/bracket-nest/label-autolink-closer",
@@ -68359,8 +68359,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Label precedence. A footnote label and a link label are the same mechanism, not two: `[^[a]]` is a reference to Obsidian while `[^[note]](url)` is a *link* whose label holds an inline footnote -- the discriminator is whether the outer link succeeds. So the footnote half cannot be closed on its own, and both wait on balanced-bracket label scanning."
+      "triage": "match",
+      "note": "Fixed by retractLinks: a ] inside a code span, html attribute, math span or comment closes the label to Obsidian, so the link either shrinks to that label or does not form at all."
     },
     "probe/bracket-nest/label-html-closer": {
       "id": "probe/bracket-nest/label-html-closer",
@@ -68407,8 +68407,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Label precedence. A footnote label and a link label are the same mechanism, not two: `[^[a]]` is a reference to Obsidian while `[^[note]](url)` is a *link* whose label holds an inline footnote -- the discriminator is whether the outer link succeeds. So the footnote half cannot be closed on its own, and both wait on balanced-bracket label scanning."
+      "triage": "match",
+      "note": "Fixed by retractLinks: a ] inside a code span, html attribute, math span or comment closes the label to Obsidian, so the link either shrinks to that label or does not form at all."
     },
     "probe/bracket-nest/label-math-closer": {
       "id": "probe/bracket-nest/label-math-closer",
@@ -68455,8 +68455,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Label precedence. A footnote label and a link label are the same mechanism, not two: `[^[a]]` is a reference to Obsidian while `[^[note]](url)` is a *link* whose label holds an inline footnote -- the discriminator is whether the outer link succeeds. So the footnote half cannot be closed on its own, and both wait on balanced-bracket label scanning."
+      "triage": "match",
+      "note": "Fixed by retractLinks: a ] inside a code span, html attribute, math span or comment closes the label to Obsidian, so the link either shrinks to that label or does not form at all."
     },
     "probe/bracket-nest/label-comment-closer": {
       "id": "probe/bracket-nest/label-comment-closer",
@@ -68503,8 +68503,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Label precedence. A footnote label and a link label are the same mechanism, not two: `[^[a]]` is a reference to Obsidian while `[^[note]](url)` is a *link* whose label holds an inline footnote -- the discriminator is whether the outer link succeeds. So the footnote half cannot be closed on its own, and both wait on balanced-bracket label scanning."
+      "triage": "match",
+      "note": "Fixed by retractLinks: a ] inside a code span, html attribute, math span or comment closes the label to Obsidian, so the link either shrinks to that label or does not form at all."
     },
     "probe/bracket-nest/label-escaped-close": {
       "id": "probe/bracket-nest/label-escaped-close",

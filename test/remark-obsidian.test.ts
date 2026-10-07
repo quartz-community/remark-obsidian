@@ -2767,3 +2767,41 @@ describe("label precedence", () => {
     });
   });
 });
+
+describe("label retraction", () => {
+  const read = (md: string) => {
+    const tree = processWithGfm(md) as any;
+    const txt: string[] = [];
+    const urls: string[] = [];
+    visit(tree, (n: any) => {
+      if (n.type === "text") txt.push(n.value);
+      if (n.type === "link") urls.push(n.url);
+    });
+    return { text: txt.join(""), urls };
+  };
+
+  /**
+   * CommonMark lets a code span own a `]` and carries the label past it. Obsidian's
+   * scan looks inside nothing, so that `]` closes the label -- and a backtick then
+   * follows it, which opens no link.
+   */
+  it("forms no link when the label closes inside a construct", () => {
+    expect(read("[a`]`b](u)\n").urls).toEqual([]);
+    expect(read("[a$x]y$b](u)\n").urls).toEqual([]);
+    expect(read('[a<i x="]">b](u)\n').urls).toEqual([]);
+  });
+
+  /** The same comparison, where a destination *does* follow the raw close. */
+  it("shrinks the link to the label raw scanning allows", () => {
+    expect(read("[foo`](u)`\n").urls).toEqual(["u"]);
+  });
+
+  /**
+   * An angle destination may hold unbalanced parens, so the label close cannot be
+   * found by counting delimiters back from the tail -- doing that put it inside the
+   * destination and demoted CommonMark's own example 499.
+   */
+  it("keeps a link whose angle destination holds unbalanced parens", () => {
+    expect(read("[link](<foo(and(bar)>)\n").urls).toEqual(["foo(and(bar)"]);
+  });
+});

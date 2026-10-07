@@ -56,6 +56,14 @@ function inlineDestination(
   offset: number,
 ): { url: string; end: number } | undefined {
   if (source[offset] !== "(") return undefined;
+  // An angle-bracket destination may hold unbalanced parens -- `(<foo(and(bar)>)`
+  // is CommonMark's own example 499 -- so counting them is wrong there.
+  if (source[offset + 1] === "<") {
+    const close = source.indexOf(">", offset + 2);
+    if (close === -1 || source[close + 1] !== ")") return undefined;
+    if (source.slice(offset, close).includes("\n")) return undefined;
+    return { url: source.slice(offset + 2, close), end: close + 2 };
+  }
   let depth = 0;
   for (let index = offset; index < source.length; index++) {
     const character = source[index];
@@ -126,6 +134,125 @@ function demoteLinks(nodes: RootContent[], source: string): void {
  * Off by default. 369 of this corpus's cases hold a nested bracket pair, and the
  * option exists so that blast radius is measured rather than estimated.
  */
+/**
+ * The offset of the `]` that closed this link's label.
+ *
+ * Found by asking which `]` yields a destination ending exactly where the link
+ * does, rather than by counting delimiters backwards from the tail -- an angle
+ * destination can hold unbalanced parens, and counting them put the label close
+ * *inside* the destination and demoted a perfectly good link.
+ */
+function labelCloseOf(source: string, start: number, end: number): number {
+  for (let index = start + 1; index < end; index++) {
+    if (source[index] === "\\") {
+      index++;
+      continue;
+    }
+    if (source[index] !== "]") continue;
+    if (inlineDestination(source, index + 1)?.end === end) return index;
+    if (source[index + 1] === "[" && source[end - 1] === "]") return index;
+  }
+  return -1;
+}
+
+/** Where raw bracket counting from `open` puts the matching `]`. */
+function rawCloseFrom(source: string, open: number, limit: number): number {
+  let depth = 0;
+  for (let index = open; index < limit; index++) {
+    const character = source[index];
+    if (character === "\\") {
+      index++;
+      continue;
+    }
+    if (character === "[") depth++;
+    else if (character === "]") {
+      depth--;
+      if (depth === 0) return index;
+    }
+  }
+  return -1;
+}
+
+/**
+ * Cut a link back to the label raw scanning allows, or remove it entirely.
+ *
+ * CommonMark lets a code span, an html attribute, a math span or a comment own a
+ * `]` and carries the label past it. Obsidian's scan does not look inside anything,
+ * so that `]` closes the label -- and what follows is usually not `(`, which means
+ * no link at all:
+ *
+ *     [a`]`b](u)      entirely literal: the label is `` a` `` and a backtick follows
+ *     [foo`](u)`      a link to `u` labelled `` foo` ``, with a backtick left over
+ *
+ * Same comparison either way: where the tree's label runs past the raw close, the
+ * link is rebuilt if a destination follows that close and demoted if not.
+ */
+function retractLinks(
+  paragraph: Paragraph,
+  source: string,
+  reparse: (markdown: string) => Root,
+): boolean {
+  let changed = false;
+
+  const walk = (nodes: RootContent[]): void => {
+    for (let index = 0; index < nodes.length; index++) {
+      const child = nodes[index]!;
+      const kids = (child as unknown as { children?: RootContent[] }).children;
+      if (child.type !== "link") {
+        if (Array.isArray(kids)) walk(kids);
+        continue;
+      }
+      const start = (child as Positioned).position?.start?.offset;
+      const end = (child as Positioned).position?.end?.offset;
+      if (start === undefined || end === undefined) continue;
+      if (source[start] !== "[") continue;
+
+      const treeClose = labelCloseOf(source, start, end);
+      const rawClose = rawCloseFrom(source, start, end);
+      if (treeClose === -1 || rawClose === -1 || rawClose >= treeClose) {
+        if (Array.isArray(kids)) walk(kids);
+        continue;
+      }
+
+      const after = inlineDestination(source, rawClose + 1);
+      if (!after) {
+        nodes[index] = text(source.slice(start, end), start, end);
+        changed = true;
+        continue;
+      }
+
+      const inner = reparse(source.slice(start + 1, rawClose));
+      const body = inner.children[0];
+      const children =
+        body?.type === "paragraph" ? (body.children as RootContent[]) : [];
+      shiftAll(children, start + 1);
+      demoteLinks(children, source);
+      nodes[index] = {
+        type: "link",
+        url: after.url,
+        title: null,
+        children: children as Link["children"],
+        position: {
+          start: { line: 0, column: 1, offset: start },
+          end: { line: 0, column: 1, offset: after.end },
+        },
+      } as Link;
+      if (after.end < end) {
+        nodes.splice(
+          index + 1,
+          0,
+          text(source.slice(after.end, end), after.end, end),
+        );
+        index++;
+      }
+      changed = true;
+    }
+  };
+
+  walk(paragraph.children as RootContent[]);
+  return changed;
+}
+
 export function labelPrecedenceTransform(
   tree: Root,
   source: string,
@@ -183,9 +310,13 @@ export function labelPrecedenceTransform(
       changed = true;
     }
 
-    if (!changed) return;
-    if (cursor < to) rebuilt.push(text(source.slice(cursor, to), cursor, to));
-    paragraph.children = rebuilt as Paragraph["children"];
+    if (changed) {
+      if (cursor < to) rebuilt.push(text(source.slice(cursor, to), cursor, to));
+      paragraph.children = rebuilt as Paragraph["children"];
+      return;
+    }
+
+    retractLinks(paragraph, source, reparse);
   });
 }
 
