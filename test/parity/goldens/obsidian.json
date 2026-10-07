@@ -33060,8 +33060,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/setext/2": {
       "id": "fuzz/setext/2",
@@ -33754,8 +33753,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/14": {
       "id": "fuzz/embed/14",
@@ -36966,8 +36964,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/math/5": {
       "id": "fuzz/math/5",
@@ -106643,8 +106640,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/html-blocks/157": {
       "id": "commonmark/html-blocks/157",
@@ -106691,8 +106687,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/html-blocks/158": {
       "id": "commonmark/html-blocks/158",
@@ -106739,8 +106734,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/html-blocks/159": {
       "id": "commonmark/html-blocks/159",

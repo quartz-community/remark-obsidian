@@ -298,8 +298,20 @@ export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
         // than separated: `a<br>b` reads `ab`, and `~~<br>~~` reads `~~~~`.
         // Replacing one with a space invented a word boundary the DOM has no
         // equivalent for.
+        //
+        // The second pattern is the *unterminated* tag, which the first cannot
+        // reach: `<[^>]*>` needs a `>` to anchor on and an unclosed tag has none,
+        // so `<div class` / `foo` kept its whole raw source as visible text. An
+        // HTML tokenizer that hits end-of-input mid-tag emits nothing at all, so
+        // the browser drops it along with everything it swallowed -- the same
+        // reasoning the comment pattern above already applies with its `|$`.
+        //
+        // A tag start is `<` plus a letter, `/`, `!` or `?`; a bare `<` followed
+        // by anything else is literal text in the DOM and has to stay.
         parts.push(
-          `${decodeEntities(raw.replace(/<[^>]*>/g, ""))}${phrasing ? "" : " "}`,
+          `${decodeEntities(
+            raw.replace(/<[^>]*>/g, "").replace(/<[a-zA-Z/!?][^>]*$/, ""),
+          )}${phrasing ? "" : " "}`,
         );
         return;
       }
