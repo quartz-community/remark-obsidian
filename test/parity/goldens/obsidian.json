@@ -53852,7 +53852,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Obsidian has no 9-digit cap on an ordered list marker: remark-parse@8 parses 12345678901. as a list with start=12345678901, and the golden reports list@0:0-1:13 with two items for \"1) a\" / \"1234567890) b\". CommonMark caps at 9 digits and micromark enforces it inside the list CONTAINER construct, which cannot be reached by prepending (a container owns continuation, so overriding means porting it whole). A tree transform would have to both create a list and append an item to a preceding one. 2 cases; recorded rather than implemented."
+      "note": "9-digit cap plus the `)` delimiter. obsidian: list@0:0-1:13, 2 items, text \"a b\". Stock remark-parse 8 lacks `)` so the arbiter cannot adjudicate this one; the golden is unambiguous. Obsidian list container divergence family (7 replicate cases). Obsidian runs remark-parse@8 fork; the arbiter agrees with Obsidian on every case in this family. Three CommonMark divergences, all inside micromark list container: (1) no 9-digit cap on an ordered marker, (2) `)` is a valid ordered delimiter, (3) indent handling is far more permissive - a staircase of 1-space increments stays FLAT rather than nesting, and 4+ spaces of relative indent does not become indented code. Blocked on route: list is a CONTAINER owning continuation via containerState, so it cannot be overridden by a declining prepended construct the way a text construct can, and a tree transform would have to synthesise listItems micromark never tokenized (positions feed sections, and listItems feed the compute oracle)."
     },
     "list/tight-to-loose": {
       "id": "list/tight-to-loose",
@@ -53955,7 +53955,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "note": "Permissive indent. arbiter: flat list, 4 items. obsidian: list@0:0-3:7, 4 items, text \"a b c d\". We give 3 items and leave \"- d\" as text. Obsidian list container divergence family (7 replicate cases). Obsidian runs remark-parse@8 fork; the arbiter agrees with Obsidian on every case in this family. Three CommonMark divergences, all inside micromark list container: (1) no 9-digit cap on an ordered marker, (2) `)` is a valid ordered delimiter, (3) indent handling is far more permissive - a staircase of 1-space increments stays FLAT rather than nesting, and 4+ spaces of relative indent does not become indented code. Blocked on route: list is a CONTAINER owning continuation via containerState, so it cannot be overridden by a declining prepended construct the way a text construct can, and a tree transform would have to synthesise listItems micromark never tokenized (positions feed sections, and listItems feed the compute oracle)."
     },
     "list/fence-interruption": {
       "id": "list/fence-interruption",
@@ -99235,7 +99235,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "Permissive indent with a tab. arbiter: list(1 item) + nested list(2 items). obsidian: list@0:0-2:7, 3 items, text \"foo bar baz\". Obsidian list container divergence family (7 replicate cases). Obsidian runs remark-parse@8 fork; the arbiter agrees with Obsidian on every case in this family. Three CommonMark divergences, all inside micromark list container: (1) no 9-digit cap on an ordered marker, (2) `)` is a valid ordered delimiter, (3) indent handling is far more permissive - a staircase of 1-space increments stays FLAT rather than nesting, and 4+ spaces of relative indent does not become indented code. Blocked on route: list is a CONTAINER owning continuation via containerState, so it cannot be overridden by a declining prepended construct the way a text construct can, and a tree transform would have to synthesise listItems micromark never tokenized (positions feed sections, and listItems feed the compute oracle)."
     },
     "commonmark/tabs/10": {
       "id": "commonmark/tabs/10",
@@ -111778,7 +111778,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "Permissive indent across a blank line. arbiter: list(1 item) holding p(one) and p(two). obsidian: list@0:0-2:8, 1 item, text \"one two\". We produce a code block. Obsidian list container divergence family (7 replicate cases). Obsidian runs remark-parse@8 fork; the arbiter agrees with Obsidian on every case in this family. Three CommonMark divergences, all inside micromark list container: (1) no 9-digit cap on an ordered marker, (2) `)` is a valid ordered delimiter, (3) indent handling is far more permissive - a staircase of 1-space increments stays FLAT rather than nesting, and 4+ spaces of relative indent does not become indented code. Blocked on route: list is a CONTAINER owning continuation via containerState, so it cannot be overridden by a declining prepended construct the way a text construct can, and a tree transform would have to synthesise listItems micromark never tokenized (positions feed sections, and listItems feed the compute oracle)."
     },
     "commonmark/list-items/258": {
       "id": "commonmark/list-items/258",
@@ -112223,7 +112223,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Obsidian has no 9-digit cap on an ordered list marker: remark-parse@8 parses 12345678901. as a list with start=12345678901, and the golden reports list@0:0-1:13 with two items for \"1) a\" / \"1234567890) b\". CommonMark caps at 9 digits and micromark enforces it inside the list CONTAINER construct, which cannot be reached by prepending (a container owns continuation, so overriding means porting it whole). A tree transform would have to both create a list and append an item to a preceding one. 2 cases; recorded rather than implemented."
+      "note": "9-digit cap. arbiter: list(ordered,start=1234567890,1 item). obsidian: list@0:0-0:18, 1 item, text \"not ok\". Obsidian list container divergence family (7 replicate cases). Obsidian runs remark-parse@8 fork; the arbiter agrees with Obsidian on every case in this family. Three CommonMark divergences, all inside micromark list container: (1) no 9-digit cap on an ordered marker, (2) `)` is a valid ordered delimiter, (3) indent handling is far more permissive - a staircase of 1-space increments stays FLAT rather than nesting, and 4+ spaces of relative indent does not become indented code. Blocked on route: list is a CONTAINER owning continuation via containerState, so it cannot be overridden by a declining prepended construct the way a text construct can, and a tree transform would have to synthesise listItems micromark never tokenized (positions feed sections, and listItems feed the compute oracle)."
     },
     "commonmark/list-items/267": {
       "id": "commonmark/list-items/267",
@@ -114550,7 +114550,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "Permissive indent. arbiter: flat list, 5 items. obsidian: list@0:0-4:7, 5 items, text \"a b c d e\". We give 4 items and leave \"- e\" as text. Obsidian list container divergence family (7 replicate cases). Obsidian runs remark-parse@8 fork; the arbiter agrees with Obsidian on every case in this family. Three CommonMark divergences, all inside micromark list container: (1) no 9-digit cap on an ordered marker, (2) `)` is a valid ordered delimiter, (3) indent handling is far more permissive - a staircase of 1-space increments stays FLAT rather than nesting, and 4+ spaces of relative indent does not become indented code. Blocked on route: list is a CONTAINER owning continuation via containerState, so it cannot be overridden by a declining prepended construct the way a text construct can, and a tree transform would have to synthesise listItems micromark never tokenized (positions feed sections, and listItems feed the compute oracle)."
     },
     "commonmark/lists/313": {
       "id": "commonmark/lists/313",
@@ -114602,7 +114602,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "Permissive indent across blank lines. arbiter: list(ordered,start=1,3 items). obsidian: list@0:0-4:8, 3 items, text \"a b c\". We produce a code block. Obsidian list container divergence family (7 replicate cases). Obsidian runs remark-parse@8 fork; the arbiter agrees with Obsidian on every case in this family. Three CommonMark divergences, all inside micromark list container: (1) no 9-digit cap on an ordered marker, (2) `)` is a valid ordered delimiter, (3) indent handling is far more permissive - a staircase of 1-space increments stays FLAT rather than nesting, and 4+ spaces of relative indent does not become indented code. Blocked on route: list is a CONTAINER owning continuation via containerState, so it cannot be overridden by a declining prepended construct the way a text construct can, and a tree transform would have to synthesise listItems micromark never tokenized (positions feed sections, and listItems feed the compute oracle)."
     },
     "commonmark/lists/314": {
       "id": "commonmark/lists/314",
