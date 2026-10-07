@@ -901,6 +901,36 @@ function adjacentBlockFollows(
   return !source.slice(here, next).includes("\n\n");
 }
 
+/** Inline wrappers an identifier scan reads straight through. */
+const ID_WRAPPERS = new Set(["emphasis", "strong", "delete", "highlight"]);
+
+/**
+ * The node actually holding a trailing identifier, descending through wrappers.
+ *
+ * Returns the children array to read the last text from, plus the chain of
+ * wrappers walked, innermost first, so an emptied one can be pruned afterwards.
+ */
+function trailingIdHost(inner: Node[]):
+  | {
+      inner: Node[];
+      chain: { node: Node; parent: Node[]; index: number }[];
+    }
+  | undefined {
+  const chain: { node: Node; parent: Node[]; index: number }[] = [];
+  let kids = inner;
+  for (let depth = 0; depth < 4; depth++) {
+    const last = kids[kids.length - 1];
+    if (!last) return undefined;
+    if (last.type === "text") return { inner: kids, chain };
+    if (!ID_WRAPPERS.has(last.type)) return undefined;
+    const next = (last as ParentNode).children;
+    if (!Array.isArray(next)) return undefined;
+    chain.unshift({ node: last, parent: kids, index: kids.length - 1 });
+    kids = next;
+  }
+  return undefined;
+}
+
 function stripBlockIds(tree: Root, source: string): Root {
   visit(tree, (node: Node) => {
     const parent = node as Partial<{ children: Node[] }>;
@@ -911,7 +941,14 @@ function stripBlockIds(tree: Root, source: string): Root {
       // A heading carries one as readily as a paragraph: `## Heading ^id`.
       if (child.type !== "paragraph" && child.type !== "heading") continue;
       const inner = (child as ParentNode).children;
-      const last = inner[inner.length - 1];
+      // Through a trailing inline wrapper, because the identifier is recognised
+      // from the raw line and emphasis around it is invisible to that scan:
+      // `*^blk*` renders nothing, `x *^blk*` renders `x`, and `*x ^blk*` renders
+      // `x` with the emphasis kept. A code span or a math span *does* shield one --
+      // `` `^blk` `` and `$^blk$` keep their text -- so those are not descended.
+      const host = trailingIdHost(inner);
+      if (!host) continue;
+      const last = host.inner[host.inner.length - 1];
       if (!last || last.type !== "text") continue;
       const value = (last as ValueNode).value;
 
@@ -929,6 +966,10 @@ function stripBlockIds(tree: Root, source: string): Root {
       if (
         child.type === "paragraph" &&
         inner.length === 1 &&
+        // Only an *unwrapped* identifier takes the paragraph with it. `*^blk*`
+        // keeps its paragraph and its emphasis, reported as an `em:` with no
+        // content, so dropping the block here cost six cases on `sections`.
+        host.chain.length === 0 &&
         ONLY_BLOCK_ID.test(value) &&
         (child as { position?: { start?: { column?: number } } }).position
           ?.start?.column === 1 &&
@@ -940,10 +981,25 @@ function stripBlockIds(tree: Root, source: string): Root {
       // Not when a space follows the identifier. `text ^blk ` keeps its `^blk` to
       // Obsidian and records no identifier at all, so stripping it dropped text the
       // source still holds.
+      // Only for an unwrapped identifier. `text ^blk ` keeps its `^blk` because the
+      // space sits straight after the identifier, but in `*^blk* ` the `*` does, and
+      // Obsidian strips that one -- so the closing marker is what the scan sees, not
+      // the whitespace beyond it.
       const end = pointOf(child, "end");
-      if (end !== undefined && /[ \t]/u.test(source[end - 1] ?? "")) continue;
+      if (
+        host.chain.length === 0 &&
+        end !== undefined &&
+        /[ \t]/u.test(source[end - 1] ?? "")
+      ) {
+        continue;
+      }
       const match = TRAILING_BLOCK_ID.exec(value);
-      if (match) (last as ValueNode).value = value.slice(0, match.index);
+      if (!match) continue;
+      (last as ValueNode).value = value.slice(0, match.index);
+      // The emptied wrapper stays. Obsidian still reports an emphasis for
+      // `*^blk*` -- an `em:` with no content -- and still reports the paragraph
+      // section, so pruning it cost nine cases on `sections` and `emphasis` while
+      // the text was already right.
     }
   });
 
@@ -1162,16 +1218,38 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       lineEnd === -1 ? source.length : lineEnd,
     );
     const raw = full.replace(/\r?\n[ \t]*(?:>[ \t]*)*[=-]+[ \t]*$/u, "");
-    const id = /\^([A-Za-z0-9-]+)$/u.exec(raw);
+    // Trailing inline markers are allowed between the identifier and the end of
+    // the line: `*^blk*` registers the block `blk`, as do `==^blk==` and
+    // `~~^blk~~`. The identifier is read from the raw line, so emphasis around it
+    // is invisible to the scan -- which `stripBlockIds` now mirrors.
+    //
+    // Whitespace may follow those markers but never the identifier itself. That is
+    // the whole difference between `*^blk* `, which registers, and `text ^blk `,
+    // which registers nothing.
+    const id = /\^([A-Za-z0-9-]+)(?:[*_=~]+[ \t]*)?$/u.exec(raw);
     if (!id) continue;
     // The caret must follow whitespace. Without that `$x^2` reports the block
     // `2`, `[^1` reports `1` and `[[a#^blk` reports `blk` -- six false
     // identifiers in the corpus, all of them a caret inside another construct.
     // A setext heading is the measured exception: `^blk` over `---` registers
     // from column zero, where the same line alone registers nothing.
-    const before = raw[id.index - 1];
+    // ...and before it, for the same reason. The caret must still not sit inside
+    // another construct, which is what this guard is for: `$x^2`, `[^1` and
+    // `[[a#^blk` would otherwise report six false identifiers.
+    const opener = /[*_=~]+$/u.exec(raw.slice(0, id.index));
+    const beforeAt = id.index - (opener?.[0].length ?? 0);
+    const before = raw[beforeAt - 1];
     const setext = raw !== full;
-    if (!(setext && id.index === 0) && !(before && /\s/u.test(before))) {
+    // A wrapper counts as something preceding the caret, which is what separates
+    // `*^blk*` from a bare `^blk`. Only a line that is *exactly* an identifier
+    // registers nothing -- a leading space is enough to make ` ^blk` register, so
+    // the exclusion is narrow and the wrapper falls outside it.
+    const wrapped = opener !== null;
+    if (
+      !(setext && beforeAt === 0) &&
+      !wrapped &&
+      !(before && /\s/u.test(before))
+    ) {
       continue;
     }
     blocks.push(

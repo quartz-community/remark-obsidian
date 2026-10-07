@@ -1729,6 +1729,36 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // Enumerated rather than inferred: container x how many lazy lines x which line
   // carries the underline. The `===`/`---` pair is kept because only `---` is also
   // a thematic break, which is the likeliest source of the asymmetry.
+  // Is a block identifier still one when an inline construct wraps it?
+  //
+  // Nineteen `probe/block-id*` cases settle where an identifier is recognised and
+  // all nineteen match -- but exactly **one** of them puts the `^id` inside an
+  // inline construct, and the sweep reduced five independent failures onto that
+  // shape: `*^blk*`, `> _^blk_`, `> *^blk* `, `lk *^blk*` and `1. ==^blk==`.
+  // Second under-sampled axis found the same way as `probe/quote-html/*`.
+  //
+  // The question is whether the wrapper hides the identifier. A `^id` is recognised
+  // from the raw line, so emphasis around it may be invisible to that scan or may
+  // cancel it -- and the recorded rule that a *trailing space* cancels one says the
+  // scan is strict about what follows, which cuts both ways here.
+  //
+  // Controls included: an identifier outside the construct, and one with content
+  // beside it, both of which the existing probes already fix.
+  ["probe/block-id-inline/emphasis-wraps", "*^blk*\n"],
+  ["probe/block-id-inline/underscore-wraps", "_^blk_\n"],
+  ["probe/block-id-inline/strong-wraps", "**^blk**\n"],
+  ["probe/block-id-inline/highlight-wraps", "==^blk==\n"],
+  ["probe/block-id-inline/strike-wraps", "~~^blk~~\n"],
+  ["probe/block-id-inline/code-wraps", "`^blk`\n"],
+  ["probe/block-id-inline/math-wraps", "$^blk$\n"],
+  ["probe/block-id-inline/text-then-wrapped", "x *^blk*\n"],
+  ["probe/block-id-inline/content-beside-inside", "*x ^blk*\n"],
+  ["probe/block-id-inline/outside-after-emphasis", "*x* ^blk\n"],
+  ["probe/block-id-inline/in-quote", "> *^blk*\n"],
+  ["probe/block-id-inline/in-list", "1. ==^blk==\n"],
+  ["probe/block-id-inline/wrapped-trailing-space", "*^blk* \n"],
+  ["probe/block-id-inline/wrapped-then-block", "*^blk*\nnext\n"],
+
   // Does a quote absorb raw html at column zero, as a list does?
   //
   // `containerLazyTransform` documents the rule for a list and for a paragraph --

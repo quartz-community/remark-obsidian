@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-07T19:54:42.072Z",
+  "recordedAt": "2026-10-07T20:16:42.434Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -63742,6 +63742,718 @@
         }
       },
       "triage": "match"
+    },
+    "probe/block-id-inline/emphasis-wraps": {
+      "id": "probe/block-id-inline/emphasis-wraps",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "*^blk*\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><em></em></p>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "*^blk*"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:6"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-inline/underscore-wraps": {
+      "id": "probe/block-id-inline/underscore-wraps",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "_^blk_\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><em></em></p>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "_^blk_"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:6"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-inline/strong-wraps": {
+      "id": "probe/block-id-inline/strong-wraps",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "**^blk**\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><strong></strong></p>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "strong:"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "**^blk**"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:8"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-inline/highlight-wraps": {
+      "id": "probe/block-id-inline/highlight-wraps",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "==^blk==\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><mark data-highlight=\"\"></mark></p>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            ""
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "==^blk=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:8"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-inline/strike-wraps": {
+      "id": "probe/block-id-inline/strike-wraps",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "~~^blk~~\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><del></del></p>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "~~^blk~~"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:8"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-inline/code-wraps": {
+      "id": "probe/block-id-inline/code-wraps",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "`^blk`\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><code>^blk</code></p>",
+        "projections": {
+          "text": "^blk",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "`^blk`"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-inline/math-wraps": {
+      "id": "probe/block-id-inline/math-wraps",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "$^blk$\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"^blk\" class=\"TEX-N\"><mjx-msup data-latex=\"^b\"><mjx-mi></mjx-mi><mjx-script style=\"vertical-align: 0.363em;\"><mjx-mi size=\"s\" data-latex=\"b\"><mjx-c class=\"mjx-c1D44F\">𝑏</mjx-c></mjx-mi></mjx-script></mjx-msup><mjx-mi data-latex=\"l\"><mjx-c class=\"mjx-c1D459\">𝑙</mjx-c></mjx-mi><mjx-mi data-latex=\"k\"><mjx-c class=\"mjx-c1D458\">𝑘</mjx-c></mjx-mi></mjx-math></mjx-container></span></p>",
+        "projections": {
+          "text": "⟨math⟩",
+          "math": [
+            {
+              "display": false,
+              "tex": "^blk"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "$^blk$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-inline/text-then-wrapped": {
+      "id": "probe/block-id-inline/text-then-wrapped",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "x *^blk*\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">x <em></em></p>",
+        "projections": {
+          "text": "x",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "x *^blk*"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:8"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-inline/content-beside-inside": {
+      "id": "probe/block-id-inline/content-beside-inside",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "*x ^blk*\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><em>x </em></p>",
+        "projections": {
+          "text": "x",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:x"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "*x ^blk*"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:8"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-inline/outside-after-emphasis": {
+      "id": "probe/block-id-inline/outside-after-emphasis",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "*x* ^blk\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><em>x</em> </p>",
+        "projections": {
+          "text": "x",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:x"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "*x* ^blk"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:8"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-inline/in-quote": {
+      "id": "probe/block-id-inline/in-quote",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> *^blk*\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p><em></em></p>\n</blockquote>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:"
+          ],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> *^blk*"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:8"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-inline/in-list": {
+      "id": "probe/block-id-inline/in-list",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "1. ==^blk==\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\"><mark data-highlight=\"\"></mark></li>\n</ol>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [
+            ""
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1. ==^blk=="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:11"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:11"
+          ],
+          "blocks": [
+            "blk@0:0-0:11"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-inline/wrapped-trailing-space": {
+      "id": "probe/block-id-inline/wrapped-trailing-space",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "*^blk* \n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><em></em> </p>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "*^blk* "
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:7"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-inline/wrapped-then-block": {
+      "id": "probe/block-id-inline/wrapped-then-block",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "*^blk*\nnext\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><em></em><br>\nnext</p>",
+        "projections": {
+          "text": "next",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "*^blk*\nnext"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-1:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-1:4"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "The identifier sits on the FIRST line of a multi-line paragraph, not the last: \"*^blk*\" over \"next\" is one paragraph@0:0-1:4 to Obsidian whose rendered text is just \"next\", with the emphasis still reported as an empty em:. Every other case in this family puts the identifier at the end of the block, which is where stripBlockIds looks - it reads the paragraph trailing text node and finds \"next\" there. Obsidian is evidently matching the identifier per LINE rather than per block when a wrapper is involved; the unwrapped equivalent is a separate paragraph and is handled by the adjacentBlockFollows rule instead. One case, and widening the scan from block-trailing to line-trailing without probes for the unwrapped multi-line shapes would be guessing."
     },
     "probe/quote-html/quote-close-tag": {
       "id": "probe/quote-html/quote-close-tag",
