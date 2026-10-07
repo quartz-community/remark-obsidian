@@ -1685,6 +1685,62 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/escape/comment-opener", "\\%%note%%\n"],
   ["probe/escape/in-code-span", "`a \\* b`\n"],
   ["probe/escape/in-table-cell", "| a \\| b |\n| --- |\n"],
+  // An inline construct **straddling** a boundary one of our transforms reparses.
+  //
+  // Shaped this way because the ratio-selected families are spent: five of them came
+  // back essentially perfect, while every family that did yield was about an
+  // interaction rather than a construct -- and twice over it was exactly this one. A
+  // demoted setext heading had to be reparsed *together* or the emphasis was lost;
+  // a callout title had to be reparsed *apart* or the emphasis spanned a boundary
+  // Obsidian stops at. Both were found by accident. Twenty-four passes take a
+  // reparse callback, so there are twenty-four of these boundaries and nothing has
+  // ever aimed at them.
+  //
+  // Emphasis is deliberately absent: it is the one construct already known to
+  // straddle correctly, so these use the four Obsidian-native inline constructs plus
+  // code, which shields its own content and should straddle nothing.
+  ["probe/straddle/callout-highlight", "> [!note] ==a\nb==\n"],
+  ["probe/straddle/callout-math", "> [!note] $a\nb$\n"],
+  ["probe/straddle/callout-code", "> [!note] `a\nb`\n"],
+  ["probe/straddle/callout-wikilink", "> [!note] [[a\nb]]\n"],
+  ["probe/straddle/callout-comment", "> [!note] %%a\nb%%\n"],
+  ["probe/straddle/setext-highlight", "==a\nb==\n====\n"],
+  ["probe/straddle/setext-math", "$a\nb$\n====\n"],
+  ["probe/straddle/setext-code", "`a\nb`\n====\n"],
+  ["probe/straddle/setext-wikilink", "[[a\nb]]\n====\n"],
+  ["probe/straddle/setext-comment", "%%a\nb%%\n====\n"],
+  ["probe/straddle/setext-dash-highlight", "==a\nb==\n----\n"],
+  ["probe/straddle/definition-highlight", "[^1]: ==a\nb==\n"],
+  ["probe/straddle/definition-math", "[^1]: $a\nb$\n"],
+  ["probe/straddle/definition-code", "[^1]: `a\nb`\n"],
+  ["probe/straddle/task-highlight", "- [ ] ==a\n  b==\n"],
+  ["probe/straddle/task-math", "- [ ] $a\n  b$\n"],
+  ["probe/straddle/empty-item-highlight", "-\n\n  ==a==\n"],
+  ["probe/straddle/empty-item-math", "-\n\n  $x$\n"],
+  ["probe/straddle/indent-tab-highlight", "  \t==a==\n"],
+  ["probe/straddle/indent-tab-math", "  \t$x$\n"],
+  ["probe/straddle/table-interrupt-highlight", "| a |\n| --- |\n==b\nc==\n"],
+  ["probe/straddle/table-open-highlight", "==a\n| b |\n| --- |\n"],
+  ["probe/straddle/comment-crosses-highlight", "==a %%b== c%%\n"],
+  ["probe/straddle/highlight-crosses-comment", "%%a ==b%% c==\n"],
+  ["probe/straddle/quote-code-highlight", "> ==a\n>     b==\n"],
+  ["probe/straddle/html-setext-highlight", "<br>\n==a==\n===\n"],
+  // A callout whose title line is a block, *with a body under it*. The straddle
+  // probes turned this up sideways: `> [!note] %%a` / `b%%` lost the body entirely,
+  // and the same holds for a heading or a list title. `rest` is taken as
+  // `quote.children.slice(1)` only when the lead text carries the newline, and a
+  // title that parses as a block never gets that far -- so the body is dropped.
+  //
+  // Content loss, and the quoted form is an ordinary thing to write, so what
+  // Obsidian does with each needs recording rather than reasoning about.
+  ["probe/callout-block-body/heading-lazy", "> [!note] # h\nbody\n"],
+  ["probe/callout-block-body/heading-quoted", "> [!note] # h\n> body\n"],
+  ["probe/callout-block-body/list-lazy", "> [!note] - item\nbody\n"],
+  ["probe/callout-block-body/list-quoted", "> [!note] - item\n> body\n"],
+  ["probe/callout-block-body/comment-lazy", "> [!note] %%a\nbody\n"],
+  ["probe/callout-block-body/definition-quoted", "> [!note] [^1]: d\n> body\n"],
+  ["probe/callout-block-body/heading-two-lines", "> [!note] # h\n> a\n> b\n"],
+  ["probe/callout-block-body/heading-blank-body", "> [!note] # h\n>\n> body\n"],
 ];
 
 /** Inline tokens, each crossed with a set of malformed delimiter states. */

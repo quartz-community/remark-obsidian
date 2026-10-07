@@ -2632,3 +2632,75 @@ describe("doubled bracket in a wikilink alias", () => {
     expect(links("[[[[x]]\n")).toEqual(["[x||false"]);
   });
 });
+
+describe("callout with a block title", () => {
+  const shape = (md: string) => {
+    const f = (n: any): string => {
+      const kids = (n.children ?? []).map(f).join(" ");
+      return n.type + (kids ? `(${kids})` : "");
+    };
+    return (processWithGfm(md) as any).children.map(f).join(" + ");
+  };
+
+  /**
+   * `titleLineIsBlock` reparses the title line only, and whatever followed it in the
+   * same paragraph used to go with the paragraph it replaced -- losing the body
+   * outright on input anyone might write.
+   */
+  it("keeps the body under a block title", () => {
+    expect(shape("> [!note] # h\n> body\n")).toBe(
+      "callout(calloutTitle heading(text) paragraph(text))",
+    );
+    expect(shape("> [!note] # h\nbody\n")).toBe(
+      "callout(calloutTitle heading(text) paragraph(text))",
+    );
+    expect(shape("> [!note] - item\n> body\n")).toBe(
+      "callout(calloutTitle list(listItem(paragraph(text))) paragraph(text))",
+    );
+  });
+
+  /** A body in a separate paragraph was dropped by a second, narrower bug. */
+  it("keeps a body separated by a blank quote line", () => {
+    expect(shape("> [!note] # h\n>\n> body\n")).toBe(
+      "callout(calloutTitle heading(text) paragraph(text))",
+    );
+  });
+
+  it("still handles a block title with no body", () => {
+    expect(shape("> [!note] # h\n")).toBe(
+      "callout(calloutTitle heading(text))",
+    );
+  });
+
+  it("places the empty title it creates", () => {
+    const [callout] = (processWithGfm("> [!note] # h\n") as any).children;
+    const [title] = callout.children;
+    expect(title.type).toBe("calloutTitle");
+    expect(title.position?.start?.offset).toBe(title.position?.end?.offset);
+    expect(title.position?.start?.offset).toBeTypeOf("number");
+  });
+});
+
+describe("highlight across a line ending", () => {
+  const marks = (md: string) => {
+    const found: string[] = [];
+    visit(processWithGfm(md), "highlight", (n: any) => {
+      const parts: string[] = [];
+      visit(n, "text", (t: any) => {
+        parts.push(t.value);
+      });
+      found.push(parts.join("\n"));
+    });
+    return found;
+  };
+
+  /**
+   * A paragraph's continuation line loses its indent everywhere else in micromark,
+   * so a construct consuming raw characters has to drop it too.
+   */
+  it("drops the continuation line's indent", () => {
+    expect(marks("> ==a\n>     b==\n")).toEqual(["a\nb"]);
+    expect(marks("==a\n    b==\n")).toEqual(["a\nb"]);
+    expect(marks("==a\nb==\n")).toEqual(["a\nb"]);
+  });
+});

@@ -74,7 +74,7 @@ const highlight: Construct = {
     let remaining = 0;
 
     function startBody(code: Code): State | undefined {
-      segments = planBody(queue);
+      segments = planBody(queue, { stripContinuationIndent: true });
       index = 0;
       return nextSegment(code);
     }
@@ -85,6 +85,7 @@ const highlight: Construct = {
       remaining = segment.length;
       if (segment.kind === "eol") effects.enter(types.lineEnding);
       else if (segment.kind === "data") effects.enter("data");
+      else if (segment.kind === "prefix") effects.enter(types.linePrefix);
       else effects.enter(TEXT_TOKEN, { contentType: "text" });
       return consumeSegment(code);
     }
@@ -98,7 +99,9 @@ const highlight: Construct = {
           ? types.lineEnding
           : segment.kind === "data"
             ? "data"
-            : TEXT_TOKEN,
+            : segment.kind === "prefix"
+              ? types.linePrefix
+              : TEXT_TOKEN,
       );
       index++;
       return nextSegment;

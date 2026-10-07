@@ -226,6 +226,36 @@ export function calloutTransform(
       const breakAt = source.indexOf("\n", titleFrom);
       firstLine = source.slice(titleFrom, breakAt === -1 ? undefined : breakAt);
     }
+    /**
+     * Whatever the title line's own paragraph holds after it.
+     *
+     * Reparsed with the quote prefixes stripped, through `mapLines`, so a body
+     * inside the callout is placed back on the lines it came from.
+     */
+    function bodyUnderTitleLine(): Node[] {
+      const from = (leadText as unknown as Positioned).position?.start?.offset;
+      const to = (paragraph as unknown as Positioned).position?.end?.offset;
+      if (from === undefined || to === undefined || source === "") return [];
+      const breakAt = source.indexOf("\n", from);
+      if (breakAt === -1 || breakAt >= to) return [];
+
+      const bodyFrom =
+        breakAt +
+        1 +
+        (LINE_PREFIX.exec(source.slice(breakAt + 1))?.[0].length ?? 0);
+      if (bodyFrom >= to) return [];
+
+      const map = mapLines(
+        source,
+        bodyFrom,
+        to,
+        source.slice(0, bodyFrom).split("\n").length,
+      );
+      const parsed = reparse(map.text);
+      for (const child of parsed.children) shiftByMap(child, map, 0);
+      return parsed.children as unknown as Node[];
+    }
+
     const asBlock = titleLineIsBlock(firstLine, reparse);
     if (asBlock) {
       const titleStart = (leadText as unknown as Positioned).position?.start;
@@ -234,7 +264,18 @@ export function calloutTransform(
           shiftOnto(block, titleStart.offset, titleStart.line);
         }
       }
-      const rest = newlineAt === -1 ? [] : quote.children.slice(1);
+      // The lines under the title line are the callout's body, and they were
+      // being thrown away: `titleLineIsBlock` reparses the *first line only*, and
+      // whatever followed it inside the same paragraph went with the paragraph it
+      // replaced. `> [!note] # h` / `> body` lost `body` outright, as did the lazy,
+      // list, comment and definition forms -- eight recorded cases, all content
+      // loss on input anyone might write.
+      //
+      // `slice(1)` is also unconditional now. It was guarded on the lead text
+      // carrying the newline, which is false whenever the body sits in a *separate*
+      // paragraph -- so `> [!note] # h` / `>` / `> body` dropped that paragraph too.
+      const body = bodyUnderTitleLine();
+      const rest = quote.children.slice(1);
       // An empty `calloutTitle` rather than none. A callout with no title node
       // displays the capitalised type -- `> [!note]` alone reads "Note" --
       // but this one renders nothing at all, so the empty node is what says
@@ -243,8 +284,21 @@ export function calloutTransform(
         {
           type: "calloutTitle",
           children: [],
+          // Zero width at the title's own offset. The title is empty, not absent --
+          // it has nowhere to span, but it does have a place, and an unplaced node
+          // is one a formatter cannot edit around. Nine of these arrived with the
+          // block-title cases alone.
+          ...(titleStart?.offset === undefined
+            ? {}
+            : {
+                position: {
+                  start: { ...titleStart },
+                  end: { ...titleStart },
+                },
+              }),
         } as unknown as (typeof quote.children)[number],
         ...(asBlock as typeof quote.children),
+        ...(body as typeof quote.children),
         ...rest,
       ];
       const callout = node as unknown as Callout;

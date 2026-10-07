@@ -51,7 +51,7 @@ export function createChunkScan(
 }
 
 export interface Segment {
-  readonly kind: "text" | "eol" | "data";
+  readonly kind: "text" | "eol" | "data" | "prefix";
   readonly length: number;
 }
 
@@ -70,7 +70,10 @@ export interface Segment {
  * never hit it, but Obsidian's can — `a* b *c` holds ` b `. That tail is
  * emitted as `data`, which keeps it.
  */
-export function planBody(body: string): Segment[] {
+export function planBody(
+  body: string,
+  options: { readonly stripContinuationIndent?: boolean } = {},
+): Segment[] {
   const segments: Segment[] = [];
   let index = 0;
 
@@ -82,6 +85,22 @@ export function planBody(body: string): Segment[] {
     }
     let end = index;
     while (end < body.length && body[end] !== "\n") end++;
+
+    // A paragraph's continuation line loses its indent everywhere else in
+    // micromark, so a construct that consumes raw characters has to drop it too or
+    // it reports content no other construct would: `==a` / `    b==` held
+    // `a\n    b` where the same text outside a highlight holds `a\nb`. Emitted as
+    // `linePrefix`, which is consumed but is not content.
+    if (options.stripContinuationIndent === true && index > 0) {
+      let after = index;
+      while (after < end && (body[after] === " " || body[after] === "\t"))
+        after++;
+      if (after > index) {
+        segments.push({ kind: "prefix", length: after - index });
+        index = after;
+        if (index === end) continue;
+      }
+    }
 
     const run = body.slice(index, end);
     const kept = run.trimEnd();
