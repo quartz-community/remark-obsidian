@@ -55,7 +55,12 @@ export function setextDefinitionTransform(tree: Root, source: string): void {
         const nextEnd = next?.position?.end?.offset;
         if (next?.type !== "thematicBreak") continue;
         if (nextStart === undefined || nextEnd === undefined) continue;
-        if (source.slice(end, nextStart).trim() !== "") continue;
+        // Exactly one newline. `trim()` accepted a blank line, so `[^1]:` / blank /
+        // `---` became one heading spanning both -- where Obsidian reports the
+        // definition and the thematic break as the separate blocks they are. A blank
+        // line ends a definition, which is the same boundary
+        // `comment-definition-extent.ts` and `definitionLazyTransform` both use.
+        if (source.slice(end, nextStart) !== "\n") continue;
         if (!UNDERLINE.test(source.slice(nextStart, nextEnd))) continue;
 
         end = nextEnd;

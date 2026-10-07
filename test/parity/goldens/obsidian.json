@@ -19814,8 +19814,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+      "triage": "match",
+      "note": "Fixed in setextDefinitionTransform: the gap check used trim(), which accepted a blank line, so a definition absorbed a thematic break two lines down. A blank line ends a definition."
     },
     "fuzz/footnote/45": {
       "id": "fuzz/footnote/45",
@@ -19869,8 +19869,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+      "triage": "match",
+      "note": "Fixed in setextDefinitionTransform: the gap check used trim(), which accepted a blank line, so a definition absorbed a thematic break two lines down. A blank line ends a definition."
     },
     "fuzz/highlight/69": {
       "id": "fuzz/highlight/69",
@@ -19976,8 +19976,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+      "triage": "match",
+      "note": "Fixed in setextDefinitionTransform: the gap check used trim(), which accepted a blank line, so a definition absorbed a thematic break two lines down. A blank line ends a definition."
     },
     "fuzz/block-ref/14": {
       "id": "fuzz/block-ref/14",

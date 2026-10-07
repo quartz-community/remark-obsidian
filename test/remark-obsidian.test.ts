@@ -2810,3 +2810,30 @@ describe("label retraction", () => {
     expect(read("[link](<foo(and(bar)>)\n").urls).toEqual(["foo(and(bar)"]);
   });
 });
+
+describe("setext underline under a definition", () => {
+  const shape = (md: string) => {
+    const f = (n: any): string => {
+      const kids = (n.children ?? []).map(f).join(" ");
+      return n.type + (kids ? `(${kids})` : "");
+    };
+    return (processWithGfm(md) as any).children.map(f).join(" + ");
+  };
+
+  /**
+   * The gap check used `trim()`, which a blank line passes -- so a definition
+   * absorbed a thematic break two lines down and reported one heading spanning both.
+   * Highest-frequency cluster across two independent fuzz ranges.
+   */
+  it("stops at a blank line", () => {
+    expect(shape("[^1]:\n\n---\n")).toBe("footnoteDefinition + thematicBreak");
+    expect(shape("[^1]: x\n\n---\n")).toBe(
+      "footnoteDefinition(paragraph(text)) + thematicBreak",
+    );
+  });
+
+  it("still takes an adjacent underline", () => {
+    expect(shape("[^1]: x\n---\n")).toBe("heading(footnoteReference text)");
+    expect(shape("[^1]: x\n===\n")).toBe("heading(footnoteReference text)");
+  });
+});
