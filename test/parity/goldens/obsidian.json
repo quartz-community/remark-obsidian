@@ -9411,7 +9411,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed in stripBlockIds: it dropped every paragraph whose content was only an identifier, where Obsidian keeps the host unless nothing follows on the next line; and it stripped an identifier cancelled by a trailing space."
     },
     "probe/block-id/after-text": {
       "id": "probe/block-id/after-text",
@@ -9862,7 +9863,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed in stripBlockIds: it dropped every paragraph whose content was only an identifier, where Obsidian keeps the host unless nothing follows on the next line; and it stripped an identifier cancelled by a trailing space."
     },
     "probe/block-id/two-ids": {
       "id": "probe/block-id/two-ids",
@@ -20031,8 +20033,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+      "triage": "match",
+      "note": "Fixed in stripBlockIds: it dropped every paragraph whose content was only an identifier, where Obsidian keeps the host unless nothing follows on the next line; and it stripped an identifier cancelled by a trailing space."
     },
     "fuzz/inline-footnote/33": {
       "id": "fuzz/inline-footnote/33",
@@ -70377,8 +70379,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Newly probed divergence."
+      "triage": "match",
+      "note": "Fixed in stripBlockIds: it dropped every paragraph whose content was only an identifier, where Obsidian keeps the host unless nothing follows on the next line; and it stripped an identifier cancelled by a trailing space."
     },
     "token/wikilink/balanced": {
       "id": "token/wikilink/balanced",

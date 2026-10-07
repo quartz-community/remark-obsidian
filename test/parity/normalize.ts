@@ -795,7 +795,33 @@ const ONLY_BLOCK_ID = /^[ \t]*\^[A-Za-z0-9-]+[ \t]*$/u;
  * `rehype-obsidian` strips it when rendering, and this mirrors that so the
  * comparison measures the parse rather than the anchor.
  */
-function stripBlockIds(tree: Root): Root {
+/** A node's start or end offset, if it has one. */
+function pointOf(
+  node: Node | undefined,
+  which: "start" | "end",
+): number | undefined {
+  return (
+    node as
+      | {
+          position?: { start?: { offset?: number }; end?: { offset?: number } };
+        }
+      | undefined
+  )?.position?.[which]?.offset;
+}
+
+/** Whether the next sibling block begins on the line straight after this one. */
+function adjacentBlockFollows(
+  children: readonly Node[],
+  index: number,
+  source: string,
+): boolean {
+  const here = pointOf(children[index], "end");
+  const next = pointOf(children[index + 1], "start");
+  if (here === undefined || next === undefined) return false;
+  return !source.slice(here, next).includes("\n\n");
+}
+
+function stripBlockIds(tree: Root, source: string): Root {
   visit(tree, (node: Node) => {
     const parent = node as Partial<{ children: Node[] }>;
     if (!Array.isArray(parent.children)) return;
@@ -809,16 +835,33 @@ function stripBlockIds(tree: Root): Root {
       if (!last || last.type !== "text") continue;
       const value = (last as ValueNode).value;
 
-      // A paragraph that is only an identifier is not a block at all. A
-      // heading always is one, however little is left of it.
+      // A paragraph that is only an identifier is usually not a block at all --
+      // `^blk` alone reports no section and no identifier, so there was nothing for
+      // it to attach to. But that only holds when nothing follows it on the next
+      // line. Measured across four forms:
+      //
+      //     ^blk              no section      nothing to attach to
+      //     ^blk ⏎⏎ para      no section      blank line, same case
+      //     ^blk ⏎ - item     *a* paragraph   the next block is adjacent
+      //      ^blk             *a* paragraph   indented, so not an identifier line
+      //
+      // Dropping all four cost the paragraph in the latter two.
       if (
         child.type === "paragraph" &&
         inner.length === 1 &&
-        ONLY_BLOCK_ID.test(value)
+        ONLY_BLOCK_ID.test(value) &&
+        (child as { position?: { start?: { column?: number } } }).position
+          ?.start?.column === 1 &&
+        !adjacentBlockFollows(parent.children, index, source)
       ) {
         parent.children.splice(index, 1);
         continue;
       }
+      // Not when a space follows the identifier. `text ^blk ` keeps its `^blk` to
+      // Obsidian and records no identifier at all, so stripping it dropped text the
+      // source still holds.
+      const end = pointOf(child, "end");
+      if (end !== undefined && /[ \t]/u.test(source[end - 1] ?? "")) continue;
       const match = TRAILING_BLOCK_ID.exec(value);
       if (match) (last as ValueNode).value = value.slice(0, match.index);
     }
@@ -832,7 +875,10 @@ export function projectOurs(
   profile: ProfileName,
 ): Projections {
   const source = applyTextTransform(markdown);
-  const tree = stripBlockIds(alignTableCells(parseOurs(markdown, profile)));
+  const tree = stripBlockIds(
+    alignTableCells(parseOurs(markdown, profile)),
+    source,
+  );
   return {
     ...projectMdast(tree, source),
     text: mdastText(tree, definedFootnotes(tree)),
