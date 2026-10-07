@@ -1775,6 +1775,59 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/cross/strong-highlight", "**a==b**c==\n"],
   ["probe/cross/highlight-strong", "==a**b==c**\n"],
   ["probe/cross/tag-highlight", "#a==b==\n"],
+  // Bracket nesting, the family the corpus under-samples worst. A 1000-seed sweep
+  // reduced to 244 distinct causes and **39% of them** have the shape `[`..`[`..`]`..`]`
+  // against the ~24 cases recorded here -- and only 4 of those 244 appear in this
+  // corpus verbatim, so that share is new ground rather than a replay.
+  //
+  // Three questions, deliberately kept apart because each has its own fix and its
+  // own blast radius: what a *footnote* label may hold, what a *link* label may
+  // hold, and where a wikilink's own brackets end. Unbalanced runs are here too,
+  // since 23% of the reduced causes have unequal bracket counts and nothing says
+  // what they should do.
+  //
+  // `[[a](u)](v)` is not repeated: `probe/label-precedence/double-open` has it.
+  ["probe/bracket-nest/fn-wikilink", "use[^[[a]]]\n\n[^[[a]]]: d\n"],
+  ["probe/bracket-nest/fn-embed", "use[^![[a]]]\n\n[^![[a]]]: d\n"],
+  ["probe/bracket-nest/fn-plain-pair", "use[^[a]]\n\n[^[a]]: d\n"],
+  ["probe/bracket-nest/fn-interior-pair", "use[^a[b]c]\n\n[^a[b]c]: d\n"],
+  ["probe/bracket-nest/fn-inline-link", "use[^[a](u)]\n\n[^[a](u)]: d\n"],
+  ["probe/bracket-nest/fn-empty-pair", "use[^[]]\n\n[^[]]: d\n"],
+  ["probe/bracket-nest/fn-alias", "use[^[[a|b]]]\n\n[^[[a|b]]]: d\n"],
+  ["probe/bracket-nest/fn-heading", "use[^[[a#h]]]\n\n[^[[a#h]]]: d\n"],
+  ["probe/bracket-nest/fn-undefined-wikilink", "[^[[a]]]\n"],
+  ["probe/bracket-nest/link-inner-inline", "[a [b](u) c](v)\n"],
+  ["probe/bracket-nest/link-inner-pair", "[a[b]](u)\n"],
+  ["probe/bracket-nest/link-inner-wikilink", "[a[[b]]](u)\n"],
+  ["probe/bracket-nest/link-trailing-pair", "[a](u)](v)\n"],
+  ["probe/bracket-nest/link-inner-reference", "[a [b][r]](u)\n\n[r]: /r\n"],
+  ["probe/bracket-nest/link-outer-reference", "[a [b](u)][r]\n\n[r]: /r\n"],
+  ["probe/bracket-nest/link-triple", "[a [b [c](u) d](v) e](w)\n"],
+  ["probe/bracket-nest/image-inner-inline", "![a [b](u) c](v)\n"],
+  ["probe/bracket-nest/wikilink-inner", "[[a[[b]]]]\n"],
+  ["probe/bracket-nest/wikilink-doubled-open", "[[[[a]]]]\n"],
+  ["probe/bracket-nest/wikilink-extra-close", "[[a]]]]\n"],
+  ["probe/bracket-nest/wikilink-single-inner", "[[a[b]]]\n"],
+  ["probe/bracket-nest/embed-inner-wikilink", "![[a[[b]]]]\n"],
+  ["probe/bracket-nest/wikilink-in-label", "[x [[a]] y](u)\n"],
+  ["probe/bracket-nest/unbalanced-open", "[a\n"],
+  ["probe/bracket-nest/unbalanced-close", "a]\n"],
+  ["probe/bracket-nest/unbalanced-wikilink-open", "[[a\n"],
+  ["probe/bracket-nest/unbalanced-wikilink-close", "a]]\n"],
+  ["probe/bracket-nest/unbalanced-fn-open", "[^[\n"],
+  ["probe/bracket-nest/unbalanced-fn-space", "[^1 1]\n"],
+  ["probe/bracket-nest/unbalanced-three-open", "[[[a\n"],
+  ["probe/bracket-nest/unbalanced-three-close", "a]]]\n"],
+  ["probe/bracket-nest/label-code-closer", "[a`]`b](u)\n"],
+  [
+    "probe/bracket-nest/label-autolink-closer",
+    "[a<https://e.test/?q=]>b](u)\n",
+  ],
+  ["probe/bracket-nest/label-html-closer", '[a<i x="]">b](u)\n'],
+  ["probe/bracket-nest/label-math-closer", "[a$x]y$b](u)\n"],
+  ["probe/bracket-nest/label-comment-closer", "[a%%]%%b](u)\n"],
+  ["probe/bracket-nest/label-escaped-close", "[a\\]b](u)\n"],
+  ["probe/bracket-nest/label-escaped-open", "[a\\[b](u)\n"],
 ];
 
 /** Inline tokens, each crossed with a set of malformed delimiter states. */

@@ -145,6 +145,7 @@ describe("positioned oracle", () => {
     "hunt/continuation-masked-under-foreign-label/2: P1, Obsidian's column is short by the `%%` marker",
     "probe/reference-in-link/collection-label: we claim a wikilink where the label holds the reference",
     "probe/reference-in-link/shortcut: we read a collapsed link's label as a reference",
+    "probe/bracket-nest/fn-empty-pair: label precedence, we read `[^[]]` as a reference with an empty name",
   ];
 
   it("places every footnote reference, except the classified cases", () => {
@@ -232,12 +233,12 @@ describe("positioned oracle", () => {
    * these are out of reach here rather than unimplemented.
    */
   const CEILING = {
-    footnotes: 41,
-    footnoteRefs: 4,
+    footnotes: 47,
+    footnoteRefs: 5,
     headings: 18,
     sections: 136,
-    links: 114,
-    embeds: 39,
+    links: 123,
+    embeds: 41,
     tags: 5,
     blocks: 11,
     listItems: 73,
