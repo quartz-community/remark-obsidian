@@ -2759,8 +2759,10 @@ describe("label precedence", () => {
   });
 
   it("can be turned off", () => {
+    // CommonMark's own reading: the inner link wins and the outer brackets stay as
+    // text, which is what the `[` and `](v)` either side of it become.
     expect(read("[a [b](u) c](v)\n", { labelPrecedence: false })).toEqual({
-      text: "a b c",
+      text: "[a b c](v)",
       urls: ["u"],
     });
   });
