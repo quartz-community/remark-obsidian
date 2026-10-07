@@ -255,7 +255,15 @@ export interface RemarkObsidianOptions {
    * container owns its own continuation, so a construct that declines never sees
    * the second item of a list the stock one opened.
    *
-   * Shipped **off** by default until measured, as `labelPrecedence` was.
+   * On by default, and the default moved because the measurement said so. It was
+   * shipped off, as `labelPrecedence` was, and turning it on costs **0 regressions**
+   * across 3103 cases for 5 gained -- plus two improvements to the independent
+   * `metadataCache` oracle, which is the one that has refused two other changes.
+   *
+   * Two cases in the family remain and are recorded rather than chased: a tab-indented
+   * sibling, where `containerState.size` counts characters while `factorySpace` counts
+   * columns, and an under-indented continuation, which needs legacy's whole-item
+   * minimum-indent scan rather than a different limit.
    */
   legacyLists?: boolean;
   /**
@@ -315,7 +323,7 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
   legacyEntities: true,
   legacyAutolinks: true,
   legacyCodeSpans: true,
-  legacyLists: false,
+  legacyLists: true,
   labelPrecedence: true,
   positionedBreaks: true,
   escapedLineBreaks: false,

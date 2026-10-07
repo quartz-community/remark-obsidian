@@ -99232,7 +99232,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Permissive indent with a tab. arbiter: list(1 item) + nested list(2 items). obsidian: list@0:0-2:7, 3 items, text \"foo bar baz\". Obsidian list container divergence family (7 replicate cases). Obsidian runs remark-parse@8 fork; the arbiter agrees with Obsidian on every case in this family. Three CommonMark divergences, all inside micromark list container: (1) no 9-digit cap on an ordered marker, (2) `)` is a valid ordered delimiter, (3) indent handling is far more permissive - a staircase of 1-space increments stays FLAT rather than nesting, and 4+ spaces of relative indent does not become indented code. Blocked on route: list is a CONTAINER owning continuation via containerState, so it cannot be overridden by a declining prepended construct the way a text construct can, and a tree transform would have to synthesise listItems micromark never tokenized (positions feed sections, and listItems feed the compute oracle)."
+      "note": "legacyLists closed 5 of this family; this is the tab half. ` - foo` / `   - bar` / `\\t - baz`: obsidian reports 2 nested uls, we now report 3. containerState.size is measured with sliceSerialize().length, i.e. CHARACTERS, while factorySpace consumes COLUMNS after the preprocessor expands a tab to virtual spaces - so `\\t ` is 2 characters and 5 columns, and the two measures part company exactly where this case is decided. Oracle flagged this as the reason to leave tabs last. Needs the indent compared in one unit before it can be fixed."
     },
     "commonmark/tabs/10": {
       "id": "commonmark/tabs/10",
@@ -111773,7 +111773,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Permissive indent across a blank line. arbiter: list(1 item) holding p(one) and p(two). obsidian: list@0:0-2:8, 1 item, text \"one two\". We produce a code block. Obsidian list container divergence family (7 replicate cases). Obsidian runs remark-parse@8 fork; the arbiter agrees with Obsidian on every case in this family. Three CommonMark divergences, all inside micromark list container: (1) no 9-digit cap on an ordered marker, (2) `)` is a valid ordered delimiter, (3) indent handling is far more permissive - a staircase of 1-space increments stays FLAT rather than nesting, and 4+ spaces of relative indent does not become indented code. Blocked on route: list is a CONTAINER owning continuation via containerState, so it cannot be overridden by a declining prepended construct the way a text construct can, and a tree transform would have to synthesise listItems micromark never tokenized (positions feed sections, and listItems feed the compute oracle)."
+      "note": "legacyLists closed 5 of this family; this is the under-indented continuation half. ` -    one` / blank / `     two`: the item prefix is 6 characters so containerState.size is 6, the continuation line has 5 spaces, indentConstruct requires exactly 6, and the list ends leaving indented code. Obsidian keeps `two` in the item. remark-parse@8 scans the WHOLE item and strips the minimum indentation across its lines, which a streaming tokenizer cannot do by changing one limit; any fixed relaxation here would be arbitrary without probes."
     },
     "commonmark/list-items/258": {
       "id": "commonmark/list-items/258",

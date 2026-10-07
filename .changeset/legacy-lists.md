@@ -13,4 +13,9 @@ CommonMark's. Two divergences covered:
   three spaces, so ` - a` / `  - b` / `   - c` / `    - d` is four flat items rather than
   three and an indented code block
 
-Off by default until the remaining divergences in the family are measured.
+On by default: turning it on costs **0 regressions** across the 3103-case parity corpus
+for 5 cases gained, and improves the independent `metadataCache` oracle on two counters.
+
+Two cases in the family remain and are recorded rather than chased -- a tab-indented
+sibling, and an under-indented continuation that needs `remark-parse@8`'s whole-item
+minimum-indent scan rather than a different limit.
