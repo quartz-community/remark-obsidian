@@ -676,10 +676,19 @@ correct. Only `text` diverges, so the fix belongs in the projection: at render t
 markers pair in source order, blind to block boundaries, and everything between an opener
 and its closer (or end of note, when there is none) is invisible.
 
-Two things worth keeping from the detour. The second oracle earned its cost here: the main
-gate reported a clean 2-for-0 and the ceiling test is what caught the mechanism being
-wrong. And `afterLazy` committing an **empty** comment is load-bearing rather than sloppy
--- making it decline instead costs 6 cases, four of them `probe/quote-comment/*`.
+Three things worth keeping from the detour. The second oracle earned its cost here: the
+main gate reported a clean 2-for-0 and the ceiling test is what caught the mechanism being
+wrong. `afterLazy` committing an **empty** comment is load-bearing rather than sloppy --
+making it decline instead costs 6 cases, four of them `probe/quote-comment/*`.
+
+And the recorded text lives at `obsidian.projections.text`, not at `text`. A scratch script
+read the shorter path, got `undefined` for every case, printed it as `""`, and that read as
+"Obsidian renders nothing here" for nine cases at once -- including
+`probe/definition-comment/blank-after`, which really wants `use⟨fn⟩`, and
+`probe/straddle/callout-comment`, which really wants `b%%`. The conclusion above survived
+only because it rested on `obsidian.compute`, which the same script read correctly. **A
+field that does not exist reads as agreement with whatever you expected**, so print one
+known-non-empty value as a control before trusting a scan built on a field path.
 
 ### A `%%` comment defines nothing, but its references still count
 
