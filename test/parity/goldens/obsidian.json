@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-07T16:08:22.079Z",
+  "recordedAt": "2026-10-07T19:10:39.893Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -63734,6 +63734,880 @@
             "table@0:0-1:7"
           ],
           "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-link/target-then-destination": {
+      "id": "probe/wikilink-link/target-then-destination",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a]](u)\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"a\" href=\"a\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a</a>(u)</p>",
+        "projections": {
+          "text": "a(u)",
+          "math": [],
+          "links": [
+            {
+              "path": "a",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a]](u)"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [
+            "[[a]]=>a|a@0:0-0:5"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-link/embed-then-destination": {
+      "id": "probe/wikilink-link/embed-then-destination",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "![[a]](u)\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><span alt=\"a\" src=\"a\" class=\"internal-embed is-loaded file-embed mod-empty\">“a” is not created yet. Click to create.</span>(u)</p>",
+        "projections": {
+          "text": "a(u)",
+          "math": [],
+          "links": [
+            {
+              "path": "a",
+              "heading": "",
+              "embedded": true
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "![[a]](u)"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [
+            "a"
+          ],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:9"
+          ],
+          "links": [],
+          "embeds": [
+            "![[a]]=>a|a@0:0-0:6"
+          ],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-link/alias-then-destination": {
+      "id": "probe/wikilink-link/alias-then-destination",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a|b]](u)\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-tooltip-position=\"top\" aria-label=\"a\" data-href=\"a\" href=\"a\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">b</a>(u)</p>",
+        "projections": {
+          "text": "b(u)",
+          "math": [],
+          "links": [
+            {
+              "path": "a",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a|b]](u)"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:10"
+          ],
+          "links": [
+            "[[a|b]]=>a|b@0:0-0:7"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-link/fragment-then-destination": {
+      "id": "probe/wikilink-link/fragment-then-destination",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a#h]](u)\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"a#h\" href=\"a#h\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a &gt; h</a>(u)</p>",
+        "projections": {
+          "text": "a > h(u)",
+          "math": [],
+          "links": [
+            {
+              "path": "a",
+              "heading": "h",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a#h]](u)"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a#h"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:10"
+          ],
+          "links": [
+            "[[a#h]]=>a#h|a > h@0:0-0:7"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-link/wikilink-as-destination": {
+      "id": "probe/wikilink-link/wikilink-as-destination",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[t]([[a]])\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a class=\"internal-link\" data-href=\"[[a]]\" href=\"[[a]]\" target=\"_blank\" rel=\"noopener nofollow\">t</a></p>",
+        "projections": {
+          "text": "t",
+          "math": [],
+          "links": [
+            {
+              "path": "[[a]]",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[t]([[a]])"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "[[a]]"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:10"
+          ],
+          "links": [
+            "[t]([[a]])=>[[a]]|t@0:0-0:10"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "Matches the main parity gate; diverges on the metadataCache oracle only, which is why it is triage match with the compute ceiling raised instead. Obsidian indexes an inline link whose destination is a wikilink, or whose label holds an embed, as an internal link: \"[t]([[a]])\" is indexed with target \"[[a]]\" and display \"t\", and \"[![[a]]](u)\" with target \"u\" and display \"a\". We index nothing, because the wikilink tokenizer claims the brackets before any link node forms. Found by probe/wikilink-link/*, where 15 of 15 matched the main gate and only the second oracle showed the gap."
+    },
+    "probe/wikilink-link/embed-as-destination": {
+      "id": "probe/wikilink-link/embed-as-destination",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[t](![[a]])\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a class=\"internal-link\" data-href=\"![[a]]\" href=\"![[a]]\" target=\"_blank\" rel=\"noopener nofollow\">t</a></p>",
+        "projections": {
+          "text": "t",
+          "math": [],
+          "links": [
+            {
+              "path": "![[a]]",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[t](![[a]])"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "![[a]]"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:11"
+          ],
+          "links": [
+            "[t](![[a]])=>![[a]]|t@0:0-0:11"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "Matches the main parity gate; diverges on the metadataCache oracle only, which is why it is triage match with the compute ceiling raised instead. Obsidian indexes an inline link whose destination is a wikilink, or whose label holds an embed, as an internal link: \"[t]([[a]])\" is indexed with target \"[[a]]\" and display \"t\", and \"[![[a]]](u)\" with target \"u\" and display \"a\". We index nothing, because the wikilink tokenizer claims the brackets before any link node forms. Found by probe/wikilink-link/*, where 15 of 15 matched the main gate and only the second oracle showed the gap."
+    },
+    "probe/wikilink-link/both-wikilinks": {
+      "id": "probe/wikilink-link/both-wikilinks",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a]]([[b]])\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"a\" href=\"a\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a</a>(<a data-href=\"b\" href=\"b\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">b</a>)</p>",
+        "projections": {
+          "text": "a(b)",
+          "math": [],
+          "links": [
+            {
+              "path": "a",
+              "heading": "",
+              "embedded": false
+            },
+            {
+              "path": "b",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a]]([[b]])"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a",
+            "b"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:12"
+          ],
+          "links": [
+            "[[a]]=>a|a@0:0-0:5",
+            "[[b]]=>b|b@0:6-0:11"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-link/inner-link-in-target": {
+      "id": "probe/wikilink-link/inner-link-in-target",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a](u)]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"a](u)\" href=\"a](u)\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a](u)</a></p>",
+        "projections": {
+          "text": "a](u)",
+          "math": [],
+          "links": [
+            {
+              "path": "a](u)",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a](u)]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a](u)"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:9"
+          ],
+          "links": [
+            "[[a](u)]]=>a](u)|a](u)@0:0-0:9"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-link/inner-link-in-embed": {
+      "id": "probe/wikilink-link/inner-link-in-embed",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "![[a](u)]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><span alt=\"a](u)\" src=\"a](u)\" class=\"internal-embed is-loaded file-embed mod-empty\">“a](u)” is not created yet. Click to create.</span></p>",
+        "projections": {
+          "text": "a](u)",
+          "math": [],
+          "links": [
+            {
+              "path": "a](u)",
+              "heading": "",
+              "embedded": true
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "![[a](u)]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [
+            "a](u)"
+          ],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:10"
+          ],
+          "links": [],
+          "embeds": [
+            "![[a](u)]]=>a](u)|a](u)@0:0-0:10"
+          ],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-link/triple-open-then-destination": {
+      "id": "probe/wikilink-link/triple-open-then-destination",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[[a]]](u)\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"[a\" href=\"[a\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">[a</a>](u)</p>",
+        "projections": {
+          "text": "[a](u)",
+          "math": [],
+          "links": [
+            {
+              "path": "[a",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[[a]]](u)"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "[a"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:10"
+          ],
+          "links": [
+            "[[[a]]=>[a|[a@0:0-0:6"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-link/early-close-then-destination": {
+      "id": "probe/wikilink-link/early-close-then-destination",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a]b]](u)\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"a]b\" href=\"a]b\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a]b</a>(u)</p>",
+        "projections": {
+          "text": "a]b(u)",
+          "math": [],
+          "links": [
+            {
+              "path": "a]b",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a]b]](u)"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a]b"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:10"
+          ],
+          "links": [
+            "[[a]b]]=>a]b|a]b@0:0-0:7"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-link/embed-in-label": {
+      "id": "probe/wikilink-link/embed-in-label",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[![[a]]](u)\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a class=\"internal-link\" data-href=\"u\" href=\"u\" target=\"_blank\" rel=\"noopener nofollow\"><span alt=\"a\" src=\"a\" class=\"internal-embed is-loaded file-embed mod-empty\">“a” is not created yet. Click to create.</span></a></p>",
+        "projections": {
+          "text": "a",
+          "math": [],
+          "links": [
+            {
+              "path": "u",
+              "heading": "",
+              "embedded": false
+            },
+            {
+              "path": "a",
+              "heading": "",
+              "embedded": true
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[![[a]]](u)"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "u"
+          ],
+          "embeds": [
+            "a"
+          ],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:11"
+          ],
+          "links": [
+            "[![[a]]](u)=>u|a@0:0-0:11"
+          ],
+          "embeds": [
+            "![[a]]=>a|a@0:1-0:7"
+          ],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "Matches the main parity gate; diverges on the metadataCache oracle only, which is why it is triage match with the compute ceiling raised instead. Obsidian indexes an inline link whose destination is a wikilink, or whose label holds an embed, as an internal link: \"[t]([[a]])\" is indexed with target \"[[a]]\" and display \"t\", and \"[![[a]]](u)\" with target \"u\" and display \"a\". We index nothing, because the wikilink tokenizer claims the brackets before any link node forms. Found by probe/wikilink-link/*, where 15 of 15 matched the main gate and only the second oracle showed the gap."
+    },
+    "probe/wikilink-link/in-running-text": {
+      "id": "probe/wikilink-link/in-running-text",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "x [[a]](u) y\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">x <a data-href=\"a\" href=\"a\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a</a>(u) y</p>",
+        "projections": {
+          "text": "x a(u) y",
+          "math": [],
+          "links": [
+            {
+              "path": "a",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "x [[a]](u) y"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:12"
+          ],
+          "links": [
+            "[[a]]=>a|a@0:2-0:7"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-link/space-before-paren": {
+      "id": "probe/wikilink-link/space-before-paren",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a]] (u)\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"a\" href=\"a\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a</a> (u)</p>",
+        "projections": {
+          "text": "a (u)",
+          "math": [],
+          "links": [
+            {
+              "path": "a",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a]] (u)"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:9"
+          ],
+          "links": [
+            "[[a]]=>a|a@0:0-0:5"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-link/block-ref-then-destination": {
+      "id": "probe/wikilink-link/block-ref-then-destination",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a#^blk]](u)\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"a#^blk\" href=\"a#^blk\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a &gt; ^blk</a>(u)</p>",
+        "projections": {
+          "text": "a > ^blk(u)",
+          "math": [],
+          "links": [
+            {
+              "path": "a",
+              "heading": "^blk",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a#^blk]](u)"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a#^blk"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:13"
+          ],
+          "links": [
+            "[[a#^blk]]=>a#^blk|a > ^blk@0:0-0:10"
+          ],
           "embeds": [],
           "tags": [],
           "listItems": [],
@@ -168808,7 +169682,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match"
+      "triage": "match",
+      "note": "Third recording of this case to come back with a changed text against byte-identical html, which is the documented flake signature - a pipe inside a one-column table. The stable value is the correct one: the delimiter declares one column, so the surplus cell is dropped when rendering. Restored from the previous recording rather than absorbed."
     },
     "hunt/table-rows-on-label-line/0": {
       "id": "hunt/table-rows-on-label-line/0",

@@ -1729,6 +1729,33 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // Enumerated rather than inferred: container x how many lazy lines x which line
   // carries the underline. The `===`/`---` pair is kept because only `---` is also
   // a thematic break, which is the likeliest source of the asymmetry.
+  // Where a wikilink meets inline-link syntax.
+  //
+  // Picked by measurement, not by feel: of the wikilink cases still diverging, `](`
+  // is the commonest thing sitting next to them -- 8 of 21 -- and of the 58 wikilink
+  // probes already here only **5** hold a `](` at all, all of them matching. So the
+  // axis the failures concentrate on is the one nobody aimed at, which is the
+  // coverage-measures-attention trap this file already warns about.
+  //
+  // Both orders matter and are enumerated separately: a wikilink followed by a
+  // destination, and a wikilink *as* a destination. `labelPrecedence` scans raw
+  // balanced brackets while the wikilink tokenizer claims `[[` first, so which one
+  // opens first decides each of these.
+  ["probe/wikilink-link/target-then-destination", "[[a]](u)\n"],
+  ["probe/wikilink-link/embed-then-destination", "![[a]](u)\n"],
+  ["probe/wikilink-link/alias-then-destination", "[[a|b]](u)\n"],
+  ["probe/wikilink-link/fragment-then-destination", "[[a#h]](u)\n"],
+  ["probe/wikilink-link/wikilink-as-destination", "[t]([[a]])\n"],
+  ["probe/wikilink-link/embed-as-destination", "[t](![[a]])\n"],
+  ["probe/wikilink-link/both-wikilinks", "[[a]]([[b]])\n"],
+  ["probe/wikilink-link/inner-link-in-target", "[[a](u)]]\n"],
+  ["probe/wikilink-link/inner-link-in-embed", "![[a](u)]]\n"],
+  ["probe/wikilink-link/triple-open-then-destination", "[[[a]]](u)\n"],
+  ["probe/wikilink-link/early-close-then-destination", "[[a]b]](u)\n"],
+  ["probe/wikilink-link/embed-in-label", "[![[a]]](u)\n"],
+  ["probe/wikilink-link/in-running-text", "x [[a]](u) y\n"],
+  ["probe/wikilink-link/space-before-paren", "[[a]] (u)\n"],
+  ["probe/wikilink-link/block-ref-then-destination", "[[a#^blk]](u)\n"],
   ["probe/lazy-setext/quote-lazy-dash", "> a\nb\n---\n"],
   ["probe/lazy-setext/quote-lazy-equals", "> a\nb\n===\n"],
   ["probe/lazy-setext/quote-underline-is-lazy-dash", "> a\n---\n"],

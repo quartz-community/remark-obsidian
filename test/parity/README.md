@@ -141,6 +141,36 @@ So the ratio is spent as a selector. What remains needs probes shaped around two
 constructs meeting, or around a transform boundary, and the honest version of the
 coverage table below is that it measures attention rather than risk.
 
+### Co-occurrence frequency is a spent selector too
+
+The ratio heuristic -- open cases per designed probe -- was already retired above. Picking a
+probe axis by **what the failing cases most often sit next to** fails the same way.
+
+Measured: of the wikilink cases still diverging, `](` was the commonest neighbour at 8 of
+21, and of the 58 wikilink probes already here only **5** held a `](` at all. That reads
+like a textbook gap -- the axis the failures concentrate on is the one nobody aimed at.
+
+Fifteen probes crossing a wikilink with inline-link syntax came back **15 of 15 matching**
+on the main gate. The co-occurrence was not causal: those fuzz documents contain a `](`,
+but the `](` is not what is wrong with them.
+
+What the family did find was on the **other oracle**. Three of the fifteen diverge on
+`metadataCache` while matching the parity gate: Obsidian indexes an inline link whose
+destination is a wikilink, or whose label holds an embed, as an internal link --
+`[t]([[a]])` with target `[[a]]` and display `t`, `[![[a]]](u)` with target `u` and display
+`a` -- and we index nothing, because the wikilink tokenizer claims the brackets before any
+link node forms.
+
+So the probe wave was worth running and the selector still does not work. Two lessons,
+pulling apart:
+
+- **Stop choosing axes by counting.** Both counting heuristics tried here -- probes per open
+  case, and neighbour frequency -- have now produced near-perfect families. What has
+  actually yielded every time is a _contradiction_: two recorded cases that cannot both
+  follow from the same rule.
+- **Check every oracle before calling a family clean.** "15 of 15 matched" was true and
+  incomplete; the gap was one `compute` counter away.
+
 ### Coverage is not uniform, and the gaps are where the backlog lives
 
 Measure it before concluding anything about a family's size. Counting designed
