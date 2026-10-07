@@ -2953,3 +2953,39 @@ describe("container setext heading", () => {
     expect(shape("> q\n===\n")).toBe("blockquote(heading(text))");
   });
 });
+
+describe("html setext inside a container", () => {
+  const shape = (md: string) => {
+    const f = (n: any): string => {
+      const kids = (n.children ?? []).map(f).join(" ");
+      return n.type + (kids ? `(${kids})` : "");
+    };
+    return (processWithGfm(md) as any).children.map(f).join(" + ");
+  };
+
+  /**
+   * At root the html block swallows the underline, so both lines are inside one
+   * node. Inside a container they are not: the html node is just the tag and the
+   * run arrives as the next sibling paragraph.
+   */
+  it("takes the underline from the next sibling", () => {
+    expect(shape("- <br>\n===\n")).toBe("list(listItem(heading(html)))");
+    expect(shape("1. <br>\n===\n")).toBe("list(listItem(heading(html)))");
+    expect(shape("> <br>\n===\n")).toBe("blockquote(heading(html))");
+  });
+
+  /** A blank line ends the container's block, so the run is prose of its own. */
+  it("requires the underline on the very next line", () => {
+    expect(shape("- <br>\n\n===\n")).toBe(
+      "list(listItem(html)) + paragraph(text)",
+    );
+    expect(shape("- <br>\nplain\n")).toBe(
+      "list(listItem(html paragraph(text)))",
+    );
+  });
+
+  it("still handles the root form", () => {
+    expect(shape("<br>\n===\n")).toBe("heading(html)");
+    expect(shape("<pre>\n---\n</pre>\n")).toBe("heading(html) + html");
+  });
+});

@@ -361,8 +361,28 @@ export function htmlSetextTransform(tree: Root, source: string): void {
       }
 
       const lines = source.slice(start, end).split("\n");
-      const underline = lines[1];
-      if (lines.length < 2 || underline === undefined) continue;
+      // At root the underline sits inside the html block's own span, because the
+      // block swallowed it. Inside a container it does not: the html node is just
+      // `<br>` and the run arrives as the next sibling paragraph, so `- <br>` /
+      // `===` found one line here and was skipped where Obsidian reports a heading.
+      //
+      // Required on the very next line. A blank line ends the container's block,
+      // and the run is then a thematic break or prose of its own.
+      let fromSibling = false;
+      let underline = lines[1];
+      if (lines.length < 2) {
+        const next = parent.children[index + 1];
+        if (next?.type !== "paragraph") continue;
+        const nextFrom = next.position?.start?.offset;
+        const nextTo = next.position?.end?.offset;
+        if (nextFrom === undefined || nextTo === undefined) continue;
+        if (source.slice(end, nextFrom) !== "\n") continue;
+        const text = source.slice(nextFrom, nextTo);
+        if (text.includes("\n")) continue;
+        underline = text;
+        fromSibling = true;
+      }
+      if (underline === undefined) continue;
       if (!LOOSE.test(underline)) continue;
 
       const first = lines[0]!;
@@ -415,7 +435,9 @@ export function htmlSetextTransform(tree: Root, source: string): void {
         } as RootContent);
       }
 
-      parent.children.splice(index, 1, ...replacement);
+      // Two children go when the underline was a sibling -- the html and that
+      // paragraph -- and one otherwise, since the block held both lines itself.
+      parent.children.splice(index, fromSibling ? 2 : 1, ...replacement);
       index += replacement.length - 1;
     }
   });

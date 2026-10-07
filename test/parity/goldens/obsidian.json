@@ -19921,8 +19921,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+      "triage": "match",
+      "note": "Fixed by letting htmlSetextTransform take the underline from the next sibling: inside a container the html node is just the tag and the run is a separate paragraph, where at root the html block swallows both lines."
     },
     "fuzz/footnote/46": {
       "id": "fuzz/footnote/46",
@@ -69775,8 +69775,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Newly probed divergence."
+      "triage": "match",
+      "note": "Fixed by letting htmlSetextTransform take the underline from the next sibling: inside a container the html node is just the tag and the run is a separate paragraph, where at root the html block swallows both lines."
     },
     "probe/container-setext/quote-math": {
       "id": "probe/container-setext/quote-math",
