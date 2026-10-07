@@ -13,7 +13,20 @@ interface Point {
 }
 
 const QUOTED = /^[ \t]*>/;
-const INDENTED = /^ {4,}\S/;
+const CODE_INDENT = 4;
+
+/**
+ * The indent a line needs before it counts as code here.
+ *
+ * Measured from the container's own content column, not from column zero. A
+ * footnote definition continues at four spaces, so inside one those four are the
+ * continuation and code needs eight -- `[^1]: > [!note` over `    [[target]]` is
+ * the quote's lazy continuation, and cutting it into code lost the wikilink
+ * Obsidian indexes. At root there is no prefix and the threshold is unchanged.
+ */
+function codeIndent(host: string): number {
+  return host === "footnoteDefinition" ? CODE_INDENT * 2 : CODE_INDENT;
+}
 
 /**
  * An indented line below a quote is code, not lazy continuation.
@@ -43,11 +56,18 @@ export function quoteIndentedCodeTransform(
         continue;
       }
 
+      const want = codeIndent(node.type);
+      const indented = (text: string): boolean =>
+        text.length > want &&
+        text.slice(0, want).trim() === "" &&
+        text.charAt(want) !== " " &&
+        text.slice(want).trim() !== "";
+
       const lines = source.slice(start, end).split("\n");
       let cut = lines.length;
       while (cut > 0) {
         const candidate = lines[cut - 1]!;
-        if (QUOTED.test(candidate) || !INDENTED.test(candidate)) break;
+        if (QUOTED.test(candidate) || !indented(candidate)) break;
         cut--;
       }
       if (cut === lines.length || cut === 0) continue;
@@ -64,7 +84,7 @@ export function quoteIndentedCodeTransform(
         type: "code",
         lang: null,
         meta: null,
-        value: tail.map((text) => text.slice(4)).join("\n"),
+        value: tail.map((text) => text.slice(want)).join("\n"),
         position: {
           start: {
             line: line + cut,
