@@ -520,6 +520,36 @@ the harness's own asymmetries has been triaged as a package bug: **before implem
 projection divergence, check what the recorder does to the DOM it reads that projection
 from.** The answer is in `oracle.e2e.ts`, usually in a comment next to the `remove()`.
 
+### A footnote label and a link label are different scans
+
+Both are "find the closing bracket", and they do it differently, which is why label
+precedence closed 30 cases without touching the footnote half at all.
+
+A **link** label is found by balanced counting, so the outermost pair wins:
+`[a [b](u) c](v)` links to `v`. A **footnote** label runs to the **first** `]`, with no
+counting: `[^a[b]c]` renders `a[bc]`, which is the label `a[b` and `c]` left as text, and
+nothing else explains that. Nine recorded labels agree -- a wikilink, an embed, an alias,
+a heading, a bare pair, an inline link and an empty pair among them.
+
+Nothing may parse inside either. For a link label that falls out of the scan ignoring
+constructs; for a footnote label it has to be enforced, and that is what remains open.
+Three attempts are refuted:
+
+- Widening the label pattern in `footnote-bare.ts` costs **11 regressions** for
+  whitespace -- which `hunt/invalid-name-rewritten-by-rules/0-5` was established for --
+  and trips the ReDoS lint for brackets.
+- Declining `^[` after a `[` in the inline-footnote construct costs
+  `context/link-label/inline-footnote` and lets the **wikilink** win instead, so
+  `[^[[a]]]` becomes a link to `a` where Obsidian reports the text `[[a]]` and no link.
+- `labelPrecedenceTransform` cannot reach them: `claimedByOther` correctly declines a
+  bracket a footnote reference already owns, and removing that guard is what cost 35
+  regressions.
+
+So it needs a construct claiming `[^` to the first `]` **before** anything else on that
+bracket sees it -- competing with the wikilink extension, GFM's footnote call and
+CommonMark's label start. `[` appears in 1517 corpus cases, so that is a measured piece
+of work rather than a widening, and it is the last attributable group left.
+
 ### A rendered divergence can hide the character that caused it
 
 `commonmark/links/507` reads `[link](/url "title")` and the two sides disagree about
