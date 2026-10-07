@@ -581,10 +581,15 @@ export function projectMdast(
   options: {
     readonly skipUnreferencedDefinitions?: boolean;
     readonly skipComments?: boolean;
+    readonly writtenTargets?: boolean;
   } = {},
 ): Omit<Projections, "text" | "sections"> {
   const skipUnreferenced = options.skipUnreferencedDefinitions ?? true;
   const skipComments = options.skipComments ?? true;
+  // Off for the compared `links` projection, which is matched structurally
+  // against Obsidian's DOM and would see this as a surplus key. Only the cache
+  // cares how the target was written.
+  const writtenTargets = options.writtenTargets ?? false;
   const math: MathItem[] = [];
   const defined = definedFootnotes(tree);
   /** Every node under a footnote definition or an inline footnote. */
@@ -643,10 +648,28 @@ export function projectMdast(
       return;
     }
     if (isType<WikilinkNode>(node, "wikilink")) {
+      const from = node.position?.start?.offset;
+      const to = node.position?.end?.offset;
+      // Read off the source, because an empty fragment and an absent one both
+      // leave `heading` empty. Only the target matters here, so the alias is cut
+      // at the first `|` and the inner text is trimmed as a whole, exactly as the
+      // parser splits it.
+      const written =
+        from === undefined || to === undefined
+          ? ""
+          : source
+              .slice(from, to)
+              .replace(/^!?\[\[/, "")
+              .replace(/\]\]$/, "")
+              .trim()
+              .split("|")[0]!;
       links.push({
         path: node.path,
         heading: node.heading,
         embedded: node.embedded,
+        ...(writtenTargets && node.heading === "" && written.endsWith("#")
+          ? { emptyFragment: true }
+          : {}),
       });
       return;
     }
@@ -755,10 +778,13 @@ export function metaOurs(tree: Root, source: string): MetaProjections {
   const projected = projectMdast(tree, source, {
     skipUnreferencedDefinitions: false,
     skipComments: false,
+    writtenTargets: true,
   });
   const defined = definedFootnotes(tree);
   const target = (link: LinkItem): string =>
-    link.heading === "" ? link.path : `${link.path}#${link.heading}`;
+    link.heading === ""
+      ? `${link.path}${link.emptyFragment === true ? "#" : ""}`
+      : `${link.path}#${link.heading}`;
 
   // Only a resolved `[^x]`, never a `[^x]` nothing defines. An inline `^[...]`
   // is not a reference either -- with one exception, measured rather than

@@ -27,6 +27,14 @@ export interface LinkItem {
   readonly path: string;
   readonly heading: string;
   readonly embedded: boolean;
+  /**
+   * A `#` was written with nothing after it, as in `[[page#]]`.
+   *
+   * `metadataCache` indexes the target as the author wrote it, so that one reads
+   * `page#` while the rendered link reads `page`. The flag is needed because an
+   * empty fragment and an absent one give the same `heading`.
+   */
+  readonly emptyFragment?: boolean;
 }
 
 export interface TaskItem {

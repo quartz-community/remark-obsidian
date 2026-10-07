@@ -13853,8 +13853,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Divergence seen only by the metadataCache oracle, which the gate did not compare until now."
+      "triage": "match"
     },
     "wikilink/self-heading": {
       "id": "wikilink/self-heading",
