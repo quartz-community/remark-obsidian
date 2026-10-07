@@ -22,8 +22,12 @@ const format = (markdown: string): string =>
   String(
     unified()
       .use(remarkParse)
-      .use(remarkObsidian, PROFILES["quartz-default"].remarkObsidian)
+      // `remarkGfm` before `remarkObsidian`, as `chain.ts` pins it. This processor
+      // had the old order, so every measurement here was taken against a chain
+      // Quartz does not use -- and for `toMarkdown` it matters doubly, since the
+      // later extension's handlers win and gfm was overriding ours.
       .use(remarkGfm)
+      .use(remarkObsidian, PROFILES["quartz-default"].remarkObsidian)
       .use(remarkBreaks)
       .use(remarkStringify)
       .processSync(markdown),
@@ -143,25 +147,23 @@ describe("round-trip", () => {
    * the serialiser gap is progress; a new case reaching it is only coverage.
    */
   /**
-   * Forty to sixty-nine are the cost of the footnote-label rule, and the largest
-   * single jump this number has taken. A label that holds a `[` is correct --
-   * `[^![[img.png]]]` is a reference to `![[img.png` with `]]` left as text, which is
-   * what Obsidian reports -- but `remark-stringify` writes it back as
-   * `[^!\[\[img.png]`, and re-parsing those escapes yields a *different* label, so
-   * each pass adds another backslash.
+   * Thirty-three, and it was thirty-five before tonight -- a more faithful parse
+   * lowered it, which has not happened before.
    *
-   * The disagreement is between our parse rule and the serialiser's escape rule, not
-   * inside either: written unescaped, `[^![[img.png]` re-parses to exactly the label
-   * we produced, because the label ends at the first `]`. Resolving it needs a
-   * `remark-stringify` extension that knows that rule, which is the same place
-   * `rehype-obsidian` already owns rendering an undefined reference as its bare
-   * label.
+   * It read sixty-nine for a while, and both halves of that were artefacts. This
+   * processor had `remarkObsidian` before `remarkGfm`, against the order `chain.ts`
+   * pins, so every measurement here was taken on a chain Quartz does not use -- and
+   * for `toMarkdown` that decides which extension's handlers win, so gfm was
+   * overriding ours. And `footnote-reference-to-markdown.ts` did not exist, so a
+   * label holding a `[` was written back escaped, re-parsed to a different label and
+   * grew a backslash every pass.
    *
-   * Recorded rather than worked around: the alternative is emitting text nodes whose
-   * value has lost the `[^` and `]`, and a formatter would then write those
-   * characters out of the author's file.
+   * What remains is the `break` gap this file was written for: a transform that folds
+   * lazy lines back into a block emits `break` nodes, `remark-stringify` writes a hard
+   * break as a trailing backslash, and that re-parses as an escaped one. The fix
+   * belongs in how those passes represent a folded line.
    */
   it("does not grow the set of inputs formatting cannot settle", () => {
-    expect(unstable.length).toBeLessThanOrEqual(69);
+    expect(unstable.length).toBeLessThanOrEqual(33);
   });
 });

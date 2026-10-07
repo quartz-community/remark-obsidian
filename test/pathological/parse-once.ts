@@ -24,8 +24,11 @@ if (!build || !size) {
 const markdown = build(Number(size));
 const processor = unified()
   .use(remarkParse)
-  .use(remarkObsidian)
+  // `remarkGfm` before `remarkObsidian`, as `chain.ts` pins it. With the old order
+  // gfm's strikethrough claimed every `~`, so `legacy-delete.ts` never ran and the
+  // delimiter-run shape was not measuring this package's tokenizer at all.
   .use(remarkGfm)
+  .use(remarkObsidian)
   .use(remarkBreaks);
 
 const started = performance.now();

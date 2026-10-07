@@ -30,6 +30,7 @@ import { calloutToMarkdown } from "./lib/mdast/callout-to-markdown.js";
 import { commentToMarkdown } from "./lib/mdast/comment-to-markdown.js";
 import { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 import { inlineFootnoteToMarkdown } from "./lib/mdast/inline-footnote-to-markdown.js";
+import { footnoteReferenceToMarkdown } from "./lib/mdast/footnote-reference-to-markdown.js";
 import { customTaskCharTransform } from "./lib/task-char.js";
 import { mathDisplayTransform } from "./lib/math-display.js";
 import { mathFenceTransform } from "./lib/math-fence.js";
@@ -330,6 +331,10 @@ export default function remarkObsidian(
     data.micromarkExtensions.push(inlineFootnoteSyntax());
     data.fromMarkdownExtensions.push(inlineFootnoteFromMarkdown());
     data.toMarkdownExtensions.push(inlineFootnoteToMarkdown());
+    // Paired with `bracketLabelReferences`, which reads a label to the first `]`:
+    // the default handler escapes a `[` in one, and re-parsing that escape yields a
+    // different label every pass.
+    data.toMarkdownExtensions.push(footnoteReferenceToMarkdown());
   }
   if (opts.wikilinks) {
     data.micromarkExtensions.push(wikilinkSyntax());
