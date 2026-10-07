@@ -2904,3 +2904,52 @@ describe("setext underline indent inside a container", () => {
     expect(shape("- item\n===\n")).toBe("list(listItem(heading(text)))");
   });
 });
+
+describe("container setext heading", () => {
+  const shape = (md: string) => {
+    const f = (n: any): string => {
+      const kids = (n.children ?? []).map(f).join(" ");
+      return n.type + (kids ? `(${kids})` : "");
+    };
+    return (processWithGfm(md) as any).children.map(f).join(" + ");
+  };
+  const span = (md: string, type: string) => {
+    let found = "";
+    visit(processWithGfm(md), type, (n: any) => {
+      if (!found) {
+        found = `${n.position?.start?.offset}..${n.position?.end?.offset}`;
+      }
+    });
+    return found;
+  };
+
+  /**
+   * The reparsed children used to keep the fragment's own offsets, and
+   * `contentStart` in `setext-underline.ts` trusts a heading's children over its
+   * span -- so an unshifted child reported offset 0, that pass read the whole
+   * document as the heading's content, counted three lines and demoted the heading
+   * it had just been handed.
+   */
+  it("places the heading's children on the document", () => {
+    expect(span("- item\n===\n", "text")).toBe("2..6");
+    expect(shape("- a\n- b\n===\n")).toBe(
+      "list(listItem(paragraph(text)) listItem(heading(text)))",
+    );
+  });
+
+  /**
+   * The underline must be the second line, but content after it is fine. Capping
+   * the whole paragraph at two lines conflated that with a run on the fourth line,
+   * which Obsidian does not treat as an underline at all.
+   */
+  it("keeps what follows the underline", () => {
+    expect(shape("- item\n===\nmore\n")).toBe(
+      "list(listItem(heading(text) paragraph(text)))",
+    );
+  });
+
+  it("leaves the plain forms alone", () => {
+    expect(shape("- item\n===\n")).toBe("list(listItem(heading(text)))");
+    expect(shape("> q\n===\n")).toBe("blockquote(heading(text))");
+  });
+});

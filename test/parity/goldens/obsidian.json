@@ -20198,8 +20198,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+      "triage": "match",
+      "note": "Fixed in containerSetextTransform: its reparsed children were left numbered from the fragment, which made contentStart read the whole document and setextUnderlineTransform demote the heading; and the paragraph cap is now on the underline's line rather than the whole block."
     },
     "fuzz/callout/13": {
       "id": "fuzz/callout/13",
@@ -69616,8 +69616,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Newly probed divergence."
+      "triage": "match",
+      "note": "Fixed in containerSetextTransform: its reparsed children were left numbered from the fragment, which made contentStart read the whole document and setextUnderlineTransform demote the heading; and the paragraph cap is now on the underline's line rather than the whole block."
     },
     "probe/container-setext/ordered": {
       "id": "probe/container-setext/ordered",
@@ -69981,8 +69981,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Newly probed divergence."
+      "triage": "match",
+      "note": "Fixed in containerSetextTransform: its reparsed children were left numbered from the fragment, which made contentStart read the whole document and setextUnderlineTransform demote the heading; and the paragraph cap is now on the underline's line rather than the whole block."
     },
     "probe/container-setext/nested-quote": {
       "id": "probe/container-setext/nested-quote",

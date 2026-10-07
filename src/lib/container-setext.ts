@@ -25,6 +25,23 @@ const CONTAINERS = new Set(["blockquote", "callout", "list", "listItem"]);
  * the same way — `-  *em*` / `<br>` / `](u)` / `---` reports no heading at all
  * in Obsidian — so widening this without cases for it would be guessing.
  */
+/** Move a node and its descendants onto the document by a flat offset. */
+function shiftOnto(node: unknown, offset: number): void {
+  const candidate = node as {
+    position?: {
+      start: { offset?: number };
+      end: { offset?: number };
+    };
+    children?: unknown[];
+  };
+  if (candidate.position) {
+    for (const point of [candidate.position.start, candidate.position.end]) {
+      point.offset = offset + (point.offset ?? 0);
+    }
+  }
+  for (const child of candidate.children ?? []) shiftOnto(child, offset);
+}
+
 export function containerSetextTransform(
   tree: Root,
   source: string,
@@ -48,11 +65,27 @@ export function containerSetextTransform(
       if (fromLine === undefined) continue;
 
       const lines = source.slice(from, to).split("\n");
-      if (lines.length !== 2) continue;
+      // The underline has to be the *second* line, but anything after it is fine:
+      // `- item` / `===` / `more` is a heading plus `more` to Obsidian, while
+      // `-  *em*` / `<br>` / `](u)` / `---` -- where the run is on the fourth line --
+      // reports no heading at all. Capping the whole paragraph at two lines conflated
+      // the two.
+      if (lines.length < 2) continue;
       const [content, underline] = lines as [string, string];
       if (!UNDERLINE.test(underline) || content.trim() === "") continue;
+      const tail = lines.slice(2);
 
       const inline = reparse(content).children[0];
+      // Placed onto the document. `reparse` numbers the fragment from its own
+      // start, and leaving that alone is worse than it looks: `contentStart` in
+      // `setext-underline.ts` deliberately trusts a heading's children over its own
+      // span, so an unshifted child reported offset 0, that pass then read the whole
+      // document as the heading's content, counted three lines and demoted the
+      // heading it had just been handed. `- a` / `- b` / `===` lost its heading and
+      // came back as a paragraph spanning the entire source.
+      if (inline?.type === "paragraph") {
+        for (const child of inline.children) shiftOnto(child, from);
+      }
       const heading: Heading = {
         type: "heading",
         depth: underline.startsWith("=") ? 1 : 2,
@@ -62,7 +95,30 @@ export function containerSetextTransform(
           end: { ...paragraph.position!.end },
         },
       };
-      parent.children.splice(index, 1, heading);
+      if (tail.length === 0) {
+        parent.children.splice(index, 1, heading);
+        continue;
+      }
+
+      // The lines below the underline are their own block, re-parsed from where
+      // they actually start so the heading does not claim them.
+      const tailFrom = from + content.length + 1 + underline.length + 1;
+      heading.position = {
+        start: { ...paragraph.position!.start },
+        end: { line: 0, column: 1, offset: tailFrom - 1 },
+      };
+      const rest = reparse(tail.join("\n")).children[0];
+      if (rest?.type !== "paragraph") {
+        parent.children.splice(index, 1, heading);
+        continue;
+      }
+      for (const child of rest.children) shiftOnto(child, tailFrom);
+      rest.position = {
+        start: { line: 0, column: 1, offset: tailFrom },
+        end: { ...paragraph.position!.end },
+      };
+      parent.children.splice(index, 1, heading, rest);
+      index++;
     }
   });
 }
