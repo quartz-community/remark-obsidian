@@ -819,6 +819,34 @@ What the sweep is genuinely good for is **triage**:
   as one unremarkable case. That is what tells you which "isolated fragment" deserves
   a probe family.
 
+### The backlog does not need more fuzzing; it is already minimal
+
+Asked whether the remaining cases were actionable or wanted another sweep, the honest
+way to answer was to measure. Of 107 `replicate` cases:
+
+| kind                                         | count |
+| -------------------------------------------- | ----: |
+| designed probe or borrowed CommonMark case   |    44 |
+| fuzz document carrying one or two constructs |    30 |
+| fuzz document carrying more than two         |    33 |
+
+Thirty-eight of the 44 are CommonMark spec examples, which is the most isolated evidence
+available anywhere, and 106 of the 107 already carry a recorded cause.
+
+The 33 looked like the unattributable remainder, so `fuzz/shrink-corpus.ts` reduces them
+-- the same shrinker `sweep.ts` uses, pointed at documents already recorded here rather
+than at fresh seeds. **Thirty-one of the 33 were already minimal.** They reduce to 33
+distinct forms, several of them ten to fifteen characters: `- [ ]⏎===`, `y^2$⏎$y^2$`,
+`1. %%[⏎===`.
+
+Two conclusions. A construct count is a bad proxy for attributability -- a rule can
+genuinely need three constructs to show itself, and `- [ ]⏎===` is both dense by that
+measure and perfectly isolated. And more fuzzing is the wrong instrument here: a sweep
+generates documents carrying six to eight constructs, which is the category that looked
+unactionable, while the ones already present cannot be reduced further.
+
+So the remaining work is reading 107 small recorded cases, not gathering more.
+
 ### Group the reduced forms by _shape_, not by their text
 
 Exact-string dedup is what the sweep prints, and after the shared rules were fixed it
