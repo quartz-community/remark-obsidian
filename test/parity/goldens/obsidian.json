@@ -20132,8 +20132,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+      "triage": "match"
     },
     "fuzz/highlight/70": {
       "id": "fuzz/highlight/70",
@@ -21063,8 +21062,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/wikilink/12": {
       "id": "fuzz/wikilink/12",
@@ -40780,8 +40778,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/highlight/35": {
       "id": "fuzz/highlight/35",

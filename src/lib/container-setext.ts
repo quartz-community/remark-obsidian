@@ -58,9 +58,19 @@ export function containerSetextTransform(
       const paragraph = parent.children[index];
       if (paragraph?.type !== "paragraph") continue;
 
-      const from = paragraph.position?.start?.offset;
+      // The children's start, not the paragraph's own. A task item's paragraph
+      // spans from before its checkbox while its children correctly begin after
+      // it -- `- [ ] ~~del~~` over `===` reports `paragraph@2-17` with its first
+      // child at 6 -- so slicing by the span put `[ ] ` in the heading's text
+      // where Obsidian shows `del` and counts the checkbox as the task marker.
+      //
+      // `setext-underline.ts` records the same preference for the same reason.
+      const span = paragraph.position?.start?.offset;
+      const from = paragraph.children[0]?.position?.start?.offset ?? span;
       const to = paragraph.position?.end?.offset;
-      const fromLine = paragraph.position?.start?.line;
+      const fromLine =
+        paragraph.children[0]?.position?.start?.line ??
+        paragraph.position?.start?.line;
       if (from === undefined || to === undefined) continue;
       if (fromLine === undefined) continue;
 
@@ -86,12 +96,18 @@ export function containerSetextTransform(
       if (inline?.type === "paragraph") {
         for (const child of inline.children) shiftOnto(child, from);
       }
+      // The heading's own start follows its content too, because `headingName`
+      // reads the source over this span: left at the paragraph's start it named
+      // `- [ ] ~~del~~` over `===` as `[ ] ~~del~~`, checkbox included, after the
+      // children had already been corrected.
+      const contentPoint =
+        paragraph.children[0]?.position?.start ?? paragraph.position!.start;
       const heading: Heading = {
         type: "heading",
         depth: underline.startsWith("=") ? 1 : 2,
         children: inline?.type === "paragraph" ? inline.children : [],
         position: {
-          start: { ...paragraph.position!.start },
+          start: { ...contentPoint },
           end: { ...paragraph.position!.end },
         },
       };
@@ -104,7 +120,7 @@ export function containerSetextTransform(
       // they actually start so the heading does not claim them.
       const tailFrom = from + content.length + 1 + underline.length + 1;
       heading.position = {
-        start: { ...paragraph.position!.start },
+        start: { ...contentPoint },
         end: { line: 0, column: 1, offset: tailFrom - 1 },
       };
       const rest = reparse(tail.join("\n")).children[0];
