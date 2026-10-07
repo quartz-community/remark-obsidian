@@ -15,7 +15,10 @@ import { mapLines, shiftByMap } from "./line-map.js";
  * since the whole quote arrives as one text value: `> [!note]x` and `> [!note]-x` are both
  * ordinary quotes, which is why the title cannot simply start after `]`.
  */
-const MARKER = /^\[!([^\]]+)\]([-+]?)(?=[ \t\n]|$)[ \t]?/;
+// `[^\]\n]` rather than `[^\]]`: the type may not span a line ending. Allowing it
+// made `> [!n` / `note]` a callout of type `n\nnote`, where Obsidian reads an
+// unclosed `[!` as ordinary prose and reports the text `[!n note]`.
+const MARKER = /^\[!([^\]\n]+)\]([-+]?)(?=[ \t\n]|$)[ \t]?/;
 
 /**
  * A marker binds to `>` plus at most one space. `>  [!note]` is a quote, not

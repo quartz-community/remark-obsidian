@@ -20246,8 +20246,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+      "triage": "match",
+      "note": "Fixed by requiring a callout marker's type to stay on one line: [^\\]]+ matched across the newline, so '> [!n' over 'note]' became a callout of type 'n\\nnote'."
     },
     "fuzz/highlight/42": {
       "id": "fuzz/highlight/42",

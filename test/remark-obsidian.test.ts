@@ -2837,3 +2837,33 @@ describe("setext underline under a definition", () => {
     expect(shape("[^1]: x\n===\n")).toBe("heading(footnoteReference text)");
   });
 });
+
+describe("callout marker extent", () => {
+  const shape = (md: string) => {
+    const f = (n: any): string => {
+      const kids = (n.children ?? []).map(f).join(" ");
+      return n.type + (kids ? `(${kids})` : "");
+    };
+    return (processWithGfm(md) as any).children.map(f).join(" + ");
+  };
+
+  /**
+   * The type pattern was `[^\]]+`, which matches a newline -- so an unclosed `[!`
+   * found its `]` on the next line and produced a callout whose type spanned both.
+   * Obsidian reads an unclosed marker as ordinary prose.
+   */
+  it("does not let the type span a line ending", () => {
+    expect(shape("> [!n\nnote]\n")).toBe(
+      "blockquote(paragraph(text break text))",
+    );
+    expect(shape("> [!\nnote]\n")).toBe(
+      "blockquote(paragraph(text break text))",
+    );
+  });
+
+  it("still reads the ordinary markers", () => {
+    expect(shape("> [!note]\n")).toBe("callout");
+    expect(shape("> [!note]-\n")).toBe("callout");
+    expect(shape("> [!note] t\n")).toBe("callout(calloutTitle(text))");
+  });
+});
