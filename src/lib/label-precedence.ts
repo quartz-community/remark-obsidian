@@ -72,10 +72,41 @@ function skipSpace(source: string, from: number): number | undefined {
  * pins every form: three title quote styles, an angle destination, an empty one,
  * nested and escaped parens, an unterminated title and junk after a closed one.
  */
+/**
+ * A full reference destination, `[label]`, following a link's label.
+ *
+ * `[a [b](u)][r]` is a reference to `r` whose text reads `a [b](u)` -- the same
+ * outermost-pair rule as the inline form, with `[r]` where `(u)` would be. Only the
+ * full form: a collapsed `[]` or a shortcut reference resolves against the label
+ * itself, which this pass has just redefined, and no golden covers either.
+ */
+function referenceDestination(
+  source: string,
+  offset: number,
+): { url: string; reference: string; end: number } | undefined {
+  if (source[offset] !== "[") return undefined;
+  let index = offset + 1;
+  while (index < source.length) {
+    const character = source[index]!;
+    if (character === "\\") {
+      index += 2;
+      continue;
+    }
+    if (character === "[" || character === "\n") return undefined;
+    if (character === "]") {
+      const reference = source.slice(offset + 1, index);
+      if (reference === "") return undefined;
+      return { url: "", reference, end: index + 1 };
+    }
+    index++;
+  }
+  return undefined;
+}
+
 function inlineDestination(
   source: string,
   offset: number,
-): { url: string; end: number } | undefined {
+): { url: string; end: number; reference?: undefined } | undefined {
   if (source[offset] !== "(") return undefined;
   let index = skipSpace(source, offset + 1);
   if (index === undefined) return undefined;
@@ -335,10 +366,19 @@ export function labelPrecedenceTransform(
     const rebuilt: RootContent[] = [];
     let cursor = from;
     let changed = false;
+    // Past the last label *and its destination*, whether or not it was rebuilt. A
+    // reference destination is itself a bracket pair, so the scan offers it as the
+    // next label: `[foo][bar][baz]` would have had `[bar]` -- already spent as
+    // `[foo]`'s destination -- relabelled and pointed at `[baz]`.
+    let consumed = from;
 
     for (const label of labels) {
-      const after = inlineDestination(source, label.close + 1);
+      if (label.open < consumed) continue;
+      const after =
+        inlineDestination(source, label.close + 1) ??
+        referenceDestination(source, label.close + 1);
       if (!after) continue;
+      consumed = after.end;
       // Not every `[` opens a link label: an image, a wikilink and a footnote
       // reference all start with one and are indistinguishable from a link's at
       // this level. Asked of the *tree* rather than of the characters, because
@@ -374,15 +414,20 @@ export function labelPrecedenceTransform(
       demoteLinks(children, source);
 
       rebuilt.push({
-        type: "link",
-        url: after.url,
-        title: null,
+        ...(after.reference === undefined
+          ? { type: "link", url: after.url, title: null }
+          : {
+              type: "linkReference",
+              identifier: after.reference.toLowerCase(),
+              label: after.reference,
+              referenceType: "full",
+            }),
         children: children as Link["children"],
         position: {
           start: { line: 0, column: 1, offset: label.open },
           end: { line: 0, column: 1, offset: after.end },
         },
-      } as Link);
+      } as unknown as Link);
       cursor = after.end;
       changed = true;
     }

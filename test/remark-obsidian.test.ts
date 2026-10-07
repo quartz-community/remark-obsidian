@@ -3030,3 +3030,37 @@ describe("label precedence destination parsing", () => {
     expect(urls("[foo *bar](u)*\n")).toEqual(["u"]);
   });
 });
+
+describe("label precedence with a reference destination", () => {
+  const refs = (md: string) => {
+    const found: string[] = [];
+    visit(processWithGfm(md), "linkReference", (n: any) => {
+      found.push(n.identifier);
+    });
+    return found;
+  };
+  const text = (md: string) => {
+    const parts: string[] = [];
+    visit(processWithGfm(md), "text", (n: any) => {
+      parts.push(n.value);
+    });
+    return parts.join("");
+  };
+
+  /** The same outermost-pair rule, with `[r]` where `(u)` would be. */
+  it("takes a full reference after the outermost label", () => {
+    expect(refs("[a [b](u)][r]\n\n[r]: /r\n")).toEqual(["r"]);
+    expect(text("[a [b](u)][r]\n\n[r]: /r\n")).toBe("a [b](u)");
+  });
+
+  /**
+   * A reference destination is itself a bracket pair, so the scan offers it as the
+   * next label -- `[bar]` here is already spent as `[foo]`'s destination and was
+   * being relabelled and pointed at `[baz]`.
+   */
+  it("does not relabel a pair already spent as a destination", () => {
+    expect(text("[foo][bar][baz]\n\n[baz]: /url1\n[bar]: /url2\n")).toBe(
+      "foobaz",
+    );
+  });
+});

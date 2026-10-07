@@ -6148,7 +6148,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by accepting a reference destination after the label: [a [b](u)][r] is a reference to r whose text reads a [b](u), the same outermost-pair rule with [r] where (u) would be."
     },
     "probe/label-precedence/reference-inside": {
       "id": "probe/label-precedence/reference-inside",
@@ -67915,8 +67916,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Label precedence. A footnote label and a link label are the same mechanism, not two: `[^[a]]` is a reference to Obsidian while `[^[note]](url)` is a *link* whose label holds an inline footnote -- the discriminator is whether the outer link succeeds. So the footnote half cannot be closed on its own, and both wait on balanced-bracket label scanning."
+      "triage": "match",
+      "note": "Fixed by accepting a reference destination after the label: [a [b](u)][r] is a reference to r whose text reads a [b](u), the same outermost-pair rule with [r] where (u) would be."
     },
     "probe/bracket-nest/link-triple": {
       "id": "probe/bracket-nest/link-triple",
@@ -125649,8 +125650,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Obsidian takes the OUTER bracket pair as the link and leaves the inner one literal; CommonMark takes the inner. `[foo [bar](/uri)](/uri)` is one link whose content reads `foo [bar](/uri)`, which the legacy stack confirms exactly -- both oracles agree. Closing it means replacing micromark's label resolver with legacy's balanced-bracket scan, and the corpus argues against it: 6 replicate cases have this shape against 21 that already match and would be at risk. Measured, not assumed."
+      "triage": "match",
+      "note": "Fixed by accepting a reference destination after the label: [a [b](u)][r] is a reference to r whose text reads a [b](u), the same outermost-pair rule with [r] where (u) would be."
     },
     "commonmark/links/533": {
       "id": "commonmark/links/533",
@@ -125704,8 +125705,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Obsidian takes the OUTER bracket pair as the link and leaves the inner one literal; CommonMark takes the inner. `[foo [bar](/uri)](/uri)` is one link whose content reads `foo [bar](/uri)`, which the legacy stack confirms exactly -- both oracles agree. Closing it means replacing micromark's label resolver with legacy's balanced-bracket scan, and the corpus argues against it: 6 replicate cases have this shape against 21 that already match and would be at risk. Measured, not assumed."
+      "triage": "match",
+      "note": "Fixed by accepting a reference destination after the label: [a [b](u)][r] is a reference to r whose text reads a [b](u), the same outermost-pair rule with [r] where (u) would be."
     },
     "commonmark/links/534": {
       "id": "commonmark/links/534",
@@ -125811,8 +125812,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by accepting a reference destination after the label: [a [b](u)][r] is a reference to r whose text reads a [b](u), the same outermost-pair rule with [r] where (u) would be."
     },
     "commonmark/links/536": {
       "id": "commonmark/links/536",
@@ -125864,8 +125865,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by accepting a reference destination after the label: [a [b](u)][r] is a reference to r whose text reads a [b](u), the same outermost-pair rule with [r] where (u) would be."
     },
     "commonmark/links/537": {
       "id": "commonmark/links/537",
@@ -125917,8 +125918,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by accepting a reference destination after the label: [a [b](u)][r] is a reference to r whose text reads a [b](u), the same outermost-pair rule with [r] where (u) would be."
     },
     "commonmark/links/538": {
       "id": "commonmark/links/538",
@@ -125970,8 +125971,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by accepting a reference destination after the label: [a [b](u)][r] is a reference to r whose text reads a [b](u), the same outermost-pair rule with [r] where (u) would be."
     },
     "commonmark/links/539": {
       "id": "commonmark/links/539",
