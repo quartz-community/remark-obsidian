@@ -110,9 +110,22 @@ export function wikilinkFromMarkdown(): Extension {
         // the same pair as the path: `[[a#^blk\]]` resolves to `^blk` and
         // displays `a > ^blk\`, so rendering from the stripped heading dropped a
         // character Obsidian shows.
-        if (node.path.endsWith("\\")) node.path = node.path.slice(0, -1);
-        if (node.heading.endsWith("\\")) {
-          node.heading = node.heading.slice(0, -1);
+        // Only the part touching the closer loses its backslash. `[[target\]]`
+        // resolves to `target` and `[[a#^blk\]]` to `^blk`, because in both the
+        // backslash is the last character before `]]` -- but in `[[a\#b]]` the
+        // backslash is before the `#`, and Obsidian resolves that target as `a\`.
+        // Stripping both parts unconditionally lost that character.
+        // An alias is never stripped, even when it is the part touching the
+        // closer: `[[a|b\]]` keeps its `b\`. Only a resolved target loses the
+        // character, and an alias resolves to nothing.
+        const parts = partsOf(node);
+        const resolved = parts.heading
+          ? "heading"
+          : parts.path
+            ? "path"
+            : undefined;
+        if (resolved !== undefined && String(node[resolved]).endsWith("\\")) {
+          node[resolved] = String(node[resolved]).slice(0, -1);
         }
 
         // An alias that was *written* wins even when it is empty, which is why

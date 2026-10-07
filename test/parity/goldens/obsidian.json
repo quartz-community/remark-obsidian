@@ -49040,8 +49040,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "wikilink/target-empty-alias": {
       "id": "wikilink/target-empty-alias",
@@ -49155,8 +49154,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "wikilink/escaped-alias-separator": {
       "id": "wikilink/escaped-alias-separator",

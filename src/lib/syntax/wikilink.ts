@@ -112,10 +112,17 @@ function tokenize(
 
   function pathStart(code: Code): State | undefined {
     if (code === HASH) return headingMarker(code);
-    if (code === PIPE) return nok(code);
     if (code === null || isLineEnding(code)) return nok(code);
     effects.enter("wikilinkPath");
     hasPath = true;
+    // A leading `|` is a path character, not an alias separator: `[[|b]]` is a
+    // link whose target is `|b`. Obsidian only splits where the split leaves a
+    // target behind, and declining here made the whole construct fail instead.
+    if (code === PIPE) {
+      pathChars++;
+      effects.consume(code);
+      return path;
+    }
     return path(code);
   }
 
@@ -193,6 +200,14 @@ function tokenize(
     if (code === RIGHT_BRACKET) {
       effects.exit("wikilinkPath");
       return closeFirst(code);
+    }
+    // Nor the fragment separator: `[[a\#b]]` is a link whose target is `a\` and
+    // whose heading is `b`, so the backslash stays in the target and the `#`
+    // splits anyway. Same rule as `|` and `]` above -- inside a wikilink a
+    // backslash is an ordinary character, never an escape.
+    if (code === HASH) {
+      effects.exit("wikilinkPath");
+      return headingMarker(code);
     }
     if (code === null || isLineEnding(code)) return nok(code);
     effects.consume(code);
