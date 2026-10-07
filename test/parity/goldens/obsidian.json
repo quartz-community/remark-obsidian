@@ -6563,7 +6563,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by the full destination parser plus guards: a label claimed by an image, wikilink or footnote is skipped, and so is one a construct that opened earlier still encloses."
     },
     "probe/label-precedence/html-attr-crosses": {
       "id": "probe/label-precedence/html-attr-crosses",
@@ -6620,7 +6621,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by the full destination parser plus guards: a label claimed by an image, wikilink or footnote is skipped, and so is one a construct that opened earlier still encloses."
     },
     "probe/label-precedence/emphasis-crosses": {
       "id": "probe/label-precedence/emphasis-crosses",
@@ -6677,7 +6679,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match",
+      "note": "Fixed by the full destination parser plus guards: a label claimed by an image, wikilink or footnote is skipped, and so is one a construct that opened earlier still encloses."
     },
     "probe/label-precedence/wikilink-inside": {
       "id": "probe/label-precedence/wikilink-inside",
@@ -115998,8 +116001,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by the full destination parser plus guards: a label claimed by an image, wikilink or footnote is skipped, and so is one a construct that opened earlier still encloses."
     },
     "commonmark/code-spans/343": {
       "id": "commonmark/code-spans/343",
@@ -124933,8 +124936,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Obsidian takes the OUTER bracket pair as the link and leaves the inner one literal; CommonMark takes the inner. `[foo [bar](/uri)](/uri)` is one link whose content reads `foo [bar](/uri)`, which the legacy stack confirms exactly -- both oracles agree. Closing it means replacing micromark's label resolver with legacy's balanced-bracket scan, and the corpus argues against it: 6 replicate cases have this shape against 21 that already match and would be at risk. Measured, not assumed."
+      "triage": "match",
+      "note": "Fixed by the full destination parser plus guards: a label claimed by an image, wikilink or footnote is skipped, and so is one a construct that opened earlier still encloses."
     },
     "commonmark/links/520": {
       "id": "commonmark/links/520",
@@ -125097,8 +125100,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by the full destination parser plus guards: a label claimed by an image, wikilink or footnote is skipped, and so is one a construct that opened earlier still encloses."
     },
     "commonmark/links/523": {
       "id": "commonmark/links/523",
@@ -125204,8 +125207,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by the full destination parser plus guards: a label claimed by an image, wikilink or footnote is skipped, and so is one a construct that opened earlier still encloses."
     },
     "commonmark/links/525": {
       "id": "commonmark/links/525",
@@ -125262,8 +125265,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed by the full destination parser plus guards: a label claimed by an image, wikilink or footnote is skipped, and so is one a construct that opened earlier still encloses."
     },
     "commonmark/links/526": {
       "id": "commonmark/links/526",

@@ -2792,13 +2792,13 @@ describe("label retraction", () => {
   });
 
   /**
-   * Still open, and recorded here so the boundary is visible. Obsidian builds a link
-   * to `u` labelled `` foo` ``, but our tree has no link at all -- the code span
-   * swallows `](u)` -- so there is nothing for this pass to retract, and the
-   * label-driven pass only fires where an inner link already exists.
+   * Our tree has no link here at all -- the code span swallows `](u)` -- so this is
+   * built by the label-driven pass rather than retracted by this one. It needed the
+   * full destination parser before it could be: the trigger that reaches a label the
+   * tree found no link for is the same one that claims images and wikilinks.
    */
-  it("does not yet build a link the code span swallowed", () => {
-    expect(read("[foo`](u)`\n").urls).toEqual([]);
+  it("builds a link the code span swallowed", () => {
+    expect(read("[foo`](u)\n").urls).toEqual(["u"]);
   });
 
   /**
@@ -2987,5 +2987,46 @@ describe("html setext inside a container", () => {
   it("still handles the root form", () => {
     expect(shape("<br>\n===\n")).toBe("heading(html)");
     expect(shape("<pre>\n---\n</pre>\n")).toBe("heading(html) + html");
+  });
+});
+
+describe("label precedence destination parsing", () => {
+  const urls = (md: string) => {
+    const found: string[] = [];
+    visit(processWithGfm(md), "link", (n: any) => {
+      found.push(n.url);
+    });
+    return found;
+  };
+
+  /**
+   * The naive reader returned whatever sat between the parens, so a title landed in
+   * the url -- which is why widening this pass once cost 35 regressions.
+   */
+  it("keeps a title out of the url", () => {
+    expect(urls('[a [b](u) c](v "t")\n')).toEqual(["v"]);
+    expect(urls("[a [b](u) c](v 't')\n")).toEqual(["v"]);
+    expect(urls("[a [b](u) c](v (t))\n")).toEqual(["v"]);
+  });
+
+  it("reads an angle destination and refuses an unterminated title", () => {
+    expect(urls("[a [b](u) c](<v w>)\n")).toEqual(["v w"]);
+    expect(urls('[a [b](u) c](v "unterminated\n')).toEqual(["u"]);
+  });
+
+  /**
+   * An image, a wikilink and a footnote reference all begin with a bracket and are
+   * indistinguishable from a link's at this level, so the guard asks the tree.
+   */
+  it("leaves another construct's bracket alone", () => {
+    // The image owns both brackets, so there is no `link` node here at all.
+    expect(urls("![a [b](u) c](v)\n")).toEqual([]);
+    expect(urls("[a [[w]] b](u)\n")).toEqual(["u"]);
+  });
+
+  /** Whichever construct opened first wins. */
+  it("does not claim a bracket an earlier construct encloses", () => {
+    expect(urls("*[foo*](/uri)\n")).toEqual([]);
+    expect(urls("[foo *bar](u)*\n")).toEqual(["u"]);
   });
 });

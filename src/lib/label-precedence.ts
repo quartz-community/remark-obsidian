@@ -50,37 +50,90 @@ function outermostLabels(slice: string, base: number): Label[] {
   return found;
 }
 
-/** The destination of an inline link opening at `offset`, if there is one. */
+const WHITESPACE = /[ \t\r\n]/u;
+
+/** Skip whitespace, refusing a blank line as CommonMark does. */
+function skipSpace(source: string, from: number): number | undefined {
+  let index = from;
+  let newlines = 0;
+  while (index < source.length && WHITESPACE.test(source[index]!)) {
+    if (source[index] === "\n" && ++newlines > 1) return undefined;
+    index++;
+  }
+  return index;
+}
+
+/**
+ * CommonMark's inline destination and title, in full.
+ *
+ * The naive version this replaces returned whatever sat between the parens, so a
+ * title landed in the url -- which cost 35 regressions the moment this pass was
+ * allowed to build links the tree had not already found. `probe/link-surface/*`
+ * pins every form: three title quote styles, an angle destination, an empty one,
+ * nested and escaped parens, an unterminated title and junk after a closed one.
+ */
 function inlineDestination(
   source: string,
   offset: number,
 ): { url: string; end: number } | undefined {
   if (source[offset] !== "(") return undefined;
-  // An angle-bracket destination may hold unbalanced parens -- `(<foo(and(bar)>)`
-  // is CommonMark's own example 499 -- so counting them is wrong there.
-  if (source[offset + 1] === "<") {
-    const close = source.indexOf(">", offset + 2);
-    if (close === -1 || source[close + 1] !== ")") return undefined;
-    if (source.slice(offset, close).includes("\n")) return undefined;
-    return { url: source.slice(offset + 2, close), end: close + 2 };
-  }
-  let depth = 0;
-  for (let index = offset; index < source.length; index++) {
-    const character = source[index];
-    if (character === "\\") {
-      index++;
-      continue;
+  let index = skipSpace(source, offset + 1);
+  if (index === undefined) return undefined;
+
+  let url: string;
+  if (source[index] === "<") {
+    // An angle destination may hold unbalanced parens -- CommonMark's example 499
+    // is `(<foo(and(bar)>)` -- so counting them is wrong here.
+    let close = index + 1;
+    while (close < source.length && source[close] !== ">") {
+      if (source[close] === "\n") return undefined;
+      if (source[close] === "\\") close++;
+      close++;
     }
-    if (character === "\n") return undefined;
-    if (character === "(") depth++;
-    else if (character === ")") {
-      depth--;
-      if (depth === 0) {
-        return { url: source.slice(offset + 1, index), end: index + 1 };
+    if (source[close] !== ">") return undefined;
+    url = source.slice(index + 1, close);
+    index = close + 1;
+  } else {
+    const start = index;
+    let depth = 0;
+    while (index < source.length) {
+      const character = source[index]!;
+      if (character === "\\") {
+        index += 2;
+        continue;
       }
+      if (WHITESPACE.test(character)) break;
+      if (character === "(") depth++;
+      else if (character === ")") {
+        if (depth === 0) break;
+        depth--;
+      }
+      index++;
     }
+    if (depth !== 0) return undefined;
+    url = source.slice(start, index);
   }
-  return undefined;
+
+  const afterUrl = skipSpace(source, index);
+  if (afterUrl === undefined) return undefined;
+  index = afterUrl;
+
+  const opener = source[index];
+  if (opener === '"' || opener === "'" || opener === "(") {
+    const closer = opener === "(" ? ")" : opener;
+    let close = index + 1;
+    while (close < source.length && source[close] !== closer) {
+      if (source[close] === "\\") close++;
+      close++;
+    }
+    if (source[close] !== closer) return undefined;
+    const afterTitle = skipSpace(source, close + 1);
+    if (afterTitle === undefined) return undefined;
+    index = afterTitle;
+  }
+
+  if (source[index] !== ")") return undefined;
+  return { url, end: index + 1 };
 }
 
 /**
@@ -286,7 +339,26 @@ export function labelPrecedenceTransform(
     for (const label of labels) {
       const after = inlineDestination(source, label.close + 1);
       if (!after) continue;
-      if (!containsInnerLink(paragraph, label.open, label.close)) continue;
+      // Not every `[` opens a link label: an image, a wikilink and a footnote
+      // reference all start with one and are indistinguishable from a link's at
+      // this level. Asked of the *tree* rather than of the characters, because
+      // `[[a](u)](v)` is a link to `v` whose label happens to begin with a second
+      // bracket -- a character guard on `[[` skipped it along with the wikilinks.
+      if (claimedByOther(paragraph, label.open)) continue;
+      // And not when another construct opened *before* this bracket and still holds
+      // it. Whichever opens first wins: `[foo *bar](u)*` is a link to `u`, while
+      // `*[foo*](/uri)` is emphasis with the brackets left as text, and a `[link](u)`
+      // inside a `%%` comment is not a link at all.
+      if (enclosedByConstruct(paragraph, label.open)) continue;
+      // Either the tree resolved this the other way round -- an inner link where the
+      // scan says the outer pair wins -- or it found no link here at all, which is
+      // what a construct swallowing the `](u)` leaves behind.
+      if (
+        !containsInnerLink(paragraph, label.open, label.close) &&
+        linkStartsAt(paragraph, label.open)
+      ) {
+        continue;
+      }
 
       if (label.open > cursor) {
         rebuilt.push(
@@ -346,6 +418,75 @@ function shiftAll(nodes: readonly RootContent[], base: number): void {
       }
     });
   }
+}
+
+/**
+ * Whether a construct that opened earlier still encloses this bracket.
+ *
+ * Strictly inside: a construct beginning *at* the bracket is this label's own
+ * business, and one beginning before it has already claimed the character.
+ */
+function enclosedByConstruct(paragraph: Paragraph, open: number): boolean {
+  let found = false;
+  visit(paragraph as Node, (child: Node) => {
+    if (
+      child.type !== "emphasis" &&
+      child.type !== "strong" &&
+      child.type !== "delete" &&
+      child.type !== "comment" &&
+      child.type !== "highlight" &&
+      child.type !== "inlineCode" &&
+      child.type !== "inlineMath" &&
+      child.type !== "html"
+    ) {
+      return;
+    }
+    const start = (child as Positioned).position?.start?.offset;
+    const end = (child as Positioned).position?.end?.offset;
+    if (
+      start !== undefined &&
+      end !== undefined &&
+      start < open &&
+      open < end
+    ) {
+      found = true;
+    }
+  });
+  return found;
+}
+
+/**
+ * Whether something other than a link already owns this bracket.
+ *
+ * An image's own span starts at its `!`, one before the bracket, so it is checked
+ * at both offsets.
+ */
+function claimedByOther(paragraph: Paragraph, open: number): boolean {
+  let found = false;
+  visit(paragraph as Node, (child: Node) => {
+    if (
+      child.type !== "image" &&
+      child.type !== "imageReference" &&
+      child.type !== "wikilink" &&
+      child.type !== "footnoteReference" &&
+      child.type !== "footnote"
+    ) {
+      return;
+    }
+    const start = (child as Positioned).position?.start?.offset;
+    if (start === open || start === open - 1) found = true;
+  });
+  return found;
+}
+
+/** Whether the tree already holds a `link` beginning at this offset. */
+function linkStartsAt(paragraph: Paragraph, open: number): boolean {
+  let found = false;
+  visit(paragraph as Node, (child: Node) => {
+    if (child.type !== "link" && child.type !== "linkReference") return;
+    if ((child as Positioned).position?.start?.offset === open) found = true;
+  });
+  return found;
 }
 
 /** Whether the tree holds a `link` opening strictly inside this label. */
