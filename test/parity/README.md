@@ -765,6 +765,37 @@ What the sweep is genuinely good for is **triage**:
   as one unremarkable case. That is what tells you which "isolated fragment" deserves
   a probe family.
 
+### Group the reduced forms by _shape_, not by their text
+
+Exact-string dedup is what the sweep prints, and after the shared rules were fixed it
+says everything is a singleton: 1000 seeds gave 250 failures reducing to **244** distinct
+causes, the largest cluster three seeds. An earlier sweep had 128 failures reducing to 118
+with a cluster of eight, so the clustering has got weaker exactly as the big rules were
+closed.
+
+That reading is misleading, because the shrinker reduces to different literal text for the
+same underlying rule. Classifying those 244 causes by shape instead:
+
+| shape                                   | causes |   share |
+| --------------------------------------- | -----: | ------: |
+| label nesting, `[`…`[`…`]`…`]`          |     96 | **39%** |
+| — of which doubled footnote, impossible |     16 |      7% |
+| — of which a footnote label holds `[[`  |     19 |      8% |
+| — other bracket nesting                 |     61 |     25% |
+| unbalanced brackets                     |     56 |     23% |
+| no bracket involvement                  |     91 |     37% |
+
+So the remaining divergences are fragmented by text and concentrated by shape, and the
+concentration is in the one family the corpus under-samples: bracket nesting is ~24
+recorded cases and **39% of independently discovered causes**.
+
+Only 4 of the 244 appear in the corpus verbatim, so this is new ground rather than a
+replay of known cases — which is what makes the share meaningful.
+
+Two things it does not say. A reduced form is one cause of its document's failure, so
+closing the family does not flip 39% of documents. And 37% involve no bracket at all, so
+a complete bracket fix still leaves a large, genuinely diverse remainder.
+
 Two cautions. The reduced form is **a** cause of that document's failure, not the only
 one — shrinking has drifted to a rarer cause every time it has been checked, so treat
 a minimal form as a lead and confirm the rule with recorded probes. And a fixed
