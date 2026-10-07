@@ -7246,8 +7246,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "`[text][^9]` is a collapsed reference link whose label is `^9`, so Obsidian indexes no footnote reference; we read `[^9]` as one. Same rule as collection-label, seen from the other side."
+      "triage": "match"
     },
     "probe/reference-in-link/definition-title": {
       "id": "probe/reference-in-link/definition-title",
@@ -108690,8 +108689,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/link-reference-definitions/197": {
       "id": "commonmark/link-reference-definitions/197",
@@ -108904,8 +108902,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/link-reference-definitions/201": {
       "id": "commonmark/link-reference-definitions/201",
@@ -126313,8 +126310,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/links/546": {
       "id": "commonmark/links/546",

@@ -230,9 +230,23 @@ export function definedFootnotes(tree: Node): Set<string> {
   return defined;
 }
 
+/** Labels the document defines, so a dangling reference can be told from a live one. */
+export function definedReferences(tree: Node): Set<string> {
+  const defined = new Set<string>();
+  visit(tree, "definition", (node: Node) => {
+    defined.add(String((node as unknown as { identifier: string }).identifier));
+  });
+  return defined;
+}
+
 /** From mdast, not HTML: `wikilink`/`tag` have no hast handler and vanish when rendered. */
-export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
+export function mdastText(
+  tree: Node,
+  defined?: ReadonlySet<string>,
+  source?: string,
+): string {
   const parts: string[] = [];
+  const references = source === undefined ? undefined : definedReferences(tree);
 
   const walk = (node: Node, phrasing = false): void => {
     switch (node.type) {
@@ -316,6 +330,31 @@ export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
             raw.replace(/<[^>]*>/g, "").replace(/<[a-zA-Z/!?][^>]*$/, ""),
           )}${phrasing ? "" : " "}`,
         );
+        return;
+      }
+      // A reference whose label nothing defines renders as its own source, brackets
+      // and all: Obsidian shows `[foo]` where walking the children shows `foo`.
+      // Taken as a source slice rather than rebuilt, because the written form
+      // varies by reference type and may hold escapes -- `[bar][foo\!]` has to come
+      // back exactly, and reconstructing it from `identifier` would unescape it.
+      //
+      // Same class as a dangling footnote reference, which `rehype-obsidian`
+      // already bares: the node stays in the tree so a formatter cannot delete the
+      // author's brackets, and the drop belongs downstream.
+      case "linkReference": {
+        const reference = node as unknown as { identifier: string };
+        const from = node.position?.start?.offset;
+        const to = node.position?.end?.offset;
+        if (
+          references === undefined ||
+          source === undefined ||
+          from === undefined ||
+          to === undefined ||
+          references.has(String(reference.identifier))
+        ) {
+          break;
+        }
+        parts.push(source.slice(from, to));
         return;
       }
       case "break":
@@ -896,7 +935,7 @@ export function projectOurs(
   );
   return {
     ...projectMdast(tree, source),
-    text: mdastText(tree, definedFootnotes(tree)),
+    text: mdastText(tree, definedFootnotes(tree), source),
     sections: mdastSections(tree, source),
   };
 }
