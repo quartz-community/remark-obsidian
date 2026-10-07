@@ -72,6 +72,7 @@ import {
 import { footnoteLabelTransform } from "./lib/footnote-label.js";
 import { tableInterruptTransform } from "./lib/table-interrupt.js";
 import { containerSetextTransform } from "./lib/container-setext.js";
+import { thematicBreakTabTransform } from "./lib/thematic-break-tab.js";
 import { setextDefinitionTransform } from "./lib/setext-definition.js";
 import { shortCommentTransform } from "./lib/short-comment.js";
 import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
@@ -504,6 +505,9 @@ export default function remarkObsidian(
     // on the next line continue it as prose.
     // Before the demoting pass, which only looks at headings that already
     // exist: inside a container there is none yet.
+    // Before the setext passes: a break cancelled by a tab is a list from here on,
+    // and nothing downstream should still see a `thematicBreak` there.
+    thematicBreakTabTransform(tree, String(file));
     containerSetextTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );

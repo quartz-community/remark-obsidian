@@ -59812,8 +59812,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Emphasis across a line ending works in general -- 9 of 13 probes match, including the bare, quote and list forms. The open ones are where a fragment is reparsed (setext) or a boundary is crossed (callout title), plus a tab-separated run Obsidian reads as nested lists rather than a thematic break."
+      "triage": "match",
+      "note": "Fixed by thematicBreakTabTransform: a tab between the markers cancels the break, so the line becomes the nested list items the legacy tokenizer produces -- or a paragraph for an underscore, which opens no list."
     },
     "probe/footnote-content/inline-plain": {
       "id": "probe/footnote-content/inline-plain",
@@ -60711,8 +60711,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A tab anywhere between the markers cancels the break -- even a trailing one -- and the line falls through to the list tokenizer as nested items. Confirmed against the legacy stack, which agrees with Obsidian on every variant. Suppressing the break means replacing micromark's thematicBreak wholesale, which these seven cases now justify where one did not."
+      "triage": "match",
+      "note": "Fixed by thematicBreakTabTransform: a tab between the markers cancels the break, so the line becomes the nested list items the legacy tokenizer produces -- or a paragraph for an underscore, which opens no list."
     },
     "probe/thematic-break/tab-one": {
       "id": "probe/thematic-break/tab-one",
@@ -60763,8 +60763,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A tab anywhere between the markers cancels the break -- even a trailing one -- and the line falls through to the list tokenizer as nested items. Confirmed against the legacy stack, which agrees with Obsidian on every variant. Suppressing the break means replacing micromark's thematicBreak wholesale, which these seven cases now justify where one did not."
+      "triage": "match",
+      "note": "Fixed by thematicBreakTabTransform: a tab between the markers cancels the break, so the line becomes the nested list items the legacy tokenizer produces -- or a paragraph for an underscore, which opens no list."
     },
     "probe/thematic-break/tab-trailing": {
       "id": "probe/thematic-break/tab-trailing",
@@ -60815,8 +60815,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A tab anywhere between the markers cancels the break -- even a trailing one -- and the line falls through to the list tokenizer as nested items. Confirmed against the legacy stack, which agrees with Obsidian on every variant. Suppressing the break means replacing micromark's thematicBreak wholesale, which these seven cases now justify where one did not."
+      "triage": "match",
+      "note": "Fixed by thematicBreakTabTransform: a tab between the markers cancels the break, so the line becomes the nested list items the legacy tokenizer produces -- or a paragraph for an underscore, which opens no list."
     },
     "probe/thematic-break/dash-tab": {
       "id": "probe/thematic-break/dash-tab",
@@ -60867,8 +60867,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A tab anywhere between the markers cancels the break -- even a trailing one -- and the line falls through to the list tokenizer as nested items. Confirmed against the legacy stack, which agrees with Obsidian on every variant. Suppressing the break means replacing micromark's thematicBreak wholesale, which these seven cases now justify where one did not."
+      "triage": "match",
+      "note": "Fixed by thematicBreakTabTransform: a tab between the markers cancels the break, so the line becomes the nested list items the legacy tokenizer produces -- or a paragraph for an underscore, which opens no list."
     },
     "probe/thematic-break/dash-spaces": {
       "id": "probe/thematic-break/dash-spaces",
@@ -60962,8 +60962,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A tab anywhere between the markers cancels the break -- even a trailing one -- and the line falls through to the list tokenizer as nested items. Confirmed against the legacy stack, which agrees with Obsidian on every variant. Suppressing the break means replacing micromark's thematicBreak wholesale, which these seven cases now justify where one did not."
+      "triage": "match",
+      "note": "Fixed by thematicBreakTabTransform: a tab between the markers cancels the break, so the line becomes the nested list items the legacy tokenizer produces -- or a paragraph for an underscore, which opens no list."
     },
     "probe/thematic-break/underscore-spaces": {
       "id": "probe/thematic-break/underscore-spaces",
@@ -61063,8 +61063,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A tab anywhere between the markers cancels the break -- even a trailing one -- and the line falls through to the list tokenizer as nested items. Confirmed against the legacy stack, which agrees with Obsidian on every variant. Suppressing the break means replacing micromark's thematicBreak wholesale, which these seven cases now justify where one did not."
+      "triage": "match",
+      "note": "Fixed by thematicBreakTabTransform: a tab between the markers cancels the break, so the line becomes the nested list items the legacy tokenizer produces -- or a paragraph for an underscore, which opens no list."
     },
     "probe/strikethrough/simple": {
       "id": "probe/strikethrough/simple",

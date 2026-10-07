@@ -2540,3 +2540,63 @@ describe("callout title boundary", () => {
     );
   });
 });
+
+describe("thematic break with a tab", () => {
+  const shape = (md: string) => {
+    const f = (n: any): string => {
+      const kids = (n.children ?? []).map(f).join(" ");
+      return n.type + (kids ? `(${kids})` : "");
+    };
+    return (processWithGfm(md) as any).children.map(f).join(" + ");
+  };
+  const spans = (md: string) => {
+    const found: string[] = [];
+    visit(processWithGfm(md), "listItem", (n: any) => {
+      found.push(`${n.position?.start?.offset}..${n.position?.end?.offset}`);
+    });
+    return found;
+  };
+
+  /**
+   * `remark-parse@8` accepts only spaces between the markers, so a tab drops the
+   * line to the list tokenizer. CommonMark counts a tab as whitespace and reports a
+   * break.
+   */
+  it("becomes nested list items", () => {
+    expect(shape("*\t*\t*\t\n")).toBe(
+      "list(listItem(list(listItem(list(listItem)))))",
+    );
+    expect(shape("-\t-\t-\t\n")).toBe(
+      "list(listItem(list(listItem(list(listItem)))))",
+    );
+  });
+
+  /** Each item starts at its marker and runs to the end of the line. */
+  it("places every item as the metadata cache reports it", () => {
+    expect(spans("*\t*\t*\t\n")).toEqual(["0..6", "2..6", "4..6"]);
+  });
+
+  it("is cancelled by a trailing tab alone", () => {
+    expect(shape("* * *\t\n")).toBe(
+      "list(listItem(list(listItem(list(listItem)))))",
+    );
+  });
+
+  /** `_` opens no list, so the line is simply prose. */
+  it("leaves an underscore run as a paragraph", () => {
+    expect(shape("_\t_\t_\t\n")).toBe("paragraph(text)");
+  });
+
+  it("leaves a space-separated break alone", () => {
+    expect(shape("* * *\n")).toBe("thematicBreak");
+    expect(shape("***\n")).toBe("thematicBreak");
+    expect(shape("*  *  *\n")).toBe("thematicBreak");
+  });
+
+  it("does not disturb a setext heading or an ordinary list", () => {
+    expect(shape("para\n---\n")).toBe("heading(text)");
+    expect(shape("- a\n- b\n")).toBe(
+      "list(listItem(paragraph(text)) listItem(paragraph(text)))",
+    );
+  });
+});

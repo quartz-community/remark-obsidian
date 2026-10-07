@@ -235,7 +235,7 @@ describe("positioned oracle", () => {
     footnotes: 41,
     footnoteRefs: 4,
     headings: 18,
-    sections: 141,
+    sections: 134,
     links: 116,
     embeds: 42,
     tags: 5,
