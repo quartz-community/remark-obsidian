@@ -154,6 +154,9 @@ interface ListNode extends Node {
   ordered?: boolean | null;
   start?: number | null;
 }
+interface HtmlNode extends Node {
+  value?: string;
+}
 
 export function structureFromMdast(tree: Root): Structure {
   const tableAlign: string[] = [];
@@ -181,6 +184,19 @@ export function structureFromMdast(tree: Root): Structure {
     // where the tree has a `yaml` node. Both describe the same block.
     if (node.type === "yaml") {
       codeLang.push("yaml");
+      return;
+    }
+    // A `<pre>` an author wrote themselves is still a `pre` element. The chain
+    // passes raw html through (`allowDangerousHtml` plus `rehypeRaw`), so the DOM
+    // the recorder reads has one, while this side saw only an `html` node and
+    // reported nothing -- `<pre>` / `---` / `</pre>` is the whole divergence.
+    //
+    // Extracted with the same pattern and the same `languageOf` the HTML side
+    // uses, so the two cannot drift apart.
+    if (node.type === "html") {
+      for (const pre of String((node as HtmlNode).value ?? "").matchAll(PRE)) {
+        codeLang.push(languageOf(pre[2], pre[1]));
+      }
       return;
     }
     if (node.type === "list") {

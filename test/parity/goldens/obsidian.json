@@ -4687,7 +4687,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "probe/html-block/span-setext": {
       "id": "probe/html-block/span-setext",
@@ -107262,8 +107262,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/html-blocks/170": {
       "id": "commonmark/html-blocks/170",
