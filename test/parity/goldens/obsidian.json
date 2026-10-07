@@ -113763,7 +113763,7 @@
         }
       },
       "triage": "replicate",
-      "note": "referenceLinks is EMPTY: the escaped-title form is not a definition to Obsidian, and we agree - neither side builds one. The divergence is escape resolution in the leftover text: obs renders /url\\bar*baz \"foo\"bar\\baz\" with \\* and \\\" resolved and \\b kept, while we keep every backslash. Our text node holds the RAW source because legacyDefinitionTransform demotes a rejected definition without reparsing it, so the escapes never resolve."
+      "note": "referenceLinks is EMPTY: the escaped-title form is not a definition to Obsidian, and we agree - neither side builds one. The divergence is escape resolution in the leftover text: obs renders /url\\bar*baz \"foo\"bar\\baz\" with \\* and \\\" resolved and \\b kept, while we keep every backslash. Our text node holds the RAW source because legacyDefinitionTransform demotes a rejected definition without reparsing it, so the escapes never resolve. ATTEMPTED: a lazy-continuation reparse (hang the line under a sentinel paragraph so it cannot open a block, then drop the sentinel and the break) is the right shape for forcing inline interpretation, but it never reaches that fallback here - the verbatim text is produced upstream of legacyDefinitionTransform, so the demotion is not the site. Find who builds the raw text node first."
     },
     "commonmark/link-reference-definitions/203": {
       "id": "commonmark/link-reference-definitions/203",
