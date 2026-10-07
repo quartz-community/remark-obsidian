@@ -115,6 +115,13 @@ export function wikilinkFromMarkdown(): Extension {
         // backslash is the last character before `]]` -- but in `[[a\#b]]` the
         // backslash is before the `#`, and Obsidian resolves that target as `a\`.
         // Stripping both parts unconditionally lost that character.
+        // A no-break space resolves as an ordinary one: `![[*\u00a0*]]` is an
+        // embed of the note `* *`. Applied to the resolved target only -- `value`
+        // and the source keep the character the author typed, so a formatter
+        // cannot quietly rewrite it.
+        node.path = node.path.replace(/\u00a0/g, " ");
+        node.heading = node.heading.replace(/\u00a0/g, " ");
+
         // An alias is never stripped, even when it is the part touching the
         // closer: `[[a|b\]]` keeps its `b\`. Only a resolved target loses the
         // character, and an alias resolves to nothing.
