@@ -27832,8 +27832,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/inline-footnote/28": {
       "id": "fuzz/inline-footnote/28",
@@ -28303,8 +28302,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/116": {
       "id": "fuzz/embed/116",
@@ -49387,8 +49385,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "wikilink/vault-block-search": {
       "id": "wikilink/vault-block-search",
@@ -53855,7 +53852,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "note": "Obsidian has no 9-digit cap on an ordered list marker: remark-parse@8 parses 12345678901. as a list with start=12345678901, and the golden reports list@0:0-1:13 with two items for \"1) a\" / \"1234567890) b\". CommonMark caps at 9 digits and micromark enforces it inside the list CONTAINER construct, which cannot be reached by prepending (a container owns continuation, so overriding means porting it whole). A tree transform would have to both create a list and append an item to a preceding one. 2 cases; recorded rather than implemented."
     },
     "list/tight-to-loose": {
       "id": "list/tight-to-loose",
@@ -79062,8 +79059,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "token/footnote-ref/balanced": {
       "id": "token/footnote-ref/balanced",
@@ -112227,7 +112223,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "Obsidian has no 9-digit cap on an ordered list marker: remark-parse@8 parses 12345678901. as a list with start=12345678901, and the golden reports list@0:0-1:13 with two items for \"1) a\" / \"1234567890) b\". CommonMark caps at 9 digits and micromark enforces it inside the list CONTAINER construct, which cannot be reached by prepending (a container owns continuation, so overriding means porting it whole). A tree transform would have to both create a list and append an item to a preceding one. 2 cases; recorded rather than implemented."
     },
     "commonmark/list-items/267": {
       "id": "commonmark/list-items/267",

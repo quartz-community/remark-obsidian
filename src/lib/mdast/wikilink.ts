@@ -123,7 +123,13 @@ export function wikilinkFromMarkdown(): Extension {
           ? node.path
           : partsOf(node).alias
             ? node.alias
-            : [written, writtenHeading].filter(Boolean).join(" > ");
+            : // The display form splits the heading on *every* `#`, so
+              // `[[a#b#c]]` reads `a > b > c`. Only the destination splits on
+              // the first one -- `heading` stays `b#c` because that is what a
+              // consumer resolves against.
+              [written, ...writtenHeading.split("#")]
+                .filter(Boolean)
+                .join(" > ");
         this.exit(token);
       },
     },
