@@ -158,10 +158,24 @@ describe("round-trip", () => {
    * label holding a `[` was written back escaped, re-parsed to a different label and
    * grew a backslash every pass.
    *
-   * What remains is the `break` gap this file was written for: a transform that folds
-   * lazy lines back into a block emits `break` nodes, `remark-stringify` writes a hard
-   * break as a trailing backslash, and that re-parses as an escaped one. The fix
-   * belongs in how those passes represent a folded line.
+   * What remains is **not** the `break` gap, which is what this docstring claimed
+   * before the thirty-three were classified. Measured by shape:
+   *
+   *     11  other
+   *      9  leading indent re-encoded as `&#x20;`
+   *      8  wikilink or bracket run that does not re-parse to the same node
+   *      4  emphasis delimiter ambiguity
+   *      1  gfm's literal autolink, upstream and documented above
+   *
+   * No single cause dominates, and each needs its own `toMarkdown` handler. The
+   * wikilink eight are ours and the clearest: `path` is deliberately the *resolved*
+   * target, so `[[ ]]` carries an empty one and writes back as `[[]]`, which parses
+   * as no wikilink at all -- and `[[target\]]` loses the backslash `value` keeps.
+   * Fixing those means the node carrying what to serialise alongside what to resolve
+   * and what to render, which is a third field and a staleness question.
+   *
+   * Left as tracked debt rather than chased handler by handler. This is a ceiling,
+   * the parity gate is the contract, and nothing here throws.
    */
   it("does not grow the set of inputs formatting cannot settle", () => {
     expect(unstable.length).toBeLessThanOrEqual(33);
