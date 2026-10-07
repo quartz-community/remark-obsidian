@@ -1729,6 +1729,36 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // Enumerated rather than inferred: container x how many lazy lines x which line
   // carries the underline. The `===`/`---` pair is kept because only `---` is also
   // a thematic break, which is the likeliest source of the asymmetry.
+  // Does a quote absorb raw html at column zero, as a list does?
+  //
+  // `containerLazyTransform` documents the rule for a list and for a paragraph --
+  // `- x` over `</div>` is one list, `para` over `</div>` is a paragraph *and* an
+  // html -- and applies the list half to a blockquote too, because they share one
+  // container set. Nothing ever measured the quote.
+  //
+  // A 1000-seed sweep then reduced **seven independent failures** onto exactly this
+  // shape: `> [!` / `</div>`, `> [[` / `</div>`, `> > #` / `</div>` and four more.
+  // The corpus holds three quote-and-html cases and not one of them is this way
+  // round -- the two that match have the html *first*. That is the under-sampled
+  // family a sweep is for, and the reason to run one even when the backlog looks
+  // fragmented.
+  //
+  // The list and paragraph controls are repeated here deliberately. If the quote
+  // turns out to differ, the asymmetry is the rule, and it would be the third of
+  // its kind after lazy-setext and the empty-item interruption.
+  ["probe/quote-html/quote-close-tag", "> x\n</div>\n"],
+  ["probe/quote-html/quote-open-tag", "> x\n<div>\n"],
+  ["probe/quote-html/quote-blank-then-tag", "> x\n\n</div>\n"],
+  ["probe/quote-html/quote-nested-close-tag", "> > x\n</div>\n"],
+  ["probe/quote-html/callout-close-tag", "> [!note] x\n</div>\n"],
+  ["probe/quote-html/incomplete-callout-close-tag", "> [!\n</div>\n"],
+  ["probe/quote-html/quote-wikilink-close-tag", "> [[a\n</div>\n"],
+  ["probe/quote-html/quote-inline-tag", "> x\n<br>\n"],
+  ["probe/quote-html/quote-tag-then-text", "> x\n</div>\nmore\n"],
+  ["probe/quote-html/list-close-tag", "- x\n</div>\n"],
+  ["probe/quote-html/paragraph-close-tag", "para\n</div>\n"],
+  ["probe/quote-html/list-blank-then-tag", "- x\n\n</div>\n"],
+
   // Where a wikilink meets inline-link syntax.
   //
   // Picked by measurement, not by feel: of the wikilink cases still diverging, `](`

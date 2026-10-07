@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-07T19:10:39.893Z",
+  "recordedAt": "2026-10-07T19:54:42.072Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -63737,6 +63737,624 @@
           "embeds": [],
           "tags": [],
           "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-html/quote-close-tag": {
+      "id": "probe/quote-html/quote-close-tag",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> x\n</div>\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>x</p>\n</blockquote>\n",
+        "projections": {
+          "text": "x",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> x"
+            },
+            {
+              "type": "html",
+              "text": "</div>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:3",
+            "html@1:0-1:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-html/quote-open-tag": {
+      "id": "probe/quote-html/quote-open-tag",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> x\n<div>\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>x</p>\n</blockquote>\n<div></div>",
+        "projections": {
+          "text": "x",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> x"
+            },
+            {
+              "type": "html",
+              "text": "<div>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:3",
+            "html@1:0-1:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-html/quote-blank-then-tag": {
+      "id": "probe/quote-html/quote-blank-then-tag",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> x\n\n</div>\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>x</p>\n</blockquote>\n",
+        "projections": {
+          "text": "x",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> x"
+            },
+            {
+              "type": "html",
+              "text": "</div>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:3",
+            "html@2:0-2:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-html/quote-nested-close-tag": {
+      "id": "probe/quote-html/quote-nested-close-tag",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> > x\n</div>\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n<p>x</p>\n</blockquote>\n</blockquote>\n",
+        "projections": {
+          "text": "x",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> > x"
+            },
+            {
+              "type": "html",
+              "text": "</div>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:5",
+            "html@1:0-1:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-html/callout-close-tag": {
+      "id": "probe/quote-html/callout-close-tag",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] x\n</div>\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">x</div></div></div>\n",
+        "projections": {
+          "text": "x",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] x"
+            },
+            {
+              "type": "html",
+              "text": "</div>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:11",
+            "html@1:0-1:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-html/incomplete-callout-close-tag": {
+      "id": "probe/quote-html/incomplete-callout-close-tag",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!\n</div>\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>[!</p>\n</blockquote>\n",
+        "projections": {
+          "text": "[!",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> [!"
+            },
+            {
+              "type": "html",
+              "text": "</div>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:4",
+            "html@1:0-1:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-html/quote-wikilink-close-tag": {
+      "id": "probe/quote-html/quote-wikilink-close-tag",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [[a\n</div>\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>[[a</p>\n</blockquote>\n",
+        "projections": {
+          "text": "[[a",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> [[a"
+            },
+            {
+              "type": "html",
+              "text": "</div>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:5",
+            "html@1:0-1:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-html/quote-inline-tag": {
+      "id": "probe/quote-html/quote-inline-tag",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> x\n<br>\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>x<br>\n<br></p>\n</blockquote>",
+        "projections": {
+          "text": "x",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> x\n<br>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-html/quote-tag-then-text": {
+      "id": "probe/quote-html/quote-tag-then-text",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> x\n</div>\nmore\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>x</p>\n</blockquote>\n\nmore",
+        "projections": {
+          "text": "x more",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> x"
+            },
+            {
+              "type": "html",
+              "text": "</div>\nmore"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:3",
+            "html@1:0-2:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-html/list-close-tag": {
+      "id": "probe/quote-html/list-close-tag",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- x\n</div>\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">x\n\n</li>\n</ul>",
+        "projections": {
+          "text": "x",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- x\n</div>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:6"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-html/paragraph-close-tag": {
+      "id": "probe/quote-html/paragraph-close-tag",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "para\n</div>\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">para</p>\n",
+        "projections": {
+          "text": "para",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "para"
+            },
+            {
+              "type": "html",
+              "text": "</div>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:4",
+            "html@1:0-1:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-html/list-blank-then-tag": {
+      "id": "probe/quote-html/list-blank-then-tag",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- x\n\n</div>\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">x</li>\n</ul>\n",
+        "projections": {
+          "text": "x",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- x"
+            },
+            {
+              "type": "html",
+              "text": "</div>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:3",
+            "html@2:0-2:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:3"
+          ],
           "blocks": [],
           "frontmatterLinks": []
         }

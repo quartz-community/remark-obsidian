@@ -25,15 +25,24 @@ const CONTAINERS = new Set(["list", "blockquote", "callout"]);
  * so `> [^1]: quoted def` / `plain column-0 line` / `[^2]: second` is all one
  * blockquote.
  *
- * An HTML line is absorbed for the same reason, and the legacy stack draws the
- * boundary sharply -- it is the container that matters, not the construct:
+ * An HTML line is absorbed after a **list**, and only after a list. It is the
+ * container that matters, not the construct:
  *
  *     - x⏎</div>        one `list`
+ *     > x⏎</div>        a `blockquote` *and* an `html`, like a paragraph
  *     para⏎</div>       a `paragraph` *and* an `html`, so html does interrupt at root
  *     - x⏎⏎</div>       `list` then `html`, since the blank line ends the container
  *
- * Obsidian agrees on all three, and five recorded cases reported a stray `html`
- * section after a list before this.
+ * The quote line is the correction. This rule was written from the list and the
+ * paragraph and applied to a quote as well, because they share one container set --
+ * and `probe/quote-html/*` measures the quote behaving like the paragraph instead,
+ * across a plain quote, a nested one, a callout, an incomplete callout and a
+ * wikilink-bearing one. A 1000-seed sweep reduced **seven independent failures**
+ * onto that shape before a single one of them was recorded here, which is what a
+ * sweep is for when a backlog looks fragmented.
+ *
+ * `> x⏎<br>` stays one blockquote: a tag CommonMark cannot interrupt a paragraph
+ * with never arrives as a sibling, so it is lazy continuation before this runs.
  *
  * Only a block on the very next line is absorbed. A blank line between them
  * still ends the container, which is what keeps ordinary documents untouched.
@@ -113,7 +122,17 @@ export function containerLazyTransform(tree: Root, source: string): void {
         next.type !== "footnoteDefinition" &&
         next.type !== "table" &&
         next.type !== "math" &&
-        next.type !== "html" &&
+        // Html, but only after a list. `- x` over `</div>` is one list to Obsidian
+        // while `> x` over `</div>` is a blockquote *and* an html, exactly as
+        // `para` over `</div>` is -- so a quote behaves like a paragraph here and a
+        // list is the exception. Applying the list rule to both was wrong for seven
+        // probes, and a 1000-seed sweep reduced seven independent failures onto this
+        // shape before any of them was recorded.
+        //
+        // `> x` over `<br>` is unaffected and still one blockquote: a tag CommonMark
+        // cannot interrupt a paragraph with never arrives here as a sibling, because
+        // micromark has already taken it as lazy continuation.
+        !(next.type === "html" && container.type === "list") &&
         // A heading, but only after a list. CommonMark forbids lazily continuing
         // a setext heading into a container, so micromark hands `- a` / `<br>` /
         // `b` / `---` a *root* heading of `b␤---` -- and Obsidian keeps `b` in
