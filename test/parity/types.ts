@@ -93,6 +93,16 @@ export interface ComputedMeta {
    * `frontmatterLinks` is a construct class no oracle here has ever looked at.
    */
   readonly links?: readonly string[];
+  /**
+   * Link *reference* definitions, which no oracle here has ever looked at.
+   *
+   * `[foo]: /url` is a construct class the rendered DOM cannot show -- a
+   * definition renders as nothing -- and one that neither `links` nor `sections`
+   * distinguishes from a paragraph. Eight recorded cases turn on how a definition
+   * or a reference to one is read, so this is the one unused public field with
+   * failing cases waiting for it.
+   */
+  readonly referenceLinks?: readonly string[];
   readonly embeds?: readonly string[];
   readonly tags?: readonly string[];
   readonly listItems?: readonly string[];

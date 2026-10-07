@@ -250,6 +250,12 @@ const CAPTURE = async (
     const reference = (l: any) =>
       `${l.original}=>${l.link}|${l.displayText}@${span(l.position)}`;
     return {
+      // A definition carries neither `original` nor `displayText` -- both come back
+      // undefined -- so this records the destination and the span, which is what
+      // the field actually answers: whether Obsidian read a definition here at all.
+      referenceLinks: (answer?.referenceLinks ?? []).map(
+        (l: any) => `${l.link}@${span(l.position)}`,
+      ),
       footnotes: (answer?.footnotes ?? []).map(
         (f: any) => `${f.id}@${span(f.position)}`,
       ),
