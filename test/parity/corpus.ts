@@ -1741,6 +1741,40 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/callout-block-body/definition-quoted", "> [!note] [^1]: d\n> body\n"],
   ["probe/callout-block-body/heading-two-lines", "> [!note] # h\n> a\n> b\n"],
   ["probe/callout-block-body/heading-blank-body", "> [!note] # h\n>\n> body\n"],
+  // The reparse boundaries the first straddle wave left alone. One probe per pass,
+  // each putting a highlight across the line that pass rewrites, since `==` is the
+  // construct whose content is easiest to read back out of a projection.
+  ["probe/straddle-fold/paragraph-merge", "==a\n  ===\n[^1]: b==\n"],
+  ["probe/straddle-fold/inline-refold", "H\n  ===\n[^1]: ==a==\n"],
+  ["probe/straddle-fold/frontmatter-tail", "---\na: 1\n--- ==b==\n"],
+  ["probe/straddle-fold/frontmatter-tail-span", "---\na: 1\n--- ==b\nc==\n"],
+  ["probe/straddle-fold/definition-label", "[==a==]: /u\n"],
+  ["probe/straddle-fold/definition-title", "[a]: /u ==t==\n"],
+  ["probe/straddle-fold/table-split", "[^1]: ==a\n| b |\n| --- |\nc==\n"],
+  ["probe/straddle-fold/quote-indented-code", "> ==a\n> b\n    c==\n"],
+  ["probe/straddle-fold/html-setext-span", "<br>\n==a\nb==\n===\n"],
+  ["probe/straddle-fold/list-under-definition", "[^1]: ==a\n2. b==\n"],
+  ["probe/straddle-fold/footnote-interrupt", "a==b\n[^1]: c==\n"],
+  ["probe/straddle-fold/comment-in-definition", "[^1]: ==a\n%%\nb==\n"],
+  ["probe/straddle-fold/multiline-setext", "==a\nb==\n===\n[^1]: c\n"],
+  ["probe/straddle-fold/task-reparse", "- [ ] 1. ==a\n  b==\n"],
+  // Two inline constructs whose delimiters **cross**: A opens, B opens, A closes
+  // before B does. Nothing in the corpus is shaped this way on purpose, and it is
+  // the one interaction a context or adjacency case cannot produce -- both of those
+  // nest cleanly by construction. Whichever construct wins the overlap decides what
+  // the other one even sees.
+  ["probe/cross/highlight-math", "==a$b==c$\n"],
+  ["probe/cross/math-highlight", "$a==b$c==\n"],
+  ["probe/cross/highlight-code", "==a`b==c`\n"],
+  ["probe/cross/code-highlight", "`a==b`c==\n"],
+  ["probe/cross/highlight-wikilink", "==a[[b==c]]\n"],
+  ["probe/cross/wikilink-highlight", "[[a==b]]c==\n"],
+  ["probe/cross/highlight-comment", "==a%%b==c%%\n"],
+  ["probe/cross/comment-highlight", "%%a==b%%c==\n"],
+  ["probe/cross/math-wikilink", "$a[[b$c]]\n"],
+  ["probe/cross/strong-highlight", "**a==b**c==\n"],
+  ["probe/cross/highlight-strong", "==a**b==c**\n"],
+  ["probe/cross/tag-highlight", "#a==b==\n"],
 ];
 
 /** Inline tokens, each crossed with a set of malformed delimiter states. */

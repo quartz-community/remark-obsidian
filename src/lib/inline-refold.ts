@@ -36,7 +36,6 @@ export function inlineRefoldTransform(
     if (from === undefined || to === undefined) return;
 
     if (!hasLiteralMarker(paragraph)) return;
-    if (countType(paragraph, "highlight") > 0) return;
 
     const slice = source.slice(from, to);
     if (!slice.includes("\n")) return;
@@ -44,7 +43,15 @@ export function inlineRefoldTransform(
     const parsed = reparse(slice.replace(/\n/gu, " "));
     const only = parsed.children[0];
     if (parsed.children.length !== 1 || only?.type !== "paragraph") return;
-    if (countType(only, "highlight") === 0) return;
+    // Compared by how much the refold highlights, not by whether anything was
+    // highlighted already. The old guard bailed the moment a highlight existed, so
+    // `H` / `  ===` / `[^1]: ==a==` kept the small highlight the first parse found
+    // and never formed the large one Obsidian reports -- which opens on the `==` of
+    // the former underline and closes on the last `==` three lines down. A paragraph
+    // can hold both a delimiter that was judged and one that never was.
+    //
+    // Both slices are the same length, so the sums are directly comparable.
+    if (highlighted(only) <= highlighted(paragraph)) return;
 
     restore(only, source, from);
     paragraph.children = only.children;
@@ -60,12 +67,15 @@ function hasLiteralMarker(paragraph: Paragraph): boolean {
   return found;
 }
 
-function countType(root: Node, type: string): number {
-  let count = 0;
-  visit(root, type, () => {
-    count += 1;
+/** How many characters of this paragraph sit inside a highlight. */
+function highlighted(root: Node): number {
+  let total = 0;
+  visit(root, "highlight", (node: Node) => {
+    const start = node.position?.start?.offset;
+    const end = node.position?.end?.offset;
+    if (start !== undefined && end !== undefined) total += end - start;
   });
-  return count;
+  return total;
 }
 
 /**
