@@ -83,6 +83,24 @@ export function legacyEmailAutolink(value: string): string | null {
   return content;
 }
 
+/** A scheme with no `//` after it, and no `@` to make it an email. */
+const BARE_SCHEME = /^<[A-Za-z][A-Za-z0-9+.-]+:(?!\/\/)[^>\s@]*>/u;
+
+/**
+ * Whether this `<…>` is a scheme Obsidian does not autolink.
+ *
+ * Legacy's tokenizer requires `@` or `://`, so a bare scheme is ordinary text there:
+ * `<a+b+c:d>`, `<a:b>` and `<tel:123>` are all literal, while `<x://y>` is a link.
+ * Stock micromark needs only a `:`, so it linked all of them.
+ *
+ * `<mailto:a@e.test>` is unaffected because it holds an `@` and goes through the
+ * email branch instead, which is why thirty-seven recorded cases with a
+ * semicolon-less scheme already match -- every one of them is a `mailto:`.
+ */
+function isBareScheme(value: string): boolean {
+  return BARE_SCHEME.test(value);
+}
+
 /**
  * A backslash inside an autolink is content, not an escape.
  *
@@ -140,7 +158,17 @@ const legacyAutolink: Construct = {
     }
 
     function decide(code: Code): State | undefined {
-      const content = legacyEmailAutolink(characters.join(""));
+      const scanned = characters.join("");
+      // Claimed as data, so stock's autolink never sees the `<`. Returning `nok`
+      // would hand it straight back to the construct that gets this wrong, which is
+      // the one thing a prepended construct cannot undo.
+      if (isBareScheme(scanned)) {
+        effects.enter(types.data);
+        effects.consume(code);
+        effects.exit(types.data);
+        return ok;
+      }
+      const content = legacyEmailAutolink(scanned);
       // Stand aside rather than emit data: stock autolink and html both want
       // this `<`, and for every case but ours they are right.
       if (content === null) return nok(code);
