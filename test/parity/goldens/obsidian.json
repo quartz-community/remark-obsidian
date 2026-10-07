@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-07T07:46:17.022Z",
+  "recordedAt": "2026-10-07T16:08:22.079Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -12707,26 +12707,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "x ^[⟨fn⟩ y",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "x ^[^[note] y"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "footnote/inline-extra-close": {
       "id": "footnote/inline-extra-close",
@@ -21026,35 +21007,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [
-            {
-              "display": true,
-              "tex": "x^2"
-            }
-          ],
-          "links": [],
-          "tags": [],
-          "headings": [
-            "1:\\[[a|b]] | $$x^2$$_under_ | [^[^1]"
-          ],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "em:under"
-          ],
-          "text": "[[a|b]] | ⟨math⟩under | [⟨fn⟩",
-          "sections": [
-            {
-              "type": "heading",
-              "text": "# \\[[a|b]] | $$x^2$$_under_ | [^[^1]"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "fuzz/highlight/46": {
       "id": "fuzz/highlight/46",
@@ -21216,26 +21169,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "| ^[⟨fn⟩",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "| ^[^[inline]"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "fuzz/comment/10": {
       "id": "fuzz/comment/10",
@@ -22075,28 +22009,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [
-            "em:em"
-          ],
-          "text": "^[⟨fn⟩em",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "^[^[inline]*em*"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "fuzz/callout/8": {
       "id": "fuzz/callout/8",
@@ -22165,7 +22078,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "Setext underline versus a container lazy continuation, and the corpus contradicts the obvious reading. \"> [!\" / \"[[a|b]]\" / \"---\" gives blockquote(line 0) then heading(lines 1-2), so line 1 is NOT lazily continued. But \"> [!no\" / \"===\" gives blockquote@0:0-1:3 spanning BOTH lines, and \"> [!n\" / \"note]\" likewise - so a lazy continuation IS absorbed when it is the last line. The incomplete callout marker is therefore NOT the discriminator (5 cases with one match on that shape); the third line is. Candidate rule: a setext underline binds its preceding line more tightly than a blockquote lazy continuation does, so line 1 belongs to the heading rather than the quote. fuzz/setext/1 appears to contradict even that - there a LIST absorbs the lazy line and the --- becomes a thematic break - so the container type or the intervening html block matters too. Needs a designed probe family enumerating container x lazy line x underline before any of it is implemented."
     },
     "fuzz/embed/74": {
       "id": "fuzz/embed/74",
@@ -22762,26 +22675,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "]] [⟨fn⟩]",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "]]\t[^[^]]"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "fuzz/embed/78": {
       "id": "fuzz/embed/78",
@@ -23502,28 +23396,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [
-            "tag"
-          ],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "#tag. ^[⟨fn⟩[[",
-          "sections": [
-            {
-              "type": "blockquote",
-              "text": "> #tag. ^[^[inline][["
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "fuzz/table/13": {
       "id": "fuzz/table/13",
@@ -24639,26 +24512,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "| [[⟨fn⟩",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "|   [[^[inline]"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "fuzz/embed/90": {
       "id": "fuzz/embed/90",
@@ -26065,7 +25919,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "Setext underline versus a container lazy continuation, and the corpus contradicts the obvious reading. \"> [!\" / \"[[a|b]]\" / \"---\" gives blockquote(line 0) then heading(lines 1-2), so line 1 is NOT lazily continued. But \"> [!no\" / \"===\" gives blockquote@0:0-1:3 spanning BOTH lines, and \"> [!n\" / \"note]\" likewise - so a lazy continuation IS absorbed when it is the last line. The incomplete callout marker is therefore NOT the discriminator (5 cases with one match on that shape); the third line is. Candidate rule: a setext underline binds its preceding line more tightly than a blockquote lazy continuation does, so line 1 belongs to the heading rather than the quote. fuzz/setext/1 appears to contradict even that - there a LIST absorbs the lazy line and the --- becomes a thematic break - so the container type or the intervening html block matters too. Needs a designed probe family enumerating container x lazy line x underline before any of it is implemented."
     },
     "fuzz/embed/100": {
       "id": "fuzz/embed/100",
@@ -27562,26 +27416,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "[⟨fn⟩]",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "[^[[a#^blk]]] "
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "fuzz/highlight/63": {
       "id": "fuzz/highlight/63",
@@ -28446,26 +28281,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "& [⟨fn⟩]^",
-          "sections": [
-            {
-              "type": "blockquote",
-              "text": "> > &amp;\t[^[^1]]^"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "fuzz/embed/117": {
       "id": "fuzz/embed/117",
@@ -28743,26 +28559,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "(u)%% | [⟨fn⟩(u)]",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "(u)%% | [^[link](u)]"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "fuzz/math/15": {
       "id": "fuzz/math/15",
@@ -30797,28 +30594,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [
-            "1:^[^[inline]!"
-          ],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "^[⟨fn⟩!",
-          "sections": [
-            {
-              "type": "heading",
-              "text": "# ^[^[inline]!"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "fuzz/highlight/2": {
       "id": "fuzz/highlight/2",
@@ -31472,26 +31248,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Was `report-upstream` on an impossibility argument that turned out to be wrong: Obsidian is not dropping characters here, it is reading `[^` as a reference whose label runs to the first `]`. Seventeen of the eighteen cases in that family now match. This one still diverges because the label sits behind a `#` heading marker inside a table cell, where our marker offset and the source part company.",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "| # [[a|b # ^blk [⟨fn⟩ 1 1] # [[a#^blk",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "| # [[a|b # [^^blk] [^[^1] [^1]\t1] # [[a#^blk"
-            }
-          ]
-        }
-      }
+      "note": "Was `report-upstream` on an impossibility argument that turned out to be wrong: Obsidian is not dropping characters here, it is reading `[^` as a reference whose label runs to the first `]`. Seventeen of the eighteen cases in that family now match. This one still diverges because the label sits behind a `#` heading marker inside a table cell, where our marker offset and the source part company."
     },
     "fuzz/footnote/3": {
       "id": "fuzz/footnote/3",
@@ -35218,26 +34975,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "[⟨fn⟩]",
-          "sections": [
-            {
-              "type": "list",
-              "text": "1. [^[[a#^blk]]]"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "fuzz/html/6": {
       "id": "fuzz/html/6",
@@ -35399,26 +35137,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "lk]]]]. [⟨fn⟩]",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "lk\\]]]]. [^[[target]]]"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "fuzz/embed/28": {
       "id": "fuzz/embed/28",
@@ -40956,28 +40675,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [
-            "1:^[^[inline]\t<"
-          ],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "^[⟨fn⟩ <",
-          "sections": [
-            {
-              "type": "heading",
-              "text": "# ^[^[inline]\t<"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "fuzz/footnote/19": {
       "id": "fuzz/footnote/19",
@@ -64057,6 +63755,782 @@
       },
       "triage": "match"
     },
+    "probe/lazy-setext/quote-lazy-dash": {
+      "id": "probe/lazy-setext/quote-lazy-dash",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> a\nb\n---\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>a</p>\n</blockquote>\n<h2 data-heading=\"b\" dir=\"auto\">b</h2>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "2:b"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> a"
+            },
+            {
+              "type": "heading",
+              "text": "b\n---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "2:b"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "2:b@1:0"
+          ],
+          "sections": [
+            "blockquote@0:0-0:3",
+            "heading@1:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Measured by probe/lazy-setext/*, 14 probes. A blockquote or callout gives up its LAST lazy line to a setext underline: \"> a\" / \"b\" / \"---\" is blockquote(line 0) plus heading(1-2). With two lazy lines the earlier one stays in the quote (\"> a\" / \"b\" / \"c\" / \"---\" is blockquote@0:0-1:1 plus heading(2-3)). A LIST never gives one up: \"- a\" / \"b\" / \"---\" absorbs b and leaves the --- a thematic break. And when the underline is itself the lazy line the marker decides: --- is a thematic break, === is absorbed as content. We currently invert both halves - no heading for a quote, a heading for a list."
+    },
+    "probe/lazy-setext/quote-lazy-equals": {
+      "id": "probe/lazy-setext/quote-lazy-equals",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> a\nb\n===\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>a</p>\n</blockquote>\n<h1 data-heading=\"b\" dir=\"auto\">b</h1>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:b"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> a"
+            },
+            {
+              "type": "heading",
+              "text": "b\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "1:b"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "1:b@1:0"
+          ],
+          "sections": [
+            "blockquote@0:0-0:3",
+            "heading@1:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Measured by probe/lazy-setext/*, 14 probes. A blockquote or callout gives up its LAST lazy line to a setext underline: \"> a\" / \"b\" / \"---\" is blockquote(line 0) plus heading(1-2). With two lazy lines the earlier one stays in the quote (\"> a\" / \"b\" / \"c\" / \"---\" is blockquote@0:0-1:1 plus heading(2-3)). A LIST never gives one up: \"- a\" / \"b\" / \"---\" absorbs b and leaves the --- a thematic break. And when the underline is itself the lazy line the marker decides: --- is a thematic break, === is absorbed as content. We currently invert both halves - no heading for a quote, a heading for a list."
+    },
+    "probe/lazy-setext/quote-underline-is-lazy-dash": {
+      "id": "probe/lazy-setext/quote-underline-is-lazy-dash",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> a\n---\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>a</p>\n</blockquote>\n<hr>",
+        "projections": {
+          "text": "a",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> a"
+            },
+            {
+              "type": "thematicBreak",
+              "text": "---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:3",
+            "thematicBreak@1:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/lazy-setext/quote-underline-is-lazy-equals": {
+      "id": "probe/lazy-setext/quote-underline-is-lazy-equals",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> a\n===\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<h1 data-heading=\"a\" dir=\"auto\">a</h1>\n</blockquote>",
+        "projections": {
+          "text": "a",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:a"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> a\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/lazy-setext/quote-two-lazy": {
+      "id": "probe/lazy-setext/quote-two-lazy",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> a\nb\nc\n---\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>a<br>\nb</p>\n</blockquote>\n<h2 data-heading=\"c\" dir=\"auto\">c</h2>",
+        "projections": {
+          "text": "a b c",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "2:c"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> a\nb"
+            },
+            {
+              "type": "heading",
+              "text": "c\n---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "2:c"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "2:c@2:0"
+          ],
+          "sections": [
+            "blockquote@0:0-1:1",
+            "heading@2:0-3:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Measured by probe/lazy-setext/*, 14 probes. A blockquote or callout gives up its LAST lazy line to a setext underline: \"> a\" / \"b\" / \"---\" is blockquote(line 0) plus heading(1-2). With two lazy lines the earlier one stays in the quote (\"> a\" / \"b\" / \"c\" / \"---\" is blockquote@0:0-1:1 plus heading(2-3)). A LIST never gives one up: \"- a\" / \"b\" / \"---\" absorbs b and leaves the --- a thematic break. And when the underline is itself the lazy line the marker decides: --- is a thematic break, === is absorbed as content. We currently invert both halves - no heading for a quote, a heading for a list."
+    },
+    "probe/lazy-setext/quote-blank-then-underline": {
+      "id": "probe/lazy-setext/quote-blank-then-underline",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> a\n\nb\n---\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>a</p>\n</blockquote>\n<h2 data-heading=\"b\" dir=\"auto\">b</h2>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "2:b"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> a"
+            },
+            {
+              "type": "heading",
+              "text": "b\n---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "2:b"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "2:b@2:0"
+          ],
+          "sections": [
+            "blockquote@0:0-0:3",
+            "heading@2:0-3:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/lazy-setext/callout-lazy-dash": {
+      "id": "probe/lazy-setext/callout-lazy-dash",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] a\nb\n---\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">a</div></div></div>\n<h2 data-heading=\"b\" dir=\"auto\">b</h2>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "2:b"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] a"
+            },
+            {
+              "type": "heading",
+              "text": "b\n---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "2:b"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "2:b@1:0"
+          ],
+          "sections": [
+            "callout@0:0-0:11",
+            "heading@1:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Measured by probe/lazy-setext/*, 14 probes. A blockquote or callout gives up its LAST lazy line to a setext underline: \"> a\" / \"b\" / \"---\" is blockquote(line 0) plus heading(1-2). With two lazy lines the earlier one stays in the quote (\"> a\" / \"b\" / \"c\" / \"---\" is blockquote@0:0-1:1 plus heading(2-3)). A LIST never gives one up: \"- a\" / \"b\" / \"---\" absorbs b and leaves the --- a thematic break. And when the underline is itself the lazy line the marker decides: --- is a thematic break, === is absorbed as content. We currently invert both halves - no heading for a quote, a heading for a list."
+    },
+    "probe/lazy-setext/callout-underline-is-lazy": {
+      "id": "probe/lazy-setext/callout-underline-is-lazy",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] a\n---\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">a</div></div></div>\n<hr>",
+        "projections": {
+          "text": "a",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] a"
+            },
+            {
+              "type": "thematicBreak",
+              "text": "---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:11",
+            "thematicBreak@1:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/lazy-setext/incomplete-callout-lazy": {
+      "id": "probe/lazy-setext/incomplete-callout-lazy",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!\nb\n---\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>[!</p>\n</blockquote>\n<h2 data-heading=\"b\" dir=\"auto\">b</h2>",
+        "projections": {
+          "text": "[! b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "2:b"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> [!"
+            },
+            {
+              "type": "heading",
+              "text": "b\n---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "2:b"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "2:b@1:0"
+          ],
+          "sections": [
+            "blockquote@0:0-0:4",
+            "heading@1:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Measured by probe/lazy-setext/*, 14 probes. A blockquote or callout gives up its LAST lazy line to a setext underline: \"> a\" / \"b\" / \"---\" is blockquote(line 0) plus heading(1-2). With two lazy lines the earlier one stays in the quote (\"> a\" / \"b\" / \"c\" / \"---\" is blockquote@0:0-1:1 plus heading(2-3)). A LIST never gives one up: \"- a\" / \"b\" / \"---\" absorbs b and leaves the --- a thematic break. And when the underline is itself the lazy line the marker decides: --- is a thematic break, === is absorbed as content. We currently invert both halves - no heading for a quote, a heading for a list."
+    },
+    "probe/lazy-setext/list-lazy-dash": {
+      "id": "probe/lazy-setext/list-lazy-dash",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\nb\n---\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">a<br>\nb</li>\n</ul>\n<hr>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\nb"
+            },
+            {
+              "type": "thematicBreak",
+              "text": "---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:1",
+            "thematicBreak@2:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:1"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/lazy-setext/list-lazy-equals": {
+      "id": "probe/lazy-setext/list-lazy-equals",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\nb\n===\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">a<br>\nb<br>\n===</li>\n</ul>",
+        "projections": {
+          "text": "a b ===",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\nb\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/lazy-setext/list-underline-is-lazy": {
+      "id": "probe/lazy-setext/list-underline-is-lazy",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\n---\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">a</li>\n</ul>\n<hr>",
+        "projections": {
+          "text": "a",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a"
+            },
+            {
+              "type": "thematicBreak",
+              "text": "---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:3",
+            "thematicBreak@1:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/lazy-setext/list-html-then-lazy": {
+      "id": "probe/lazy-setext/list-html-then-lazy",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\n<br>\nb\n---\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">a<br>\n<br><br>\nb</li>\n</ul>\n<hr>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\n<br>\nb"
+            },
+            {
+              "type": "thematicBreak",
+              "text": "---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:1",
+            "thematicBreak@3:0-3:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:1"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Measured by probe/lazy-setext/*, 14 probes. A blockquote or callout gives up its LAST lazy line to a setext underline: \"> a\" / \"b\" / \"---\" is blockquote(line 0) plus heading(1-2). With two lazy lines the earlier one stays in the quote (\"> a\" / \"b\" / \"c\" / \"---\" is blockquote@0:0-1:1 plus heading(2-3)). A LIST never gives one up: \"- a\" / \"b\" / \"---\" absorbs b and leaves the --- a thematic break. And when the underline is itself the lazy line the marker decides: --- is a thematic break, === is absorbed as content. We currently invert both halves - no heading for a quote, a heading for a list."
+    },
+    "probe/lazy-setext/quote-html-then-lazy": {
+      "id": "probe/lazy-setext/quote-html-then-lazy",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> a\n<br>\nb\n---\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>a<br>\n<br></p>\n</blockquote>\n<h2 data-heading=\"b\" dir=\"auto\">b</h2>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "2:b"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> a\n<br>"
+            },
+            {
+              "type": "heading",
+              "text": "b\n---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "2:b"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "2:b@2:0"
+          ],
+          "sections": [
+            "blockquote@0:0-1:4",
+            "heading@2:0-3:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
     "probe/straddle/callout-highlight": {
       "id": "probe/straddle/callout-highlight",
       "layer": "seed",
@@ -76554,26 +77028,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "^[⟨fn⟩",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "^[^[note]"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/inline-footnote/doubled-close": {
       "id": "token/inline-footnote/doubled-close",
@@ -79239,26 +79694,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "[⟨fn⟩",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "[^[^1]"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/footnote-ref/doubled-close": {
       "id": "token/footnote-ref/doubled-close",
@@ -79446,26 +79882,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "match",
-      "ours": {
-        "profile": "quartz-default",
-        "projections": {
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "text": "[⟨fn⟩]",
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "[^[^1]]"
-            }
-          ]
-        }
-      }
+      "triage": "match"
     },
     "token/footnote-ref/escaped-open": {
       "id": "token/footnote-ref/escaped-open",

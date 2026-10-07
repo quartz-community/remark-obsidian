@@ -233,13 +233,13 @@ describe("positioned oracle", () => {
   const CEILING = {
     footnotes: 19,
     footnoteRefs: 3,
-    headings: 18,
-    sections: 136,
+    headings: 24,
+    sections: 142,
     links: 118,
     embeds: 33,
     tags: 3,
     blocks: 14,
-    listItems: 71,
+    listItems: 72,
     frontmatterPosition: 7,
   };
 

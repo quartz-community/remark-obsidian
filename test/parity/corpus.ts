@@ -1712,6 +1712,37 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // Emphasis is deliberately absent: it is the one construct already known to
   // straddle correctly, so these use the four Obsidian-native inline constructs plus
   // code, which shields its own content and should straddle nothing.
+  // Does a setext underline outrank a container's lazy continuation?
+  //
+  // The corpus holds seven cases on this shape and they contradict every reading
+  // taken from them. `> [!` / `[[a|b]]` / `---` reports blockquote(line 0) and
+  // then heading(lines 1-2), so line 1 is not lazily continued -- while
+  // `> [!no` / `===` reports one blockquote spanning both lines, so there a lazy
+  // line *is* absorbed. The incomplete callout marker looked like the
+  // discriminator and is not: five cases share it and one matches. The third line
+  // is what differs.
+  //
+  // `fuzz/setext/1` then contradicts the obvious replacement rule, because there a
+  // *list* absorbs its lazy line and the `---` becomes a thematic break. So the
+  // container type, or the html block sitting between, matters as well.
+  //
+  // Enumerated rather than inferred: container x how many lazy lines x which line
+  // carries the underline. The `===`/`---` pair is kept because only `---` is also
+  // a thematic break, which is the likeliest source of the asymmetry.
+  ["probe/lazy-setext/quote-lazy-dash", "> a\nb\n---\n"],
+  ["probe/lazy-setext/quote-lazy-equals", "> a\nb\n===\n"],
+  ["probe/lazy-setext/quote-underline-is-lazy-dash", "> a\n---\n"],
+  ["probe/lazy-setext/quote-underline-is-lazy-equals", "> a\n===\n"],
+  ["probe/lazy-setext/quote-two-lazy", "> a\nb\nc\n---\n"],
+  ["probe/lazy-setext/quote-blank-then-underline", "> a\n\nb\n---\n"],
+  ["probe/lazy-setext/callout-lazy-dash", "> [!note] a\nb\n---\n"],
+  ["probe/lazy-setext/callout-underline-is-lazy", "> [!note] a\n---\n"],
+  ["probe/lazy-setext/incomplete-callout-lazy", "> [!\nb\n---\n"],
+  ["probe/lazy-setext/list-lazy-dash", "- a\nb\n---\n"],
+  ["probe/lazy-setext/list-lazy-equals", "- a\nb\n===\n"],
+  ["probe/lazy-setext/list-underline-is-lazy", "- a\n---\n"],
+  ["probe/lazy-setext/list-html-then-lazy", "- a\n<br>\nb\n---\n"],
+  ["probe/lazy-setext/quote-html-then-lazy", "> a\n<br>\nb\n---\n"],
   ["probe/straddle/callout-highlight", "> [!note] ==a\nb==\n"],
   ["probe/straddle/callout-math", "> [!note] $a\nb$\n"],
   ["probe/straddle/callout-code", "> [!note] `a\nb`\n"],

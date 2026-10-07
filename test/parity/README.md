@@ -868,6 +868,43 @@ a tab-indented sibling, where `containerState.size` counts **characters** while
 under-indented continuation, which needs legacy's whole-item minimum-indent scan rather
 than a different limit.
 
+### A setext underline outranks a lazy continuation, but only for a quote
+
+Seven corpus cases carried this shape and every reading taken from them was wrong. `> [!` /
+`[[a|b]]` / `---` reports blockquote(line 0) then heading(1-2), so the lazy line is not
+absorbed -- while `> [!no` / `===` reports **one** blockquote spanning both lines, so there
+it is. The incomplete callout marker looked like the discriminator and is not: five cases
+share it and one of those matches. `fuzz/setext/1` then ruled out the obvious replacement,
+because there a _list_ absorbs its lazy line and the `---` becomes a thematic break.
+
+Fourteen probes settled it, and it is **three** rules, which is why no single reading fit:
+
+| input                       | Obsidian                                  |
+| --------------------------- | ----------------------------------------- |
+| `> a` / `b` / `---`         | blockquote(0) + heading `2:b`             |
+| `> a` / `b` / `c` / `---`   | blockquote(0-1) + heading `2:c`           |
+| `> [!note] a` / `b` / `---` | callout(0) + heading `2:b`                |
+| `> a` / `---`               | blockquote(0) + **thematicBreak**         |
+| `> a` / `===`               | blockquote(0-1), `===` absorbed           |
+| `- a` / `b` / `---`         | list(0-1) + **thematicBreak**, no heading |
+| `- a` / `b` / `===`         | list(0-2), `===` absorbed as text         |
+
+1. A blockquote or callout gives up its **last** lazy line to a setext underline. An
+   earlier lazy line stays in the quote, so only the line the underline touches leaves.
+2. A **list never gives one up**. It absorbs the lazy line and the underline becomes a
+   thematic break, or for `===` is absorbed as content.
+3. When the underline _is_ the lazy line, the marker decides: `---` is a thematic break,
+   `===` is absorbed. Only `---` has a second meaning, which is the whole asymmetry.
+
+Eight of the fourteen matched on arrival. The six that did not are the two halves of one
+inversion: we keep the lazy line for a quote where Obsidian hands it to a heading, and we
+build a heading for a list where Obsidian does not.
+
+This is the clearest instance yet of the rule that probes find _what_ while the fuzzer only
+finds _that_. Three separate inferences from the same seven cases were each refuted by the
+next case examined, and the family only became legible once the container type, the number
+of lazy lines, and the underline marker were varied independently.
+
 ### The two list cases that did not close, and why they are different
 
 Both were attempted rather than assumed, and the measurements are worth more than the
