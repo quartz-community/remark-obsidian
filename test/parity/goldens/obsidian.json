@@ -49101,8 +49101,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "wikilink/escaped-fragment-separator": {
       "id": "wikilink/escaped-fragment-separator",

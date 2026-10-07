@@ -83,6 +83,13 @@ export function wikilinkFromMarkdown(): Extension {
         node.heading = this.sliceSerialize(token).replace(UNESCAPE, "$1");
         partsOf(node).heading = true;
       },
+      // The marker, not the content, is what proves an alias was written: the
+      // tokenizer emits no `wikilinkAlias` token at all when the alias is empty,
+      // so `[[a|]]` would otherwise look exactly like `[[a]]` here.
+      wikilinkAliasMarker() {
+        const node = this.stack[this.stack.length - 1] as any;
+        if (node?.type === "wikilink") partsOf(node).alias = true;
+      },
       wikilinkAlias(token) {
         const node = this.stack[this.stack.length - 1] as any;
         node.alias = this.sliceSerialize(token);
@@ -108,9 +115,15 @@ export function wikilinkFromMarkdown(): Extension {
           node.heading = node.heading.slice(0, -1);
         }
 
+        // An alias that was *written* wins even when it is empty, which is why
+        // this asks `parts` rather than testing `node.alias` for truthiness:
+        // `[[a|]]` displays nothing in Obsidian while `[[a]]` displays `a`, and
+        // the node carries `alias: ""` for both.
         node.value = node.embedded
           ? node.path
-          : node.alias || [written, writtenHeading].filter(Boolean).join(" > ");
+          : partsOf(node).alias
+            ? node.alias
+            : [written, writtenHeading].filter(Boolean).join(" > ");
         this.exit(token);
       },
     },

@@ -252,9 +252,12 @@ export function mdastText(tree: Node, defined?: ReadonlySet<string>): string {
               link.heading
               ? `${link.path}#${link.heading}`
               : link.path
-            : link.value ||
-                link.alias ||
-                [link.path, link.heading].filter(Boolean).join(" > "),
+            : // `??`, not `||`: an empty `value` is a written empty alias and
+              // renders as nothing, so falling through to the path would show
+              // a target Obsidian hides.
+              (link.value ??
+                link.alias ??
+                [link.path, link.heading].filter(Boolean).join(" > ")),
         );
         return;
       }
