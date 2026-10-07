@@ -29115,7 +29115,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "Obsidian hides this at render time, not parse time: metadataCache reports the block (list@0:0-1:3 for the ===) while textContent is empty. Our structure already agrees; only the text projection diverges. Extending the comment construct across the container lazy boundary fixes text but breaks the compute oracle on this same case. Fix belongs in the text projection: %% markers pair in source order, blind to block boundaries."
     },
     "fuzz/embed/118": {
       "id": "fuzz/embed/118",
@@ -41896,7 +41896,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "Obsidian hides this at render time, not parse time: metadataCache reports the block (list@0:0-1:3 for the ===) while textContent is empty. Our structure already agrees; only the text projection diverges. Extending the comment construct across the container lazy boundary fixes text but breaks the compute oracle on this same case. Fix belongs in the text projection: %% markers pair in source order, blind to block boundaries."
     },
     "fuzz/strikethrough/8": {
       "id": "fuzz/strikethrough/8",

@@ -657,6 +657,30 @@ remaining family:
 | both sets differ        |   538 | as above, compounded                                             |
 | definition set differs  |   340 | the directly actionable bucket; 90.0% of documents already agree |
 
+### A `%%` comment hides at render time, not at parse time
+
+`- %%` / `note%%` and `1. %%[` / `===` both render as nothing in Obsidian while we show
+the body. The obvious reading is that the comment's span crosses the container's lazy
+boundary, and `nonLazyContinuation` stops it -- so the construct was taught to absorb a
+lazy line, gated on not having crossed a blank one. That reached 2 fixes and 0 regressions
+on the main gate.
+
+**The compute oracle refused it, on the very case it fixed.** Obsidian's own
+`metadataCache` reports `fuzz/comment/13` as `list@0:0-1:3` with one list item spanning
+both lines: the `===` is structurally inside the item, as a lazy paragraph continuation,
+and the rendered text is empty anyway. So Obsidian parses the block and _hides_ it.
+
+That is the governing rule restated from the other direction -- where Obsidian drops
+source characters the drop belongs downstream -- and it says our structure was already
+correct. Only `text` diverges, so the fix belongs in the projection: at render time `%%`
+markers pair in source order, blind to block boundaries, and everything between an opener
+and its closer (or end of note, when there is none) is invisible.
+
+Two things worth keeping from the detour. The second oracle earned its cost here: the main
+gate reported a clean 2-for-0 and the ceiling test is what caught the mechanism being
+wrong. And `afterLazy` committing an **empty** comment is load-bearing rather than sloppy
+-- making it decline instead costs 6 cases, four of them `probe/quote-comment/*`.
+
 ### A `%%` comment defines nothing, but its references still count
 
 Two opposite rules, and the referee needs both to measure anything here at all:
