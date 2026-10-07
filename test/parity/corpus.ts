@@ -654,6 +654,19 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // Reduced by the fuzz shrinker from randomly composed documents, each the
   // smallest input that still disagreed with Obsidian. Minimal and distinct,
   // so they read as ordinary cases rather than as generated noise.
+  ["fuzz/footnote/44", "[^1]:\n\n---\n"],
+  ["fuzz/footnote/45", "[^1]: \n\n---\n"],
+  ["fuzz/highlight/69", "1. <br>\n===\n"],
+  ["fuzz/footnote/46", "[^1]: > [\n\n---\n"],
+  ["fuzz/block-ref/14", "^blk\n</div>\n"],
+  ["fuzz/inline-footnote/33", "^[^[inline]\n"],
+  ["fuzz/inline-footnote/34", "- [ ] ^[inline]\n===\n"],
+  ["fuzz/highlight/70", "\n> ![\n===\n"],
+  ["fuzz/callout/13", "> [!n\nnote]\n"],
+
+  // Reduced by the fuzz shrinker from randomly composed documents, each the
+  // smallest input that still disagreed with Obsidian. Minimal and distinct,
+  // so they read as ordinary cases rather than as generated noise.
   ["fuzz/highlight/42", "- [ \n===\n"],
   ["fuzz/block-ref/10", "^blk\n---\n"],
   ["fuzz/html/15", "# <mailto:a@e.test>\n"],

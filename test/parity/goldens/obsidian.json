@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-07T02:09:53.645Z",
+  "recordedAt": "2026-10-07T04:00:38.587Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -19761,6 +19761,493 @@
         }
       },
       "triage": "match"
+    },
+    "fuzz/footnote/44": {
+      "id": "fuzz/footnote/44",
+      "layer": "seed",
+      "category": "fuzz",
+      "markdown": "[^1]:\n\n---\n",
+      "obsidian": {
+        "html": "<hr>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]:"
+            },
+            {
+              "type": "thematicBreak",
+              "text": "---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [
+            "1@0:0-0:5"
+          ],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "footnoteDefinition@0:0-0:5",
+            "thematicBreak@2:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+    },
+    "fuzz/footnote/45": {
+      "id": "fuzz/footnote/45",
+      "layer": "seed",
+      "category": "fuzz",
+      "markdown": "[^1]: \n\n---\n",
+      "obsidian": {
+        "html": "<hr>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]: "
+            },
+            {
+              "type": "thematicBreak",
+              "text": "---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [
+            "1@0:0-0:6"
+          ],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "footnoteDefinition@0:0-0:6",
+            "thematicBreak@2:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+    },
+    "fuzz/highlight/69": {
+      "id": "fuzz/highlight/69",
+      "layer": "seed",
+      "category": "fuzz",
+      "markdown": "1. <br>\n===\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\">\n<h1 data-heading=\"&lt;br&gt;\" dir=\"auto\"><br></h1>\n</li>\n</ol>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:<br>"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1. <br>\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+    },
+    "fuzz/footnote/46": {
+      "id": "fuzz/footnote/46",
+      "layer": "seed",
+      "category": "fuzz",
+      "markdown": "[^1]: > [\n\n---\n",
+      "obsidian": {
+        "html": "<hr>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]: > ["
+            },
+            {
+              "type": "thematicBreak",
+              "text": "---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [
+            "1@0:0-0:9"
+          ],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "footnoteDefinition@0:0-0:9",
+            "thematicBreak@2:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+    },
+    "fuzz/block-ref/14": {
+      "id": "fuzz/block-ref/14",
+      "layer": "seed",
+      "category": "fuzz",
+      "markdown": "^blk\n</div>\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"></p>\n",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "^blk"
+            },
+            {
+              "type": "html",
+              "text": "</div>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:4",
+            "html@1:0-1:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:4"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+    },
+    "fuzz/inline-footnote/33": {
+      "id": "fuzz/inline-footnote/33",
+      "layer": "seed",
+      "category": "fuzz",
+      "markdown": "^[^[inline]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">^[inline</p>",
+        "projections": {
+          "text": "^[inline",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "^[^[inline]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:11"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+    },
+    "fuzz/inline-footnote/34": {
+      "id": "fuzz/inline-footnote/34",
+      "layer": "seed",
+      "category": "fuzz",
+      "markdown": "- [ ] ^[inline]\n===\n",
+      "obsidian": {
+        "html": "<ul class=\"contains-task-list\">\n<li data-task=\"\" class=\"task-list-item\" dir=\"auto\">\n<input type=\"checkbox\" class=\"task-list-item-checkbox\">\n<h1 data-heading=\"^[inline]\" dir=\"auto\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"[inline0\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></h1>\n</li>\n</ul>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\">inline<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+        "projections": {
+          "text": "⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:^[inline]"
+          ],
+          "tasks": [
+            {
+              "char": " ",
+              "checked": false
+            }
+          ],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- [ ] ^[inline]\n==="
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [
+            "[inline0@0:8-0:14"
+          ],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:3",
+            "text@2:0-2:0",
+            "element@2:0-2:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "\" \"|parent:-1@0:0-1:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+    },
+    "fuzz/highlight/70": {
+      "id": "fuzz/highlight/70",
+      "layer": "seed",
+      "category": "fuzz",
+      "markdown": "\n> ![\n===\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<h1 data-heading=\"![\" dir=\"auto\">![</h1>\n</blockquote>",
+        "projections": {
+          "text": "![",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:!["
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> ![\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@1:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
+    },
+    "fuzz/callout/13": {
+      "id": "fuzz/callout/13",
+      "layer": "seed",
+      "category": "fuzz",
+      "markdown": "> [!n\nnote]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>[!n<br>\nnote]</p>\n</blockquote>",
+        "projections": {
+          "text": "[!n note]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> [!n\nnote]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Harvested from a fuzz sweep as a multi-seed cluster; cause not yet classified."
     },
     "fuzz/highlight/42": {
       "id": "fuzz/highlight/42",

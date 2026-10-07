@@ -131,7 +131,18 @@ describe("round-trip", () => {
    * of literal text that cannot survive a round trip, which is the same gap the
    * `break` nodes above hit.
    */
+  /**
+   * Thirty-seven to thirty-nine are three harvested fuzz clusters, and they move the
+   * ceiling for a different reason than the two above: the parse did not change, the
+   * corpus did. `[^1]:` / blank / `---` serialises to `[^1]:` with the thematic break
+   * gone, so the second pass has nothing to drop and settles somewhere else.
+   *
+   * Both reasons are legitimate and neither is a parse regression -- all three are
+   * `replicate` cases where the parse is already known to diverge -- but they are
+   * worth telling apart when this number next moves. A more faithful parse reaching
+   * the serialiser gap is progress; a new case reaching it is only coverage.
+   */
   it("does not grow the set of inputs formatting cannot settle", () => {
-    expect(unstable.length).toBeLessThanOrEqual(36);
+    expect(unstable.length).toBeLessThanOrEqual(39);
   });
 });
