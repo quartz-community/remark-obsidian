@@ -283,10 +283,25 @@ function tokenize(
       return closeFirst(code);
     }
 
+    // A doubled `[` is no more legal in an alias than in a target, and rejecting
+    // here is what lets the inner link win: `![[a|[[b]]]]` is not an embed of `a`
+    // to Obsidian, it is the literal text `![[a|` around a link to `b`. Accepting
+    // it gave an embed of `a` aliased `[[b`, which indexed the wrong target and
+    // lost the real one. Same retry-one-position-along mechanism as `pathBracket`.
+    if (code === LEFT_BRACKET) {
+      effects.consume(code);
+      return aliasBracket;
+    }
+
     if (code === null || isLineEnding(code)) return nok(code);
 
     effects.consume(code);
     return alias;
+  }
+
+  function aliasBracket(code: Code): State | undefined {
+    if (code === LEFT_BRACKET) return nok(code);
+    return alias(code);
   }
 
   function closeFirst(code: Code): State | undefined {

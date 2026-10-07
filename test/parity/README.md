@@ -107,6 +107,40 @@ markdown, so a designed probe replaces an incidental fuzz case with the same sou
 kept its id while changing content, since that would move a triage state onto a
 different document.
 
+### What five probe waves established, including where the heuristic ran out
+
+Ranking families by open cases per designed probe reliably finds the ones **nobody has
+examined**. It does not find the ones that are broken, and after five waves that
+distinction is the finding:
+
+| family           | probes | matched on arrival |
+| ---------------- | -----: | -----------------: |
+| escape `\`       |     19 |             **19** |
+| strikethrough    |     13 |             **13** |
+| math `$`         |     22 |                 21 |
+| embed `![[`      |     18 |                 17 |
+| tab              |     18 |                 16 |
+| code run/context |     30 |                 19 |
+| empty container  |     14 |                  9 |
+| emphasis extent  |     13 |                  9 |
+| footnote content |     12 |                  9 |
+| thematic break   |     11 |                  5 |
+
+Math had the worst ratio in the backlog by four times and came back 21 of 22. Escapes and
+strikethrough were perfect. In every one of those cases the "open" count that selected
+the family was made of fuzz documents carrying six other constructs, where the construct
+named was never the cause.
+
+**The families that did yield were not about a construct at all.** Empty containers,
+emphasis extent, footnote content and the thematic break were each about an _interaction_
+— a container that opens nothing, a fragment reparsed at the wrong boundary, a projection
+reading a DOM the recorder had already edited, a tab changing which tokenizer claims a
+line. A single-construct probe finds those only by accident, which is what happened here.
+
+So the ratio is spent as a selector. What remains needs probes shaped around two
+constructs meeting, or around a transform boundary, and the honest version of the
+coverage table below is that it measures attention rather than risk.
+
 ### Coverage is not uniform, and the gaps are where the backlog lives
 
 Measure it before concluding anything about a family's size. Counting designed

@@ -1633,6 +1633,58 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/strikethrough/adjacent-text", "a~~del~~b\n"],
   ["probe/strikethrough/interior-single", "~~a~b~~\n"],
   ["probe/strikethrough/in-table-cell", "| ~~del~~ |\n| --- |\n"],
+  // Embeds, the thinnest coverage left: 7 designed probes against 190 incidental
+  // hits and 22 diverging. An Obsidian-native construct, so a divergence here is
+  // more likely to be real than in a borrowed one -- unlike math and strikethrough,
+  // which the last two waves cleared. The seed is `![[a|[[b]]]]`, where Obsidian
+  // reports the *inner* link as non-embedded and does not report the outer embed at
+  // all, so nesting precedence is the question these are shaped around.
+  //
+  // That seed is `embed/wikilink-in-alias` and is not repeated here, nor is
+  // `![[d.pdf#page=3]]`, which an earlier seed already carries.
+  ["probe/embed/plain", "![[target]]\n"],
+  ["probe/embed/heading", "![[a#h]]\n"],
+  ["probe/embed/block-id", "![[a#^blk]]\n"],
+  ["probe/embed/alias", "![[a|b]]\n"],
+  ["probe/embed/size", "![[i.png|100]]\n"],
+  ["probe/embed/size-pair", "![[i.png|100x200]]\n"],
+  ["probe/embed/markdown-ext", "![[note.md]]\n"],
+  ["probe/embed/empty", "![[]]\n"],
+  ["probe/embed/unclosed", "![[a\n"],
+  ["probe/embed/escaped-marker", "\\![[a]]\n"],
+  ["probe/embed/nested-embed", "![[![[a]]]]\n"],
+  ["probe/embed/embed-in-alias", "![[a|![[b]]]]\n"],
+  ["probe/embed/in-quote", "> ![[a]]\n"],
+  ["probe/embed/in-list", "- ![[a]]\n"],
+  ["probe/embed/in-callout-title", "> [!note] ![[a]]\n"],
+  ["probe/embed/in-table-cell", "| ![[a]] |\n| --- |\n"],
+  ["probe/embed/adjacent", "x![[a]]y\n"],
+  ["probe/embed/two", "![[a]] ![[b]]\n"],
+  // Escapes. Five designed probes against 159 incidental and 13 diverging, and a
+  // global change to the escape set is already refuted -- it cost 27 regressions for
+  // 0 fixes -- so what is left has narrower causes and needs the per-character
+  // matrix nobody has recorded. Obsidian's fork escapes `$`, `=` and `%`, which
+  // stock `remark-parse@8` does not, so those three are the ones to watch. An
+  // escaped math opener lives at `probe/math/escaped-dollar` already.
+  ["probe/escape/asterisk", "a \\* b\n"],
+  ["probe/escape/underscore", "a \\_ b\n"],
+  ["probe/escape/bracket", "a \\[ b\n"],
+  ["probe/escape/close-bracket", "a \\] b\n"],
+  ["probe/escape/hash", "a \\# b\n"],
+  ["probe/escape/dollar", "a \\$ b\n"],
+  ["probe/escape/equals", "a \\= b\n"],
+  ["probe/escape/percent", "a \\% b\n"],
+  ["probe/escape/tilde", "a \\~ b\n"],
+  ["probe/escape/pipe", "a \\| b\n"],
+  ["probe/escape/bang", "a \\! b\n"],
+  ["probe/escape/backslash", "a \\\\ b\n"],
+  ["probe/escape/ampersand", "a \\& b\n"],
+  ["probe/escape/letter", "a \\z b\n"],
+  ["probe/escape/wikilink-opener", "\\[[a]]\n"],
+  ["probe/escape/highlight-opener", "\\==mark==\n"],
+  ["probe/escape/comment-opener", "\\%%note%%\n"],
+  ["probe/escape/in-code-span", "`a \\* b`\n"],
+  ["probe/escape/in-table-cell", "| a \\| b |\n| --- |\n"],
 ];
 
 /** Inline tokens, each crossed with a set of malformed delimiter states. */

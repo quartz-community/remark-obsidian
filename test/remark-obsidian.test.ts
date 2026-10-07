@@ -2600,3 +2600,35 @@ describe("thematic break with a tab", () => {
     );
   });
 });
+
+describe("doubled bracket in a wikilink alias", () => {
+  const links = (md: string) => {
+    const found: string[] = [];
+    visit(processWithGfm(md), "wikilink", (n: any) => {
+      found.push(`${n.path}|${n.alias}|${n.embedded}`);
+    });
+    return found;
+  };
+
+  /**
+   * A `[[` is no more legal in an alias than in a target. Accepting it made
+   * `![[a|[[b]]]]` an embed of `a` aliased `[[b`, indexing a target Obsidian does
+   * not report and losing the one it does: the inner link to `b`.
+   */
+  it("lets the inner link win", () => {
+    expect(links("![[a|[[b]]]]\n")).toEqual(["b||false"]);
+    expect(links("![[a|![[b]]]]\n")).toEqual(["b||true"]);
+  });
+
+  it("leaves an ordinary alias alone", () => {
+    expect(links("![[a|b]]\n")).toEqual(["a|b|true"]);
+    expect(links("[[a|b]]\n")).toEqual(["a|b|false"]);
+    expect(links("[[a|b|c]]\n")).toEqual(["a|b|c|false"]);
+  });
+
+  /** The target side already rejected it, and still does. */
+  it("keeps the target rule", () => {
+    expect(links("![[![[a]]]]\n")).toEqual(["a||true"]);
+    expect(links("[[[[x]]\n")).toEqual(["[x||false"]);
+  });
+});
