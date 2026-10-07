@@ -254,6 +254,16 @@ function tokenizeListContinuation(
       self.parser.constructs.disable.null,
       "expected `disable.null` to be populated",
     );
+    // A sibling marker may be indented up to, but not including, the open item's
+    // own indent. Stock caps this at `constants.tabSize` whatever the item's
+    // indent is, so the fourth line of ` - a` / `  - b` / `   - c` / `    - d`
+    // exceeds the cap and becomes indented code, where legacy and Obsidian both
+    // report four flat items. Legacy's rule is relative: an indent below the
+    // previous item's starts a sibling.
+    //
+    // `size` is set in `endOfPrefix` and so is always present during continuation;
+    // the fallback only keeps the type honest.
+    const itemIndent = self.containerState.size ?? constants.tabSize;
     return factorySpace(
       effects,
       // `legacyList`, not stock `list`: the recursive retry is how the second and
@@ -263,7 +273,7 @@ function tokenizeListContinuation(
       types.linePrefix,
       self.parser.constructs.disable.null.includes("codeIndented")
         ? undefined
-        : constants.tabSize,
+        : Math.max(itemIndent, constants.tabSize),
     )(code);
   }
 }
