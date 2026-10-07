@@ -127984,8 +127984,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/links/570": {
       "id": "commonmark/links/570",
@@ -128099,8 +128098,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/images/572": {
       "id": "commonmark/images/572",

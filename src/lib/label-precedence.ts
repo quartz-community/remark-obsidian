@@ -349,6 +349,16 @@ export function labelPrecedenceTransform(
 ): void {
   if (source === "") return;
 
+  // Labels the document defines, so the tail of a relabelled run can still resolve.
+  const defined = new Set<string>();
+  visit(tree, "definition", (node: Node) => {
+    defined.add(
+      String(
+        (node as unknown as { identifier: string }).identifier,
+      ).toLowerCase(),
+    );
+  });
+
   visit(tree, "paragraph", (node: Node) => {
     const paragraph = node as Paragraph;
     const from = (paragraph as Positioned).position?.start?.offset;
@@ -433,13 +443,64 @@ export function labelPrecedenceTransform(
     }
 
     if (changed) {
-      if (cursor < to) rebuilt.push(text(source.slice(cursor, to), cursor, to));
+      if (cursor < to) pushTail(rebuilt, source, cursor, to, defined);
       paragraph.children = rebuilt as Paragraph["children"];
       return;
     }
 
     retractLinks(paragraph, source, reparse);
   });
+}
+
+/**
+ * The run after the last relabelled link, with any defined label still resolving.
+ *
+ * `[foo][bar][baz]` with only `baz` defined is `[foo][bar]` as literal text and
+ * `[baz]` as a shortcut reference reading `baz`. Taking `[foo][bar]` as the outer
+ * reference is what this pass is for, and pushing everything after it as one text
+ * node left `[baz]` written out -- where `commonmark/links/570`, whose `[bar]` *is*
+ * defined, matched because micromark had already built both references itself.
+ *
+ * Only a **defined** label is promoted. An undefined one is left as text, which is
+ * what it renders as anyway, and promoting it would invent a node for characters
+ * no construct claimed.
+ */
+function pushTail(
+  rebuilt: RootContent[],
+  source: string,
+  from: number,
+  to: number,
+  defined: ReadonlySet<string>,
+): void {
+  let cursor = from;
+  for (const label of outermostLabels(source.slice(from, to), from)) {
+    const name = source.slice(label.open + 1, label.close);
+    if (!defined.has(name.toLowerCase())) continue;
+    // A destination of its own makes it a full or inline link, which the main
+    // scan above owns; only a bare pair is a shortcut.
+    if (
+      inlineDestination(source, label.close + 1) ??
+      referenceDestination(source, label.close + 1)
+    ) {
+      continue;
+    }
+    if (label.open > cursor) {
+      rebuilt.push(text(source.slice(cursor, label.open), cursor, label.open));
+    }
+    rebuilt.push({
+      type: "linkReference",
+      identifier: name.toLowerCase(),
+      label: name,
+      referenceType: "shortcut",
+      children: [text(name, label.open + 1, label.close)],
+      position: {
+        start: { line: 0, column: 1, offset: label.open },
+        end: { line: 0, column: 1, offset: label.close + 1 },
+      },
+    } as unknown as RootContent);
+    cursor = label.close + 1;
+  }
+  if (cursor < to) rebuilt.push(text(source.slice(cursor, to), cursor, to));
 }
 
 function text(value: string, start: number, end: number): RootContent {
