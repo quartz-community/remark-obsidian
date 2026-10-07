@@ -113532,8 +113532,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/list-items/286": {
       "id": "commonmark/list-items/286",
@@ -117585,8 +117584,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/emphasis-and-strong-emphasis/368": {
       "id": "commonmark/emphasis-and-strong-emphasis/368",

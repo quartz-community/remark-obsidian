@@ -234,12 +234,12 @@ describe("positioned oracle", () => {
     footnotes: 19,
     footnoteRefs: 3,
     headings: 13,
-    sections: 131,
+    sections: 129,
     links: 118,
     embeds: 33,
     tags: 3,
     blocks: 14,
-    listItems: 70,
+    listItems: 68,
     frontmatterPosition: 7,
   };
 

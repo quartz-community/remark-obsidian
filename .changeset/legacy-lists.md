@@ -12,6 +12,8 @@ CommonMark's. Two divergences covered:
 - a sibling marker may be indented up to the open item's own indent rather than a fixed
   three spaces, so ` - a` / `  - b` / `   - c` / `    - d` is four flat items rather than
   three and an indented code block
+- an **empty** item may interrupt a paragraph, so `foo` over `*` is a paragraph and then an
+  empty list — except for a dash, which is also a setext underline, and the underline wins
 
 On by default: turning it on costs **0 regressions** across the 3103-case parity corpus
 for 5 cases gained, and improves the independent `metadataCache` oracle on two counters.

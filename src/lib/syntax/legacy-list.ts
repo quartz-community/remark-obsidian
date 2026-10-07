@@ -163,8 +163,19 @@ function tokenizeListStart(
     self.containerState.marker = self.containerState.marker || code;
     return effects.check(
       blankLine,
-      // Can't be empty when interrupting.
-      self.interrupt ? nok : onBlank,
+      // An empty item *may* interrupt a paragraph, where stock refuses outright.
+      // `foo` over `*` is a paragraph and then an empty list to `remark-parse@8`
+      // and to Obsidian, where CommonMark reads one paragraph holding both lines.
+      // `foo` over `*bar` is unaffected, being no marker at all.
+      //
+      // Except a dash, which is also a setext underline -- and the underline wins:
+      // `H` over `-` is a **heading**, as three recorded cases require. Same
+      // asymmetry `lazy-setext.ts` measures from the other side, where `---` as a
+      // lazy line is a thematic break while `===` is absorbed. Only a marker with
+      // a second reading loses.
+      self.interrupt && self.containerState.marker === codes.dash
+        ? nok
+        : onBlank,
       effects.attempt(
         listItemPrefixWhitespaceConstruct,
         endOfPrefix,
