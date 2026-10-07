@@ -16,6 +16,7 @@ import { legacyEmphasisSyntax } from "./lib/syntax/legacy-emphasis.js";
 import { legacyDeleteSyntax } from "./lib/syntax/legacy-delete.js";
 import { legacyAutolinkSyntax } from "./lib/syntax/legacy-autolink.js";
 import { legacyCodeTextSyntax } from "./lib/syntax/legacy-code-text.js";
+import { legacyListSyntax } from "./lib/syntax/legacy-list.js";
 import { legacyEntitySyntax } from "./lib/syntax/legacy-entity.js";
 
 import { wikilinkFromMarkdown } from "./lib/mdast/wikilink.js";
@@ -246,6 +247,18 @@ export interface RemarkObsidianOptions {
    */
   legacyCodeSpans?: boolean;
   /**
+   * Use Obsidian's list container rather than CommonMark's.
+   *
+   * Obsidian runs a fork of `remark-parse@8`, whose list parsing is the more
+   * permissive of the two, and the legacy stack agrees with Obsidian on every
+   * recorded case in this family. Replacing the container is the only route: a
+   * container owns its own continuation, so a construct that declines never sees
+   * the second item of a list the stock one opened.
+   *
+   * Shipped **off** by default until measured, as `labelPrecedence` was.
+   */
+  legacyLists?: boolean;
+  /**
    * Find a link label by raw balanced-bracket scanning, as Obsidian does, so the
    * outermost pair wins where CommonMark gives the innermost: `[a [b](u) c](v)`
    * links to `v` and shows `[b](u)` as written.
@@ -302,6 +315,7 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
   legacyEntities: true,
   legacyAutolinks: true,
   legacyCodeSpans: true,
+  legacyLists: false,
   labelPrecedence: true,
   positionedBreaks: true,
   escapedLineBreaks: false,
@@ -389,6 +403,9 @@ export default function remarkObsidian(
     data.micromarkExtensions.push(legacyAutolinkSyntax());
   }
 
+  if (opts.legacyLists) {
+    data.micromarkExtensions.push(legacyListSyntax());
+  }
   if (opts.legacyCodeSpans) {
     data.micromarkExtensions.push(legacyCodeTextSyntax());
   }

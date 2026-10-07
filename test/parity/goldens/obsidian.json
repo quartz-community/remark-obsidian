@@ -53850,8 +53850,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "9-digit cap plus the `)` delimiter. obsidian: list@0:0-1:13, 2 items, text \"a b\". Stock remark-parse 8 lacks `)` so the arbiter cannot adjudicate this one; the golden is unambiguous. Obsidian list container divergence family (7 replicate cases). Obsidian runs remark-parse@8 fork; the arbiter agrees with Obsidian on every case in this family. Three CommonMark divergences, all inside micromark list container: (1) no 9-digit cap on an ordered marker, (2) `)` is a valid ordered delimiter, (3) indent handling is far more permissive - a staircase of 1-space increments stays FLAT rather than nesting, and 4+ spaces of relative indent does not become indented code. Blocked on route: list is a CONTAINER owning continuation via containerState, so it cannot be overridden by a declining prepended construct the way a text construct can, and a tree transform would have to synthesise listItems micromark never tokenized (positions feed sections, and listItems feed the compute oracle)."
+      "triage": "match"
     },
     "list/tight-to-loose": {
       "id": "list/tight-to-loose",
@@ -112219,8 +112218,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "9-digit cap. arbiter: list(ordered,start=1234567890,1 item). obsidian: list@0:0-0:18, 1 item, text \"not ok\". Obsidian list container divergence family (7 replicate cases). Obsidian runs remark-parse@8 fork; the arbiter agrees with Obsidian on every case in this family. Three CommonMark divergences, all inside micromark list container: (1) no 9-digit cap on an ordered marker, (2) `)` is a valid ordered delimiter, (3) indent handling is far more permissive - a staircase of 1-space increments stays FLAT rather than nesting, and 4+ spaces of relative indent does not become indented code. Blocked on route: list is a CONTAINER owning continuation via containerState, so it cannot be overridden by a declining prepended construct the way a text construct can, and a tree transform would have to synthesise listItems micromark never tokenized (positions feed sections, and listItems feed the compute oracle)."
+      "triage": "match"
     },
     "commonmark/list-items/267": {
       "id": "commonmark/list-items/267",
