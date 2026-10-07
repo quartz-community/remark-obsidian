@@ -900,6 +900,17 @@ Eight of the fourteen matched on arrival. The six that did not are the two halve
 inversion: we keep the lazy line for a quote where Obsidian hands it to a heading, and we
 build a heading for a list where Obsidian does not.
 
+The list half is the more interesting one to implement, because the cause sits **upstream
+of every transform here**. Stock micromark already makes `b` + `---` a root setext heading
+for `- a` / `<br>` / `b` / `---`, since CommonMark forbids lazily continuing a setext
+heading into a list -- confirmed with `remark-parse` and `remark-gfm` alone. Drop the
+underline and the same input leaves `b` a root paragraph that `containerLazyTransform`
+absorbs correctly, which is exactly what makes it look like one of our own passes
+misfiring. Closing it means `containerLazyTransform` accepting a `heading` as absorbable
+**for a list only**, then splitting it back into the absorbed paragraph plus a thematic
+break -- a quote must keep its heading at root, which
+`probe/lazy-setext/quote-html-then-lazy` already matches.
+
 This is the clearest instance yet of the rule that probes find _what_ while the fuzzer only
 finds _that_. Three separate inferences from the same seven cases were each refuted by the
 next case examined, and the family only became legible once the container type, the number

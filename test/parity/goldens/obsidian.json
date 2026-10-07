@@ -30994,7 +30994,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "The list half of the lazy-setext rule, and the cause is upstream of every transform here. Stock micromark already makes \"b\" + \"---\" a root setext heading for \"- a\" / \"<br>\" / \"b\" / \"---\", because CommonMark forbids lazily continuing a setext heading into a list - verified with remark-parse + remark-gfm alone, no remark-obsidian. Without the underline the same input leaves \"b\" a root paragraph and containerLazyTransform absorbs it correctly, which is what makes this look like a transform bug. Obsidian instead keeps \"b\" in the list and leaves the --- a thematic break (list@0:0-2:1 plus thematicBreak@3:0-3:3). Fixing it means containerLazyTransform accepting a heading as the absorbable next sibling for a LIST only - a quote must keep its heading at root, which probe/lazy-setext/quote-html-then-lazy already matches - and splitting it back into the absorbed paragraph plus a thematic break."
     },
     "fuzz/highlight/3": {
       "id": "fuzz/highlight/3",
@@ -64471,7 +64471,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Measured by probe/lazy-setext/*, 14 probes. A blockquote or callout gives up its LAST lazy line to a setext underline: \"> a\" / \"b\" / \"---\" is blockquote(line 0) plus heading(1-2). With two lazy lines the earlier one stays in the quote (\"> a\" / \"b\" / \"c\" / \"---\" is blockquote@0:0-1:1 plus heading(2-3)). A LIST never gives one up: \"- a\" / \"b\" / \"---\" absorbs b and leaves the --- a thematic break. And when the underline is itself the lazy line the marker decides: --- is a thematic break, === is absorbed as content. We currently invert both halves - no heading for a quote, a heading for a list."
+      "note": "The list half of the lazy-setext rule, and the cause is upstream of every transform here. Stock micromark already makes \"b\" + \"---\" a root setext heading for \"- a\" / \"<br>\" / \"b\" / \"---\", because CommonMark forbids lazily continuing a setext heading into a list - verified with remark-parse + remark-gfm alone, no remark-obsidian. Without the underline the same input leaves \"b\" a root paragraph and containerLazyTransform absorbs it correctly, which is what makes this look like a transform bug. Obsidian instead keeps \"b\" in the list and leaves the --- a thematic break (list@0:0-2:1 plus thematicBreak@3:0-3:3). Fixing it means containerLazyTransform accepting a heading as the absorbable next sibling for a LIST only - a quote must keep its heading at root, which probe/lazy-setext/quote-html-then-lazy already matches - and splitting it back into the absorbed paragraph plus a thematic break."
     },
     "probe/lazy-setext/quote-html-then-lazy": {
       "id": "probe/lazy-setext/quote-html-then-lazy",
