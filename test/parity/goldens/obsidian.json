@@ -113763,7 +113763,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "referenceLinks is EMPTY: the escaped-title form is not a definition to Obsidian, and we agree - neither side builds one. The divergence is escape resolution in the leftover text: obs renders /url\\bar*baz \"foo\"bar\\baz\" with \\* and \\\" resolved and \\b kept, while we keep every backslash. Our text node holds the RAW source because legacyDefinitionTransform demotes a rejected definition without reparsing it, so the escapes never resolve."
     },
     "commonmark/link-reference-definitions/203": {
       "id": "commonmark/link-reference-definitions/203",
@@ -114541,7 +114541,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "referenceLinks proves the rule rather than implying it: Obsidian reports NO definition for \"[foo]: /url\" over \"===\" and heads the whole line, while \"[foo]: /url\" / \"bar\" / \"===\" keeps its definition and heads only \"bar\" - four recorded cases match on that second shape. Identical to the footnote rule in setextDefinitionTransform, which already swallows a one-line definition whole. Extending that pass to link definitions is not enough on its own: an = run cannot be a thematic break, so it arrives as the FIRST LINE of the following paragraph rather than as a sibling, and the pass only looks for a sibling thematicBreak. An attempt to trim the paragraph instead fired in isolation but produced heading@0-11 - the span excluding the === - and lost the trailing [foo] paragraph altogether, so it was reverted. Needs the heading span and the paragraph trim handled together."
     },
     "commonmark/link-reference-definitions/217": {
       "id": "commonmark/link-reference-definitions/217",
@@ -131521,7 +131521,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Obsidian takes the OUTER bracket pair as the link and leaves the inner one literal; CommonMark takes the inner. `[foo [bar](/uri)](/uri)` is one link whose content reads `foo [bar](/uri)`, which the legacy stack confirms exactly -- both oracles agree. Closing it means replacing micromark's label resolver with legacy's balanced-bracket scan, and the corpus argues against it: 6 replicate cases have this shape against 21 that already match and would be at risk. Measured, not assumed."
+      "note": "referenceLinks shows Obsidian DOES define here: [ref[]: /uri gives /uri@2:0-2:12, so a label may hold a [ and the scan runs to the first ]. We form the definition too; the divergence is the reference. obs text is \"[foo]ref[]\" - [foo] literal, then [ref[] read as a reference whose label is ref[ (first-] scan) rendering ref[ plus the stray ]. We leave the whole run literal because labelPrecedence scans BALANCED brackets, which fails on [ref[]. Same two-scan split already documented for footnote versus link labels, now showing that a DEFINED link label uses the first-] scan as well."
     },
     "commonmark/links/547": {
       "id": "commonmark/links/547",
@@ -131575,7 +131575,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "referenceLinks is EMPTY here: [ref[bar]]: /uri is not a definition to Obsidian, which is why its text is visible. obs renders \"[foo]ref[bar]] [ref[bar]]: /uri\" - so [ref[bar] was still read as a reference label (first-] scan) even with nothing defining it, leaving [foo] literal and the trailing ]. Pairs with 546: the label scan is the same, only the definition differs."
     },
     "commonmark/links/548": {
       "id": "commonmark/links/548",
