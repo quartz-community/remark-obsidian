@@ -1,4 +1,12 @@
-import type { Blockquote, List, ListItem, Paragraph, Root } from "mdast";
+import type {
+  Blockquote,
+  List,
+  ListItem,
+  Paragraph,
+  Root,
+  RootContent,
+  ThematicBreak,
+} from "mdast";
 
 import { shiftByMap, type LineMap } from "./line-map.js";
 
@@ -30,6 +38,68 @@ const CONTAINERS = new Set(["list", "blockquote", "callout"]);
  * Only a block on the very next line is absorbed. A blank line between them
  * still ends the container, which is what keeps ordinary documents untouched.
  */
+/** A bare dash run, which is both a setext underline and a thematic break. */
+const DASH_UNDERLINE = /^ {0,3}-+[ \t]*$/u;
+
+/**
+ * Takes apart a heading micromark built from a container's lazy line.
+ *
+ * The content lines go back to the container as a paragraph and the underline
+ * becomes the thematic break it would have been on its own. The heading's own
+ * children are reused rather than reparsed, so their positions are untouched.
+ *
+ * Only a dash run is split. `===` has no second reading, and Obsidian absorbs it
+ * into the list as ordinary text -- which `probe/lazy-setext/list-lazy-equals`
+ * already matches, so there is nothing to change there and no case that would
+ * say what to do if there were.
+ */
+function splitLazyHeading(
+  heading: RootContent,
+  source: string,
+): { content: Paragraph; underline: ThematicBreak } | null {
+  const from = heading.position?.start?.offset;
+  const to = heading.position?.end?.offset;
+  const fromLine = heading.position?.start?.line;
+  if (from === undefined || to === undefined || fromLine === undefined) {
+    return null;
+  }
+
+  const lines = source.slice(from, to).split("\n");
+  if (lines.length < 2) return null;
+  const underline = lines[lines.length - 1]!;
+  if (!DASH_UNDERLINE.test(underline)) return null;
+
+  const body = lines.slice(0, -1).join("\n");
+  if (body.trim() === "") return null;
+  const contentEnd = from + body.length;
+
+  return {
+    content: {
+      type: "paragraph",
+      children: (heading as { children: Paragraph["children"] }).children,
+      position: {
+        start: { ...heading.position!.start },
+        end: {
+          line: fromLine + lines.length - 2,
+          column: body.length - body.lastIndexOf("\n"),
+          offset: contentEnd,
+        },
+      },
+    },
+    underline: {
+      type: "thematicBreak",
+      position: {
+        start: {
+          line: fromLine + lines.length - 1,
+          column: 1,
+          offset: contentEnd + 1,
+        },
+        end: { ...heading.position!.end },
+      },
+    },
+  };
+}
+
 export function containerLazyTransform(tree: Root, source: string): void {
   const children = tree.children;
 
@@ -43,7 +113,14 @@ export function containerLazyTransform(tree: Root, source: string): void {
         next.type !== "footnoteDefinition" &&
         next.type !== "table" &&
         next.type !== "math" &&
-        next.type !== "html"
+        next.type !== "html" &&
+        // A heading, but only after a list. CommonMark forbids lazily continuing
+        // a setext heading into a container, so micromark hands `- a` / `<br>` /
+        // `b` / `---` a *root* heading of `b␤---` -- and Obsidian keeps `b` in
+        // the list with the `---` left as a thematic break. A blockquote is the
+        // other way round and keeps the heading at root, which is why this is
+        // restricted rather than general.
+        !(next.type === "heading" && container.type === "list")
       ) {
         continue;
       }
@@ -67,6 +144,17 @@ export function containerLazyTransform(tree: Root, source: string): void {
         ? parent.children[parent.children.length - 1]
         : parent;
     if (!target || !("children" in target)) continue;
+
+    if (next.type === "heading") {
+      const split = splitLazyHeading(next, source);
+      if (!split) continue;
+      (target.children as unknown[]).push(split.content);
+      for (const point of [parent.position?.end, target.position?.end]) {
+        if (point) Object.assign(point, { ...split.content.position!.end });
+      }
+      children.splice(index + 1, 1, split.underline);
+      continue;
+    }
 
     (target.children as unknown[]).push(next as Paragraph);
     if (parent.position && next.position?.end) {

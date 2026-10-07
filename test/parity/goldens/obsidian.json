@@ -30993,8 +30993,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "The list half of the lazy-setext rule, and the cause is upstream of every transform here. Stock micromark already makes \"b\" + \"---\" a root setext heading for \"- a\" / \"<br>\" / \"b\" / \"---\", because CommonMark forbids lazily continuing a setext heading into a list - verified with remark-parse + remark-gfm alone, no remark-obsidian. Without the underline the same input leaves \"b\" a root paragraph and containerLazyTransform absorbs it correctly, which is what makes this look like a transform bug. Obsidian instead keeps \"b\" in the list and leaves the --- a thematic break (list@0:0-2:1 plus thematicBreak@3:0-3:3). Fixing it means containerLazyTransform accepting a heading as the absorbable next sibling for a LIST only - a quote must keep its heading at root, which probe/lazy-setext/quote-html-then-lazy already matches - and splitting it back into the absorbed paragraph plus a thematic break."
+      "triage": "match"
     },
     "fuzz/highlight/3": {
       "id": "fuzz/highlight/3",
@@ -64470,8 +64469,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "The list half of the lazy-setext rule, and the cause is upstream of every transform here. Stock micromark already makes \"b\" + \"---\" a root setext heading for \"- a\" / \"<br>\" / \"b\" / \"---\", because CommonMark forbids lazily continuing a setext heading into a list - verified with remark-parse + remark-gfm alone, no remark-obsidian. Without the underline the same input leaves \"b\" a root paragraph and containerLazyTransform absorbs it correctly, which is what makes this look like a transform bug. Obsidian instead keeps \"b\" in the list and leaves the --- a thematic break (list@0:0-2:1 plus thematicBreak@3:0-3:3). Fixing it means containerLazyTransform accepting a heading as the absorbable next sibling for a LIST only - a quote must keep its heading at root, which probe/lazy-setext/quote-html-then-lazy already matches - and splitting it back into the absorbed paragraph plus a thematic break."
+      "triage": "match"
     },
     "probe/lazy-setext/quote-html-then-lazy": {
       "id": "probe/lazy-setext/quote-html-then-lazy",
