@@ -131,8 +131,13 @@ function demoteLinks(nodes: RootContent[], source: string): void {
  * so no link opens and the whole run stays literal. CommonMark instead lets those
  * constructs win, which is its spec examples 524, 525, 526 and code-spans 342.
  *
- * Off by default. 369 of this corpus's cases hold a nested bracket pair, and the
- * option exists so that blast radius is measured rather than estimated.
+ * Deliberately fires only where the tree already found a link -- an inner one where
+ * this scan says the outer pair wins, or one whose label runs past the raw close.
+ * Building a link the tree found *no* link for was measured and refused: it gains 8
+ * cases and costs **35**, because the naive destination reader here takes a title as
+ * part of the url, and because a label belonging to an image, a wikilink or a
+ * footnote reference looks identical to one belonging to a link. Closing
+ * `[foo`](u)`` needs a real CommonMark destination parser, not a wider trigger.
  */
 /**
  * The offset of the `]` that closed this link's label.
