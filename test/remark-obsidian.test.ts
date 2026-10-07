@@ -2867,3 +2867,40 @@ describe("callout marker extent", () => {
     expect(shape("> [!note] t\n")).toBe("callout(calloutTitle(text))");
   });
 });
+
+describe("setext underline indent inside a container", () => {
+  const shape = (md: string) => {
+    const f = (n: any): string => {
+      const kids = (n.children ?? []).map(f).join(" ");
+      return n.type + (kids ? `(${kids})` : "");
+    };
+    return (processWithGfm(md) as any).children.map(f).join(" + ");
+  };
+
+  /**
+   * `remark-parse@8` allows no indent before a setext underline, which is why this
+   * pass demotes one. But the indent a list item puts in front of its own underline
+   * belongs to the list, and CommonMark and Obsidian both read a heading there.
+   */
+  it("keeps a heading whose underline sits at the content column", () => {
+    expect(shape("- item\n  ===\n")).toBe("list(listItem(heading(text)))");
+    expect(shape("1. item\n   ===\n")).toBe("list(listItem(heading(text)))");
+  });
+
+  /**
+   * At root an indented paragraph also starts past column one, so the indent cannot
+   * be read off the heading alone -- doing that made a heading of CommonMark's
+   * example 84, which is a paragraph.
+   */
+  it("still demotes a sloppy underline at root", () => {
+    expect(shape("H\n  ===\n")).toBe("paragraph(text break text)");
+    expect(shape("  Foo\n  ===\n")).toBe("paragraph(text break text)");
+    expect(shape("H\n===\t\n")).toBe("paragraph(text break text)");
+  });
+
+  it("leaves the plain forms alone", () => {
+    expect(shape("H\n===\n")).toBe("heading(text)");
+    expect(shape("> q\n> ===\n")).toBe("blockquote(heading(text))");
+    expect(shape("- item\n===\n")).toBe("list(listItem(heading(text)))");
+  });
+});

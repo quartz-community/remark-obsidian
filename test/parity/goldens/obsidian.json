@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-07T04:00:38.587Z",
+  "recordedAt": "2026-10-07T07:46:17.022Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -54321,8 +54321,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in setextUnderlineTransform: the no-indent rule was applied to the raw line, so the indent a list item puts before its own underline looked like sloppiness. Measured from the container's content column now, and only inside a container."
     },
     "frontmatter/not-first-line": {
       "id": "frontmatter/not-first-line",
@@ -69106,6 +69106,1279 @@
         }
       },
       "triage": "match"
+    },
+    "probe/container-setext/root": {
+      "id": "probe/container-setext/root",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "para\n===\n",
+      "obsidian": {
+        "html": "<h1 data-heading=\"para\" dir=\"auto\">para</h1>",
+        "projections": {
+          "text": "para",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:para"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "para\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "1:para"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "1:para@0:0"
+          ],
+          "sections": [
+            "heading@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/container-setext/quote-col0": {
+      "id": "probe/container-setext/quote-col0",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> para\n===\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<h1 data-heading=\"para\" dir=\"auto\">para</h1>\n</blockquote>",
+        "projections": {
+          "text": "para",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:para"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> para\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/container-setext/quote-quoted": {
+      "id": "probe/container-setext/quote-quoted",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> para\n> ===\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<h1 data-heading=\"para\" dir=\"auto\">para</h1>\n</blockquote>",
+        "projections": {
+          "text": "para",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:para"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> para\n> ==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/container-setext/quote-dash": {
+      "id": "probe/container-setext/quote-dash",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> para\n---\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>para</p>\n</blockquote>\n<hr>",
+        "projections": {
+          "text": "para",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> para"
+            },
+            {
+              "type": "thematicBreak",
+              "text": "---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:6",
+            "thematicBreak@1:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/container-setext/quote-blank-between": {
+      "id": "probe/container-setext/quote-blank-between",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> para\n\n===\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>para</p>\n</blockquote>\n<p dir=\"auto\">===</p>",
+        "projections": {
+          "text": "para ===",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> para"
+            },
+            {
+              "type": "paragraph",
+              "text": "==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:6",
+            "paragraph@2:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/container-setext/quote-two-lines": {
+      "id": "probe/container-setext/quote-two-lines",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> a\n> b\n===\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>a<br>\nb<br>\n===</p>\n</blockquote>",
+        "projections": {
+          "text": "a b ===",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> a\n> b\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/container-setext/list-col0": {
+      "id": "probe/container-setext/list-col0",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- item\n===\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<h1 data-heading=\"item\" dir=\"auto\">item</h1>\n</li>\n</ul>",
+        "projections": {
+          "text": "item",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:item"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- item\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/container-setext/list-indented": {
+      "id": "probe/container-setext/list-indented",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- item\n  ===\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<h1 data-heading=\"item\" dir=\"auto\">item</h1>\n</li>\n</ul>",
+        "projections": {
+          "text": "item",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:item"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- item\n  ==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:5"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "Fixed in setextUnderlineTransform: the no-indent rule was applied to the raw line, so the indent a list item puts before its own underline looked like sloppiness. Measured from the container's content column now, and only inside a container."
+    },
+    "probe/container-setext/list-dash": {
+      "id": "probe/container-setext/list-dash",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- item\n---\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">item</li>\n</ul>\n<hr>",
+        "projections": {
+          "text": "item",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- item"
+            },
+            {
+              "type": "thematicBreak",
+              "text": "---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:6",
+            "thematicBreak@1:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:6"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/container-setext/list-two-items": {
+      "id": "probe/container-setext/list-two-items",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\n- b\n===\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">a</li>\n<li dir=\"auto\">\n<h1 data-heading=\"b\" dir=\"auto\">b</h1>\n</li>\n</ul>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:b"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\n- b\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:3",
+            "-|parent:-1@1:0-2:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Newly probed divergence."
+    },
+    "probe/container-setext/ordered": {
+      "id": "probe/container-setext/ordered",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "1. item\n===\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\">\n<h1 data-heading=\"item\" dir=\"auto\">item</h1>\n</li>\n</ol>",
+        "projections": {
+          "text": "item",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:item"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1. item\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/container-setext/task": {
+      "id": "probe/container-setext/task",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- [ ] task\n===\n",
+      "obsidian": {
+        "html": "<ul class=\"contains-task-list\">\n<li data-task=\"\" class=\"task-list-item\" dir=\"auto\">\n<input type=\"checkbox\" class=\"task-list-item-checkbox\">\n<h1 data-heading=\"task\" dir=\"auto\">task</h1>\n</li>\n</ul>",
+        "projections": {
+          "text": "task",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:task"
+          ],
+          "tasks": [
+            {
+              "char": " ",
+              "checked": false
+            }
+          ],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- [ ] task\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "\" \"|parent:-1@0:0-1:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/container-setext/list-html": {
+      "id": "probe/container-setext/list-html",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- <br>\n===\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<h1 data-heading=\"&lt;br&gt;\" dir=\"auto\"><br></h1>\n</li>\n</ul>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:<br>"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- <br>\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Newly probed divergence."
+    },
+    "probe/container-setext/quote-math": {
+      "id": "probe/container-setext/quote-math",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> $x$\n===\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<h1 data-heading=\"$x$\" dir=\"auto\"><span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"x\" class=\"TEX-N\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi></mjx-math></mjx-container></span></h1>\n</blockquote>",
+        "projections": {
+          "text": "⟨math⟩",
+          "math": [
+            {
+              "display": false,
+              "tex": "x"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:$x$"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> $x$\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/container-setext/list-highlight": {
+      "id": "probe/container-setext/list-highlight",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- ==mark==\n===\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<h1 data-heading=\"==mark==\" dir=\"auto\"><mark data-highlight=\"\">mark</mark></h1>\n</li>\n</ul>",
+        "projections": {
+          "text": "mark",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:==mark=="
+          ],
+          "tasks": [],
+          "highlights": [
+            "mark"
+          ],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- ==mark==\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/container-setext/callout-title": {
+      "id": "probe/container-setext/callout-title",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] t\n===\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">t</div></div><div class=\"callout-content\">\n<p dir=\"auto\">===</p>\n</div></div>",
+        "projections": {
+          "text": "t ===",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] t\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/container-setext/then-more": {
+      "id": "probe/container-setext/then-more",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- item\n===\nmore\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<h1 data-heading=\"item\" dir=\"auto\">item</h1>\nmore</li>\n</ul>",
+        "projections": {
+          "text": "item more",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:item"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- item\n===\nmore"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:4"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Newly probed divergence."
+    },
+    "probe/container-setext/nested-quote": {
+      "id": "probe/container-setext/nested-quote",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> > para\n===\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n<h1 data-heading=\"para\" dir=\"auto\">para</h1>\n</blockquote>\n</blockquote>",
+        "projections": {
+          "text": "para",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:para"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> > para\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-extent/alone-then-para": {
+      "id": "probe/block-id-extent/alone-then-para",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "^blk\npara\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">^blk<br>\npara</p>",
+        "projections": {
+          "text": "^blk para",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "^blk\npara"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-1:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-extent/alone-blank-para": {
+      "id": "probe/block-id-extent/alone-blank-para",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "^blk\n\npara\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">para</p>",
+        "projections": {
+          "text": "para",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "para"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@2:0-2:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-extent/after-para": {
+      "id": "probe/block-id-extent/after-para",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "para\n^blk\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">para<br>\n</p>",
+        "projections": {
+          "text": "para",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "para\n^blk"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-1:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-1:4"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-extent/after-blank": {
+      "id": "probe/block-id-extent/after-blank",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "para\n\n^blk\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">para</p>",
+        "projections": {
+          "text": "para",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "para"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:4"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-extent/two-ids": {
+      "id": "probe/block-id-extent/two-ids",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "^blk ^blk2\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">^blk </p>",
+        "projections": {
+          "text": "^blk",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "^blk ^blk2"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:10"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk2@0:0-0:10"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-extent/inline-trailing": {
+      "id": "probe/block-id-extent/inline-trailing",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "para ^blk\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">para </p>",
+        "projections": {
+          "text": "para",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "para ^blk"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:9"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:9"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-extent/alone-then-list": {
+      "id": "probe/block-id-extent/alone-then-list",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "^blk\n- item\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"></p>\n<ul>\n<li dir=\"auto\">item</li>\n</ul>",
+        "projections": {
+          "text": "item",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "^blk"
+            },
+            {
+              "type": "list",
+              "text": "- item"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:4",
+            "list@1:0-1:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@1:0-1:6"
+          ],
+          "blocks": [
+            "blk@0:0-0:4"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Newly probed divergence."
     },
     "token/wikilink/balanced": {
       "id": "token/wikilink/balanced",
@@ -112646,8 +113919,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match",
+      "note": "Fixed in setextUnderlineTransform: the no-indent rule was applied to the raw line, so the indent a list item puts before its own underline looked like sloppiness. Measured from the container's content column now, and only inside a container."
     },
     "commonmark/lists/301": {
       "id": "commonmark/lists/301",

@@ -156,8 +156,23 @@ export function setextUnderlineTransform(
       if (start === undefined || end === undefined) continue;
 
       const lines = source.slice(start, end).split("\n");
-      const underline = lines[lines.length - 1];
-      if (lines.length < 2 || underline === undefined) continue;
+      const rawUnderline = lines[lines.length - 1];
+      if (lines.length < 2 || rawUnderline === undefined) continue;
+      // Measured from the container's content column, not from column zero. The
+      // indent a list item puts in front of its own underline is not the sloppiness
+      // this pass exists to demote: `- item` / `  ===` is a heading to Obsidian and
+      // to CommonMark, and demoting it on two spaces that belong to the list cost
+      // the heading outright.
+      //
+      // Only inside a container. At root an indented paragraph still starts past
+      // column one, so reading the indent off the heading alone treated `  Foo` over
+      // `  ===` as container-relative and made a heading CommonMark's own example 84
+      // says is a paragraph.
+      const container =
+        node.type === "root" ? 0 : (heading.position?.start?.column ?? 1) - 1;
+      const indent = /^[ \t]*/u.exec(rawUnderline)?.[0].length ?? 0;
+      const underline =
+        indent >= container ? rawUnderline.slice(container) : rawUnderline;
       if (!LOOSE.test(underline)) continue;
       // Sloppy underline, or more than one content line above it. The second
       // is where Obsidian parts company with CommonMark: the spec's own

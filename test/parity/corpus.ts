@@ -1841,6 +1841,42 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/bracket-nest/label-comment-closer", "[a%%]%%b](u)\n"],
   ["probe/bracket-nest/label-escaped-close", "[a\\]b](u)\n"],
   ["probe/bracket-nest/label-escaped-open", "[a\\[b](u)\n"],
+  // A setext underline under a container. Across two 1000-seed ranges this is the
+  // dominant shape among reduced causes that hold no bracket at all -- 53 of 91 --
+  // and six of the nine harvested clusters carry one. `containerSetextTransform`
+  // was deliberately capped at a two-line paragraph because widening it without
+  // cases would be guessing; these are the cases.
+  ["probe/container-setext/root", "para\n===\n"],
+  ["probe/container-setext/quote-col0", "> para\n===\n"],
+  ["probe/container-setext/quote-quoted", "> para\n> ===\n"],
+  ["probe/container-setext/quote-dash", "> para\n---\n"],
+  ["probe/container-setext/quote-blank-between", "> para\n\n===\n"],
+  ["probe/container-setext/quote-two-lines", "> a\n> b\n===\n"],
+  ["probe/container-setext/list-col0", "- item\n===\n"],
+  ["probe/container-setext/list-indented", "- item\n  ===\n"],
+  ["probe/container-setext/list-dash", "- item\n---\n"],
+  ["probe/container-setext/list-two-items", "- a\n- b\n===\n"],
+  ["probe/container-setext/ordered", "1. item\n===\n"],
+  ["probe/container-setext/task", "- [ ] task\n===\n"],
+  ["probe/container-setext/list-html", "- <br>\n===\n"],
+  ["probe/container-setext/ordered-html", "1. <br>\n===\n"],
+  ["probe/container-setext/quote-math", "> $x$\n===\n"],
+  ["probe/container-setext/list-highlight", "- ==mark==\n===\n"],
+  ["probe/container-setext/callout-title", "> [!note] t\n===\n"],
+  ["probe/container-setext/then-more", "- item\n===\nmore\n"],
+  ["probe/container-setext/nested-quote", "> > para\n===\n"],
+  // What a block identifier on its own line attaches to. `^blk` alone is reported as
+  // no section at all, but `^blk` over `</div>` is reported as a paragraph and a
+  // leading space keeps it prose -- three answers with no rule between them, and
+  // `stripBlockIds` currently drops the paragraph in all three.
+  ["probe/block-id-extent/alone-then-html", "^blk\n</div>\n"],
+  ["probe/block-id-extent/alone-then-para", "^blk\npara\n"],
+  ["probe/block-id-extent/alone-blank-para", "^blk\n\npara\n"],
+  ["probe/block-id-extent/after-para", "para\n^blk\n"],
+  ["probe/block-id-extent/after-blank", "para\n\n^blk\n"],
+  ["probe/block-id-extent/two-ids", "^blk ^blk2\n"],
+  ["probe/block-id-extent/inline-trailing", "para ^blk\n"],
+  ["probe/block-id-extent/alone-then-list", "^blk\n- item\n"],
 ];
 
 /** Inline tokens, each crossed with a set of malformed delimiter states. */
