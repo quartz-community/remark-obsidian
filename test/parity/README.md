@@ -172,6 +172,31 @@ one: "6 cases at risk of breaking 21" was reasoning, not measurement, and it was
 wrong — a rule both oracles agree on cannot break a case that already agrees with
 Obsidian.
 
+### An estimated blast radius cost three deferrals; the measured one was zero
+
+Label precedence was declined three times on one number. A predicate counting corpus
+cases with a nested bracket pair returned **369 `match` cases**, against ~24 to gain, and
+that ratio read as obviously not worth it.
+
+The predicate was an upper bound and nothing more. Shipping the rule behind
+`labelPrecedence: false` and flipping it cost **0 regressions** for 9 cases, then 5 more
+from the same scan. Every one of those 369 cases holds a nested pair; almost none holds
+one where Obsidian and CommonMark disagree, which the predicate could not tell apart and
+a one-line option could.
+
+Two rules fall out, and they pull in opposite directions, which is the point.
+
+**Put the rule behind a default-off option rather than estimating what it would break.**
+It costs one option and one measurement, and it is the only way to tell a predicate's
+upper bound from the real cost. The fuzz sweep is what made the attempt worth it at all --
+the family is ~24 recorded cases and 39% of independently discovered causes.
+
+**And measure the widening too, because a trigger that looks like the same rule is not.**
+Firing the same scan wherever it finds a label the tree has no link for gains 8 and costs
+**35**: a naive destination reader takes a title as part of the url, and a `[` belonging
+to an image, a wikilink or a footnote reference is indistinguishable from one belonging
+to a link. So "measure, do not estimate" does not mean the measurement will be kind.
+
 ## What is compared
 
 Rendered HTML is not compared directly. Obsidian wraps every block in `div.el-*`,
