@@ -2704,3 +2704,64 @@ describe("highlight across a line ending", () => {
     expect(marks("==a\nb==\n")).toEqual(["a\nb"]);
   });
 });
+
+describe("label precedence", () => {
+  const read = (md: string, opts?: RemarkObsidianOptions) => {
+    const tree = processWithGfm(md, opts) as any;
+    const txt: string[] = [];
+    const urls: string[] = [];
+    visit(tree, (n: any) => {
+      if (n.type === "text") txt.push(n.value);
+      if (n.type === "link") urls.push(n.url);
+    });
+    return { text: txt.join(""), urls };
+  };
+
+  /**
+   * Obsidian finds a label by raw balanced-bracket scanning, so the outermost pair
+   * wins. CommonMark forbids a link inside a link and resolves it the other way
+   * round, by letting the inner one win.
+   */
+  it("gives the outermost pair the link", () => {
+    expect(read("[a [b](u) c](v)\n")).toEqual({
+      text: "a [b](u) c",
+      urls: ["v"],
+    });
+    expect(read("[foo [bar](u)](v)\n")).toEqual({
+      text: "foo [bar](u)",
+      urls: ["v"],
+    });
+    expect(read("[[a](u)](v)\n")).toEqual({ text: "[a](u)", urls: ["v"] });
+  });
+
+  it("takes the outermost of three", () => {
+    expect(read("[a [b [c](u) d](v) e](w)\n")).toEqual({
+      text: "a [b [c](u) d](v) e",
+      urls: ["w"],
+    });
+  });
+
+  /**
+   * Only a link written in bracket form is demoted. An autolink and a GFM literal
+   * URL are `link` nodes too, and demoting one left text `remark-stringify` escapes
+   * as `\<` -- so formatting twice kept adding a backslash.
+   */
+  it("keeps an autolink inside the label", () => {
+    const { urls } = read("[a <https://e.test/x> b](u)\n");
+    expect(urls).toContain("u");
+    expect(urls).toContain("https://e.test/x");
+  });
+
+  it("leaves an ordinary link alone", () => {
+    expect(read("[a](u)\n")).toEqual({ text: "a", urls: ["u"] });
+    expect(read("[a [b] c](u)\n")).toEqual({ text: "a [b] c", urls: ["u"] });
+    expect(read("[a](u) [b](v)\n")).toEqual({ text: "a b", urls: ["u", "v"] });
+  });
+
+  it("can be turned off", () => {
+    expect(read("[a [b](u) c](v)\n", { labelPrecedence: false })).toEqual({
+      text: "a b c",
+      urls: ["u"],
+    });
+  });
+});
