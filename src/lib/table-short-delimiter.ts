@@ -160,16 +160,31 @@ export function tableShortDelimiterTransform(
           lineStart + line.length,
         );
 
+      // Body rows follow the delimiter for as long as the lines keep delimiting.
+      // `|a|` over `|---|---|` over `|b|c|` is one table to Obsidian, where
+      // building the header alone left `|b|c|` behind as a paragraph. The same
+      // `delimits` precondition decides it, so a row whose only pipe is the
+      // leading one still ends the table rather than joining it.
+      let bodyEnd = start + header.length + 1 + delimiter.length;
+      const body: TableRow[] = [];
+      for (let at = 2; at < lines.length; at++) {
+        const line = lines[at]!;
+        if (!line.includes("|") || !delimits(line)) break;
+        body.push(row(line, bodyEnd + 1));
+        bodyEnd += 1 + line.length;
+      }
+
+      const lastLine = startLine + 1 + body.length;
       const table: Table = {
         type: "table",
         align: delimiterCells.map((cell) => alignOf(cell)),
-        children: [row(header, start)],
+        children: [row(header, start), ...body],
         position: {
           start: { ...paragraph.position!.start },
           end: {
-            line: startLine + 1,
-            column: delimiter.length + 1,
-            offset: start + header.length + 1 + delimiter.length,
+            line: lastLine,
+            column: (lines[1 + body.length]?.length ?? delimiter.length) + 1,
+            offset: bodyEnd,
           },
         },
       };
@@ -177,13 +192,10 @@ export function tableShortDelimiterTransform(
       // Bounded by the paragraph, not the document: re-parsing to the end
       // would duplicate every block after it, since only the paragraph is
       // spliced out.
-      const rest = source.slice(
-        start + header.length + 1 + delimiter.length,
-        end,
-      );
+      const rest = source.slice(bodyEnd, end);
       const tail = reparse(rest.replace(/^\n/u, ""));
-      const tailStart = start + header.length + delimiter.length + 2;
-      for (const child of tail.children) shift(child, tailStart, startLine + 1);
+      const tailStart = bodyEnd + 1;
+      for (const child of tail.children) shift(child, tailStart, lastLine);
 
       parent.children.splice(
         index,
