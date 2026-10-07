@@ -657,6 +657,37 @@ remaining family:
 | both sets differ        |   538 | as above, compounded                                             |
 | definition set differs  |   340 | the directly actionable bucket; 90.0% of documents already agree |
 
+### A parse fix can make the formatter corrupt the file
+
+`shortCommentTransform` already knew that `<!-->` and `<!--->` are literal text to
+Obsidian. It anchored its pattern (`^…$`), so it fired only when the html node was
+_exactly_ one of those -- and micromark's comment scan runs to the **last** `-->` on the
+line, so `foo <!--> foo -->` arrives as one node valued `<!--> foo -->` and was missed.
+
+A prefix match plus restoring the space micromark drops before that node does reach
+`match`, with no parity regressions. It is still wrong to ship. Converting the html node
+to text makes `remark-stringify` escape the `<`, and re-parsing that escape grows another
+backslash on every pass:
+
+```
+foo <!--> foo -->        source
+foo \<!--> foo -->       once
+foo \\\<!--> foo -->      twice
+foo \\\\\<!--> foo -->     thrice
+```
+
+The round-trip ceiling caught it as a 33 -> 34 move, which undersells it: the other 33 are
+stable-but-unsettled, while this one never converges. **One parity case does not buy a
+formatter that grows the author's file every time it runs.** Reaching `match` here needs a
+`toMarkdown` handler that writes the literal form first, which is the same thing the 33
+remainder each need.
+
+The dash boundary was worth measuring anyway, and the arbiter settles it: two dashes and
+three are literal, **four** is a genuine comment with an empty body, five is literal
+again. `commonmark/raw-html/625` is a separate half -- a `--` buried in a longer body
+needs an unbounded scan on `<`, which is the quadratic shape `legacy-scan.ts` bounds
+against (`<` x20000: 64ms to 16s).
+
 ### A `%%` comment hides at render time, not at parse time
 
 `- %%` / `note%%` and `1. %%[` / `===` both render as nothing in Obsidian while we show

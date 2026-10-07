@@ -130330,7 +130330,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "Needs an unbounded scan on < to see a -- buried in a longer comment body, which is the quadratic shape legacy-scan.ts bounds against (< x20000: 64ms -> 16s). shortCommentTransform handles the all-dashes short forms instead, since micromark hands those over as an html node already."
     },
     "commonmark/raw-html/626": {
       "id": "commonmark/raw-html/626",
@@ -130383,7 +130383,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "shortCommentTransform anchors its regex (^...$) so it only fires when the html node is EXACTLY <!--> or <!--->; micromark scans to the LAST --> on the line, so \"foo <!--> foo -->\" arrives as one node valued \"<!--> foo -->\" and is missed. A prefix match plus restoring the whitespace micromark drops before the node does reach match, but converting the html node to text makes remark-stringify escape the < as \\<, and on re-parse that backslash multiplies on every pass (foo \\< -> foo \\\\\\< -> ...). Unbounded formatter growth is not worth 1 parity case. Needs a toMarkdown handler writing the literal form first, same shape as the 33 round-trip remainder. Measured dash boundary, via the legacy arbiter: 2 and 3 dashes are literal text, 4 is a real comment with an empty body, 5 is literal again."
     },
     "commonmark/raw-html/627": {
       "id": "commonmark/raw-html/627",
