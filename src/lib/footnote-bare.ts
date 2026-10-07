@@ -248,8 +248,157 @@ function rejoinSplitReferences(tree: Root, source: string): void {
   });
 }
 
+/** A node's end offset, if it has one. */
+function endOf(node: Node | undefined): number | undefined {
+  return (node as { position?: { end?: { offset?: number } } } | undefined)
+    ?.position?.end?.offset;
+}
+
+/** Where a balanced bracket scan from `open` closes, or -1. */
+function balancedClose(source: string, open: number): number {
+  let depth = 0;
+  for (let index = open; index < source.length; index++) {
+    const character = source[index];
+    if (character === "\\") {
+      index++;
+      continue;
+    }
+    if (character === "\n") return -1;
+    if (character === "[") depth++;
+    else if (character === "]") {
+      depth--;
+      if (depth === 0) return index;
+    }
+  }
+  return -1;
+}
+
+/**
+ * A footnote label holding a bracket, which runs to the **first** `]`.
+ *
+ * Obsidian's footnote label is not balance-scanned the way its link label is:
+ * `[^a[b]c]` renders `a[bc]`, which is the label `a[b` with `c]` left as text, and
+ * nothing parses inside it. We let the label's contents tokenise, so `[^[[a]]]`
+ * became a wikilink to `a` where Obsidian reports the text `[[a]]` and no link.
+ *
+ * Only a label that actually holds a `[`. Every other form is already handled --
+ * by GFM when a definition matches, or by the passes above when it does not -- and
+ * claiming them would re-decide 1517 corpus cases for nothing.
+ *
+ * Declines when an outer link forms, which is the one thing that outranks this
+ * reading: `[^[note]](url)` is a *link* whose label holds an inline footnote, so a
+ * balanced close followed by a destination means this is not a footnote at all.
+ */
+function bracketLabelReferences(tree: Root, source: string): void {
+  visit(tree, (node: Node) => {
+    const parent = node as Partial<ParentNode>;
+    const children = parent.children;
+    if (!Array.isArray(children)) return;
+
+    for (let index = 0; index < children.length; index++) {
+      const opener = children[index];
+      if (opener?.type !== "text") continue;
+      const value = (opener as Text).value;
+      const openerStart = (opener as Text).position?.start?.offset;
+      const openerEnd = endOf(opener);
+      if (openerStart === undefined || openerEnd === undefined) continue;
+
+      // Two ways the marker shows up. Usually both characters sit in this text
+      // node. But our inline-footnote construct claims the `^[` first, which leaves
+      // the text node ending at the bracket and the rest inside a `footnote` -- so
+      // `[^[[a]]]` arrives as text `[`, a footnote, then text `]`, with no `[^`
+      // anywhere to search for.
+      //
+      // That shape is also what tells this apart from `[^[note]](url)`, where the
+      // footnote is inside a *link* rather than beside a text node: there the outer
+      // pair really is a link label and Obsidian agrees.
+      let at = value.lastIndexOf("[^");
+      if (at === -1) {
+        if (!value.endsWith("[")) continue;
+        if (children[index + 1]?.type !== "footnote") continue;
+        at = value.length - 1;
+      }
+      // Through the alignment, not by adding the index. A value and its source run
+      // to different lengths wherever an escape or a character reference sits
+      // between them, and `> > &amp;⇥[^[^1]]^` is exactly that -- `&amp;` decodes to
+      // one character, so counting from the node's start landed four bytes early
+      // and the `[^` guard below declined a case that should be claimed.
+      const slice = source.slice(openerStart, openerEnd);
+      const aligned = alignToSource(slice, value);
+      const markerAt =
+        aligned === null
+          ? openerStart + at
+          : openerStart + (aligned.at[at] ?? at);
+      if (source.slice(markerAt, markerAt + 2) !== "[^") continue;
+
+      const close = source.indexOf("]", markerAt + 2);
+      if (close === -1) continue;
+      const label = source.slice(markerAt + 2, close);
+      if (!label.includes("[")) continue;
+      if (label.includes("\n") || /^\s*$/u.test(label)) continue;
+
+      const outer = balancedClose(source, markerAt);
+      if (outer !== -1) {
+        const next = source[outer + 1];
+        if (next === "(" || next === "[") continue;
+      }
+
+      // Everything from the marker to that `]` belongs to the reference, so every
+      // sibling it covers goes with it.
+      let last = index;
+      while (last < children.length) {
+        const end = endOf(children[last]);
+        if (end === undefined) return;
+        if (end >= close + 1) break;
+        last++;
+      }
+      if (last >= children.length) continue;
+      const tailEnd = endOf(children[last]);
+      if (tailEnd === undefined) continue;
+
+      const before = value.slice(0, at);
+      const replacement: Node[] = [];
+      if (before !== "") {
+        replacement.push({
+          type: "text",
+          value: before,
+          position: {
+            start: { ...(opener as Text).position!.start },
+            end: { line: 0, column: 1, offset: markerAt },
+          },
+        } as unknown as Node);
+      }
+      replacement.push({
+        type: "footnoteReference",
+        identifier: label.toLowerCase(),
+        label,
+        position: {
+          start: { line: 0, column: 1, offset: markerAt },
+          end: { line: 0, column: 1, offset: close + 1 },
+        },
+      } as unknown as Node);
+      if (tailEnd > close + 1) {
+        replacement.push({
+          type: "text",
+          value: source.slice(close + 1, tailEnd),
+          position: {
+            start: { line: 0, column: 1, offset: close + 1 },
+            end: { line: 0, column: 1, offset: tailEnd },
+          },
+        } as unknown as Node);
+      }
+
+      children.splice(index, last - index + 1, ...replacement);
+      index += replacement.length - 1;
+    }
+  });
+}
+
 export function bareFootnoteRefTransform(tree: Root, source = ""): void {
-  if (source !== "") rejoinSplitReferences(tree, source);
+  if (source !== "") {
+    bracketLabelReferences(tree, source);
+    rejoinSplitReferences(tree, source);
+  }
 
   visit(tree, "text", (node: Node, index, parent) => {
     const text = node as Text;

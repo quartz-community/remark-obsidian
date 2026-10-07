@@ -457,33 +457,32 @@ cases would otherwise look like parity bugs forever.
 ### When `replicate` is the wrong state
 
 `replicate` claims we intend to close the gap, so a case **no permissible fix can
-close** does not belong there — left alone it blocks the backlog forever while
-looking like ordinary debt.
+close** does not belong there — left alone it blocks the backlog forever while looking
+like ordinary debt. Moving a case out of `replicate` is only legitimate with an
+impossibility argument attached; without one it is just hiding it.
 
-The worked example is the doubled inline-footnote opener. Obsidian consumes `^[` and
-its `]`, emits no footnote at all, and shows the body as literal text:
+**And the argument can be wrong.** This section used to carry the doubled
+inline-footnote opener as its worked example, with an argument that read well: Obsidian
+consumes `^[` and its `]`, emits no node, shows the body as literal text, so reaching
+`match` would mean dropping those characters ourselves and a formatter would write them
+out of the author's file. Eighteen cases were `report-upstream` on that basis.
 
-| source       | Obsidian | us       |
-| ------------ | -------- | -------- |
-| `^[^[note]`  | `^[note` | `^[⟨fn⟩` |
-| `[^[^1]`     | `[^1`    | `[⟨fn⟩`  |
-| `^[^[note]]` | `⟨fn⟩`   | agrees   |
+The model was wrong. Obsidian is not dropping anything in `[^[^1]` — it is reading a
+**reference** whose label runs to the first `]`, so the label is `[^1` and it renders as
+its own bare text. Nothing is consumed that a formatter would lose, and the node
+round-trips. Once `bracketLabelReferences` implemented the real rule, **17 of the 18
+matched outright** and `report-upstream` went to zero.
 
-The first was already `report-upstream` and the second was `replicate`, though they
-are the same thing: Obsidian drops characters and makes no node. Reaching `match`
-would need us to drop them too, and a formatter would then write the author's `^[`
-and `]` out of their file — the rule that also keeps a surplus table cell and a
-colour marker. Suppressing only our spurious node would not reach `match` either,
-since the character drop would remain. So the whole family is `report-upstream`: 18
-cases, all of which satisfy one mechanical signature — Obsidian's text is ours with
-the footnote placeholder replaced by that footnote's own body.
+So the standard holds — an argument is required — with one addition: an impossibility
+argument rests on a model of what the other side is doing, and that model is the part
+most likely to be wrong. Revisit the state whenever the surrounding rules change, and
+prefer `replicate` while any doubt remains, because a `replicate` case that turns out
+impossible costs one re-triage while a `report-upstream` case that turns out fixable
+hides eighteen.
 
-Note what the third row shows: this is a real parse rule, not blanket breakage.
-Balance decides whether Obsidian forms a footnote at all, so `^[^[note]]` and
-`^[^[^[x]]]` close evenly and match outright.
-
-Re-triaging on this ground is only legitimate with the impossibility argument
-attached. Without one, moving a case out of `replicate` is just hiding it.
+What the family looks like now: one case remains, `fuzz/inline-footnote/3`, where the
+label sits behind a `#` heading marker inside a table cell and our marker offset parts
+company with the source. It is `replicate`, which is what it should have been all along.
 
 ### One recording flake, with a signature worth knowing
 

@@ -142,7 +142,26 @@ describe("round-trip", () => {
    * worth telling apart when this number next moves. A more faithful parse reaching
    * the serialiser gap is progress; a new case reaching it is only coverage.
    */
+  /**
+   * Forty to sixty-nine are the cost of the footnote-label rule, and the largest
+   * single jump this number has taken. A label that holds a `[` is correct --
+   * `[^![[img.png]]]` is a reference to `![[img.png` with `]]` left as text, which is
+   * what Obsidian reports -- but `remark-stringify` writes it back as
+   * `[^!\[\[img.png]`, and re-parsing those escapes yields a *different* label, so
+   * each pass adds another backslash.
+   *
+   * The disagreement is between our parse rule and the serialiser's escape rule, not
+   * inside either: written unescaped, `[^![[img.png]` re-parses to exactly the label
+   * we produced, because the label ends at the first `]`. Resolving it needs a
+   * `remark-stringify` extension that knows that rule, which is the same place
+   * `rehype-obsidian` already owns rendering an undefined reference as its bare
+   * label.
+   *
+   * Recorded rather than worked around: the alternative is emitting text nodes whose
+   * value has lost the `[^` and `]`, and a formatter would then write those
+   * characters out of the author's file.
+   */
   it("does not grow the set of inputs formatting cannot settle", () => {
-    expect(unstable.length).toBeLessThanOrEqual(39);
+    expect(unstable.length).toBeLessThanOrEqual(69);
   });
 });

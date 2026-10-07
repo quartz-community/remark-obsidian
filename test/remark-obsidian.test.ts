@@ -2416,9 +2416,14 @@ describe("footnote reference labels", () => {
     expect(refs("a[^1]b\n\n[^1]: d\n")).toEqual(["1@1..5"]);
   });
 
-  /** A label may hold no bracket, so an embed inside one is still unresolved. */
-  it("does not claim a label containing brackets", () => {
-    expect(refs("[^![[img.png]]]\n")).toEqual([]);
+  /**
+   * A label *may* hold a bracket, and it runs to the first `]` rather than being
+   * balance-scanned -- so this is a reference to `![[img.png` with `]]` left as
+   * text. `bracketLabelReferences` owns that reading; the pass above only rejoins a
+   * run some construct split.
+   */
+  it("claims a label containing brackets, up to the first bracket", () => {
+    expect(refs("[^![[img.png]]]\n")).toEqual(["![[img.png@0..13"]);
   });
 });
 
@@ -3062,5 +3067,52 @@ describe("label precedence with a reference destination", () => {
     expect(text("[foo][bar][baz]\n\n[baz]: /url1\n[bar]: /url2\n")).toBe(
       "foobaz",
     );
+  });
+});
+
+describe("footnote label holding a bracket", () => {
+  const refs = (md: string) => {
+    const found: string[] = [];
+    visit(processWithGfm(md), "footnoteReference", (n: any) => {
+      found.push(n.label ?? n.identifier);
+    });
+    return found;
+  };
+  const other = (md: string) => {
+    const found: string[] = [];
+    visit(processWithGfm(md), (n: any) => {
+      if (n.type === "wikilink") found.push(`wikilink:${n.path}`);
+      if (n.type === "link") found.push(`link:${n.url}`);
+    });
+    return found;
+  };
+
+  /**
+   * A footnote label runs to the **first** `]`, not balance-scanned the way a link
+   * label is, and nothing parses inside it. `[^a[b]c]` renders `a[bc]` -- the label
+   * `a[b` with `c]` left as text -- which nothing else explains.
+   */
+  it("runs to the first bracket", () => {
+    expect(refs("[^a[b]c]\n")).toEqual(["a[b"]);
+    expect(refs("[^[[a]]]\n")).toEqual(["[[a"]);
+    expect(refs("[^![[img.png]]]\n")).toEqual(["![[img.png"]);
+  });
+
+  /** Nothing inside it parses, so the wikilink that used to form does not. */
+  it("suppresses a construct inside the label", () => {
+    expect(other("[^[[a]]]\n")).toEqual([]);
+  });
+
+  /** An outer link outranks the reading: `[^[note]](url)` is a link. */
+  it("declines when an outer link forms", () => {
+    expect(refs("[^[note]](https://example.com)\n")).toEqual([]);
+    expect(other("[^[note]](https://example.com)\n")).toEqual([
+      "link:https://example.com",
+    ]);
+  });
+
+  it("leaves a label with no bracket to the passes above", () => {
+    expect(refs("[^1]\n")).toEqual(["1"]);
+    expect(refs("a[^1]b\n\n[^1]: d\n")).toEqual(["1"]);
   });
 });
