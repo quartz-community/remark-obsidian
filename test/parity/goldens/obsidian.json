@@ -137057,8 +137057,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/autolinks/598": {
       "id": "commonmark/autolinks/598",

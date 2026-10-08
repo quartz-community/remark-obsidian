@@ -479,7 +479,7 @@ export function mdastText(
           only &&
           only.type === "text" &&
           (only as ValueNode).value === url &&
-          url.startsWith("mailto:")
+          MAILTO_PREFIX.test(url)
         ) {
           parts.push(url.slice("mailto:".length));
           return;
@@ -901,6 +901,15 @@ export function metaOurs(tree: Root, source: string): MetaProjections {
  */
 const TRAILING_BLOCK_ID = /(?:^|[ \t])\^[A-Za-z0-9-]+$/u;
 const ONLY_BLOCK_ID = /^[ \t]*\^[A-Za-z0-9-]+[ \t]*$/u;
+/**
+ * A `mailto:` scheme in any case, which Obsidian strips from the displayed text.
+ *
+ * `<MAILTO:FOO@BAR.BAZ>` renders `FOO@BAR.BAZ` exactly as `<mailto:a@e.test>` renders
+ * `a@e.test` -- the recorded html shows the prefix gone from the anchor text and kept
+ * in the href for both. A case-sensitive `startsWith` matched only the lowercase one.
+ */
+const MAILTO_PREFIX = /^mailto:/iu;
+
 /** A link label that is nothing but a footnote marker. */
 const FOOTNOTE_ONLY_LABEL = /^\^[A-Za-z0-9-]+$/u;
 

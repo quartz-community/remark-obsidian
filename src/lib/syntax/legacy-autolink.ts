@@ -75,9 +75,14 @@ export function legacyEmailAutolink(value: string): string | null {
 
   // `<mailto:a\+@e.test>` is also already right, by a different route: micromark
   // reads it as a *protocol* autolink, where a backslash is permitted, giving url
-  // and text `mailto:a\+@e.test`. Legacy would call it an email and strip the
-  // prefix from the text, but the recorded `<mailto:a@e.test>` match shows
-  // Obsidian keeps it -- the arbiter loses to the goldens here, so leave it be.
+  // and text `mailto:a\+@e.test`.
+  //
+  // The claim that used to sit here -- that Obsidian keeps the prefix in the text --
+  // was wrong, and the recorded html says so plainly: `<mailto:a@e.test>` renders the
+  // anchor text `a@e.test` and `<MAILTO:FOO@BAR.BAZ>` renders `FOO@BAR.BAZ`, with the
+  // scheme kept in the href both times. The arbiter agreed all along. What made the
+  // lowercase case *look* settled is that the text projection strips the prefix
+  // itself, which it did case-sensitively until `MAILTO:` turned up.
   if (content.slice(0, MAILTO.length).toLowerCase() === MAILTO) return null;
 
   return content;
