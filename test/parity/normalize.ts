@@ -458,6 +458,23 @@ export function mdastText(
         const url = link.url ?? "";
         const children = link.children ?? [];
         const only = children.length === 1 ? children[0] : undefined;
+        // A label that is only a footnote marker renders as nothing. `[^1](u)` is
+        // an internal link to `u` whose anchor comes back **empty** --
+        // `<a class="internal-link" data-href="u"></a>` -- so the `^1` is consumed
+        // and never drawn, which is the same answer `probe/reference-in-link/*`
+        // already recorded for a reference inside a link: it survives almost
+        // nowhere. The node keeps its text, so a formatter cannot lose the
+        // characters; only the rendering drops them.
+        //
+        // Undefined only. `[^1](u)` with a `[^1]:` definition parses differently --
+        // a real `footnoteReference` followed by the literal `(u)` -- and never
+        // reaches here.
+        if (
+          only?.type === "text" &&
+          FOOTNOTE_ONLY_LABEL.test((only as ValueNode).value)
+        ) {
+          return;
+        }
         if (
           only &&
           only.type === "text" &&
@@ -884,6 +901,8 @@ export function metaOurs(tree: Root, source: string): MetaProjections {
  */
 const TRAILING_BLOCK_ID = /(?:^|[ \t])\^[A-Za-z0-9-]+$/u;
 const ONLY_BLOCK_ID = /^[ \t]*\^[A-Za-z0-9-]+[ \t]*$/u;
+/** A link label that is nothing but a footnote marker. */
+const FOOTNOTE_ONLY_LABEL = /^\^[A-Za-z0-9-]+$/u;
 
 /**
  * Drop block identifiers before projecting.

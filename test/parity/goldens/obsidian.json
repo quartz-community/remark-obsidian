@@ -35108,8 +35108,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/22": {
       "id": "fuzz/embed/22",
@@ -65879,8 +65878,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "`[^blk](u)` renders as NOTHING in Obsidian, same as `[^1](u)` in fuzz/footnote/10. Neither a link (which would show its label) nor an undefined reference (which would show its brackets) explains an empty render, so what consumes the line is still unidentified."
+      "triage": "match"
     },
     "probe/label-shape/doubled-then-destination": {
       "id": "probe/label-shape/doubled-then-destination",
