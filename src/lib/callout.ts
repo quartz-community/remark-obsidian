@@ -172,6 +172,20 @@ export function calloutTransform(
     if (!first || first.type !== "paragraph") return;
 
     const paragraph = first as Paragraph;
+    // On the blockquote's own first line, not merely in its first child. An empty `>`
+    // line produces no node, so `>` over `> [!note]` leaves the marker's paragraph as
+    // `children[0]` and read as a callout -- where Obsidian reports a plain blockquote
+    // rendering `[!note]` as text. The line still counts even though it holds nothing.
+    //
+    // `> x` over `> [!note]` was already declined, but by the lead text not matching
+    // rather than by position, which is why the empty-line form slipped through.
+    if (
+      paragraph.position?.start?.line !== undefined &&
+      quote.position?.start?.line !== undefined &&
+      paragraph.position.start.line !== quote.position.start.line
+    ) {
+      return;
+    }
     const lead = paragraph.children[0];
     if (!lead || lead.type !== "text") return;
 

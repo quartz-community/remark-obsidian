@@ -122,10 +122,16 @@ const CAPTURE = async (
         return `${el.tagName.slice(1)}:${text.trim()}`;
       });
 
+    // `:scope >` so an item reads its *own* checkbox. A plain descendant query makes
+    // an outer task inherit a nested one's state: `> [!note]` / `> - [ ] Outer` over a
+    // nested callout holding `- [x] Inner` recorded the outer task as checked while
+    // its own input carries no `checked` attribute at all, so the golden contradicted
+    // the html stored beside it. The input is a direct child of the `li`, which is
+    // what makes the narrower selector exact rather than merely safer.
     const tasks = Array.from(root.querySelectorAll("li[data-task]")).map(
       (el) => ({
         char: el.getAttribute("data-task") || " ",
-        checked: !!el.querySelector("input[type=checkbox]:checked"),
+        checked: !!el.querySelector(":scope > input[type=checkbox]:checked"),
       }),
     );
 

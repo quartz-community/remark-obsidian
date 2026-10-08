@@ -14,8 +14,19 @@ import { visit } from "unist-util-visit";
 import { delimits } from "./table-pipe-style.js";
 import { span } from "./normalize-points.js";
 
+/**
+ * A delimiter row, with the dashes optional.
+ *
+ * GFM needs at least one `-` in every cell, so `|a|` over `|::|` builds nothing.
+ * Obsidian builds a centred table, and the arbiter agrees -- `remark-parse@8` makes a
+ * table of `|::|` and of `|:|` alike, so the dash was never required and the colons
+ * carry the alignment on their own.
+ */
 const DELIMITER =
-  /^ {0,3}\|?[ \t]*:?-+:?[ \t]*(\|[ \t]*:?-+:?[ \t]*)*(?:\|[ \t]*)?$/u;
+  /^ {0,3}\|?[ \t]*(?:-+:?|:-+:?|:+)[ \t]*(\|[ \t]*(?:-+:?|:-+:?|:+)[ \t]*)*(?:\|[ \t]*)?$/u;
+
+/** A cell GFM refuses outright: colons with no dash at all. */
+const DASHLESS = /^:+$/u;
 
 /** Split a row into cells, with or without the outer pipes. */
 function cells(line: string): string[] {
@@ -112,7 +123,13 @@ export function tableShortDelimiterTransform(
 
       const headerCells = cells(header);
       const delimiterCells = cells(delimiter);
-      if (headerCells.length === delimiterCells.length) continue;
+      // Equal counts usually mean upstream already built the table, and a paragraph
+      // still holding one would then be declined for a reason this pass cannot see.
+      // A dashless cell is the exception, because it names that reason: GFM requires
+      // a dash and refuses the row outright, so `|a|` over `|::|` reaches here with
+      // matching widths and no table. `alignOf` already reads the colons.
+      const dashless = delimiterCells.some((cell) => DASHLESS.test(cell));
+      if (headerCells.length === delimiterCells.length && !dashless) continue;
       if (delimiterCells.length === 0) continue;
 
       // Every header cell is kept in the tree, but the delimiter is what

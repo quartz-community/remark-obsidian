@@ -161,6 +161,7 @@ export function commentRegionTransform(
   const commentStarts = new Set<number>();
   const spans = new Set<string>();
   const shielded: Array<[number, number]> = [];
+  const htmlSpans: Array<[number, number]> = [];
 
   visit(tree, (node: Node) => {
     const from = node.position?.start?.offset;
@@ -169,6 +170,7 @@ export function commentRegionTransform(
     spans.add(`${from}:${to}`);
     if (SHIELDS.has(node.type)) shielded.push([from, to]);
     if (node.type === "comment") commentStarts.add(from);
+    if (node.type === "html") htmlSpans.push([from, to]);
   });
 
   const isShielded = (at: number): boolean =>
@@ -191,9 +193,18 @@ export function commentRegionTransform(
       regions: htmlCommentRegions(source),
       // A swallowed `<!--` still produces an `html` node, but only for the
       // four-character opener, so "a node starts here" means nothing. What
-      // counts is whether one *covers* the region.
+      // counts is whether one *covers* the region -- and covering means
+      // containing it, not matching it exactly, which is what this used to test.
+      //
+      // A correct type-2 html block runs to the end of the line holding its `-->`,
+      // so `- <!-- x --> visible` is one html node spanning past the closer. Exact
+      // equality called that unsettled and rebuilt it into a node stopping at the
+      // closer, which emptied the list item and pushed ` visible` out to the root.
+      // Containment still rejects the four-character opener this pass exists for.
       settled: ({ start, end }) =>
-        spans.has(`${start}:${end}`) || isShielded(start),
+        spans.has(`${start}:${end}`) ||
+        isShielded(start) ||
+        htmlSpans.some(([from, to]) => from <= start && to >= end),
       build: (start, end) => buildHtml(source, start, end),
     },
   ];

@@ -51997,8 +51997,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "callout/title-wikilink-and-embed": {
       "id": "callout/title-wikilink-and-embed",
@@ -53149,7 +53148,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "note": "Not a parity divergence but a recorder bug, and the stored html proves it: the outer task's own input carries no `checked` attribute while the inner one carries `checked=\"\"`, so the DOM says unchecked/checked exactly as we do. The recorded projection said checked/checked because the extraction used `el.querySelector(\"input:checked\")`, which searches descendants, so an outer task inherited its nested task's state. Fixed in oracle.e2e.ts with `:scope >`; closes on the next recording."
     },
     "blockquote/changing-depth-without-spaces": {
       "id": "blockquote/changing-depth-without-spaces",
@@ -53742,8 +53741,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "task/in-obsidian-comment": {
       "id": "task/in-obsidian-comment",
@@ -53943,8 +53941,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Found by widening the corpus: an edge-case sweep plus the test suites of other Obsidian-Markdown implementations. Recorded and triaged, not yet reproduced."
+      "triage": "match"
     },
     "table/single-column-short-rule": {
       "id": "table/single-column-short-rule",
