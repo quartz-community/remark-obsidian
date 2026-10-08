@@ -77843,7 +77843,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "probe/comment-setext/ordered-comment-then-equals": {
       "id": "probe/comment-setext/ordered-comment-then-equals",

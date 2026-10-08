@@ -465,7 +465,19 @@ export function calloutTransform(
     const blankTitle =
       title === "" && firstLine !== "" && firstLine.trim() === "";
 
-    if (title !== "" || blankTitle) {
+    // A node that is not an empty text node is a title, whatever it collects to.
+    // `> [!note] ^[]` is an empty *inline footnote*, which Obsidian shows as the
+    // title -- and `^[]` collects to nothing, so the text gate alone cannot see it
+    // while the same footnote carrying content, `^[x]`, sails through. Testing the
+    // node *count* instead was rejected earlier for a reason that still holds:
+    // stripping the marker can leave an empty text node behind, and that is not a
+    // title. So the test is on the node's kind, not on how many there are.
+    const hasTitleNode = titleNodes.some(
+      (node) =>
+        node.type !== "text" || ((node as Text).value ?? "").trim() !== "",
+    );
+
+    if (title !== "" || blankTitle || hasTitleNode) {
       const head = (titleNodes[0] as Positioned | undefined)?.position?.start;
       const tail = (titleNodes[titleNodes.length - 1] as Positioned | undefined)
         ?.position?.end;

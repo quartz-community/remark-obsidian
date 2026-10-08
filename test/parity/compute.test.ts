@@ -144,7 +144,6 @@ describe("positioned oracle", () => {
     "hunt/aftercloser-chain-eats-referenced-definition/0: P1, Obsidian's column is short by the `%%` marker",
     "hunt/continuation-masked-under-foreign-label/2: P1, Obsidian's column is short by the `%%` marker",
     "probe/reference-in-link/collection-label: we claim a wikilink where the label holds the reference",
-    "probe/callout-title-caret/empty-inline-footnote: a callout title holding only `^[]`",
   ];
 
   it("places every footnote reference, except the classified cases", () => {
@@ -238,13 +237,14 @@ describe("positioned oracle", () => {
    *
    *     sections     +2  embed-fragment/unclosed-leading-space,
    *                      math-space/space-body-trailing-period
-   *     footnoteRefs +1  callout-title-caret/empty-inline-footnote
    *
-   * Two of the wave's cases have since come off these lists entirely.
+   * Three of the wave's cases have since come off these lists entirely.
    * `entity-bare/lone-ampersand-in-item` held `sections` and `listItems` until the
    * unclosed-frontmatter mis-parse was repaired; `footnote-bare/colon-then-blank-run`
    * held `sections` and `footnotes` until a definition learned to take a trailing
-   * whitespace-only line.
+   * whitespace-only line; and `callout-title-caret/empty-inline-footnote` held
+   * `footnoteRefs` until a callout title learned to see a node that collects to no
+   * text at all.
    *
    * `blocks` is absent from that list because it went back down: it rose to 21 with
    * the three `block-id-wrapper` cases and returned to 18 when they were fixed, which
@@ -260,7 +260,7 @@ describe("positioned oracle", () => {
    */
   const CEILING = {
     footnotes: 20,
-    footnoteRefs: 4,
+    footnoteRefs: 3,
     headings: 13,
     sections: 136,
     links: 120,
