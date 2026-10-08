@@ -22653,7 +22653,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "ORDERING only -- the content agrees exactly. obs lists [\"img.png\",\"d.pdf#page=3\"] and we list them reversed, because the `d.pdf` embed sits inside an inline footnote (`^[i ...`) whose body Obsidian relocates to the end of the document and indexes there, while we index in source order. Nothing is mis-parsed; the fix is to order the link/embed projections by rendered position rather than source position, which means knowing where a footnote body lands."
     },
     "fuzz/highlight/48": {
       "id": "fuzz/highlight/48",
@@ -23355,7 +23355,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "Our wikilink FRAGMENT scan accepts `[[` where the path scan abandons it, and that asymmetry is the whole cause. Isolated by varying one character: `![[d.pdf. [[word]]` abandons the embed and lets the inner wikilink win, which is what Obsidian does, while `![[d.pdf#page=3. [[word]]` and `![[d#page=3. [[word]]` both build an embed whose *heading* is `page=3. [[word`. So a `[` inside a target is fine in general -- 94 recorded cases hold one and nearly all match, including targets like `[link](u)` -- and the defect is specific to the scan after the `#`. Fix in src/lib/syntax/wikilink.ts: make the heading scan abandon on `[[` exactly as the path scan does."
     },
     "fuzz/footnote/33": {
       "id": "fuzz/footnote/33",
@@ -23410,7 +23410,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "A wikilink inside a `%%` comment inside a footnote definition: obs meta.links [\"target\"] and we index nothing. This is the recorded asymmetry -- a definition inside a comment defines nothing while a reference inside one is still indexed -- applied to wikilinks, which our link projection does not mirror because it skips comment contents wholesale. Narrow and separate from every bracket rule here."
     },
     "fuzz/footnote/34": {
       "id": "fuzz/footnote/34",
@@ -25603,7 +25603,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "FRAGMENT SCAN family, with fuzz/embed/79 and fuzz/embed/121. Our heading scan swallows `\\[[a#h` into the link's heading where Obsidian abandons the whole opener and leaves `[[a#^blk \\ [[a#h]]` literal with no link at all. Same asymmetry: the path scan abandons on `[[` and the scan after `#` does not. Fix in src/lib/syntax/wikilink.ts."
     },
     "fuzz/embed/93": {
       "id": "fuzz/embed/93",
@@ -29922,7 +29922,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "Our wikilink FRAGMENT scan accepts `[[` where the path scan abandons it, and that asymmetry is the whole cause. Isolated by varying one character: `![[d.pdf. [[word]]` abandons the embed and lets the inner wikilink win, which is what Obsidian does, while `![[d.pdf#page=3. [[word]]` and `![[d#page=3. [[word]]` both build an embed whose *heading* is `page=3. [[word`. So a `[` inside a target is fine in general -- 94 recorded cases hold one and nearly all match, including targets like `[link](u)` -- and the defect is specific to the scan after the `#`. Fix in src/lib/syntax/wikilink.ts: make the heading scan abandon on `[[` exactly as the path scan does."
     },
     "fuzz/table/18": {
       "id": "fuzz/table/18",
@@ -32350,7 +32350,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "GFM AUTOLINK-LITERAL EXTENT family, with fuzz/misc/5 and fuzz/math/4. Obsidian's bare-URL autolink runs to the end of the line and swallows everything after it, so nothing later on the line parses: obs reports no links, no math and fully literal text. We end the autolink early and then parse the remainder, inventing constructs Obsidian never sees. Closing it means overriding gfm's autolink-literal extent, which owns every bare URL in the corpus -- one rule for the whole family rather than four fixes."
     },
     "fuzz/embed/6": {
       "id": "fuzz/embed/6",
@@ -33664,7 +33664,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "We report the tag `tag` and Obsidian reports none, with the rendered text agreeing. `#tag` follows `]]`, and our tag rule admits a tag straight after a completed construct -- correct in general, measured on `a[[t]]#next`. So the real question is upstream: whether `[^1[[a#^blk\\]]` forms a construct ending there at all. Obsidian evidently has no construct boundary at that `]]`, so the tag never starts. Depends on the bracket/escape reading, not on the tag rule itself."
     },
     "fuzz/entity/1": {
       "id": "fuzz/entity/1",
@@ -33813,7 +33813,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "BLOCK IDENTIFIER family, with the probe/escaped-label trio: obs text is exactly ours minus `^1`, which Obsidian consumes as a block id and strips from the rendered text. Same open question -- what distinguishes it from the matching control `\\[^1]` -- and the same answer: wants probes varying the context before the escaped bracket."
     },
     "fuzz/highlight/9": {
       "id": "fuzz/highlight/9",
@@ -33933,7 +33933,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "Not a bracket case at all: the only divergence is the trailing `<br>`, which Obsidian renders as an element contributing nothing to textContent while we emit its source as text. Sibling of the recorded rule that an unterminated html tag drops from the text projection; this is the terminated void-element half of it."
     },
     "fuzz/footnote/8": {
       "id": "fuzz/footnote/8",
@@ -35177,7 +35177,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "Obsidian indexes the wikilink `a#h` out of `^[[[a#h]]]` -- a wikilink inside an inline footnote inside a footnote definition -- and we index nothing. Belongs with the recorded metadataCache family where a link inside a bracket construct is still indexed, not with the label-scan rules."
     },
     "fuzz/embed/23": {
       "id": "fuzz/embed/23",
@@ -36747,7 +36747,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "GFM AUTOLINK-LITERAL EXTENT family, with fuzz/misc/5 and fuzz/math/4. Obsidian's bare-URL autolink runs to the end of the line and swallows everything after it, so nothing later on the line parses: obs reports no links, no math and fully literal text. We end the autolink early and then parse the remainder, inventing constructs Obsidian never sees. Closing it means overriding gfm's autolink-literal extent, which owns every bare URL in the corpus -- one rule for the whole family rather than four fixes."
     },
     "fuzz/highlight/15": {
       "id": "fuzz/highlight/15",
@@ -37423,7 +37423,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "A `$$` opener at column zero interrupts a blockquote rather than continuing it lazily: obs reports blockquote(`> <br>`) plus math(`$$\\t[`) as two sections and we report one blockquote spanning both lines. Sibling of the recorded rule that a quote does not absorb raw html at column zero while a list does -- same shape, different opener, and the asymmetry between the two container types is already established. Narrow: it wants `$$` added to whatever set containerLazyTransform treats as non-absorbable for a quote, measured on both container types."
     },
     "fuzz/inline-footnote/8": {
       "id": "fuzz/inline-footnote/8",
@@ -39395,7 +39395,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "`![[[[word]]]]` -- a quadruple bracket opener. Obsidian indexes no link at all; we index one whose path is `[word`, taking the outer opener and a path that begins with a bracket. Related to the measured inner-wins rule (`[[A[[B]]]]` links `B`), but here the correct answer is *neither* opener. Wants probes on 3- and 4-deep openers before a rule is written, since the recorded evidence covers only two."
     },
     "fuzz/misc/3": {
       "id": "fuzz/misc/3",
@@ -41225,7 +41225,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "The recorded metadataCache family, verbatim: Obsidian indexes an inline link whose label holds an embed as both a link to the destination and an embed of the label -- meta.links [\"u\"] and meta.embeds [\"#tag\"] for `[![[#tag]]](u)` -- because the wikilink tokenizer claims the brackets before any link node forms. Tracked in KNOWN_REFERENCE_GAPS territory; needs tokenizer precedence between the wikilink extension and CommonMark's link label."
     },
     "fuzz/html/11": {
       "id": "fuzz/html/11",
@@ -42631,7 +42631,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "A footnote label that is a bare URL: obs strips `[^` and `]` and shows `https://e.test/p`, the bare label of an undefined reference, and we keep the delimiters. The label itself is legal to our pattern -- no brackets, no whitespace -- so the cause is upstream of the pattern: gfm's autolink literal claims the URL and splits the text node, so footnote-bare.ts never sees a contiguous `[^...]` to rejoin. Related to the autolink-extent family by mechanism but distinct: here the problem is the node split, not how far the autolink runs."
     },
     "fuzz/highlight/37": {
       "id": "fuzz/highlight/37",
@@ -43790,7 +43790,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "PROXY FIDELITY, not parse. The stored html holds SIX separate copies of the callout title, ~1600 bytes apart, each with its own math span -- so obs math reports the same formula six times while the text projection reports one. The two read different roots, which is why they disagree. Nothing here is a parsing rule: the detached renderer the recorder batches appears to have duplicated the callout. Settle it with PARITY_FULL_PROXY_CHECK=1, which exists for exactly this and has already caught one golden recording detached-renderer behaviour Obsidian does not produce; if it reproduces in a real Reading View, then it is an upstream rendering defect and belongs in KNOWN_PROXY_DIVERGENCES rather than in replicate."
     },
     "fuzz/embed/65": {
       "id": "fuzz/embed/65",
@@ -55817,7 +55817,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Visible only once Obsidian 1.14 began exposing the LaTeX source: the formula's characters differ, not just its surrounding whitespace."
+      "note": "The formula's characters differ by U+00A0, not by layout: obs tex is `\\u00a0x\\u00a0` and ours is `x`. The math comparison deliberately normalises whitespace *around* a formula, because `$$\\nx\\n$$` and `x` render identically -- but U+00A0 is not that whitespace, and Obsidian keeps it. Harness-side: the trim should not treat a no-break space as trimmable. Narrow, and the same character that made commonmark/links/507 unreadable until the code points were dumped."
     },
     "thematic-break/paragraph-dashes": {
       "id": "thematic-break/paragraph-dashes",
@@ -65586,7 +65586,7 @@
         }
       },
       "triage": "replicate",
-      "note": "An escaped bracket then a footnote marker, inside a blockquote: Obsidian renders \"[\" and drops the \"^1\". CONTROL: \"\\\\[^1]\" alone renders \"[^1]\" in full and MATCHES (token/footnote-ref/escaped-open), so an escaped bracket in front of a footnote marker does NOT swallow it - the note previously here claiming that is wrong. The marker only vanishes when a further [ precedes the escaped one, which is the shape all four of these share. Recorded html: \"> \\\\[^1\" renders \"[\", \"[[\\\\[^1]\" renders \"[[[]\", \"[\\\\[^1]]]\" renders \"[[]]]\". A plausible mechanism is that the outer [ opens a label, and a footnote reference inside a link construct renders nothing - the same rule the [^1](u) empty-anchor fix encodes - but that is untested and the bracket arithmetic has not been made to add up. No implementation attempt yet."
+      "note": "BLOCK IDENTIFIER family, not a footnote-label one: Obsidian registers blocks [\"1@0:0-...\"] spanning the whole line for all three of these, and blocks [] for the matching control `\\[^1]` (token/footnote-ref/escaped-open), which keeps its text `[^1]` in full. So the `^1` does not vanish into a reference -- it is consumed as a block id and stripped from the rendered text, which is why obs output is exactly ours minus `^1`. Our block scan refuses it because the caret follows `[` rather than whitespace, a guard measured to stop `$x^2` reporting the block `2`. What is NOT yet pinned is why the control registers nothing when its caret also follows `[`: the three that register all have something before the escaped bracket (`[`, `[[`, `> `) and the control has nothing. Four samples cannot separate \"something precedes\" from \"a bracket precedes\", so this wants probes varying the preceding context before any rule is written."
     },
     "probe/escaped-label/in-wikilink": {
       "id": "probe/escaped-label/in-wikilink",
@@ -65637,7 +65637,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Inside a wikilink opener: \"[[\\\\[^1]\" renders \"[[[]\". CONTROL: \"\\\\[^1]\" alone renders \"[^1]\" in full and MATCHES (token/footnote-ref/escaped-open), so an escaped bracket in front of a footnote marker does NOT swallow it - the note previously here claiming that is wrong. The marker only vanishes when a further [ precedes the escaped one, which is the shape all four of these share. Recorded html: \"> \\\\[^1\" renders \"[\", \"[[\\\\[^1]\" renders \"[[[]\", \"[\\\\[^1]]]\" renders \"[[]]]\". A plausible mechanism is that the outer [ opens a label, and a footnote reference inside a link construct renders nothing - the same rule the [^1](u) empty-anchor fix encodes - but that is untested and the bracket arithmetic has not been made to add up. No implementation attempt yet."
+      "note": "BLOCK IDENTIFIER family, not a footnote-label one: Obsidian registers blocks [\"1@0:0-...\"] spanning the whole line for all three of these, and blocks [] for the matching control `\\[^1]` (token/footnote-ref/escaped-open), which keeps its text `[^1]` in full. So the `^1` does not vanish into a reference -- it is consumed as a block id and stripped from the rendered text, which is why obs output is exactly ours minus `^1`. Our block scan refuses it because the caret follows `[` rather than whitespace, a guard measured to stop `$x^2` reporting the block `2`. What is NOT yet pinned is why the control registers nothing when its caret also follows `[`: the three that register all have something before the escaped bracket (`[`, `[[`, `> `) and the control has nothing. Four samples cannot separate \"something precedes\" from \"a bracket precedes\", so this wants probes varying the preceding context before any rule is written."
     },
     "probe/escaped-label/in-brackets": {
       "id": "probe/escaped-label/in-brackets",
@@ -65688,7 +65688,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Inside a bare bracket pair: \"[\\\\[^1]]]\" renders \"[[]]]\". CONTROL: \"\\\\[^1]\" alone renders \"[^1]\" in full and MATCHES (token/footnote-ref/escaped-open), so an escaped bracket in front of a footnote marker does NOT swallow it - the note previously here claiming that is wrong. The marker only vanishes when a further [ precedes the escaped one, which is the shape all four of these share. Recorded html: \"> \\\\[^1\" renders \"[\", \"[[\\\\[^1]\" renders \"[[[]\", \"[\\\\[^1]]]\" renders \"[[]]]\". A plausible mechanism is that the outer [ opens a label, and a footnote reference inside a link construct renders nothing - the same rule the [^1](u) empty-anchor fix encodes - but that is untested and the bracket arithmetic has not been made to add up. No implementation attempt yet."
+      "note": "BLOCK IDENTIFIER family, not a footnote-label one: Obsidian registers blocks [\"1@0:0-...\"] spanning the whole line for all three of these, and blocks [] for the matching control `\\[^1]` (token/footnote-ref/escaped-open), which keeps its text `[^1]` in full. So the `^1` does not vanish into a reference -- it is consumed as a block id and stripped from the rendered text, which is why obs output is exactly ours minus `^1`. Our block scan refuses it because the caret follows `[` rather than whitespace, a guard measured to stop `$x^2` reporting the block `2`. What is NOT yet pinned is why the control registers nothing when its caret also follows `[`: the three that register all have something before the escaped bracket (`[`, `[[`, `> `) and the control has nothing. Four samples cannot separate \"something precedes\" from \"a bracket precedes\", so this wants probes varying the preceding context before any rule is written."
     },
     "probe/escaped-label/in-embed": {
       "id": "probe/escaped-label/in-embed",
@@ -77664,7 +77664,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "replicate",
+      "note": "A footnote label keeps a trailing backslash -- `[^1\\]` names `1\\` -- and obs renders `1 1\\` where we render `1 1`. footnote-bare.ts already reads the label from the source for this reason; it fails on the *second* reference because alignToSource validates by exact equality, so the rejoined label disagrees with the node it is checked against. Same cause recorded on fuzz/embed/12."
     },
     "probe/math-emphasis/display-across-lines": {
       "id": "probe/math-emphasis/display-across-lines",
@@ -133072,7 +133073,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "BACKSLASH IS NOT AN ESCAPE IN A LINK DESTINATION family, with commonmark/links/500. `[link](<foo\\>)` is a link whose path is `foo\\` to Obsidian: inside angle brackets the backslash is literal and the `>` closes the destination, where we treat `\\>` as an escape so the destination never closes and no link forms. Needs micromark factoryDestination changed or a repair pass; the shorter legacy escape set recorded in the README is the same territory, and replacing it wholesale cost 27 regressions, so this wants the destination scan specifically rather than a global escape list."
     },
     "commonmark/links/494": {
       "id": "commonmark/links/494",
@@ -133450,7 +133451,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "BACKSLASH IS NOT AN ESCAPE IN A LINK DESTINATION family, with commonmark/links/500. `[link](<foo\\>)` is a link whose path is `foo\\` to Obsidian: inside angle brackets the backslash is literal and the `>` closes the destination, where we treat `\\>` as an escape so the destination never closes and no link forms. Needs micromark factoryDestination changed or a repair pass; the shorter legacy escape set recorded in the README is the same territory, and replacing it wholesale cost 27 regressions, so this wants the destination scan specifically rather than a global escape list. In 500 the direction is reversed -- obs forms NO link where we form one -- but the cause is the same reading of `\\)`."
     },
     "commonmark/links/501": {
       "id": "commonmark/links/501",
@@ -139767,7 +139768,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "An html open tag whose attribute value holds `<` and `>` and spans a line ending: obs reads the whole two-line run as one html block contributing no text at all, and we end the tag early and emit `\\\"' _boolean zoop:33=zoop:33 />` as text. Belongs with the htmlFlow/raw-html family (step 4) -- the attribute-value scan must not treat a quoted `<em>` as ending the tag."
     },
     "commonmark/raw-html/617": {
       "id": "commonmark/raw-html/617",
@@ -140399,7 +140400,7 @@
         }
       },
       "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "note": "CDATA is not an html construct to Obsidian: obs renders `foo &<]]>`, reading `<![CDATA[>` as a declaration that ends at the FIRST `>` and leaving `&<]]>` as visible text, where we consume the whole CDATA section as html and render `foo &`. Belongs with the htmlFlow/raw-html family (step 4); it is the declaration half rather than the comment half."
     },
     "commonmark/raw-html/630": {
       "id": "commonmark/raw-html/630",
