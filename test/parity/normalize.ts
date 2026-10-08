@@ -173,6 +173,14 @@ function textOf(node: Node, defined?: ReadonlySet<string>): string {
         if (defined && !defined.has(id)) out += id;
         return;
       }
+      // An inline note renders as a marker here too, so its body is not part of
+      // the surrounding construct: `# ==^[inline]==` reports the highlight as
+      // `⟨fn⟩`, where walking the children reported `inline`. Without this case the
+      // body leaks into whichever construct encloses it, since the default below
+      // descends into it.
+      case "footnote":
+        out += "\u27e8fn\u27e9";
+        return;
       default:
         break;
     }
