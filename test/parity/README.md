@@ -171,6 +171,59 @@ pulling apart:
 - **Check every oracle before calling a family clean.** "15 of 15 matched" was true and
   incomplete; the gap was one `compute` counter away.
 
+### Construct frequency is the third spent selector, and a base rate kills it
+
+All three counting heuristics tried here have now produced near-perfect families. The third
+is the most tempting, because the number looks enormous: of 129 causes a sweep reduced to,
+`blockid` appeared in **67**, over half.
+
+It means nothing without the base rate. `blockid` also appears in **785 of the 1000
+generated documents**, so the conditional failure rate is 15.0% against a 13.1% base --
+a lift of 1.15. The strongest lift in the whole table is 1.45. Dense fuzz documents carry
+six to eight constructs, so nearly every construct appears in nearly every failure, and
+frequency measures the generator rather than the parser.
+
+| construct | in all | in failures | P(fail \| present) | lift |
+| --------- | -----: | ----------: | -----------------: | ---: |
+| setext    |    499 |          95 |              19.0% | 1.45 |
+| highlight |    489 |          93 |              19.0% | 1.45 |
+| math      |    555 |          97 |              17.5% | 1.33 |
+| blockid   |    785 |         118 |              15.0% | 1.15 |
+| wikilink  |    908 |         124 |              13.7% | 1.04 |
+
+So: **compute a base rate before believing any count.** What still works is a
+contradiction between recorded cases, and -- new here -- plain **minimality**. Picking the
+shortest reduced forms a sweep produces found nine fixable rules in one wave, on the
+reasoning that a seven-character document can only be wrong about one thing.
+
+### A zero-regression measurement proves nothing if the corpus cannot adjudicate the rule
+
+The sharpest lesson available, because it cost a shipped regression.
+
+A tag was taught not to start after a label opener, so that ` ![[#t` would stop reporting
+one. Measured with the usual delta tool: **zero regressions**. It was wrong anyway. Every
+one of the fourteen recorded `[#` cases is a `[[#heading]]` wikilink, so no case in the
+corpus held a bare `[#tag]` at all -- and `[#tag]`, `[#tag](u)` and `[#a/b]]` all report a
+tag in Obsidian. Six of the next sweep's thirty shortest causes were exactly that shape.
+
+A clean delta against a corpus with no case for the rule is not evidence, and it reads
+exactly like evidence. Before trusting one, **count the cases that exercise the rule** --
+a one-line predicate over `markdown` -- and if the answer is zero, the measurement has
+told you nothing. This is the counting that _is_ worth doing.
+
+Two smaller corollaries from the same night:
+
+- **Check every oracle before calling a family clean**, now five instances. The newest is
+  the inverse of the usual one: the main gate went _green_ on three `block-id-wrapper`
+  cases while `compute` still reported `blocks: []` for all three, because the projection
+  and the block scan are separate passes and `compareCase` reads only the first. A passing
+  gate can be the misleading one.
+- **When a rule looks inconstant, check whether the inconstant case is the same
+  construct.** `sections` carried 139 divergences and the largest family in it was declined
+  twice as the "definition start-column convention", because `    [^12]:` reports column 2
+  where everything else reports 0. Four spaces is indented _code_ -- never a top-level
+  paragraph, so never part of the family. Excluding it dropped the ceiling to 44.
+
 ### Coverage is not uniform, and the gaps are where the backlog lives
 
 Measure it before concluding anything about a family's size. Counting designed
