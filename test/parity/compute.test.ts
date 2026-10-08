@@ -243,6 +243,17 @@ describe("positioned oracle", () => {
    * split as `block-id-wrapper` below -- projection and compute are separate passes and
    * `compareCase` reads only the first.
    *
+   * A third, smaller wave probed the boundaries those fixes left unmeasured, and three
+   * of its six answers landed here rather than on the main gate:
+   *
+   *     embeds       +1  tag-in-label/image-opener
+   *     blocks       -1  the wrapper tail now admits a following word, which also
+   *                      closed block-id-inline/wrapped-then-block
+   *     sections     -1  a leading byte-order mark no longer shifts every slice
+   *
+   * `![#tag](u)` matches on the main gate too: the tag is right, and this oracle
+   * disagrees about the image around it.
+   *
    * `sections` went 139 to 44 and the five cases both waves added to it went with the
    * other 90. Obsidian reports a top-level block's section from the start of its
    * *line*, so a block indented one to three spaces begins at column 0 where mdast
@@ -280,11 +291,11 @@ describe("positioned oracle", () => {
     footnotes: 20,
     footnoteRefs: 3,
     headings: 13,
-    sections: 44,
+    sections: 43,
     links: 123,
-    embeds: 33,
+    embeds: 34,
     tags: 3,
-    blocks: 18,
+    blocks: 17,
     listItems: 72,
     frontmatterPosition: 7,
   };

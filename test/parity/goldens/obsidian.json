@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-08T10:29:25.078Z",
+  "recordedAt": "2026-10-08T13:13:31.733Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -10864,11 +10864,11 @@
           "sections": [
             {
               "type": "heading",
-              "text": "﻿# "
+              "text": "# H"
             },
             {
               "type": "paragraph",
-              "text": "\ntex"
+              "text": "text"
             }
           ]
         },
@@ -10900,8 +10900,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Obsidian strips a byte-order mark before parsing, so `\\uFEFF# H` is the heading `H` and every later offset shifts by one; we keep the mark and read the heading as `#`. Measured through computeMetadataAsync and the section offsets, which differ by exactly one character."
+      "triage": "match"
     },
     "probe/inline-footnote/two-inline": {
       "id": "probe/inline-footnote/two-inline",
@@ -25957,8 +25956,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/97": {
       "id": "fuzz/embed/97",
@@ -78683,6 +78681,317 @@
           "tags": [
             "#a/b@0:0-0:4"
           ],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-tail/wrapper-then-word": {
+      "id": "probe/block-id-tail/wrapper-then-word",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "*^blk* word\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><em></em> word</p>",
+        "projections": {
+          "text": "word",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "*^blk* word"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:11"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:11"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-tail/wrapper-then-comma-word": {
+      "id": "probe/block-id-tail/wrapper-then-comma-word",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "*^blk*, word\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><em></em>, word</p>",
+        "projections": {
+          "text": ", word",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "*^blk*, word"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:12"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:12"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tag-in-label/image-opener": {
+      "id": "probe/tag-in-label/image-opener",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "![#tag](u)\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><span alt=\"#tag\" src=\"u\" class=\"internal-embed is-loaded file-embed mod-empty\">“u” is not created yet. Click to create.</span></p>",
+        "projections": {
+          "text": "u",
+          "math": [],
+          "links": [
+            {
+              "path": "u",
+              "heading": "",
+              "embedded": true
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "![#tag](u)"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [
+            "u"
+          ],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:10"
+          ],
+          "links": [],
+          "embeds": [
+            "![#tag](u)=>u|#tag@0:0-0:10"
+          ],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-closer-space/space-before-closer": {
+      "id": "probe/math-closer-space/space-before-closer",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "$. $\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">$. $</p>",
+        "projections": {
+          "text": "$. $",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "$. $"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-closer-space/no-space-before-closer": {
+      "id": "probe/math-closer-space/no-space-before-closer",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "$.$\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\".\" class=\"TEX-N\"><mjx-mo data-latex=\".\"><mjx-c class=\"mjx-c2E\">.</mjx-c></mjx-mo></mjx-math></mjx-container></span></p>",
+        "projections": {
+          "text": "⟨math⟩",
+          "math": [
+            {
+              "display": false,
+              "tex": "."
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "$.$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-closer-space/space-after-opener": {
+      "id": "probe/math-closer-space/space-after-opener",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "$ .$\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">$ .$</p>",
+        "projections": {
+          "text": "$ .$",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "$ .$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
           "listItems": [],
           "blocks": [],
           "frontmatterLinks": []

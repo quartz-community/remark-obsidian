@@ -219,7 +219,16 @@ export const CHAIN_MANIFEST = {
  * Mirrors `calloutLineRegex` upstream.
  */
 export function applyTextTransform(src: string): string {
-  return src;
+  // Obsidian strips a leading byte-order mark before parsing, so every offset it
+  // reports is in mark-less coordinates. micromark skips the mark without counting it
+  // either, so *our* node offsets already agree -- `\uFEFF# H` gives `heading@0-3`
+  // on both sides. What did not agree is the string those offsets are sliced from:
+  // against the mark-bearing source, `heading@0-3` reads `\uFEFF# ` rather than `# H`,
+  // which reported the heading as `#` and shifted every later section by one.
+  //
+  // Stripping it here aligns the slices on both sides without touching either parse.
+  // The tree is still built from the original text, so no node position moves.
+  return src.startsWith("\uFEFF") ? src.slice(1) : src;
 }
 
 /** Stand-in for the vfile data Quartz populates; the wikilink visitor reads `slug`. */

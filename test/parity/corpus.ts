@@ -2259,6 +2259,31 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // taught to absorb. Whether anything else absorbs one is unmeasured.
   ["probe/trailing-blank-line/tag-then-escape", "#a/b \\ \n \n"],
   ["probe/trailing-blank-line/code-span", "`code`\n \n"],
+  // Boundaries left unmeasured by tonight's fixes, each one a rule that was widened
+  // only as far as its evidence went.
+
+  // A block identifier in a wrapper, with a *word* after it rather than punctuation.
+  //
+  // `*^blk*.` registers and is fixed; the tail test deliberately refuses anything
+  // holding a word character, so `*^blk* word` is the untested side of that line.
+  ["probe/block-id-tail/wrapper-then-word", "*^blk* word\n"],
+  ["probe/block-id-tail/wrapper-then-comma-word", "*^blk*, word\n"],
+
+  // A tag after a single `![` opener.
+  //
+  // `[#tag](u)` tags and `![[#t` does not, and the rule separating them counts label
+  // opener *groups*. `![#tag](u)` closes exactly one group, so the rule allows a tag
+  // here -- by construction rather than by measurement.
+  ["probe/tag-in-label/image-opener", "![#tag](u)\n"],
+
+  // An inline math closer with whitespace before it.
+  //
+  // `^2$. $` renders literally in Obsidian while we read `. ` as math, so a closer
+  // preceded by whitespace may be refused the way a highlight's content is. Probed
+  // either side of the boundary.
+  ["probe/math-closer-space/space-before-closer", "$. $\n"],
+  ["probe/math-closer-space/no-space-before-closer", "$.$\n"],
+  ["probe/math-closer-space/space-after-opener", "$ .$\n"],
 ];
 
 /** Inline tokens, each crossed with a set of malformed delimiter states. */

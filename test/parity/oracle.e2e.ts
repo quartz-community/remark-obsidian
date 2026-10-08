@@ -553,9 +553,20 @@ describe("Obsidian parity oracle", () => {
           html: c.html,
           projections: {
             ...c.projections,
+            // Sliced from the mark-less text, because Obsidian strips a leading
+            // byte-order mark before parsing and so reports offsets that do not
+            // index the file. Against the raw markdown, `\uFEFF# H` made the
+            // heading section read `\uFEFF# ` instead of `# H` and pushed every
+            // later section one character early. Mirrors `applyTextTransform`,
+            // which does the same on our side of the comparison.
             sections: c.sectionOffsets.map((s) => ({
               type: s.type,
-              text: source.markdown.slice(s.start, s.end).replace(/\n+$/, ""),
+              text: (source.markdown.startsWith("\uFEFF")
+                ? source.markdown.slice(1)
+                : source.markdown
+              )
+                .slice(s.start, s.end)
+                .replace(/\n+$/, ""),
             })),
           },
           meta: c.meta,

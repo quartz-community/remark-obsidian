@@ -6,7 +6,7 @@ import { visit } from "unist-util-visit";
 import type { Root } from "mdast";
 import type { Node } from "unist";
 
-import { parseOurs } from "./chain.js";
+import { applyTextTransform, parseOurs } from "./chain.js";
 import type { GoldenCase } from "./types.js";
 
 const goldenPath = path.join(
@@ -86,9 +86,14 @@ describe("node positions", () => {
   it("never lets a point disagree with its own offset", () => {
     const offenders: string[] = [];
     for (const entry of cases) {
+      // Derived from the text the tree was actually parsed from, which is not the
+      // raw markdown: `parseOurs` runs `applyTextTransform` first, and that strips a
+      // leading byte-order mark. Checking offsets against the raw string instead
+      // reported `\uFEFF# H` as inconsistent by exactly one character -- the mark --
+      // when the tree was perfectly self-consistent.
       const bad = inconsistent(
         parseOurs(entry.markdown, "quartz-default"),
-        entry.markdown,
+        applyTextTransform(entry.markdown),
       );
       if (bad.length > 0) offenders.push(`${entry.id}: ${bad[0]}`);
     }

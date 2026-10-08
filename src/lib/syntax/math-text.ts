@@ -103,6 +103,19 @@ function tokenizeMathText(
   let sizeOpen = 0;
   let sizeClose = 0;
   let token: Token;
+  /**
+   * Whether a space or tab was the last thing consumed before a candidate closer.
+   *
+   * A single-dollar closer may not sit straight after one: `$. $` renders literally
+   * in Obsidian while `$.$` is math, so the content may no more end in whitespace
+   * than it may begin with it. Probed on both sides, and `$ .$` is refused earlier
+   * by the opener for the matching reason.
+   *
+   * Only a space or tab, not a line ending. An opener may be followed by a line
+   * ending and `$a⏎b$` is a span, so what a *closer* does after one is unmeasured
+   * and left alone.
+   */
+  let afterSpace = false;
 
   return start;
 
@@ -150,6 +163,8 @@ function tokenizeMathText(
     if (code === null) return nok(code);
 
     if (code === DOLLAR) {
+      // A single-dollar span may not close straight after a space or tab.
+      if (sizeOpen === 1 && afterSpace) return nok(code);
       token = effects.enter("mathTextSequence");
       sizeClose = 0;
       return sequenceClose(code);
@@ -159,6 +174,7 @@ function tokenizeMathText(
       effects.enter("space");
       effects.consume(code);
       effects.exit("space");
+      afterSpace = true;
       return between;
     }
 
@@ -169,6 +185,7 @@ function tokenizeMathText(
       return between;
     }
 
+    afterSpace = false;
     effects.enter("mathTextData");
     return data(code);
   }

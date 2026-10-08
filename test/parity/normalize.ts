@@ -1003,17 +1003,6 @@ function adjacentBlockFollows(
 const ID_WRAPPERS = new Set(["emphasis", "strong", "delete", "highlight"]);
 
 /**
- * A trailing text node that cannot itself hold an identifier and does not end the
- * search for one. `*^blk*.` registers the block `blk` across the whole line and
- * renders `<em></em>.`, so the identifier sits inside the wrapper while the `.`
- * sits after it -- and a search that stops at the last child never sees it.
- *
- * Deliberately narrow: punctuation and whitespace only, so `*^blk* word` is still
- * left alone. Whether Obsidian strips *that* is unmeasured, and a probe for it is
- * recorded rather than assumed.
- */
-const TRAILING_NON_WORD = /^[^\w]*$/u;
-
 /**
  * The node actually holding a trailing identifier, descending through wrappers.
  *
@@ -1034,11 +1023,17 @@ function trailingIdHost(inner: Node[]):
     if (last.type === "text") {
       const value = (last as ValueNode).value;
       const before = kids[kids.length - 2];
-      // Step over a punctuation-only tail into the wrapper behind it, but only
-      // when this text could not be the identifier's own host.
+      // Step over any tail into the wrapper behind it, but only when this text
+      // could not be the identifier's own host. The tail used to have to be free of
+      // word characters, which was as far as the evidence went at the time -- probes
+      // since recorded show `*^blk* word` and `*^blk*, word` both registering `blk`
+      // and rendering only the tail, so what follows the wrapper is unrestricted.
+      //
+      // Widening is safe because the real gate is downstream: whatever this descends
+      // into must still *end* with an identifier for `TRAILING_BLOCK_ID` to match, so
+      // `*em* word` descends, finds `em`, and changes nothing.
       if (
         TRAILING_BLOCK_ID.test(value) ||
-        !TRAILING_NON_WORD.test(value) ||
         !before ||
         !ID_WRAPPERS.has(before.type)
       ) {
@@ -1395,24 +1390,34 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     // Whitespace may follow those markers but never the identifier itself. That is
     // the whole difference between `*^blk* `, which registers, and `text ^blk `,
     // which registers nothing.
-    const id = /\^([A-Za-z0-9-]+)([^A-Za-z0-9]*)$/u.exec(raw);
+    // Scanned rather than anchored at the end of the line. What must sit straight
+    // after the identifier is a closing marker; what sits after *that* is
+    // unrestricted, because `*^blk* word` and `*^blk*, word` both register `blk` and
+    // render only their tail. Anchoring the whole tail at `$` could not express that
+    // -- it had to be free of letters, so a following word defeated it.
+    //
+    // The last candidate wins, which is the recorded rule for a line holding two.
+    let id: { name: string; index: number } | undefined;
+    for (const candidate of raw.matchAll(/\^([A-Za-z0-9-]+)/gu)) {
+      const at = candidate.index ?? 0;
+      const after = raw.slice(at + candidate[0].length);
+      if (after !== "") {
+        if (!/^[*_=~]/u.test(after)) continue;
+        // A marker can only *close* something that opened, so the same marker has to
+        // appear before the caret somewhere on the line. `x ^a_b` has `_b` after the
+        // identifier and no `_` before it, so that one is part of a word rather than
+        // a closing run, and Obsidian registers no block. Without the test at all,
+        // widening the tail to allow a following word read `^a` as an identifier and
+        // cost two cases that had always been right.
+        //
+        // Anywhere before, not immediately before: `*x ^blk*` registers `blk` with
+        // its opener three characters back, so requiring adjacency cost that case
+        // instead. The wrapper opens where it opens.
+        if (!raw.slice(0, at).includes(after[0] ?? "")) continue;
+      }
+      id = { name: candidate[1] ?? "", index: at };
+    }
     if (!id) continue;
-    // The tail must be empty or begin with a closing marker. That is the whole
-    // difference between `*^blk*.`, which registers `blk` across the line, and
-    // `text ^blk ` or `text ^blk.`, which register nothing: what matters is the
-    // character straight after the identifier, not the run beyond it. Punctuation
-    // is allowed past the marker because `*^blk*.` measurably registers -- the
-    // earlier pattern stopped at whitespace and so missed all three wrapper cases.
-    //
-    // The tail class is `[^A-Za-z0-9]`, not `[^\w]`, because `_` *is* a word
-    // character -- `[^\w]` silently excludes the one marker that `_^blk_` and
-    // `_*^blk*_.` depend on, which cost one working case and left the nested one
-    // open. Second time tonight that `\w` quietly meant "and underscore".
-    //
-    // Written as two flat tests rather than one nested group: `(?:[*_=~]+[^\w]*)?`
-    // puts a quantifier inside a quantified group, which the ReDoS lint rejects.
-    const tail = id[2] ?? "";
-    if (tail !== "" && !/^[*_=~]/u.test(tail)) continue;
     // The caret must follow whitespace. Without that `$x^2` reports the block
     // `2`, `[^1` reports `1` and `[[a#^blk` reports `blk` -- six false
     // identifiers in the corpus, all of them a caret inside another construct.
@@ -1438,7 +1443,7 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       continue;
     }
     blocks.push(
-      `${id[1]}@${atOffset(lineStart)}-${atPoint(child.position!.end)}`,
+      `${id.name}@${atOffset(lineStart)}-${atPoint(child.position!.end)}`,
     );
   }
 
