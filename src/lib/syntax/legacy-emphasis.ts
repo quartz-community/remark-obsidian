@@ -31,8 +31,22 @@ const UNDERSCORE = 95;
  * inside micromark's consume-once model.
  */
 
+/**
+ * Legacy's word-character test, which is ASCII and nothing else.
+ *
+ * `remark-parse@8` delegates this to the `is-word-character` package, and that package
+ * is three lines: `/\w/` against the first character. So Cyrillic, CJK and even a
+ * Latin-1 accent are all *not* word characters to it, and since this gate is the only
+ * thing stopping `_` from closing inside a word, `_пристаням_стремятся` emphasises where
+ * `_foo_bar` stays literal. Obsidian renders exactly that, and so does the arbiter.
+ *
+ * This port had `\u0080-\uFFFF` bolted onto the class, which inverted the rule for every
+ * non-ASCII script -- a reasonable-looking guess at "letters" that the upstream package
+ * never made. CommonMark *does* side with the guess, which is presumably where it came
+ * from, but the goldens are what this is reproducing.
+ */
 function isWordCharacter(character: string): boolean {
-  return character !== "" && /[\dA-Za-z_\u0080-\uFFFF]/.test(character);
+  return character !== "" && /\w/u.test(character);
 }
 
 /** Port of remark-parse@8.0.3 `lib/tokenize/strong.js`; returns the inner slice. */

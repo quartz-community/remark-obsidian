@@ -125204,8 +125204,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/emphasis-and-strong-emphasis/376": {
       "id": "commonmark/emphasis-and-strong-emphasis/376",
