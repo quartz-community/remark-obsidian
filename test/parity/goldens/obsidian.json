@@ -27619,7 +27619,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "note": "`*$y^2` / `y^2$*` is one inline math span to Obsidian; a legacy wrapper chunks its body at every line ending, so the span cannot cross one. Same obstacle the `$$` form had, and `inlineRefoldTransform` closed that by re-tokenizing the paragraph with line endings replaced by spaces. Widening its marker test from `$$` to a single `$` was measured at 1 gain and 2 regressions -- `fuzz/highlight/49` and `probe/math-unclosed/lone-closer-then-inline`, both of which already parse correctly and whose line-joined form produces different math. The refold needs a gate that can tell a *better* pairing from merely more of one."
     },
     "fuzz/highlight/61": {
       "id": "fuzz/highlight/61",
