@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-08T13:13:31.733Z",
+  "recordedAt": "2026-10-08T17:38:38.892Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -53103,7 +53103,7 @@
           "tasks": [
             {
               "char": " ",
-              "checked": true
+              "checked": false
             },
             {
               "char": "x",
@@ -53145,8 +53145,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Not a parity divergence but a recorder bug, and the stored html proves it: the outer task's own input carries no `checked` attribute while the inner one carries `checked=\"\"`, so the DOM says unchecked/checked exactly as we do. The recorded projection said checked/checked because the extraction used `el.querySelector(\"input:checked\")`, which searches descendants, so an outer task inherited its nested task's state. Fixed in oracle.e2e.ts with `:scope >`; closes on the next recording."
+      "triage": "match"
     },
     "blockquote/changing-depth-without-spaces": {
       "id": "blockquote/changing-depth-without-spaces",
