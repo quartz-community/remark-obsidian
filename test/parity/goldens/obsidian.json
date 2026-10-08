@@ -78412,7 +78412,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "probe/math-indent/two-space-then-embed": {
       "id": "probe/math-indent/two-space-then-embed",
@@ -78465,7 +78465,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "probe/math-indent/one-space-empty-body": {
       "id": "probe/math-indent/one-space-empty-body",

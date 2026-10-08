@@ -298,9 +298,16 @@ export function mdastText(
         // `data.display`, not `display`: `mathDisplayTransform` writes the flag
         // into `data` alongside the hast properties, which is where `math[].display`
         // reads it from too.
+        //
+        // The marker is pushed only for math starting in column 1, because that is
+        // what decides whether the `break` beside it survives. `$$y^2$$` over `word`
+        // reads `⟨math⟩word`, while `··$$y^2$$` over `··[[` reads `⟨math⟩ [[` -- five
+        // unindented cases drop the separator and both indented ones keep it. Indented
+        // display math therefore takes the plain placeholder, which is identical once
+        // the marker is stripped and leaves the line ending to speak for itself.
         parts.push(
           (node as unknown as { data?: { display?: boolean } }).data
-            ?.display === true
+            ?.display === true && node.position?.start?.column === 1
             ? DISPLAY_INLINE_MATH
             : "\u27e8math\u27e9",
         );
@@ -376,10 +383,13 @@ export function mdastText(
         return;
       }
       case "break":
-        // Nothing after display math on its own line. `$$y^2$$` over `word` reads
-        // `⟨math⟩word` in Obsidian with no separator at all, where every other line
-        // ending in a paragraph reads as one -- the rendered math is a block-level
-        // element, so the `<br>` beside it contributes nothing to `textContent`.
+        // Nothing after display math that began in column 1. `$$y^2$$` over `word`
+        // reads `⟨math⟩word` in Obsidian with no separator at all, where every other
+        // line ending in a paragraph reads as one -- the rendered math is a
+        // block-level element, so the `<br>` beside it contributes nothing to
+        // `textContent`. Indented display math is not that element and keeps its
+        // separator, which is why the marker is only pushed for column 1; the test
+        // here reads the marker rather than re-deciding it.
         if (parts[parts.length - 1] === DISPLAY_INLINE_MATH) return;
         parts.push("\n");
         return;
