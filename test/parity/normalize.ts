@@ -385,9 +385,22 @@ export function mdastText(
         //
         // A tag start is `<` plus a letter, `/`, `!` or `?`; a bare `<` followed
         // by anything else is literal text in the DOM and has to stay.
+        //
+        // That rule was stated here while the *first* pattern still read
+        // `<[^>]*>`, which contradicts it, and `<![CDATA[>&<]]>` is where the
+        // contradiction shows. HTML5 has no CDATA in content, so a browser reads
+        // `<![CDATA[>` as a bogus comment ending at the first `>` and renders the
+        // rest, `&<]]>`, as text -- `<]` is not a tag start. The wide pattern ate
+        // `<]]>` as if it were one, losing four visible characters, and Obsidian
+        // reports `foo &<]]>` exactly as the DOM rule predicts. Both patterns now
+        // use the one class, which is also why micromark consuming the whole CDATA
+        // span as a single html node is *correct* and needs no parse change: the
+        // arbiter agrees with micromark here, and the drop was only ever downstream.
         parts.push(
           `${decodeEntities(
-            raw.replace(/<[^>]*>/g, "").replace(/<[a-zA-Z/!?][^>]*$/, ""),
+            raw
+              .replace(/<[a-zA-Z/!?][^>]*>/g, "")
+              .replace(/<[a-zA-Z/!?][^>]*$/, ""),
           )}${phrasing ? "" : " "}`,
         );
         return;

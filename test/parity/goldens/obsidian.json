@@ -140394,8 +140394,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CDATA is not an html construct to Obsidian: obs renders `foo &<]]>`, reading `<![CDATA[>` as a declaration that ends at the FIRST `>` and leaving `&<]]>` as visible text, where we consume the whole CDATA section as html and render `foo &`. Belongs with the htmlFlow/raw-html family (step 4); it is the declaration half rather than the comment half."
+      "triage": "match"
     },
     "commonmark/raw-html/630": {
       "id": "commonmark/raw-html/630",
