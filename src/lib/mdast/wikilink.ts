@@ -7,7 +7,7 @@ interface Parts {
   alias: boolean;
 }
 
-const UNESCAPE = /\\([#[\]])/g;
+const UNESCAPE = /\\([#\]])/g;
 
 /**
  * Obsidian trims a wikilink's inner text **once, as a whole**, and only then splits
