@@ -77,6 +77,7 @@ import { containerSetextTransform } from "./lib/container-setext.js";
 import { lazySetextTransform } from "./lib/lazy-setext.js";
 import { bareCheckboxTransform } from "./lib/bare-checkbox.js";
 import { blankFootnoteLabelTransform } from "./lib/blank-footnote-label.js";
+import { mathUnclosedContainerTransform } from "./lib/math-unclosed-container.js";
 import { thematicBreakTabTransform } from "./lib/thematic-break-tab.js";
 import { labelPrecedenceTransform } from "./lib/label-precedence.js";
 import { setextDefinitionTransform } from "./lib/setext-definition.js";
@@ -535,6 +536,8 @@ export default function remarkObsidian(
     fenceOutlivesTransform(tree, String(file));
     mathOutlivesTransform(tree, String(file));
     mathMidlineTransform(tree, String(file));
+    // After both, because either can be the pass that opened the block this undoes.
+    mathUnclosedContainerTransform(tree, String(file));
     listUnderDefinitionTransform(tree, String(file));
     tableRowStyleTransform(tree, String(file), (markdown) =>
       self.parse(markdown),

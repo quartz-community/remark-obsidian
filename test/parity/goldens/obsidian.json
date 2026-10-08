@@ -66083,8 +66083,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Measured by probe/math-unclosed/*: inside a container an UNCLOSED $$ does not open display math. \"> $$y^2\" is a blockquote whose text is the literal \"$$y^2\" and whose math list is EMPTY; same for \"> [!note] $$\" and for a tab-indented \"$$y\" under a task. At root the opposite holds and we already agree - \"$$y^2\" alone reports math@0:0-1:0 and swallows to end of block, as do \"$$y^2\" over \"word\" and over a blank line. So the rule is about the container, not the delimiter: an opener that cannot close before its container ends stays literal. We open display math in all three."
+      "triage": "match"
     },
     "probe/math-unclosed/callout-title": {
       "id": "probe/math-unclosed/callout-title",
@@ -66133,7 +66132,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Measured by probe/math-unclosed/*: inside a container an UNCLOSED $$ does not open display math. \"> $$y^2\" is a blockquote whose text is the literal \"$$y^2\" and whose math list is EMPTY; same for \"> [!note] $$\" and for a tab-indented \"$$y\" under a task. At root the opposite holds and we already agree - \"$$y^2\" alone reports math@0:0-1:0 and swallows to end of block, as do \"$$y^2\" over \"word\" and over a blank line. So the rule is about the container, not the delimiter: an opener that cannot close before its container ends stays literal. We open display math in all three."
+      "note": "A callout TITLE, which is a separate rule from the container one now implemented: $$ at the end of a title line opens no block even though nothing follows it, where > $$ over a lazy line does open one. That follows the recorded rule that a construct must not cross a callout title line ending, and it is why calloutTitle is deliberately absent from the container set in math-unclosed-container.ts."
     },
     "probe/math-unclosed/list-tab": {
       "id": "probe/math-unclosed/list-tab",
@@ -66183,8 +66182,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Measured by probe/math-unclosed/*: inside a container an UNCLOSED $$ does not open display math. \"> $$y^2\" is a blockquote whose text is the literal \"$$y^2\" and whose math list is EMPTY; same for \"> [!note] $$\" and for a tab-indented \"$$y\" under a task. At root the opposite holds and we already agree - \"$$y^2\" alone reports math@0:0-1:0 and swallows to end of block, as do \"$$y^2\" over \"word\" and over a blank line. So the rule is about the container, not the delimiter: an opener that cannot close before its container ends stays literal. We open display math in all three."
+      "triage": "match"
     },
     "probe/math-unclosed/definition": {
       "id": "probe/math-unclosed/definition",
