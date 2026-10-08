@@ -24,7 +24,16 @@ export function taskReparseTransform(
     const [first] = item.children;
     if (!first || first.type !== "paragraph") return;
 
-    const start = first.position?.start?.offset;
+    // The children's start, not the paragraph's own. A task item's paragraph can
+    // span from *before* its checkbox while its children correctly begin after it:
+    // `- [ ] ~~~~` reports `paragraph@2-10` with its first child at 6 once
+    // `legacyStrikethrough` is on. Slicing by the span then read `[ ] ~~~~`, which
+    // `TASK_MARKER` cannot match and which reparses to a paragraph, so this pass
+    // declined and the tilde fence never formed. `container-setext.ts` records the
+    // same preference for the same reason.
+    const start =
+      first.children[0]?.position?.start?.offset ??
+      first.position?.start?.offset;
     const end = first.position?.end?.offset;
     if (start === undefined || end === undefined) return;
 

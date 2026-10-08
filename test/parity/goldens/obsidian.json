@@ -65015,8 +65015,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "`~~~~` is four tildes, so it is a fenced code block delimiter rather than an empty strikethrough: Obsidian reports a code element (html.codeLang [\"\"]) inside the task and we report none. The bare `~~~~` case matches, so the task context is what differs."
+      "triage": "match"
     },
     "probe/empty-inline/highlight-then-blank": {
       "id": "probe/empty-inline/highlight-then-blank",
