@@ -208,6 +208,7 @@ const legacyAttention: Construct = {
       remaining = segment.length;
       if (segment.kind === "eol") effects.enter(types.lineEnding);
       else if (segment.kind === "data") effects.enter("data");
+      else if (segment.kind === "hardBreak") effects.enter("hardBreakEscape");
       else effects.enter(`${name}Text`, { contentType: "text" });
       return consumeSegment(code);
     }
@@ -221,7 +222,9 @@ const legacyAttention: Construct = {
           ? types.lineEnding
           : segment.kind === "data"
             ? "data"
-            : `${name}Text`,
+            : segment.kind === "hardBreak"
+              ? "hardBreakEscape"
+              : `${name}Text`,
       );
       index++;
       return nextSegment;

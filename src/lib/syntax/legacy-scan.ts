@@ -51,7 +51,7 @@ export function createChunkScan(
 }
 
 export interface Segment {
-  readonly kind: "text" | "eol" | "data" | "prefix";
+  readonly kind: "text" | "eol" | "data" | "prefix" | "hardBreak";
   readonly length: number;
 }
 
@@ -105,9 +105,31 @@ export function planBody(
     const run = body.slice(index, end);
     const kept = run.trimEnd();
     const isLast = end >= body.length;
+    // A backslash immediately before a line ending is a hard break, and the
+    // subtokenizer cannot recognise it as one for the same reason the line ending
+    // needs its own token: the `\` ends up last in a text chunk with nothing after
+    // it, so `*foo\` / `bar*` kept the backslash as content where Obsidian renders
+    // `foo bar`. Emitted as its own token instead, which consumes the character
+    // without it becoming text -- the line ending beside it already becomes the
+    // break. Counted for parity, because `\\` before a line ending is a literal
+    // backslash and not a break at all.
+    // Counted rather than matched: an anchored `/\\*$/` is a second-degree polynomial
+    // to the ReDoS lint, and this is the established substitution for one.
+    let trailingSlashes = 0;
+    while (
+      trailingSlashes < run.length &&
+      run[run.length - 1 - trailingSlashes] === "\\"
+    ) {
+      trailingSlashes++;
+    }
     if (isLast && kept.length < run.length) {
       if (kept.length > 0) segments.push({ kind: "text", length: kept.length });
       segments.push({ kind: "data", length: run.length - kept.length });
+    } else if (!isLast && trailingSlashes % 2 === 1) {
+      if (run.length > 1) {
+        segments.push({ kind: "text", length: run.length - 1 });
+      }
+      segments.push({ kind: "hardBreak", length: 1 });
     } else {
       segments.push({ kind: "text", length: run.length });
     }

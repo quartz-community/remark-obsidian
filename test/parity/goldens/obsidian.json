@@ -140584,8 +140584,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/hard-line-breaks/640": {
       "id": "commonmark/hard-line-breaks/640",

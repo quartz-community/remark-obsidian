@@ -139,6 +139,7 @@ const legacyDelete: Construct = {
       remaining = segment.length;
       if (segment.kind === "eol") effects.enter(types.lineEnding);
       else if (segment.kind === "data") effects.enter("data");
+      else if (segment.kind === "hardBreak") effects.enter("hardBreakEscape");
       else effects.enter("strikethroughText", { contentType: "text" });
       return consumeSegment(code);
     }
@@ -152,7 +153,9 @@ const legacyDelete: Construct = {
           ? types.lineEnding
           : segment.kind === "data"
             ? "data"
-            : "strikethroughText",
+            : segment.kind === "hardBreak"
+              ? "hardBreakEscape"
+              : "strikethroughText",
       );
       index++;
       return nextSegment;
