@@ -1253,11 +1253,42 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
   // Obsidian reports only top-level blocks as sections -- a list inside a
   // quote is part of the quote's section, not one of its own -- so the
   // document's own children are the whole projection.
+  // Obsidian reports a top-level block's section from the start of its *line*, so a
+  // block indented one to three spaces begins at column 0 while mdast quite correctly
+  // begins it at the content. Measured across 87 cases whose only disagreement is
+  // exactly that, among them ` [^1]: def`, ` ^blk` and `  $$y^2$$`.
+  //
+  // Four spaces is not this family and must not be folded into it: that is indented
+  // code, a different construct, which is why `    [^12]:` reports column 2 rather
+  // than 0. Keying on "the prefix is only whitespace" rather than on a width keeps
+  // them apart, since the four-space case is not a top-level paragraph at all.
+  //
+  // The clamp lives here, in the harness's mirror of Obsidian's reporting, and not in
+  // the tree: a paragraph's position has to keep pointing at its content, or a
+  // formatter editing around it would consume the author's indentation.
+  const lineStartOf = (line: number): number | undefined =>
+    lineStarts[line - 1];
+  const sectionStart = (start: {
+    line: number;
+    column: number;
+    offset?: number;
+  }): string => {
+    const lineStart = lineStartOf(start.line);
+    if (
+      start.offset !== undefined &&
+      lineStart !== undefined &&
+      source.slice(lineStart, start.offset).trim() === ""
+    ) {
+      return `${start.line - 1}:0`;
+    }
+    return atPoint(start);
+  };
+
   const sections = tree.children
     .filter((child) => child.position)
     .map(
       (child) =>
-        `${child.type}@${atPoint(child.position!.start)}-${atPoint(child.position!.end)}`,
+        `${child.type}@${sectionStart(child.position!.start)}-${atPoint(child.position!.end)}`,
     );
 
   const spanOf = (node: Node): string =>

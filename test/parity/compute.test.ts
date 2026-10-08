@@ -235,20 +235,26 @@ describe("positioned oracle", () => {
    * rather than regression -- every one is a case the wave was written to expose.
    * Attributed exactly, by dumping which new id joins which key:
    *
-   *     sections     +2  embed-fragment/unclosed-leading-space,
-   *                      math-space/space-body-trailing-period
-   *
-   * A second wave, from sweep 800000, adds:
-   *
    *     links        +3  tag-in-label/{heading-full-link,quote-full-link,
    *                      nested-in-destination}
-   *     sections     +3  math-indent/{two-space-then-wikilink,
-   *                      two-space-then-embed,one-space-empty-body}
    *
    * All three `links` cases *match* on the main gate: a `#tag` inside a link label now
    * tags correctly, while this oracle still disagrees about the link around it. Same
    * split as `block-id-wrapper` below -- projection and compute are separate passes and
    * `compareCase` reads only the first.
+   *
+   * `sections` went 139 to 44 and the five cases both waves added to it went with the
+   * other 90. Obsidian reports a top-level block's section from the start of its
+   * *line*, so a block indented one to three spaces begins at column 0 where mdast
+   * begins it at the content -- which was 87 of the cases measured as disagreeing on
+   * nothing else, and the single largest family this oracle held.
+   *
+   * It had been declined twice as the "definition start-column convention", on the
+   * strength of `    [^12]:` reporting column 2 rather than 0, which made the rule look
+   * inconstant. Four spaces is indented *code*: a different construct, never a
+   * top-level paragraph, and so never this family at all. Keying on "the prefix is only
+   * whitespace" rather than on an indent width separates them, and the apparent
+   * counter-example was the reason the real rule stayed hidden.
    *
    * Three of the first wave's cases have since come off these lists entirely.
    * `entity-bare/lone-ampersand-in-item` held `sections` and `listItems` until the
@@ -274,7 +280,7 @@ describe("positioned oracle", () => {
     footnotes: 20,
     footnoteRefs: 3,
     headings: 13,
-    sections: 139,
+    sections: 44,
     links: 123,
     embeds: 33,
     tags: 3,
