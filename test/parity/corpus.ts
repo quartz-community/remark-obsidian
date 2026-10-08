@@ -1729,6 +1729,52 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // Enumerated rather than inferred: container x how many lazy lines x which line
   // carries the underline. The `===`/`---` pair is kept because only `---` is also
   // a thematic break, which is the likeliest source of the asymmetry.
+  // A `$$` opener sitting directly after a container marker.
+  //
+  // `math-unclosed-container.ts` requires the opener to carry a container prefix and
+  // tests that prefix for whitespace and `>` only, so `- $$y` and `1. $$y^2` fall
+  // through it -- their prefix holds a list marker. The sweep reduced four
+  // independent failures onto exactly that, which is the gap the first version of
+  // the rule left open rather than a new construct.
+  ["probe/math-marker/dash-then-opener", "- $$y\n"],
+  ["probe/math-marker/ordered-then-opener", "1. $$y^2\n"],
+  ["probe/math-marker/task-then-opener", "- [ ] $$y^\n"],
+  ["probe/math-marker/callout-title-content", "> [!note] $$y\n"],
+  ["probe/math-marker/dash-then-closed", "- $$y$$\n"],
+  ["probe/math-marker/dash-opener-alone", "- $$\ny\n"],
+
+  // A single `$` and a `$$` run meeting on the same line.
+  //
+  // `$\` \`$`, `$$ $$` and `x^2$` / `y^2$$]]` all reduced out of the sweep. The math
+  // probes cover a lone closer and an unclosed opener; what is unprobed is a line
+  // where both widths appear and the pairing is ambiguous.
+  ["probe/math-widths/code-inside-dollars", "$` `$\n"],
+  ["probe/math-widths/closer-then-double-closer", "x^2$\ny^2$$]]\n"],
+  ["probe/math-widths/triple-then-inline", "$$$], $x^2$\n"],
+  ["probe/math-widths/definition-then-inline", "[^1]:\n$x^2$\n"],
+  ["probe/math-widths/ordered-split-inline", "1. $\ny^2$$!\n"],
+
+  // An escaped bracket in front of a footnote marker, inside another construct.
+  //
+  // Four reduced forms share `\[^1`: `> \[^1`, `[[\[^1]`, `[\[^1]]]` and
+  // `![[\[^1]]]`. The escape rules here are settled at root -- `escape` came back
+  // 19 of 19 -- and `\[` in front of a label inside a wikilink or a quote is not
+  // among them.
+  ["probe/escaped-label/in-quote", "> \\[^1\n"],
+  ["probe/escaped-label/in-wikilink", "[[\\[^1]\n"],
+  ["probe/escaped-label/in-brackets", "[\\[^1]]]\n"],
+  ["probe/escaped-label/in-embed", "![[\\[^1]]]\n"],
+
+  // A whitespace-only line directly after a closed inline construct.
+  //
+  // `probe/space-line/*` settled the shape for a container opener and for prose, all
+  // six matching. The sweep then reduced four more onto a *closed* construct
+  // followed by a space-only line: `~~del~~`, `` `code` ``, `  **\u200b**`, `a#^b`.
+  ["probe/space-after/strike", "~~del~~\n \n"],
+  ["probe/space-after/code", "`code`\n \n"],
+  ["probe/space-after/strong-zwsp", "  **\u200b**\n \n"],
+  ["probe/space-after/tag-block-ref", "a#^b\n   \n"],
+
   // An inline construct with nothing inside it.
   //
   // `- [ ] ~~~~` and `==ma` / whitespace both came out of the sweep, and the empty

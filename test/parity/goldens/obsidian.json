@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-08T01:26:29.277Z",
+  "recordedAt": "2026-10-08T02:53:59.482Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -64951,6 +64951,1003 @@
           "headings": [],
           "sections": [
             "table@0:0-1:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-marker/dash-then-opener": {
+      "id": "probe/math-marker/dash-then-opener",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- $$y\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">$$y</li>\n</ul>",
+        "projections": {
+          "text": "$$y",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- $$y"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:5"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-marker/ordered-then-opener": {
+      "id": "probe/math-marker/ordered-then-opener",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "1. $$y^2\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\">$$y^2</li>\n</ol>",
+        "projections": {
+          "text": "$$y^2",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1. $$y^2"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:8"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-marker/task-then-opener": {
+      "id": "probe/math-marker/task-then-opener",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- [ ] $$y^\n",
+      "obsidian": {
+        "html": "<ul class=\"contains-task-list\">\n<li data-task=\"\" class=\"task-list-item\" dir=\"auto\"><input type=\"checkbox\" class=\"task-list-item-checkbox\">$$y^</li>\n</ul>",
+        "projections": {
+          "text": "$$y^",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [
+            {
+              "char": " ",
+              "checked": false
+            }
+          ],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- [ ] $$y^"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:10"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "\" \"|parent:-1@0:0-0:10"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-marker/callout-title-content": {
+      "id": "probe/math-marker/callout-title-content",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] $$y\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">$$y</div></div></div>",
+        "projections": {
+          "text": "$$y",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] $$y"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:13"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-marker/dash-then-closed": {
+      "id": "probe/math-marker/dash-then-closed",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- $$y$$\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\"><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y\" display=\"true\" class=\"TEX-N\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi></mjx-math></mjx-container></span></li>\n</ul>",
+        "projections": {
+          "text": "⟨math⟩",
+          "math": [
+            {
+              "display": true,
+              "tex": "y"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- $$y$$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:7"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-marker/dash-opener-alone": {
+      "id": "probe/math-marker/dash-opener-alone",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- $$\ny\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<div class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y\" display=\"true\" class=\"TEX-N\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi></mjx-math></mjx-container></div>\n</li>\n</ul>",
+        "projections": {
+          "text": "⟨math⟩",
+          "math": [
+            {
+              "display": true,
+              "tex": "y"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- $$\ny"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:1"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:1"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-widths/code-inside-dollars": {
+      "id": "probe/math-widths/code-inside-dollars",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "$` `$\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"` `\" class=\"TEX-N\"><mjx-mo data-latex=\"`\"><mjx-c class=\"mjx-c2035\">‵</mjx-c></mjx-mo><mjx-mo data-latex=\"`\"><mjx-c class=\"mjx-c2035\">‵</mjx-c></mjx-mo></mjx-math></mjx-container></span></p>",
+        "projections": {
+          "text": "⟨math⟩",
+          "math": [
+            {
+              "display": false,
+              "tex": "` `"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "$` `$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-widths/closer-then-double-closer": {
+      "id": "probe/math-widths/closer-then-double-closer",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "x^2$\ny^2$$]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">x^2<span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"\ny^2\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.363em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>$]]</p>",
+        "projections": {
+          "text": "x^2⟨math⟩$]]",
+          "math": [
+            {
+              "display": false,
+              "tex": "\ny^2"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "x^2$\ny^2$$]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-1:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A lone `$` closer then a `$$` run: `x^2$` / `y^2$$]]` renders `x^2⟨math⟩$]]` in Obsidian, so the inline formula is `y^2` and the trailing `$]]` is literal. We pair none of it and leave the whole run as text. Same pairing family as probe/math-widths/ordered-split-inline."
+    },
+    "probe/math-widths/triple-then-inline": {
+      "id": "probe/math-widths/triple-then-inline",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "$$$], $x^2$\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">$$<span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"], $x^2\" class=\"TEX-N\"><mjx-mo data-latex=\"]\"><mjx-c class=\"mjx-c5D\">]</mjx-c></mjx-mo><mjx-mo data-latex=\",\"><mjx-c class=\"mjx-c2C\">,</mjx-c></mjx-mo><mjx-mo space=\"2\" data-latex=\"$\"><mjx-c class=\"mjx-c24\">$</mjx-c></mjx-mo><mjx-msup data-latex=\"x^2\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.363em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span></p>",
+        "projections": {
+          "text": "$$⟨math⟩",
+          "math": [
+            {
+              "display": false,
+              "tex": "], $x^2"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "$$$], $x^2$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:11"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "`$$$], $x^2$` gives Obsidian one inline formula holding `], $x^2` -- the opener is the third dollar and the closer is the last -- rendering `$$⟨math⟩`. We pair the first two dollars instead and get `],` with `x^2$` left over."
+    },
+    "probe/math-widths/definition-then-inline": {
+      "id": "probe/math-widths/definition-then-inline",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^1]:\n$x^2$\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"x^2\" class=\"TEX-N\"><mjx-msup data-latex=\"x^2\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.363em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span></p>",
+        "projections": {
+          "text": "⟨math⟩",
+          "math": [
+            {
+              "display": false,
+              "tex": "x^2"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]:"
+            },
+            {
+              "type": "paragraph",
+              "text": "$x^2$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@0:0-0:5"
+          ],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "footnoteDefinition@0:0-0:5",
+            "paragraph@1:0-1:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "`[^1]:` over `$x^2$` is a footnoteDefinition holding only `[^1]:` plus a separate paragraph to Obsidian, which renders the formula. We absorb the second line into the definition, so the formula is hidden inside it. A definition-extent rule rather than a math one."
+    },
+    "probe/math-widths/ordered-split-inline": {
+      "id": "probe/math-widths/ordered-split-inline",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "1. $\ny^2$$!\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\"><span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"\ny^2\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.363em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>$!</li>\n</ol>",
+        "projections": {
+          "text": "⟨math⟩$!",
+          "math": [
+            {
+              "display": false,
+              "tex": "\ny^2"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1. $\ny^2$$!"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:6"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "`1. $` / `y^2$$!` renders `⟨math⟩$!` in Obsidian: the inline formula spans the line ending and holds `y^2`, leaving `$!`. We pair nothing and render `$ y^2$$!`. Same family as closer-then-double-closer."
+    },
+    "probe/escaped-label/in-quote": {
+      "id": "probe/escaped-label/in-quote",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> \\[^1\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>[</p>\n</blockquote>",
+        "projections": {
+          "text": "[",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> \\[^1"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "1@0:0-0:6"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Four reduced forms share `\\\\[^1` and all four diverge the same way: Obsidian renders the escaped bracket and DROPS the `^1`. `> \\\\[^1` renders `[`, `[[\\\\[^1]` renders `[[[]`, `[\\\\[^1]]]` renders `[[]]]`. We keep `^1` as text in every one. So an escaped `[` in front of a footnote marker swallows the marker, which no recorded escape case covers - `probe/escape/*` came back 19 of 19 at root."
+    },
+    "probe/escaped-label/in-wikilink": {
+      "id": "probe/escaped-label/in-wikilink",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[\\[^1]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[[[]</p>",
+        "projections": {
+          "text": "[[[]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[\\[^1]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "1@0:0-0:7"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "See probe/escaped-label/in-quote: the same `\\\\[^1` rule, inside a wikilink target. `[[\\\\[^1]` renders `[[[]`."
+    },
+    "probe/escaped-label/in-brackets": {
+      "id": "probe/escaped-label/in-brackets",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[\\[^1]]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[[]]]</p>",
+        "projections": {
+          "text": "[[]]]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[\\[^1]]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "1@0:0-0:8"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "See probe/escaped-label/in-quote: the same `\\\\[^1` rule, inside a bare bracket pair. `[\\\\[^1]]]` renders `[[]]]`."
+    },
+    "probe/escaped-label/in-embed": {
+      "id": "probe/escaped-label/in-embed",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "![[\\[^1]]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><span alt=\"\\[^1\" src=\"\\[^1\" class=\"internal-embed is-loaded file-embed mod-empty\">“\\[^1” is not created yet. Click to create.</span>]</p>",
+        "projections": {
+          "text": "\\[^1]",
+          "math": [],
+          "links": [
+            {
+              "path": "\\[^1",
+              "heading": "",
+              "embedded": true
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "![[\\[^1]]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [
+            "\\[^1"
+          ],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:10"
+          ],
+          "links": [],
+          "embeds": [
+            "![[\\[^1]]=>\\[^1|\\[^1@0:0-0:9"
+          ],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "The embed half of the `\\\\[^1` family, and the only one where the target is also wrong: Obsidian embeds `\\\\[^1` with the backslash KEPT in the path, where we resolve `[^1`. So inside an embed target the backslash is content, matching the recorded rule that a backslash is never an escape inside a wikilink."
+    },
+    "probe/space-after/strike": {
+      "id": "probe/space-after/strike",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "~~del~~\n \n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><del>del</del></p>",
+        "projections": {
+          "text": "del",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "~~del~~"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/space-after/code": {
+      "id": "probe/space-after/code",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "`code`\n \n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><code>code</code></p>",
+        "projections": {
+          "text": "code",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "`code`"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/space-after/strong-zwsp": {
+      "id": "probe/space-after/strong-zwsp",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "  **​**\n \n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">  <strong>​</strong></p>",
+        "projections": {
+          "text": "​",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "strong:​"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "  **​**"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/space-after/tag-block-ref": {
+      "id": "probe/space-after/tag-block-ref",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "a#^b\n   \n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">a#^b</p>",
+        "projections": {
+          "text": "a#^b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "a#^b"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:4"
           ],
           "links": [],
           "embeds": [],

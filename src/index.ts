@@ -536,8 +536,6 @@ export default function remarkObsidian(
     fenceOutlivesTransform(tree, String(file));
     mathOutlivesTransform(tree, String(file));
     mathMidlineTransform(tree, String(file));
-    // After both, because either can be the pass that opened the block this undoes.
-    mathUnclosedContainerTransform(tree, String(file));
     listUnderDefinitionTransform(tree, String(file));
     tableRowStyleTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
@@ -618,6 +616,11 @@ export default function remarkObsidian(
     paragraphMergeTransform(tree, String(file));
     if (opts.taskReparse) {
       taskReparseTransform(tree, String(file), reparse);
+      // After the task reparse, not before it. Three passes can open the block this
+      // undoes -- micromark itself, `mathMidlineTransform`, and this reparse, which
+      // re-reads a task body as block markdown and makes `- [ ] $$y^` math all over
+      // again. Running earlier demoted it and was silently reverted.
+      mathUnclosedContainerTransform(tree, String(file));
     }
     // Presence of the table means it was recorded, so it is started even for a
     // document holding no container at all.

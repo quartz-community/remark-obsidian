@@ -9,6 +9,10 @@ interface ParentNode extends Node {
 const CONTAINERS = new Set([
   "blockquote",
   "callout",
+  // A title too, but only through the content-after rule below. `> [!note] $$y`
+  // has no formula, and neither does `> [!note] $$` -- that second one is the
+  // separate title-boundary rule and stays recorded rather than handled here.
+  "calloutTitle",
   "listItem",
   "footnoteDefinition",
 ]);
@@ -75,10 +79,11 @@ export function mathUnclosedContainerTransform(
       const lineStart = source.lastIndexOf("\n", from - 1) + 1;
       const prefix = source.slice(lineStart, from);
       if (prefix === "") continue;
-      // One character class rather than `[ \t]*(?:>[ \t]*)*`, which the ReDoS lint
-      // rejects as quadratic. Order does not matter here: the test is only whether
-      // the prefix is made of container markers and whitespace.
-      if (!/^[ \t>]*$/u.test(prefix)) continue;
+      // Any non-empty prefix qualifies. Restricting it to whitespace and `>` let
+      // `- $$y`, `1. $$y^2`, `- [ ] $$y^` and `> [!note] $$y` through, since each
+      // carries a list or callout marker instead -- four independent sweep failures
+      // reduced onto exactly that. The emptiness test above is what distinguishes a
+      // genuine container from a lazy line at column zero, and it is sufficient.
 
       const text: Text = {
         type: "text",

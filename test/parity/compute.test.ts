@@ -231,15 +231,15 @@ describe("positioned oracle", () => {
    * these are out of reach here rather than unimplemented.
    */
   const CEILING = {
-    footnotes: 20,
+    footnotes: 21,
     footnoteRefs: 3,
     headings: 13,
-    sections: 131,
+    sections: 135,
     links: 120,
-    embeds: 33,
+    embeds: 34,
     tags: 3,
-    blocks: 15,
-    listItems: 70,
+    blocks: 18,
+    listItems: 72,
     frontmatterPosition: 7,
   };
 
