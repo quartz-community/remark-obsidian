@@ -136428,8 +136428,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A whitespace-only link label resolves against its definition in Obsidian: `[\\n ]` over `[\\n ]: /uri` is an anchor with no content, and remark-parse@8 makes a linkReference of `[ ]` unconditionally where CommonMark requires one non-whitespace character. Implemented and reverted: the parse was right and 0 regressions, but remark-stringify cannot write a shortcut reference whose label is whitespace, so the first format pass emitted `[\\n&#x20;][\\n ]` -- it duplicates the label. It converges on pass 3, so it is not the unbounded-growth shape, but one parity case does not buy a formatter that duplicates an author's text. Needs a toMarkdown handler first, like the rest of the round-trip remainder."
+      "triage": "match"
     },
     "commonmark/links/553": {
       "id": "commonmark/links/553",

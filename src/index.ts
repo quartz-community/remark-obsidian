@@ -84,7 +84,9 @@ import { setextDefinitionTransform } from "./lib/setext-definition.js";
 import { shortCommentTransform } from "./lib/short-comment.js";
 import { definitionBlankTailTransform } from "./lib/definition-blank-tail.js";
 import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
+import { blankLabelReferenceTransform } from "./lib/blank-label-reference.js";
 import { linkNbspTitleTransform } from "./lib/link-nbsp-title.js";
+import { linkReferenceToMarkdown } from "./lib/mdast/link-reference-to-markdown.js";
 import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
 import { lrdFootnoteTransform } from "./lib/lrd-footnote.js";
 import {
@@ -347,6 +349,9 @@ export default function remarkObsidian(
   data.micromarkExtensions ??= [];
   data.fromMarkdownExtensions ??= [];
   data.toMarkdownExtensions ??= [];
+  // No option: a shortcut reference written back as its own label is correct for every
+  // consumer, and the upstream branch it replaces can duplicate the label.
+  data.toMarkdownExtensions.push(linkReferenceToMarkdown());
 
   if (opts.lineOffsets) {
     data.fromMarkdownExtensions.push(lineOffsetsFromMarkdown());
@@ -659,6 +664,8 @@ export default function remarkObsidian(
     // Late, and order-free: it only ever rewrites a `link`'s own `url` and `title`,
     // which nothing else here reads.
     linkNbspTitleTransform(tree);
+    // After every pass that can rewrite a paragraph's span, since it matches on one.
+    blankLabelReferenceTransform(tree, String(file));
     normalizePointsTransform(tree, String(file));
   };
 
