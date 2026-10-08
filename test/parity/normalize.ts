@@ -256,6 +256,65 @@ export function definedReferences(tree: Node): Set<string> {
   return defined;
 }
 
+/** A tag opens on `<` plus a letter, `/`, `!` or `?`; any other `<` is literal text. */
+const TAG_START = /[a-zA-Z/!?]/;
+
+/**
+ * Tags removed as an HTML tokenizer removes them, leaving only the visible text.
+ *
+ * Two rules a `<[^>]*>` pattern cannot express:
+ *
+ * - A `>` inside a quoted attribute value does not close the tag. So
+ *   `<a bam='baz <em>"</em>'` continued onto a second line ending `/>` is **one**
+ *   element and renders nothing; stopping at the first `>` leaks the attribute tail
+ *   as text. As a regex the quote rule needs a nested quantifier --
+ *   `(?:[^>"']|"[^"]*"|'[^']*')*` -- which the ReDoS lint rejects, hence a scanner.
+ * - That quote rule holds for a **tag only**. `<!` and `<?` enter the bogus-comment
+ *   state, which has no notion of attributes and ends at the first `>` whatever
+ *   quotes enclose it. `<?php` / `echo '>';` / `?>` is the case that discriminates:
+ *   the bogus comment ends inside the PHP string literal, so `'; ?>` is visible
+ *   text and Obsidian reports it. Honouring quotes there swallows the block whole.
+ * - An unterminated tag takes the remainder of the value with it, because a
+ *   tokenizer reaching end-of-input mid-tag emits nothing and the browser discards
+ *   it along with everything it swallowed.
+ */
+function stripTags(raw: string): string {
+  let out = "";
+  let at = 0;
+
+  while (at < raw.length) {
+    if (raw[at] !== "<" || !TAG_START.test(raw[at + 1] ?? "")) {
+      out += raw[at];
+      at += 1;
+      continue;
+    }
+
+    const marker = raw[at + 1];
+    const quotesApply = marker !== "!" && marker !== "?";
+    let cursor = at + 2;
+    let quote = "";
+    let closed = false;
+    while (cursor < raw.length) {
+      const code = raw[cursor];
+      if (quote !== "") {
+        if (code === quote) quote = "";
+      } else if (quotesApply && (code === '"' || code === "'")) {
+        quote = code;
+      } else if (code === ">") {
+        cursor += 1;
+        closed = true;
+        break;
+      }
+      cursor += 1;
+    }
+
+    at = cursor;
+    if (!closed) break;
+  }
+
+  return out;
+}
+
 /** From mdast, not HTML: `wikilink`/`tag` have no hast handler and vanish when rendered. */
 export function mdastText(
   tree: Node,
@@ -372,37 +431,16 @@ export function mdastText(
           // `<!--` has no `>` for that pattern to match.
           .replace(/<!--[\s\S]*?(?:-->|$)/g, " ");
         // A tag contributes nothing to `textContent`, so it is removed rather
-        // than separated: `a<br>b` reads `ab`, and `~~<br>~~` reads `~~~~`.
-        // Replacing one with a space invented a word boundary the DOM has no
-        // equivalent for.
+        // than separated: `a<br>b` reads `ab`. Replacing one with a space
+        // invented a word boundary the DOM has no equivalent for.
         //
-        // The second pattern is the *unterminated* tag, which the first cannot
-        // reach: `<[^>]*>` needs a `>` to anchor on and an unclosed tag has none,
-        // so `<div class` / `foo` kept its whole raw source as visible text. An
-        // HTML tokenizer that hits end-of-input mid-tag emits nothing at all, so
-        // the browser drops it along with everything it swallowed -- the same
-        // reasoning the comment pattern above already applies with its `|$`.
-        //
-        // A tag start is `<` plus a letter, `/`, `!` or `?`; a bare `<` followed
-        // by anything else is literal text in the DOM and has to stay.
-        //
-        // That rule was stated here while the *first* pattern still read
-        // `<[^>]*>`, which contradicts it, and `<![CDATA[>&<]]>` is where the
-        // contradiction shows. HTML5 has no CDATA in content, so a browser reads
-        // `<![CDATA[>` as a bogus comment ending at the first `>` and renders the
-        // rest, `&<]]>`, as text -- `<]` is not a tag start. The wide pattern ate
-        // `<]]>` as if it were one, losing four visible characters, and Obsidian
-        // reports `foo &<]]>` exactly as the DOM rule predicts. Both patterns now
-        // use the one class, which is also why micromark consuming the whole CDATA
-        // span as a single html node is *correct* and needs no parse change: the
-        // arbiter agrees with micromark here, and the drop was only ever downstream.
-        parts.push(
-          `${decodeEntities(
-            raw
-              .replace(/<[a-zA-Z/!?][^>]*>/g, "")
-              .replace(/<[a-zA-Z/!?][^>]*$/, ""),
-          )}${phrasing ? "" : " "}`,
-        );
+        // Only a `<` that really opens a tag is removed, which is what keeps
+        // `<![CDATA[>&<]]>` honest: HTML5 has no CDATA in content, so a browser
+        // reads `<![CDATA[>` as a bogus comment ending at the first `>` and shows
+        // the rest, `&<]]>`, as text. Note that none of this is a parse question --
+        // micromark takes the whole CDATA span as one html node and the arbiter
+        // agrees, so the drop is downstream by construction.
+        parts.push(`${decodeEntities(stripTags(raw))}${phrasing ? "" : " "}`);
         return;
       }
       // A reference whose label nothing defines renders as its own source, brackets

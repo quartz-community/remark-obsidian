@@ -139762,8 +139762,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "An html open tag whose attribute value holds `<` and `>` and spans a line ending: obs reads the whole two-line run as one html block contributing no text at all, and we end the tag early and emit `\\\"' _boolean zoop:33=zoop:33 />` as text. Belongs with the htmlFlow/raw-html family (step 4) -- the attribute-value scan must not treat a quoted `<em>` as ending the tag."
+      "triage": "match"
     },
     "commonmark/raw-html/617": {
       "id": "commonmark/raw-html/617",
