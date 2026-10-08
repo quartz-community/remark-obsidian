@@ -66059,8 +66059,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A footnote label of only whitespace is not a definition to Obsidian: `[^ ]: x` reports two paragraphs and renders `[^ ] [^ ]: x`, where we build a footnoteDefinition and hide the body. Our own REFERENCE and LABEL patterns already exclude whitespace, so the gap is micromark's gfm-footnote definition accepting what its reference would not."
+      "triage": "match"
     },
     "probe/label-shape/block-id-then-destination": {
       "id": "probe/label-shape/block-id-then-destination",

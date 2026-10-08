@@ -76,6 +76,7 @@ import { tableInterruptTransform } from "./lib/table-interrupt.js";
 import { containerSetextTransform } from "./lib/container-setext.js";
 import { lazySetextTransform } from "./lib/lazy-setext.js";
 import { bareCheckboxTransform } from "./lib/bare-checkbox.js";
+import { blankFootnoteLabelTransform } from "./lib/blank-footnote-label.js";
 import { thematicBreakTabTransform } from "./lib/thematic-break-tab.js";
 import { labelPrecedenceTransform } from "./lib/label-precedence.js";
 import { setextDefinitionTransform } from "./lib/setext-definition.js";
@@ -564,6 +565,7 @@ export default function remarkObsidian(
     // Before both setext passes: a bare checkbox has to stop being a task marker
     // first, or the underline folds a heading whose content excludes the `[ ]`
     // Obsidian still shows.
+    blankFootnoteLabelTransform(tree, String(file));
     bareCheckboxTransform(tree, String(file));
     lazySetextTransform(tree, String(file), (markdown) => self.parse(markdown));
     containerSetextTransform(tree, String(file), (markdown) =>
