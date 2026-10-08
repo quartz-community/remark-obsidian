@@ -115493,8 +115493,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "The only divergence is that our middle paragraph absorbs `</pre>` where Obsidian starts a new html block there: obs reports html, paragraph(`_world_.`), html(`</pre>`...), and we report the `</pre>` inside the paragraph. `pre` is a type-6 tag and a closing one may interrupt a paragraph to remark-parse@8. Not ours to repair at the tree level: plain remark-parse plus remark-gfm, with no remark-obsidian in the pipeline, absorbs it identically, so this is CommonMark behaviour and closing it means vendoring micromark htmlFlow -- the same dependency as commonmark/html-blocks/171 (`<textarea>`) and raw-html/625."
+      "triage": "match"
     },
     "commonmark/html-blocks/149": {
       "id": "commonmark/html-blocks/149",

@@ -86,6 +86,7 @@ import { definitionBlankTailTransform } from "./lib/definition-blank-tail.js";
 import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
 import { blankLabelReferenceTransform } from "./lib/blank-label-reference.js";
 import { textareaNotRawTransform } from "./lib/textarea-not-raw.js";
+import { closingPreInterruptSyntax } from "./lib/syntax/closing-pre-interrupt.js";
 import { linkNbspTitleTransform } from "./lib/link-nbsp-title.js";
 import { linkReferenceToMarkdown } from "./lib/mdast/link-reference-to-markdown.js";
 import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
@@ -277,6 +278,31 @@ export interface RemarkObsidianOptions {
    */
   legacyLists?: boolean;
   /**
+   * Classify html block tags as Obsidian's parser does, not as CommonMark now does.
+   *
+   * micromark sorts tags into two shared lists and the fork Obsidian runs predates
+   * both revisions that matter here, so the classification differs at two points.
+   *
+   * `pre` is in `htmlRawNames`, which governs only *opening* tags, and is missing
+   * from `htmlBlockNames` -- so a bare `</pre>` falls through to a type 7 block,
+   * which refuses to interrupt a paragraph. Obsidian carries `pre` in its block-tag
+   * list, so there the closer interrupts and takes the rest of its line with it.
+   * The rule is narrower than the mechanism suggests and the arbiter pins it: of the
+   * four raw names only `</pre>` interrupts, while `</script>`, `</style>` and
+   * `</textarea>` stay absorbed. Generalising would cost six cases that match today.
+   *
+   * `textarea` is the other direction. CommonMark added it to `htmlRawNames` after
+   * the fork, so micromark lets `<textarea>` swallow every following block while
+   * Obsidian ends it at the first blank line and parses the rest as markdown.
+   *
+   * On by default. Together the two are worth 1 gained case and `sections` 39 -> 38
+   * on the independent `metadataCache` oracle, for 0 regressions. One case in the
+   * family stays open for a reason that is not parsing: inside a `<textarea>` the
+   * content is the element's *value*, so the recorder finds no `<em>` elements and
+   * reads a de-tagged string, which no tree can reproduce without mis-parsing.
+   */
+  legacyHtmlBlocks?: boolean;
+  /**
    * Find a link label by raw balanced-bracket scanning, as Obsidian does, so the
    * outermost pair wins where CommonMark gives the innermost: `[a [b](u) c](v)`
    * links to `v` and shows `[b](u)` as written.
@@ -334,6 +360,7 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
   legacyAutolinks: true,
   legacyCodeSpans: true,
   legacyLists: true,
+  legacyHtmlBlocks: true,
   labelPrecedence: true,
   positionedBreaks: true,
   escapedLineBreaks: false,
@@ -431,6 +458,10 @@ export default function remarkObsidian(
     data.micromarkExtensions.push(legacyCodeTextSyntax());
   }
 
+  if (opts.legacyHtmlBlocks) {
+    data.micromarkExtensions.push(closingPreInterruptSyntax());
+  }
+
   if (opts.customTaskChars) {
     data.toMarkdownExtensions.push(taskCharToMarkdown());
   }
@@ -514,9 +545,11 @@ export default function remarkObsidian(
     shortCommentTransform(tree);
     // Before anything reads the block structure: a swallowed `<textarea>` hides whole
     // blocks, so splitting it has to happen while the tree is still being shaped.
-    textareaNotRawTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
+    if (opts.legacyHtmlBlocks) {
+      textareaNotRawTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+    }
     if (opts.customTaskChars) {
       customTaskCharTransform(tree, String(file));
     }
