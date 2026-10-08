@@ -1729,6 +1729,35 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // Enumerated rather than inferred: container x how many lazy lines x which line
   // carries the underline. The `===`/`---` pair is kept because only `---` is also
   // a thematic break, which is the likeliest source of the asymmetry.
+  // An UNCLOSED `$$` carrying content on its own line.
+  //
+  // Math is the most probed construct here -- 22 `probe/math/*` plus a large seed
+  // family -- and every `$$` case in it is **closed**: `tail $$` / `x` / `$$` and
+  // `> $$` / `> x^2` / `> $$`. The sweep's reduced forms are all the other way:
+  // `> $$y^2`, `$ $$_`, `$$$$` / `#`, `^2$$` / `word$x`, `- [ ]` / tab + `$$y`.
+  // Third under-sampled axis found this way, after quote-html and block-id-inline.
+  //
+  // The question is where an unfinished display-math run ends. `math/unclosed-inner`
+  // says a `$` inside an open `$$` is content, and `math/close-on-content-line` says
+  // a closer may share a line with content -- so an opener that never closes has to
+  // either swallow to end of block or not open at all, and no recorded case says
+  // which. The container matters because `mathOutlivesTransform` already exists for
+  // a run that escapes its block.
+  ["probe/math-unclosed/root-same-line", "$$y^2\n"],
+  ["probe/math-unclosed/root-then-text", "$$y^2\nword\n"],
+  ["probe/math-unclosed/quote-same-line", "> $$y^2\n"],
+  ["probe/math-unclosed/callout-title", "> [!note] $$\n"],
+  ["probe/math-unclosed/list-tab", "- [ ]\n\t$$y\n"],
+  ["probe/math-unclosed/definition", "[^1]: $$y^2\n"],
+  ["probe/math-unclosed/inline-display-then-text", "$$y^2$$\nword\n"],
+  ["probe/math-unclosed/lone-closer-then-inline", "x^2$\n$x^2$\n"],
+  ["probe/math-unclosed/closer-then-opener", "^2$$\nword$x\n"],
+  ["probe/math-unclosed/four-dollars-then-heading", "$$$$\n#  \n"],
+  ["probe/math-unclosed/space-then-double", "$ $$_\n"],
+  ["probe/math-unclosed/text-then-empty-inline", ", $ $\n"],
+  ["probe/math-unclosed/double-then-tag", "$$y^2$$\n$#a/b\n"],
+  ["probe/math-unclosed/blank-after-opener", "$$y^2\n\nword\n"],
+
   // Is a block identifier still one when an inline construct wraps it?
   //
   // Nineteen `probe/block-id*` cases settle where an identifier is recognised and

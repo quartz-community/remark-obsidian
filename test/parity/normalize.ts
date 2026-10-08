@@ -230,6 +230,15 @@ export function definedFootnotes(tree: Node): Set<string> {
   return defined;
 }
 
+/**
+ * `$$…$$` written inline, marked so the `break` beside it can be dropped.
+ *
+ * The NUL is a marker, not output: it is stripped before the text is returned, so
+ * display and inline math still compare identically. Reusing the plain placeholder
+ * here instead made the check fire for *every* inline formula, which cost 11 cases.
+ */
+const DISPLAY_INLINE_MATH = "\u27e8math\u27e9\u0000";
+
 /** Labels the document defines, so a dangling reference can be told from a live one. */
 export function definedReferences(tree: Node): Set<string> {
   const defined = new Set<string>();
@@ -248,6 +257,7 @@ export function mdastText(
   const parts: string[] = [];
   const references = source === undefined ? undefined : definedReferences(tree);
 
+  const strip = (value: string): string => value.replace(/\u0000/gu, "");
   const walk = (node: Node, phrasing = false): void => {
     switch (node.type) {
       case "text":
@@ -285,7 +295,15 @@ export function mdastText(
       case "comment":
         return;
       case "inlineMath":
-        parts.push("\u27e8math\u27e9");
+        // `data.display`, not `display`: `mathDisplayTransform` writes the flag
+        // into `data` alongside the hast properties, which is where `math[].display`
+        // reads it from too.
+        parts.push(
+          (node as unknown as { data?: { display?: boolean } }).data
+            ?.display === true
+            ? DISPLAY_INLINE_MATH
+            : "\u27e8math\u27e9",
+        );
         return;
       case "math":
         parts.push("\u27e8math\u27e9 ");
@@ -358,6 +376,11 @@ export function mdastText(
         return;
       }
       case "break":
+        // Nothing after display math on its own line. `$$y^2$$` over `word` reads
+        // `⟨math⟩word` in Obsidian with no separator at all, where every other line
+        // ending in a paragraph reads as one -- the rendered math is a block-level
+        // element, so the `<br>` beside it contributes nothing to `textContent`.
+        if (parts[parts.length - 1] === DISPLAY_INLINE_MATH) return;
         parts.push("\n");
         return;
       // Obsidian resolves a relative image path against the vault and renders it
@@ -457,7 +480,7 @@ export function mdastText(
   };
 
   walk(tree);
-  return parts.join("").replace(/\s+/g, " ").trim();
+  return strip(parts.join("")).replace(/\s+/g, " ").trim();
 }
 
 /** Counterpart to Obsidian's `sections`. Offsets index the *transformed* source we parsed. */
