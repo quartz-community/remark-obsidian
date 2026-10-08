@@ -65602,7 +65602,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Four reduced forms share `\\\\[^1` and all four diverge the same way: Obsidian renders the escaped bracket and DROPS the `^1`. `> \\\\[^1` renders `[`, `[[\\\\[^1]` renders `[[[]`, `[\\\\[^1]]]` renders `[[]]]`. We keep `^1` as text in every one. So an escaped `[` in front of a footnote marker swallows the marker, which no recorded escape case covers - `probe/escape/*` came back 19 of 19 at root."
+      "note": "An escaped bracket then a footnote marker, inside a blockquote: Obsidian renders \"[\" and drops the \"^1\". CONTROL: \"\\\\[^1]\" alone renders \"[^1]\" in full and MATCHES (token/footnote-ref/escaped-open), so an escaped bracket in front of a footnote marker does NOT swallow it - the note previously here claiming that is wrong. The marker only vanishes when a further [ precedes the escaped one, which is the shape all four of these share. Recorded html: \"> \\\\[^1\" renders \"[\", \"[[\\\\[^1]\" renders \"[[[]\", \"[\\\\[^1]]]\" renders \"[[]]]\". A plausible mechanism is that the outer [ opens a label, and a footnote reference inside a link construct renders nothing - the same rule the [^1](u) empty-anchor fix encodes - but that is untested and the bracket arithmetic has not been made to add up. No implementation attempt yet."
     },
     "probe/escaped-label/in-wikilink": {
       "id": "probe/escaped-label/in-wikilink",
@@ -65653,7 +65653,7 @@
         }
       },
       "triage": "replicate",
-      "note": "See probe/escaped-label/in-quote: the same `\\\\[^1` rule, inside a wikilink target. `[[\\\\[^1]` renders `[[[]`."
+      "note": "Inside a wikilink opener: \"[[\\\\[^1]\" renders \"[[[]\". CONTROL: \"\\\\[^1]\" alone renders \"[^1]\" in full and MATCHES (token/footnote-ref/escaped-open), so an escaped bracket in front of a footnote marker does NOT swallow it - the note previously here claiming that is wrong. The marker only vanishes when a further [ precedes the escaped one, which is the shape all four of these share. Recorded html: \"> \\\\[^1\" renders \"[\", \"[[\\\\[^1]\" renders \"[[[]\", \"[\\\\[^1]]]\" renders \"[[]]]\". A plausible mechanism is that the outer [ opens a label, and a footnote reference inside a link construct renders nothing - the same rule the [^1](u) empty-anchor fix encodes - but that is untested and the bracket arithmetic has not been made to add up. No implementation attempt yet."
     },
     "probe/escaped-label/in-brackets": {
       "id": "probe/escaped-label/in-brackets",
@@ -65704,7 +65704,7 @@
         }
       },
       "triage": "replicate",
-      "note": "See probe/escaped-label/in-quote: the same `\\\\[^1` rule, inside a bare bracket pair. `[\\\\[^1]]]` renders `[[]]]`."
+      "note": "Inside a bare bracket pair: \"[\\\\[^1]]]\" renders \"[[]]]\". CONTROL: \"\\\\[^1]\" alone renders \"[^1]\" in full and MATCHES (token/footnote-ref/escaped-open), so an escaped bracket in front of a footnote marker does NOT swallow it - the note previously here claiming that is wrong. The marker only vanishes when a further [ precedes the escaped one, which is the shape all four of these share. Recorded html: \"> \\\\[^1\" renders \"[\", \"[[\\\\[^1]\" renders \"[[[]\", \"[\\\\[^1]]]\" renders \"[[]]]\". A plausible mechanism is that the outer [ opens a label, and a footnote reference inside a link construct renders nothing - the same rule the [^1](u) empty-anchor fix encodes - but that is untested and the bracket arithmetic has not been made to add up. No implementation attempt yet."
     },
     "probe/escaped-label/in-embed": {
       "id": "probe/escaped-label/in-embed",
@@ -65763,7 +65763,7 @@
         }
       },
       "triage": "replicate",
-      "note": "The embed half of the `\\\\[^1` family, and the only one where the target is also wrong: Obsidian embeds `\\\\[^1` with the backslash KEPT in the path, where we resolve `[^1`. So inside an embed target the backslash is content, matching the recorded rule that a backslash is never an escape inside a wikilink."
+      "note": "The embed half, and the only one whose TARGET also differs: Obsidian embeds \"\\\\[^1\" with the backslash KEPT in the path (src and alt both show it) where we resolve \"[^1\", and renders the alt text plus a trailing \"]\". That half is consistent with the recorded rule that a backslash is never an escape inside a wikilink, so it may be separable from the other three. CONTROL: \"\\\\[^1]\" alone renders \"[^1]\" in full and MATCHES (token/footnote-ref/escaped-open), so an escaped bracket in front of a footnote marker does NOT swallow it - the note previously here claiming that is wrong. The marker only vanishes when a further [ precedes the escaped one, which is the shape all four of these share. Recorded html: \"> \\\\[^1\" renders \"[\", \"[[\\\\[^1]\" renders \"[[[]\", \"[\\\\[^1]]]\" renders \"[[]]]\". A plausible mechanism is that the outer [ opens a label, and a footnote reference inside a link construct renders nothing - the same rule the [^1](u) empty-anchor fix encodes - but that is untested and the bracket arithmetic has not been made to add up. No implementation attempt yet."
     },
     "probe/space-after/strike": {
       "id": "probe/space-after/strike",
