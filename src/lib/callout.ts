@@ -449,7 +449,23 @@ export function calloutTransform(
     // can leave an empty text node behind, and a `calloutTitle` holding nothing
     // still reads as "this callout has a title", which suppresses the type name
     // Obsidian displays in its place.
-    if (title !== "") {
+    // Whitespace after the `]` is a title that was *written*, even though it collects
+    // to nothing. `> [!note]` alone displays `Note`, the capitalised type, and all
+    // seventeen recorded title-less callouts agree; `> [!note]  ` displays nothing at
+    // all. The trailing run is the entire difference between them, so gating on the
+    // trimmed text made the two indistinguishable. Same rule as a wikilink's
+    // written-but-empty alias: an explicit empty beats an absent one.
+    //
+    // Read off `firstLine`, which by here is the title line with the marker and any
+    // fold character already stripped: `> [!note]  ` leaves `"  "` and a bare
+    // `> [!note]` leaves `""`. That is the whole test. (It is emphatically not the
+    // marker-bearing source line it reads like -- a first attempt matched a `]` that
+    // is long gone, and only printing the value alongside a known-non-empty control
+    // said so.)
+    const blankTitle =
+      title === "" && firstLine !== "" && firstLine.trim() === "";
+
+    if (title !== "" || blankTitle) {
       const head = (titleNodes[0] as Positioned | undefined)?.position?.start;
       const tail = (titleNodes[titleNodes.length - 1] as Positioned | undefined)
         ?.position?.end;

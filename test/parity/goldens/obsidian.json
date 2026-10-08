@@ -32305,8 +32305,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/wikilink/2": {
       "id": "fuzz/wikilink/2",
