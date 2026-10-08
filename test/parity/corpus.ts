@@ -2124,6 +2124,82 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/block-id-extent/two-ids", "^blk ^blk2\n"],
   ["probe/block-id-extent/inline-trailing", "para ^blk\n"],
   ["probe/block-id-extent/alone-then-list", "^blk\n- item\n"],
+  // A sweep at seeds 700000..700999 left 131 causes and no shape held two of them,
+  // so these are chosen for being *short* rather than for being frequent. Length is
+  // the only attributability signal left after the counting selectors ran out: a
+  // seven-character document can only be wrong about one thing.
+
+  // An embed whose target is a bare fragment.
+  //
+  // ` ![[#t` reduced out of the sweep. The wikilink probes cover a fragment after a
+  // path and an empty fragment, but never a target that is *only* a fragment, which
+  // is the form Obsidian resolves against the current file.
+  ["probe/embed-fragment/unclosed-leading-space", " ![[#t\n"],
+  ["probe/embed-fragment/closed", "![[#t]]\n"],
+  ["probe/embed-fragment/link-not-embed", "[[#t]]\n"],
+
+  // A block identifier inside a *strong* wrapper, and with punctuation after it.
+  //
+  // `*^blk*` and `==^blk==` are probed and fixed; `**^blk**.` reduced out of the
+  // sweep anyway. Two candidate gaps: the two-character marker, and a trailing
+  // period, which the single-marker probes never carried.
+  ["probe/block-id-wrapper/strong-trailing-period", "**^blk**.\n"],
+  ["probe/block-id-wrapper/em-trailing-period", "*^blk*.\n"],
+  ["probe/block-id-wrapper/nested-trailing-period", "_*^blk*_.\n"],
+
+  // Display math whose content is a single space.
+  //
+  // `  $$ $$.` reduced out of the sweep. The math probes cover an empty body and an
+  // unclosed opener, never a body that is whitespace -- which decides whether the
+  // run is one span or two markers.
+  // `$$ $$` bare is deliberately absent: the TOKENS cross-product already emits it as
+  // `token/display-math/whitespace-body`, and a probe here wins the dedup and displaces
+  // that id. The collision runs the opposite way to the one the checks were built for.
+  ["probe/math-space/space-body-trailing-period", "  $$ $$.\n"],
+
+  // A nested tag ended by punctuation rather than whitespace.
+  //
+  // `-  #a/b,` reduced out of the sweep. Whether the comma ends the tag decides
+  // whether the tag is `a/b` or `a/b,`, and the tag probes all end at a space.
+  ["probe/tag-boundary/nested-then-comma", "- #a/b,\n"],
+  ["probe/tag-boundary/nested-then-period", "- #a/b.\n"],
+
+  // A bare `[^1]:` over a whitespace-only line, and a reference over an escaped label.
+  //
+  // `[^1]:` absorbing nothing is fixed and probed over a *paragraph*; what the sweep
+  // reduced to is the same opener over a line that is only spaces, plus a reference
+  // whose following label carries an escaped bracket.
+  ["probe/footnote-bare/colon-then-blank-run", "[^1]:\n      \n"],
+  ["probe/footnote-bare/ref-then-escaped-label", "[^1]\n  [^1\\]\n"],
+
+  // Display math inside emphasis, spanning a line ending.
+  //
+  // `_$$y^2` / `y^2$$_` reduced out of the sweep. The inline-opener rule now allows a
+  // line ending, and this is that rule meeting an emphasis wrapper that must close on
+  // the second line.
+  ["probe/math-emphasis/display-across-lines", "_$$y^2\ny^2$$_\n"],
+
+  // A callout title holding a block identifier, and holding an inline footnote.
+  //
+  // `> [!note] ^blk` and `> [!note] ^[]` both reduced out of the sweep. A block id
+  // survives an inline wrapper and a title is not a heading, but a title is also the
+  // one line where a trailing `^id` has two readings.
+  ["probe/callout-title-caret/block-id", "> [!note] ^blk\n"],
+  ["probe/callout-title-caret/empty-inline-footnote", "> [!note] ^[]\n"],
+
+  // A comment as the whole content of an ordered item, under a setext underline.
+  //
+  // `1. %%note` / `===` reduced out of the sweep. `%%` hides at render time, so the
+  // question is whether the hidden line still counts as paragraph content for the
+  // underline to attach to.
+  ["probe/comment-setext/ordered-comment-then-equals", "1. %%note\n===\n"],
+
+  // A semicolon-less entity as the whole content of an ordered item.
+  //
+  // `---` / `1. &` reduced out of the sweep. The legacy entity construct resolves a
+  // bare reference, and a lone `&` resolves to nothing -- this checks it stays
+  // literal rather than consuming the line ending.
+  ["probe/entity-bare/lone-ampersand-in-item", "---\n1. &\n"],
 ];
 
 /** Inline tokens, each crossed with a set of malformed delimiter states. */

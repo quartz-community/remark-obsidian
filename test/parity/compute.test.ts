@@ -144,6 +144,7 @@ describe("positioned oracle", () => {
     "hunt/aftercloser-chain-eats-referenced-definition/0: P1, Obsidian's column is short by the `%%` marker",
     "hunt/continuation-masked-under-foreign-label/2: P1, Obsidian's column is short by the `%%` marker",
     "probe/reference-in-link/collection-label: we claim a wikilink where the label holds the reference",
+    "probe/callout-title-caret/empty-inline-footnote: a callout title holding only `^[]`",
   ];
 
   it("places every footnote reference, except the classified cases", () => {
@@ -230,16 +231,35 @@ describe("positioned oracle", () => {
    * YAML parses. We deliberately do not parse YAML -- Quartz owns that -- so
    * these are out of reach here rather than unimplemented.
    */
+  /**
+   * A probe wave drawn from sweep 700000 moved six of these, all of it new debt
+   * rather than regression -- every one is a case the wave was written to expose.
+   * Attributed exactly, by dumping which new id joins which key:
+   *
+   *     blocks       +3  block-id-wrapper/{strong,em,nested}-trailing-period
+   *     sections     +4  embed-fragment/unclosed-leading-space,
+   *                      math-space/space-body-trailing-period,
+   *                      footnote-bare/colon-then-blank-run,
+   *                      entity-bare/lone-ampersand-in-item
+   *     footnotes    +1  footnote-bare/colon-then-blank-run
+   *     footnoteRefs +1  callout-title-caret/empty-inline-footnote
+   *     listItems    +1  entity-bare/lone-ampersand-in-item
+   *     tags         +1  embed-fragment/unclosed-leading-space
+   *
+   * `blocks +3` is one rule, not three: a block identifier inside an inline
+   * wrapper is already stripped when the wrapper ends the line, and all three new
+   * cases put a `.` after it.
+   */
   const CEILING = {
-    footnotes: 20,
-    footnoteRefs: 3,
+    footnotes: 21,
+    footnoteRefs: 4,
     headings: 13,
-    sections: 134,
+    sections: 138,
     links: 120,
     embeds: 33,
-    tags: 3,
-    blocks: 18,
-    listItems: 72,
+    tags: 4,
+    blocks: 21,
+    listItems: 73,
     frontmatterPosition: 7,
   };
 

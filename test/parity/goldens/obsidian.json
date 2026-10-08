@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-08T02:53:59.482Z",
+  "recordedAt": "2026-10-08T06:41:27.699Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -77093,6 +77093,862 @@
       },
       "triage": "match",
       "note": "Fixed in stripBlockIds: it dropped every paragraph whose content was only an identifier, where Obsidian keeps the host unless nothing follows on the next line; and it stripped an identifier cancelled by a trailing space."
+    },
+    "probe/embed-fragment/unclosed-leading-space": {
+      "id": "probe/embed-fragment/unclosed-leading-space",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": " ![[#t\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"> ![[#t</p>",
+        "projections": {
+          "text": "![[#t",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": " ![[#t"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate"
+    },
+    "probe/embed-fragment/closed": {
+      "id": "probe/embed-fragment/closed",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "![[#t]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><span alt=\"t\" src=\"#t\" class=\"internal-embed markdown-embed inline-embed is-loaded\"><div class=\"embed-title markdown-embed-title\"></div><div class=\"markdown-embed-content\"><div class=\"markdown-preview-view markdown-rendered show-indentation-guide\"><p dir=\"auto\"><span alt=\"t\" src=\"#t\" class=\"internal-embed markdown-embed inline-embed is-loaded\"><div class=\"embed-title markdown-embed-title\"></div><div class=\"markdown-embed-content\"><div class=\"markdown-preview-view markdown-rendered show-indentation-guide\"><p dir=\"auto\"><span alt=\"t\" src=\"#t\" class=\"internal-embed markdown-embed inline-embed is-loaded\"><div class=\"embed-title markdown-embed-title\"></div><div class=\"markdown-embed-content\"><div class=\"markdown-preview-view markdown-rendered show-indentation-guide\"><p dir=\"auto\"><span alt=\"t\" src=\"#t\" class=\"internal-embed markdown-embed inline-embed is-loaded\"><div class=\"embed-title markdown-embed-title\"></div><div class=\"markdown-embed-content\"><div class=\"markdown-preview-view markdown-rendered show-indentation-guide\"><p dir=\"auto\"><span alt=\"t\" src=\"#t\" class=\"internal-embed markdown-embed inline-embed is-loaded\"><div class=\"embed-title markdown-embed-title\"></div><div class=\"markdown-embed-content\"><div class=\"markdown-preview-view markdown-rendered show-indentation-guide\"><p dir=\"auto\"><span alt=\"t\" src=\"#t\" class=\"internal-embed file-embed mod-generic is-loaded\"><div class=\"file-embed-title\"><span class=\"file-embed-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-file\"><path d=\"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z\"></path><path d=\"M14 2v5a1 1 0 0 0 1 1h5\"></path></svg></span> probe-embed-fragment-closed.md</div></span></p></div></div></span></p></div></div></span></p></div></div></span></p></div></div></span></p></div></div></span></p>",
+        "projections": {
+          "text": "#t",
+          "math": [],
+          "links": [
+            {
+              "path": "",
+              "heading": "t",
+              "embedded": true
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "![[#t]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [
+            "#t"
+          ],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [
+            "![[#t]]=>#t|t@0:0-0:7"
+          ],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/embed-fragment/link-not-embed": {
+      "id": "probe/embed-fragment/link-not-embed",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[#t]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"#t\" href=\"#t\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">t</a></p>",
+        "projections": {
+          "text": "t",
+          "math": [],
+          "links": [
+            {
+              "path": "",
+              "heading": "t",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[#t]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "#t"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:6"
+          ],
+          "links": [
+            "[[#t]]=>#t|t@0:0-0:6"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-id-wrapper/strong-trailing-period": {
+      "id": "probe/block-id-wrapper/strong-trailing-period",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "**^blk**.\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><strong></strong>.</p>",
+        "projections": {
+          "text": ".",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "strong:"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "**^blk**."
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:9"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:9"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate"
+    },
+    "probe/block-id-wrapper/em-trailing-period": {
+      "id": "probe/block-id-wrapper/em-trailing-period",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "*^blk*.\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><em></em>.</p>",
+        "projections": {
+          "text": ".",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "*^blk*."
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:7"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate"
+    },
+    "probe/block-id-wrapper/nested-trailing-period": {
+      "id": "probe/block-id-wrapper/nested-trailing-period",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "_*^blk*_.\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><em><em></em></em>.</p>",
+        "projections": {
+          "text": ".",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:",
+            "em:"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "_*^blk*_."
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:9"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:9"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate"
+    },
+    "probe/math-space/space-body-trailing-period": {
+      "id": "probe/math-space/space-body-trailing-period",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "  $$ $$.\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">  <span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\" \" display=\"true\" class=\"TEX-N\"></mjx-math></mjx-container></span>.</p>",
+        "projections": {
+          "text": "⟨math⟩.",
+          "math": [
+            {
+              "display": true,
+              "tex": " "
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "  $$ $$."
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tag-boundary/nested-then-comma": {
+      "id": "probe/tag-boundary/nested-then-comma",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- #a/b,\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\"><a href=\"#a/b\" class=\"tag\" target=\"_blank\" rel=\"noopener nofollow\">#a/b</a>,</li>\n</ul>",
+        "projections": {
+          "text": "#a/b,",
+          "math": [],
+          "links": [],
+          "tags": [
+            "a/b"
+          ],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- #a/b,"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [
+            "a/b"
+          ],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [
+            "#a/b@0:2-0:6"
+          ],
+          "listItems": [
+            "-|parent:-1@0:0-0:7"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/tag-boundary/nested-then-period": {
+      "id": "probe/tag-boundary/nested-then-period",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- #a/b.\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\"><a href=\"#a/b\" class=\"tag\" target=\"_blank\" rel=\"noopener nofollow\">#a/b</a>.</li>\n</ul>",
+        "projections": {
+          "text": "#a/b.",
+          "math": [],
+          "links": [],
+          "tags": [
+            "a/b"
+          ],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- #a/b."
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [
+            "a/b"
+          ],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [
+            "#a/b@0:2-0:6"
+          ],
+          "listItems": [
+            "-|parent:-1@0:0-0:7"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/footnote-bare/colon-then-blank-run": {
+      "id": "probe/footnote-bare/colon-then-blank-run",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^1]:\n      \n",
+      "obsidian": {
+        "html": "",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]:\n      "
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@0:0-1:6"
+          ],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "footnoteDefinition@0:0-1:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate"
+    },
+    "probe/footnote-bare/ref-then-escaped-label": {
+      "id": "probe/footnote-bare/ref-then-escaped-label",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^1]\n  [^1\\]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">1<br>\n1\\</p>",
+        "projections": {
+          "text": "1 1\\",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[^1]\n  [^1\\]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-1:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate"
+    },
+    "probe/math-emphasis/display-across-lines": {
+      "id": "probe/math-emphasis/display-across-lines",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "_$$y^2\ny^2$$_\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><em><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\ny^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span></em></p>",
+        "projections": {
+          "text": "⟨math⟩",
+          "math": [
+            {
+              "display": true,
+              "tex": "y^2\ny^2"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:⟨math⟩"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "_$$y^2\ny^2$$_"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-1:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate"
+    },
+    "probe/callout-title-caret/block-id": {
+      "id": "probe/callout-title-caret/block-id",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] ^blk\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\"></div></div></div>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] ^blk"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:14"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:14"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate"
+    },
+    "probe/callout-title-caret/empty-inline-footnote": {
+      "id": "probe/callout-title-caret/empty-inline-footnote",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] ^[]\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></div></div></div>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+        "projections": {
+          "text": "⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] ^[]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            ""
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [
+            "@0:10"
+          ],
+          "headings": [],
+          "sections": [
+            "callout@0:0-0:13",
+            "text@1:0-1:0",
+            "element@1:0-1:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate"
+    },
+    "probe/comment-setext/ordered-comment-then-equals": {
+      "id": "probe/comment-setext/ordered-comment-then-equals",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "1. %%note\n===\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\"></li>\n</ol>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1. %%note\n==="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate"
+    },
+    "probe/entity-bare/lone-ampersand-in-item": {
+      "id": "probe/entity-bare/lone-ampersand-in-item",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "---\n1. &\n",
+      "obsidian": {
+        "html": "<hr>\n<ol>\n<li dir=\"auto\">&amp;</li>\n</ol>",
+        "projections": {
+          "text": "&",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "thematicBreak",
+              "text": "---"
+            },
+            {
+              "type": "list",
+              "text": "1. &"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "thematicBreak@0:0-0:3",
+            "list@1:0-1:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@1:0-1:4"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate"
     },
     "token/wikilink/balanced": {
       "id": "token/wikilink/balanced",

@@ -243,6 +243,7 @@ describe("source fidelity", () => {
     expect(lost).toEqual([
       "fuzz/embed/12: [^1\\]",
       "fuzz/footnote/24: [^https://e.test/p]",
+      "probe/footnote-bare/ref-then-escaped-label: [^1\\]",
     ]);
   });
 });
