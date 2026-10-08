@@ -236,14 +236,15 @@ describe("positioned oracle", () => {
    * rather than regression -- every one is a case the wave was written to expose.
    * Attributed exactly, by dumping which new id joins which key:
    *
-   *     sections     +3  embed-fragment/unclosed-leading-space,
-   *                      math-space/space-body-trailing-period,
-   *                      footnote-bare/colon-then-blank-run
-   *     footnotes    +1  footnote-bare/colon-then-blank-run
+   *     sections     +2  embed-fragment/unclosed-leading-space,
+   *                      math-space/space-body-trailing-period
    *     footnoteRefs +1  callout-title-caret/empty-inline-footnote
    *
-   * `entity-bare/lone-ampersand-in-item` is off both lists now: it held `sections` and
-   * `listItems`, and fixing the unclosed-frontmatter mis-parse returned each by one.
+   * Two of the wave's cases have since come off these lists entirely.
+   * `entity-bare/lone-ampersand-in-item` held `sections` and `listItems` until the
+   * unclosed-frontmatter mis-parse was repaired; `footnote-bare/colon-then-blank-run`
+   * held `sections` and `footnotes` until a definition learned to take a trailing
+   * whitespace-only line.
    *
    * `blocks` is absent from that list because it went back down: it rose to 21 with
    * the three `block-id-wrapper` cases and returned to 18 when they were fixed, which
@@ -258,10 +259,10 @@ describe("positioned oracle", () => {
    * no `compareCase` delta can see.
    */
   const CEILING = {
-    footnotes: 21,
+    footnotes: 20,
     footnoteRefs: 4,
     headings: 13,
-    sections: 137,
+    sections: 136,
     links: 120,
     embeds: 33,
     tags: 3,

@@ -82,6 +82,7 @@ import { thematicBreakTabTransform } from "./lib/thematic-break-tab.js";
 import { labelPrecedenceTransform } from "./lib/label-precedence.js";
 import { setextDefinitionTransform } from "./lib/setext-definition.js";
 import { shortCommentTransform } from "./lib/short-comment.js";
+import { definitionBlankTailTransform } from "./lib/definition-blank-tail.js";
 import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
 import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
 import { lrdFootnoteTransform } from "./lib/lrd-footnote.js";
@@ -640,6 +641,10 @@ export default function remarkObsidian(
     // After every pass that can extend a definition, and before points are
     // normalised from the offsets this corrects.
     definitionTrimTransform(tree, String(file));
+    // Strictly after the trim: that pass pulls a definition back off an interior
+    // blank, this one extends it over a trailing blank, and an earlier placement was
+    // silently undone by it.
+    definitionBlankTailTransform(tree, String(file));
     // After every pass that reads a newline out of a text value, and before points
     // are normalised from the offsets it sets.
     if (opts.positionedBreaks) breakPositionsTransform(tree, String(file));

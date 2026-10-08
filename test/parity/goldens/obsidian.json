@@ -77628,7 +77628,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "probe/footnote-bare/ref-then-escaped-label": {
       "id": "probe/footnote-bare/ref-then-escaped-label",
