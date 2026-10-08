@@ -18,6 +18,63 @@ interface CommentNode {
 const isComment = (node: unknown): node is CommentNode =>
   (node as { type?: string } | undefined)?.type === "comment";
 
+/** A footnote definition's continuation indent: four spaces, or the tab it stands for. */
+const CONTINUATION_INDENT = /^(?: {1,4}|\t)/u;
+
+/**
+ * The comment's source as one text node per line, indent excluded, spans exact.
+ *
+ * A container's indent is structure, not content, and folding the raw slice in as
+ * a single node keeps it. The `footnoteDefinition` handler then indents that value
+ * a second time on the way out, so `    b` is written at eight columns; the leading
+ * space of the doubled run is encoded as `&#x20;` to preserve it, and the `&` of
+ * *that* is escaped on the pass after. Each round adds four columns and a backslash
+ * run, without bound -- a 48-byte definition reaches 12kB in eleven passes.
+ *
+ * Stripping the indent out of one whole-span node fixes the growth and costs worse:
+ * `hunt/obsidian-comments/23` carries a `[^2]` inside the comment, and removing four
+ * characters from a value whose position still spans them shifts every offset derived
+ * from it. That showed up as `footnoteRefs` 3 -> 4 and three unplaced counters, and a
+ * wrong offset is worse than a missing one.
+ *
+ * So the split is per line, each segment spanning exactly the characters it holds,
+ * with a `break` over each line ending -- the same reason `legacy-scan.ts` gives every
+ * line ending its own token and `blank-label-reference.ts` splits before
+ * `remark-breaks` can. `commentQuoteExtentTransform` strips `>` from its continuation
+ * lines for the same underlying reason; it needs no spans because it rebuilds a value
+ * the tokenizer owns.
+ */
+function pushCommentLines(
+  host: Paragraph,
+  source: string,
+  from: number,
+  to: number,
+): void {
+  const lines = source.slice(from, to).split("\n");
+  let cursor = from;
+
+  for (let offset = 0; offset < lines.length; offset++) {
+    const line = lines[offset] ?? "";
+    if (offset > 0) {
+      host.children.push(
+        span<Break>({ type: "break" }, source, cursor - 1, cursor),
+      );
+    }
+    const indent =
+      offset === 0 ? 0 : (CONTINUATION_INDENT.exec(line)?.[0].length ?? 0);
+    const contentTo = cursor + line.length;
+    host.children.push(
+      span<Text>(
+        { type: "text", value: line.slice(indent) } as Text,
+        source,
+        cursor + indent,
+        contentTo,
+      ),
+    );
+    cursor = contentTo + 1;
+  }
+}
+
 /**
  * A `%%` never ends a footnote definition.
  *
@@ -62,19 +119,12 @@ export function commentInDefinitionTransform(tree: Root, source: string): void {
         from === undefined ? undefined : from - 1,
         from,
       ),
-      span<Text>(
-        {
-          type: "text",
-          value:
-            from === undefined || to === undefined
-              ? "%%"
-              : source.slice(from, to),
-        } as Text,
-        source,
-        from,
-        to,
-      ),
     );
+    if (from === undefined || to === undefined) {
+      host.children.push({ type: "text", value: "%%" } as Text);
+    } else {
+      pushCommentLines(host, source, from, to);
+    }
 
     // Then every block the comment cut loose, while each is still lazy
     // continuation: one newline between, never a blank line.

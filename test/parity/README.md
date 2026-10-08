@@ -761,11 +761,55 @@ foo \\\<!--> foo -->      twice
 foo \\\\\<!--> foo -->     thrice
 ```
 
-The round-trip ceiling caught it as a 33 -> 34 move, which undersells it: the other 33 are
-stable-but-unsettled, while this one never converges. **One parity case does not buy a
+The round-trip ceiling caught it as a 33 -> 34 move. **One parity case does not buy a
 formatter that grows the author's file every time it runs.** Reaching `match` here needs a
 `toMarkdown` handler that writes the literal form first, which is the same thing the 33
 remainder each need.
+
+The sentence that used to sit here claimed the other 33 were "stable-but-unsettled, while
+this one never converges". That was false, and it had been false for a long time -- see
+below.
+
+### The ceiling could not see the difference between untidy and unbounded
+
+`once !== twice` is the wrong question asked for a long time. It cannot separate
+"normalises one pass later than expected", which is cosmetic, from "rewrites the file
+forever", which corrupts a vault on every save. Chasing the unstable set to a fixed point
+instead -- twelve passes, since everything that settles settles on pass 2 -- found **13 of
+the 41 never settled at all**, nine of them growing _exponentially_: a 48-byte definition
+reaches 12,418 bytes in eleven passes.
+
+So `raw-html/626` was being refused on a principle the harness was simultaneously
+violating thirteen times, and the gate was green throughout. `roundtrip.test.ts` now gates
+convergence separately from instability, which is the property a consumer actually needs.
+
+Six of the thirteen were **one** bug. A `%%` inside a footnote definition was folded back
+into the paragraph as a single text node holding the raw source slice -- including the
+definition's own four-space continuation indent. The `footnoteDefinition` handler indents
+that value again on the way out, so `    b` is written at eight columns; the leading space
+of the doubled run is encoded as `&#x20;` to preserve it, and the `&` of _that_ is escaped
+on the next pass. Four columns and a backslash run per round, forever.
+
+The obvious repair is worse than the bug and the corpus said so immediately. Stripping the
+indent out of one whole-span node converges, and costs `footnoteRefs` 3 -> 4 plus three
+unplaced counters, because `hunt/obsidian-comments/23` carries a `[^2]` **inside** the
+comment and removing four characters from a value whose position still spans them shifts
+every offset derived from it. A wrong offset is worse than a missing one, so that version
+does not ship.
+
+What works is the idiom already in the repo twice: split on the line endings yourself and
+give every segment its own exact span, with a `break` over each ending -- the reason
+`legacy-scan.ts` gives every line ending its own token, and the reason
+`blank-label-reference.ts` splits before `remark-breaks` can. `commentQuoteExtentTransform`
+had been stripping `>` from its continuation lines for the same underlying reason all
+along; it needs no spans only because it rebuilds a value the tokenizer owns.
+
+13 -> 7 and 41 -> 35, with **0 parity regressions** and no ceiling moved on either
+oracle. `join` was measured against this family first and is refuted: it is the only
+`toMarkdown` hook aimed at block separation, pass 0 really does look like a missing blank
+line between the definition and the following paragraph, and adding one changes nothing --
+output is byte-identical at every pass, because the growth is inside the definition's own
+serialisation. One more counting selector that read as evidence and was not.
 
 The dash boundary was worth measuring anyway, and the arbiter settles it: two dashes and
 three are literal, **four** is a genuine comment with an empty body, five is literal
