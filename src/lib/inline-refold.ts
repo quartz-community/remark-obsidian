@@ -35,7 +35,8 @@ export function inlineRefoldTransform(
     const to = paragraph.position?.end?.offset;
     if (from === undefined || to === undefined) return;
 
-    if (!hasLiteralMarker(paragraph)) return;
+    const literal = literalMarkers(paragraph);
+    if (!literal.highlight && !literal.math) return;
 
     const slice = source.slice(from, to);
     if (!slice.includes("\n")) return;
@@ -51,20 +52,43 @@ export function inlineRefoldTransform(
     // can hold both a delimiter that was judged and one that never was.
     //
     // Both slices are the same length, so the sums are directly comparable.
-    if (highlighted(only) <= highlighted(paragraph)) return;
+    const gainedHighlight =
+      literal.highlight && highlighted(only) > highlighted(paragraph);
+    const gainedMath = literal.math && mathed(only) > mathed(paragraph);
+    if (!gainedHighlight && !gainedMath) return;
 
     restore(only, source, from);
     paragraph.children = only.children;
   });
 }
 
-/** A `==` left in text is one the tokenizer never got to judge. */
-function hasLiteralMarker(paragraph: Paragraph): boolean {
-  let found = false;
+/**
+ * Which delimiters are sitting in text, where the tokenizer never got to judge them.
+ *
+ * Reported per marker rather than as one boolean, because each clause of the gate
+ * below needs evidence for *its own* construct. `y^2$` / `$y^2$` / `===` holds a
+ * literal `==` and no literal `$$`, and its single-`$` math is already correct; a
+ * shared boolean let the math clause fire on the `==` and replaced a right answer
+ * with a wrong one.
+ *
+ * `$$` is here at all because a legacy wrapper cannot let an inline construct cross a
+ * line ending: `planBody` has to emit every line ending as its own token, so
+ * `_$$y^2` / `y^2$$_` leaves two text nodes and a `break` where Obsidian reports one
+ * display math. Consuming the line ending inside the token is what desynchronises the
+ * chunked chain, which is why that route is closed and this one is open.
+ */
+function literalMarkers(paragraph: Paragraph): {
+  highlight: boolean;
+  math: boolean;
+} {
+  let highlight = false;
+  let math = false;
   visit(paragraph, "text", (node: Node) => {
-    if ((node as Text).value.includes("==")) found = true;
+    const value = (node as Text).value;
+    if (value.includes("==")) highlight = true;
+    if (value.includes("$$")) math = true;
   });
-  return found;
+  return { highlight, math };
 }
 
 /** How many characters of this paragraph sit inside a highlight. */
@@ -75,6 +99,18 @@ function highlighted(root: Node): number {
     const end = node.position?.end?.offset;
     if (start !== undefined && end !== undefined) total += end - start;
   });
+  return total;
+}
+
+function mathed(root: Node): number {
+  let total = 0;
+  for (const type of ["inlineMath", "math"]) {
+    visit(root, type, (node: Node) => {
+      const start = node.position?.start?.offset;
+      const end = node.position?.end?.offset;
+      if (start !== undefined && end !== undefined) total += end - start;
+    });
+  }
   return total;
 }
 
@@ -93,6 +129,18 @@ function restore(root: Node, source: string, base: number): void {
 
     if (node.type === "text") {
       (node as Text).value = source.slice(absoluteStart, absoluteEnd);
+    } else if (node.type === "inlineMath" || node.type === "math") {
+      // A math node's value is its tex, so it excludes the `$` delimiters its span
+      // includes. The substitution was length-preserving, so the real tex is the same
+      // length as the spaces-for-newlines one and the delimiters are what is left
+      // over -- which locates them without parsing them, and without assuming how
+      // many there are.
+      const raw = source.slice(absoluteStart, absoluteEnd);
+      const held = node as unknown as { value: string };
+      const pad = (raw.length - held.value.length) / 2;
+      if (Number.isInteger(pad) && pad > 0) {
+        held.value = raw.slice(pad, raw.length - pad);
+      }
     }
     node.position = {
       start: { ...node.position!.start, offset: absoluteStart },

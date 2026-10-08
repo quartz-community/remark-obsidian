@@ -614,6 +614,12 @@ export default function remarkObsidian(
       inlineRefoldTransform(tree, String(file), (markdown) =>
         self.parse(markdown),
       );
+      // Again, because the refold can produce a math node that the first run never
+      // saw: `_$$y^2` / `y^2$$_` only becomes one span once the paragraph is
+      // re-tokenized here, hundreds of lines after the classification pass. Safe to
+      // repeat -- it keys on the real source at the node's span and only ever sets
+      // fields, so re-running it on an already-classified tree changes nothing.
+      mathDisplayTransform(tree, String(file));
       bareFootnoteRefTransform(tree, String(file));
       // After the bare pass, so a reference it revives inside an inline note is
       // demoted too.

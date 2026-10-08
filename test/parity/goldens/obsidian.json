@@ -33266,8 +33266,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/math/3": {
       "id": "fuzz/math/3",
@@ -77731,7 +77730,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "probe/callout-title-caret/block-id": {
       "id": "probe/callout-title-caret/block-id",
