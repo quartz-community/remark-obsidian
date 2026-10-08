@@ -258,6 +258,23 @@ export function mdastText(
   const references = source === undefined ? undefined : definedReferences(tree);
 
   const strip = (value: string): string => value.replace(/\u0000/gu, "");
+
+  /**
+   * A `%%` comment that never closes, read from its own source slice.
+   *
+   * The node's value cannot answer this: an unclosed comment and one closed around
+   * the same body both hold that body. The slice can -- `%%` and `%%note` carry no
+   * closer, while `%%x%%` and `%%%%` do, so a closer is a trailing `%%` with at least
+   * four characters to sit in.
+   */
+  const unclosedComment = (candidate: Node): boolean => {
+    if (candidate.type !== "comment" || source === undefined) return false;
+    const from = candidate.position?.start?.offset;
+    const to = candidate.position?.end?.offset;
+    if (from === undefined || to === undefined) return false;
+    const slice = source.slice(from, to);
+    return !(slice.length >= 4 && slice.endsWith("%%"));
+  };
   const walk = (node: Node, phrasing = false): void => {
     switch (node.type) {
       case "text":
@@ -502,7 +519,19 @@ export function mdastText(
 
     const children = (node as { children?: Node[] }).children;
     const inner = phrasing || PHRASING_HOSTS.has(node.type);
-    if (children) for (const child of children) walk(child, inner);
+    if (children) {
+      for (const child of children) {
+        walk(child, inner);
+        // A comment with no closer hides its following *siblings* as well as its own
+        // body. Usually it absorbs what follows -- `a` / `%%` / `b` arrives as a
+        // comment spanning `b`, so skipping the node is enough -- but inside a list
+        // item a `===` line lands beside it instead: `1. %%note` / `===` leaves
+        // `comment "note"` and a sibling paragraph, and Obsidian renders nothing for
+        // either. Our `sections` already agree with its `list@0:0-1:3`, so the
+        // structure was right and only this projection was wrong.
+        if (unclosedComment(child)) break;
+      }
+    }
     if (!phrasing && BLOCK_TYPES.has(node.type)) parts.push(" ");
   };
 
