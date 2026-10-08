@@ -65492,8 +65492,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "`[^1]:` over `$x^2$` is a footnoteDefinition holding only `[^1]:` plus a separate paragraph to Obsidian, which renders the formula. We absorb the second line into the definition, so the formula is hidden inside it. A definition-extent rule rather than a math one."
+      "triage": "match"
     },
     "probe/math-widths/ordered-split-inline": {
       "id": "probe/math-widths/ordered-split-inline",

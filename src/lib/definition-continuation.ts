@@ -4,6 +4,9 @@ import { visit } from "unist-util-visit";
 
 import { shiftByMap, type LineMap } from "./line-map.js";
 
+/** A definition line ending at its colon, with nothing after it at all. */
+const BARE_COLON = /^[ \t]*\[\^[^\]\n]*\]:$/u;
+
 /** The continuation indent a footnote definition's later blocks sit at. */
 const CONTINUATION_INDENT = /^ {0,4}/u;
 
@@ -110,8 +113,25 @@ export function definitionLazyTransform(tree: Root, source: string): void {
 
       const definitionEnd = definition.position?.end?.offset;
       const from = block.position?.start?.offset;
+      const definitionStart = definition.position?.start?.offset;
       if (definitionEnd === undefined || from === undefined) continue;
+      if (definitionStart === undefined) continue;
       if (source.slice(definitionEnd, from) !== "\n") continue;
+
+      // Something has to follow the colon, even if only a space. A **bare**
+      // `[^1]:` absorbs nothing -- `[^1]:` over `x` is a definition and a separate
+      // paragraph, where `[^1]: ` over `x` is one definition. The arbiter agrees on
+      // both, so this is `remark-footnotes@2`'s own boundary rather than an
+      // inference from rendered output, and it is why the docstring's examples all
+      // carry that trailing space.
+      const firstLine = source.slice(
+        definitionStart,
+        definitionEnd === definitionStart
+          ? definitionEnd
+          : (source.indexOf("\n", definitionStart) + 1 || definitionEnd + 1) -
+              1,
+      );
+      if (BARE_COLON.test(firstLine)) continue;
 
       definition.children.push(block as never);
       if (definition.position && block.position) {
