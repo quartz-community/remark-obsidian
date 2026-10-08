@@ -236,13 +236,14 @@ describe("positioned oracle", () => {
    * rather than regression -- every one is a case the wave was written to expose.
    * Attributed exactly, by dumping which new id joins which key:
    *
-   *     sections     +4  embed-fragment/unclosed-leading-space,
+   *     sections     +3  embed-fragment/unclosed-leading-space,
    *                      math-space/space-body-trailing-period,
-   *                      footnote-bare/colon-then-blank-run,
-   *                      entity-bare/lone-ampersand-in-item
+   *                      footnote-bare/colon-then-blank-run
    *     footnotes    +1  footnote-bare/colon-then-blank-run
    *     footnoteRefs +1  callout-title-caret/empty-inline-footnote
-   *     listItems    +1  entity-bare/lone-ampersand-in-item
+   *
+   * `entity-bare/lone-ampersand-in-item` is off both lists now: it held `sections` and
+   * `listItems`, and fixing the unclosed-frontmatter mis-parse returned each by one.
    *
    * `blocks` is absent from that list because it went back down: it rose to 21 with
    * the three `block-id-wrapper` cases and returned to 18 when they were fixed, which
@@ -260,12 +261,12 @@ describe("positioned oracle", () => {
     footnotes: 21,
     footnoteRefs: 4,
     headings: 13,
-    sections: 138,
+    sections: 137,
     links: 120,
     embeds: 33,
     tags: 3,
     blocks: 18,
-    listItems: 73,
+    listItems: 72,
     frontmatterPosition: 7,
   };
 

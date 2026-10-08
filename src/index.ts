@@ -83,6 +83,7 @@ import { labelPrecedenceTransform } from "./lib/label-precedence.js";
 import { setextDefinitionTransform } from "./lib/setext-definition.js";
 import { shortCommentTransform } from "./lib/short-comment.js";
 import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
+import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
 import { lrdFootnoteTransform } from "./lib/lrd-footnote.js";
 import {
   legacyDefinitionPromoteTransform,
@@ -482,6 +483,12 @@ export default function remarkObsidian(
     // tail means there is no frontmatter in the tree yet at all.
     if (opts.frontmatter) {
       frontmatterTailTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+      // The other half of the same extension defect: a fence that never closes,
+      // where a tail is a fence that closes awkwardly. Mutually exclusive with the
+      // pass above, which is why either order works.
+      frontmatterUnclosedTransform(tree, String(file), (markdown) =>
         self.parse(markdown),
       );
     }

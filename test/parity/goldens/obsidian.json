@@ -77948,7 +77948,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "token/wikilink/balanced": {
       "id": "token/wikilink/balanced",
