@@ -36,7 +36,7 @@ export function inlineRefoldTransform(
     if (from === undefined || to === undefined) return;
 
     const literal = literalMarkers(paragraph);
-    if (!literal.highlight && !literal.math) return;
+    if (!literal.highlight && !literal.math && !literal.note) return;
 
     const slice = source.slice(from, to);
     if (!slice.includes("\n")) return;
@@ -55,12 +55,16 @@ export function inlineRefoldTransform(
     const gainedHighlight =
       literal.highlight && highlighted(only) > highlighted(paragraph);
     const gainedMath = literal.math && mathed(only) > mathed(paragraph);
-    if (!gainedHighlight && !gainedMath) return;
+    const gainedNote = literal.note && noted(only) > noted(paragraph);
+    if (!gainedHighlight && !gainedMath && !gainedNote) return;
 
     restore(only, source, from);
     paragraph.children = only.children;
   });
 }
+
+/** The legacy constructs whose body is chunked at every line ending. */
+const WRAPPERS = new Set(["emphasis", "strong", "delete", "highlight"]);
 
 /**
  * Which delimiters are sitting in text, where the tokenizer never got to judge them.
@@ -80,15 +84,41 @@ export function inlineRefoldTransform(
 function literalMarkers(paragraph: Paragraph): {
   highlight: boolean;
   math: boolean;
+  note: boolean;
 } {
   let highlight = false;
   let math = false;
-  visit(paragraph, "text", (node: Node) => {
-    const value = (node as Text).value;
-    if (value.includes("==")) highlight = true;
-    if (value.includes("$$")) math = true;
-  });
-  return { highlight, math };
+  let note = false;
+  // Walked rather than visited, because for math it matters *where* the delimiter is.
+  // A legacy wrapper chunks its body at every line ending, so a span inside one cannot
+  // cross it however well formed -- that is the defect this pass works around. At
+  // paragraph level there is no such obstacle: micromark saw the whole run and its
+  // answer stands, so re-tokenizing there replaces a considered reading with a
+  // differently-paired one. Measured: without the ancestry test, `y^2$` / `$y^2$` /
+  // `===` and `probe/math-unclosed/lone-closer-then-inline` both regress, and both
+  // hold their dollars directly under the paragraph.
+  //
+  // `==` keeps its old, position-blind test, which is measured and working.
+  const walk = (node: Node, inWrapper: boolean): void => {
+    if (node.type === "text") {
+      const value = (node as Text).value;
+      if (value.includes("==")) highlight = true;
+      if (inWrapper && value.includes("$")) math = true;
+      // An inline note cannot span a *lazy* continuation line -- measured on all four
+      // shapes: `- ^[i` / `e]` and `> ^[i` / `e]` both fail while `- ^[i` / `  e]` and
+      // `> ^[i` / `> e]` succeed, as does the same text at root. Position-blind like
+      // the highlight clause, and self-limiting for the same reason: where micromark
+      // already builds the note, the refold produces no new one and nothing happens.
+      if (value.includes("^[")) note = true;
+      return;
+    }
+    const inner = inWrapper || WRAPPERS.has(node.type);
+    for (const child of (node as { children?: Node[] }).children ?? []) {
+      walk(child, inner);
+    }
+  };
+  walk(paragraph, false);
+  return { highlight, math, note };
 }
 
 /** How many characters of this paragraph sit inside a highlight. */
@@ -98,6 +128,14 @@ function highlighted(root: Node): number {
     const start = node.position?.start?.offset;
     const end = node.position?.end?.offset;
     if (start !== undefined && end !== undefined) total += end - start;
+  });
+  return total;
+}
+
+function noted(root: Node): number {
+  let total = 0;
+  visit(root, "footnote", () => {
+    total += 1;
   });
   return total;
 }

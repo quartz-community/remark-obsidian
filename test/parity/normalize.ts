@@ -276,7 +276,17 @@ export function mdastText(
    * four characters to sit in.
    */
   const unclosedComment = (candidate: Node): boolean => {
-    if (candidate.type !== "comment" || source === undefined) return false;
+    if (source === undefined) return false;
+    // Through the last child, because the hiding propagates outwards. At one level
+    // `> %%` absorbs its lazy line and `- %%` leaves the comment as a direct sibling,
+    // both already handled; at two, `> > %%` over `em*` leaves `em*` beside the inner
+    // *blockquote* rather than beside the comment. A container whose last descendant
+    // is an unclosed comment is itself unclosed for this purpose.
+    if (candidate.type !== "comment") {
+      const kids = (candidate as { children?: Node[] }).children;
+      const last = kids?.[kids.length - 1];
+      return last !== undefined && unclosedComment(last);
+    }
     const from = candidate.position?.start?.offset;
     const to = candidate.position?.end?.offset;
     if (from === undefined || to === undefined) return false;

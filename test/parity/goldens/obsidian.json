@@ -27618,8 +27618,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "`*$y^2` / `y^2$*` is one inline math span to Obsidian; a legacy wrapper chunks its body at every line ending, so the span cannot cross one. Same obstacle the `$$` form had, and `inlineRefoldTransform` closed that by re-tokenizing the paragraph with line endings replaced by spaces. Widening its marker test from `$$` to a single `$` was measured at 1 gain and 2 regressions -- `fuzz/highlight/49` and `probe/math-unclosed/lone-closer-then-inline`, both of which already parse correctly and whose line-joined form produces different math. The refold needs a gate that can tell a *better* pairing from merely more of one."
+      "triage": "match"
     },
     "fuzz/highlight/61": {
       "id": "fuzz/highlight/61",
@@ -40559,8 +40558,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/embed/52": {
       "id": "fuzz/embed/52",
@@ -66602,8 +66600,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "The `%%` render-time rule, two quotes deep. Obsidian renders nothing while we show the lazy line, exactly as for `- %%` / `note%%` at one level: hiding is render-time and the structure is preserved, so the fix belongs in the text projection. Recorded against fuzz/comment/9 and /13 already."
+      "triage": "match"
     },
     "probe/nested-comment/two-deep-closed": {
       "id": "probe/nested-comment/two-deep-closed",
