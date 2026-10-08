@@ -909,11 +909,18 @@ Definition spans are the open ground, now ~810 across two families:
   pattern-matched corpus data has already produced a wrong answer once, which is
   why the `%%` rules in `corpus.ts` are recorded instead.
 
-## A container cannot be overridden the way a text construct can
+## A container cannot be _prepended over_ the way a text construct can
 
 Five cases closed by replacing micromark's `list` container, and the reason it had to be
 replaced _whole_ is worth keeping, because the cheaper shape that works elsewhere in this
 package does not work here.
+
+The heading is deliberately narrower than it used to read. **Prepending** is what cannot
+override a container; `disable` can, and the distinction took a separate measurement.
+`disable: {null: [...]}` is honoured at `create-tokenizer.js:413` and so reaches container
+constructs too -- verified for `list`, `blockQuote`, `htmlFlow` and `setextUnderline`. So
+"replace it whole" is the right route for the _list_ rules below, and not a general law
+about containers. What follows is about the prepend-and-decline shape specifically.
 
 `legacyCodeSpans` and `legacyAutolinks` both prepend a construct that handles the cases
 Obsidian reads differently and declines the rest -- and one of them goes further, consuming
@@ -952,6 +959,51 @@ a tab-indented sibling, where `containerState.size` counts **characters** while
 `factorySpace` consumes **columns** so `⇥ ` is two of one and five of the other; and an
 under-indented continuation, which needs legacy's whole-item minimum-indent scan rather
 than a different limit.
+
+### The third shape: delegate to the stock construct with one flag suppressed
+
+Between "prepend a construct that declines the rest" and "vendor the whole thing" there is
+a cheaper route, and it has now shipped on both sides of the pipeline. Where our rule
+differs from stock by **one decision** rather than by a whole algorithm, prepend a
+construct that recognises only the triggering shape and then calls the stock construct's
+own `tokenize` with the offending flag cleared.
+
+`</pre>` is the worked example. micromark keeps `pre` in `htmlRawNames`, which governs only
+_opening_ tags, and omits it from `htmlBlockNames` -- so a bare `</pre>` lands on block
+type 7, which refuses outright when interrupting (`html-flow.js`: `self.interrupt && !lazy
+? nok`). Obsidian's fork carries `pre` in its block-tag list, so there the closer
+interrupts. The entire difference is that one `nok`, so
+`src/lib/syntax/closing-pre-interrupt.ts` checks for `</pre` and hands off to stock
+`htmlFlow` with `self.interrupt` saved and cleared, restoring it on both exits. Attribute
+scanning and the blank-line continuation stay micromark's, which is also what makes the
+block correctly absorb the rest of its line. Hand-rolling type 6 would have been ~60 lines
+of duplicated scanning for the same result.
+
+Two properties make it safe, and they are worth copying:
+
+- **Engage only when the difference exists.** The construct returns `nok` unless
+  `self.interrupt` is set, so every non-interrupting `</pre>` is tokenized by stock
+  micromark bit for bit. The blast radius is zero by construction rather than by
+  measurement.
+- **A prepended flow construct that declines falls through to stock.** Verified
+  separately: declining on `<` reaches stock `htmlFlow` normally. That is the same
+  prepend-and-decline property the text constructs rely on, and it does hold for flow --
+  it is only _containers_ it fails for, for the continuation reason above.
+
+`mdast-util-to-markdown` has the identical shape and `defaultHandlers` is its name for it:
+`src/lib/mdast/link-reference-to-markdown.ts` overrides one label spelling and delegates
+everything else, after three attempts at reimplementing `linkReference` each cost different
+cases, because `state.safe`, `createTracker` and the enter/exit stack are order-sensitive.
+`task-char-to-markdown.ts` was already doing it before any of that was re-derived.
+
+**When the difference is data rather than behaviour, skip the construct entirely.**
+`textarea` is the counter-example in the same family: it is in `htmlRawNames` and Obsidian
+predates its addition, so `<textarea>` swallowed every following block. There is no
+decision to suppress -- the lists are module exports, and mutating one reaches every
+processor in the process -- and the only thing the repair needs to know is that the type-7
+boundary is the first blank line. `textarea-not-raw.ts` splits the node there and hands the
+remainder back to the parser, which is far less code than a construct and gets Obsidian's
+four sections exactly.
 
 ### A setext underline outranks a lazy continuation, but only for a quote
 
