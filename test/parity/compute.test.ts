@@ -236,7 +236,6 @@ describe("positioned oracle", () => {
    * rather than regression -- every one is a case the wave was written to expose.
    * Attributed exactly, by dumping which new id joins which key:
    *
-   *     blocks       +3  block-id-wrapper/{strong,em,nested}-trailing-period
    *     sections     +4  embed-fragment/unclosed-leading-space,
    *                      math-space/space-body-trailing-period,
    *                      footnote-bare/colon-then-blank-run,
@@ -246,9 +245,17 @@ describe("positioned oracle", () => {
    *     listItems    +1  entity-bare/lone-ampersand-in-item
    *     tags         +1  embed-fragment/unclosed-leading-space
    *
-   * `blocks +3` is one rule, not three: a block identifier inside an inline
-   * wrapper is already stripped when the wrapper ends the line, and all three new
-   * cases put a `.` after it.
+   * `blocks` is absent from that list because it went back down: it rose to 21 with
+   * the three `block-id-wrapper` cases and returned to 18 when they were fixed, which
+   * was one rule rather than three -- a block identifier inside an inline wrapper is
+   * recognised when the wrapper ends the line, and all three merely put a `.` after
+   * it.
+   *
+   * That fix is also why this list is worth dumping rather than inferring. The main
+   * gate went green on all three while this oracle still reported `[]` for every one
+   * of them, because the projection and the block scan are separate passes; and the
+   * first attempt at the scan quietly broke `block-id-inline/underscore-wraps`, which
+   * no `compareCase` delta can see.
    */
   const CEILING = {
     footnotes: 21,
@@ -258,7 +265,7 @@ describe("positioned oracle", () => {
     links: 120,
     embeds: 33,
     tags: 4,
-    blocks: 21,
+    blocks: 18,
     listItems: 73,
     frontmatterPosition: 7,
   };

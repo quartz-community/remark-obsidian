@@ -956,6 +956,18 @@ function adjacentBlockFollows(
 const ID_WRAPPERS = new Set(["emphasis", "strong", "delete", "highlight"]);
 
 /**
+ * A trailing text node that cannot itself hold an identifier and does not end the
+ * search for one. `*^blk*.` registers the block `blk` across the whole line and
+ * renders `<em></em>.`, so the identifier sits inside the wrapper while the `.`
+ * sits after it -- and a search that stops at the last child never sees it.
+ *
+ * Deliberately narrow: punctuation and whitespace only, so `*^blk* word` is still
+ * left alone. Whether Obsidian strips *that* is unmeasured, and a probe for it is
+ * recorded rather than assumed.
+ */
+const TRAILING_NON_WORD = /^[^\w]*$/u;
+
+/**
  * The node actually holding a trailing identifier, descending through wrappers.
  *
  * Returns the children array to read the last text from, plus the chain of
@@ -972,7 +984,25 @@ function trailingIdHost(inner: Node[]):
   for (let depth = 0; depth < 4; depth++) {
     const last = kids[kids.length - 1];
     if (!last) return undefined;
-    if (last.type === "text") return { inner: kids, chain };
+    if (last.type === "text") {
+      const value = (last as ValueNode).value;
+      const before = kids[kids.length - 2];
+      // Step over a punctuation-only tail into the wrapper behind it, but only
+      // when this text could not be the identifier's own host.
+      if (
+        TRAILING_BLOCK_ID.test(value) ||
+        !TRAILING_NON_WORD.test(value) ||
+        !before ||
+        !ID_WRAPPERS.has(before.type)
+      ) {
+        return { inner: kids, chain };
+      }
+      const behind = (before as ParentNode).children;
+      if (!Array.isArray(behind)) return { inner: kids, chain };
+      chain.unshift({ node: before, parent: kids, index: kids.length - 2 });
+      kids = behind;
+      continue;
+    }
     if (!ID_WRAPPERS.has(last.type)) return undefined;
     const next = (last as ParentNode).children;
     if (!Array.isArray(next)) return undefined;
@@ -1277,8 +1307,24 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     // Whitespace may follow those markers but never the identifier itself. That is
     // the whole difference between `*^blk* `, which registers, and `text ^blk `,
     // which registers nothing.
-    const id = /\^([A-Za-z0-9-]+)(?:[*_=~]+[ \t]*)?$/u.exec(raw);
+    const id = /\^([A-Za-z0-9-]+)([^A-Za-z0-9]*)$/u.exec(raw);
     if (!id) continue;
+    // The tail must be empty or begin with a closing marker. That is the whole
+    // difference between `*^blk*.`, which registers `blk` across the line, and
+    // `text ^blk ` or `text ^blk.`, which register nothing: what matters is the
+    // character straight after the identifier, not the run beyond it. Punctuation
+    // is allowed past the marker because `*^blk*.` measurably registers -- the
+    // earlier pattern stopped at whitespace and so missed all three wrapper cases.
+    //
+    // The tail class is `[^A-Za-z0-9]`, not `[^\w]`, because `_` *is* a word
+    // character -- `[^\w]` silently excludes the one marker that `_^blk_` and
+    // `_*^blk*_.` depend on, which cost one working case and left the nested one
+    // open. Second time tonight that `\w` quietly meant "and underscore".
+    //
+    // Written as two flat tests rather than one nested group: `(?:[*_=~]+[^\w]*)?`
+    // puts a quantifier inside a quantified group, which the ReDoS lint rejects.
+    const tail = id[2] ?? "";
+    if (tail !== "" && !/^[*_=~]/u.test(tail)) continue;
     // The caret must follow whitespace. Without that `$x^2` reports the block
     // `2`, `[^1` reports `1` and `[[a#^blk` reports `blk` -- six false
     // identifiers in the corpus, all of them a caret inside another construct.

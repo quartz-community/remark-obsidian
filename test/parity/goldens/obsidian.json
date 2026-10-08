@@ -77308,7 +77308,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "probe/block-id-wrapper/em-trailing-period": {
       "id": "probe/block-id-wrapper/em-trailing-period",
@@ -77360,7 +77360,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "probe/block-id-wrapper/nested-trailing-period": {
       "id": "probe/block-id-wrapper/nested-trailing-period",
@@ -77413,7 +77413,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate"
+      "triage": "match"
     },
     "probe/math-space/space-body-trailing-period": {
       "id": "probe/math-space/space-body-trailing-period",
