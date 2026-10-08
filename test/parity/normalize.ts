@@ -1019,8 +1019,18 @@ function stripBlockIds(tree: Root, source: string): Root {
 
     for (let index = parent.children.length - 1; index >= 0; index--) {
       const child = parent.children[index]!;
-      // A heading carries one as readily as a paragraph: `## Heading ^id`.
-      if (child.type !== "paragraph" && child.type !== "heading") continue;
+      // A heading carries one as readily as a paragraph: `## Heading ^id`, and so
+      // does a callout title: `> [!note] ^blk` registers `blk` and renders a title
+      // with nothing in it. The emptied `calloutTitle` has to stay, because its
+      // presence is what suppresses the capitalised type a title-less callout shows
+      // -- strip the node and the title reads `Note` instead of nothing.
+      if (
+        child.type !== "paragraph" &&
+        child.type !== "heading" &&
+        child.type !== "calloutTitle"
+      ) {
+        continue;
+      }
       const inner = (child as ParentNode).children;
       // Through a trailing inline wrapper, because the identifier is recognised
       // from the raw line and emphasis around it is invisible to that scan:
