@@ -167,7 +167,9 @@ pulling apart:
 - **Stop choosing axes by counting.** Both counting heuristics tried here -- probes per open
   case, and neighbour frequency -- have now produced near-perfect families. What has
   actually yielded every time is a _contradiction_: two recorded cases that cannot both
-  follow from the same rule.
+  follow from the same rule. `fuzz/contradictions.ts` reports them, and wants re-running
+  after every landing: each one re-partitions the triage and can expose a shape that was
+  uniformly diverging a moment ago.
 - **Check every oracle before calling a family clean.** "15 of 15 matched" was true and
   incomplete; the gap was one `compute` counter away.
 
@@ -1174,13 +1176,14 @@ like the fix not working until you test the minimal form directly.
 
 ## Files
 
-| File                    | Role                                         |
-| ----------------------- | -------------------------------------------- |
-| `corpus.ts`             | Deterministic case generator                 |
-| `chain.ts`              | Pinned Quartz pipeline and feature profiles  |
-| `normalize.ts`          | Our projections, from mdast                  |
-| `types.ts`              | Shared projection and golden shapes          |
-| `compare.ts`            | Diffing and gate policy                      |
-| `oracle.e2e.ts`         | Recorder; runs inside Obsidian               |
-| `parity.test.ts`        | The gate; no Obsidian required               |
-| `goldens/obsidian.json` | Recorded output, version-stamped and triaged |
+| File                     | Role                                         |
+| ------------------------ | -------------------------------------------- |
+| `corpus.ts`              | Deterministic case generator                 |
+| `chain.ts`               | Pinned Quartz pipeline and feature profiles  |
+| `normalize.ts`           | Our projections, from mdast                  |
+| `types.ts`               | Shared projection and golden shapes          |
+| `compare.ts`             | Diffing and gate policy                      |
+| `oracle.e2e.ts`          | Recorder; runs inside Obsidian               |
+| `parity.test.ts`         | The gate; no Obsidian required               |
+| `goldens/obsidian.json`  | Recorded output, version-stamped and triaged |
+| `fuzz/contradictions.ts` | Shapes holding both a match and a divergence |
