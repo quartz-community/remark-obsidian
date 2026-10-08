@@ -265,10 +265,28 @@ function tokenize(
       return closeFirst(code);
     }
 
+    // A `[[` inside the fragment abandons the opener, exactly as it does inside the
+    // path. The two scans had drifted apart: `path` routes a bracket through
+    // `pathBracket` and rejects a doubled one, while this one consumed any bracket at
+    // all. One character isolates it -- `![[d.pdf. [[word]]` abandons correctly and
+    // lets the inner wikilink win, where `![[d.pdf#page=3. [[word]]` built an embed
+    // whose *heading* was `page=3. [[word`. A single `[` is still ordinary content, so
+    // targets like `[link](u)` keep working; 94 recorded cases hold a bracket inside
+    // an opener and nearly all of them match.
+    if (code === LEFT_BRACKET) {
+      effects.consume(code);
+      return headingBracket;
+    }
+
     if (code === null || isLineEnding(code)) return nok(code);
 
     effects.consume(code);
     return heading;
+  }
+
+  function headingBracket(code: Code): State | undefined {
+    if (code === LEFT_BRACKET) return nok(code);
+    return heading(code);
   }
 
   function headingEscape(code: Code): State | undefined {
@@ -281,6 +299,15 @@ function tokenize(
       return closeFirst(code);
     }
     if (code === null || isLineEnding(code)) return nok(code);
+    // A backslash is never an escape inside a wikilink, so it cannot shield the first
+    // bracket of a `[[` either: `#page=3 \ \[[target]]` holds a doubled bracket in the
+    // source and Obsidian abandons the opener on it. Routing through the bracket state
+    // rather than straight back to the heading is what lets the *next* bracket be seen
+    // as the second of a pair.
+    if (code === LEFT_BRACKET) {
+      effects.consume(code);
+      return headingBracket;
+    }
     effects.consume(code);
     return heading;
   }

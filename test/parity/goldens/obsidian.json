@@ -23354,8 +23354,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Our wikilink FRAGMENT scan accepts `[[` where the path scan abandons it, and that asymmetry is the whole cause. Isolated by varying one character: `![[d.pdf. [[word]]` abandons the embed and lets the inner wikilink win, which is what Obsidian does, while `![[d.pdf#page=3. [[word]]` and `![[d#page=3. [[word]]` both build an embed whose *heading* is `page=3. [[word`. So a `[` inside a target is fine in general -- 94 recorded cases hold one and nearly all match, including targets like `[link](u)` -- and the defect is specific to the scan after the `#`. Fix in src/lib/syntax/wikilink.ts: make the heading scan abandon on `[[` exactly as the path scan does."
+      "triage": "match"
     },
     "fuzz/footnote/33": {
       "id": "fuzz/footnote/33",
@@ -25602,8 +25601,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "FRAGMENT SCAN family, with fuzz/embed/79 and fuzz/embed/121. Our heading scan swallows `\\[[a#h` into the link's heading where Obsidian abandons the whole opener and leaves `[[a#^blk \\ [[a#h]]` literal with no link at all. Same asymmetry: the path scan abandons on `[[` and the scan after `#` does not. Fix in src/lib/syntax/wikilink.ts."
+      "triage": "match"
     },
     "fuzz/embed/93": {
       "id": "fuzz/embed/93",
@@ -29921,8 +29919,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Our wikilink FRAGMENT scan accepts `[[` where the path scan abandons it, and that asymmetry is the whole cause. Isolated by varying one character: `![[d.pdf. [[word]]` abandons the embed and lets the inner wikilink win, which is what Obsidian does, while `![[d.pdf#page=3. [[word]]` and `![[d#page=3. [[word]]` both build an embed whose *heading* is `page=3. [[word`. So a `[` inside a target is fine in general -- 94 recorded cases hold one and nearly all match, including targets like `[link](u)` -- and the defect is specific to the scan after the `#`. Fix in src/lib/syntax/wikilink.ts: make the heading scan abandon on `[[` exactly as the path scan does."
+      "triage": "match"
     },
     "fuzz/table/18": {
       "id": "fuzz/table/18",
