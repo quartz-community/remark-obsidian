@@ -15,6 +15,9 @@ const ASTERISK = 42;
 
 const tagCharRegex = /[\p{L}\p{M}\p{Emoji}]/u;
 
+/** The `[` and `![` tokens, which open a label rather than close a construct. */
+const LABEL_OPENERS = new Set(["labelLink", "labelImage"]);
+
 function isWhitespace(code: Code): boolean {
   return (
     code === codes.space ||
@@ -73,8 +76,16 @@ function tokenize(
     // `a**b**#next` and `a[[t]]#next` tag `next` while `foo#next` does not. The
     // boundary is the end of a construct, not the character before it.
     const last = context.events[context.events.length - 1];
+    // A label *opener* is not the end of anything. micromark emits an `exit` for the
+    // `[` token itself, so an unclosed `![[` or `[[` reads as a finished construct and
+    // let a tag start inside it: ` ![[#t` tagged `t` where Obsidian reports no tag at
+    // all, because the `#` is simply inside literal text there. A closed one still
+    // counts -- `a[[t]]#next` exits `wikilink` and does tag `next`.
     const afterConstruct =
-      !!last && last[0] === "exit" && last[1].type !== "data";
+      !!last &&
+      last[0] === "exit" &&
+      last[1].type !== "data" &&
+      !LABEL_OPENERS.has(last[1].type);
     const allowedStart =
       previous === null ||
       isWhitespace(previous) ||

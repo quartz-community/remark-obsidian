@@ -243,7 +243,6 @@ describe("positioned oracle", () => {
    *     footnotes    +1  footnote-bare/colon-then-blank-run
    *     footnoteRefs +1  callout-title-caret/empty-inline-footnote
    *     listItems    +1  entity-bare/lone-ampersand-in-item
-   *     tags         +1  embed-fragment/unclosed-leading-space
    *
    * `blocks` is absent from that list because it went back down: it rose to 21 with
    * the three `block-id-wrapper` cases and returned to 18 when they were fixed, which
@@ -264,7 +263,7 @@ describe("positioned oracle", () => {
     sections: 138,
     links: 120,
     embeds: 33,
-    tags: 4,
+    tags: 3,
     blocks: 18,
     listItems: 73,
     frontmatterPosition: 7,
