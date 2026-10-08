@@ -114,6 +114,8 @@ const legacyCharacterReference: Construct = {
     let remaining = 0;
     let hexadecimal = false;
     let isNumeric = false;
+    /** Whether the reference carries its terminator, which is ours to consume too. */
+    let semicolon = false;
 
     const scan = createBodyScan(body);
 
@@ -126,8 +128,27 @@ const legacyCharacterReference: Construct = {
 
     function decide(code: Code): State | undefined {
       const written = body.join("");
-      // Written in full, so it is micromark's to claim.
-      if (written.endsWith(";")) return nok(code);
+      // Written in full, so it is micromark's to claim -- unless micromark will not
+      // claim it. Its numeric reference caps the digits at seven for decimal and six
+      // for hexadecimal, so `&#87654321;` is refused outright and stays literal, where
+      // Obsidian decodes it to U+FFFD like any other out-of-range code point. Note the
+      // cap is on *digits* and not on the value: `&#0;`, `&#1114111;` and `&#x110000;`
+      // are all within it and all already give U+FFFD, which is what made this look
+      // like a value rule until the digit counts were compared.
+      if (written.endsWith(";")) {
+        const inside = numeric(written.slice(0, -1));
+        if (!inside) return nok(code);
+        if (inside.digits.length <= (inside.hex ? 6 : 7)) return nok(code);
+        semicolon = true;
+        isNumeric = true;
+        hexadecimal = inside.hex;
+        remaining = inside.digits.length;
+        effects.enter("characterReference");
+        effects.enter("characterReferenceMarker");
+        effects.consume(code);
+        effects.exit("characterReferenceMarker");
+        return numericMarker;
+      }
 
       const asNumber = numeric(written);
       if (asNumber) {
@@ -185,6 +206,19 @@ const legacyCharacterReference: Construct = {
       effects.consume(code);
       if (--remaining > 0) return value;
       effects.exit("characterReferenceValue");
+      if (!semicolon) {
+        effects.exit("characterReference");
+        return ok;
+      }
+      // The terminator is a second `characterReferenceMarker`, which is how
+      // micromark's own full-reference form spells it.
+      effects.enter("characterReferenceMarker");
+      return terminator;
+    }
+
+    function terminator(code: Code): State | undefined {
+      effects.consume(code);
+      effects.exit("characterReferenceMarker");
       effects.exit("characterReference");
       return ok;
     }
