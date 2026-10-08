@@ -133205,7 +133205,7 @@
         }
       },
       "triage": "replicate",
-      "note": "referenceLinks shows Obsidian DOES define here: [ref[]: /uri gives /uri@2:0-2:12, so a label may hold a [ and the scan runs to the first ]. We form the definition too; the divergence is the reference. obs text is \"[foo]ref[]\" - [foo] literal, then [ref[] read as a reference whose label is ref[ (first-] scan) rendering ref[ plus the stray ]. We leave the whole run literal because labelPrecedence scans BALANCED brackets, which fails on [ref[]. Same two-scan split already documented for footnote versus link labels, now showing that a DEFINED link label uses the first-] scan as well."
+      "note": "The recorded html settles this and refutes the first-] scan theory in the earlier note: there is NO anchor. \"<p>[foo]ref[]</p>\" is plain text, meta.links is empty, and only referenceLinks carries the definition at /uri@2:0-2:12. Source first line is \"[foo][ref[]\" (11 chars) and the render is \"[foo]ref[]\" (10) - exactly one character gone, the [ that opens the second pair. So a reference attempt consumed its opener, formed no link, and left the remainder literal. 547 shows the identical shape: \"[foo][ref[bar]]\" renders \"[foo]ref[bar]]\", again one [ dropped. This is a render-time one-character drop, not a resolution rule, and no principled model for it has been established yet - read obsidian.html first for any further attempt."
     },
     "commonmark/links/547": {
       "id": "commonmark/links/547",
@@ -133259,7 +133259,7 @@
         }
       },
       "triage": "replicate",
-      "note": "referenceLinks is EMPTY here: [ref[bar]]: /uri is not a definition to Obsidian, which is why its text is visible. obs renders \"[foo]ref[bar]] [ref[bar]]: /uri\" - so [ref[bar] was still read as a reference label (first-] scan) even with nothing defining it, leaving [foo] literal and the trailing ]. Pairs with 546: the label scan is the same, only the definition differs."
+      "note": "Same shape as 546 and the same evidence: \"<p>[foo]ref[bar]]</p>\" with no anchor, and the definition line rendered as its own visible paragraph because referenceLinks is EMPTY - \"[ref[bar]]: /uri\" is not a definition. Source \"[foo][ref[bar]]\" renders \"[foo]ref[bar]]\": exactly one [ dropped, the one opening the second pair. Pairs with 546, where the definition IS registered, so the dropped bracket is independent of whether anything defines the label."
     },
     "commonmark/links/548": {
       "id": "commonmark/links/548",
