@@ -238,7 +238,19 @@ describe("positioned oracle", () => {
    *     sections     +2  embed-fragment/unclosed-leading-space,
    *                      math-space/space-body-trailing-period
    *
-   * Three of the wave's cases have since come off these lists entirely.
+   * A second wave, from sweep 800000, adds:
+   *
+   *     links        +3  tag-in-label/{heading-full-link,quote-full-link,
+   *                      nested-in-destination}
+   *     sections     +3  math-indent/{two-space-then-wikilink,
+   *                      two-space-then-embed,one-space-empty-body}
+   *
+   * All three `links` cases *match* on the main gate: a `#tag` inside a link label now
+   * tags correctly, while this oracle still disagrees about the link around it. Same
+   * split as `block-id-wrapper` below -- projection and compute are separate passes and
+   * `compareCase` reads only the first.
+   *
+   * Three of the first wave's cases have since come off these lists entirely.
    * `entity-bare/lone-ampersand-in-item` held `sections` and `listItems` until the
    * unclosed-frontmatter mis-parse was repaired; `footnote-bare/colon-then-blank-run`
    * held `sections` and `footnotes` until a definition learned to take a trailing
@@ -262,8 +274,8 @@ describe("positioned oracle", () => {
     footnotes: 20,
     footnoteRefs: 3,
     headings: 13,
-    sections: 136,
-    links: 120,
+    sections: 139,
+    links: 123,
     embeds: 33,
     tags: 3,
     blocks: 18,

@@ -18,6 +18,35 @@ const tagCharRegex = /[\p{L}\p{M}\p{Emoji}]/u;
 /** The `[` and `![` tokens, which open a label rather than close a construct. */
 const LABEL_OPENERS = new Set(["labelLink", "labelImage"]);
 
+/**
+ * Whether two label openers sit back to back, which is a `[[` or `![[`.
+ *
+ * This is the only thing separating a wikilink opener from an ordinary label, and the
+ * event stream offers nothing else: ` ![[#t` and `[#tag]` produce byte-identical
+ * four-event tails, so a tail of any fixed length cannot tell them apart. Counting
+ * *groups* can -- ` ![[` closes a `labelImage` and then a `labelLink`, `[[` closes two
+ * `labelLink`s, while `[`, `![` and `[#tag](u)` close exactly one.
+ *
+ * It matters because the `#` means different things in each: a heading fragment inside
+ * a wikilink, a tag inside a label. A closed wikilink never reaches here at all, since
+ * its own construct claims the text first.
+ */
+function insideDoubledOpener(events: TokenizeContext["events"]): boolean {
+  let index = events.length - 1;
+  const last = events[index];
+  if (!last || last[0] !== "exit" || !LABEL_OPENERS.has(last[1].type)) {
+    return false;
+  }
+  const type = last[1].type;
+  while (index >= 0) {
+    const event = events[index]!;
+    if (event[0] === "enter" && event[1].type === type) break;
+    index--;
+  }
+  const before = events[index - 1];
+  return !!before && before[0] === "exit" && LABEL_OPENERS.has(before[1].type);
+}
+
 function isWhitespace(code: Code): boolean {
   return (
     code === codes.space ||
@@ -76,22 +105,20 @@ function tokenize(
     // `a**b**#next` and `a[[t]]#next` tag `next` while `foo#next` does not. The
     // boundary is the end of a construct, not the character before it.
     const last = context.events[context.events.length - 1];
-    // A label *opener* is not the end of anything. micromark emits an `exit` for the
-    // `[` token itself, so an unclosed `![[` or `[[` reads as a finished construct and
-    // let a tag start inside it: ` ![[#t` tagged `t` where Obsidian reports no tag at
-    // all, because the `#` is simply inside literal text there. A closed one still
-    // counts -- `a[[t]]#next` exits `wikilink` and does tag `next`.
     const afterConstruct =
-      !!last &&
-      last[0] === "exit" &&
-      last[1].type !== "data" &&
-      !LABEL_OPENERS.has(last[1].type);
+      !!last && last[0] === "exit" && last[1].type !== "data";
     const allowedStart =
       previous === null ||
       isWhitespace(previous) ||
       previous === HASH ||
       afterConstruct;
     if (!allowedStart) return nok(code);
+    // A `#` directly inside `[[` or `![[` is a heading fragment, not a tag, so
+    // ` ![[#t` reports none while `[#tag]`, `[#tag](u)` and `[#a/b]]` all report one.
+    // Refusing every label opener instead was measured at zero regressions and was
+    // still wrong: no recorded case held a bare `[#tag]`, and six of a sweep's thirty
+    // shortest causes turned out to be exactly that.
+    if (insideDoubledOpener(context.events)) return nok(code);
     if (code !== HASH) return nok(code);
     effects.enter("tag");
     effects.enter("tagMarker");

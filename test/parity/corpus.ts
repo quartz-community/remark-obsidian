@@ -2200,6 +2200,65 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // bare reference, and a lone `&` resolves to nothing -- this checks it stays
   // literal rather than consuming the line ending.
   ["probe/entity-bare/lone-ampersand-in-item", "---\n1. &\n"],
+  // Sweep 800000 left 131 causes; these are again the shortest of them.
+
+  // A tag inside a *link label*, which is the shape the corpus never held.
+  //
+  // Six of the thirty shortest causes are this, and it matters more than its share:
+  // `tag.ts` was just taught that a label opener is not the end of a construct, so a
+  // tag no longer starts inside an unclosed `![[`. Every recorded `[#...` case is a
+  // `[[#heading]]` wikilink, so that change measured zero regressions against a corpus
+  // with no bare `[#tag](u)` in it at all. These decide whether the rule is right or
+  // merely unrefuted -- if Obsidian tags these, it is too broad and wants narrowing to
+  // an opener that never closes.
+  ["probe/tag-in-label/heading-full-link", "# [#tag](u)\n"],
+  ["probe/tag-in-label/quote-full-link", "> [#tag](u) \n"],
+  ["probe/tag-in-label/item-unclosed-destination", "- [#a/b](u\n"],
+  ["probe/tag-in-label/bare-label", "[#tag]\n"],
+  ["probe/tag-in-label/extra-closer", "[#a/b]] \\\n"],
+  ["probe/tag-in-label/nested-in-destination", "|100]([#a/b](u)\n"],
+
+  // A footnote label that is a single space.
+  //
+  // A whitespace-only label defines nothing, which is settled and probed for the
+  // *definition*. `[^ ]` as a bare reference reduced out of the sweep twice, once
+  // alone and once as an item's content, and a reference is the other half of that
+  // rule.
+  // The bare `[^ ]` is deliberately absent: the TOKENS cross-product already emits it
+  // as `token/footnote-ref/whitespace-body`, and a probe declared here wins the dedup
+  // and displaces that id. Second instance of that collision, same direction.
+  ["probe/footnote-space-label/item-then-bang", "- [^ ]!\n"],
+
+  // Indented display math, and what follows it on the next indented line.
+  //
+  // `  $$y^2$$` over `  [[` and over `  ![` both reduced out, as did ` $$ $$` alone.
+  // The math-marker probes cover a container prefix; two spaces is not a container, so
+  // whether the second line continues the paragraph is unprobed.
+  ["probe/math-indent/two-space-then-wikilink", "  $$y^2$$\n  [[\n"],
+  ["probe/math-indent/two-space-then-embed", "  $$y^2$$\n  ![\n"],
+  ["probe/math-indent/one-space-empty-body", " $$ $$\n"],
+
+  // A setext underline under a container whose content is hidden or empty.
+  //
+  // `- %%` / `===` and `>  ` / `===` both reduced out. The lazy-setext rules are
+  // measured for prose content; a hidden `%%` line and a blank quote line are the two
+  // cases where there may be nothing for the underline to attach to.
+  ["probe/setext-empty-host/item-comment", "- %%\n===\n"],
+  ["probe/setext-empty-host/quote-blank", ">  \n===\n"],
+
+  // An inline footnote inside a highlight inside a heading.
+  //
+  // `# ==^[inline]==` reduced out. Each pair is probed alone; the question is whether
+  // the heading's own trailing-marker handling survives two nested inline wrappers.
+  ["probe/heading-highlight-footnote/inline-note", "# ==^[inline]==\n"],
+
+  // A tag followed by an escape, and a code span followed by a whitespace-only line.
+  //
+  // `#a/b \ ` / ` ` and `` `code` `` / ` ` both reduced out, and both are a construct
+  // meeting the trailing-whitespace-line shape that a footnote definition was just
+  // taught to absorb. Whether anything else absorbs one is unmeasured.
+  ["probe/trailing-blank-line/tag-then-escape", "#a/b \\ \n \n"],
+  ["probe/trailing-blank-line/code-span", "`code`\n \n"],
 ];
 
 /** Inline tokens, each crossed with a set of malformed delimiter states. */
