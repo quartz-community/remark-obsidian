@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-08T00:52:20.160Z",
+  "recordedAt": "2026-10-08T01:26:29.277Z",
   "cases": {
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
@@ -65019,150 +65019,6 @@
       "triage": "replicate",
       "note": "`~~~~` is four tildes, so it is a fenced code block delimiter rather than an empty strikethrough: Obsidian reports a code element (html.codeLang [\"\"]) inside the task and we report none. The bare `~~~~` case matches, so the task context is what differs."
     },
-    "probe/empty-inline/highlight-bare": {
-      "id": "probe/empty-inline/highlight-bare",
-      "layer": "seed",
-      "category": "probe",
-      "markdown": "====\n",
-      "obsidian": {
-        "html": "<p dir=\"auto\">====</p>",
-        "projections": {
-          "text": "====",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "===="
-            }
-          ]
-        },
-        "meta": {
-          "headings": [],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        },
-        "compute": {
-          "referenceLinks": [],
-          "footnotes": [],
-          "footnoteRefs": [],
-          "headings": [],
-          "sections": [
-            "paragraph@0:0-0:4"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "listItems": [],
-          "blocks": [],
-          "frontmatterLinks": []
-        }
-      },
-      "triage": "match"
-    },
-    "probe/empty-inline/strong-bare": {
-      "id": "probe/empty-inline/strong-bare",
-      "layer": "seed",
-      "category": "probe",
-      "markdown": "****\n",
-      "obsidian": {
-        "html": "<hr>",
-        "projections": {
-          "text": "",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "thematicBreak",
-              "text": "****"
-            }
-          ]
-        },
-        "meta": {
-          "headings": [],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        },
-        "compute": {
-          "referenceLinks": [],
-          "footnotes": [],
-          "footnoteRefs": [],
-          "headings": [],
-          "sections": [
-            "thematicBreak@0:0-0:4"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "listItems": [],
-          "blocks": [],
-          "frontmatterLinks": []
-        }
-      },
-      "triage": "match"
-    },
-    "probe/empty-inline/emphasis-bare": {
-      "id": "probe/empty-inline/emphasis-bare",
-      "layer": "seed",
-      "category": "probe",
-      "markdown": "**\n",
-      "obsidian": {
-        "html": "<p dir=\"auto\">**</p>",
-        "projections": {
-          "text": "**",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "**"
-            }
-          ]
-        },
-        "meta": {
-          "headings": [],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        },
-        "compute": {
-          "referenceLinks": [],
-          "footnotes": [],
-          "footnoteRefs": [],
-          "headings": [],
-          "sections": [
-            "paragraph@0:0-0:2"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "listItems": [],
-          "blocks": [],
-          "frontmatterLinks": []
-        }
-      },
-      "triage": "match"
-    },
     "probe/empty-inline/highlight-then-blank": {
       "id": "probe/empty-inline/highlight-then-blank",
       "layer": "seed",
@@ -65200,54 +65056,6 @@
           "headings": [],
           "sections": [
             "paragraph@0:0-0:4"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "listItems": [],
-          "blocks": [],
-          "frontmatterLinks": []
-        }
-      },
-      "triage": "match"
-    },
-    "probe/empty-inline/strike-padded": {
-      "id": "probe/empty-inline/strike-padded",
-      "layer": "seed",
-      "category": "probe",
-      "markdown": "~~ ~~\n",
-      "obsidian": {
-        "html": "<p dir=\"auto\">~~ ~~</p>",
-        "projections": {
-          "text": "~~ ~~",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "~~ ~~"
-            }
-          ]
-        },
-        "meta": {
-          "headings": [],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        },
-        "compute": {
-          "referenceLinks": [],
-          "footnotes": [],
-          "footnoteRefs": [],
-          "headings": [],
-          "sections": [
-            "paragraph@0:0-0:5"
           ],
           "links": [],
           "embeds": [],
@@ -65960,54 +65768,6 @@
       },
       "triage": "match"
     },
-    "probe/label-shape/space-only": {
-      "id": "probe/label-shape/space-only",
-      "layer": "seed",
-      "category": "probe",
-      "markdown": "[^ ]\n",
-      "obsidian": {
-        "html": "<p dir=\"auto\">[^ ]</p>",
-        "projections": {
-          "text": "[^ ]",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "[^ ]"
-            }
-          ]
-        },
-        "meta": {
-          "headings": [],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        },
-        "compute": {
-          "referenceLinks": [],
-          "footnotes": [],
-          "footnoteRefs": [],
-          "headings": [],
-          "sections": [
-            "paragraph@0:0-0:4"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "listItems": [],
-          "blocks": [],
-          "frontmatterLinks": []
-        }
-      },
-      "triage": "match"
-    },
     "probe/label-shape/space-only-defined": {
       "id": "probe/label-shape/space-only-defined",
       "layer": "seed",
@@ -66170,54 +65930,6 @@
       },
       "triage": "replicate",
       "note": "`][^[^1]](` renders `][^1](` in Obsidian, so the inner `[^1]` is NOT a reference - it is literal text - where we build one. Doubled-opener family, which 17 of 18 cases already match after bracketLabelReferences; this is a shape that family did not cover."
-    },
-    "probe/label-shape/caret-only": {
-      "id": "probe/label-shape/caret-only",
-      "layer": "seed",
-      "category": "probe",
-      "markdown": "[^]\n",
-      "obsidian": {
-        "html": "<p dir=\"auto\">[^]</p>",
-        "projections": {
-          "text": "[^]",
-          "math": [],
-          "links": [],
-          "tags": [],
-          "headings": [],
-          "tasks": [],
-          "highlights": [],
-          "emphasis": [],
-          "sections": [
-            {
-              "type": "paragraph",
-              "text": "[^]"
-            }
-          ]
-        },
-        "meta": {
-          "headings": [],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "footnotes": []
-        },
-        "compute": {
-          "referenceLinks": [],
-          "footnotes": [],
-          "footnoteRefs": [],
-          "headings": [],
-          "sections": [
-            "paragraph@0:0-0:3"
-          ],
-          "links": [],
-          "embeds": [],
-          "tags": [],
-          "listItems": [],
-          "blocks": [],
-          "frontmatterLinks": []
-        }
-      },
-      "triage": "match"
     },
     "probe/math-unclosed/root-same-line": {
       "id": "probe/math-unclosed/root-same-line",
@@ -78004,6 +77716,54 @@
       },
       "triage": "match"
     },
+    "token/highlight/empty": {
+      "id": "token/highlight/empty",
+      "layer": "token",
+      "category": "highlight",
+      "markdown": "====\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">====</p>",
+        "projections": {
+          "text": "====",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "===="
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
     "token/highlight/whitespace-body": {
       "id": "token/highlight/whitespace-body",
       "layer": "token",
@@ -80663,6 +80423,54 @@
       "triage": "match",
       "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
     },
+    "token/emphasis/empty": {
+      "id": "token/emphasis/empty",
+      "layer": "token",
+      "category": "emphasis",
+      "markdown": "**\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">**</p>",
+        "projections": {
+          "text": "**",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "**"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:2"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
     "token/emphasis/whitespace-body": {
       "id": "token/emphasis/whitespace-body",
       "layer": "token",
@@ -81303,6 +81111,54 @@
       },
       "triage": "match",
       "note": "Obsidian runs remark-parse@8, whose pre-CommonMark attention algorithm the `legacyEmphasis` option ports, so we now reproduce this. Previously a deliberate CommonMark-conformant divergence; see COMMONMARK-DIVERGENCES.md."
+    },
+    "token/strong/empty": {
+      "id": "token/strong/empty",
+      "layer": "token",
+      "category": "strong",
+      "markdown": "****\n",
+      "obsidian": {
+        "html": "<hr>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "thematicBreak",
+              "text": "****"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "thematicBreak@0:0-0:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
     },
     "token/strong/whitespace-body": {
       "id": "token/strong/whitespace-body",
@@ -83395,6 +83251,54 @@
       "triage": "match",
       "note": "Fixed by porting remark-parse@8's delete tokenizer: it closes on the first `~~` it reaches, honours no escape, requires a double tilde, and treats `~~~~` as an empty delete. Needs remark-gfm registered before this package so the later extension wins the `~` code."
     },
+    "token/strikethrough/whitespace-body": {
+      "id": "token/strikethrough/whitespace-body",
+      "layer": "token",
+      "category": "strikethrough",
+      "markdown": "~~ ~~\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">~~ ~~</p>",
+        "projections": {
+          "text": "~~ ~~",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "~~ ~~"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
     "token/strikethrough/nested": {
       "id": "token/strikethrough/nested",
       "layer": "token",
@@ -85285,6 +85189,102 @@
           "headings": [],
           "sections": [
             "paragraph@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "token/footnote-ref/empty": {
+      "id": "token/footnote-ref/empty",
+      "layer": "token",
+      "category": "footnote-ref",
+      "markdown": "[^]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[^]</p>",
+        "projections": {
+          "text": "[^]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[^]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "token/footnote-ref/whitespace-body": {
+      "id": "token/footnote-ref/whitespace-body",
+      "layer": "token",
+      "category": "footnote-ref",
+      "markdown": "[^ ]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[^ ]</p>",
+        "projections": {
+          "text": "[^ ]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[^ ]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:4"
           ],
           "links": [],
           "embeds": [],

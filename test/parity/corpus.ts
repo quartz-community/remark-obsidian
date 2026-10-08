@@ -1732,17 +1732,15 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // An inline construct with nothing inside it.
   //
   // `- [ ] ~~~~` and `==ma` / whitespace both came out of the sweep, and the empty
-  // forms are barely probed: `probe/math/inline-empty` is `$ $` and there is no
-  // equivalent for `~~`, `==`, `**` or a code span. An empty delimiter run is the
-  // one case where "did the construct open at all" is visible in the text alone.
+  // `probe/math/inline-empty` is `$ $`, and the `token/*` layer already covers the
+  // bare runs -- `====`, `**`, `****`, `~~ ~~`, `[^]`, `[^ ]` -- so only the shapes
+  // it does not reach are probed here. Writing those again displaced six recorded
+  // ids through dedup without adding coverage, which is the hazard this file warns
+  // about: dedup keeps whichever case comes first, not the designed probe.
   ["probe/empty-inline/strike-bare", "~~~~\n"],
   ["probe/empty-inline/strike-in-task", "- [ ] ~~~~\n"],
-  ["probe/empty-inline/highlight-bare", "====\n"],
-  ["probe/empty-inline/strong-bare", "****\n"],
-  ["probe/empty-inline/emphasis-bare", "**\n"],
   ["probe/empty-inline/code-bare", "``\n"],
   ["probe/empty-inline/highlight-then-blank", "==ma\n \n"],
-  ["probe/empty-inline/strike-padded", "~~ ~~\n"],
 
   // A line holding nothing but whitespace, where a blank line would end the block.
   //
@@ -1781,11 +1779,9 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // `[^ ]`, `[^blk](u)` and `][^[^1]](` all reduced out of the sweep. The label rules
   // here are extensive, but a label of a single space and a label followed by an
   // inline-link destination are both unprobed.
-  ["probe/label-shape/space-only", "[^ ]\n"],
   ["probe/label-shape/space-only-defined", "[^ ]\n\n[^ ]: x\n"],
   ["probe/label-shape/block-id-then-destination", "[^blk](u)\n"],
   ["probe/label-shape/doubled-then-destination", "][^[^1]](\n"],
-  ["probe/label-shape/caret-only", "[^]\n"],
 
   // An UNCLOSED `$$` carrying content on its own line.
   //
