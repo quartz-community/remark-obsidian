@@ -1729,6 +1729,64 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // Enumerated rather than inferred: container x how many lazy lines x which line
   // carries the underline. The `===`/`---` pair is kept because only `---` is also
   // a thematic break, which is the likeliest source of the asymmetry.
+  // An inline construct with nothing inside it.
+  //
+  // `- [ ] ~~~~` and `==ma` / whitespace both came out of the sweep, and the empty
+  // forms are barely probed: `probe/math/inline-empty` is `$ $` and there is no
+  // equivalent for `~~`, `==`, `**` or a code span. An empty delimiter run is the
+  // one case where "did the construct open at all" is visible in the text alone.
+  ["probe/empty-inline/strike-bare", "~~~~\n"],
+  ["probe/empty-inline/strike-in-task", "- [ ] ~~~~\n"],
+  ["probe/empty-inline/highlight-bare", "====\n"],
+  ["probe/empty-inline/strong-bare", "****\n"],
+  ["probe/empty-inline/emphasis-bare", "**\n"],
+  ["probe/empty-inline/code-bare", "``\n"],
+  ["probe/empty-inline/highlight-then-blank", "==ma\n \n"],
+  ["probe/empty-inline/strike-padded", "~~ ~~\n"],
+
+  // A line holding nothing but whitespace, where a blank line would end the block.
+  //
+  // `-  ` / ` `, `>  ` / `===` and `  [[` / `   ` all reduced out of the sweep onto
+  // this shape. A space-only line is not blank to CommonMark's tokenizer but renders
+  // as one, and nothing here has ever probed the difference.
+  ["probe/space-line/after-bare-marker", "-  \n \n"],
+  ["probe/space-line/quote-then-underline", ">  \n===\n"],
+  ["probe/space-line/indented-wikilink-open", "  [[\n   \n"],
+  ["probe/space-line/between-paragraphs", "a\n \nb\n"],
+  ["probe/space-line/ends-quote", "> a\n \n> b\n"],
+  ["probe/space-line/in-list", "- a\n \n- b\n"],
+
+  // An unclosed code span, which shields whatever follows it or does not.
+  //
+  // `  \`tar` / `   ` came out of the sweep. `legacyCodeSpans` settles the *retry*
+  // rule for an opener with a closer of the wrong width; an opener with no closer at
+  // all ends up literal, and what happens to the rest of the line is not probed.
+  ["probe/code-unclosed/indented-then-space-line", "  `tar\n   \n"],
+  ["probe/code-unclosed/root-then-text", "`tar\nword\n"],
+  ["probe/code-unclosed/with-construct-after", "`tar [[a]] b\n"],
+  ["probe/code-unclosed/in-quote", "> `tar\n> word\n"],
+
+  // A comment opening inside a nested quote, with an inline construct after it.
+  //
+  // `> > %%` / `em*` reduced out of the sweep. The `%%` rules here are measured at
+  // one quote deep; a second `>` changes which container the lazy line belongs to,
+  // which is exactly the axis `probe/quote-html/*` just found mattered.
+  ["probe/nested-comment/two-deep-then-lazy", "> > %%\nem*\n"],
+  ["probe/nested-comment/two-deep-closed", "> > %%a%%\n"],
+  ["probe/nested-comment/two-deep-then-quoted", "> > %%\n> > a%%\n"],
+  ["probe/nested-comment/one-deep-then-lazy", "> %%\nem*\n"],
+
+  // A footnote label that looks like something else.
+  //
+  // `[^ ]`, `[^blk](u)` and `][^[^1]](` all reduced out of the sweep. The label rules
+  // here are extensive, but a label of a single space and a label followed by an
+  // inline-link destination are both unprobed.
+  ["probe/label-shape/space-only", "[^ ]\n"],
+  ["probe/label-shape/space-only-defined", "[^ ]\n\n[^ ]: x\n"],
+  ["probe/label-shape/block-id-then-destination", "[^blk](u)\n"],
+  ["probe/label-shape/doubled-then-destination", "][^[^1]](\n"],
+  ["probe/label-shape/caret-only", "[^]\n"],
+
   // An UNCLOSED `$$` carrying content on its own line.
   //
   // Math is the most probed construct here -- 22 `probe/math/*` plus a large seed
