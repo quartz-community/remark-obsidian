@@ -124,7 +124,21 @@ function tokenizeMathText(
       return sequenceOpen;
     }
 
-    if (sizeOpen === 1 && (isDigit(code) || isWhitespaceOrEof(code))) {
+    // A line ending after the opener is allowed, where a space or tab is not.
+    // `x^2$` over `y^2$$]]` is an inline formula holding `⏎y^2` in Obsidian -- the
+    // opener ends its line, the span crosses the ending, and the closer is the
+    // *first* `$` of the `$$` run, leaving `$]]` literal. `1. $` over `y^2$$!` is
+    // the same shape one container in.
+    //
+    // Refusing on every whitespace, as upstream does, left both as plain text:
+    // measured directly, `$a⏎b$` opened a span and `a$⏎b$` did not.
+    if (
+      sizeOpen === 1 &&
+      (isDigit(code) ||
+        code === null ||
+        code === codes.space ||
+        code === codes.horizontalTab)
+    ) {
       return nok(code);
     }
 

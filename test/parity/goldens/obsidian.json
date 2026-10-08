@@ -22916,8 +22916,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reduced by the fuzz shrinker from a randomly composed document."
+      "triage": "match"
     },
     "fuzz/footnote/32": {
       "id": "fuzz/footnote/32",
@@ -65379,8 +65378,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A lone `$` closer then a `$$` run: `x^2$` / `y^2$$]]` renders `x^2⟨math⟩$]]` in Obsidian, so the inline formula is `y^2` and the trailing `$]]` is literal. We pair none of it and leave the whole run as text. Same pairing family as probe/math-widths/ordered-split-inline."
+      "triage": "match"
     },
     "probe/math-widths/triple-then-inline": {
       "id": "probe/math-widths/triple-then-inline",
@@ -65550,8 +65548,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "`1. $` / `y^2$$!` renders `⟨math⟩$!` in Obsidian: the inline formula spans the line ending and holds `y^2`, leaving `$!`. We pair nothing and render `$ y^2$$!`. Same family as closer-then-double-closer."
+      "triage": "match"
     },
     "probe/escaped-label/in-quote": {
       "id": "probe/escaped-label/in-quote",
@@ -67331,8 +67328,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Measured by probe/math-unclosed/*: a lone $ closer followed by an opener on the next line. \"x^2$\" / \"$x^2$\" and \"^2$$\" / \"word$x\" are both single paragraphs to Obsidian, which pairs the dollars differently than we do. Distinct from the container rule in the same family, and from the display-separator rule already fixed."
+      "triage": "match"
     },
     "probe/math-unclosed/closer-then-opener": {
       "id": "probe/math-unclosed/closer-then-opener",
@@ -67385,8 +67381,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Measured by probe/math-unclosed/*: a lone $ closer followed by an opener on the next line. \"x^2$\" / \"$x^2$\" and \"^2$$\" / \"word$x\" are both single paragraphs to Obsidian, which pairs the dollars differently than we do. Distinct from the container rule in the same family, and from the display-separator rule already fixed."
+      "triage": "match"
     },
     "probe/math-unclosed/four-dollars-then-heading": {
       "id": "probe/math-unclosed/four-dollars-then-heading",
