@@ -133891,8 +133891,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Obsidian treats U+00A0 as whitespace when splitting a link destination from its title. This is CommonMark's own spec example and the space between `/url` and `\"title\"` is a NO-BREAK SPACE, so CommonMark says the destination is the whole `/url \"title\"` and there is no title -- which is what we report. Obsidian reports `/url`. One case, and the only one exercising U+00A0 in a destination of the 21 that hold the character at all, so the rule needs probes before any tokenizer change: whether it generalises to other Unicode spaces, and whether it applies outside a link destination."
+      "triage": "match"
     },
     "commonmark/links/508": {
       "id": "commonmark/links/508",

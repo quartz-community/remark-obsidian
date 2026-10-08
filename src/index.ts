@@ -84,6 +84,7 @@ import { setextDefinitionTransform } from "./lib/setext-definition.js";
 import { shortCommentTransform } from "./lib/short-comment.js";
 import { definitionBlankTailTransform } from "./lib/definition-blank-tail.js";
 import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
+import { linkNbspTitleTransform } from "./lib/link-nbsp-title.js";
 import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
 import { lrdFootnoteTransform } from "./lib/lrd-footnote.js";
 import {
@@ -655,6 +656,9 @@ export default function remarkObsidian(
     // are normalised from the offsets it sets.
     if (opts.positionedBreaks) breakPositionsTransform(tree, String(file));
     // Last, so every pass above only has to keep its offsets honest.
+    // Late, and order-free: it only ever rewrites a `link`'s own `url` and `title`,
+    // which nothing else here reads.
+    linkNbspTitleTransform(tree);
     normalizePointsTransform(tree, String(file));
   };
 
