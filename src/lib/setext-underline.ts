@@ -186,7 +186,16 @@ export function setextUnderlineTransform(
       // `thematicBreak` for `a` / `b` / `---`. `===` has no block form, so it
       // stays text there, which is what we already did for both.
       const dashes = /^-{3,}$/u.test(underline.replace(/[ \t]/gu, ""));
-      const broken = dashes && lines.length >= 3;
+      // Or when the underline is merely sloppy, whatever sits above it. `Foo` over
+      // `···----······` is a paragraph plus a thematic break to Obsidian, and so is
+      // `Foo` over `----···`: a dash run that `remark-parse@8` will not take as an
+      // underline still has its other reading available. Only one content line is
+      // needed for that, where the multi-line case above needs no sloppiness at all.
+      //
+      // `===` is unaffected and must stay so: `Foo` over `···===······` is a plain
+      // paragraph, because `=` has no block form to fall back to. That asymmetry is
+      // the same one the lazy-setext rules turn on.
+      const broken = dashes && (lines.length >= 3 || !STRICT.test(underline));
       const content = broken ? lines.slice(0, -1) : lines;
 
       const contentEnd = start + content.join("\n").length;

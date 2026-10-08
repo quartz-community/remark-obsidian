@@ -112339,8 +112339,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CommonMark spec example; recorded against Obsidian and not yet reproduced."
+      "triage": "match"
     },
     "commonmark/setext-headings/87": {
       "id": "commonmark/setext-headings/87",
