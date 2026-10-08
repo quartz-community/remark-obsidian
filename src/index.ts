@@ -85,6 +85,7 @@ import { shortCommentTransform } from "./lib/short-comment.js";
 import { definitionBlankTailTransform } from "./lib/definition-blank-tail.js";
 import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
 import { blankLabelReferenceTransform } from "./lib/blank-label-reference.js";
+import { textareaNotRawTransform } from "./lib/textarea-not-raw.js";
 import { linkNbspTitleTransform } from "./lib/link-nbsp-title.js";
 import { linkReferenceToMarkdown } from "./lib/mdast/link-reference-to-markdown.js";
 import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
@@ -511,6 +512,11 @@ export default function remarkObsidian(
       self.parse(markdown),
     );
     shortCommentTransform(tree);
+    // Before anything reads the block structure: a swallowed `<textarea>` hides whole
+    // blocks, so splitting it has to happen while the tree is still being shaped.
+    textareaNotRawTransform(tree, String(file), (markdown) =>
+      self.parse(markdown),
+    );
     if (opts.customTaskChars) {
       customTaskCharTransform(tree, String(file));
     }

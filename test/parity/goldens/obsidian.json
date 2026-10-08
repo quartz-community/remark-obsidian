@@ -116662,7 +116662,7 @@
         }
       },
       "triage": "replicate",
-      "note": "`text` re-measured through a real Reading View: the detached renderer the recorder batches disagreed with the application, so its capture was not Obsidian behaviour. Other projections are as recorded."
+      "note": "PARSE HALF FIXED; the residual is a form-element rendering artifact. `textarea` is in micromark's htmlRawNames [\"pre\",\"script\",\"style\",\"textarea\"] and Obsidian's fork of remark-parse@8 has only {pre, script, style}, so micromark made one type-1 block swallowing everything while Obsidian reports four sections. textareaNotRawTransform now reproduces those four exactly, and compute sections falls to 38. What remains is text (obs \"foobar\" vs ours \"foo bar\") and emphasis (obs [] vs ours two ems): inside a <textarea> the content is the element's VALUE, so there are no <em> ELEMENTS for the recorder to find and textContent is the de-tagged string. Reproducing that would mean not emphasising content Obsidian's own metadataCache reports as two paragraphs. Settle the recorded values with PARITY_FULL_PROXY_CHECK=1; the id is already in KNOWN_PROXY_DIVERGENCES as RAW_TEXT_ELEMENT."
     },
     "commonmark/html-blocks/172": {
       "id": "commonmark/html-blocks/172",
