@@ -382,6 +382,18 @@ describe("positioned oracle", () => {
     // least two rules -- one where we overrun and one where we stop short of a blank or
     // space-only line the item absorbs -- and it wants its own probe family before any
     // of it is implemented. A blanket "end at the last content character" regresses the 10.
+    // The 18 we-INVENT rows are attributed and are NOT the span question above:
+    //
+    //   3  items inside a `%%` comment are counted. `%%` / `- [ ] Hidden` reports no
+    //      list item in Obsidian and two here. The `links`, `tags` and `blocks`
+    //      collectors in `computeOurs` already `return SKIP` on a `comment` node; the
+    //      `listItems` walk is a separate pass and does not. Cleanest of the three,
+    //      and it follows a rule already established elsewhere in the same function.
+    //   6  a tab-separated thematic-break line is nested one level too deep --
+    //      `-\t-\t-` and `* *\t*` report `parent:-1` in Obsidian and `parent:0` here,
+    //      so the counts agree and the parents do not. Same family as the tab-straddle
+    //      rule in `list-tab-straddle.ts`.
+    //   1  `- [] a` / `- [ ]x`, a task-character difference.
     listItems: 71,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
