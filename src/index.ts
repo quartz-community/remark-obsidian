@@ -87,6 +87,7 @@ import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
 import { blankLabelReferenceTransform } from "./lib/blank-label-reference.js";
 import { textareaNotRawTransform } from "./lib/textarea-not-raw.js";
 import { closingPreInterruptSyntax } from "./lib/syntax/closing-pre-interrupt.js";
+import { labelOpenerWikilinkTransform } from "./lib/label-opener-wikilink.js";
 import { autolinkLiteralToMarkdown } from "./lib/mdast/autolink-literal-to-markdown.js";
 import { htmlTailToMarkdown } from "./lib/mdast/html-tail-to-markdown.js";
 import { linkNbspTitleTransform } from "./lib/link-nbsp-title.js";
@@ -612,6 +613,11 @@ export default function remarkObsidian(
     // Before the setext passes: a break cancelled by a tab is a list from here on,
     // and nothing downstream should still see a `thematicBreak` there.
     if (opts.labelPrecedence) {
+      // Before label precedence: that pass asks the tree which construct owns a
+      // bracket, so the wikilink has to be demoted first or it still owns it.
+      labelOpenerWikilinkTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
       labelPrecedenceTransform(tree, String(file), (markdown) =>
         reparse(markdown),
       );

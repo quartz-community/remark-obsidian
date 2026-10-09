@@ -577,7 +577,7 @@ function text(value: string, start: number, end: number): RootContent {
   } as Text;
 }
 
-function shiftAll(nodes: readonly RootContent[], base: number): void {
+export function shiftAll(nodes: readonly RootContent[], base: number): void {
   for (const node of nodes) {
     visit(node as Node, (child: Node) => {
       const position = (child as Positioned).position;

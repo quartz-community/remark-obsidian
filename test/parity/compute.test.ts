@@ -131,19 +131,21 @@ describe("positioned oracle", () => {
    * Obsidian's own defect, which a fix here would be a regression against.
    */
   /**
-   * The first two are `P1`, where a fix would be a regression: Obsidian's cache
-   * reports a column short by the width of a `%%` marker. The other two are gaps
-   * we intend to close, tracked `replicate`, and they are one rule seen from both
-   * sides -- a `[` right after a link text's `]` opens a link label, so it is
-   * neither a wikilink opener nor the start of a footnote reference. Closing it
-   * means tokenizer precedence between the wikilink extension and CommonMark's
-   * link label, so it is not a repair pass, and the referee measures the family at
-   * 44 of 6806 documents.
+   * Both remaining entries are `P1`, where a fix would be a regression: Obsidian's
+   * cache reports a column short by the width of a `%%` marker.
+   *
+   * The third entry is gone. It was the `[` that opens a link label straight after a
+   * link text's `]`, recorded here as needing tokenizer precedence between the
+   * wikilink extension and CommonMark's link label, and explicitly "not a repair
+   * pass". That was wrong, and a probe wave is what showed it: separating the shapes
+   * where the `[[` *does* open a wikilink -- after a footnote reference, after
+   * another wikilink, after an inline footnote -- left a condition a repair pass can
+   * test, namely that the preceding sibling is a plain text node ending in `]`.
+   * `labelOpenerWikilinkTransform` closed it and three sibling probes with it.
    */
   const KNOWN_REFERENCE_GAPS = [
     "hunt/aftercloser-chain-eats-referenced-definition/0: P1, Obsidian's column is short by the `%%` marker",
     "hunt/continuation-masked-under-foreign-label/2: P1, Obsidian's column is short by the `%%` marker",
-    "probe/reference-in-link/collection-label: we claim a wikilink where the label holds the reference",
   ];
 
   it("places every footnote reference, except the classified cases", () => {
@@ -289,13 +291,12 @@ describe("positioned oracle", () => {
    */
   const CEILING = {
     footnotes: 19,
-    footnoteRefs: 3,
+    footnoteRefs: 2,
     headings: 13,
     sections: 36,
-    // 124 with the probe wave: `probe/label-wikilink/{after-plain-bracket,
-    // after-image-text,defined-label}`, where a `[` after a link text's `]` opens a
-    // label and we open a wikilink. New documents, not a regression.
-    links: 124,
+    // 120, below the 121 it sat at before the wave: the three probes that raised it
+    // are closed, and so is a fourth case the backlog had carried.
+    links: 120,
     embeds: 32,
     tags: 2,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
