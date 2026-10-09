@@ -29,6 +29,47 @@ export interface Case {
  */
 const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // ---------------------------------------------------------------------------
+  // Probe wave 2: the two families wave 1 left open.
+  // ---------------------------------------------------------------------------
+
+  // IS AN UNMATCHED BRACKET A LEGAL REFERENCE LABEL, AND HOW DOES THE REFERENCE RENDER?
+  //
+  // Wave 1 settled the definition half: `[ref[]: /uri` *is* a definition and vanishes,
+  // while `[ref[bar]]: /uri` is not and stays visible. It did not settle the reference
+  // half, which is what `commonmark/links/546` and `/547` need -- both render with one
+  // bracket consumed (`[foo]ref[]`, `[foo]ref[bar]]`) and neither produces an anchor,
+  // so the label is being read and then shown bare. These ask the reference on its own,
+  // defined and undefined, for both label shapes.
+  ["probe/label-bracket/full-unmatched-undefined", "[foo][ref[]\n"],
+  ["probe/label-bracket/full-nested-undefined", "[foo][ref[bar]]\n"],
+  ["probe/label-bracket/collapsed-unmatched", "[ref[][]\n\n[ref[]: /uri\n"],
+  [
+    "probe/label-bracket/full-unmatched-other-def",
+    "[foo][ref[]\n\n[foo]: /other\n",
+  ],
+  ["probe/label-bracket/text-then-unmatched", "see [foo][ref[] end\n"],
+  [
+    "probe/label-bracket/unmatched-two-closers",
+    "[foo][ref[]]\n\n[ref[]: /uri\n",
+  ],
+
+  // HOW FAR DOES A WIKILINK PATH RUN WHEN A `](` IS INSIDE IT?
+  //
+  // `fuzz/comment/2` holds `[[a#^blk](target]]`, and Obsidian indexes a link whose whole
+  // target is `a#^blk](target` -- the path swallows the `](` and runs to the `]]`. That
+  // is the same shape the bare-URL extent turned out to be, so it is worth asking
+  // directly rather than inferring: these vary where the closer sits and whether a
+  // destination follows, which is what separates "the path ran on" from "the outer
+  // bracket pair won".
+  ["probe/wikilink-destination/paren-inside", "[[a](b]]\n"],
+  ["probe/wikilink-destination/block-then-paren", "[[a#^blk](target]]\n"],
+  ["probe/wikilink-destination/paren-inside-tail", "[[a](b]] tail\n"],
+  ["probe/wikilink-destination/paren-then-destination", "[[a](b]](u)\n"],
+  ["probe/wikilink-destination/closer-before-paren", "[[a]](b)\n"],
+  ["probe/wikilink-destination/embed-paren-inside", "![[a](b]]\n"],
+  ["probe/wikilink-destination/alias-paren-inside", "[[a|b](c]]\n"],
+
+  // ---------------------------------------------------------------------------
   // Probe wave: the five families the backlog could not adjudicate.
   //
   // Each group below answers one question the recorded cases leave open. They are

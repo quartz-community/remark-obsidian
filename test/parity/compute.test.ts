@@ -294,9 +294,10 @@ describe("positioned oracle", () => {
     footnoteRefs: 2,
     headings: 13,
     sections: 36,
-    // 118. The three probes that raised this to 124 are closed, and so are the four
-    // bracket cases and the three autolink-extent cases the backlog had carried.
-    links: 118,
+    // 120. Two more than the 118 the autolink work left, and both are new wave-2
+    // documents: `probe/wikilink-destination/{block-then-paren,alias-paren-inside}`,
+    // where a wikilink's fragment and alias swallow a `](` and ours stop at the `(`.
+    links: 120,
     embeds: 32,
     tags: 2,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped

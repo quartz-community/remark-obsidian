@@ -54,8 +54,726 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-09T03:57:37.233Z",
+  "recordedAt": "2026-10-09T10:29:01.276Z",
   "cases": {
+    "probe/label-bracket/full-unmatched-undefined": {
+      "id": "probe/label-bracket/full-unmatched-undefined",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[foo][ref[]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[foo]ref[]</p>",
+        "projections": {
+          "text": "[foo]ref[]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[foo][ref[]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:11"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/label-bracket/full-nested-undefined": {
+      "id": "probe/label-bracket/full-nested-undefined",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[foo][ref[bar]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[foo]ref[bar]]</p>",
+        "projections": {
+          "text": "[foo]ref[bar]]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[foo][ref[bar]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:15"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/label-bracket/collapsed-unmatched": {
+      "id": "probe/label-bracket/collapsed-unmatched",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[ref[][]\n\n[ref[]: /uri\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[ref[][]</p>",
+        "projections": {
+          "text": "[ref[][]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[ref[][]"
+            },
+            {
+              "type": "definition",
+              "text": "[ref[]: /uri"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [
+            "/uri@2:0-2:12"
+          ],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8",
+            "definition@2:0-2:12"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/label-bracket/full-unmatched-other-def": {
+      "id": "probe/label-bracket/full-unmatched-other-def",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[foo][ref[]\n\n[foo]: /other\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-tooltip-position=\"top\" aria-label=\"/other\" rel=\"noopener nofollow\" class=\"external-link\" href=\"/other\" target=\"_blank\">foo</a>ref[]</p>",
+        "projections": {
+          "text": "fooref[]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[foo][ref[]"
+            },
+            {
+              "type": "definition",
+              "text": "[foo]: /other"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [
+            "/other@2:0-2:13"
+          ],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:11",
+            "definition@2:0-2:13"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "`[foo][ref[]` over `[foo]: /other` renders `fooref[]` with an anchor to `/other`: once the `[` after the closer is taken as a label opener, the FIRST pair is left as a shortcut reference and resolves. We drop the opener correctly -- that half landed with `commonmark/links/546` and `/547` -- and still render `[foo]` literally, because no shortcut reference is built for it. The four sibling probes with nothing defined all match, so this is specifically the resolve step: the first pair has to become a `linkReference` once the second pair stops being its label, which is a tree change rather than the projection drop this family needed."
+    },
+    "probe/label-bracket/text-then-unmatched": {
+      "id": "probe/label-bracket/text-then-unmatched",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see [foo][ref[] end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see [foo]ref[] end</p>",
+        "projections": {
+          "text": "see [foo]ref[] end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see [foo][ref[] end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:19"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/label-bracket/unmatched-two-closers": {
+      "id": "probe/label-bracket/unmatched-two-closers",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[foo][ref[]]\n\n[ref[]: /uri\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[foo]ref[]]</p>",
+        "projections": {
+          "text": "[foo]ref[]]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[foo][ref[]]"
+            },
+            {
+              "type": "definition",
+              "text": "[ref[]: /uri"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [
+            "/uri@2:0-2:12"
+          ],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:12",
+            "definition@2:0-2:12"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-destination/paren-inside": {
+      "id": "probe/wikilink-destination/paren-inside",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a](b]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"a](b\" href=\"a](b\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a](b</a></p>",
+        "projections": {
+          "text": "a](b",
+          "math": [],
+          "links": [
+            {
+              "path": "a](b",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a](b]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a](b"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [
+            "[[a](b]]=>a](b|a](b@0:0-0:8"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-destination/block-then-paren": {
+      "id": "probe/wikilink-destination/block-then-paren",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a#^blk](target]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"a#^blk](target\" href=\"a#^blk](target\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a &gt; ^blk](target</a></p>",
+        "projections": {
+          "text": "a > ^blk](target",
+          "math": [],
+          "links": [
+            {
+              "path": "a",
+              "heading": "^blk](target",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a#^blk](target]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a#^blk](target"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:18"
+          ],
+          "links": [
+            "[[a#^blk](target]]=>a#^blk](target|a > ^blk](target@0:0-0:18"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A wikilink's FRAGMENT and ALIAS swallow a `](` the same way its path does. `[[a#^blk](target]]` indexes `a#^blk](target` and `[[a|b](c]]` indexes `a` with the display `b](c`, so the run continues to the `]]` in both. The path half already works -- `[[a](b]]`, `[[a](b]] tail`, `[[a](b]](u)`, `[[a]](b)` and `![[a](b]]` all match -- so this is the fragment and alias scans specifically, in `wikilink.ts`, where `headingBracket` and the alias scan stop at a `(`. `fuzz/comment/2` is the recorded case of the same rule."
+    },
+    "probe/wikilink-destination/paren-inside-tail": {
+      "id": "probe/wikilink-destination/paren-inside-tail",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a](b]] tail\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"a](b\" href=\"a](b\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a](b</a> tail</p>",
+        "projections": {
+          "text": "a](b tail",
+          "math": [],
+          "links": [
+            {
+              "path": "a](b",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a](b]] tail"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a](b"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:13"
+          ],
+          "links": [
+            "[[a](b]]=>a](b|a](b@0:0-0:8"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-destination/paren-then-destination": {
+      "id": "probe/wikilink-destination/paren-then-destination",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a](b]](u)\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"a](b\" href=\"a](b\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a](b</a>(u)</p>",
+        "projections": {
+          "text": "a](b(u)",
+          "math": [],
+          "links": [
+            {
+              "path": "a](b",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a](b]](u)"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a](b"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:11"
+          ],
+          "links": [
+            "[[a](b]]=>a](b|a](b@0:0-0:8"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-destination/closer-before-paren": {
+      "id": "probe/wikilink-destination/closer-before-paren",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a]](b)\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"a\" href=\"a\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a</a>(b)</p>",
+        "projections": {
+          "text": "a(b)",
+          "math": [],
+          "links": [
+            {
+              "path": "a",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a]](b)"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [
+            "[[a]]=>a|a@0:0-0:5"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-destination/embed-paren-inside": {
+      "id": "probe/wikilink-destination/embed-paren-inside",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "![[a](b]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><span alt=\"a](b\" src=\"a](b\" class=\"internal-embed is-loaded file-embed mod-empty\">“a](b” is not created yet. Click to create.</span></p>",
+        "projections": {
+          "text": "a](b",
+          "math": [],
+          "links": [
+            {
+              "path": "a](b",
+              "heading": "",
+              "embedded": true
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "![[a](b]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [
+            "a](b"
+          ],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:9"
+          ],
+          "links": [],
+          "embeds": [
+            "![[a](b]]=>a](b|a](b@0:0-0:9"
+          ],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/wikilink-destination/alias-paren-inside": {
+      "id": "probe/wikilink-destination/alias-paren-inside",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a|b](c]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-tooltip-position=\"top\" aria-label=\"a\" data-href=\"a\" href=\"a\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">b](c</a></p>",
+        "projections": {
+          "text": "b](c",
+          "math": [],
+          "links": [
+            {
+              "path": "a",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a|b](c]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:10"
+          ],
+          "links": [
+            "[[a|b](c]]=>a|b](c@0:0-0:10"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A wikilink's FRAGMENT and ALIAS swallow a `](` the same way its path does. `[[a#^blk](target]]` indexes `a#^blk](target` and `[[a|b](c]]` indexes `a` with the display `b](c`, so the run continues to the `]]` in both. The path half already works -- `[[a](b]]`, `[[a](b]] tail`, `[[a](b]](u)`, `[[a]](b)` and `![[a](b]]` all match -- so this is the fragment and alias scans specifically, in `wikilink.ts`, where `headingBracket` and the alias scan stop at a `(`. `fuzz/comment/2` is the recorded case of the same rule."
+    },
     "probe/autolink-trail/period": {
       "id": "probe/autolink-trail/period",
       "layer": "seed",
@@ -138445,8 +139163,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "The recorded html settles this and refutes the first-] scan theory in the earlier note: there is NO anchor. \"<p>[foo]ref[]</p>\" is plain text, meta.links is empty, and only referenceLinks carries the definition at /uri@2:0-2:12. Source first line is \"[foo][ref[]\" (11 chars) and the render is \"[foo]ref[]\" (10) - exactly one character gone, the [ that opens the second pair. So a reference attempt consumed its opener, formed no link, and left the remainder literal. 547 shows the identical shape: \"[foo][ref[bar]]\" renders \"[foo]ref[bar]]\", again one [ dropped. This is a render-time one-character drop, not a resolution rule, and no principled model for it has been established yet - read obsidian.html first for any further attempt."
+      "triage": "match"
     },
     "commonmark/links/547": {
       "id": "commonmark/links/547",
@@ -138499,8 +139216,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Same shape as 546 and the same evidence: \"<p>[foo]ref[bar]]</p>\" with no anchor, and the definition line rendered as its own visible paragraph because referenceLinks is EMPTY - \"[ref[bar]]: /uri\" is not a definition. Source \"[foo][ref[bar]]\" renders \"[foo]ref[bar]]\": exactly one [ dropped, the one opening the second pair. Pairs with 546, where the definition IS registered, so the dropped bracket is independent of whether anything defines the label."
+      "triage": "match"
     },
     "commonmark/links/548": {
       "id": "commonmark/links/548",

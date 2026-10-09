@@ -324,6 +324,57 @@ function bracketStillOpen(source: string, from: number, at: number): boolean {
   return depth > 0;
 }
 
+/**
+ * A `[` straight after a balanced `]` is a label opener and is not rendered.
+ *
+ * `[foo][ref[]` renders `[foo]ref[]`: the bracket after the closer opens a label, and
+ * the label is shown bare because nothing defines it. Measured across both label
+ * shapes, defined and undefined, and with a destination for the first pair --
+ * `[foo][ref[bar]]` gives `[foo]ref[bar]]`, `see [foo][ref[] end` gives
+ * `see [foo]ref[] end`, and `[foo][ref[]` over `[foo]: /other` resolves the first pair
+ * to a link and still shows `ref[]`.
+ *
+ * The closer must balance to depth zero, which `[ref[][]` is what forces: its `]`
+ * closes an inner `[` while the outer one is still open, so no label opens and Obsidian
+ * renders the whole run. Same balance test the escaped block identifier needed, for the
+ * same reason -- a bracket only closes a label if it was the label's own.
+ *
+ * Downstream by the governing rule rather than by preference. Obsidian *drops* this
+ * character, and a drop belongs in the projection: removing it from a node value would
+ * let a formatter delete a bracket the author wrote, which is the same reasoning that
+ * keeps a dangling footnote reference and a surplus table cell in the tree.
+ */
+function dropLabelOpeners(value: string): string {
+  let out = value;
+  for (let at = out.length - 1; at >= 1; at--) {
+    if (out[at] !== "[" || out[at - 1] !== "]") continue;
+    // Through the closer itself, so the depth read is the one *after* it: in
+    // `[foo][ref[]` the `]` closes the only opener and the next `[` is a label's,
+    // while in `[ref[][]` it closes an inner one and the outer is still waiting.
+    let depth = 0;
+    for (let scan = 0; scan < at; scan++) {
+      const character = out[scan];
+      if (character === "\\") {
+        scan += 1;
+        continue;
+      }
+      if (character === "[") depth += 1;
+      else if (character === "]" && depth > 0) depth -= 1;
+    }
+    if (depth > 0) continue;
+    out = out.slice(0, at) + out.slice(at + 1);
+  }
+  return out;
+}
+
+/** Nodes whose children are a label, where a bracket is content and opens nothing. */
+const LABEL_HOSTS = new Set([
+  "link",
+  "linkReference",
+  "image",
+  "imageReference",
+]);
+
 /** A tag opens on `<` plus a letter, `/`, `!` or `?`; any other `<` is literal text. */
 const TAG_START = /[a-zA-Z/!?]/;
 
@@ -388,6 +439,16 @@ export function mdastText(
   tree: Node,
   defined?: ReadonlySet<string>,
   source?: string,
+  /**
+   * Whether the walk starts *inside* a link label.
+   *
+   * `emphasis` calls this on an emphasis node directly, so the walk begins below any
+   * enclosing `linkReference` and cannot see it -- and inside a label a bracket is
+   * content rather than a label opener. `commonmark/links/533` is what measures it:
+   * `[foo *bar [baz][ref]*][ref]` reports the emphasis as `bar [baz][ref]`, brackets
+   * and all.
+   */
+  startsInLabel = false,
 ): string {
   const parts: string[] = [];
   const references = source === undefined ? undefined : definedReferences(tree);
@@ -420,9 +481,23 @@ export function mdastText(
     const slice = source.slice(from, to);
     return !(slice.length >= 4 && slice.endsWith("%%"));
   };
-  const walk = (node: Node, phrasing = false): void => {
+  const walk = (
+    node: Node,
+    phrasing = false,
+    inLabel = startsInLabel,
+  ): void => {
     switch (node.type) {
       case "text":
+        // Not inside a link label, where nothing parses and both brackets stay:
+        // `[foo [bar][ref]](u)` renders `foo [bar][ref]`, so the inner `[` is
+        // content there rather than a label opener. Three cases measure it.
+        parts.push(
+          inLabel
+            ? (node as ValueNode).value
+            : dropLabelOpeners((node as ValueNode).value),
+        );
+        return;
+      // A code span is literal, so its brackets are content and no label opens in it.
       case "inlineCode":
         parts.push((node as ValueNode).value);
         return;
@@ -568,7 +643,7 @@ export function mdastText(
         const mark = parts.length;
         for (const child of (node as unknown as { children: Node[] })
           .children) {
-          walk(child, phrasing);
+          walk(child, phrasing, inLabel);
         }
         const first = parts[mark];
         if (typeof first === "string") parts[mark] = stripColourMarker(first);
@@ -587,7 +662,7 @@ export function mdastText(
           const type = callout.calloutType.toLowerCase().replace(/-/gu, " ");
           parts.push(`${type.charAt(0).toUpperCase()}${type.slice(1)} `);
         }
-        for (const child of children) walk(child, phrasing);
+        for (const child of children) walk(child, phrasing, inLabel);
         parts.push(" ");
         return;
       }
@@ -656,9 +731,10 @@ export function mdastText(
 
     const children = (node as { children?: Node[] }).children;
     const inner = phrasing || PHRASING_HOSTS.has(node.type);
+    const label = inLabel || LABEL_HOSTS.has(node.type);
     if (children) {
       for (const child of children) {
-        walk(child, inner);
+        walk(child, inner, label);
         // A comment with no closer hides its following *siblings* as well as its own
         // body. Usually it absorbs what follows -- `a` / `%%` / `b` arrives as a
         // comment spanning `b`, so skipping the node is enough -- but inside a list
@@ -816,6 +892,14 @@ export function projectMdast(
       inFootnote.add(inner);
     });
   });
+  /** Every node under a link label, where a bracket is content. */
+  const inLabelNode = new Set<Node>();
+  visit(tree, (node: Node) => {
+    if (!LABEL_HOSTS.has(node.type)) return;
+    visit(node, (inner: Node) => {
+      inLabelNode.add(inner);
+    });
+  });
   const referenced = new Set<string>();
   visit(tree, "footnoteReference", (node: Node) => {
     referenced.add(
@@ -882,7 +966,9 @@ export function projectMdast(
       // body to a trailing section.
       if (inFootnote.has(node)) return;
       const kind = node.type === "strong" ? "strong" : "em";
-      emphasis.push(`${kind}:${mdastText(node, defined)}`);
+      emphasis.push(
+        `${kind}:${mdastText(node, defined, undefined, inLabelNode.has(node))}`,
+      );
       return;
     }
     if (isType<WikilinkNode>(node, "wikilink")) {
