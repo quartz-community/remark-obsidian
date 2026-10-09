@@ -286,6 +286,33 @@ describe("round-trip", () => {
     // and holds, while the `[foo]` below it is a reference nothing defines, so it is
     // written bare, re-parses as text, and is escaped once. That is the same
     // dangling-reference shape as most of this list, and `neverSettles` stays empty.
+    /*
+     * Attributed, 32 of which 15 are the inherent math family documented in the parity
+     * README and 17 are not. The 17 cluster into two dominant causes, measured by
+     * diffing pass 1 against pass 2 at the first differing character -- 15 grow, 2
+     * shrink:
+     *
+     *   5  an EMPTY wikilink or embed: `[[]]` and `![[]]` are written back literally on
+     *      pass 1, do not re-parse as a wikilink, and so are escaped as text on pass 2
+     *      -- `![[]]` becomes `!\[\[]]`. `wikilink/spaces-only`, `fuzz/embed/43`,
+     *      `fuzz/embed/44`, `fuzz/embed/64`, `token/embed/whitespace-body`.
+     *   4  a DANGLING shortcut reference: `[foo]` with no definition re-parses as text
+     *      and gains a backslash -- `\[foo]`. All four are
+     *      `commonmark/link-reference-definitions/*`. Note `linkReferenceToMarkdown`
+     *      already overrides one label spelling; it does not cover the undefined case.
+     *   3  emphasis re-escaping, and one of them is the worst in the set:
+     *      `emphasis/nest-underscore-outer` grows 15 bytes into `&#x20;`/`&#x62;`
+     *      entities. The other two are `commonmark/emphasis-and-strong-emphasis/*`.
+     *   2  a backslash before a setext run doubling: `\===` becomes `\\===`.
+     *   3  singletons, including `fuzz/inline-footnote/11`, which SHRINKS by losing a
+     *      line ending inside an inline footnote (`^[i` / `  e]` becomes `^[ie]`).
+     *
+     * So this is not 32 separate defects. Two handlers -- an empty wikilink and an
+     * undefined shortcut reference -- would address 9 of the 17 actionable ones, and the
+     * mechanism for both is the one already documented in the parity README: a
+     * `toMarkdown` handler's return value is appended without passing through
+     * `state.safe`.
+     */
     expect(unstable.length).toBeLessThanOrEqual(33);
   });
 });
