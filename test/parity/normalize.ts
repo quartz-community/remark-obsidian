@@ -2023,7 +2023,18 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       );
       const own = item.position.start.line - 1;
       for (const nested of (item as unknown as { children: Node[] }).children) {
-        if (nested.type === "list") walkList(nested, own);
+        if (nested.type !== "list") continue;
+        // `parent` is a LINE NUMBER in Obsidian's cache, so nesting that happens
+        // *within* one line cannot be expressed and is reported as a root item instead.
+        // `*\t*\t*` is three items all on line 0, and Obsidian reports `parent:-1` for
+        // all three where tree nesting would make the last two children of the first.
+        //
+        // Not a parse difference: the legacy arbiter nests this exactly as we do, three
+        // levels deep, so the tree is right and only this projection was over-reporting
+        // what the field can hold.
+        const at = nested.position?.start?.line;
+        const sameLine = at !== undefined && at - 1 === own;
+        walkList(nested, sameLine ? (own === 0 ? -1 : -own) : own);
       }
     }
   };

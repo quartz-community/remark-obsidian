@@ -414,12 +414,14 @@ describe("positioned oracle", () => {
     //      and `blocks` collectors already skipped them. `probe/straddle-fold/
     //      list-under-definition` looked like a third and is not -- `[^1]: ==a` /
     //      `2. b==` is a highlight fold, not a comment, so it stays open.
-    //   6  a tab-separated thematic-break line is nested one level too deep --
-    //      `-\t-\t-` and `* *\t*` report `parent:-1` in Obsidian and `parent:0` here,
-    //      so the counts agree and the parents do not. Same family as the tab-straddle
-    //      rule in `list-tab-straddle.ts`.
+    //   5 of 6 FIXED, and the cause was neither the tab nor the parse. `parent` is a
+    //      LINE NUMBER in Obsidian's cache, so nesting that happens *within* one line
+    //      cannot be expressed -- `*\t*\t*` is three items all on line 0 and Obsidian
+    //      reports `parent:-1` for all three. The legacy arbiter nests it exactly as we
+    //      do, three levels deep, so the tree was right and this projection was
+    //      over-reporting what the field can hold. One case in the family remains.
     //   1  `- [] a` / `- [ ]x`, a task-character difference.
-    listItems: 69,
+    listItems: 64,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
