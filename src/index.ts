@@ -88,6 +88,7 @@ import { blankLabelReferenceTransform } from "./lib/blank-label-reference.js";
 import { textareaNotRawTransform } from "./lib/textarea-not-raw.js";
 import { closingPreInterruptSyntax } from "./lib/syntax/closing-pre-interrupt.js";
 import { autolinkLiteralToMarkdown } from "./lib/mdast/autolink-literal-to-markdown.js";
+import { htmlTailToMarkdown } from "./lib/mdast/html-tail-to-markdown.js";
 import { linkNbspTitleTransform } from "./lib/link-nbsp-title.js";
 import { linkReferenceToMarkdown } from "./lib/mdast/link-reference-to-markdown.js";
 import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
@@ -382,6 +383,7 @@ export default function remarkObsidian(
   // consumer, and the upstream branch it replaces can duplicate the label.
   data.toMarkdownExtensions.push(linkReferenceToMarkdown());
   data.toMarkdownExtensions.push(autolinkLiteralToMarkdown());
+  data.toMarkdownExtensions.push(htmlTailToMarkdown());
 
   if (opts.lineOffsets) {
     data.fromMarkdownExtensions.push(lineOffsetsFromMarkdown());
