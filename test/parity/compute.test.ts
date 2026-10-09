@@ -294,6 +294,15 @@ describe("positioned oracle", () => {
     // containing block's content column, not the position of the `[`. The 11 closed were
     // every space-indented definition in the corpus. A tab in the prefix is excluded and
     // keeps its own rule -- see the pass.
+    // All 6 are SPAN now, the name-level rule being fully closed, and they are NOT one
+    // convention -- the column divergences run in both directions:
+    //
+    //     '>  [^1]: def'                obs 1@0:2   ours 1@0:3   (we are one too far)
+    //     '1. item' / '' / '    [^1]:'  obs 1@2:4   ours 1@2:3   (we are one short)
+    //
+    // The other three are definition END lines: `[^9]: orphan` over `    <!--` ends at
+    // 3:8 for Obsidian and 4:0 for us, and `> [^2]: body` over `> - item` ends at 0:12
+    // against our 1:2. So at least three rules in six cases; probe before fixing.
     footnotes: 6,
     footnoteRefs: 2,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
@@ -325,11 +334,29 @@ describe("positioned oracle", () => {
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
     // invented, which is the shape of a missing collector rather than a parse bug.
+    //
+    // The 31 remaining are attributed and are three separate things:
+    //
+    //   - a trailing BACKSLASH in a wikilink's heading or alias is kept in the display
+    //     text and we drop it: `[[a#h\]]` displays `a > h\` and we give `a > h`. The
+    //     largest group, and the same shape in `fuzz/wikilink/13`, `/14`, `/16`,
+    //     `fuzz/embed/98` and `/110`.
+    //   - a trailing `#` is kept in the TARGET: `[[page#]]` resolves to `page#`, not
+    //     `page` (`wikilink/trailing-hash`).
+    //   - a link inside a `%%` comment IS indexed, and this collector returns SKIP on a
+    //     comment node: `%%\![[d.pdf#page=3]]%%` and `a@e.test> %%[link](u)%%` both
+    //     report a link in Obsidian and none here. Consistent with the recorded
+    //     asymmetry that a definition inside a comment does not define while a reference
+    //     inside one still counts -- but the SKIP predates the markdown-link collector
+    //     and was presumably measured for wikilinks, so removing it needs its own delta.
     links: 31,
-    // 31 -> 16: the same missing collector as `links`. `embeds` only ever received an
-    // embedded wikilink, so a markdown image was never indexed -- `![a](u)` is an embed
-    // to Obsidian exactly as `![[a]]` is.
-    embeds: 16,
+    // 31 -> 16 -> 6. First the missing collector (a markdown image was never indexed at
+    // all), then the display field: the cache reports an image's alt as WRITTEN, not as
+    // rendered, so it keeps a nested construct's brackets. `![foo [bar](u)](v)` displays
+    // `foo [bar](u)` where mdast's flattened `alt` gives `foo bar`, and
+    // `![alt [^9]](/url)` displays `alt [^9]` against our `alt `. Sliced from the source
+    // between the opener and the LAST `](`, since the alt may hold one itself.
+    embeds: 6,
     tags: 1,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
     // block identifier and the fix closed eleven cases, its own eight included.

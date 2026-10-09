@@ -1884,7 +1884,16 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         node.position.start.offset!,
         node.position.end.offset!,
       );
-      const alt = String((node as unknown as { alt?: string }).alt ?? "");
+      // The cache reports the alt as WRITTEN, not as rendered, so it keeps a nested
+      // construct's own brackets: `![foo [bar](u)](v)` displays `foo [bar](u)`, and
+      // `![alt [^9]](/url)` displays `alt [^9]`. mdast's `alt` is already flattened to
+      // `foo bar` and `alt `, so it is sliced out of the source between the opener and
+      // the LAST `](` -- the last, because the alt may itself contain one.
+      const close = original.lastIndexOf("](");
+      const alt =
+        close > 1
+          ? original.slice(2, close)
+          : String((node as unknown as { alt?: string }).alt ?? "");
       embeds.push(`${original}=>${url}|${alt}@${spanOf(node)}`);
       return;
     }
