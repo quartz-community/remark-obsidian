@@ -38260,7 +38260,7 @@
         }
       },
       "triage": "replicate",
-      "note": "Obsidian indexes the wikilink `a#h` out of `^[[[a#h]]]` -- a wikilink inside an inline footnote inside a footnote definition -- and we index nothing. Belongs with the recorded metadataCache family where a link inside a bracket construct is still indexed, not with the label-scan rules."
+      "note": "CAUSE CORRECTED. The old note said Obsidian indexes a wikilink inside an inline footnote inside a footnote definition and we index nothing, filed under the metadataCache family. Our tree already holds the right node -- `footnoteDefinition > list > listItem > paragraph > footnote > wikilink(a#h)` -- so nothing is mis-parsed; the links PROJECTION drops it. Two separate reasons, both measured. (1) `skipUnreferencedDefinitions` skips the whole definition, because `[^1]` is never referenced and an unreferenced definition is not rendered -- that rule is right and defaulting it to false costs 14 cases. What is missing is the exception: an INLINE footnote is self-referencing and is relocated and rendered even inside an unreferenced definition, so its subtree should still be collected. (2) With the skip off we then report TWO links where Obsidian reports one, the surplus being `path: \"[a\"` from the `![[[[` opener -- which is exactly `fuzz/embed/46`'s quadruple-bracket rule. So this case needs both fixes and `fuzz/embed/46` is the one to do first."
     },
     "fuzz/embed/23": {
       "id": "fuzz/embed/23",
@@ -44306,7 +44306,7 @@
         }
       },
       "triage": "replicate",
-      "note": "The recorded metadataCache family, verbatim: Obsidian indexes an inline link whose label holds an embed as both a link to the destination and an embed of the label -- meta.links [\"u\"] and meta.embeds [\"#tag\"] for `[![[#tag]]](u)` -- because the wikilink tokenizer claims the brackets before any link node forms. Tracked in KNOWN_REFERENCE_GAPS territory; needs tokenizer precedence between the wikilink extension and CommonMark's link label."
+      "note": "CAUSE CORRECTED, and it is not the metadataCache family the old note filed it under. The divergence is block structure: `    target]]. [![[#tag]]](u), 日本語` follows a nested blockquote inside the footnote definition, and we read the four-space indent as INDENTED CODE -- our tree has `footnoteDefinition > blockquote > blockquote > paragraph` and then a sibling `code` node holding the whole rest of the line. Nothing inside a code span is indexed, which is why both `meta.links` and `meta.embeds` come back empty rather than from any precedence question. Obsidian reads the line as content, so it indexes `u` and `#tag` normally. Four spaces is a footnote definition's own continuation indent, so it cannot also open code there; the fix is in how the definition's continuation is measured after a nested container closes, and it wants probes over that boundary before anything is written."
     },
     "fuzz/html/11": {
       "id": "fuzz/html/11",
