@@ -124,9 +124,16 @@ describe("round-trip", () => {
    * missing blank line between the definition and the following paragraph. Adding
    * one changes nothing: output is byte-identical at every pass, because the growth
    * happens *inside* the definition's own serialisation.
+   *
+   * All thirteen are now closed, so this asserts emptiness rather than a ceiling: a
+   * formatter that never terminates is a defect and not debt, and there is no longer
+   * a count to hold the line at. Four were one bug class -- a raw source slice used
+   * as a node *value* rather than only as a span -- and two were upstream, reproduced
+   * on bare `remark-parse` + `remark-gfm` + `remark-stringify` with none of this
+   * package loaded. The remaining instability is all pass-2 settling.
    */
   it("reaches a fixed point, or records why not", () => {
-    expect(neverSettles.length).toBeLessThanOrEqual(1);
+    expect(neverSettles).toEqual([]);
   });
 
   it.each([
@@ -259,6 +266,6 @@ describe("round-trip", () => {
     // not an unstable parse.
     // 41 with the sweep-800000 wave: ` $$ $$`, as
     // `probe/math-indent/one-space-empty-body`, joins the same missing-handler group.
-    expect(unstable.length).toBeLessThanOrEqual(30);
+    expect(unstable.length).toBeLessThanOrEqual(29);
   });
 });

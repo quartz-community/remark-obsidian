@@ -1,6 +1,7 @@
 import type { Link, Paragraph, Root, RootContent, Text } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
+import { decodeString } from "micromark-util-decode-string";
 
 interface Positioned extends Node {
   position?: {
@@ -428,8 +429,17 @@ export function labelPrecedenceTransform(
           ? { type: "link", url: after.url, title: null }
           : {
               type: "linkReference",
+              // Raw, deliberately. Decoding it is what mdast's contract says an
+              // `identifier` is, and it costs `commonmark/links/545`: `foo\!` decoded
+              // matches the `[foo!]` definition, so the reference resolves into a
+              // real link where Obsidian leaves it dangling. The spec agrees with
+              // Obsidian here, and the goldens are the authority either way.
               identifier: after.reference.toLowerCase(),
-              label: after.reference,
+              // Decoded, because this is the field `associationId` hands to
+              // `state.safe`. Raw, `foo\!` had its backslash escaped again on every
+              // format pass -- `foo\\!`, `foo\\\\!` -- doubling without bound.
+              // Decoding affects only the spelling written out, not what resolves.
+              label: decodeString(after.reference),
               referenceType: "full",
             }),
         children: children as Link["children"],
