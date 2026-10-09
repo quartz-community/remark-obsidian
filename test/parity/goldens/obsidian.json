@@ -1218,8 +1218,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+      "triage": "match"
     },
     "probe/escaped-block-id/heading-marker": {
       "id": "probe/escaped-block-id/heading-marker",

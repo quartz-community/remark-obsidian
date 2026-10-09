@@ -1211,8 +1211,13 @@ function trailingIdHost(inner: Node[]):
       // Widening is safe because the real gate is downstream: whatever this descends
       // into must still *end* with an identifier for `TRAILING_BLOCK_ID` to match, so
       // `*em* word` descends, finds `em`, and changes nothing.
+      // `BRACKETED_BLOCK_ID` too, or this descends past its own host: `*x* \[^1`
+      // leaves the identifier in a text node whose value is ` [^1`, which the
+      // whitespace-anchored pattern cannot match, so the walk stepped into the
+      // emphasis behind it and found nothing to strip.
       if (
         TRAILING_BLOCK_ID.test(value) ||
+        BRACKETED_BLOCK_ID.test(value) ||
         !before ||
         !ID_WRAPPERS.has(before.type)
       ) {
