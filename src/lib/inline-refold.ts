@@ -153,6 +153,37 @@ function mathed(root: Node): number {
 }
 
 /**
+ * The value with its substituted line endings back, and nothing else changed.
+ *
+ * Taking the raw slice wholesale does restore them, and throws away every other
+ * decision the tokenizer made about those characters. `\*\* ` resolves to `** `, so
+ * the raw slice spells the backslashes again and the next format pass escapes them
+ * once more -- `\\\*\\\* `, doubling every pass, without bound. That accounted for
+ * five of the seven documents formatting could never settle.
+ *
+ * The two strings differ only in ways this can walk past: a `\n` the copy spells as
+ * a space, and characters the tokenizer consumed without emitting, such as an
+ * escape's backslash or the tail of a character reference. Matching forward and
+ * taking the newline only where both sides agree on its position restores the line
+ * endings and leaves resolution alone.
+ */
+function withLineEndings(raw: string, value: string): string {
+  let out = "";
+  let at = 0;
+
+  for (const character of value) {
+    while (at < raw.length && raw[at] !== character) {
+      if (raw[at] === "\n" && character === " ") break;
+      at += 1;
+    }
+    out += raw[at] === "\n" && character === " " ? "\n" : character;
+    at += 1;
+  }
+
+  return out;
+}
+
+/**
  * Put the real characters back. The parse ran against a copy whose newlines
  * were spaces, so a text node's value spells those spaces; its offsets are
  * unchanged, which is what lets the source supply the original.
@@ -166,7 +197,11 @@ function restore(root: Node, source: string, base: number): void {
     const absoluteEnd = base + end;
 
     if (node.type === "text") {
-      (node as Text).value = source.slice(absoluteStart, absoluteEnd);
+      const held = node as Text;
+      held.value = withLineEndings(
+        source.slice(absoluteStart, absoluteEnd),
+        held.value,
+      );
     } else if (node.type === "inlineMath" || node.type === "math") {
       // A math node's value is its tex, so it excludes the `$` delimiters its span
       // includes. The substitution was length-preserving, so the real tex is the same
