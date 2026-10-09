@@ -294,9 +294,9 @@ describe("positioned oracle", () => {
     footnoteRefs: 2,
     headings: 12,
     sections: 34,
-    // 117, the lowest this has been. The wave-2 probes that raised it are closed with
-    // the fragment and alias bracket fix, and `fuzz/comment/2` went with them.
-    links: 117,
+    // 116. Lower again with the comment fold re-parsing its lines, which is what
+    // lets `metaOurs` index a wikilink written inside a `%%`.
+    links: 116,
     embeds: 32,
     tags: 2,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped

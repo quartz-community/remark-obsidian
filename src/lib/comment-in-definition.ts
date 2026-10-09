@@ -1,6 +1,7 @@
 import type { Break, Paragraph, Root, Text } from "mdast";
 
 import { span } from "./normalize-points.js";
+import { shiftAll } from "./label-precedence.js";
 
 interface CommentNode {
   readonly type: "comment";
@@ -83,6 +84,7 @@ function pushCommentLines(
   source: string,
   from: number,
   to: number,
+  reparse?: (markdown: string) => Root,
 ): void {
   const lines = source.slice(from, to).split("\n");
   let cursor = from;
@@ -97,14 +99,42 @@ function pushCommentLines(
     const indent =
       offset === 0 ? 0 : (CONTINUATION_INDENT.exec(line)?.[0].length ?? 0);
     const contentTo = cursor + line.length;
-    host.children.push(
-      span<Text>(
-        { type: "text", value: resolveEscapes(line.slice(indent)) } as Text,
-        source,
-        cursor + indent,
-        contentTo,
-      ),
-    );
+    const written = line.slice(indent);
+    // Re-parsed so a construct inside the comment still forms. `metadataCache`
+    // indexes a reference written inside a `%%` even though nothing renders, which
+    // is the recorded asymmetry -- `[^1]: **` / `····%%note` / `····[[target]]`
+    // reports `links: ["target"]` with an empty rendered document, because the
+    // definition is unreferenced. Folding the line to literal text lost the wikilink
+    // and there was nothing left for `metaOurs` to index.
+    //
+    // Kept literal unless the re-parse yields something other than one bare text
+    // node, which is what protects the eleven matching cases in this family: a line
+    // like `%%note` or `b` re-parses to a single text node and takes the literal
+    // path exactly as before, so only a line that really holds a construct changes.
+    // `%%note` cannot re-form a comment either -- it has no closer.
+    let placed = false;
+    if (reparse && written !== "") {
+      const parsed = reparse(written);
+      const body = parsed.children[0];
+      if (parsed.children.length === 1 && body?.type === "paragraph") {
+        const kids = body.children as unknown as Text[];
+        if (!(kids.length === 1 && kids[0]?.type === "text")) {
+          shiftAll(kids, cursor + indent);
+          host.children.push(...(kids as unknown as Paragraph["children"]));
+          placed = true;
+        }
+      }
+    }
+    if (!placed) {
+      host.children.push(
+        span<Text>(
+          { type: "text", value: resolveEscapes(written) } as Text,
+          source,
+          cursor + indent,
+          contentTo,
+        ),
+      );
+    }
     cursor = contentTo + 1;
   }
 }
@@ -121,7 +151,11 @@ function pushCommentLines(
  * lines are folded back in, which is the same repair the interrupt pass makes
  * for a definition that a following block would otherwise cut short.
  */
-export function commentInDefinitionTransform(tree: Root, source: string): void {
+export function commentInDefinitionTransform(
+  tree: Root,
+  source: string,
+  reparse?: (markdown: string) => Root,
+): void {
   if (source === "") return;
 
   const children = tree.children;
@@ -157,7 +191,7 @@ export function commentInDefinitionTransform(tree: Root, source: string): void {
     if (from === undefined || to === undefined) {
       host.children.push({ type: "text", value: "%%" } as Text);
     } else {
-      pushCommentLines(host, source, from, to);
+      pushCommentLines(host, source, from, to, reparse);
     }
 
     // Then every block the comment cut loose, while each is still lazy

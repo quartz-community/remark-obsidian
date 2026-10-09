@@ -260,8 +260,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "`[foo][ref[]` over `[foo]: /other` renders `fooref[]` with an anchor to `/other`: once the `[` after the closer is taken as a label opener, the FIRST pair is left as a shortcut reference and resolves. We drop the opener correctly -- that half landed with `commonmark/links/546` and `/547` -- and still render `[foo]` literally, because no shortcut reference is built for it. The four sibling probes with nothing defined all match, so this is specifically the resolve step: the first pair has to become a `linkReference` once the second pair stops being its label, which is a tree change rather than the projection drop this family needed."
+      "triage": "match"
     },
     "probe/label-bracket/text-then-unmatched": {
       "id": "probe/label-bracket/text-then-unmatched",
@@ -26499,8 +26498,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A wikilink inside a `%%` comment inside a footnote definition: obs meta.links [\"target\"] and we index nothing. This is the recorded asymmetry -- a definition inside a comment defines nothing while a reference inside one is still indexed -- applied to wikilinks, which our link projection does not mirror because it skips comment contents wholesale. Narrow and separate from every bracket rule here."
+      "triage": "match"
     },
     "fuzz/footnote/34": {
       "id": "fuzz/footnote/34",

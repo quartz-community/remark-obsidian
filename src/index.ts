@@ -517,7 +517,9 @@ export default function remarkObsidian(
       commentDefinitionExtentTransform(tree, String(file), (markdown) =>
         reparse(markdown),
       );
-      commentInDefinitionTransform(tree, String(file));
+      commentInDefinitionTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
       visit(tree, "comment", (node: any) => {
         node.data = {
           ...node.data,
