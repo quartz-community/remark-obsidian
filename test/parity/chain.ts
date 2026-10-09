@@ -64,7 +64,7 @@ import remarkRehype from "remark-rehype";
 import rehypeRaw from "rehype-raw";
 import rehypeStringify from "rehype-stringify";
 import rehypeObsidian from "@quartz-community/rehype-obsidian";
-import remarkObsidian, { type RemarkObsidianOptions } from "../../src/index.js";
+import remarkObsidian, { type RemarkObsidianFlags } from "../../src/index.js";
 
 /** Options `rehype-obsidian` accepts, mirrored so we do not depend on its types. */
 export interface RehypeObsidianOptions {
@@ -77,7 +77,7 @@ export interface RehypeObsidianOptions {
 }
 
 export interface ChainProfile {
-  readonly remarkObsidian: Required<RemarkObsidianOptions>;
+  readonly remarkObsidian: RemarkObsidianFlags;
   readonly rehypeObsidian: RehypeObsidianOptions;
 }
 

@@ -144,6 +144,8 @@ const MAX_REPARSE_DEPTH = 8;
 export const COMMENT_ELEMENT = "obsidian-comment";
 
 export interface RemarkObsidianOptions {
+  /** Defaults to `legacy`. See {@link RemarkObsidianPreset}. */
+  preset?: RemarkObsidianPreset;
   wikilinks?: boolean;
   highlights?: boolean;
   comments?: boolean;
@@ -352,7 +354,61 @@ export interface RemarkObsidianOptions {
   escapedLineBreaks?: boolean;
 }
 
-const defaultOptions: Required<RemarkObsidianOptions> = {
+/**
+ * Which body of behaviour to follow where Obsidian and CommonMark disagree.
+ *
+ * `legacy` reproduces Obsidian, which is what an Obsidian plugin or a Quartz site
+ * rendering a vault needs: the whole point is that the output matches what the
+ * author saw in the app. It is the default, and it is every option at the value the
+ * parity corpus is measured against.
+ *
+ * `strict` keeps Obsidian's *syntax* -- wikilinks, embeds, callouts, tags, `%%`
+ * comments, `==highlights==`, `$math$`, frontmatter -- while parsing everything
+ * CommonMark and GFM already define the way they define it. That is what a consumer
+ * outside Obsidian usually wants: Obsidian's extensions are the reason to use this
+ * package, but its emphasis, list, entity, autolink, code-span, html-block and
+ * link-label divergences are bugs it inherited from `remark-parse@8` and has not
+ * fixed, and reproducing them off-platform helps nobody.
+ *
+ * The split is taken from the options' own documentation rather than from taste:
+ * every flag below is one whose docstring says it parses something "as Obsidian
+ * does" or "instead of CommonMark's", so turning it off is by definition the
+ * compliant reading. An explicit option always wins over the preset.
+ */
+export type RemarkObsidianPreset = "legacy" | "strict";
+
+/** Every behaviour flag, with the preset selector itself excluded. */
+export type RemarkObsidianFlags = Required<
+  Omit<RemarkObsidianOptions, "preset">
+>;
+
+const STRICT_OVERRIDES: Partial<RemarkObsidianFlags> = {
+  legacyEmphasis: false,
+  legacyStrikethrough: false,
+  legacyEntities: false,
+  legacyAutolinks: false,
+  legacyCodeSpans: false,
+  legacyLists: false,
+  legacyHtmlBlocks: false,
+  labelPrecedence: false,
+  // Obsidian's reading view re-parses a task line, so `- [ ] 1.` nests where
+  // CommonMark leaves two flat items.
+  taskReparse: false,
+  // GFM leaves an undefined `[^x]` literal; stripping its delimiters is Obsidian
+  // rendering, not parsing.
+  bareFootnoteRefs: false,
+  // A soft line ending is not a break in CommonMark.
+  positionedBreaks: false,
+  // GFM admits only `[ ]` and `[x]`.
+  customTaskChars: false,
+};
+
+const PRESETS: Record<RemarkObsidianPreset, Partial<RemarkObsidianFlags>> = {
+  legacy: {},
+  strict: STRICT_OVERRIDES,
+};
+
+const defaultOptions: RemarkObsidianFlags = {
   wikilinks: true,
   highlights: true,
   comments: true,
@@ -382,7 +438,11 @@ const defaultOptions: Required<RemarkObsidianOptions> = {
 export default function remarkObsidian(
   userOpts?: RemarkObsidianOptions,
 ): undefined | ((tree: Root, file: any) => void) {
-  const opts = { ...defaultOptions, ...userOpts };
+  const opts = {
+    ...defaultOptions,
+    ...PRESETS[userOpts?.preset ?? "legacy"],
+    ...userOpts,
+  };
   // @ts-expect-error - unified `this` context
   const self = this as Processor<Root>;
   const data = self.data();
