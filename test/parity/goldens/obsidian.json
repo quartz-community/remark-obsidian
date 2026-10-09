@@ -136135,8 +136135,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "BACKSLASH IS NOT AN ESCAPE IN A LINK DESTINATION family, with commonmark/links/500. `[link](<foo\\>)` is a link whose path is `foo\\` to Obsidian: inside angle brackets the backslash is literal and the `>` closes the destination, where we treat `\\>` as an escape so the destination never closes and no link forms. Needs micromark factoryDestination changed or a repair pass; the shorter legacy escape set recorded in the README is the same territory, and replacing it wholesale cost 27 regressions, so this wants the destination scan specifically rather than a global escape list."
+      "triage": "match"
     },
     "commonmark/links/494": {
       "id": "commonmark/links/494",
