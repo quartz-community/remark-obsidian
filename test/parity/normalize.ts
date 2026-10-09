@@ -778,6 +778,28 @@ export function projectMdast(
   });
 
   const links: LinkItem[] = [];
+  /**
+   * Links whose node sits inside an inline footnote, kept apart until the end.
+   *
+   * Obsidian relocates an inline footnote's body to a trailing section, and
+   * `metadataCache` indexes it there -- so `^[... ![[d.pdf]] ...] ... ![[img.png]]`
+   * reports `img.png` first even though `d.pdf` is written earlier on the line. A
+   * single in-order walk cannot produce that, so the two buckets are concatenated.
+   *
+   * Inline footnotes only. A `footnoteDefinition` is already written at the end of a
+   * document in every recorded case, so hoisting one would reorder nothing and the
+   * six matching controls here cannot tell the two rules apart -- which is reason to
+   * implement the one that is measured rather than the one that sounds symmetrical.
+   */
+  const relocated: LinkItem[] = [];
+  /** Every node under an inline footnote, whose body the renderer moves. */
+  const inInlineNote = new Set<Node>();
+  visit(tree, (node: Node) => {
+    if (node.type !== "footnote") return;
+    visit(node, (inner: Node) => {
+      inInlineNote.add(inner);
+    });
+  });
   const tags: string[] = [];
   const headings: string[] = [];
   const tasks: TaskItem[] = [];
@@ -833,7 +855,7 @@ export function projectMdast(
               .replace(/\]\]$/, "")
               .trim()
               .split("|")[0]!;
-      links.push({
+      (inInlineNote.has(node) ? relocated : links).push({
         path: node.path,
         heading: node.heading,
         embedded: node.embedded,
@@ -846,7 +868,10 @@ export function projectMdast(
     if (isType<ImageNode>(node, "image")) {
       const url = node.url ?? "";
       if (url !== "" && !/^[a-z][a-z0-9+.-]*:|^\/\//i.test(url)) {
-        links.push({ ...splitTarget(url), embedded: true });
+        (inInlineNote.has(node) ? relocated : links).push({
+          ...splitTarget(url),
+          embedded: true,
+        });
       }
       return;
     }
@@ -857,7 +882,10 @@ export function projectMdast(
     if (isType<ImageNode>(node, "link")) {
       const url = node.url ?? "";
       if (url !== "" && !/^[a-z][a-z0-9+.-]*:|^\/\//i.test(url)) {
-        links.push({ ...splitTarget(url), embedded: false });
+        (inInlineNote.has(node) ? relocated : links).push({
+          ...splitTarget(url),
+          embedded: false,
+        });
       }
       // Children still walk: a wikilink or tag can sit inside the label.
     }
@@ -898,7 +926,15 @@ export function projectMdast(
     }
   });
 
-  return { math, links, tags, headings, tasks, highlights, emphasis };
+  return {
+    math,
+    links: [...links, ...relocated],
+    tags,
+    headings,
+    tasks,
+    highlights,
+    emphasis,
+  };
 }
 
 interface ParentNode extends Node {

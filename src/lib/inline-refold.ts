@@ -166,18 +166,44 @@ function mathed(root: Node): number {
  * escape's backslash or the tail of a character reference. Matching forward and
  * taking the newline only where both sides agree on its position restores the line
  * endings and leaves resolution alone.
+ *
+ * A continuation line's own indentation is dropped with the same justification. The
+ * block parser strips it before any inline tokenizer sees it, so a construct spanning
+ * a line ending never holds it -- `==a` / `··===` is the highlight `a⏎=` to Obsidian,
+ * not `a⏎··=`. The flat slice this re-parses has no container structure to strip it,
+ * so it is stripped here, where the line endings are already being put back.
  */
 function withLineEndings(raw: string, value: string): string {
   let out = "";
   let at = 0;
+  let index = 0;
 
-  for (const character of value) {
+  while (index < value.length) {
+    const character = value[index]!;
     while (at < raw.length && raw[at] !== character) {
       if (raw[at] === "\n" && character === " ") break;
       at += 1;
     }
-    out += raw[at] === "\n" && character === " " ? "\n" : character;
+
+    if (raw[at] === "\n" && character === " ") {
+      out += "\n";
+      at += 1;
+      index += 1;
+      // Past the newline, skip whatever whitespace opened the next line.
+      while (
+        at < raw.length &&
+        (raw[at] === " " || raw[at] === "\t") &&
+        value[index] === raw[at]
+      ) {
+        at += 1;
+        index += 1;
+      }
+      continue;
+    }
+
+    out += character;
     at += 1;
+    index += 1;
   }
 
   return out;

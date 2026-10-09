@@ -22652,8 +22652,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "ORDERING only -- the content agrees exactly. obs lists [\"img.png\",\"d.pdf#page=3\"] and we list them reversed, because the `d.pdf` embed sits inside an inline footnote (`^[i ...`) whose body Obsidian relocates to the end of the document and indexes there, while we index in source order. Nothing is mis-parsed; the fix is to order the link/embed projections by rendered position rather than source position, which means knowing where a footnote body lands."
+      "triage": "match"
     },
     "fuzz/highlight/48": {
       "id": "fuzz/highlight/48",
@@ -72417,8 +72416,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "The refold path replaces newlines with spaces to force one paragraph, then restores the real characters -- indent included -- so a highlight spanning a rebuilt line ending keeps a continuation indent the block parser would have dropped. Fixing it in `breakPositionsTransform` was measured and refuted: a text node after a break legitimately begins with whitespace, and stripping it cost **207** regressions, `highlight/across-newline` and `breaks/single-newline` among them. Fixing it in `restore` would leave a value that no longer reproduces its own span. Left recorded rather than shipped."
+      "triage": "match"
     },
     "probe/straddle-fold/inline-refold": {
       "id": "probe/straddle-fold/inline-refold",
