@@ -39254,8 +39254,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A whitespace-only line after a blockquote is its own paragraph at end of document: `> [li` over ` ` reports blockquote plus paragraph@1:0-1:1 and renders `<p>&nbsp;</p>`. Not implemented, because the evidence contradicts itself one case each way: `probe/space-line/ends-quote` (`> a` / ` ` / `> b`) matches today with sections blockquote+blockquote and *no* paragraph for the identical space line, so the same line is a separator with content after it and a paragraph without. Needs probes varying what follows the space line before any rule is written."
+      "triage": "match"
     },
     "fuzz/embed/31": {
       "id": "fuzz/embed/31",

@@ -293,7 +293,7 @@ describe("positioned oracle", () => {
     footnotes: 19,
     footnoteRefs: 2,
     headings: 12,
-    sections: 34,
+    sections: 33,
     // 116. Lower again with the comment fold re-parsing its lines, which is what
     // lets `metaOurs` index a wikilink written inside a `%%`.
     links: 116,
