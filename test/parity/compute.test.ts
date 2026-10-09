@@ -292,8 +292,8 @@ describe("positioned oracle", () => {
   const CEILING = {
     footnotes: 19,
     footnoteRefs: 2,
-    headings: 13,
-    sections: 36,
+    headings: 12,
+    sections: 35,
     // 117, the lowest this has been. The wave-2 probes that raised it are closed with
     // the fragment and alias bracket fix, and `fuzz/comment/2` went with them.
     links: 117,

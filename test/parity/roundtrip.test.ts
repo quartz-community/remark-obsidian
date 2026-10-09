@@ -280,6 +280,12 @@ describe("round-trip", () => {
     // Obsidian renders and inert on re-parse. A fix that duplicates the author's text
     // is refused even when it converges.
     // 32 with the probe wave; both additions are new documents.
-    expect(unstable.length).toBeLessThanOrEqual(32);
+    //
+    // 33 with the definition-setext rule. `link-reference-definitions/216` settles on
+    // the third pass rather than the second: the heading is written `# \[foo]: /url`
+    // and holds, while the `[foo]` below it is a reference nothing defines, so it is
+    // written bare, re-parses as text, and is escaped once. That is the same
+    // dangling-reference shape as most of this list, and `neverSettles` stays empty.
+    expect(unstable.length).toBeLessThanOrEqual(33);
   });
 });

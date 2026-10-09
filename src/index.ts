@@ -89,6 +89,7 @@ import { textareaNotRawTransform } from "./lib/textarea-not-raw.js";
 import { closingPreInterruptSyntax } from "./lib/syntax/closing-pre-interrupt.js";
 import { labelOpenerWikilinkTransform } from "./lib/label-opener-wikilink.js";
 import { autolinkLiteralExtentTransform } from "./lib/autolink-literal-extent.js";
+import { definitionSetextTransform } from "./lib/definition-setext.js";
 import { autolinkLiteralToMarkdown } from "./lib/mdast/autolink-literal-to-markdown.js";
 import { htmlTailToMarkdown } from "./lib/mdast/html-tail-to-markdown.js";
 import { linkNbspTitleTransform } from "./lib/link-nbsp-title.js";
@@ -613,6 +614,9 @@ export default function remarkObsidian(
     // exist: inside a container there is none yet.
     // Before the setext passes: a break cancelled by a tab is a list from here on,
     // and nothing downstream should still see a `thematicBreak` there.
+    // Before anything reads definitions: a definition directly under a setext
+    // underline is not a definition at all, it is the heading's own line.
+    definitionSetextTransform(tree, String(file));
     // Before the bracket passes: a bare URL swallowing a `](` means the brackets
     // after it never belonged to a label at all.
     autolinkLiteralExtentTransform(tree, String(file));

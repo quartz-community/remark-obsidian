@@ -122181,8 +122181,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "referenceLinks proves the rule rather than implying it: Obsidian reports NO definition for \"[foo]: /url\" over \"===\" and heads the whole line, while \"[foo]: /url\" / \"bar\" / \"===\" keeps its definition and heads only \"bar\" - four recorded cases match on that second shape. Identical to the footnote rule in setextDefinitionTransform, which already swallows a one-line definition whole. Extending that pass to link definitions is not enough on its own: an = run cannot be a thematic break, so it arrives as the FIRST LINE of the following paragraph rather than as a sibling, and the pass only looks for a sibling thematicBreak. An attempt to trim the paragraph instead fired in isolation but produced heading@0-11 - the span excluding the === - and lost the trailing [foo] paragraph altogether, so it was reverted. Needs the heading span and the paragraph trim handled together."
+      "triage": "match"
     },
     "commonmark/link-reference-definitions/217": {
       "id": "commonmark/link-reference-definitions/217",
