@@ -36745,8 +36745,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "We report the tag `tag` and Obsidian reports none, with the rendered text agreeing. `#tag` follows `]]`, and our tag rule admits a tag straight after a completed construct -- correct in general, measured on `a[[t]]#next`. So the real question is upstream: whether `[^1[[a#^blk\\]]` forms a construct ending there at all. Obsidian evidently has no construct boundary at that `]]`, so the tag never starts. Depends on the bracket/escape reading, not on the tag rule itself."
+      "triage": "match"
     },
     "fuzz/entity/1": {
       "id": "fuzz/entity/1",

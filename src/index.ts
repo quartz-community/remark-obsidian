@@ -95,6 +95,7 @@ import { invisibleBlankLineTransform } from "./lib/invisible-blank-line.js";
 import { angleDestinationEscapeTransform } from "./lib/angle-destination-escape.js";
 import { doubledFootnoteOpenerTransform } from "./lib/doubled-footnote-opener.js";
 import { restoreInlinePositionsTransform } from "./lib/restore-inline-positions.js";
+import { tagAfterCloserTransform } from "./lib/tag-after-closer.js";
 import { autolinkLiteralToMarkdown } from "./lib/mdast/autolink-literal-to-markdown.js";
 import { htmlTailToMarkdown } from "./lib/mdast/html-tail-to-markdown.js";
 import { linkNbspTitleTransform } from "./lib/link-nbsp-title.js";
@@ -708,6 +709,9 @@ export default function remarkObsidian(
       // fields, so re-running it on an already-classified tree changes nothing.
       mathDisplayTransform(tree, String(file));
       bareFootnoteRefTransform(tree, String(file));
+      // After the reference passes, because the tree is what can say whether the `]`
+      // before a tag closed a construct or was ordinary text.
+      tagAfterCloserTransform(tree);
       // After the bare pass, so a reference it revives inside an inline note is
       // demoted too.
       if (opts.inlineFootnotes) {

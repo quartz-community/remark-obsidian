@@ -298,7 +298,7 @@ describe("positioned oracle", () => {
     // lets `metaOurs` index a wikilink written inside a `%%`.
     links: 116,
     embeds: 31,
-    tags: 2,
+    tags: 1,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
     // block identifier and the fix closed eleven cases, its own eight included.
     blocks: 16,
