@@ -309,6 +309,19 @@ describe("positioned oracle", () => {
     tags: 1,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
     // block identifier and the fix closed eleven cases, its own eight included.
+    //
+    // Attributed, and it carries the same signature `links` did -- 14 we-miss against
+    // ZERO we-invent, which is a missing rule rather than a wrong one. Two clusters:
+    //
+    //   A block id ALONE on its own line, naming the block above it across a blank
+    //   line: `x` / '' / `^b`, `- x` / '' / `^b`, `| x |` / `| --- |` / '' / `^b`,
+    //   `> quoted` / '' / `^quote-id`, and `^blk` / `</div>`. Five cases. We require the
+    //   identifier to trail the block's own lines, so a standalone one registers
+    //   nothing.
+    //
+    //   An escaped label in a bracket context: `[[\[^1]`, `[\[^1]]]`, `[^1](u)` and
+    //   `[^[[a#` / `\[^1]`. Four cases. `\[^1` registering a block id is already
+    //   implemented, but the rule does not reach inside a wikilink or a bracket pair.
     blocks: 16,
     // 71, of which 44 are span-only and they do NOT share one rule -- measured, after
     // "Obsidian ends an item at its last content character and we run on to the next
