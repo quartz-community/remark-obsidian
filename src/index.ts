@@ -94,6 +94,7 @@ import { listDeepContinuationTransform } from "./lib/list-deep-continuation.js";
 import { invisibleBlankLineTransform } from "./lib/invisible-blank-line.js";
 import { angleDestinationEscapeTransform } from "./lib/angle-destination-escape.js";
 import { doubledFootnoteOpenerTransform } from "./lib/doubled-footnote-opener.js";
+import { restoreInlinePositionsTransform } from "./lib/restore-inline-positions.js";
 import { autolinkLiteralToMarkdown } from "./lib/mdast/autolink-literal-to-markdown.js";
 import { htmlTailToMarkdown } from "./lib/mdast/html-tail-to-markdown.js";
 import { linkNbspTitleTransform } from "./lib/link-nbsp-title.js";
@@ -631,6 +632,9 @@ export default function remarkObsidian(
     // Before anything reads definitions: a definition directly under a setext
     // underline is not a definition at all, it is the heading's own line.
     definitionSetextTransform(tree, String(file));
+    // Before everything that reads offsets: gfm's autolink literal splices nodes
+    // with no position at all, and a pass without offsets correctly stands aside.
+    restoreInlinePositionsTransform(tree, String(file));
     // Before the bracket passes: a `[^` that beat an inline footnote is a reference,
     // and the passes below ask the tree which construct owns each bracket.
     doubledFootnoteOpenerTransform(tree, String(file));

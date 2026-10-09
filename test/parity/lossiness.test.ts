@@ -228,18 +228,15 @@ describe("source fidelity", () => {
       if (missing.length > 0) lost.push(`${entry.id}: ${missing.join(" ")}`);
     }
     /**
-     * Two labels still unreachable, down from seven: `rejoinSplitReferences` now
-     * recovers a reference whose closing bracket a construct inside the label had
-     * taken out of reach, which covered the emphasis, highlight, html, math and
-     * `%%` cases listed here before.
+     * None left, down from seven. `rejoinSplitReferences` recovers a reference whose
+     * closing bracket a construct inside the label had taken out of reach, which
+     * covered the emphasis, highlight, html, math and `%%` cases; the backslash
+     * label came back when `alignToSource` learned to tolerate a container's
+     * continuation indent; and `[^https://e.test/p]` came back when the nodes GFM's
+     * autolink literal splices stopped arriving without a position.
      *
-     * What is left is a different shape in each case. `[^1\]` ends in a backslash,
-     * so the label the author wrote and the label the value holds differ. And
-     * `[^https://e.test/p]` has GFM's bare-URL autolink claim the whole label, so
-     * the text node the scan needs never exists.
-     *
-     * Listed rather than counted so a third cannot arrive unnoticed.
+     * Asserted empty rather than counted, so the first regression names itself.
      */
-    expect(lost).toEqual(["fuzz/footnote/24: [^https://e.test/p]"]);
+    expect(lost).toEqual([]);
   });
 });

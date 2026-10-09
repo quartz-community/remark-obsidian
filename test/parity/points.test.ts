@@ -178,11 +178,13 @@ describe("node positions", () => {
    * One case, two kinds -- not two problems.
    */
   const UNPLACED_CEILING = {
-    "link > text": 1,
+    // 6 -> 2 with `restoreInlinePositionsTransform`. `mdast-util-find-and-replace`
+    // splices gfm's autolink literal with no position on any node it creates, so the
+    // link, its text and the text either side were all unplaceable; tiling the
+    // parent's span from what each child was written as places them exactly.
     "paragraph > break": 1,
     "paragraph > footnoteReference": 1,
-    "paragraph > link": 1,
-    "paragraph > text": 3,
+    "paragraph > text": 2,
   };
 
   it("does not splice more unplaced nodes than the recorded ceiling", () => {
