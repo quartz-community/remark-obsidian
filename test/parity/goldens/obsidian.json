@@ -34924,8 +34924,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Was `report-upstream` on an impossibility argument that turned out to be wrong: Obsidian is not dropping characters here, it is reading `[^` as a reference whose label runs to the first `]`. Seventeen of the eighteen cases in that family now match. This one still diverges because the label sits behind a `#` heading marker inside a table cell, where our marker offset and the source part company."
+      "triage": "match"
     },
     "fuzz/footnote/3": {
       "id": "fuzz/footnote/3",
@@ -69974,8 +69973,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "`][^[^1]](` renders `][^1](` in Obsidian, so the inner `[^1]` is NOT a reference - it is literal text - where we build one. Doubled-opener family, which 17 of 18 cases already match after bracketLabelReferences; this is a shape that family did not cover."
+      "triage": "match"
     },
     "probe/math-unclosed/root-same-line": {
       "id": "probe/math-unclosed/root-same-line",

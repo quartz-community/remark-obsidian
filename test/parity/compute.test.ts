@@ -290,7 +290,7 @@ describe("positioned oracle", () => {
    * no `compareCase` delta can see.
    */
   const CEILING = {
-    footnotes: 19,
+    footnotes: 17,
     footnoteRefs: 2,
     headings: 12,
     sections: 33,
