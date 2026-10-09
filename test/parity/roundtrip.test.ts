@@ -126,7 +126,7 @@ describe("round-trip", () => {
    * happens *inside* the definition's own serialisation.
    */
   it("reaches a fixed point, or records why not", () => {
-    expect(neverSettles.length).toBeLessThanOrEqual(4);
+    expect(neverSettles.length).toBeLessThanOrEqual(3);
   });
 
   it.each([
@@ -259,6 +259,6 @@ describe("round-trip", () => {
     // not an unstable parse.
     // 41 with the sweep-800000 wave: ` $$ $$`, as
     // `probe/math-indent/one-space-empty-body`, joins the same missing-handler group.
-    expect(unstable.length).toBeLessThanOrEqual(33);
+    expect(unstable.length).toBeLessThanOrEqual(32);
   });
 });
