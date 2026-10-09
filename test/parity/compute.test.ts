@@ -317,7 +317,10 @@ describe("positioned oracle", () => {
     // space-only line the item absorbs -- and it wants its own probe family before any
     // of it is implemented. A blanket "end at the last content character" regresses the 10.
     listItems: 71,
-    frontmatterPosition: 7,
+    // 7 -> 2: Obsidian reports no position at all unless the block parses as a
+    // non-empty YAML mapping, and we reported one for any `---` block. The five closed
+    // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
+    frontmatterPosition: 2,
   };
 
   it("diverges on no more cases than the recorded ceiling", () => {

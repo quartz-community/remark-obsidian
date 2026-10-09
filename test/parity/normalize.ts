@@ -8,6 +8,7 @@
  * fail for a reason that is not a parity bug.
  */
 
+import { load } from "js-yaml";
 import { decodeNamedCharacterReference } from "decode-named-character-reference";
 import type { Root } from "mdast";
 import type { Node } from "unist";
@@ -1614,6 +1615,40 @@ export function projectOurs(
  * both kinds in document order and does not restart in a new block, which is
  * why `^[] and ^[x]` names its definition `[inline1`.
  */
+/**
+ * Whether a frontmatter body is YAML Obsidian would actually accept.
+ *
+ * Obsidian reports no `frontmatterPosition` at all unless the block parses as a
+ * non-empty mapping, and the corpus exercises four separate ways to fail that:
+ *
+ *     '---' / '---'                                   empty
+ *     '---' / 'Title' / '---'                         a bare scalar, not a mapping
+ *     '---' / 'title: "unterminated' / '---'          unterminated quote
+ *     '---' / 'k: 2.' / 'k: 3.' / '---'               duplicate keys
+ *
+ * The node stays in the tree either way, which is the governing rule: the source really
+ * does hold a `---` block, and whether the YAML parses is the consumer's concern --
+ * Quartz's own FrontMatter plugin owns it, and `remark-frontmatter` is not even in the
+ * pinned chain. So the drop belongs here in the projection rather than in the parse.
+ *
+ * `js-yaml` throws on both of the last two, which is why this is a parse rather than a
+ * pattern: duplicate keys cannot be detected by inspection.
+ */
+function parsesAsMapping(body: string): boolean {
+  let parsed: unknown;
+  try {
+    parsed = load(body);
+  } catch {
+    return false;
+  }
+  return (
+    typeof parsed === "object" &&
+    parsed !== null &&
+    !Array.isArray(parsed) &&
+    Object.keys(parsed).length > 0
+  );
+}
+
 export function computeOurs(tree: Root, source: string): ComputedMeta {
   const defined = definedFootnotes(tree);
   const lineStarts = [0];
@@ -1957,7 +1992,9 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
 
   const yaml = tree.children.find((child) => child.type === "yaml");
   const frontmatterPosition =
-    yaml?.position && yaml.position.start.offset !== undefined
+    yaml?.position &&
+    yaml.position.start.offset !== undefined &&
+    parsesAsMapping(String((yaml as unknown as { value: unknown }).value))
       ? spanOf(yaml)
       : undefined;
 
