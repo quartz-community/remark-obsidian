@@ -109,6 +109,32 @@ function splitLazyHeading(
   };
 }
 
+interface ParentLike {
+  readonly type: string;
+  readonly children?: readonly ParentLike[];
+}
+
+/**
+ * Whether a container's last block is a paragraph a lazy line could join.
+ *
+ * Asked through the last descendant and not of the immediate child, because a
+ * definition keeps its own paragraph open: `- item` / `··[^37]: a` / `x $$` ends in a
+ * `footnoteDefinition`, whose last child is the paragraph the math really continues,
+ * and Obsidian reports the whole thing as one list. Testing only the immediate child
+ * refused that one while fixing `> <br>` over `$$⇥[`.
+ *
+ * An html block, a fence or a thematic break ends in no paragraph and stops the walk,
+ * which is the case this exists to catch -- `<br>` closes the only block a lazy line
+ * could have joined, so Obsidian reports a blockquote *and* a math.
+ */
+function endsInOpenParagraph(node: ParentLike): boolean {
+  if (node.type === "paragraph") return true;
+  const children = node.children;
+  if (!children || children.length === 0) return false;
+  const last = children[children.length - 1];
+  return last === undefined ? false : endsInOpenParagraph(last);
+}
+
 export function containerLazyTransform(tree: Root, source: string): void {
   const children = tree.children;
 
@@ -163,6 +189,21 @@ export function containerLazyTransform(tree: Root, source: string): void {
         ? parent.children[parent.children.length - 1]
         : parent;
     if (!target || !("children" in target)) continue;
+
+    // Display math is absorbed only onto a paragraph, which is lazy continuation's
+    // actual precondition: a container continues lazily when its last open block is
+    // a paragraph, and an html block or a fence is not one. `> <br>` over `$$⇥[` is
+    // a blockquote *and* a math to Obsidian -- two sections -- because the `<br>`
+    // closed the only block a lazy line could have joined.
+    //
+    // Scoped to math rather than stated generally. The same precondition plainly
+    // governs the other absorbable types, but each of those arrived with its own
+    // measured family -- html after a list, a heading after a list -- and the corpus
+    // holds exactly one case of a column-zero `$$` after a container line, so it
+    // cannot adjudicate the general form. Widening it is a probe wave, not a guess.
+    if (next.type === "math" && !endsInOpenParagraph(target as ParentLike)) {
+      continue;
+    }
 
     if (next.type === "heading") {
       const split = splitLazyHeading(next, source);

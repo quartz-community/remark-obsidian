@@ -266,6 +266,19 @@ describe("round-trip", () => {
     // not an unstable parse.
     // 41 with the sweep-800000 wave: ` $$ $$`, as
     // `probe/math-indent/one-space-empty-body`, joins the same missing-handler group.
-    expect(unstable.length).toBeLessThanOrEqual(29);
+    // 30 with the callout-title math rule. The case it adds is the one that rule
+    // fixed, and it joins its own family: eight `probe/math-*` documents already
+    // settle on the second pass by the same route, `$$` written `\$$` and then
+    // `\$\$`.
+    //
+    // A literal-emission handler was built for that family and is refused. Returning
+    // the demoted value verbatim is the ecosystem's mechanism for unescaped content,
+    // and here it makes `> [!note] $$` *duplicate* -- `> $$` becomes `> $$` / `> $$`
+    // -- because the bare spelling re-opens the very construct the demotion undid.
+    // So the escape is load-bearing rather than spurious, and the README's reading of
+    // this family as "a missing math handler" was wrong: no spelling is both what
+    // Obsidian renders and inert on re-parse. A fix that duplicates the author's text
+    // is refused even when it converges.
+    expect(unstable.length).toBeLessThanOrEqual(30);
   });
 });

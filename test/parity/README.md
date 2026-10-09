@@ -854,6 +854,25 @@ again. `commonmark/raw-html/625` is a separate half -- a `--` buried in a longer
 needs an unbounded scan on `<`, which is the quadratic shape `legacy-scan.ts` bounds
 against (`<` x20000: 64ms to 16s).
 
+### "A missing math handler" was the wrong diagnosis
+
+Ten of the unsettled documents were written off as needing a `toMarkdown` handler that
+writes the literal form -- the demoted `$$` is spelled `\$$`, then `\$\$`, and never
+agrees with the source it came from. The mechanism for that is now known and documented
+above: a handler's return value skips `state.safe` entirely.
+
+Built, measured, refused. Returning the demoted value verbatim makes
+`probe/math-unclosed/callout-title` **duplicate** -- `> [!note] $$` is written
+`> [!note]` / `> $$` and then `> [!note]` / `> $$` / `> $$` -- because the bare spelling
+re-opens the very construct the demotion undid. The escape is load-bearing, not spurious.
+
+So the family is not a missing handler at all: **no spelling of these characters is both
+what Obsidian renders and inert on re-parse.** The escaped form is stable and wrong about
+the source; the literal form is right about the source and re-parses into something else.
+That is inherent debt, and the honest ceiling is to carry it rather than to keep looking
+for a handler. A fix that duplicates the author's text is refused even when it converges --
+the same standard that refused `raw-html/626` for growing one.
+
 ### A `%%` comment hides at render time, not at parse time
 
 `- %%` / `note%%` and `1. %%[` / `===` both render as nothing in Obsidian while we show

@@ -37417,8 +37417,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A `$$` opener at column zero interrupts a blockquote rather than continuing it lazily: obs reports blockquote(`> <br>`) plus math(`$$\\t[`) as two sections and we report one blockquote spanning both lines. Sibling of the recorded rule that a quote does not absorb raw html at column zero while a list does -- same shape, different opener, and the asymmetry between the two container types is already established. Narrow: it wants `$$` added to whatever set containerLazyTransform treats as non-absorbable for a quote, measured on both container types."
+      "triage": "match"
     },
     "fuzz/inline-footnote/8": {
       "id": "fuzz/inline-footnote/8",
@@ -67101,8 +67100,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A callout TITLE, which is a separate rule from the container one now implemented: $$ at the end of a title line opens no block even though nothing follows it, where > $$ over a lazy line does open one. That follows the recorded rule that a construct must not cross a callout title line ending, and it is why calloutTitle is deliberately absent from the container set in math-unclosed-container.ts."
+      "triage": "match"
     },
     "probe/math-unclosed/list-tab": {
       "id": "probe/math-unclosed/list-tab",

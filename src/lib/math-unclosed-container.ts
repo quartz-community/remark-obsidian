@@ -9,9 +9,9 @@ interface ParentNode extends Node {
 const CONTAINERS = new Set([
   "blockquote",
   "callout",
-  // A title too, but only through the content-after rule below. `> [!note] $$y`
-  // has no formula, and neither does `> [!note] $$` -- that second one is the
-  // separate title-boundary rule and stays recorded rather than handled here.
+  // A title is both rules at once. `> [!note] $$y` goes through the content-after
+  // rule below like any other container, and `> [!note] $$` through the title
+  // exception beside it -- a title is one line, so a bare opener can never close.
   "calloutTitle",
   "listItem",
   "footnoteDefinition",
@@ -70,7 +70,27 @@ export function mathUnclosedContainerTransform(
       // `math-outlives.ts` exists for -- eleven cases depend on it. Only an opener
       // whose formula *starts on the opener's own line* and never closes is
       // literal, which is what every probe in this family has.
-      if (!CONTENT_AFTER_OPENER.test(written)) continue;
+      //
+      // Except on a callout's title line, where the container *is* the line.
+      // Nothing can follow the opener and nothing can close it, so `> [!note] $$`
+      // renders the literal `$$` and reports no formula, while `> $$` over a lazy
+      // line reports one. The discriminator is whether the container can continue
+      // past the opener's line, not what sits after the opener on it.
+      //
+      // Tested by line and not by parent type: the `math` node is a *sibling* of
+      // `calloutTitle` under `callout`, not a child of it, so asking the parent's
+      // type never fires. Sharing the callout's first line is what puts the opener
+      // in the title.
+      //
+      // Thin evidence and worth saying so: the corpus holds exactly two callout
+      // titles carrying a `$$`, this one and `> [!note] $$y`, which the rule above
+      // already covers. The structural argument is what carries it -- a title is one
+      // line by construction -- so a probe wave over title boundaries would be the
+      // way to confirm it rather than another fuzz sweep.
+      const onTitleLine =
+        node.type === "callout" &&
+        math.position?.start?.line === node.position?.start?.line;
+      if (!onTitleLine && !CONTENT_AFTER_OPENER.test(written)) continue;
       // And the opener has to be *inside* the container, not merely under a node
       // that is. `- item` / `  [^37]: a` / `x $$` / `$$ tail` has its opener at
       // column zero as a lazy line, and Obsidian opens math there -- the arbiter
