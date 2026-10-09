@@ -91,6 +91,7 @@ import { textareaNotRawTransform } from "./lib/textarea-not-raw.js";
 import { closingPreInterruptSyntax } from "./lib/syntax/closing-pre-interrupt.js";
 import { labelOpenerWikilinkTransform } from "./lib/label-opener-wikilink.js";
 import { autolinkLiteralExtentTransform } from "./lib/autolink-literal-extent.js";
+import { definitionColumnTransform } from "./lib/definition-column.js";
 import { definitionSetextTransform } from "./lib/definition-setext.js";
 import { listDeepContinuationTransform } from "./lib/list-deep-continuation.js";
 import { invisibleBlankLineTransform } from "./lib/invisible-blank-line.js";
@@ -776,6 +777,8 @@ export default function remarkObsidian(
       // fields, so re-running it on an already-classified tree changes nothing.
       mathDisplayTransform(tree, String(file));
       bareFootnoteRefTransform(tree, String(file));
+      // Last of the footnote passes, so it sees every definition in its final place.
+      definitionColumnTransform(tree, String(file));
       // After the reference passes, because the tree is what can say whether the `]`
       // before a tag closed a construct or was ordinary text.
       tagAfterCloserTransform(tree);

@@ -290,7 +290,11 @@ describe("positioned oracle", () => {
    * no `compareCase` delta can see.
    */
   const CEILING = {
-    footnotes: 17,
+    // 17 -> 6 with `definitionColumnTransform`: a definition's start column is its
+    // containing block's content column, not the position of the `[`. The 11 closed were
+    // every space-indented definition in the corpus. A tab in the prefix is excluded and
+    // keeps its own rule -- see the pass.
+    footnotes: 6,
     footnoteRefs: 2,
     headings: 12,
     sections: 33,

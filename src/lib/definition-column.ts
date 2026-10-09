@@ -1,0 +1,69 @@
+import type { FootnoteDefinition, ListItem, Root } from "mdast";
+import type { Node } from "unist";
+import { visit } from "unist-util-visit";
+
+const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]/u;
+
+/**
+ * A footnote definition starts at its containing block's content column.
+ *
+ * Obsidian reports the start of the *block*, not the position of the `[`, and the
+ * indentation in between belongs to the definition:
+ *
+ *     ' [^1]: def'                -> 0:0   root, so column zero
+ *     '  [^1]: def'               -> 0:0
+ *     '   [^1]: def'              -> 0:0
+ *     '- a' / '' / '    [^1]: x'  -> 2:2   the item's content column, not the bracket at 4
+ *
+ * Read alone the bare rows look like indentation being lost. The container rows rule
+ * that out, and Obsidian's own section agrees with them -- ` [^1]: def` is reported as
+ * `footnoteDefinition@0:0-0:10`, starting at zero rather than at the bracket.
+ *
+ * Fires only where the definition's own line prefix is whitespace, which is what keeps
+ * the cases that already agree out of reach: `- [^1]: def` reports 0:2, `-  [^1]: def`
+ * reports 0:3, `> [^1]: def` and `>  [^1]: def` both report 0:2, and `- [ ] [^1]: def`
+ * and `- [ ]  [^1]: def` both report 0:6. Those have a marker in the prefix, so none of
+ * them reaches this pass.
+ */
+export function definitionColumnTransform(tree: Root, source: string): void {
+  if (source === "") return;
+
+  const items = new Map<Node, ListItem>();
+  visit(tree, "listItem", (item: Node) => {
+    visit(item, (inner: Node) => {
+      if (!items.has(inner)) items.set(inner, item as ListItem);
+    });
+  });
+
+  visit(tree, "footnoteDefinition", (node: Node) => {
+    const definition = node as FootnoteDefinition;
+    const start = definition.position?.start;
+    if (!start || start.offset === undefined) return;
+
+    const bol = source.lastIndexOf("\n", start.offset - 1) + 1;
+    const prefix = source.slice(bol, start.offset);
+    // Spaces only. A tab in the prefix has its own rule with its own evidence: the
+    // arbiter does not count a tab that follows a space, so ` \t[^1]: def` is re-parsed
+    // and placed back PAST that whitespace at offset 2, which this would overwrite with
+    // zero. Every recorded Obsidian golden behind the content-column rule is
+    // space-indented, so narrowing to spaces keeps both rules rather than picking one.
+    if (!/^ +$/u.test(prefix)) return;
+
+    const host = items.get(node);
+    const column = host ? contentColumn(source, host) : 0;
+    if (column === undefined || column >= start.column - 1) return;
+
+    start.column = column + 1;
+    start.offset = bol + column;
+  });
+}
+
+/** The column an item's own content begins at, past its marker and one space. */
+function contentColumn(source: string, item: ListItem): number | undefined {
+  const from = item.position?.start?.offset;
+  if (from === undefined) return undefined;
+  const bol = source.lastIndexOf("\n", from - 1) + 1;
+  const nl = source.indexOf("\n", from);
+  const opener = MARKER.exec(source.slice(bol, nl === -1 ? undefined : nl));
+  return opener ? opener[0]!.length : undefined;
+}
