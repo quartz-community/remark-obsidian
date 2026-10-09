@@ -46860,8 +46860,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "RECURSIVE SELF-EMBED, not parse. Re-recorded under PARITY_FULL_PROXY_CHECK=1 and the six copies persist, so it is not a detached-renderer flake as previously recorded. The html holds 6 `internal-embed` spans, 12 `is-loaded` and ZERO `is-unresolved`, with alt=\"\" and src=\"\": the `![[ ]]` target collapsed to empty, Obsidian resolved it to the current note and embedded the note into itself six levels deep -- so the single `$**strong**$` is read six times while `text` reports it once. Reproducing that needs vault resolution and recursive inlining of the embedded note, which is the renderer's job; this harness models no vault and the parse is a single callout with one inline math."
+      "triage": "out-of-scope",
+      "note": "OUT OF SCOPE: embed resolution, not parsing. `math` is the ONLY diverging projection -- obs reports the one `$**strong**$` SIX times, identically, while `text` reports it once and agrees with us. The html says why: 6 `internal-embed` spans, 12 `is-loaded`, ZERO `is-unresolved`, with alt=\"\" and src=\"\". The `![[ ]]` target collapsed to empty, Obsidian resolved it to the current note, and embedded the note into itself six levels deep, so the single formula is read once per copy. Re-recorded under PARITY_FULL_PROXY_CHECK=1 and all six persist, so this is not the detached-renderer duplication the earlier note guessed at.\nIMPOSSIBILITY ARGUMENT: reproducing six math nodes from one formula would require resolving a vault target and recursively inlining the embedded note's content into the tree. This package has no vault and must not invent one; `obsidian-flavored-markdown` owns embed rendering. Writing the formula six times into the mdast would also let a formatter write it six times into the author's file -- the same standard that refused the literal-math toMarkdown handler. Our parse, one callout holding one inline math, is the correct parse of these two lines."
     },
     "fuzz/embed/65": {
       "id": "fuzz/embed/65",
