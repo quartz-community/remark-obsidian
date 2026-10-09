@@ -33929,8 +33929,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Not a bracket case at all: the only divergence is the trailing `<br>`, which Obsidian renders as an element contributing nothing to textContent while we emit its source as text. Sibling of the recorded rule that an unterminated html tag drops from the text projection; this is the terminated void-element half of it."
+      "triage": "match"
     },
     "fuzz/footnote/8": {
       "id": "fuzz/footnote/8",
@@ -55813,8 +55812,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "The formula's characters differ by U+00A0, not by layout: obs tex is `\\u00a0x\\u00a0` and ours is `x`. The math comparison deliberately normalises whitespace *around* a formula, because `$$\\nx\\n$$` and `x` render identically -- but U+00A0 is not that whitespace, and Obsidian keeps it. Harness-side: the trim should not treat a no-break space as trimmable. Narrow, and the same character that made commonmark/links/507 unreadable until the code points were dumped."
+      "triage": "match"
     },
     "thematic-break/paragraph-dashes": {
       "id": "thematic-break/paragraph-dashes",

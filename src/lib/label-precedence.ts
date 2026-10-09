@@ -453,7 +453,7 @@ export function labelPrecedenceTransform(
     }
 
     if (changed) {
-      if (cursor < to) pushTail(rebuilt, source, cursor, to, defined);
+      if (cursor < to) pushTail(rebuilt, source, cursor, to, defined, reparse);
       paragraph.children = rebuilt as Paragraph["children"];
       return;
     }
@@ -481,6 +481,7 @@ function pushTail(
   from: number,
   to: number,
   defined: ReadonlySet<string>,
+  reparse: (markdown: string) => Root,
 ): void {
   let cursor = from;
   for (const label of outermostLabels(source.slice(from, to), from)) {
@@ -510,7 +511,59 @@ function pushTail(
     } as unknown as RootContent);
     cursor = label.close + 1;
   }
-  if (cursor < to) rebuilt.push(text(source.slice(cursor, to), cursor, to));
+  if (cursor < to) pushInline(rebuilt, source, cursor, to, reparse);
+}
+
+/**
+ * A leftover run as inline nodes, not as one literal text node.
+ *
+ * The run is source this pass did not claim, so it can still hold constructs the
+ * tokenizer would have built: `1. [![[[[a#h]]]]](u) \ <br>` leaves ` \ <br>` behind,
+ * and as a raw text node the `<br>` is visible text where Obsidian renders an element
+ * contributing nothing. Re-parsing it is the whole fix -- the same reason a raw slice
+ * is the right source for a `position` and the wrong one for a `value`, now the fifth
+ * instance of that in this package.
+ *
+ * Falls back to the literal node whenever the re-parse does not yield exactly one
+ * paragraph, so a run that is not inline content cannot silently change shape.
+ *
+ * The run's own leading whitespace is held back and pushed as its own node, because
+ * a paragraph drops it: re-parsing ` \ <br>` returns `\` and the `<br>`, losing the
+ * space Obsidian renders. Only the leading run needs this -- a trailing one survives
+ * inside the paragraph's last text node.
+ */
+function pushInline(
+  rebuilt: RootContent[],
+  source: string,
+  from: number,
+  to: number,
+  reparse: (markdown: string) => Root,
+): void {
+  const slice = source.slice(from, to);
+  let lead = 0;
+  while (lead < slice.length) {
+    const character = slice[lead];
+    if (character !== " " && character !== "\t") break;
+    lead += 1;
+  }
+
+  const body = lead === slice.length ? undefined : reparse(slice.slice(lead));
+  const only = body?.children[0];
+  if (
+    body === undefined ||
+    body.children.length !== 1 ||
+    only?.type !== "paragraph"
+  ) {
+    rebuilt.push(text(slice, from, to));
+    return;
+  }
+
+  if (lead > 0) {
+    rebuilt.push(text(slice.slice(0, lead), from, from + lead));
+  }
+  const children = only.children as RootContent[];
+  shiftAll(children, from + lead);
+  rebuilt.push(...children);
 }
 
 function text(value: string, start: number, end: number): RootContent {

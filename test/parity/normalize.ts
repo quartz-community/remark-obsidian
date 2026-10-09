@@ -256,6 +256,28 @@ export function definedReferences(tree: Node): Set<string> {
   return defined;
 }
 
+/**
+ * A formula as Obsidian hands it to MathJax, with a no-break space entity-encoded.
+ *
+ * Measured from `data-latex`: `$⟨nbsp⟩x⟨nbsp⟩$` is reported as the literal six
+ * characters `&nbsp;` either side of the `x`, and the stored html agrees --
+ * `data-latex="&amp;nbsp;x&amp;nbsp;"` is the escaped spelling of that string, so this
+ * is Obsidian's own encoding and not the recorder's. The tree keeps U+00A0 because
+ * that is what the source holds; only the projection speaks the renderer's dialect.
+ *
+ * Encoding here rather than relaxing the comparison's trim is what makes it work at
+ * all: `alignMath` trims the formula's edges, and `String.prototype.trim` counts
+ * U+00A0 as whitespace, so a raw no-break space at either end is removed from our
+ * side before the two are ever compared. As `&nbsp;` it is no longer trimmable.
+ *
+ * U+00A0 alone, because that is the only character the corpus can adjudicate: it
+ * holds exactly one formula containing one, and none containing a raw `&`, `<` or
+ * `>`. Widening to those would be a guess dressed as a rule.
+ */
+function renderedTex(value: string): string {
+  return value.replaceAll("\u00a0", "&nbsp;");
+}
+
 /** A tag opens on `<` plus a letter, `/`, `!` or `?`; any other `<` is literal text. */
 const TAG_START = /[a-zA-Z/!?]/;
 
@@ -856,11 +878,11 @@ export function projectMdast(
       const display = Boolean(
         (node as { data?: { display?: boolean } }).data?.display,
       );
-      math.push({ display, tex: (node as ValueNode).value });
+      math.push({ display, tex: renderedTex((node as ValueNode).value) });
       return;
     }
     if (node.type === "math") {
-      math.push({ display: true, tex: (node as ValueNode).value });
+      math.push({ display: true, tex: renderedTex((node as ValueNode).value) });
       return;
     }
     if (isType<HeadingNode>(node, "heading")) {
