@@ -53,6 +53,11 @@ interface ImageNode extends Node {
   url?: string;
 }
 
+interface LinkNode extends Node {
+  type: "link";
+  url?: string;
+}
+
 const isType = <T extends Node>(node: Node, type: string): node is T =>
   node.type === type;
 
@@ -1813,6 +1818,27 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     if (!node.position) return;
     if (isType<ValueNode>(node, "tag")) {
       tags.push(`#${node.value}@${spanOf(node)}`);
+      return;
+    }
+    // An ordinary markdown link is in `metadataCache.links` too, and this projection
+    // only ever collected wikilinks -- so every one of them read as a link we failed to
+    // index. 94 of the 116 divergences on this key were that, with not one case of us
+    // inventing a link, which is the shape of a missing collector rather than a parse
+    // bug. `[a](u)` is indexed `[a](u)=>u|a`.
+    //
+    // `url` is taken from the node rather than the source because mdast has already
+    // resolved what the cache reports resolved: `<u>` loses its brackets, `<u v>` keeps
+    // its space, and `u\(v\)` becomes `u(v)`.
+    if (isType<LinkNode>(node, "link")) {
+      const url = node.url ?? "";
+      if (!isVaultTarget(url)) return;
+      const original = source.slice(
+        node.position.start.offset!,
+        node.position.end.offset!,
+      );
+      links.push(
+        `${original}=>${url}|${mdastText(node).trim()}@${spanOf(node)}`,
+      );
       return;
     }
     if (!isType<WikilinkNode>(node, "wikilink")) return;

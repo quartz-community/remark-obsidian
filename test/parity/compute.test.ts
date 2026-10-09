@@ -298,9 +298,10 @@ describe("positioned oracle", () => {
     footnoteRefs: 2,
     headings: 12,
     sections: 33,
-    // 116. Lower again with the comment fold re-parsing its lines, which is what
-    // lets `metaOurs` index a wikilink written inside a `%%`.
-    links: 116,
+    // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
+    // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
+    // invented, which is the shape of a missing collector rather than a parse bug.
+    links: 31,
     embeds: 31,
     tags: 1,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
