@@ -1,3 +1,4 @@
+import { resolveEscapes } from "./character-escapes.js";
 import type {
   Definition,
   Paragraph,
@@ -280,7 +281,7 @@ export function legacyDefinitionTransform(
           // it left every reference the line carries unplaceable too.
           children.push(
             span<Text>(
-              { type: "text", value: line } as Text,
+              { type: "text", value: resolveEscapes(line) } as Text,
               source,
               offset,
               offset + line.length,

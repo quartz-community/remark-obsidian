@@ -1,3 +1,4 @@
+import { resolveEscapes } from "./character-escapes.js";
 import type { Break, Paragraph, Root, Text } from "mdast";
 
 import { span } from "./normalize-points.js";
@@ -21,40 +22,6 @@ const isComment = (node: unknown): node is CommentNode =>
 
 /** A footnote definition's continuation indent: four spaces, or the tab it stands for. */
 const CONTINUATION_INDENT = /^(?: {1,4}|\t)/u;
-
-/** The ASCII punctuation a backslash may escape, per CommonMark. */
-const PUNCTUATION = new Set("!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~");
-
-/**
- * A line of the comment's source as a text node's value, with escapes resolved.
- *
- * The raw slice is the right source for the *span* and the wrong one for the *value*.
- * Left raw, `\[\[target]]` stays spelled with its backslashes, `remark-stringify`
- * escapes them again on the way out, and the run doubles on every pass. Resolving
- * them is what a text node for this span would have held anyway, so re-escaping is
- * idempotent and the formatter settles.
- *
- * Only the backslash is dropped, never a character, so the value stays aligned with
- * the span for everything after it -- which is what the `[^2]` inside
- * `hunt/obsidian-comments/23` needs.
- */
-function resolveEscapes(line: string): string {
-  if (!line.includes("\\")) return line;
-
-  let out = "";
-  let at = 0;
-  while (at < line.length) {
-    const next = line[at + 1];
-    if (line[at] === "\\" && next !== undefined && PUNCTUATION.has(next)) {
-      out += next;
-      at += 2;
-      continue;
-    }
-    out += line[at];
-    at += 1;
-  }
-  return out;
-}
 
 /**
  * The comment's source as one text node per line, indent excluded, spans exact.
