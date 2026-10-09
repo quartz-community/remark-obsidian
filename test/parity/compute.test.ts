@@ -317,12 +317,11 @@ describe("positioned oracle", () => {
     // differs on the NAME (obs `1:H`, ours `1:#`), and
     // `commonmark/link-reference-definitions/*` differs on the LINE (obs 1, ours 0).
     headings: 6,
-    // Attributed: 29 SPAN and 4 we-INVENT, and all four we-invent are the standalone
-    // block-identifier paragraphs -- `^blk`, `> quoted` / '' / `^quote-id`,
-    // `- x` / '' / `^b`, `| x |` / `| --- |` / '' / `^b`. We emit a `paragraph` section
-    // Obsidian consumes. So the `blocks` cluster A fix closes these four as well, which
-    // confirms the coupling recorded there: measure the two keys together.
-    sections: 33,
+    // 33 -> 27. The 4 we-INVENT rows were the standalone block-identifier paragraphs --
+    // we emitted a `paragraph` section Obsidian consumes -- and the cluster A fix closed
+    // them along with two more, exactly as the recorded coupling predicted. The 27
+    // remaining are all SPAN.
+    sections: 27,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
     // invented, which is the shape of a missing collector rather than a parse bug.
@@ -349,27 +348,13 @@ describe("positioned oracle", () => {
     //       '| x |' / '| --- |' / '' / '^b' blocks b@0:0-1:7   sections [table@0:0-1:7]
     //       '^blk' / '</div>'               blocks blk@0:0-0:4 sections [paragraph, html]
     //
-    //   The rule is TWO sub-rules, not one, which `probe/block-id-extent/*` settles:
-    //
-    //     '^blk'                blocks []            sections []
-    //     '^blk' / 'para'       blocks []            sections [paragraph@0:0-1:4]
-    //     '^blk' / '' / 'para'  blocks []            sections [paragraph@2:0-2:4]
-    //     '^blk' / '- item'     blocks [blk@0:0-0:4] sections [paragraph@0:0-0:4, list]
-    //     '^blk' / '</div>'     blocks [blk@0:0-0:4] sections [paragraph@0:0-0:4, html]
-    //     'x' / '' / '^b'       blocks [b@0:0-0:1]   sections [paragraph@0:0-0:1]
-    //     '- x' / '' / '^b'     blocks [b@0:0-0:3]   sections [list@0:0-0:3]
-    //
-    //   Separated by a blank line or ending the document, the `^id` paragraph is
-    //   CONSUMED -- it leaves `sections` entirely -- and names the PRECEDING block, or
-    //   nothing when there is none. Interrupted without a blank line, by a list or an
-    //   html block, it SURVIVES as its own section and names ITSELF.
-    //
-    //   `'^blk' / 'para'` is neither: no blank line and a paragraph cannot interrupt
-    //   one, so the two lines merge and the identifier is not at a block end at all.
-    //
-    //   So this touches `sections` as well as `blocks`, and is a candidate for the
-    //   four we-INVENT there -- we emit a section for an `^id` paragraph Obsidian
-    //   consumes. Measure the two together; one fix should move both.
+    //   LANDED: the rule is two sub-rules, which `probe/block-id-extent/*` settles.
+    //   When the next block ABUTS the identifier's paragraph -- starts on the very next
+    //   line, which only a construct that interrupts a paragraph can do -- that
+    //   paragraph survives as a section and names itself. Otherwise it is CONSUMED: it
+    //   leaves `sections` and names the block before it, or nothing when there is none.
+    //   Closed 6 rows here and 6 on `sections`, confirming the coupling rather than
+    //   assuming it.
     //
     //   We require the identifier to trail the block's own lines, so a standalone one
     //   registers nothing.
@@ -396,7 +381,7 @@ describe("positioned oracle", () => {
     // bracket becomes a link rather than a footnote reference and so never claims the
     // caret. That is a tree question and this collector reads lines, so it needs a
     // different mechanism than the escape check.
-    blocks: 15,
+    blocks: 9,
     // 71, of which 44 are span-only and they do NOT share one rule -- measured, after
     // "Obsidian ends an item at its last content character and we run on to the next
     // line start" was recorded here from two examples. It holds for 34. The other 10

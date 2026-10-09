@@ -1801,8 +1801,52 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
   // quote is part of the quote's section, not one of its own -- so the
   // document's own children are the whole projection.
 
+  /**
+   * A root paragraph that is nothing but a block identifier.
+   *
+   * Obsidian treats it two ways, and `probe/block-id-extent/*` settles which:
+   *
+   *     '^blk'                blocks []            sections []
+   *     '^blk' / '' / 'para'  blocks []            sections [paragraph@2:0-2:4]
+   *     '^blk' / '- item'     blocks [blk@0:0-0:4] sections [paragraph@0:0-0:4, list]
+   *     'x' / '' / '^b'       blocks [b@0:0-0:1]   sections [paragraph@0:0-0:1]
+   *     '- x' / '' / '^b'     blocks [b@0:0-0:3]   sections [list@0:0-0:3]
+   *
+   * When the next block ABUTS it -- starts on the very next line, which only a
+   * construct that interrupts a paragraph can do -- the identifier's own paragraph
+   * survives as a section and names itself. Otherwise the paragraph is CONSUMED: it
+   * leaves `sections` entirely and names the block before it, or nothing when there is
+   * none.
+   */
+  const standalone = new Map<
+    Node,
+    { readonly names: Node | undefined; readonly consumed: boolean }
+  >();
+  tree.children.forEach((child, index) => {
+    if (child.type !== "paragraph" || !child.position) return;
+    const from = child.position.start.offset;
+    const to = child.position.end.offset;
+    if (from === undefined || to === undefined) return;
+    if (!/^\^[A-Za-z0-9-]+$/u.test(source.slice(from, to).trim())) return;
+
+    const next = tree.children[index + 1];
+    const abutted =
+      next?.position !== undefined &&
+      next.position.start.line === child.position.end.line + 1;
+    if (abutted) {
+      standalone.set(child, { names: child, consumed: false });
+      return;
+    }
+    const before = tree.children[index - 1];
+    standalone.set(child, {
+      names: before?.position ? before : undefined,
+      consumed: true,
+    });
+  });
+
   const sections = tree.children
     .filter((child) => child.position)
+    .filter((child) => standalone.get(child)?.consumed !== true)
     .map(
       (child) =>
         `${child.type}@${sectionStart(child.position!.start)}-${atPoint(child.position!.end)}`,
@@ -1892,6 +1936,23 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
    */
   const blocks: string[] = [];
   for (const child of tree.children) {
+    // A standalone identifier never reaches the line scan below, which requires
+    // something to precede the caret on its own line. It is registered here instead,
+    // against whichever block it names.
+    const alone = standalone.get(child);
+    if (alone) {
+      const target = alone.names;
+      if (target?.position) {
+        const name = source
+          .slice(child.position!.start.offset!, child.position!.end.offset!)
+          .trim()
+          .slice(1);
+        blocks.push(
+          `${name}@${sectionStart(target.position.start)}-${atPoint(target.position.end)}`,
+        );
+      }
+      continue;
+    }
     const from = child.position?.start?.offset;
     const to = child.position?.end?.offset;
     if (from === undefined || to === undefined) continue;
