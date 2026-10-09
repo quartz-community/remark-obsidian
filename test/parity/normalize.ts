@@ -966,6 +966,14 @@ export function projectMdast(
       inLabelNode.add(inner);
     });
   });
+  /** The last definition for each label, which is the one Obsidian renders. */
+  const lastDefinition = new Map<string, Node>();
+  visit(tree, "footnoteDefinition", (node: Node) => {
+    lastDefinition.set(
+      String((node as unknown as { identifier: string }).identifier),
+      node,
+    );
+  });
   const referenced = new Set<string>();
   visit(tree, "footnoteReference", (node: Node) => {
     referenced.add(
@@ -988,6 +996,8 @@ export function projectMdast(
    * implement the one that is measured rather than the one that sounds symmetrical.
    */
   const relocated: LinkItem[] = [];
+  /** Definitions the walk skipped, whose inline footnotes are rendered anyway. */
+  const skipped: Node[] = [];
   /** Every node under an inline footnote, whose body the renderer moves. */
   const inInlineNote = new Set<Node>();
   visit(tree, (node: Node) => {
@@ -1021,7 +1031,19 @@ export function projectMdast(
     // the reference, not on the node.
     if (node.type === "footnoteDefinition") {
       const id = String((node as unknown as { identifier: string }).identifier);
-      if (skipUnreferenced && !referenced.has(id)) return SKIP;
+      if (skipUnreferenced && !referenced.has(id)) {
+        skipped.push(node);
+        return SKIP;
+      }
+      // Duplicates: only the LAST definition for a label is rendered. The recorded
+      // html for `fuzz/embed/46` shows it -- `[^1]: > [!note] ![[[[word]]]]` over
+      // `[^1]: - [^1]` renders `<li data-footnote-id="fn-1">` holding the *second*
+      // definition's list, so the first one's embed never appears and Obsidian
+      // indexes no link. We collected from both and reported the discarded one.
+      if (skipUnreferenced && lastDefinition.get(id) !== node) {
+        skipped.push(node);
+        return SKIP;
+      }
     }
     // `mdastText`, not `textOf`, so a wikilink or math span inside the emphasis
     // yields the same display text the DOM side reads off the rendered element.
@@ -1123,6 +1145,42 @@ export function projectMdast(
       });
     }
   });
+
+  // An inline footnote is self-referencing: the renderer relocates its body to the
+  // trailing section and shows it even when the definition around it is never
+  // rendered. `fuzz/embed/22` is the case -- `[^1]: - ![[[[a|b]]]]](^[[[a#h]]]` has
+  // no reference anywhere, so the definition is skipped and its own `![[[[a|b]]]]`
+  // never appears, while the `a#h` inside the inline footnote does.
+  //
+  // Collected in a second pass rather than by not skipping, because the definition's
+  // *own* content must stay suppressed -- letting the walk through would report the
+  // `[a` the recording does not have. Only links, because that is the projection the
+  // relocation reaches; the text and emphasis projections read a clone with the
+  // footnotes section removed, so nothing there is expected either way.
+  for (const definition of skipped) {
+    visit(definition, (node: Node) => {
+      if (node.type !== "footnote") return;
+      visit(node, (inner: Node) => {
+        if (isType<WikilinkNode>(inner, "wikilink")) {
+          relocated.push({
+            path: inner.path,
+            heading: inner.heading,
+            embedded: inner.embedded,
+          });
+          return;
+        }
+        if (inner.type === "image" || inner.type === "link") {
+          const url = (inner as unknown as { url?: string }).url ?? "";
+          if (isVaultTarget(url)) {
+            relocated.push({
+              ...splitTarget(url),
+              embedded: inner.type === "image",
+            });
+          }
+        }
+      });
+    });
+  }
 
   return {
     math,

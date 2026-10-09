@@ -38258,8 +38258,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "CAUSE CORRECTED. The old note said Obsidian indexes a wikilink inside an inline footnote inside a footnote definition and we index nothing, filed under the metadataCache family. Our tree already holds the right node -- `footnoteDefinition > list > listItem > paragraph > footnote > wikilink(a#h)` -- so nothing is mis-parsed; the links PROJECTION drops it. Two separate reasons, both measured. (1) `skipUnreferencedDefinitions` skips the whole definition, because `[^1]` is never referenced and an unreferenced definition is not rendered -- that rule is right and defaulting it to false costs 14 cases. What is missing is the exception: an INLINE footnote is self-referencing and is relocated and rendered even inside an unreferenced definition, so its subtree should still be collected. (2) With the skip off we then report TWO links where Obsidian reports one, the surplus being `path: \"[a\"` from the `![[[[` opener -- which is exactly `fuzz/embed/46`'s quadruple-bracket rule. So this case needs both fixes and `fuzz/embed/46` is the one to do first."
+      "triage": "match"
     },
     "fuzz/embed/23": {
       "id": "fuzz/embed/23",
@@ -42474,8 +42473,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "`![[[[word]]]]` -- a quadruple bracket opener. Obsidian indexes no link at all; we index one whose path is `[word`, taking the outer opener and a path that begins with a bracket. Related to the measured inner-wins rule (`[[A[[B]]]]` links `B`), but here the correct answer is *neither* opener. Wants probes on 3- and 4-deep openers before a rule is written, since the recorded evidence covers only two."
+      "triage": "match"
     },
     "fuzz/misc/3": {
       "id": "fuzz/misc/3",
