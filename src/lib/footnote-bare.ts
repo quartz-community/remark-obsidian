@@ -4,7 +4,18 @@ import { visit } from "unist-util-visit";
 import { characterEntitiesLegacy } from "character-entities-legacy";
 import { decodeNamedCharacterReference } from "decode-named-character-reference";
 
-const REFERENCE = /\[\^([^[\]\s]+)\]/g;
+/**
+ * ASCII whitespace only, written out because `\s` is wider than the rule.
+ *
+ * A footnote label may not hold a space, a tab or a line ending -- widening it to allow
+ * them costs eleven cases, which `hunt/invalid-name-rewritten-by-rules/0-5` was
+ * established for. It may hold a no-break space: `[^~~⟨nbsp⟩~~]` is a reference whose
+ * label is `~~⟨nbsp⟩~~`, and Obsidian renders that label bare. `\s` matches U+00A0, so
+ * the shorthand silently excluded it -- the same trap as `\w` quietly meaning "and
+ * underscore", which cost two cases in the block-identifier tail.
+ */
+const BLANK = " \\t\\r\\n\\v\\f";
+const REFERENCE = new RegExp(`\\[\\^([^[\\]${BLANK}]+)\\]`, "g");
 
 interface ParentNode extends Node {
   children: Node[];
@@ -141,9 +152,9 @@ function alignToSource(source: string, value: string): SourceAlignment | null {
 }
 
 /** A `[^label` left hanging at the end of a text node, with no closer in it. */
-const HANGING_OPENER = /\[\^[^[\]\s]*$/u;
+const HANGING_OPENER = new RegExp(`\\[\\^[^[\\]${BLANK}]*$`, "u");
 /** The label rule, applied to what the source holds between the delimiters. */
-const LABEL = /^[^[\]\s]+$/u;
+const LABEL = new RegExp(`^[^[\\]${BLANK}]+$`, "u");
 
 /**
  * Rejoin a reference whose delimiters an inline construct split apart.

@@ -27249,8 +27249,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "`[^~~ ~~]` is a footnote reference whose label is `~~ ~~`, undefined, so Obsidian renders the bare label and the `~~` stays literal. Part of the recorded footnote-label family: the label runs to the first `]` with no counting, and widening the pattern in `footnote-bare.ts` to admit whitespace costs 11 regressions. Needs the construct that claims `[^` to the first `]` before anything else sees that bracket."
+      "triage": "match"
     },
     "fuzz/embed/89": {
       "id": "fuzz/embed/89",
@@ -70712,8 +70711,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "The identifier sits on the FIRST line of a multi-line paragraph, not the last: \"*^blk*\" over \"next\" is one paragraph@0:0-1:4 to Obsidian whose rendered text is just \"next\", with the emphasis still reported as an empty em:. Every other case in this family puts the identifier at the end of the block, which is where stripBlockIds looks - it reads the paragraph trailing text node and finds \"next\" there. Obsidian is evidently matching the identifier per LINE rather than per block when a wrapper is involved; the unwrapped equivalent is a separate paragraph and is handled by the adjacentBlockFollows rule instead. One case, and widening the scan from block-trailing to line-trailing without probes for the unwrapped multi-line shapes would be guessing."
+      "triage": "match"
     },
     "probe/quote-html/quote-close-tag": {
       "id": "probe/quote-html/quote-close-tag",

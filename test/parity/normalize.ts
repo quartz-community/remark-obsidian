@@ -1188,6 +1188,14 @@ const ID_WRAPPERS = new Set(["emphasis", "strong", "delete", "highlight"]);
  * Returns the children array to read the last text from, plus the chain of
  * wrappers walked, innermost first, so an emptied one can be pruned afterwards.
  */
+/** Whether a host candidate's last text node actually ends in an identifier. */
+function hostHasIdentifier(host: { inner: Node[]; chain: unknown[] }): boolean {
+  const last = host.inner[host.inner.length - 1];
+  if (!last || last.type !== "text") return false;
+  const value = (last as ValueNode).value;
+  return TRAILING_BLOCK_ID.test(value) || BRACKETED_BLOCK_ID.test(value);
+}
+
 function trailingIdHost(inner: Node[]):
   | {
       inner: Node[];
@@ -1263,7 +1271,27 @@ function stripBlockIds(tree: Root, source: string): Root {
       // `*^blk*` renders nothing, `x *^blk*` renders `x`, and `*x ^blk*` renders
       // `x` with the emphasis kept. A code span or a math span *does* shield one --
       // `` `^blk` `` and `$^blk$` keep their text -- so those are not descended.
-      const host = trailingIdHost(inner);
+      // An identifier may sit at the end of the paragraph's FIRST line rather than
+      // its last: `*^blk*` over `next` is one paragraph whose rendered text is just
+      // `next`, with the emphasis still reported as an empty `em:`. The host walk
+      // only ever looks at the final segment, so the segment before the first
+      // `break` is offered to it too -- and only when the final one found nothing,
+      // so a paragraph with identifiers on both lines keeps the recorded last-wins
+      // behaviour.
+      // Wrapped only, which `^blk` over `para` is what forces: that one keeps its
+      // identifier as text (`^blk para`), while `*^blk*` over `next` strips it. Same
+      // asymmetry the paragraph-removal branch below already records -- an unwrapped
+      // identifier on its own line has nothing to attach to, and a wrapped one does.
+      const firstBreak = inner.findIndex((node) => node.type === "break");
+      const tailHost = trailingIdHost(inner);
+      let host = tailHost;
+      if (!tailHost || !hostHasIdentifier(tailHost)) {
+        const headHost =
+          firstBreak > 0
+            ? trailingIdHost(inner.slice(0, firstBreak))
+            : undefined;
+        if (headHost && headHost.chain.length > 0) host = headHost;
+      }
       if (!host) continue;
       const last = host.inner[host.inner.length - 1];
       if (!last || last.type !== "text") continue;
