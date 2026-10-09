@@ -302,7 +302,10 @@ describe("positioned oracle", () => {
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
     // invented, which is the shape of a missing collector rather than a parse bug.
     links: 31,
-    embeds: 31,
+    // 31 -> 16: the same missing collector as `links`. `embeds` only ever received an
+    // embedded wikilink, so a markdown image was never indexed -- `![a](u)` is an embed
+    // to Obsidian exactly as `![[a]]` is.
+    embeds: 16,
     tags: 1,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
     // block identifier and the fix closed eleven cases, its own eight included.

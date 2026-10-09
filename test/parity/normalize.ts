@@ -1829,6 +1829,20 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     // `url` is taken from the node rather than the source because mdast has already
     // resolved what the cache reports resolved: `<u>` loses its brackets, `<u v>` keeps
     // its space, and `u\(v\)` becomes `u(v)`.
+    // The same gap one surface along: `embeds` only ever received an embedded
+    // *wikilink*, so a markdown image was never indexed either. `![a](u)` is an embed to
+    // Obsidian exactly as `![[a]]` is.
+    if (isType<ImageNode>(node, "image")) {
+      const url = node.url ?? "";
+      if (!isVaultTarget(url)) return;
+      const original = source.slice(
+        node.position.start.offset!,
+        node.position.end.offset!,
+      );
+      const alt = String((node as unknown as { alt?: string }).alt ?? "");
+      embeds.push(`${original}=>${url}|${alt}@${spanOf(node)}`);
+      return;
+    }
     if (isType<LinkNode>(node, "link")) {
       const url = node.url ?? "";
       if (!isVaultTarget(url)) return;
