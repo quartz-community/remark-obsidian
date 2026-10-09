@@ -740,6 +740,46 @@ the two renderers agreed, and `| a | b |` over `| --- |` really does render as
 `a` alone. The delimiter declares the columns — the surplus cell stays in the
 tree and is dropped only when rendering.
 
+### Correcting one projection from the other renderer makes the golden unsatisfiable
+
+The correction above writes Reading View's `text` into the golden and leaves every other
+projection as the detached renderer captured it. When the two renderers disagree about the
+**DOM** rather than only about display, that mixture describes no single rendering, and no
+tree can match it.
+
+`commonmark/html-blocks/171` is the worked example. `<textarea>` / blank / `*foo*` / blank
+/ `_bar_` / blank / `</textarea>` records `text: "foobar"` from Reading View and
+`emphasis: []` from the detached render, and those two cannot come from one DOM:
+
+- `textarea` is RCDATA to the HTML **parser**. Feeding the renderer's own emitted markup —
+  the raw `<textarea>` open tag, the two rendered paragraphs, then `</textarea>` — through
+  `parse5` reproduces the stored html **byte for byte** and yields **zero** `<em>`
+  elements. So `emphasis: []` is a swallow artifact, and that DOM's `textContent` is the
+  literal `<p><em>foo</em></p> <p><em>bar</em></p>`, which is exactly what the full proxy
+  check prints as `detached:`.
+- Reading View's `foobar` therefore requires the `<em>`s to be **real elements**, so its
+  emphasis is `["em:foo", "em:bar"]` — which is what we already produce, and what
+  Obsidian's own `sections` agree with (html, paragraph, paragraph, html).
+
+So the case is not parse debt, and the earlier note calling it an impossibility was
+describing the harness rather than the parser. The fix belongs in the recorder: a Reading
+View correction has to cover **every** projection it re-measures, not `text` alone.
+Until it does, a case like this is unreachable by construction while looking like ordinary
+backlog.
+
+The general rule: **a projection is only comparable against others captured from the same
+DOM.** When the cross-check fires, either correct the whole capture or record the case as
+a proxy divergence — never half of it.
+
+`fuzz/embed/64` is the other half of the same audit and went the other way. Its six
+identical `$**strong**$` readings were recorded as a suspected detached-renderer
+duplication; re-recording under `PARITY_FULL_PROXY_CHECK=1` kept all six, so the guess was
+wrong. The html says what it is: six `internal-embed` spans, twelve `is-loaded`, **zero**
+`is-unresolved`, with `alt=""` and `src=""`. The `![[ ]]` target collapsed to empty,
+Obsidian resolved it to the current note, and embedded the note into itself six levels
+deep. Reproducing that needs vault resolution and recursive inlining — the renderer's job,
+and this harness models no vault.
+
 ## The referee: a second, independent oracle
 
 `referee.mts` replays ~6800 notes recorded from Obsidian's own

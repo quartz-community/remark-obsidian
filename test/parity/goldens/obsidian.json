@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-09T10:29:01.276Z",
+  "recordedAt": "2026-10-09T17:12:05.393Z",
   "cases": {
     "probe/label-bracket/full-unmatched-undefined": {
       "id": "probe/label-bracket/full-unmatched-undefined",
@@ -46861,7 +46861,7 @@
         }
       },
       "triage": "replicate",
-      "note": "PROXY FIDELITY, not parse. The stored html holds SIX separate copies of the callout title, ~1600 bytes apart, each with its own math span -- so obs math reports the same formula six times while the text projection reports one. The two read different roots, which is why they disagree. Nothing here is a parsing rule: the detached renderer the recorder batches appears to have duplicated the callout. Settle it with PARITY_FULL_PROXY_CHECK=1, which exists for exactly this and has already caught one golden recording detached-renderer behaviour Obsidian does not produce; if it reproduces in a real Reading View, then it is an upstream rendering defect and belongs in KNOWN_PROXY_DIVERGENCES rather than in replicate."
+      "note": "RECURSIVE SELF-EMBED, not parse. Re-recorded under PARITY_FULL_PROXY_CHECK=1 and the six copies persist, so it is not a detached-renderer flake as previously recorded. The html holds 6 `internal-embed` spans, 12 `is-loaded` and ZERO `is-unresolved`, with alt=\"\" and src=\"\": the `![[ ]]` target collapsed to empty, Obsidian resolved it to the current note and embedded the note into itself six levels deep -- so the single `$**strong**$` is read six times while `text` reports it once. Reproducing that needs vault resolution and recursive inlining of the embedded note, which is the renderer's job; this harness models no vault and the parse is a single callout with one inline math."
     },
     "fuzz/embed/65": {
       "id": "fuzz/embed/65",
@@ -119723,7 +119723,7 @@
         }
       },
       "triage": "replicate",
-      "note": "`text` re-measured through a real Reading View: the detached renderer the recorder batches disagreed with the application, so its capture was not Obsidian behaviour. Other projections are as recorded."
+      "note": "PROXY CONVENTION MIXTURE, not parse. The golden mixes two renderings and no tree can satisfy both. PARITY_FULL_PROXY_CHECK=1 reports reading='foobar' against detached='<p><em>foo</em></p> <p><em>bar</em></p>', so the harness overwrote `text` with the Reading View value and left every other projection from the detached render. Proven with parse5: feeding the renderer's own emitted markup (`<textarea>` + the two rendered paragraphs + `</textarea>`) through a spec HTML parser reproduces the stored html BYTE FOR BYTE and yields ZERO <em> elements, because textarea is RCDATA -- so `emphasis: []` is a swallow artifact. Reading View's 'foobar' requires real <em> elements, hence emphasis ['em:foo','em:bar'], which is exactly what we produce. Obsidian's own `sections` agree with us too (html, paragraph, paragraph, html). The fix is in the RECORDER, not here: the Reading View correction must cover every projection it re-measures, not `text` alone. Kept `replicate` deliberately -- the gap is real and closeable, just not in src/."
     },
     "commonmark/html-blocks/172": {
       "id": "commonmark/html-blocks/172",
