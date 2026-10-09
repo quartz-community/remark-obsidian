@@ -23,9 +23,16 @@ const CODE_INDENT = 4;
  * continuation and code needs eight -- `[^1]: > [!note` over `    [[target]]` is
  * the quote's lazy continuation, and cutting it into code lost the wikilink
  * Obsidian indexes. At root there is no prefix and the threshold is unchanged.
+ *
+ * Asked of the **ancestry** and not of the quote's immediate parent, which is what
+ * `fuzz/embed/56` forces: `[^1]: > > <ma` over `    target]]. [![[#tag]]](u)` nests a
+ * quote inside a quote, so the inner one's parent is a `blockquote` and the four-space
+ * threshold came back even though the definition's own continuation is what those four
+ * spaces are. The outer quote was already right, which is why the bug needed two levels
+ * to show.
  */
-function codeIndent(host: string): number {
-  return host === "footnoteDefinition" ? CODE_INDENT * 2 : CODE_INDENT;
+function codeIndent(inDefinition: boolean): number {
+  return inDefinition ? CODE_INDENT * 2 : CODE_INDENT;
 }
 
 /**
@@ -41,6 +48,14 @@ export function quoteIndentedCodeTransform(
   source: string,
   reparse: (markdown: string) => Root,
 ): void {
+  /** Every node under a footnote definition, whose four spaces are continuation. */
+  const inDefinition = new Set<Node>();
+  visit(tree, "footnoteDefinition", (node: Node) => {
+    visit(node, (inner: Node) => {
+      inDefinition.add(inner);
+    });
+  });
+
   visit(tree, (node: Node) => {
     const parent = node as Partial<ParentNode>;
     if (!Array.isArray(parent.children)) return;
@@ -56,7 +71,7 @@ export function quoteIndentedCodeTransform(
         continue;
       }
 
-      const want = codeIndent(node.type);
+      const want = codeIndent(inDefinition.has(quote));
       const indented = (text: string): boolean =>
         text.length > want &&
         text.slice(0, want).trim() === "" &&

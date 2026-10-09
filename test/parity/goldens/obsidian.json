@@ -44298,8 +44298,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Not the metadataCache family the original note filed it under, and not an indented-code PARSE either. Measured: `remark-parse` + `remark-gfm` alone, and our own parse with every extension, both read `    target]]. [![[#tag]]](u), 日本語` as a LAZY CONTINUATION of the inner blockquote's paragraph -- `footnoteDefinition > blockquote > blockquote > paragraph` holding text, a link and more text. The `code` node appears only after the transform chain runs WITH the source passed to `runSync`, and no single feature option removes it, so an ungated pass creates it -- almost certainly by reparsing a slice whose four-space container indent was not stripped, which is the raw-slice class this package has hit six times. Nothing inside a code node is indexed, which is the whole reason `meta.links` and `meta.embeds` come back empty. `definitionContinuationTransform` exists for the `code`-after-definition shape and cannot reach this one: it compares root-level siblings, and here the `code` is inside the inner blockquote. Relaxing its blank-line gate to accept a single newline was tried and is unexercised -- 0 gains, 0 regressions. The next step is to identify the producing pass by bisecting the ungated transforms, not to add another repair."
+      "triage": "match"
     },
     "fuzz/html/11": {
       "id": "fuzz/html/11",

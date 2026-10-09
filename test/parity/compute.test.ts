@@ -297,7 +297,7 @@ describe("positioned oracle", () => {
     // 116. Lower again with the comment fold re-parsing its lines, which is what
     // lets `metaOurs` index a wikilink written inside a `%%`.
     links: 116,
-    embeds: 32,
+    embeds: 31,
     tags: 2,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
     // block identifier and the fix closed eleven cases, its own eight included.
