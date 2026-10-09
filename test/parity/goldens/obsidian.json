@@ -61705,8 +61705,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Narrowed to `html.listShape` alone: the absorbed block now lands in the right item, but micromark reads `-` / blank / `  -` as a *flat* two-item list where Obsidian nests the second under the first. That is a list-nesting rule about a marker at the content column of an empty item, not about the trailing block, and it needs its own probes."
+      "triage": "match"
     },
     "probe/footnote-embed/ref-wikilink": {
       "id": "probe/footnote-embed/ref-wikilink",

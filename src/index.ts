@@ -46,6 +46,7 @@ import {
 } from "./lib/container-lazy.js";
 import { quoteMergeTransform } from "./lib/quote-merge.js";
 import { indentTabTransform } from "./lib/indent-tab.js";
+import { listEmptyNestTransform } from "./lib/list-empty-nest.js";
 import { listTabTransform } from "./lib/list-tab.js";
 import { listTabStraddleTransform } from "./lib/list-tab-straddle.js";
 import { quoteTabTransform } from "./lib/quote-tab.js";
@@ -585,6 +586,9 @@ export default function remarkObsidian(
     // The complement of the pass above: that one needs no blank line, this one
     // needs exactly the blank line it rejects.
     listEmptyItemTransform(tree, String(file), (markdown) => reparse(markdown));
+    // After it, because that pass has already put any trailing block in the sibling
+    // item and this only has to move the item. Legacy reading only.
+    if (opts.legacyLists) listEmptyNestTransform(tree, String(file));
     quoteMergeTransform(tree, String(file));
     // After the quote passes have settled the block, since this reads its lines.
     quoteTabTransform(tree, String(file));
