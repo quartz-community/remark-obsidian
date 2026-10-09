@@ -296,6 +296,34 @@ function renderedTex(value: string): string {
 const isVaultTarget = (url: string): boolean =>
   url !== "" && !url.includes(":") && !url.startsWith("//");
 
+/**
+ * Whether an unescaped `[` is still open at `at`, counting from `from`.
+ *
+ * This is what licenses a `]` run *after* an escaped-bracket block identifier. With no
+ * closers behind it the identifier always registers, but `\[^1]` registers nothing
+ * while `[[\[^1]` and `[\[^1]]]` both do -- the trailing `]` has to be answering an
+ * opener that is still outstanding. Presence is not enough:
+ * `# ![[[[link](u)]]](\[^1]` has four openers before the identifier and all of them
+ * are already closed, so it registers nothing too.
+ *
+ * Escaped brackets are skipped on both sides, since a `\[` opens nothing and a `\]`
+ * closes nothing. Counted over the block rather than the line, which
+ * `[^[[a#` / `\[^1]` is what settles: its closer answers an opener one line up.
+ */
+function bracketStillOpen(source: string, from: number, at: number): boolean {
+  let depth = 0;
+  for (let index = from; index < at; index++) {
+    const character = source[index];
+    if (character === "\\") {
+      index += 1;
+      continue;
+    }
+    if (character === "[") depth += 1;
+    else if (character === "]" && depth > 0) depth -= 1;
+  }
+  return depth > 0;
+}
+
 /** A tag opens on `<` plus a letter, `/`, `!` or `?`; any other `<` is literal text. */
 const TAG_START = /[a-zA-Z/!?]/;
 
@@ -1086,6 +1114,20 @@ export function metaOurs(tree: Root, source: string): MetaProjections {
 const TRAILING_BLOCK_ID = /(?:^|[ \t])\^[A-Za-z0-9-]+$/u;
 const ONLY_BLOCK_ID = /^[ \t]*\^[A-Za-z0-9-]+[ \t]*$/u;
 /**
+ * The same identifier behind a bracket, which only counts when the bracket is escaped.
+ *
+ * `\[^1` renders `[`, so the caret is a block identifier; `[^1` renders in full,
+ * because there the bracket opens a footnote reference that claims the caret. The two
+ * are indistinguishable in a node's value and differ by one character in the source,
+ * so the caller checks the span rather than the text.
+ *
+ * Closing brackets may follow the identifier and are kept: `[[\[^1]` renders `[[[]`
+ * and `[\[^1]]]` renders `[[]]]`, so only the `^1` goes. That is why the identifier is
+ * captured separately instead of the whole match being sliced off, and why this is not
+ * anchored the way `TRAILING_BLOCK_ID` is -- four cases carry a `]` run behind it.
+ */
+const BRACKETED_BLOCK_ID = /\[(\^[A-Za-z0-9-]+)\]*$/u;
+/**
  * A `mailto:` scheme in any case, which Obsidian strips from the displayed text.
  *
  * `<MAILTO:FOO@BAR.BAZ>` renders `FOO@BAR.BAZ` exactly as `<mailto:a@e.test>` renders
@@ -1264,7 +1306,29 @@ function stripBlockIds(tree: Root, source: string): Root {
         continue;
       }
       const match = TRAILING_BLOCK_ID.exec(value);
-      if (!match) continue;
+      if (!match) {
+        // An escaped bracket leaves a literal `[` with the caret free behind it, so
+        // `\[^1` renders `[` alone. The value cannot tell that apart from an
+        // unescaped `[^1`, which renders in full -- both resolve to the text `[^1` --
+        // so the source decides, which is why the spans differ by the backslash.
+        const bracketed = BRACKETED_BLOCK_ID.exec(value);
+        const start = pointOf(child, "start");
+        const stop = pointOf(child, "end");
+        if (!bracketed || start === undefined || stop === undefined) continue;
+        if (!source.slice(start, stop).endsWith(`\\${bracketed[0]}`)) continue;
+        // A `]` run behind the identifier needs an opener still outstanding.
+        const closers = bracketed[0].length - 1 - (bracketed[1]?.length ?? 0);
+        const idAt = stop - closers - (bracketed[1]?.length ?? 0);
+        const blockFrom = pointOf(child, "start") ?? start;
+        if (closers > 0 && !bracketStillOpen(source, blockFrom, idAt)) continue;
+        // Drop the identifier and keep everything either side of it, brackets
+        // included: `[\[^1` renders `[[` and `[\[^1]]]` renders `[[]]]`.
+        const kept = bracketed.index + 1;
+        (last as ValueNode).value =
+          value.slice(0, kept) +
+          value.slice(kept + (bracketed[1]?.length ?? 0));
+        continue;
+      }
       (last as ValueNode).value = value.slice(0, match.index);
       // The emptied wrapper stays. Obsidian still reports an emphasis for
       // `*^blk*` -- an `em:` with no content -- and still reports the paragraph
@@ -1572,9 +1636,25 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     // registers nothing -- a leading space is enough to make ` ^blk` register, so
     // the exclusion is narrow and the wrapper falls outside it.
     const wrapped = opener !== null;
+    // An *escaped* bracket counts as something preceding the caret, where a bare one
+    // does not. The exclusion above exists because `[^1` opens a footnote reference
+    // and the reference claims the caret -- but `\[^1` leaves a literal `[`, so the
+    // caret is free and the trailing `^1` is an ordinary block identifier. Measured
+    // on both halves: nine recorded cases register with the escape, and the four
+    // without it -- `token/footnote-ref/no-closer` and its siblings -- register
+    // nothing and already matched.
+    const closersAfter = /^\]*$/u.test(raw.slice(id.index + 1 + id.name.length))
+      ? raw.slice(id.index + 1 + id.name.length).length
+      : 0;
+    const escapedBracket =
+      before === "[" &&
+      raw[beforeAt - 2] === "\\" &&
+      (closersAfter === 0 ||
+        bracketStillOpen(source, from, lineStart + id.index - 2));
     if (
       !(setext && beforeAt === 0) &&
       !wrapped &&
+      !escapedBracket &&
       !(before && /\s/u.test(before))
     ) {
       continue;

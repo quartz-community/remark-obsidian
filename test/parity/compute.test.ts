@@ -298,11 +298,9 @@ describe("positioned oracle", () => {
     links: 124,
     embeds: 32,
     tags: 2,
-    // 25 with the probe wave: the eight `probe/escaped-block-id/*` documents whose
-    // `\[^1` has no closing bracket. They settle the family -- the closing bracket is
-    // the discriminator, not the preceding context -- and they all diverge until the
-    // block scan learns to look past an escaped opener.
-    blocks: 25,
+    // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
+    // block identifier and the fix closed eleven cases, its own eight included.
+    blocks: 16,
     listItems: 71,
     frontmatterPosition: 7,
   };

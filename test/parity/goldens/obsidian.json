@@ -968,8 +968,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+      "triage": "match"
     },
     "probe/escaped-block-id/text-space-before": {
       "id": "probe/escaped-block-id/text-space-before",
@@ -1019,8 +1018,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+      "triage": "match"
     },
     "probe/escaped-block-id/text-nospace-before": {
       "id": "probe/escaped-block-id/text-nospace-before",
@@ -1070,8 +1068,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+      "triage": "match"
     },
     "probe/escaped-block-id/text-before-closed": {
       "id": "probe/escaped-block-id/text-before-closed",
@@ -1169,8 +1166,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+      "triage": "match"
     },
     "probe/escaped-block-id/emphasis-before": {
       "id": "probe/escaped-block-id/emphasis-before",
@@ -1279,8 +1275,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+      "triage": "match"
     },
     "probe/escaped-block-id/list-marker": {
       "id": "probe/escaped-block-id/list-marker",
@@ -1332,8 +1327,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+      "triage": "match"
     },
     "probe/escaped-block-id/quote-marker-closed": {
       "id": "probe/escaped-block-id/quote-marker-closed",
@@ -1431,8 +1425,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+      "triage": "match"
     },
     "probe/math-retry/triple-no-closer": {
       "id": "probe/math-retry/triple-no-closer",
@@ -36197,8 +36190,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "BLOCK IDENTIFIER family, with the probe/escaped-label trio: obs text is exactly ours minus `^1`, which Obsidian consumes as a block id and strips from the rendered text. Same open question -- what distinguishes it from the matching control `\\[^1]` -- and the same answer: wants probes varying the context before the escaped bracket."
+      "triage": "match"
     },
     "fuzz/highlight/9": {
       "id": "fuzz/highlight/9",
@@ -67967,8 +67959,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "BLOCK IDENTIFIER family, not a footnote-label one: Obsidian registers blocks [\"1@0:0-...\"] spanning the whole line for all three of these, and blocks [] for the matching control `\\[^1]` (token/footnote-ref/escaped-open), which keeps its text `[^1]` in full. So the `^1` does not vanish into a reference -- it is consumed as a block id and stripped from the rendered text, which is why obs output is exactly ours minus `^1`. Our block scan refuses it because the caret follows `[` rather than whitespace, a guard measured to stop `$x^2` reporting the block `2`. What is NOT yet pinned is why the control registers nothing when its caret also follows `[`: the three that register all have something before the escaped bracket (`[`, `[[`, `> `) and the control has nothing. Four samples cannot separate \"something precedes\" from \"a bracket precedes\", so this wants probes varying the preceding context before any rule is written."
+      "triage": "match"
     },
     "probe/escaped-label/in-wikilink": {
       "id": "probe/escaped-label/in-wikilink",
@@ -68018,8 +68009,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "BLOCK IDENTIFIER family, not a footnote-label one: Obsidian registers blocks [\"1@0:0-...\"] spanning the whole line for all three of these, and blocks [] for the matching control `\\[^1]` (token/footnote-ref/escaped-open), which keeps its text `[^1]` in full. So the `^1` does not vanish into a reference -- it is consumed as a block id and stripped from the rendered text, which is why obs output is exactly ours minus `^1`. Our block scan refuses it because the caret follows `[` rather than whitespace, a guard measured to stop `$x^2` reporting the block `2`. What is NOT yet pinned is why the control registers nothing when its caret also follows `[`: the three that register all have something before the escaped bracket (`[`, `[[`, `> `) and the control has nothing. Four samples cannot separate \"something precedes\" from \"a bracket precedes\", so this wants probes varying the preceding context before any rule is written."
+      "triage": "match"
     },
     "probe/escaped-label/in-brackets": {
       "id": "probe/escaped-label/in-brackets",
@@ -68069,8 +68059,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "BLOCK IDENTIFIER family, not a footnote-label one: Obsidian registers blocks [\"1@0:0-...\"] spanning the whole line for all three of these, and blocks [] for the matching control `\\[^1]` (token/footnote-ref/escaped-open), which keeps its text `[^1]` in full. So the `^1` does not vanish into a reference -- it is consumed as a block id and stripped from the rendered text, which is why obs output is exactly ours minus `^1`. Our block scan refuses it because the caret follows `[` rather than whitespace, a guard measured to stop `$x^2` reporting the block `2`. What is NOT yet pinned is why the control registers nothing when its caret also follows `[`: the three that register all have something before the escaped bracket (`[`, `[[`, `> `) and the control has nothing. Four samples cannot separate \"something precedes\" from \"a bracket precedes\", so this wants probes varying the preceding context before any rule is written."
+      "triage": "match"
     },
     "probe/escaped-label/in-embed": {
       "id": "probe/escaped-label/in-embed",
