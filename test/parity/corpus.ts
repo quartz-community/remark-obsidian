@@ -28,6 +28,107 @@ export interface Case {
  * quartz-community/remark-obsidian#4 and the forum thread it links.
  */
 const SEEDS: ReadonlyArray<readonly [string, string]> = [
+  // ---------------------------------------------------------------------------
+  // Probe wave: the five families the backlog could not adjudicate.
+  //
+  // Each group below answers one question the recorded cases leave open. They are
+  // batched into a single wave because a full recording is about nine minutes, and
+  // because the open cases they serve are independent of each other.
+  // ---------------------------------------------------------------------------
+
+  // WHAT DOES A BARE-URL AUTOLINK TRIM FROM ITS TAIL?
+  //
+  // Obsidian's literal runs further than GFM's: `https://e.test/p](`code`` is one
+  // link whose href is the whole string, so nothing later on the line parses. Three
+  // recorded cases show it trimming a `.` and keeping `]]`, which is not enough to
+  // pin the set -- and the set is exactly what a repair needs, since a trim that is
+  // too eager breaks the 33 bare-URL cases that already match. One character each.
+  ["probe/autolink-trail/period", "see https://e.test/p. end\n"],
+  ["probe/autolink-trail/comma", "see https://e.test/p, end\n"],
+  ["probe/autolink-trail/semicolon", "see https://e.test/p; end\n"],
+  ["probe/autolink-trail/colon", "see https://e.test/p: end\n"],
+  ["probe/autolink-trail/bang", "see https://e.test/p! end\n"],
+  ["probe/autolink-trail/question", "see https://e.test/p? end\n"],
+  ["probe/autolink-trail/close-paren", "see https://e.test/p) end\n"],
+  ["probe/autolink-trail/close-bracket", "see https://e.test/p] end\n"],
+  ["probe/autolink-trail/double-close-bracket", "see https://e.test/p]] end\n"],
+  ["probe/autolink-trail/bracket-then-paren", "see https://e.test/p]( end\n"],
+  ["probe/autolink-trail/backtick-run", "see https://e.test/p`code` end\n"],
+  ["probe/autolink-trail/star", "see https://e.test/p* end\n"],
+  ["probe/autolink-trail/strong", "see https://e.test/p**b** end\n"],
+  ["probe/autolink-trail/tilde", "see https://e.test/p~~d~~ end\n"],
+  ["probe/autolink-trail/dollar", "see https://e.test/p$x$ end\n"],
+  ["probe/autolink-trail/wikilink", "see https://e.test/p[[a]] end\n"],
+  ["probe/autolink-trail/quote", 'see https://e.test/p" end\n'],
+  ["probe/autolink-trail/trailing-period-eol", "see https://e.test/p.\n"],
+
+  // WHAT LETS AN ESCAPED LABEL REGISTER A BLOCK IDENTIFIER?
+  //
+  // `> \[^1`, `[[\[^1]` and `[\[^1]]]` each register `blocks: ["1@..."]` spanning
+  // the line, while the control `\[^1]` registers nothing. Every registering case
+  // has something before the escaped bracket, which is a hypothesis and not a rule:
+  // these vary what precedes it, and whether a closing bracket is present, so the
+  // two candidate discriminators are separated.
+  ["probe/escaped-block-id/bare-open", "\\[^1\n"],
+  // The closed control `\[^1]` is deliberately NOT repeated here: it already exists
+  // as `token/footnote-ref/escaped-open`, and because SEEDS are declared first a probe
+  // with the same markdown would displace it -- taking with it the `blocks: []`
+  // control this whole family is defined against. The pre-recording displacement
+  // check is what caught that.
+  ["probe/escaped-block-id/text-space-before", "x \\[^1\n"],
+  ["probe/escaped-block-id/text-nospace-before", "x\\[^1\n"],
+  ["probe/escaped-block-id/text-before-closed", "x \\[^1]\n"],
+  ["probe/escaped-block-id/single-bracket-before", "[\\[^1\n"],
+  ["probe/escaped-block-id/emphasis-before", "*x* \\[^1\n"],
+  ["probe/escaped-block-id/heading-marker", "# \\[^1\n"],
+  ["probe/escaped-block-id/list-marker", "- \\[^1\n"],
+  ["probe/escaped-block-id/quote-marker-closed", "> \\[^1]\n"],
+  ["probe/escaped-block-id/second-line", "head\n\\[^1\n"],
+
+  // DOES A DISPLAY OPENER RETRY WITH A SHORTER RUN?
+  //
+  // `$$$], $x^2$` gives Obsidian one inline formula holding `], $x^2` -- the opener
+  // is the *third* dollar and the two before it are literal. That is the shape the
+  // backtick retry already has (shed from the left until a closer is found), and if
+  // it holds for dollars too then `legacy-code-text.ts` has the pattern to copy.
+  // `$$$$x^2$$` already matches as an empty formula, so the retry only happens when
+  // the display pairing fails; these separate run width from closer width.
+  ["probe/math-retry/triple-no-closer", "$$$x^2\n"],
+  ["probe/math-retry/triple-single-closer", "$$$x^2$\n"],
+  ["probe/math-retry/triple-double-closer", "$$$x^2$$\n"],
+  ["probe/math-retry/five-single-closer", "$$$$$x^2$\n"],
+  ["probe/math-retry/five-double-closer", "$$$$$x^2$$\n"],
+  ["probe/math-retry/triple-space-before-closer", "$$$x^2 $\n"],
+  ["probe/math-retry/triple-then-two-singles", "$$$a$b$\n"],
+
+  // WHICH `]` STOPS A WIKILINK OPENER?
+  //
+  // A `[` right after a link text's `]` opens a label, so `[[` there is not a
+  // wikilink opener -- but declining on any preceding `]` costs three cases where
+  // the bracket closed a footnote reference instead. These separate the two, and add
+  // the shapes a tree repair would have to tell apart.
+  ["probe/label-wikilink/after-footnote-ref", "a[^1][[w]] b\n\n[^1]: d\n"],
+  ["probe/label-wikilink/after-plain-bracket", "a [x][[w]] b\n"],
+  ["probe/label-wikilink/after-wikilink", "[[a]][[b]]\n"],
+  ["probe/label-wikilink/after-image-text", "![x][[w]]\n"],
+  ["probe/label-wikilink/after-inline-footnote", "^[a][[w]]\n"],
+  ["probe/label-wikilink/defined-label", "a [x][[w]] b\n\n[[w]]: /u\n"],
+
+  // IS AN UNMATCHED BRACKET A LEGAL REFERENCE LABEL?
+  //
+  // `[foo][ref[]` renders `[foo]ref[]` in Obsidian with no anchor, and its
+  // definition line vanishes -- so `[ref[]: /uri` *is* a definition while the
+  // reference using it is not a link. `[foo][ref[bar]]` keeps its definition line
+  // visible instead, so the two are not one rule. These ask each half on its own.
+  ["probe/label-bracket/definition-then-shortcut", "[ref[]: /uri\n\n[ref[]\n"],
+  ["probe/label-bracket/shortcut-then-definition", "[ref[]\n\n[ref[]: /uri\n"],
+  [
+    "probe/label-bracket/nested-then-shortcut",
+    "[ref[bar]]: /uri\n\n[ref[bar]]\n",
+  ],
+  ["probe/label-bracket/definition-alone", "[ref[]: /uri\n"],
+  ["probe/label-bracket/nested-definition-alone", "[ref[bar]]: /uri\n"],
+
   // `metadataCache` reports a well-formed `^[body]` as a *definition* named
   // `[inline0`, spanning the body alone, and an empty `^[]` as a *reference*
   // with an empty name at the caret. Every case in the corpus held at most one

@@ -292,10 +292,17 @@ describe("positioned oracle", () => {
     footnoteRefs: 3,
     headings: 13,
     sections: 36,
-    links: 121,
+    // 124 with the probe wave: `probe/label-wikilink/{after-plain-bracket,
+    // after-image-text,defined-label}`, where a `[` after a link text's `]` opens a
+    // label and we open a wikilink. New documents, not a regression.
+    links: 124,
     embeds: 32,
     tags: 2,
-    blocks: 17,
+    // 25 with the probe wave: the eight `probe/escaped-block-id/*` documents whose
+    // `\[^1` has no closing bracket. They settle the family -- the closing bracket is
+    // the discriminator, not the preceding context -- and they all diverge until the
+    // block scan learns to look past an escaped opener.
+    blocks: 25,
     listItems: 71,
     frontmatterPosition: 7,
   };

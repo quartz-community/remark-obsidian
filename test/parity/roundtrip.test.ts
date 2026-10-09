@@ -279,6 +279,7 @@ describe("round-trip", () => {
     // this family as "a missing math handler" was wrong: no spelling is both what
     // Obsidian renders and inert on re-parse. A fix that duplicates the author's text
     // is refused even when it converges.
-    expect(unstable.length).toBeLessThanOrEqual(30);
+    // 32 with the probe wave; both additions are new documents.
+    expect(unstable.length).toBeLessThanOrEqual(32);
   });
 });

@@ -54,8 +54,2397 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-08T17:38:38.892Z",
+  "recordedAt": "2026-10-09T03:57:37.233Z",
   "cases": {
+    "probe/autolink-trail/period": {
+      "id": "probe/autolink-trail/period",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p. end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p\" target=\"_blank\">https://e.test/p</a>. end</p>",
+        "projections": {
+          "text": "see https://e.test/p. end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p. end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:25"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/comma": {
+      "id": "probe/autolink-trail/comma",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p, end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p\" target=\"_blank\">https://e.test/p</a>, end</p>",
+        "projections": {
+          "text": "see https://e.test/p, end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p, end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:25"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/semicolon": {
+      "id": "probe/autolink-trail/semicolon",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p; end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p\" target=\"_blank\">https://e.test/p</a>; end</p>",
+        "projections": {
+          "text": "see https://e.test/p; end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p; end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:25"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/colon": {
+      "id": "probe/autolink-trail/colon",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p: end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p\" target=\"_blank\">https://e.test/p</a>: end</p>",
+        "projections": {
+          "text": "see https://e.test/p: end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p: end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:25"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/bang": {
+      "id": "probe/autolink-trail/bang",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p! end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p\" target=\"_blank\">https://e.test/p</a>! end</p>",
+        "projections": {
+          "text": "see https://e.test/p! end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p! end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:25"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/question": {
+      "id": "probe/autolink-trail/question",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p? end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p\" target=\"_blank\">https://e.test/p</a>? end</p>",
+        "projections": {
+          "text": "see https://e.test/p? end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p? end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:25"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/close-paren": {
+      "id": "probe/autolink-trail/close-paren",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p) end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p\" target=\"_blank\">https://e.test/p</a>) end</p>",
+        "projections": {
+          "text": "see https://e.test/p) end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p) end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:25"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/close-bracket": {
+      "id": "probe/autolink-trail/close-bracket",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p] end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a data-tooltip-position=\"top\" aria-label=\"https://e.test/p%5D\" rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p%5D\" target=\"_blank\">https://e.test/p]</a> end</p>",
+        "projections": {
+          "text": "see https://e.test/p] end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p] end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:25"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/double-close-bracket": {
+      "id": "probe/autolink-trail/double-close-bracket",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p]] end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a data-tooltip-position=\"top\" aria-label=\"https://e.test/p%5D%5D\" rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p%5D%5D\" target=\"_blank\">https://e.test/p]]</a> end</p>",
+        "projections": {
+          "text": "see https://e.test/p]] end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p]] end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:26"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/bracket-then-paren": {
+      "id": "probe/autolink-trail/bracket-then-paren",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p]( end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a data-tooltip-position=\"top\" aria-label=\"https://e.test/p%5D(\" rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p%5D(\" target=\"_blank\">https://e.test/p](</a> end</p>",
+        "projections": {
+          "text": "see https://e.test/p]( end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p]( end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:26"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/backtick-run": {
+      "id": "probe/autolink-trail/backtick-run",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p`code` end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a data-tooltip-position=\"top\" aria-label=\"https://e.test/p%60code%60\" rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p%60code%60\" target=\"_blank\">https://e.test/p`code`</a> end</p>",
+        "projections": {
+          "text": "see https://e.test/p`code` end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p`code` end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:30"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/star": {
+      "id": "probe/autolink-trail/star",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p* end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p\" target=\"_blank\">https://e.test/p</a>* end</p>",
+        "projections": {
+          "text": "see https://e.test/p* end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p* end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:25"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/strong": {
+      "id": "probe/autolink-trail/strong",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p**b** end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p**b\" target=\"_blank\">https://e.test/p**b</a>** end</p>",
+        "projections": {
+          "text": "see https://e.test/p**b** end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p**b** end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:29"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/tilde": {
+      "id": "probe/autolink-trail/tilde",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p~~d~~ end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p~~d\" target=\"_blank\">https://e.test/p~~d</a>~~ end</p>",
+        "projections": {
+          "text": "see https://e.test/p~~d~~ end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p~~d~~ end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:29"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/dollar": {
+      "id": "probe/autolink-trail/dollar",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p$x$ end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p$x$\" target=\"_blank\">https://e.test/p$x$</a> end</p>",
+        "projections": {
+          "text": "see https://e.test/p$x$ end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p$x$ end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:27"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/wikilink": {
+      "id": "probe/autolink-trail/wikilink",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p[[a]] end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a data-tooltip-position=\"top\" aria-label=\"https://e.test/p%5B%5Ba%5D%5D\" rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p%5B%5Ba%5D%5D\" target=\"_blank\">https://e.test/p[[a]]</a> end</p>",
+        "projections": {
+          "text": "see https://e.test/p[[a]] end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p[[a]] end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:29"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/quote": {
+      "id": "probe/autolink-trail/quote",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p\" end\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a data-tooltip-position=\"top\" aria-label=\"https://e.test/p%22\" rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p%22\" target=\"_blank\">https://e.test/p\"</a> end</p>",
+        "projections": {
+          "text": "see https://e.test/p\" end",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p\" end"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:25"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/autolink-trail/trailing-period-eol": {
+      "id": "probe/autolink-trail/trailing-period-eol",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "see https://e.test/p.\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">see <a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p\" target=\"_blank\">https://e.test/p</a>.</p>",
+        "projections": {
+          "text": "see https://e.test/p.",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "see https://e.test/p."
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:21"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/escaped-block-id/bare-open": {
+      "id": "probe/escaped-block-id/bare-open",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "\\[^1\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[</p>",
+        "projections": {
+          "text": "[",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "\\[^1"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "1@0:0-0:4"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+    },
+    "probe/escaped-block-id/text-space-before": {
+      "id": "probe/escaped-block-id/text-space-before",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "x \\[^1\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">x [</p>",
+        "projections": {
+          "text": "x [",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "x \\[^1"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "1@0:0-0:6"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+    },
+    "probe/escaped-block-id/text-nospace-before": {
+      "id": "probe/escaped-block-id/text-nospace-before",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "x\\[^1\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">x[</p>",
+        "projections": {
+          "text": "x[",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "x\\[^1"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "1@0:0-0:5"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+    },
+    "probe/escaped-block-id/text-before-closed": {
+      "id": "probe/escaped-block-id/text-before-closed",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "x \\[^1]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">x [^1]</p>",
+        "projections": {
+          "text": "x [^1]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "x \\[^1]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/escaped-block-id/single-bracket-before": {
+      "id": "probe/escaped-block-id/single-bracket-before",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[\\[^1\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[[</p>",
+        "projections": {
+          "text": "[[",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[\\[^1"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "1@0:0-0:5"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+    },
+    "probe/escaped-block-id/emphasis-before": {
+      "id": "probe/escaped-block-id/emphasis-before",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "*x* \\[^1\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><em>x</em> [</p>",
+        "projections": {
+          "text": "x [",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [
+            "em:x"
+          ],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "*x* \\[^1"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "1@0:0-0:8"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+    },
+    "probe/escaped-block-id/heading-marker": {
+      "id": "probe/escaped-block-id/heading-marker",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "# \\[^1\n",
+      "obsidian": {
+        "html": "<h1 data-heading=\"\\[^1\" dir=\"auto\">[</h1>",
+        "projections": {
+          "text": "[",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "1:\\[^1"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "# \\[^1"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "1:\\[^1"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "1:\\[^1@0:0"
+          ],
+          "sections": [
+            "heading@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "1@0:0-0:6"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+    },
+    "probe/escaped-block-id/list-marker": {
+      "id": "probe/escaped-block-id/list-marker",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- \\[^1\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">[</li>\n</ul>",
+        "projections": {
+          "text": "[",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- \\[^1"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:6"
+          ],
+          "blocks": [
+            "1@0:0-0:6"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+    },
+    "probe/escaped-block-id/quote-marker-closed": {
+      "id": "probe/escaped-block-id/quote-marker-closed",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> \\[^1]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>[^1]</p>\n</blockquote>",
+        "projections": {
+          "text": "[^1]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> \\[^1]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/escaped-block-id/second-line": {
+      "id": "probe/escaped-block-id/second-line",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "head\n\\[^1\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">head<br>\n[</p>",
+        "projections": {
+          "text": "head [",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "head\n\\[^1"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-1:4"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "1@0:0-1:4"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "BLOCK IDENTIFIER AFTER AN ESCAPED BRACKET. An unclosed `\\[^1` registers blocks [\"1@0:0-0:4\"] and renders only `[`, so the trailing `^1` is a block identifier and is stripped from the rendered text. The escaped bracket is irrelevant: `x \\[^1`, `x\\[^1`, `[\\[^1`, `*x* \\[^1`, `# \\[^1`, `- \\[^1` and a second-line form all register, and the two CLOSED controls (`x \\[^1]`, `> \\[^1]`) register nothing and match. So the discriminator is the closing bracket, not the preceding context -- which refutes the hypothesis the earlier note carried. Our block scan declines after a `\\[`, so we render `[^1` where Obsidian renders `[`."
+    },
+    "probe/math-retry/triple-no-closer": {
+      "id": "probe/math-retry/triple-no-closer",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "$$$x^2\n",
+      "obsidian": {
+        "html": "<div class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"x^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"x^2\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></div>",
+        "projections": {
+          "text": "⟨math⟩",
+          "math": [
+            {
+              "display": true,
+              "tex": "x^2"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "math",
+              "text": "$$$x^2"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "math@0:0-1:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-retry/triple-single-closer": {
+      "id": "probe/math-retry/triple-single-closer",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "$$$x^2$\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">$$<span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"x^2\" class=\"TEX-N\"><mjx-msup data-latex=\"x^2\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.363em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span></p>",
+        "projections": {
+          "text": "$$⟨math⟩",
+          "math": [
+            {
+              "display": false,
+              "tex": "x^2"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "$$$x^2$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-retry/triple-double-closer": {
+      "id": "probe/math-retry/triple-double-closer",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "$$$x^2$$\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"$x^2\" display=\"true\" class=\"TEX-N\"><mjx-mo data-latex=\"$\"><mjx-c class=\"mjx-c24\">$</mjx-c></mjx-mo><mjx-msup data-latex=\"x^2\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span></p>",
+        "projections": {
+          "text": "⟨math⟩",
+          "math": [
+            {
+              "display": true,
+              "tex": "$x^2"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "$$$x^2$$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-retry/five-single-closer": {
+      "id": "probe/math-retry/five-single-closer",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "$$$$$x^2$\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"\" display=\"true\" class=\"TEX-N\"></mjx-math></mjx-container></span><span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"x^2\" class=\"TEX-N\"><mjx-msup data-latex=\"x^2\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.363em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span></p>",
+        "projections": {
+          "text": "⟨math⟩⟨math⟩",
+          "math": [
+            {
+              "display": true,
+              "tex": ""
+            },
+            {
+              "display": false,
+              "tex": "x^2"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "$$$$$x^2$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:9"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-retry/five-double-closer": {
+      "id": "probe/math-retry/five-double-closer",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "$$$$$x^2$$\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"\" display=\"true\" class=\"TEX-N\"></mjx-math></mjx-container></span><span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"x^2\" class=\"TEX-N\"><mjx-msup data-latex=\"x^2\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.363em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>$</p>",
+        "projections": {
+          "text": "⟨math⟩⟨math⟩$",
+          "math": [
+            {
+              "display": true,
+              "tex": ""
+            },
+            {
+              "display": false,
+              "tex": "x^2"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "$$$$$x^2$$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:10"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-retry/triple-space-before-closer": {
+      "id": "probe/math-retry/triple-space-before-closer",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "$$$x^2 $\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">$$$x^2 $</p>",
+        "projections": {
+          "text": "$$$x^2 $",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "$$$x^2 $"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/math-retry/triple-then-two-singles": {
+      "id": "probe/math-retry/triple-then-two-singles",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "$$$a$b$\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">$$<span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"a\" class=\"TEX-N\"><mjx-mi data-latex=\"a\"><mjx-c class=\"mjx-c1D44E\">𝑎</mjx-c></mjx-mi></mjx-math></mjx-container></span>b$</p>",
+        "projections": {
+          "text": "$$⟨math⟩b$",
+          "math": [
+            {
+              "display": false,
+              "tex": "a"
+            }
+          ],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "$$$a$b$"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/label-wikilink/after-footnote-ref": {
+      "id": "probe/label-wikilink/after-footnote-ref",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "a[^1][[w]] b\n\n[^1]: d\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup><a data-href=\"w\" href=\"w\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">w</a> b</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>d<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "a⟨fn⟩w b",
+          "math": [],
+          "links": [
+            {
+              "path": "w",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "a[^1][[w]] b"
+            },
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]: d"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "w"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@2:0-2:7"
+          ],
+          "footnoteRefs": [
+            "1@0:1"
+          ],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:12",
+            "footnoteDefinition@2:0-2:7",
+            "text@3:0-3:0",
+            "element@3:0-3:0"
+          ],
+          "links": [
+            "[[w]]=>w|w@0:5-0:10"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/label-wikilink/after-plain-bracket": {
+      "id": "probe/label-wikilink/after-plain-bracket",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "a [x][[w]] b\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">a [x][w]] b</p>",
+        "projections": {
+          "text": "a [x][w]] b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "a [x][[w]] b"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:12"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A `[` right after a LINK TEXT's `]` opens a label, so `[[` there is not a wikilink opener: `a [x][[w]] b` renders `a [x][w]] b` with no link. Separated from the shapes that do open one -- after a footnote reference (`a[^1][[w]]`), after a wikilink (`[[a]][[b]]`) and after an inline footnote (`^[a][[w]]`) all index `w` and all match -- so the rule is specifically a bracket pair that is plain text, not one belonging to another construct."
+    },
+    "probe/label-wikilink/after-wikilink": {
+      "id": "probe/label-wikilink/after-wikilink",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[[a]][[b]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-href=\"a\" href=\"a\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a</a><a data-href=\"b\" href=\"b\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">b</a></p>",
+        "projections": {
+          "text": "ab",
+          "math": [],
+          "links": [
+            {
+              "path": "a",
+              "heading": "",
+              "embedded": false
+            },
+            {
+              "path": "b",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[[a]][[b]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "a",
+            "b"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:10"
+          ],
+          "links": [
+            "[[a]]=>a|a@0:0-0:5",
+            "[[b]]=>b|b@0:5-0:10"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/label-wikilink/after-image-text": {
+      "id": "probe/label-wikilink/after-image-text",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "![x][[w]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">![x][w]]</p>",
+        "projections": {
+          "text": "![x][w]]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "![x][[w]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:9"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A `[` right after a LINK TEXT's `]` opens a label, so `[[` there is not a wikilink opener: `a [x][[w]] b` renders `a [x][w]] b` with no link. Separated from the shapes that do open one -- after a footnote reference (`a[^1][[w]]`), after a wikilink (`[[a]][[b]]`) and after an inline footnote (`^[a][[w]]`) all index `w` and all match -- so the rule is specifically a bracket pair that is plain text, not one belonging to another construct."
+    },
+    "probe/label-wikilink/after-inline-footnote": {
+      "id": "probe/label-wikilink/after-inline-footnote",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "^[a][[w]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"[inline0\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup><a data-href=\"w\" href=\"w\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">w</a></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\">a<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+        "projections": {
+          "text": "⟨fn⟩w",
+          "math": [],
+          "links": [
+            {
+              "path": "w",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "^[a][[w]]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "w"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "[inline0@0:2-0:3"
+          ],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:9",
+            "text@1:0-1:0",
+            "element@1:0-1:0"
+          ],
+          "links": [
+            "[[w]]=>w|w@0:4-0:9"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/label-wikilink/defined-label": {
+      "id": "probe/label-wikilink/defined-label",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "a [x][[w]] b\n\n[[w]]: /u\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">a [x][w]] b</p>\n<p dir=\"auto\"><a data-href=\"w\" href=\"w\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">w</a>: /u</p>",
+        "projections": {
+          "text": "a [x][w]] b w: /u",
+          "math": [],
+          "links": [
+            {
+              "path": "w",
+              "heading": "",
+              "embedded": false
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "a [x][[w]] b"
+            },
+            {
+              "type": "paragraph",
+              "text": "[[w]]: /u"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [
+            "w"
+          ],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:12",
+            "paragraph@2:0-2:9"
+          ],
+          "links": [
+            "[[w]]=>w|w@2:0-2:5"
+          ],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A `[` right after a LINK TEXT's `]` opens a label, so `[[` there is not a wikilink opener: `a [x][[w]] b` renders `a [x][w]] b` with no link. Separated from the shapes that do open one -- after a footnote reference (`a[^1][[w]]`), after a wikilink (`[[a]][[b]]`) and after an inline footnote (`^[a][[w]]`) all index `w` and all match -- so the rule is specifically a bracket pair that is plain text, not one belonging to another construct."
+    },
+    "probe/label-bracket/definition-then-shortcut": {
+      "id": "probe/label-bracket/definition-then-shortcut",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[ref[]: /uri\n\n[ref[]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[ref[]</p>",
+        "projections": {
+          "text": "[ref[]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "definition",
+              "text": "[ref[]: /uri"
+            },
+            {
+              "type": "paragraph",
+              "text": "[ref[]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [
+            "/uri@0:0-0:12"
+          ],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "definition@0:0-0:12",
+            "paragraph@2:0-2:6"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/label-bracket/shortcut-then-definition": {
+      "id": "probe/label-bracket/shortcut-then-definition",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[ref[]\n\n[ref[]: /uri\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[ref[]</p>",
+        "projections": {
+          "text": "[ref[]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[ref[]"
+            },
+            {
+              "type": "definition",
+              "text": "[ref[]: /uri"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [
+            "/uri@2:0-2:12"
+          ],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:6",
+            "definition@2:0-2:12"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/label-bracket/nested-then-shortcut": {
+      "id": "probe/label-bracket/nested-then-shortcut",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[ref[bar]]: /uri\n\n[ref[bar]]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[ref[bar]]: /uri</p>\n<p dir=\"auto\">[ref[bar]]</p>",
+        "projections": {
+          "text": "[ref[bar]]: /uri [ref[bar]]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[ref[bar]]: /uri"
+            },
+            {
+              "type": "paragraph",
+              "text": "[ref[bar]]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:16",
+            "paragraph@2:0-2:10"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/label-bracket/definition-alone": {
+      "id": "probe/label-bracket/definition-alone",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[ref[]: /uri\n",
+      "obsidian": {
+        "html": "",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "definition",
+              "text": "[ref[]: /uri"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [
+            "/uri@0:0-0:12"
+          ],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "definition@0:0-0:12"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/label-bracket/nested-definition-alone": {
+      "id": "probe/label-bracket/nested-definition-alone",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[ref[bar]]: /uri\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[ref[bar]]: /uri</p>",
+        "projections": {
+          "text": "[ref[bar]]: /uri",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[ref[bar]]: /uri"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:16"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
     "probe/inline-footnote/ref-then-inline": {
       "id": "probe/inline-footnote/ref-then-inline",
       "layer": "seed",
@@ -116655,7 +119044,7 @@
         }
       },
       "triage": "replicate",
-      "note": "PARSE HALF FIXED; the residual is a form-element rendering artifact. `textarea` is in micromark's htmlRawNames [\"pre\",\"script\",\"style\",\"textarea\"] and Obsidian's fork of remark-parse@8 has only {pre, script, style}, so micromark made one type-1 block swallowing everything while Obsidian reports four sections. textareaNotRawTransform now reproduces those four exactly, and compute sections falls to 38. What remains is text (obs \"foobar\" vs ours \"foo bar\") and emphasis (obs [] vs ours two ems): inside a <textarea> the content is the element's VALUE, so there are no <em> ELEMENTS for the recorder to find and textContent is the de-tagged string. Reproducing that would mean not emphasising content Obsidian's own metadataCache reports as two paragraphs. Settle the recorded values with PARITY_FULL_PROXY_CHECK=1; the id is already in KNOWN_PROXY_DIVERGENCES as RAW_TEXT_ELEMENT."
+      "note": "`text` re-measured through a real Reading View: the detached renderer the recorder batches disagreed with the application, so its capture was not Obsidian behaviour. Other projections are as recorded."
     },
     "commonmark/html-blocks/172": {
       "id": "commonmark/html-blocks/172",
