@@ -335,6 +335,13 @@ describe("positioned oracle", () => {
     //   An escaped label in a bracket context: `[[\[^1]`, `[\[^1]]]`, `[^1](u)` and
     //   `[^[[a#` / `\[^1]`. Four cases. `\[^1` registering a block id is already
     //   implemented, but the rule does not reach inside a wikilink or a bracket pair.
+    //
+    //   Narrowed once already, so start from here. BRACKETED_BLOCK_ID matches all four
+    //   values, and `stripBlockIds` is NOT the place -- that one strips the identifier
+    //   from the TEXT projection and is working correctly. What misses is the `blocks`
+    //   collector, which reads a block's own LINES rather than node values, so it needs
+    //   the same escaped-bracket allowance the text stripper already applies when it
+    //   checks that the source slice ends with a backslash before the match.
     blocks: 16,
     // 71, of which 44 are span-only and they do NOT share one rule -- measured, after
     // "Obsidian ends an item at its last content character and we run on to the next
