@@ -124247,8 +124247,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "legacyLists closed 5 of 7 in this family; this is the under-indented continuation half. \" -    one\" / blank / \"     two\": the prefix is 5 wide so containerState.size is 6, the line has 5 spaces, indentConstruct needs exactly 6, the list ends and the line becomes indented code. Obsidian keeps two in the item. remark-parse@8 strips the MINIMUM indentation across the whole item, which a streaming tokenizer cannot see. Two approximations are measured and refuted: a floor one column past the marker (initialSize + marker + 1) gains this case and costs commonmark/list-items/276, where \"-    foo\" / blank / \"  bar\" must leave bar a paragraph of its own; a floor of the prefix width (size - initialSize) gains this case and costs SEVEN, including the staircase cases legacyLists had just fixed, because a nested item has initialSize 0 and the lower floor then swallows sibling markers. The two cases pin any floor from both sides and no constant satisfies both, so this needs the whole-item scan rather than a different limit."
+      "triage": "match"
     },
     "commonmark/list-items/258": {
       "id": "commonmark/list-items/258",
