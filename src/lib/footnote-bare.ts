@@ -141,8 +141,20 @@ function referenceAt(
  * regressions, which reads like a free fix, while the referee drops 4604 -> 4561
  * documents and the unplaced count RISES 451 -> 504: leading whitespace is genuine
  * content often enough that the rebuild then mismatches and the retry fails where it
- * used to succeed. Those references want a narrower rule keyed on the container's own
- * prefix width, not a blanket skip.
+ * used to succeed.
+ *
+ * Guarding that skip on the value -- taking it only when the value does NOT itself begin
+ * with whitespace, so the value proves the run is indent rather than content -- is the
+ * obvious refinement and is ALSO refuted. It places 28 more references (unplaced
+ * 451 -> 423) and still costs 14 documents of agreement (4828 -> 4814), because some of
+ * those 28 get an offset Obsidian disagrees with.
+ *
+ * And the reason the count is a bad target at all is worth keeping: the referee EXCLUDES
+ * an unplaced node from its set comparison, so leaving a reference unplaced quietly
+ * produces the right answer whenever Obsidian does not index it either. Driving
+ * `unplaced` down therefore moves agreement in either direction, and agreement is the
+ * metric. Anything here needs to establish WHICH references Obsidian indexes first --
+ * a placement rule alone cannot do it.
  */
 function alignToSource(source: string, value: string): SourceAlignment | null {
   const strict = alignRun(source, value, false);
