@@ -36846,8 +36846,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A footnote label keeps a backslash (\"[^1\\\\]\" names \"1\\\\\"), and footnote-bare.ts already reads the label from the source for exactly that reason. It fails here because alignToSource validates by exact equality and a paragraph inside a container has its continuation indent in the source but not in its value, so the rebuild never matches and the whole alignment is dropped - the label then comes from the value, where micromark has resolved the escape. Needs BOTH an indent and a second line; a single-line indented paragraph is fine, which is what made it look like an escape bug. Trying both strip strategies gains this case and fuzz/table/2, lowers the links ceiling 119->118, makes this marker reachable in lossiness, and drops unplaced nodes 23->5 - but the newly placed continuation-line text nodes span the stripped indent (source \"  b\" for value \"b\") where the non-indented path is exact, because their start is derived from the preceding break end rather than from the alignment map. A wrong offset is worse than a missing one, so this needs the break/text split to read at[] before the alignment fix can land."
+      "triage": "match"
     },
     "fuzz/inline-footnote/4": {
       "id": "fuzz/inline-footnote/4",
@@ -80738,8 +80737,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A footnote label keeps a trailing backslash -- `[^1\\]` names `1\\` -- and obs renders `1 1\\` where we render `1 1`. footnote-bare.ts already reads the label from the source for this reason; it fails on the *second* reference because alignToSource validates by exact equality, so the rejoined label disagrees with the node it is checked against. Same cause recorded on fuzz/embed/12."
+      "triage": "match"
     },
     "probe/math-emphasis/display-across-lines": {
       "id": "probe/math-emphasis/display-across-lines",

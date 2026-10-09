@@ -114,7 +114,35 @@ function referenceAt(
   return undefined;
 }
 
+/**
+ * Align a node's value to its source, tolerating a container's continuation indent.
+ *
+ * The strict pass is tried first and is unchanged: it rebuilds the value from the
+ * source, resolving escapes and character references, and returns null unless the two
+ * agree exactly. That exactness is the point -- `at[]` drives every spliced node's
+ * position, and a wrong offset is worse than a missing one.
+ *
+ * A paragraph inside a container defeats it, though, and not for any interesting
+ * reason: the source carries the continuation indent and the value does not, so the
+ * rebuild is longer than the value and the whole alignment is dropped. The label then
+ * comes from the value, where micromark has already resolved the escape, and
+ * `[^1\]` stops naming `1\`.
+ *
+ * So the strict pass is followed by one that skips whitespace after a line ending.
+ * `at[]` still records the real offset of every character it keeps, which is what
+ * keeps the spliced positions exact -- the indent is absent from the value, so no
+ * value index ever maps into it.
+ */
 function alignToSource(source: string, value: string): SourceAlignment | null {
+  const strict = alignRun(source, value, false);
+  return strict ?? alignRun(source, value, true);
+}
+
+function alignRun(
+  source: string,
+  value: string,
+  skipIndent: boolean,
+): SourceAlignment | null {
   const escaped: boolean[] = [];
   const at: number[] = [];
   const rebuilt: string[] = [];
@@ -127,6 +155,19 @@ function alignToSource(source: string, value: string): SourceAlignment | null {
       escaped.push(true);
       rebuilt.push(next);
       index++;
+      continue;
+    }
+    if (skipIndent && character === "\n") {
+      escaped.push(false);
+      rebuilt.push("\n");
+      let ahead = index + 1;
+      while (
+        ahead < source.length &&
+        (source[ahead] === " " || source[ahead] === "\t")
+      ) {
+        ahead += 1;
+      }
+      index = ahead - 1;
       continue;
     }
     if (character === "&") {
