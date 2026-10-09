@@ -306,6 +306,14 @@ describe("positioned oracle", () => {
     //     '   # foo'       obs 1:foo@2:0   ours 1:foo@2:3
     //     '   Foo' / '---' obs 2:Foo@0:0   ours 2:Foo@0:3   (setext too)
     //
+    // Generalising `definitionColumnTransform` to headings is REFUTED: it moves this
+    // ceiling only 12 -> 11 and breaks FIVE matching cases on the main gate
+    // (`atx-headings/68`, `/71`, `hunt/definition-starts-misses-block-enders/10`, `/11`,
+    // `/15`). The reason the parallel does not hold is in the goldens: obs reports
+    // column 0 on `compute.sections` as well as `compute.headings`, and our `sections`
+    // projection already produced the matching text -- so moving the node's start
+    // double-adjusts a span that was already right. Whatever fixes this has to leave
+    // the node alone, or understand `sectionStart` first.
     // Two are NOT that rule and want separate treatment: `probe/line-ending/bom-heading`
     // differs on the NAME (obs `1:H`, ours `1:#`), and
     // `commonmark/link-reference-definitions/*` differs on the LINE (obs 1, ours 0).
