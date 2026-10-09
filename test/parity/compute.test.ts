@@ -294,9 +294,9 @@ describe("positioned oracle", () => {
     footnoteRefs: 2,
     headings: 13,
     sections: 36,
-    // 120, below the 121 it sat at before the wave: the three probes that raised it
-    // are closed, and so is a fourth case the backlog had carried.
-    links: 120,
+    // 118. The three probes that raised this to 124 are closed, and so are the four
+    // bracket cases and the three autolink-extent cases the backlog had carried.
+    links: 118,
     embeds: 32,
     tags: 2,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped

@@ -24471,8 +24471,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Obsidian's GFM autolink literal runs to end of line and swallows the backticks: `https://e.test/p](`code`` is one link whose href is the whole string, so no code span forms and the text is literal. We form the code span, which ends the autolink early. Closing it means overriding gfm's autolink-literal extent, which owns every bare URL in the corpus. MEASURED FURTHER: stock micromark+gfm stops the autolink only on `](` -- `https://e.test/p]x` and `https://e.test/p(x` both consume the tail, while `](` together ends it, because the trail check treats `]` as trailing punctuation when `(` follows. So the extent rule is narrower than \"runs to end of line\": the target set is exactly these three, and 33 other bare-URL cases are untouched by a `](`-specific repair. Not implemented because Obsidian's trailing-trim set also differs from GFM in a way three samples cannot pin -- it trims `.` (see the matching `see http://a.com/x. now`) but keeps `]]` (see this case's own href) -- so a repair would be guessing the trim set. Wants probes varying the trailing character before any rule is written."
+      "triage": "match"
     },
     "fuzz/embed/73": {
       "id": "fuzz/embed/73",
@@ -34721,8 +34720,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "GFM AUTOLINK-LITERAL EXTENT family, with fuzz/misc/5 and fuzz/math/4. Obsidian's bare-URL autolink runs to the end of the line and swallows everything after it, so nothing later on the line parses: obs reports no links, no math and fully literal text. We end the autolink early and then parse the remainder, inventing constructs Obsidian never sees. Closing it means overriding gfm's autolink-literal extent, which owns every bare URL in the corpus -- one rule for the whole family rather than four fixes. MEASURED FURTHER: stock micromark+gfm stops the autolink only on `](` -- `https://e.test/p]x` and `https://e.test/p(x` both consume the tail, while `](` together ends it, because the trail check treats `]` as trailing punctuation when `(` follows. So the extent rule is narrower than \"runs to end of line\": the target set is exactly these three, and 33 other bare-URL cases are untouched by a `](`-specific repair. Not implemented because Obsidian's trailing-trim set also differs from GFM in a way three samples cannot pin -- it trims `.` (see the matching `see http://a.com/x. now`) but keeps `]]` (see this case's own href) -- so a repair would be guessing the trim set. Wants probes varying the trailing character before any rule is written."
+      "triage": "match"
     },
     "fuzz/embed/6": {
       "id": "fuzz/embed/6",
@@ -39116,8 +39114,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "GFM AUTOLINK-LITERAL EXTENT family, with fuzz/misc/5 and fuzz/math/4. Obsidian's bare-URL autolink runs to the end of the line and swallows everything after it, so nothing later on the line parses: obs reports no links, no math and fully literal text. We end the autolink early and then parse the remainder, inventing constructs Obsidian never sees. Closing it means overriding gfm's autolink-literal extent, which owns every bare URL in the corpus -- one rule for the whole family rather than four fixes. MEASURED FURTHER: stock micromark+gfm stops the autolink only on `](` -- `https://e.test/p]x` and `https://e.test/p(x` both consume the tail, while `](` together ends it, because the trail check treats `]` as trailing punctuation when `(` follows. So the extent rule is narrower than \"runs to end of line\": the target set is exactly these three, and 33 other bare-URL cases are untouched by a `](`-specific repair. Not implemented because Obsidian's trailing-trim set also differs from GFM in a way three samples cannot pin -- it trims `.` (see the matching `see http://a.com/x. now`) but keeps `]]` (see this case's own href) -- so a repair would be guessing the trim set. Wants probes varying the trailing character before any rule is written."
+      "triage": "match"
     },
     "fuzz/highlight/15": {
       "id": "fuzz/highlight/15",
