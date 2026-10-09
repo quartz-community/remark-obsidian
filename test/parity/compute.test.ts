@@ -302,6 +302,16 @@ describe("positioned oracle", () => {
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
     // block identifier and the fix closed eleven cases, its own eight included.
     blocks: 16,
+    // 71, of which 44 are span-only and they do NOT share one rule -- measured, after
+    // "Obsidian ends an item at its last content character and we run on to the next
+    // line start" was recorded here from two examples. It holds for 34. The other 10
+    // invert it, with Obsidian ending LATER than us: `fuzz/footnote/18` is 0:6-1:4
+    // against our 0:6-0:7, `callout/nested-task-list` 1:2-3:20 against 1:2-1:18, and
+    // `probe/space-line/in-list` 0:0-1:0 against 0:0-0:3. That last one also kills the
+    // rule's premise, since 1:0 is itself a next-line start. So an item's end is at
+    // least two rules -- one where we overrun and one where we stop short of a blank or
+    // space-only line the item absorbs -- and it wants its own probe family before any
+    // of it is implemented. A blanket "end at the last content character" regresses the 10.
     listItems: 71,
     frontmatterPosition: 7,
   };
