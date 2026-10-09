@@ -68496,8 +68496,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "`$$$], $x^2$` gives Obsidian one inline formula holding `], $x^2` -- the opener is the third dollar and the closer is the last -- rendering `$$⟨math⟩`. We pair the first two dollars instead and get `],` with `x^2$` left over."
+      "triage": "match"
     },
     "probe/math-widths/definition-then-inline": {
       "id": "probe/math-widths/definition-then-inline",

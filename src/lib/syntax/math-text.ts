@@ -163,8 +163,23 @@ function tokenizeMathText(
     if (code === null) return nok(code);
 
     if (code === DOLLAR) {
-      // A single-dollar span may not close straight after a space or tab.
-      if (sizeOpen === 1 && afterSpace) return nok(code);
+      // A single-dollar span may not close straight after a space or tab -- and a
+      // dollar that cannot close is *content*, not the end of the attempt. The scan
+      // goes on to look for a closer that can: `$$$], $x^2$` is one span holding
+      // `], $x^2`, where the dollar before `x` sits after a space and the last one
+      // closes. Abandoning here instead let that interior dollar open a span of its
+      // own and left `$$$], ` as text.
+      //
+      // `$. $` is unaffected and still literal: its only candidate also follows a
+      // space, so the scan runs out of input with no closer and the whole attempt
+      // fails -- which is the measured rule, reached by running out rather than by
+      // giving up early.
+      if (sizeOpen === 1 && afterSpace) {
+        afterSpace = false;
+        effects.enter("mathTextData");
+        effects.consume(code);
+        return data;
+      }
       token = effects.enter("mathTextSequence");
       sizeClose = 0;
       return sequenceClose(code);
