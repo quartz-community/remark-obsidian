@@ -2027,11 +2027,24 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       }
     }
   };
+  // A `%%` comment hides its body, so nothing inside one is indexed. The `links`,
+  // `tags` and `blocks` collectors above already `return SKIP` on a `comment`; this walk
+  // is a separate pass and counted them -- `%%` / `- [ ] Hidden` reported two items where
+  // Obsidian reports none. Collected as a set because `visit` reaches a list directly
+  // rather than descending to it, so there is no ancestor chain to test here.
+  const inComment = new Set<Node>();
+  visit(tree, "comment", (node: Node) => {
+    visit(node, (inner: Node) => {
+      inComment.add(inner);
+    });
+  });
+
   // Any list that is not itself inside an item, so a list in a blockquote is
   // reached too -- looking only at the document's own children reported nothing
   // at all for `> - a`.
   visit(tree, "list", (node: Node, _index, parent) => {
     if ((parent as Node | null)?.type === "listItem") return;
+    if (inComment.has(node)) return;
     if (!node.position) return;
     const line = node.position.start.line - 1;
     walkList(node, line === 0 ? -1 : -line);

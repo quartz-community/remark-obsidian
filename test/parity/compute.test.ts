@@ -384,17 +384,16 @@ describe("positioned oracle", () => {
     // of it is implemented. A blanket "end at the last content character" regresses the 10.
     // The 18 we-INVENT rows are attributed and are NOT the span question above:
     //
-    //   3  items inside a `%%` comment are counted. `%%` / `- [ ] Hidden` reports no
-    //      list item in Obsidian and two here. The `links`, `tags` and `blocks`
-    //      collectors in `computeOurs` already `return SKIP` on a `comment` node; the
-    //      `listItems` walk is a separate pass and does not. Cleanest of the three,
-    //      and it follows a rule already established elsewhere in the same function.
+    //   2  FIXED: items inside a `%%` comment were counted, where the `links`, `tags`
+    //      and `blocks` collectors already skipped them. `probe/straddle-fold/
+    //      list-under-definition` looked like a third and is not -- `[^1]: ==a` /
+    //      `2. b==` is a highlight fold, not a comment, so it stays open.
     //   6  a tab-separated thematic-break line is nested one level too deep --
     //      `-\t-\t-` and `* *\t*` report `parent:-1` in Obsidian and `parent:0` here,
     //      so the counts agree and the parents do not. Same family as the tab-straddle
     //      rule in `list-tab-straddle.ts`.
     //   1  `- [] a` / `- [ ]x`, a task-character difference.
-    listItems: 71,
+    listItems: 69,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
