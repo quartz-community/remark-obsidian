@@ -480,8 +480,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A wikilink's FRAGMENT and ALIAS swallow a `](` the same way its path does. `[[a#^blk](target]]` indexes `a#^blk](target` and `[[a|b](c]]` indexes `a` with the display `b](c`, so the run continues to the `]]` in both. The path half already works -- `[[a](b]]`, `[[a](b]] tail`, `[[a](b]](u)`, `[[a]](b)` and `![[a](b]]` all match -- so this is the fragment and alias scans specifically, in `wikilink.ts`, where `headingBracket` and the alias scan stop at a `(`. `fuzz/comment/2` is the recorded case of the same rule."
+      "triage": "match"
     },
     "probe/wikilink-destination/paren-inside-tail": {
       "id": "probe/wikilink-destination/paren-inside-tail",
@@ -771,8 +770,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A wikilink's FRAGMENT and ALIAS swallow a `](` the same way its path does. `[[a#^blk](target]]` indexes `a#^blk](target` and `[[a|b](c]]` indexes `a` with the display `b](c`, so the run continues to the `]]` in both. The path half already works -- `[[a](b]]`, `[[a](b]] tail`, `[[a](b]](u)`, `[[a]](b)` and `![[a](b]]` all match -- so this is the fragment and alias scans specifically, in `wikilink.ts`, where `headingBracket` and the alias scan stop at a `(`. `fuzz/comment/2` is the recorded case of the same rule."
+      "triage": "match"
     },
     "probe/autolink-trail/period": {
       "id": "probe/autolink-trail/period",
@@ -35292,8 +35290,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Obsidian takes the OUTER bracket pair as the link and leaves the inner one literal; CommonMark takes the inner. `[foo [bar](/uri)](/uri)` is one link whose content reads `foo [bar](/uri)`, which the legacy stack confirms exactly -- both oracles agree. Closing it means replacing micromark's label resolver with legacy's balanced-bracket scan, and the corpus argues against it: 6 replicate cases have this shape against 21 that already match and would be at risk. Measured, not assumed."
+      "triage": "match"
     },
     "fuzz/comment/3": {
       "id": "fuzz/comment/3",

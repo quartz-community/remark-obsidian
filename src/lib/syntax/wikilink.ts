@@ -260,9 +260,17 @@ function tokenize(
       return aliasMarker(code);
     }
 
+    // A lone `]` belongs to the fragment, exactly as it does to the path.
+    // `[[a#^blk](target]]` indexes `a#^blk](target`, so the run continues to the
+    // `]]`; going straight to `closeFirst` here ended the fragment on the first
+    // bracket and then failed for want of a second. `path` has had the rewindable
+    // check since the start and this is the same one -- the two scans had drifted.
     if (code === RIGHT_BRACKET) {
-      effects.exit("wikilinkHeading");
-      return closeFirst(code);
+      return effects.check(
+        closerAhead,
+        headingCloses,
+        headingLiteralBracket,
+      )(code);
     }
 
     // A `[[` inside the fragment abandons the opener, exactly as it does inside the
@@ -280,6 +288,17 @@ function tokenize(
 
     if (code === null || isLineEnding(code)) return nok(code);
 
+    effects.consume(code);
+    return heading;
+  }
+
+  function headingCloses(code: Code): State | undefined {
+    effects.exit("wikilinkHeading");
+    return closeFirst(code);
+  }
+
+  /** A lone `]` belongs to the fragment, so it stays in it. */
+  function headingLiteralBracket(code: Code): State | undefined {
     effects.consume(code);
     return heading;
   }
@@ -329,9 +348,10 @@ function tokenize(
   }
 
   function alias(code: Code): State | undefined {
+    // A lone `]` belongs to the alias, as it does to the path and the fragment:
+    // `[[a|b](c]]` is a link to `a` displaying `b](c`.
     if (code === RIGHT_BRACKET) {
-      effects.exit("wikilinkAlias");
-      return closeFirst(code);
+      return effects.check(closerAhead, aliasCloses, aliasLiteralBracket)(code);
     }
 
     // A doubled `[` is no more legal in an alias than in a target, and rejecting
@@ -346,6 +366,17 @@ function tokenize(
 
     if (code === null || isLineEnding(code)) return nok(code);
 
+    effects.consume(code);
+    return alias;
+  }
+
+  function aliasCloses(code: Code): State | undefined {
+    effects.exit("wikilinkAlias");
+    return closeFirst(code);
+  }
+
+  /** A lone `]` belongs to the alias, so it stays in it. */
+  function aliasLiteralBracket(code: Code): State | undefined {
     effects.consume(code);
     return alias;
   }
