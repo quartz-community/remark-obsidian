@@ -296,7 +296,25 @@ describe("positioned oracle", () => {
     // keeps its own rule -- see the pass.
     footnotes: 6,
     footnoteRefs: 2,
+    // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
+    // `definitionColumnTransform` already implements for footnote definitions.
+    // Obsidian reports a heading's column as its containing block's content column,
+    // not the position of the marker:
+    //
+    //     ' ### foo'       obs 3:foo@0:0   ours 3:foo@0:1
+    //     '  ## foo'       obs 2:foo@1:0   ours 2:foo@1:2
+    //     '   # foo'       obs 1:foo@2:0   ours 1:foo@2:3
+    //     '   Foo' / '---' obs 2:Foo@0:0   ours 2:Foo@0:3   (setext too)
+    //
+    // Two are NOT that rule and want separate treatment: `probe/line-ending/bom-heading`
+    // differs on the NAME (obs `1:H`, ours `1:#`), and
+    // `commonmark/link-reference-definitions/*` differs on the LINE (obs 1, ours 0).
     headings: 12,
+    // Attributed: 29 SPAN and 4 we-INVENT, and all four we-invent are the standalone
+    // block-identifier paragraphs -- `^blk`, `> quoted` / '' / `^quote-id`,
+    // `- x` / '' / `^b`, `| x |` / `| --- |` / '' / `^b`. We emit a `paragraph` section
+    // Obsidian consumes. So the `blocks` cluster A fix closes these four as well, which
+    // confirms the coupling recorded there: measure the two keys together.
     sections: 33,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
