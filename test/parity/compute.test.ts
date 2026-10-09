@@ -324,10 +324,27 @@ describe("positioned oracle", () => {
     //       '| x |' / '| --- |' / '' / '^b' blocks b@0:0-1:7   sections [table@0:0-1:7]
     //       '^blk' / '</div>'               blocks blk@0:0-0:4 sections [paragraph, html]
     //
-    //   The last is the exception that pins the rule: with no block above it, `^blk` is
-    //   its own paragraph and names itself. So this probably also accounts for the four
-    //   we-INVENT on `sections` -- we emit a section for the `^id` line that Obsidian
-    //   does not -- and the two should be measured together.
+    //   The rule is TWO sub-rules, not one, which `probe/block-id-extent/*` settles:
+    //
+    //     '^blk'                blocks []            sections []
+    //     '^blk' / 'para'       blocks []            sections [paragraph@0:0-1:4]
+    //     '^blk' / '' / 'para'  blocks []            sections [paragraph@2:0-2:4]
+    //     '^blk' / '- item'     blocks [blk@0:0-0:4] sections [paragraph@0:0-0:4, list]
+    //     '^blk' / '</div>'     blocks [blk@0:0-0:4] sections [paragraph@0:0-0:4, html]
+    //     'x' / '' / '^b'       blocks [b@0:0-0:1]   sections [paragraph@0:0-0:1]
+    //     '- x' / '' / '^b'     blocks [b@0:0-0:3]   sections [list@0:0-0:3]
+    //
+    //   Separated by a blank line or ending the document, the `^id` paragraph is
+    //   CONSUMED -- it leaves `sections` entirely -- and names the PRECEDING block, or
+    //   nothing when there is none. Interrupted without a blank line, by a list or an
+    //   html block, it SURVIVES as its own section and names ITSELF.
+    //
+    //   `'^blk' / 'para'` is neither: no blank line and a paragraph cannot interrupt
+    //   one, so the two lines merge and the identifier is not at a block end at all.
+    //
+    //   So this touches `sections` as well as `blocks`, and is a candidate for the
+    //   four we-INVENT there -- we emit a section for an `^id` paragraph Obsidian
+    //   consumes. Measure the two together; one fix should move both.
     //
     //   We require the identifier to trail the block's own lines, so a standalone one
     //   registers nothing.
