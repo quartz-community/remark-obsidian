@@ -1921,7 +1921,14 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       const at = candidate.index ?? 0;
       const after = raw.slice(at + candidate[0].length);
       if (after !== "") {
-        if (!/^[*_=~]/u.test(after)) continue;
+        // A `]` run is let through to the escaped-bracket gate below, which is written
+        // for exactly this shape -- `closersAfter` and `bracketStillOpen` validate it --
+        // and was unreachable because this scan rejected the candidate first. It also
+        // skips the opener test underneath: a `]` is closing a bracket, not a wrapper, so
+        // there is no `]` earlier on the line to find. `[[\[^1]` and `[\[^1]]]` both
+        // register `1` in Obsidian.
+        const closerRun = after.startsWith("]");
+        if (!closerRun && !/^[*_=~]/u.test(after)) continue;
         // A marker can only *close* something that opened, so the same marker has to
         // appear before the caret somewhere on the line. `x ^a_b` has `_b` after the
         // identifier and no `_` before it, so that one is part of a word rather than
@@ -1932,7 +1939,7 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         // Anywhere before, not immediately before: `*x ^blk*` registers `blk` with
         // its opener three characters back, so requiring adjacency cost that case
         // instead. The wrapper opens where it opens.
-        if (!raw.slice(0, at).includes(after[0] ?? "")) continue;
+        if (!closerRun && !raw.slice(0, at).includes(after[0] ?? "")) continue;
       }
       id = { name: candidate[1] ?? "", index: at };
     }

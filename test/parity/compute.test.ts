@@ -342,7 +342,19 @@ describe("positioned oracle", () => {
     //   collector, which reads a block's own LINES rather than node values, so it needs
     //   the same escaped-bracket allowance the text stripper already applies when it
     //   checks that the source slice ends with a backslash before the match.
-    blocks: 16,
+    // 16 -> 15. Cluster B's cause was an internal inconsistency, not a missing rule:
+    // the identifier scan rejected any candidate whose tail was not an emphasis marker,
+    // so a `]` run never reached the escaped-bracket gate written for it -- making
+    // `closersAfter` and `bracketStillOpen` unreachable for exactly those cases. Letting
+    // a closer run through fixed three of the four under `all-features`
+    // (`fuzz/inline-footnote/4`, `probe/escaped-label/in-wikilink`, `.../in-brackets`)
+    // while the ceiling, which scores the better profile, moved by one.
+    //
+    // `[^1](u)` stays: Obsidian registers `1` there with NO backslash, because the
+    // bracket becomes a link rather than a footnote reference and so never claims the
+    // caret. That is a tree question and this collector reads lines, so it needs a
+    // different mechanism than the escape check.
+    blocks: 15,
     // 71, of which 44 are span-only and they do NOT share one rule -- measured, after
     // "Obsidian ends an item at its last content character and we run on to the next
     // line start" was recorded here from two examples. It holds for 34. The other 10
