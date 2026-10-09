@@ -375,6 +375,33 @@ const LABEL_HOSTS = new Set([
   "imageReference",
 ]);
 
+/**
+ * Whether Obsidian's parser would accept this as an html comment.
+ *
+ * remark-parse@8 keeps CommonMark 0.28's restriction and micromark dropped it, which is
+ * the whole difference: the body may not contain `--`, may not start with `>` or `->`,
+ * and may not end with `-`. An invalid one is not a comment at all, so Obsidian renders
+ * it as visible text -- `foo <!-- a -- b --> bar` reads in full.
+ *
+ * Confirmed against the arbiter rather than inferred. The note on
+ * `commonmark/raw-html/625` had claimed this needed "an unbounded scan on `<`" and
+ * quoted a quadratic cost for it; the rule is a check on the node's own body and
+ * `foo <!-- a -- b --> bar` is literal on one line, so line-spanning was never
+ * involved either.
+ */
+function isRealComment(raw: string): boolean {
+  if (!raw.startsWith("<!--") || !raw.endsWith("-->") || raw.length < 7) {
+    return false;
+  }
+  const body = raw.slice(4, -3);
+  return (
+    !body.startsWith(">") &&
+    !body.startsWith("->") &&
+    !body.includes("--") &&
+    !body.endsWith("-")
+  );
+}
+
 /** A tag opens on `<` plus a letter, `/`, `!` or `?`; any other `<` is literal text. */
 const TAG_START = /[a-zA-Z/!?]/;
 
@@ -556,6 +583,45 @@ export function mdastText(
         parts.push(`${(node as ValueNode).value} `);
         return;
       case "html": {
+        // A comment Obsidian's parser rejects is not a comment, so it renders in
+        // full. Emitted before the strips below, because every one of them would
+        // otherwise treat it as markup and hide it.
+        {
+          const raw = (node as ValueNode).value;
+          // Closed but invalid only. An *unclosed* comment still hides everything
+          // it swallowed -- `html/unclosed-comment-plain` and seven others measure
+          // that -- so it must keep going through the strips below.
+          if (
+            raw.startsWith("<!--") &&
+            raw.endsWith("-->") &&
+            !isRealComment(raw)
+          ) {
+            // With the whitespace micromark dropped in front of it. The comment scan
+            // runs to the LAST `-->` on the line, so `foo <!--> foo -->` arrives as
+            // one html node spanning `<!--> foo -->` with the space at offset 3
+            // belonging to no node at all -- text ends at 3 and html starts at 4.
+            // Obsidian renders `foo <!--> foo -->`, so the space has to come back,
+            // and it comes from the source rather than being assumed.
+            const at = node.position?.start?.offset;
+            let gap = "";
+            if (at !== undefined && source !== undefined) {
+              let back = at;
+              while (
+                back > 0 &&
+                (source[back - 1] === " " || source[back - 1] === "\t")
+              ) {
+                back -= 1;
+              }
+              gap = source.slice(back, at);
+            }
+            const previous = parts[parts.length - 1];
+            if (typeof previous === "string" && /[ \t]$/u.test(previous)) {
+              gap = "";
+            }
+            parts.push(`${gap}${raw}${phrasing ? "" : " "}`);
+            return;
+          }
+        }
         // Obsidian's textContent has no markup, so compare inner text only. The
         // trailing space is the block separator every other block type gets from
         // BLOCK_TYPES below, which this early return would otherwise skip.

@@ -143266,8 +143266,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Needs an unbounded scan on < to see a -- buried in a longer comment body, which is the quadratic shape legacy-scan.ts bounds against (< x20000: 64ms -> 16s). shortCommentTransform handles the all-dashes short forms instead, since micromark hands those over as an html node already."
+      "triage": "match"
     },
     "commonmark/raw-html/626": {
       "id": "commonmark/raw-html/626",
@@ -143320,8 +143319,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Reachable on the parity gate and still refused, now with the measurement. Making SHORT a prefix match (micromark scans an html comment to the LAST `-->` on the line, so `foo <!--> foo -->` arrives as one node valued `<!--> foo -->`) gains this case with 0 regressions. The formatter then grows the file without bound: `foo <!--> foo -->` goes to `foo \\<!--> foo -->`, then `foo \\\\\\<!--> foo -->`, adding two backslashes every pass and never settling. Note the short form ALONE is fine -- `<!-->` settles at `\\<!-->` on pass two -- so the growth needs the trailing ` foo -->`, which suggests the `\\<` escape is not resolving back to text when more content follows it on the line. Unlike the 41 stable-but-unsettled cases this one diverges forever, and one parity case does not buy a formatter that grows an author's file on every run. Closing it needs that escape resolution understood first, not a wider pattern. A second attempt also showed the space-restore must check whether the preceding text already ends with the space, or `foo <!--> bar` gains a doubled one."
+      "triage": "match"
     },
     "commonmark/raw-html/627": {
       "id": "commonmark/raw-html/627",
