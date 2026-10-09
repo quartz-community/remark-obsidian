@@ -278,6 +278,24 @@ function renderedTex(value: string): string {
   return value.replaceAll("\u00a0", "&nbsp;");
 }
 
+/**
+ * Whether Obsidian would resolve this destination against the vault.
+ *
+ * A colon **anywhere** marks it external, not merely a leading scheme. That is
+ * measured rather than assumed: `[link](foo\)\:)` is a link to `foo):` in both our
+ * tree and Obsidian's, and Obsidian renders it `class="external-link"` -- so the
+ * recorder, which captures `a.internal-link`, reports no link where a leading-scheme
+ * test reported one. Across the corpus no internal link's destination holds a colon,
+ * and every `mailto:` and `https://` one already did.
+ *
+ * Note this is a *classification* question and not a resolution one. Obsidian's real
+ * answer depends on the vault -- `b.md` and `/uri` are external in the recording while
+ * `#fragment` is internal -- and the harness has no vault to consult, so the test only
+ * has to agree with the recording on the cases the corpus holds. It does, on all 500.
+ */
+const isVaultTarget = (url: string): boolean =>
+  url !== "" && !url.includes(":") && !url.startsWith("//");
+
 /** A tag opens on `<` plus a letter, `/`, `!` or `?`; any other `<` is literal text. */
 const TAG_START = /[a-zA-Z/!?]/;
 
@@ -506,7 +524,7 @@ export function mdastText(
       // absolute URL stays an ordinary external image.
       case "image": {
         const url = (node as { url?: string }).url ?? "";
-        if (url !== "" && !/^[a-z][a-z0-9+.-]*:|^\/\//i.test(url)) {
+        if (isVaultTarget(url)) {
           parts.push(url);
         }
         return;
@@ -867,7 +885,7 @@ export function projectMdast(
     }
     if (isType<ImageNode>(node, "image")) {
       const url = node.url ?? "";
-      if (url !== "" && !/^[a-z][a-z0-9+.-]*:|^\/\//i.test(url)) {
+      if (isVaultTarget(url)) {
         (inInlineNote.has(node) ? relocated : links).push({
           ...splitTarget(url),
           embedded: true,
@@ -881,7 +899,7 @@ export function projectMdast(
     // absolute URL stays an ordinary external link and is not a vault link.
     if (isType<ImageNode>(node, "link")) {
       const url = node.url ?? "";
-      if (url !== "" && !/^[a-z][a-z0-9+.-]*:|^\/\//i.test(url)) {
+      if (isVaultTarget(url)) {
         (inInlineNote.has(node) ? relocated : links).push({
           ...splitTarget(url),
           embedded: false,
