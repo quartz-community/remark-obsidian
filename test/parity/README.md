@@ -660,6 +660,22 @@ those three false leads came from reading a truncated multi-link document as a
 single-link one. Read the golden's own `markdown` before concluding anything from a
 summary of it.
 
+### Rewriting a golden from Python needs `ensure_ascii=False`
+
+`json.dumps` escapes every non-ASCII character by default, and this corpus deliberately
+carries CJK text, U+00A0 and a zero-width space -- so a one-field edit rewrote 1800 lines
+into `\uXXXX` escapes. Prettier then accepted the result, because it is valid JSON that
+parses to the same values, and the gate stayed green. Nothing was _wrong_, and the diff
+was unreviewable.
+
+Check `git diff --stat` after any scripted edit to the golden. A note change is one line;
+anything larger means the writer re-encoded the file. `node -e` with
+`JSON.stringify(g, null, 2)` does not have this failure mode, which is why the rest of
+these notes use it -- but it has a different one: a backtick inside a double-quoted
+`node -e` string is command substitution to the shell, and silently deletes the text
+between backticks. Write the edit as a `python3` heredoc with quoted delimiters, or pass
+the text through a file.
+
 ## When goldens drift
 
 The scheduled workflow never commits. It uploads the freshly recorded goldens as

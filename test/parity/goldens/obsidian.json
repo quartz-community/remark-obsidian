@@ -7017,7 +7017,7 @@
         }
       },
       "triage": "replicate",
-      "note": "A `[` right after a link text's `]` opens a link label, so `[[` there is not a wikilink opener. Obsidian reads the label `[^9]` and indexes the footnote reference inside it at 0:9; we claim a wikilink to `^9` and index nothing. Needs tokenizer precedence between the wikilink extension and CommonMark's link label, not a repair pass."
+      "note": "A `[` right after a link text's `]` opens a link label, so `[[` there is not a wikilink opener. Obsidian reads the label `[^9]` and indexes the footnote reference inside it at 0:9; we claim a wikilink to `^9` and index nothing. Needs tokenizer precedence between the wikilink extension and CommonMark's link label, not a repair pass. REFUTED ATTEMPT: declining the wikilink opener whenever `self.previous` is a right bracket gains 0 and costs 3 -- `fuzz/embed/117`, `fuzz/embed/54` and `probe/footnote-embed/ref-then-embed`, where the `]` closes a footnote reference rather than a link text and the embed after it is genuine. So the guard needs the bracket to have closed a LINK TEXT specifically, which a streaming tokenizer cannot know at the opener: it would have to see an unmatched `[` behind it and a label or destination ahead. The corpus holds only three cases carrying `][[` and two are those controls, so the next attempt wants a tree repair in `label-precedence.ts`, whose raw scan already finds outermost pairs, rather than another tokenizer guard."
     },
     "probe/reference-in-link/bare-wikilink": {
       "id": "probe/reference-in-link/bare-wikilink",
