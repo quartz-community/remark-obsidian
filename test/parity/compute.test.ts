@@ -314,10 +314,23 @@ describe("positioned oracle", () => {
     // ZERO we-invent, which is a missing rule rather than a wrong one. Two clusters:
     //
     //   A block id ALONE on its own line, naming the block above it across a blank
-    //   line: `x` / '' / `^b`, `- x` / '' / `^b`, `| x |` / `| --- |` / '' / `^b`,
-    //   `> quoted` / '' / `^quote-id`, and `^blk` / `</div>`. Five cases. We require the
-    //   identifier to trail the block's own lines, so a standalone one registers
-    //   nothing.
+    //   line. Five cases, and the recorded spans make it more than a collector change:
+    //   the identifier takes the PRECEDING BLOCK'S span, and its own line yields no
+    //   section at all.
+    //
+    //       'x' / '' / '^b'                 blocks b@0:0-0:1   sections [paragraph@0:0-0:1]
+    //       '- x' / '' / '^b'               blocks b@0:0-0:3   sections [list@0:0-0:3]
+    //       '> quoted' / '' / '^quote-id'   blocks quote-id@0:0-0:17  sections [blockquote@...]
+    //       '| x |' / '| --- |' / '' / '^b' blocks b@0:0-1:7   sections [table@0:0-1:7]
+    //       '^blk' / '</div>'               blocks blk@0:0-0:4 sections [paragraph, html]
+    //
+    //   The last is the exception that pins the rule: with no block above it, `^blk` is
+    //   its own paragraph and names itself. So this probably also accounts for the four
+    //   we-INVENT on `sections` -- we emit a section for the `^id` line that Obsidian
+    //   does not -- and the two should be measured together.
+    //
+    //   We require the identifier to trail the block's own lines, so a standalone one
+    //   registers nothing.
     //
     //   An escaped label in a bracket context: `[[\[^1]`, `[\[^1]]]`, `[^1](u)` and
     //   `[^[[a#` / `\[^1]`. Four cases. `\[^1` registering a block id is already
