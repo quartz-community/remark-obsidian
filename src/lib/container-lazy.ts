@@ -238,6 +238,11 @@ function trailingEmptyItem(
 ): { item: ListItem; chain: (List | ListItem)[] } | undefined {
   const item = list.children[list.children.length - 1];
   if (!item) return undefined;
+  // A kept `%%` comment is a leaf, and it can be a list's direct child: `- <!--` over
+  // an indented body puts one where a `listItem` is assumed. It is not a list item, so
+  // it is not a trailing empty one either -- 17 documents in the referee corpus crashed
+  // here on `item.children` being undefined, every one of them a comment inside an item.
+  if (!Array.isArray(item.children)) return undefined;
   const last = item.children[item.children.length - 1];
   if (last?.type === "list") {
     const deeper = trailingEmptyItem(last);

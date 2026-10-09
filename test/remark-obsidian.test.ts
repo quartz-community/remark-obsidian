@@ -3116,3 +3116,21 @@ describe("footnote label holding a bracket", () => {
     expect(refs("a[^1]b\n\n[^1]: d\n")).toEqual(["1"]);
   });
 });
+
+describe("a kept comment inside a list item", () => {
+  // Seventeen documents in the referee corpus crashed on these, all one bug:
+  // `trailingEmptyItem` read `item.children.length` on a `list` child that was a
+  // kept `%%` comment, which is a leaf. The types say that cannot happen.
+  const CRASHERS = [
+    "- <!--\n  hidden\nplain[^1]\n-->\n\n[^1]: one",
+    "- [^1]: def\n  %%\n  x[^2]\n  %%\n\nuse[^1] use[^2] use[^3]\n",
+    "- [^1]: def\n    %%\n    x[^2]\n    %%\n\nuse[^1] use[^2] use[^3]\n",
+    "- [^9]: orphan\n  %%\n  [^1]: one\n  %%\n\nuse[^1] use[^2] use[^3]\n",
+  ];
+
+  for (const markdown of CRASHERS) {
+    it(`parses ${JSON.stringify(markdown).slice(0, 44)} without throwing`, () => {
+      expect(() => parse(markdown)).not.toThrow();
+    });
+  }
+});
