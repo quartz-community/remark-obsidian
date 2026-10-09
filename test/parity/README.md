@@ -762,14 +762,28 @@ tree can match it.
   Obsidian's own `sections` agree with (html, paragraph, paragraph, html).
 
 So the case is not parse debt, and the earlier note calling it an impossibility was
-describing the harness rather than the parser. The fix belongs in the recorder: a Reading
-View correction has to cover **every** projection it re-measures, not `text` alone.
-Until it does, a case like this is unreachable by construction while looking like ordinary
-backlog.
+describing the harness rather than the parser.
+
+Correcting the other projections too would fix that half. It would **not** make the case
+comparable, which is the part worth knowing before attempting it: Reading View appends
+block `div`s with no whitespace between them, so its `textContent` carries no block
+separator — `foobar` — while the corpus-wide convention comes from the proxy's markup
+newlines, where `aaa` / blank / `bbb` is recorded as `aaa bbb` and our projection matches
+on 3302 cases. A corrected `text` is therefore only commensurable when the document
+reduces to **one block**, which is exactly why the sibling correction
+`hunt/blockquote-region-outlives-quote/1` (`after1`) is `match` and this three-block
+document cannot be.
+
+Adding separators to the Reading View capture would be adjusting the measurement to fit
+our own output, so it is deliberately not done. `171` is `accepted` instead, with the
+argument attached — our parse is right, both renderers agree with it, and only the two
+captures disagree with each other.
 
 The general rule: **a projection is only comparable against others captured from the same
 DOM.** When the cross-check fires, either correct the whole capture or record the case as
-a proxy divergence — never half of it.
+a proxy divergence — never half of it. And **do not reach for the measurement when the
+measurement is what disagrees with you**: the separator convention here could be changed
+in one line to turn this case green, which is precisely why it must not be.
 
 `fuzz/embed/64` is the other half of the same audit and went the other way. Its six
 identical `$**strong**$` readings were recorded as a suspected detached-renderer

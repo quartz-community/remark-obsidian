@@ -809,6 +809,25 @@ describe("Obsidian parity oracle", () => {
  * Only `text` is corrected, because Reading View is captured as text; the
  * remaining projections stay as recorded. The note says so, so a reader can
  * tell a corrected case from a plain one.
+ *
+ * That is a real limitation and it has a known victim, so do not read a
+ * corrected golden as a consistent capture. `commonmark/html-blocks/171` ends up
+ * holding Reading View's `text` beside the detached renderer's `emphasis`, and no
+ * single DOM yields both: `<textarea>` is RCDATA to the HTML parser, so the
+ * detached container swallows the rendered blocks and reports no `strong`/`em` at
+ * all, while Reading View renders them as paragraphs with real elements.
+ *
+ * Correcting the other projections too would fix that half. It would **not** make
+ * such a case comparable, which is the part worth knowing before trying: Reading
+ * View appends block divs with no whitespace between them, so its `textContent`
+ * carries no block separator -- `foobar` -- while the corpus-wide convention comes
+ * from this proxy's markup newlines, where `aaa` / blank / `bbb` is recorded as
+ * `aaa bbb`. A corrected `text` is therefore only commensurable when the document
+ * reduces to a single block, which is why
+ * `hunt/blockquote-region-outlives-quote/1` is fine and the three-block `171` is
+ * not. Adding separators to the Reading View capture would be adjusting the
+ * measurement to fit our own output, so it is deliberately not done; `171` is
+ * triaged `accepted` with the argument attached instead.
  */
 async function applyReadingViewCorrections(
   corrections: ReadonlyMap<string, string>,
