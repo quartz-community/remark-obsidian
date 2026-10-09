@@ -111421,8 +111421,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "legacyLists closed 5 of 7 in this family; this is the tab half, and the cause recorded earlier (size counts characters, factorySpace counts columns) was the WRONG mechanism. Measured by probing the third line of \" - foo\" / \"   - bar\" / \"<pad>- baz\": pad of 3 spaces, 4 spaces or a lone tab all give 2 uls with baz a sibling of bar, while 5 spaces or a tab-plus-space give 3 uls. So we nest at >=5 columns and \t  is exactly 5; Obsidian puts tab-plus-space BELOW that boundary. bar is also a nested item whose own containerState.size is 2, not 5, so the outer list consumes 3 of the tab's 4 virtual columns and the inner sees the remainder - a tab straddling a container boundary is split, and half a tab has no character count at all. Comparing the indent unexpanded instead is REFUTED: 0 gains and 4 regressions (task/nested-tab, document/tab-indentation, commonmark/tabs/4, commonmark/tabs/5), because ordinary tab continuation genuinely needs the column width."
+      "triage": "match"
     },
     "commonmark/tabs/10": {
       "id": "commonmark/tabs/10",

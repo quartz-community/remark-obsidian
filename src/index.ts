@@ -47,6 +47,7 @@ import {
 import { quoteMergeTransform } from "./lib/quote-merge.js";
 import { indentTabTransform } from "./lib/indent-tab.js";
 import { listTabTransform } from "./lib/list-tab.js";
+import { listTabStraddleTransform } from "./lib/list-tab-straddle.js";
 import { quoteTabTransform } from "./lib/quote-tab.js";
 import { paragraphMergeTransform } from "./lib/paragraph-merge.js";
 import { normalizePointsTransform } from "./lib/normalize-points.js";
@@ -588,6 +589,8 @@ export default function remarkObsidian(
     // After the quote passes have settled the block, since this reads its lines.
     quoteTabTransform(tree, String(file));
     listTabTransform(tree, String(file));
+    // Beside the tab rule above, and like it only under the legacy list reading.
+    if (opts.legacyLists) listTabStraddleTransform(tree, String(file));
     // After the quote passes have settled the block, since this reads the
     // quote's own extent, and before the footnote passes that would bind a
     // definition it swallows.
