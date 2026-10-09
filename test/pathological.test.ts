@@ -65,20 +65,19 @@ const UPSTREAM: Readonly<Record<string, string>> = {
 };
 
 /**
- * Ours, and quadratic: the bare chain handles both in milliseconds. Doubling
- * the size gives 938/3451/14350ms for the highlight run and 352/1345/5117ms
- * for the footnote opener at 2500/5000/10000 — almost exactly 4x per
- * doubling, so both are O(n^2).
+ * Shapes this package was quadratic on, now gated.
  *
- * Both are an opener that rescans to end of input on every failure, fixable
- * with the failure memoisation micromark's own attention resolver uses. They
- * are recorded rather than gated until then, because 20KB of `=` is trivially
- * authorable and this should not be quietly forgotten.
+ * `highlight-run` was the last entry and is fixed. The decision function needed
+ * four characters to reject `=` x20000 -- a closer sitting on the opener has empty
+ * content -- while the chunk scan behind it read to end of input first, once per
+ * opener. Bounding that scan at the two conditions the decider already treats as
+ * final took 2500/5000/10000 from 938/3451/14350ms to 45/43/76ms, and 20000 from
+ * over 20s to 149ms: ~1.96x per doubling against the ~4x that defined the curve.
+ *
+ * Kept as an empty record rather than deleted so the assertion below still names
+ * the invariant, and so the next shape that regresses has somewhere to be recorded.
  */
-const OURS_QUADRATIC: Readonly<Record<string, string>> = {
-  "highlight-run":
-    "`=` x20000 around content. Bare chain 26ms, ours exceeds 20s. Not the no-closer case `inline-footnote-open` was: a run of `=` is full of `==` pairs, so every attempt finds a closer and the cost is the chunk scan reading to end of input before it can judge itself. Fixing it means stopping that scan at the decision point, which is a restructure of the legacy port rather than a memo.",
-};
+const OURS_QUADRATIC: Readonly<Record<string, string>> = {};
 
 const gated = Object.keys(SIZES).filter(
   (shape) => !(shape in UPSTREAM) && !(shape in OURS_QUADRATIC),
@@ -90,7 +89,7 @@ describe("pathological input", () => {
   });
 
   it("keeps the exclusions to the ones documented above", () => {
-    expect(Object.keys(OURS_QUADRATIC).sort()).toEqual(["highlight-run"]);
+    expect(Object.keys(OURS_QUADRATIC).sort()).toEqual([]);
     expect(Object.keys(UPSTREAM).length).toBe(5);
   });
 

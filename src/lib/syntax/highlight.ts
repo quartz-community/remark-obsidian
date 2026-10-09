@@ -57,6 +57,44 @@ export function legacyHighlightQueue(value: string): string | null {
   return null;
 }
 
+/**
+ * Stop the chunk scan once `legacyHighlightQueue` is bound to answer `null`.
+ *
+ * The scan materialises the rest of the text chunk so the ported tokenizer can
+ * judge the whole match, and that is what made a run of `=` quadratic: every one
+ * of 20000 openers read to end of input before the decision function ran, even
+ * though the decision itself needs four characters. `=` x20000 was 26ms on the
+ * bare chain against more than 20s here.
+ *
+ * Only the two conditions that `legacyHighlightQueue` itself treats as final are
+ * short-circuited, so this cannot change an answer -- it only stops collecting
+ * characters the answer no longer depends on:
+ *
+ *   - content beginning with whitespace never matches, whatever follows, because
+ *     the first closer tests `/^\s/` on the whole queue and every later one sees
+ *     the same prefix;
+ *   - a closer immediately after the opener has empty content, and `====` is the
+ *     case the construct's own docstring is built on.
+ *
+ * `\s` is kept rather than written out as ASCII whitespace, deliberately: the
+ * decision function uses `/^\s/u`, which includes U+00A0, and a narrower class
+ * here would stop the scan on inputs it still accepts.
+ */
+function createQueueBound(): (character: string) => boolean {
+  let index = -1;
+  let opened = false;
+  return (character: string): boolean => {
+    index += 1;
+    if (index < MARKER_LENGTH) return character !== MARKER;
+    if (index === MARKER_LENGTH) {
+      opened = character === MARKER;
+      return /^\s/u.test(character);
+    }
+    // The second half of a closer sitting directly on the opener: empty content.
+    return index === MARKER_LENGTH + 1 && opened && character === MARKER;
+  };
+}
+
 const highlight: Construct = {
   name: "highlight",
   tokenize(
@@ -66,7 +104,7 @@ const highlight: Construct = {
     nok: State,
   ): State {
     const characters: string[] = [];
-    const scan = createChunkScan(characters);
+    const scan = createChunkScan(characters, createQueueBound());
     const TEXT_TOKEN = "highlightText" as const;
     let queue = "";
     let segments: Segment[] = [];
