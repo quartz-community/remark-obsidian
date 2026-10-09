@@ -170,6 +170,17 @@ pulling apart:
   follow from the same rule. `fuzz/contradictions.ts` reports them, and wants re-running
   after every landing: each one re-partitions the triage and can expose a shape that was
   uniformly diverging a moment ago.
+
+  **And audit the detector itself.** Its skeleton collapsed adjacent `w`s across `\s`,
+  which matches a line ending -- so `[foo]: /url` / `bar` / `===` / `[foo]` reduced to the
+  same shape as `[foo]: /url` / `===` / `[foo]`, and it reported a contradiction between
+  two documents that differ by exactly the line that decides the rule. Two such phantoms
+  stood for a week and were quoted as blockers in two case notes. Narrowed to horizontal
+  whitespace the detector reports **zero** at every width, which is the honest reading: the
+  selector is spent for now, and each remaining case is its own rule with nothing in the
+  corpus contradicting it. A selector that invents work is worse than one that finds none,
+  because it also hides whatever it merged away.
+
 - **Check every oracle before calling a family clean.** "15 of 15 matched" was true and
   incomplete; the gap was one `compute` counter away.
 

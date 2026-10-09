@@ -20,7 +20,7 @@ import type { GoldenCase } from "../types.js";
  * Needs no Obsidian: it reads the committed goldens and their triage.
  *
  * The skeleton collapses runs of word characters to `w` and then collapses adjacent
- * `w`s, keeping punctuation and layout. So `[^1]: x` and `[^9]: yy` are one shape
+ * `w`s across horizontal whitespace only, keeping punctuation and layout. So `[^1]: x` and `[^9]: yy` are one shape
  * while `[^1]:` and `[^1]: ` are two -- which is exactly the distinction the
  * bare-colon definition rule turned on, and why the collapse stops at punctuation.
  *
@@ -30,8 +30,22 @@ import type { GoldenCase } from "../types.js";
  * can expose a shape that was uniformly diverging a moment ago.
  */
 const WORD_RUN = /[A-Za-z0-9\u00a0-\uffff]+/gu;
-/** Flat on purpose: `w(?:\s*w)+` is a quantified group and the ReDoS lint refuses it. */
-const ADJACENT = /w\s*w/gu;
+/**
+ * Flat on purpose: `w(?:[ \t]*w)+` is a quantified group and the ReDoS lint refuses it.
+ *
+ * Horizontal whitespace only. `\s` matches a line ending, so the collapse used to run
+ * across lines and merge documents with different layouts: `[foo]: /url` / `bar` / `===`
+ * / `[foo]` skeletonised to the same shape as `[foo]: /url` / `===` / `[foo]`, and the
+ * detector reported a contradiction between two cases that are not the same input at
+ * all. They differ by exactly the intervening line, which is the whole rule -- a
+ * definition directly under a setext underline becomes a heading and defines nothing,
+ * while one with a line between it keeps its definition.
+ *
+ * That false positive stood for a week, which matters more than the one shape: a
+ * contradiction is the only live selector left here, so a detector that invents them
+ * spends attention on nothing and -- worse -- hides the real ones it merged away.
+ */
+const ADJACENT = /w[ \t]*w/gu;
 
 function skeleton(markdown: string): string {
   let out = markdown.replace(WORD_RUN, "w");
