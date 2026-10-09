@@ -132,6 +132,17 @@ function referenceAt(
  * `at[]` still records the real offset of every character it keeps, which is what
  * keeps the spliced positions exact -- the indent is absent from the value, so no
  * value index ever maps into it.
+ *
+ * Skipping a *leading* run as well is REFUTED, and the parity corpus cannot see it.
+ * A container's first content line starts its paragraph mid-prefix -- `> [!tip]` over
+ * `>     [^a]: def` begins it at the second of five spaces -- so this run never finds a
+ * `\n` to hang the skip on and leaves 451 references across 280 referee documents with
+ * no position. Skipping from offset zero instead measures 0 parity gains and 0 parity
+ * regressions, which reads like a free fix, while the referee drops 4604 -> 4561
+ * documents and the unplaced count RISES 451 -> 504: leading whitespace is genuine
+ * content often enough that the rebuild then mismatches and the retry fails where it
+ * used to succeed. Those references want a narrower rule keyed on the container's own
+ * prefix width, not a blanket skip.
  */
 function alignToSource(source: string, value: string): SourceAlignment | null {
   const strict = alignRun(source, value, false);
