@@ -811,6 +811,43 @@ line between the definition and the following paragraph, and adding one changes 
 output is byte-identical at every pass, because the growth is inside the definition's own
 serialisation. One more counting selector that read as evidence and was not.
 
+All thirteen are now closed, and the gate asserts **emptiness** rather than a ceiling:
+a formatter that never terminates is a defect and not debt, so there is no count to hold
+a line at. The distribution is the part worth keeping.
+
+**Four of the thirteen were one bug class**, and it is worth stating as a rule because it
+recurred three times after being fixed once: **a raw source slice is the right source for
+a node's `position` and the wrong source for its `value`.** A value is what the tokenizer
+resolved; a slice is what the author typed, and the two differ by exactly the things a
+re-parse would do again. The four were container indentation in `comment-in-definition`, a
+bare `<` run in the html text projection, escape resolution in `inline-refold`, and escape
+resolution again in the comment fold one function along. The tell is always the same shape:
+output that is correct on pass 1 and grows on pass 2.
+
+**Two were upstream**, and the cheap test that settles it is worth doing first: re-run the
+input through bare `remark-parse` + `remark-gfm` + `remark-stringify` with none of this
+package loaded. If it grows there too, it is not ours. That found the `<...>` autolink
+shorthand being offered for an address CommonMark will not autolink, and an unclosed html
+block whose span runs through its trailing line ending -- both at current versions, both
+unreported, and both guarded here rather than repaired, since our package is what ships.
+
+**One needed two sibling fields to disagree on purpose.** A relabelled reference's
+`identifier` must stay raw and its `label` must be decoded: decoding the identifier
+resolves `[bar][foo\!]` against `[foo!]` and turns a dangling reference into a link, which
+`commonmark/links/545` catches, while leaving the label raw is what feeds the escaper a
+backslash to double. Both fields carry a comment, because "fixing the inconsistency" in
+either direction reintroduces one of the two defects.
+
+And the ecosystem answer for literal content, since three local re-implementations had
+already been refuted before it was looked up: **a handler's return value is appended
+without passing through `state.safe`**, so returning a string is how content that must not
+be escaped gets written -- `mdast-util-frontmatter`, `mdast-util-math`,
+`mdast-util-mdx-expression` and `mdast-util-mdx-jsx` all do exactly that. `unsafe` cannot
+express it, because `configure` only ever appends entries so an existing escape can never
+be relaxed, and `state.safe` runs a backslash pass no pattern governs. Scoping with
+`notInConstruct` cannot either: existing CommonMark entries do not name a custom construct,
+and the test is a conjunction over the stack.
+
 The dash boundary was worth measuring anyway, and the arbiter settles it: two dashes and
 three are literal, **four** is a genuine comment with an empty body, five is literal
 again. `commonmark/raw-html/625` is a separate half -- a `--` buried in a longer body
