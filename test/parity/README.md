@@ -1131,6 +1131,17 @@ corpus, and the distinct causes are known — one byte-order-mark document, and 
 author's `P1`, where Obsidian's cache reports a column short by the width of a
 `%%` marker. Fixing those two would be a regression.
 
+**The `P1` family is wider than those two, and it is worth naming because it is the one
+group here that must NOT be driven to zero.** Measured across the remaining `links`,
+`embeds` and `footnoteRefs` rows: four of them are short by exactly 2 with a `%%` in the
+document — `fuzz/embed/24` on both its `links` and `embeds` rows, plus
+`hunt/aftercloser-chain-eats-referenced-definition/0` and
+`hunt/continuation-masked-under-foreign-label/2`. That is 4 of the 20 positional rows left
+in the corpus, so roughly a fifth of what looks like debt is a cache defect to report rather
+than reproduce. Writing it into our own offsets would be strictly worse than diverging: a
+consumer splicing at those offsets would corrupt the file, which is exactly what the
+Obsidian Linter does.
+
 Definition spans are the open ground. Split by **which field** actually differs, over the
 489 documents whose names all agree — so none of this needs re-deriving:
 

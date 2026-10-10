@@ -569,6 +569,12 @@ describe("positioned oracle", () => {
     // What is left: 1 nested-item start column, and the 2 zero-width `3:0` blocks from
     // `hunt/inline-footnote-double-parse/*` that Obsidian reports and we do not -- those
     // two are the only remaining rows on this key where Obsidian reports MORE than us.
+    // One of the 3 is `fuzz/embed/24`, and it MUST NOT BE FIXED. Its column is short by
+    // exactly 2 -- the width of the `%%` marker in front of it -- which is the defect the
+    // plugin's author documented as `P1`, and the same one the two `footnoteRefs` rows
+    // below carry. Measured: colDelta is 2 for both its `links` and `embeds` rows and the
+    // document holds a `%%`. Reproducing it would mean writing a cache bug into our own
+    // offsets, so it stays counted rather than chased.
     links: 3,
     // 31 -> 16 -> 6. First the missing collector (a markdown image was never indexed at
     // all), then the display field: the cache reports an image's alt as WRITTEN, not as
