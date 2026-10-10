@@ -553,6 +553,23 @@ describe("positioned oracle", () => {
     // content column because they agree. That inference is what failed. Measure the
     // predicate itself next time: for each agreeing nested entry, compute the parent's
     // content column and compare it to the reported start.
+    // The END (ours at column 0) group is measured on both sides, and it does NOT
+    // separate on that predicate alone:
+    //
+    //     entries where our end is at column 0, and obs AGREES :  9
+    //     entries where our end is at column 0, and obs differs : 19
+    //
+    // So a blanket clamp would fix 19 and break 9, which is the same trap the three
+    // `sections` attempts fell into -- and the 19 share the shape recorded as the next
+    // hypothesis there: an UNCLOSED or STRADDLING construct in the item's last content.
+    // `- $$y`, `- ~~~~del~~`code``, `- a` / `    %%` / `    b`, and
+    // `1. tail $$` / `   x` / `   $$` are the examples.
+    //
+    // That hypothesis is now cross-validated on two keys, which is the first time any
+    // reading has held across both. Test it as a predicate over the 9 agreeing and 19
+    // diverging entries BEFORE writing code: if it separates them, the same fix should
+    // move `sections` 26 and this group together, as the block-identifier fix moved
+    // `blocks` and `sections` together.
     listItems: 55,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
