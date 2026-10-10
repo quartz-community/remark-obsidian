@@ -399,6 +399,21 @@ describe("positioned oracle", () => {
     // `0:0-0:3`, a lone-CR line-ending question, and one
     // `commonmark/link-reference-definitions` case differs on the START line, not the
     // end: `heading@1:0-2:3` against our `heading@0:0-2:3`.
+    // THE CROSS-KEY HYPOTHESIS DID NOT TRANSFER, which is the useful result. The same
+    // content-end rule that took `listItems` 55 -> 41 was retried here with `itemEnd`
+    // now correct -- a legitimate retry, since the earlier 26 -> 55 was measured while
+    // `itemEnd` still reported mdast's over-extended end. It is better and still wrong:
+    //
+    //     clamp every block                        70
+    //     clamp only final blocks                  77
+    //     list sections end at last item (old)     55
+    //     list sections end at last item (fixed)   42
+    //
+    // Four attempts, all above the baseline of 26. So `listItems` and `sections` use
+    // DIFFERENT conventions for the same list node: an item ends at its content and the
+    // section containing it does not. That is worth knowing before a fifth attempt --
+    // the 14 `list` END rows here are not the same rule as the 19 that were just fixed
+    // one key over, however similar the examples look.
     sections: 26,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
