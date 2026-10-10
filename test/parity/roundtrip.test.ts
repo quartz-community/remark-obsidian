@@ -297,10 +297,26 @@ describe("round-trip", () => {
      *      `\[\[]]` -- growing again every round. `[[ ]]` does parse, and is also what
      *      the author wrote, so the handler now keeps the space. `[[ ]]` and `![[ ]]`
      *      are byte-identical on both passes.
-     *   4  a DANGLING shortcut reference: `[foo]` with no definition re-parses as text
-     *      and gains a backslash -- `\[foo]`. All four are
-     *      `commonmark/link-reference-definitions/*`. Note `linkReferenceToMarkdown`
-     *      already overrides one label spelling; it does not cover the undefined case.
+     *   4  a FAILED DEFINITION LINE, and `linkReferenceToMarkdown` is NOT the place.
+     *      That reading came from ids truncated at 36 characters and is wrong: the
+     *      input I inferred from the shape, `foo]: /url` over `[foo]`, is stable on
+     *      both passes and byte-identical to bare remark. The real four are
+     *      `commonmark/link-reference-definitions/196`, `/200`, `/202` and `/216`, and
+     *      the instability starts a line EARLIER than the reference:
+     *
+     *          src    '[foo]: <>'   / '[foo]'
+     *          pass1  '\[foo]: <>'  / '[foo]'    the DEFINITION line is escaped
+     *          pass2  '\[foo]: <>'  / '\[foo]'   so the reference is now dangling
+     *
+     *      The tree shows why: `[foo]: <>` is a `text` node and not a `definition`,
+     *      which is correct for parity because the legacy stack does not accept `<>`
+     *      as a destination, and `remark-stringify` escapes its `[`. On pass 2 the
+     *      line is no longer definition-shaped, so the identifier that made `[foo]` a
+     *      `linkReference` is gone and the reference is escaped too.
+     *
+     *      So it needs a handler returning the text verbatim -- `unsafe` cannot relax
+     *      an escape that already exists -- the same mechanism `raw-html/626` and the
+     *      math family need. Not a reference-handler change.
      *   3  emphasis re-escaping, and one of them is the worst in the set:
      *      `emphasis/nest-underscore-outer` grows 15 bytes into `&#x20;`/`&#x62;`
      *      entities. The other two are `commonmark/emphasis-and-strong-emphasis/*`.
