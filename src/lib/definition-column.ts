@@ -47,14 +47,18 @@ export function definitionColumnTransform(tree: Root, source: string): void {
 
     const bol = source.lastIndexOf("\n", start.offset - 1) + 1;
     const prefix = source.slice(bol, start.offset);
-    // Spaces only, or a quote prefix followed by spaces. A tab is excluded and has its own
-    // rule with its own evidence: the arbiter does not count a tab that follows a space, so
-    // ` \t[^1]: def` is re-parsed and placed back PAST that whitespace at offset 2, which
-    // this would overwrite with zero. Every recorded Obsidian golden behind the
-    // content-column rule is space-indented, so narrowing keeps both rules rather than
-    // picking one.
-    const quoted = /^((?:>[ \t]?)+) *$/u.exec(prefix);
-    if (!quoted && !/^ +$/u.test(prefix)) return;
+    // Any horizontal whitespace, or a quote prefix followed by it. A tab USED to be
+    // excluded here, on the arbiter's reading that `remark-parse@8` does not count a tab
+    // following a space -- so ` \t[^1]: def` is re-parsed and placed back past that
+    // whitespace at offset 2, which this pass would overwrite with zero.
+    //
+    // The referee overturned it. That corpus carries 106 rows whose definition line has a
+    // tab in its prefix, and Obsidian reports the content column for them too: `  \t[^ä]:
+    // Definition` is column 0, not 3. Honouring it moved 25 of those documents into
+    // agreement with zero parity regressions. The legacy stack is an arbiter, not an
+    // oracle, and the recorded Obsidian answers win where they disagree.
+    const quoted = /^((?:>[ \t]?)+)[ \t]*$/u.exec(prefix);
+    if (!quoted && !/^[ \t]+$/u.test(prefix)) return;
 
     // A quote contributes its own content column, which is the marker plus the one space
     // it consumes -- anything further along the prefix belongs to the definition. The

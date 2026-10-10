@@ -2370,12 +2370,23 @@ describe("short indent with a tab", () => {
    * `remark-parse@8` does not count a tab that follows a space, so one to three
    * spaces plus a tab is content rather than indented code. The block is re-parsed
    * without that whitespace, and it has to be placed back *past* it.
+   *
+   * A footnote DEFINITION is the exception, and it is the arbiter losing to an oracle.
+   * ` \t[^1]: def` was asserted at offset 2 on the arbiter's reading; real Obsidian
+   * reports a definition at its containing block's content column, which is 0 at root,
+   * and the referee corpus carries 106 tab-prefixed rows saying so -- `  \t[^ä]:
+   * Definition` is column 0 there. Honouring it moved 25 of those documents into
+   * agreement with no parity regressions. The legacy stack is an arbiter, not an oracle;
+   * where the two disagree the recorded Obsidian answers win.
+   *
+   * The paragraph rows above are untouched, so the placement rule itself still holds --
+   * only this node type overrides it.
    */
   it("places the reparsed line past its own indent", () => {
     expect(spans("  \tfoo\n")).toEqual(["paragraph@3..6"]);
     expect(spans("   \tfoo\n")).toEqual(["paragraph@4..7"]);
     expect(spans("  \tfoo\tbaz\t\tbim\n")).toEqual(["paragraph@3..15"]);
-    expect(spans(" \t[^1]: def\n")).toEqual(["footnoteDefinition@2..11"]);
+    expect(spans(" \t[^1]: def\n")).toEqual(["footnoteDefinition@0..11"]);
   });
 
   it("leaves real indented code alone", () => {

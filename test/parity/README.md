@@ -812,7 +812,7 @@ PARITY_REFEREE_DIR=/tmp/of/test/obsidian-answers \
   npx tsx --conditions=development test/parity/referee.mts
 ```
 
-It took this package from 41.1% to 71.7% agreement, and seven of the rules in
+It took this package from 41.1% to 72.1% agreement, and seven of the rules in
 `src/lib` exist because of it. What it reports now, and what is known about each
 remaining family:
 
@@ -1150,13 +1150,28 @@ Definition spans are the open ground. Split by **which field** actually differs,
   to the node's own `position` is the largest single identified family left in either
   oracle, and it is not free — `listUnderDefinitionTransform` tests `source.slice(from, to)
 !== "\n"` against a definition's end offset, and `points.test.ts` gates offset honesty.
-- **Start column** (199, was 440). The quote content-column rule closed **60 documents** of
-  it in one commit, which is also the cross-oracle confirmation that the rule generalises
-  beyond the two corpus cases that motivated it. What remains is still not a constant: ours
-  is +2 on 44 documents, −2 on 43, −1 on 40, +1 on 35, +3 on 32, so it is several rules
-  pulling both ways rather than a shared offset. A tab in the prefix shows up immediately in
-  the examples (`>\t[1]: /u[^ä]`), and a tab is the one prefix `definition-column.ts`
-  deliberately declines. **Probes are needed before any of it is treated as a rule**;
+- **Start column** (was 440, then 199). Two content-column rules have now come out of it,
+  each confirmed on this oracle rather than on the corpus: the **quote** prefix closed 60
+  documents, and the **tab** prefix another 25. Split by the definition line's prefix shape,
+  which is the measurement that found the second one:
+
+  | prefix shape  | rows |
+  | ------------- | ---: |
+  | tab in prefix |  106 |
+  | spaces only   |   91 |
+  | quote only    |    2 |
+  | other         |    2 |
+
+  The tab family is the one worth knowing about, because the rule excluding it had real
+  evidence behind it — `remark-parse@8` does not count a tab following a space, so
+  ` \t[^1]: def` is re-parsed and placed past that whitespace at offset 2, and a unit test
+  asserted exactly that. Obsidian disagrees: `  \t[^ä]: Definition` is column **0**. **The
+  legacy stack is an arbiter, not an oracle**, and this is the first time that distinction
+  has reversed a shipped rule rather than merely declined a new one.
+
+  The 91 spaces-only rows are NOT the same rule and must not be folded into it — there
+  Obsidian reports the bracket where we report lower (`   [^注1]:` is 3 to it and 2 to us),
+  which is the opposite direction. That is why the remaining deltas still point both ways. **Probes are needed before any of it is treated as a rule**;
   inferring one from pattern-matched corpus data has already produced a wrong answer once,
   which is why the `%%` rules in `corpus.ts` are recorded instead.
 
