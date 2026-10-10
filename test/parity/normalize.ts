@@ -1397,13 +1397,6 @@ function adjacentBlockFollows(
 /** Inline wrappers an identifier scan reads straight through. */
 const ID_WRAPPERS = new Set(["emphasis", "strong", "delete", "highlight"]);
 
-/**
-/**
- * The node actually holding a trailing identifier, descending through wrappers.
- *
- * Returns the children array to read the last text from, plus the chain of
- * wrappers walked, innermost first, so an emptied one can be pruned afterwards.
- */
 /** Whether a host candidate's last text node actually ends in an identifier. */
 function hostHasIdentifier(host: { inner: Node[]; chain: unknown[] }): boolean {
   const last = host.inner[host.inner.length - 1];
@@ -1412,6 +1405,12 @@ function hostHasIdentifier(host: { inner: Node[]; chain: unknown[] }): boolean {
   return TRAILING_BLOCK_ID.test(value) || BRACKETED_BLOCK_ID.test(value);
 }
 
+/**
+ * The node actually holding a trailing identifier, descending through wrappers.
+ *
+ * Returns the children array to read the last text from, plus the chain of
+ * wrappers walked, innermost first, so an emptied one can be pruned afterwards.
+ */
 function trailingIdHost(inner: Node[]):
   | {
       inner: Node[];
@@ -2209,7 +2208,13 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         // skips the opener test underneath: a `]` is closing a bracket, not a wrapper, so
         // there is no `]` earlier on the line to find. `[[\[^1]` and `[\[^1]]]` both
         // register `1` in Obsidian.
-        const closerRun = after.startsWith("]");
+        // ...but an EMBED's bracket does not free one, which is the same asymmetry already
+        // measured for the markdown forms: `[^1](u)` registers the block `1` and
+        // `![^1](url)` registers nothing, because an image's alt is not a place a block
+        // identifier can live. `![[\[^1]]]` is the wikilink spelling of that, and it
+        // differs from the registering `[[\[^1]` by exactly the leading `!`.
+        const closerRun =
+          after.startsWith("]") && !raw.slice(0, at).includes("![[");
         if (!closerRun && !/^[*_=~]/u.test(after)) continue;
         // A marker can only *close* something that opened, so the same marker has to
         // appear before the caret somewhere on the line. `x ^a_b` has `_b` after the
