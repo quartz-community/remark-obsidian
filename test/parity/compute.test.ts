@@ -773,7 +773,7 @@ describe("positioned oracle", () => {
     //   MISSING  two `hunt/ordered-item-under-definition` rows plus
     //            `probe/straddle-fold/list-under-definition`, where we invent an item
     //            Obsidian does not report at all.
-    listItems: 19,
+    listItems: 15,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.

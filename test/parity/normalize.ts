@@ -2461,10 +2461,22 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       //
       // A NESTED item keeps the parent's content column instead, which is a separate
       // measured rule and must not be clamped to zero.
+      // A TAB-indented item begins just past its tab run, which four cases now agree on
+      // and two of them were long-standing divergences: `- parent` / `\t- child` and
+      // `- a` / `\t - b` are both 1:1, as are `- [ ] parent` / `\t- [ ] child` and
+      // ` - foo` / `   - bar` / `\t - baz`. So a tab contributes ONE column however many
+      // spaces follow it, and the line-start clamp -- which reports 0 -- is wrong here.
+      //
+      // Only a run of one is measured: `- a` / `\t\t- b` reports no second item at all, so
+      // two tabs stop being an item rather than moving the column.
+      const bol = lineStarts[item.position.start.line - 1] ?? 0;
+      const tabRun = /^\t+/u.exec(source.slice(bol))?.[0].length;
       const startAt =
-        hostColumn === undefined
-          ? sectionStart(item.position.start)
-          : `${item.position.start.line - 1}:${hostColumn}`;
+        tabRun !== undefined
+          ? `${item.position.start.line - 1}:${tabRun}`
+          : hostColumn === undefined
+            ? sectionStart(item.position.start)
+            : `${item.position.start.line - 1}:${hostColumn}`;
       listItems.push(
         `${marker ? JSON.stringify(marker[1]) : "-"}|parent:${parent}@${startAt}-${atPoint(itemEnd(item, hasSibling))}`,
       );
