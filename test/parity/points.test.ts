@@ -15,13 +15,26 @@ const goldenPath = path.join(
   "obsidian.json",
 );
 
-/** Line and column of an absolute offset, counting from one as mdast does. */
+/**
+ * Line and column of an absolute offset, counting from one as mdast does.
+ *
+ * A line ends on `\r\n`, `\n` or a LONE `\r`, which is CommonMark's rule and micromark's
+ * behaviour. Deriving against `\n` alone made this helper the thing that was wrong: once
+ * `normalize-points.ts` stopped flattening `a\rb\r` onto one line, the correct point
+ * `1:1` was reported as disagreeing with its own offset. Both sides of this invariant
+ * have to count line endings the same way, and `\n`-only is the half that does not match
+ * the parser.
+ */
 const pointOf = (source: string, offset: number): [number, number] => {
-  const before = source.slice(0, offset);
-  return [
-    before.split("\n").length,
-    offset - (before.lastIndexOf("\n") + 1) + 1,
-  ];
+  let line = 1;
+  let bol = 0;
+  for (let index = 0; index < offset; index++) {
+    if (source[index] === "\r" && source[index + 1] === "\n") continue;
+    if (source[index] !== "\n" && source[index] !== "\r") continue;
+    line += 1;
+    bol = index + 1;
+  }
+  return [line, offset - bol + 1];
 };
 
 /**

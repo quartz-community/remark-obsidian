@@ -33,12 +33,17 @@ export function pointAt(
   source: string,
   offset: number,
 ): { line: number; column: number; offset: number } {
-  const before = source.slice(0, offset);
-  return {
-    line: before.split("\n").length,
-    column: offset - (before.lastIndexOf("\n") + 1) + 1,
-    offset,
-  };
+  let line = 1;
+  let bol = 0;
+  for (let index = 0; index < offset; index++) {
+    // A lone CR ends a line too, which splitting on `\n` cannot see -- see
+    // `normalizePointsTransform` below for what that cost.
+    if (source[index] === "\r" && source[index + 1] === "\n") continue;
+    if (source[index] !== "\n" && source[index] !== "\r") continue;
+    line += 1;
+    bol = index + 1;
+  }
+  return { line, column: offset - bol + 1, offset };
 }
 
 /**
@@ -71,9 +76,17 @@ export function span<T extends Node>(
 export function normalizePointsTransform(tree: Root, source: string): void {
   if (source === "") return;
 
+  // CommonMark ends a line on `\r\n`, `\n` OR a lone `\r`, and indexing only `\n` made
+  // this pass CORRUPT the positions it exists to repair. `a\rb\r` is two lines to Obsidian
+  // and to micromark, which gets the paragraph right; this pass then rebuilt every point
+  // against a one-line index and reported `0:0-0:3` for what is `0:0-1:1`. A lone CR is
+  // rare enough that it hid behind a single probe, and the failure mode is the worst kind
+  // -- a wrong offset rather than a missing one, written over a correct one.
   const starts = [0];
   for (let index = 0; index < source.length; index++) {
-    if (source[index] === "\n") starts.push(index + 1);
+    const character = source[index];
+    if (character === "\r" && source[index + 1] === "\n") continue;
+    if (character === "\n" || character === "\r") starts.push(index + 1);
   }
 
   /** The index in `starts` of the line holding `offset`. */
