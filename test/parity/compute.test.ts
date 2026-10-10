@@ -340,7 +340,23 @@ describe("positioned oracle", () => {
     // next-line-column-0 and Obsidian agrees with them. So the clamp needs a
     // discriminator, and the obvious candidate from the sample is whether the block is
     // the LAST in the document -- every one of the eleven is a final block with no
-    // content after it. Test that before widening anything.
+    // the LAST in the document -- every one of the eleven is a final block.
+    //
+    // THAT HYPOTHESIS IS ALSO REFUTED, and the numbers are worth keeping because they
+    // point the opposite way to the sample:
+    //
+    //     baseline                 26
+    //     clamp every block        70
+    //     clamp only final blocks  77
+    //
+    // Clamping only the final block is WORSE than clamping all of them, so clamping
+    // the non-final ones must help by about seven. Being final is therefore not the
+    // discriminator -- it is closer to an anti-discriminator -- and both subsets are
+    // mixed. The eleven sampled cases are all final blocks that want the content end,
+    // yet final blocks as a group want the mdast end more often than not, so the real
+    // rule is about the block's TYPE or its content rather than its position. Dump the
+    // 26 by node type before the next attempt; a 14-case sample chosen for brevity
+    // over-represented unclosed math and single-item lists.
     //
     // Two of the fourteen are different rules and should not be folded in:
     // `probe/line-ending/lone-cr` (`a\rb\r`) is `paragraph@0:0-1:1` against our
