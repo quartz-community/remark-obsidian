@@ -2471,6 +2471,12 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       // two tabs stop being an item rather than moving the column.
       const bol = lineStarts[item.position.start.line - 1] ?? 0;
       const tabRun = /^\t+/u.exec(source.slice(bol))?.[0].length;
+      // A quote-content-column clamp is REFUTED at 15 -> 25. `> - a` / `>  - b` reports
+      // the second item at 1:2, which is `> ` and reads exactly like the root clamp where
+      // one to three spaces give 0 -- but applying it to every quoted item indented past
+      // its prefix moves 10 that agree at the marker today. So the quote prefix is not a
+      // clamping context the way the start of a line is, and this one case wants its own
+      // evidence rather than the analogy.
       const startAt =
         tabRun !== undefined
           ? `${item.position.start.line - 1}:${tabRun}`
