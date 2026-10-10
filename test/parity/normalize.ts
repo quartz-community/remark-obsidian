@@ -2119,9 +2119,21 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     const shownHeading = (
       inner.startsWith("#") ? heading.replace(/^#+[ \t]*/u, "") : heading
     ).replaceAll("#", " > ");
-    const shown = hasAlias
-      ? node.alias
-      : [shownPath, shownHeading].filter(Boolean).join(" > ");
+    // An EMPTY path with a pipe is not an alias at all: `[[|b]]` displays `|b`, the whole
+    // inner verbatim, because there is no note for the pipe to separate an alias from.
+    //
+    // The test is the written form, not the parsed path: the tokenizer does NOT split on a
+    // leading pipe, so `node.path` is the whole `|b` and a `shownPath === ""` guard is
+    // silently inert -- which is exactly how it first went in.
+    //
+    // THIN EVIDENCE and the pass says so -- this is the only corpus entry whose inner
+    // starts with a pipe, so there are no controls and the blast radius is that one entry
+    // by construction.
+    const shown = inner.startsWith("|")
+      ? inner
+      : hasAlias
+        ? node.alias
+        : [shownPath, shownHeading].filter(Boolean).join(" > ");
     (node.embedded ? embeds : links).push(
       `${original}=>${target}|${shown}@${spanOf(node)}`,
     );

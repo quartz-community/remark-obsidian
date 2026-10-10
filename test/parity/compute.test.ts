@@ -543,12 +543,17 @@ describe("positioned oracle", () => {
     // since of the entries whose target holds 2+ `#`, four convert all and zero convert
     // only the first, and the two matching neither shape turn out not to reach the join.
     //
-    // The 4 links left: `wikilink/empty-target-with-alias` wants display `|b` for `[[|b]]`
-    // -- an empty path with a pipe makes the WHOLE inner the display, where we treat it as
-    // an alias and show nothing. `hunt/image-alt-with-brackets/4` wants alt `x` against
-    // our `x⟨fn⟩`, so a dangling footnote marker is not in an alt. `probe/caret-link/*` is
-    // the recorded reference-gap probe. `fuzz/embed/24` is span/ordering inside a `%%`.
-    links: 4,
+    // The 3 links left: `hunt/image-alt-with-brackets/4` wants alt `x` against our `x⟨fn⟩`,
+    // so a dangling footnote marker is not rendered into an alt. `probe/caret-link/*` is
+    // the recorded reference-gap probe. `fuzz/embed/24` is span/ordering inside a `%%`,
+    // which is also one of the 3 `embeds`.
+    //
+    // `blocks` 5, all named: 2 where we INVENT a block (`  ^blk](...` and
+    // `![[\[^1]]]`, both with a `]` right after the identifier -- and the embed one has a
+    // measured rule behind it already, since an IMAGE does not free a caret where a LINK
+    // does), 1 nested-item start column, and the 2 zero-width `3:0` blocks from
+    // `hunt/inline-footnote-double-parse/*` which Obsidian reports and we do not.
+    links: 3,
     // 31 -> 16 -> 6. First the missing collector (a markdown image was never indexed at
     // all), then the display field: the cache reports an image's alt as WRITTEN, not as
     // rendered, so it keeps a nested construct's brackets. `![foo [bar](u)](v)` displays
