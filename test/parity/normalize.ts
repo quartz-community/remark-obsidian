@@ -2156,9 +2156,19 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     for (const [at, item] of kids.entries()) {
       if (item.type !== "listItem" || !item.position) continue;
       const hasSibling = at + 1 < kids.length;
-      const marker = /^[-*+]\s*\[(.)\]/u.exec(
-        source.slice(item.position.start.offset!),
+      // A checkbox with nothing after it on its own line is not a task: `- [ ]` over
+      // `![[*` reports the plain marker `-`, not `" "`. Measured on both sides of the
+      // predicate rather than inferred -- all 5 corpus entries whose line ends right
+      // after the checkbox report a plain marker, and of the 86 with content after it,
+      // 76 report a task.
+      const itemLineEnd = source.indexOf("\n", item.position.start.offset!);
+      const itemLine = source.slice(
+        item.position.start.offset!,
+        itemLineEnd === -1 ? undefined : itemLineEnd,
       );
+      const marker = /^[-*+][ \t]*\[.\][ \t]*$/u.test(itemLine)
+        ? null
+        : /^[-*+]\s*\[(.)\]/u.exec(source.slice(item.position.start.offset!));
       listItems.push(
         `${marker ? JSON.stringify(marker[1]) : "-"}|parent:${parent}@${atPoint(item.position.start)}-${atPoint(itemEnd(item, hasSibling))}`,
       );

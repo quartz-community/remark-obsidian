@@ -539,8 +539,12 @@ describe("positioned oracle", () => {
     //           shipped for definitions and headings.
     //   PARENT  `- [ ] 1.` is `parent:0` to Obsidian and `parent:-1` here, so the
     //           reading-view task re-parse nests where we leave the items siblings.
-    //   MARKER  `- [ ]` over `![[*` reports `-` to Obsidian and `" "` here: a checkbox
-    //           with no content after it on its own line is not a task.
+    //   MARKER  FIXED: a checkbox with no content after it on its own line is not a
+    //           task -- `- [ ]` over `![[*` reports the plain marker `-`, not `" "`.
+    //           Measured on BOTH sides of the predicate this time, which is what the
+    //           failed START attempt did not do: all 5 entries whose line ends right
+    //           after the checkbox report a plain marker, 0 report a task, and of the 86
+    //           entries with content after the checkbox, 76 report a task. 59 -> 55.
     //
     // ATTEMPTED AND REFUTED on START: reporting a nested item at its parent's content
     // column takes this 59 -> 65. The blast-radius check that preceded it was NOT a
@@ -549,7 +553,7 @@ describe("positioned oracle", () => {
     // content column because they agree. That inference is what failed. Measure the
     // predicate itself next time: for each agreeing nested entry, compute the parent's
     // content column and compare it to the reported start.
-    listItems: 59,
+    listItems: 55,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
