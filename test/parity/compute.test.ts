@@ -562,10 +562,9 @@ describe("positioned oracle", () => {
     // since of the entries whose target holds 2+ `#`, four convert all and zero convert
     // only the first, and the two matching neither shape turn out not to reach the join.
     //
-    // The 3 links left: `hunt/image-alt-with-brackets/4` wants alt `x` against our `x⟨fn⟩`,
-    // so a dangling footnote marker is not rendered into an alt. `probe/caret-link/*` is
-    // the recorded reference-gap probe. `fuzz/embed/24` is span/ordering inside a `%%`,
-    // which is also one of the 3 `embeds`.
+    // Both remaining rows are already classified, so this key is at its floor: one is the
+    // `P1` cache defect (`fuzz/embed/24`, column short by a `%%` marker) and the other is
+    // `probe/caret-link/link-with-def`, one of the recorded `KNOWN_REFERENCE_GAPS`.
     //
     // `blocks` 3. Both invented blocks are closed, by two narrowings of the same `]`-run
     // gate: an EMBED's bracket does not free an identifier where a LINK's does
@@ -582,7 +581,7 @@ describe("positioned oracle", () => {
     // below carry. Measured: colDelta is 2 for both its `links` and `embeds` rows and the
     // document holds a `%%`. Reproducing it would mean writing a cache bug into our own
     // offsets, so it stays counted rather than chased.
-    links: 3,
+    links: 2,
     // 31 -> 16 -> 6. First the missing collector (a markdown image was never indexed at
     // all), then the display field: the cache reports an image's alt as WRITTEN, not as
     // rendered, so it keeps a nested construct's brackets. `![foo [bar](u)](v)` displays

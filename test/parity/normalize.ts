@@ -2065,7 +2065,13 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         }
       }
       links.push(
-        `${original}=>${resolved}|${mdastText(node).trim()}@${spanOf(node)}`,
+        // A footnote marker inside the label is NOT part of a link's display text:
+        // `[x[^1]](url)` displays `x`, where the same document's `text` projection is
+        // `x⟨fn⟩`. Measured on both sides -- of 554 recorded link and embed displays ZERO
+        // hold the marker, while 341 `text` projections do -- so it belongs to `text`
+        // alone. The renderer makes the marker its own anchor beside the link rather than
+        // content of it, which is why `mdastText` is right to emit it and wrong here.
+        `${original}=>${resolved}|${mdastText(node).replaceAll("\u27e8fn\u27e9", "").trim()}@${spanOf(node)}`,
       );
       return;
     }
