@@ -18,7 +18,17 @@ export function wikilinkToMarkdown(): Options {
         const prefix = node.embedded ? "!" : "";
         const heading = node.heading ? `#${node.heading}` : "";
         const alias = node.alias ? `|${node.alias}` : "";
-        const written = `${prefix}[[${node.path}${heading}${alias}]]`;
+        // An entirely empty wikilink needs its space back. `[[ ]]` parses as a wikilink
+        // whose path is the empty string -- the inner text is trimmed as a whole -- but
+        // `[[]]` does not parse as one at all, so writing that spelling loses the
+        // construct: the next pass reads plain text and escapes it to `\[\[]]`, which
+        // grows again every time. Five corpus documents never converged on this, and the
+        // space is also what the author actually wrote.
+        const body =
+          node.path === "" && heading === "" && alias === ""
+            ? " "
+            : `${node.path}${heading}${alias}`;
+        const written = `${prefix}[[${body}]]`;
 
         // A table cell ends at the first unescaped pipe, and this handler
         // builds its own string rather than going through `state.safe`, so

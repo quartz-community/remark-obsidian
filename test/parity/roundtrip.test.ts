@@ -292,10 +292,11 @@ describe("round-trip", () => {
      * diffing pass 1 against pass 2 at the first differing character -- 15 grow, 2
      * shrink:
      *
-     *   5  an EMPTY wikilink or embed: `[[]]` and `![[]]` are written back literally on
-     *      pass 1, do not re-parse as a wikilink, and so are escaped as text on pass 2
-     *      -- `![[]]` becomes `!\[\[]]`. `wikilink/spaces-only`, `fuzz/embed/43`,
-     *      `fuzz/embed/44`, `fuzz/embed/64`, `token/embed/whitespace-body`.
+     *   5  FIXED: an entirely empty wikilink was written `[[]]`, which does not parse as
+     *      a wikilink at all, so the next pass read plain text and escaped it to
+     *      `\[\[]]` -- growing again every round. `[[ ]]` does parse, and is also what
+     *      the author wrote, so the handler now keeps the space. `[[ ]]` and `![[ ]]`
+     *      are byte-identical on both passes.
      *   4  a DANGLING shortcut reference: `[foo]` with no definition re-parses as text
      *      and gains a backslash -- `\[foo]`. All four are
      *      `commonmark/link-reference-definitions/*`. Note `linkReferenceToMarkdown`
@@ -313,6 +314,6 @@ describe("round-trip", () => {
      * `toMarkdown` handler's return value is appended without passing through
      * `state.safe`.
      */
-    expect(unstable.length).toBeLessThanOrEqual(33);
+    expect(unstable.length).toBeLessThanOrEqual(27);
   });
 });
