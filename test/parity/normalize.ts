@@ -2524,16 +2524,23 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
           kidFrom !== undefined &&
           kidBol !== undefined &&
           source.slice(kidBol, kidFrom).includes("\t");
-        // A nested list does NOT nest when its parent item carries content AFTER it --
-        // probed, and NOT implementable as stated. `- a` / `  - b` / blank / `  c` reports
-        // BOTH items at `parent:-1`, while `- a` / `  - b` / blank / `c`, where the
-        // paragraph is at root instead of in the item, reports the child at `parent:0`. So
-        // the fact is established and `commonmark/lists/325` is the same shape.
+        // A nested list does NOT nest when its parent item carries content after it.
+        // PROBED AND CERTAIN as a fact, and three predicates for it are refuted:
         //
-        // Testing "the item has a child starting at or after the nested list's end" costs
-        // 19 -> 21: it also fires on items whose trailing content Obsidian still nests
-        // through. Something narrower is needed -- the blank line is the obvious next axis,
-        // since both probes have one and the rule has to separate them some other way.
+        //   the item has a child at or after the nested list's end   19 -> 21
+        //   ...and a blank line separates them                       15 -> 16
+        //   ...and that child is not itself a list                   15 -> 16
+        //
+        // Each fixes the same 3 rows -- `probe/nest-parent/blank-then-indented`,
+        // `commonmark/lists/325` and `document/tab-indentation`, all of them a nested item
+        // followed by a blank line and a block still inside the parent -- and breaks 4
+        // others, so the trailing content is not what Obsidian is keying on. The control
+        // probe pins the fact down: `- a` / `  - b` / blank / `c` puts the paragraph at
+        // ROOT and reports `parent:0`, so moving that one line changes the answer.
+        //
+        // Three strikes, so this stops here rather than taking a fourth guess. What it
+        // wants is a probe varying the TRAILING BLOCK's kind and indent against a fixed
+        // nested list, which is the axis none of the three predicates could see.
         walkList(
           nested,
           sameLine ? (own === 0 ? -1 : -own) : own,

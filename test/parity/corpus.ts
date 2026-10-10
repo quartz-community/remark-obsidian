@@ -2309,6 +2309,11 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/quote-nest/two-space", "> - a\n>  - b\n"],
   // `* foo` / `  * bar` / blank / `  baz` reports `bar` at `parent:-1`, i.e. NOT nested,
   // which no rule here predicts. Does the trailing indented paragraph cause it?
+  //
+  // ANSWERED, yes: the indented spelling un-nests and the root-level one does not. Three
+  // predicates for it are nonetheless refuted in `normalize.ts` -- each fixes these 3 rows
+  // and breaks 4 others -- so what is still wanted is a wave varying the trailing block's
+  // KIND and INDENT against a fixed nested list, which is the axis all three missed.
   ["probe/nest-parent/blank-then-indented", "- a\n  - b\n\n  c\n"],
   ["probe/nest-parent/blank-then-root", "- a\n  - b\n\nc\n"],
   // A definition freed by a comment CLOSER on its own line takes the column one past that
