@@ -589,7 +589,7 @@ describe("positioned oracle", () => {
     // `foo [bar](u)` where mdast's flattened `alt` gives `foo bar`, and
     // `![alt [^9]](/url)` displays `alt [^9]` against our `alt `. Sliced from the source
     // between the opener and the LAST `](`, since the alt may hold one itself.
-    embeds: 3,
+    embeds: 2,
     tags: 0,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
     // block identifier and the fix closed eleven cases, its own eight included.

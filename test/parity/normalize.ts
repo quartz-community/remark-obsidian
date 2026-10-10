@@ -2127,10 +2127,20 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         pathSlashes += 1;
       }
     }
-    const shownPath =
-      pathSlashes > 0 && !node.path.endsWith("\\")
-        ? node.path + "\\".repeat(pathSlashes)
+    // The display keeps the path's WRITTEN whitespace where the target normalises it:
+    // `![[*\u00a0*]]` resolves to `* *` with a plain space and displays `*\u00a0*` with
+    // the no-break space intact. Only whitespace is restored, not the whole written
+    // segment -- `node.path` is trimmed and carries other resolutions the display wants,
+    // and taking the segment wholesale was refuted once on exactly that.
+    const writtenPath = inner.split(/[#|]/u, 1)[0] ?? "";
+    const resolvedPath =
+      writtenPath.replace(/[^\S ]/gu, " ") === node.path
+        ? writtenPath
         : node.path;
+    const shownPath =
+      pathSlashes > 0 && !resolvedPath.endsWith("\\")
+        ? resolvedPath + "\\".repeat(pathSlashes)
+        : resolvedPath;
     // An EMPTY alias displays empty rather than falling back to the path: `[[a|]]`
     // resolves to `a` and displays nothing at all. `node.alias` is `""` either way, so
     // the written form is what distinguishes "no alias" from "an alias that is empty".
