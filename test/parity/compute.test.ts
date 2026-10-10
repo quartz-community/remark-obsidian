@@ -400,13 +400,14 @@ describe("positioned oracle", () => {
     //     because a `#` inside an ALIAS belongs to the display -- `[[a|b#c]]` and
     //     `[[a|#b]]` both resolve to `a`, and a predicate over the whole inner text
     //     would have moved those two controls as well.
-    //   - a link inside a `%%` comment IS indexed, and this collector returns SKIP on a
-    //     comment node: `%%\![[d.pdf#page=3]]%%` and `a@e.test> %%[link](u)%%` both
-    //     report a link in Obsidian and none here. Consistent with the recorded
-    //     asymmetry that a definition inside a comment does not define while a reference
-    //     inside one still counts -- but the SKIP predates the markdown-link collector
-    //     and was presumably measured for wikilinks, so removing it needs its own delta.
-    links: 17,
+    //   - FIXED, 6 of them plus the whole of `tags`: a link, embed or tag inside a `%%`
+    //     comment IS indexed, and this collector returned SKIP on a comment node. The
+    //     delta the note asked for came back clean. All eight corpus cases holding one
+    //     inside a comment report it, six reported nothing here, and not one was an
+    //     entry we invented -- the same missing-collector signature as the markdown link
+    //     and the markdown image. Consistent with the recorded asymmetry: a DEFINITION
+    //     inside a comment does not define, a reference does.
+    links: 11,
     // 31 -> 16 -> 6. First the missing collector (a markdown image was never indexed at
     // all), then the display field: the cache reports an image's alt as WRITTEN, not as
     // rendered, so it keeps a nested construct's brackets. `![foo [bar](u)](v)` displays
@@ -414,7 +415,7 @@ describe("positioned oracle", () => {
     // `![alt [^9]](/url)` displays `alt [^9]` against our `alt `. Sliced from the source
     // between the opener and the LAST `](`, since the alt may hold one itself.
     embeds: 5,
-    tags: 1,
+    tags: 0,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
     // block identifier and the fix closed eleven cases, its own eight included.
     //

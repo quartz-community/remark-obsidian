@@ -1868,7 +1868,12 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
   const embeds: string[] = [];
   const tags: string[] = [];
   visit(tree, (node: Node) => {
-    if (node.type === "comment") return SKIP;
+    // A `%%` comment hides its body when rendering and still indexes what is inside it,
+    // which is the recorded asymmetry from the other direction: a DEFINITION inside a
+    // comment does not define, while a reference does. Links, embeds and tags behave
+    // like references -- all eight corpus cases holding one inside a comment report it,
+    // and six of the eight reported nothing here, with not one case of us inventing an
+    // entry. `%%[[target]]%%` is indexed `[[target]]=>target|target`.
     if (!node.position) return;
     if (isType<ValueNode>(node, "tag")) {
       tags.push(`#${node.value}@${spanOf(node)}`);
