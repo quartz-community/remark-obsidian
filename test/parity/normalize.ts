@@ -1913,6 +1913,12 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       }
       const shownEnd =
         at !== undefined && at !== end.offset ? atOffset(at) : atPoint(end);
+      // Narrowing a section's start to its first child's line -- the fix that works for
+      // the `headings` key -- is REFUTED here at 9 -> 83. A heading's children are inline
+      // and on its own line, so the test is safe there; a block container's first child
+      // legitimately begins later, and clamping to it moves ~74 sections that agree. The
+      // 5 setext-after-definition rows need the node type restricting to `heading` at
+      // least, and probably the same upstream-overlap test rather than a child's line.
       return `${child.type}@${sectionStart(child.position!.start)}-${shownEnd}`;
     });
 
@@ -2318,9 +2324,13 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         item.position.start.offset!,
         itemLineEnd === -1 ? undefined : itemLineEnd,
       );
-      const marker = /^(?:[-*+]|\d{1,9}[.)])[ \t]*\[.\][ \t]*$/u.test(itemLine)
+      // The box character may not be `[`, or a wikilink reads as a task: `1. [[]]`
+      // captures `[` from `[[]` and Obsidian reports the plain marker `-`.
+      const marker = /^(?:[-*+]|\d{1,9}[.)])[ \t]*\[[^[]\][ \t]*$/u.test(
+        itemLine,
+      )
         ? null
-        : /^(?:[-*+]|\d{1,9}[.)])\s*\[(.)\]/u.exec(
+        : /^(?:[-*+]|\d{1,9}[.)])\s*\[([^[])\]/u.exec(
             source.slice(item.position.start.offset!),
           );
       // A ROOT item takes the same line-start clamp `sections` and `headings` already

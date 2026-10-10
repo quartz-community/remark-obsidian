@@ -471,6 +471,13 @@ describe("positioned oracle", () => {
     // final blocks 51, clamping only lists 29, and excluding `math` and `comment` by type
     // still cost 3 -- each fitted a subset. The per-type composition of the divergences
     // is what no amount of reasoning from examples produced.
+    // The 9 remaining split 5 START / 4 END by first difference. The START five are the
+    // setext-after-definition overlap -- `[ref]: /url` / `para` / `===` is `heading@1:0`
+    // to Obsidian and `heading@0:0` here, the same upstream node overlap the `headings`
+    // key had. Narrowing to the first child's line, which fixed `headings`, is REFUTED
+    // here at 9 -> 83: a heading's children are inline and on its own line, while a block
+    // container's first child legitimately begins later, so ~74 agreeing sections move.
+    // Restricting the test to `heading` nodes is the obvious next shape.
     sections: 9,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
@@ -698,7 +705,7 @@ describe("positioned oracle", () => {
     // contradiction; `document/tab-indentation` is `parent:-1` to Obsidian and `parent:0`
     // here, so a tab-indented child of a task does NOT nest even though a space-indented
     // one does.
-    listItems: 18,
+    listItems: 17,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
