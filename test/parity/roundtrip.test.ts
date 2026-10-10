@@ -338,6 +338,22 @@ describe("round-trip", () => {
      *      footnote. Growth is untidy; silently deleting an author's line break is
      *      data loss, and it is the only one of the 27 that does it.
      *
+     *      Diagnosed, and it is a PARSE bug rather than a serialiser one, which is why
+     *      it is in this file and not fixable from a handler. Pass 1 writes a faithful
+     *      form; re-parsing it is what loses the break, and the continuation INDENT is
+     *      the discriminator:
+     *
+     *          '^[i' / 'e]'      -> footnote > [text 'i', break, text 'e']
+     *          '^[i' / '  e]'    -> footnote > [text 'ie']
+     *
+     *      So `inline-footnote.ts` keeps the line ending when the next line starts at
+     *      column 0 and swallows it when the line is indented. Note that construct is
+     *      the only one of its family not using `planBody`, which `highlight.ts`,
+     *      `legacy-delete.ts` and `legacy-emphasis.ts` all use precisely to give every
+     *      line ending its own token and emit the indent as `linePrefix` -- consumed
+     *      but not content. That is the shape to copy, and it is also why the bug does
+     *      not show on the three constructs that already do it.
+     *
      * So this is not 32 separate defects. Two handlers -- an empty wikilink and an
      * undefined shortcut reference -- would address 9 of the 17 actionable ones, and the
      * mechanism for both is the one already documented in the parity README: a
