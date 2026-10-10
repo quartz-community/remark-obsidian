@@ -719,12 +719,29 @@ describe("positioned oracle", () => {
     // `  - foo` is `0:0` not `0:2`. Measured by dumping the first difference per case
     // rather than inferred.
     //
-    // What remains, by first difference: 7 END, 3 PARENT, 2 MARKER, and a handful of
-    // START rows that are NOT the clamp. The PARENT three are the known same-line
-    // contradiction; `document/tab-indentation` is `parent:-1` to Obsidian and `parent:0`
-    // here, so a tab-indented child of a task does NOT nest even though a space-indented
-    // one does.
-    listItems: 17,
+    // What remains, by first difference, re-dumped at 16: 7 END, 4 NAME, 3 START, 3
+    // MISSING. Each row is named so none needs re-deriving:
+    //
+    //   END      `commonmark/lists/309` wants `2:11` where the blank-separated-sibling
+    //            branch gives `3:0` -- a one-case contradiction with the 9 that branch
+    //            agrees on, so it is NOT a missing clamp: the trailing-newline clamp is
+    //            already there, in the fallback. `math/list-boundary` and
+    //            `gen-list-fence-outlives-item/5` run PAST (an unclosed construct outlives
+    //            the item); `fuzz/footnote/18`, `callout/nested-task-list` and both
+    //            `gen-nested-list-fence` rows stop SHORT. Opposite directions, as the
+    //            refuted single-rule attempt found at 34/10.
+    //   NAME     `document/tab-indentation` is `parent:-1` to Obsidian against our
+    //            `parent:0`, so a TAB-indented child does not nest where a space-indented
+    //            one does. `commonmark/lists/325` is the stranger one: `* foo` / `  * bar`
+    //            / blank / `  baz` reports `bar` at `parent:-1`, i.e. NOT nested, which no
+    //            current rule predicts. `probe/empty-container/nested-list` wants the
+    //            `parent:-2` sentinel.
+    //   START    all three are tabs -- `task/nested-tab`, `probe/nested-start/in-quote`
+    //            and `commonmark/tabs/9`, which is the known straddle boundary.
+    //   MISSING  two `hunt/ordered-item-under-definition` rows plus
+    //            `probe/straddle-fold/list-under-definition`, where we invent an item
+    //            Obsidian does not report at all.
+    listItems: 16,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.

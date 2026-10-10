@@ -2368,11 +2368,16 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       );
       // The box character may not be `[`, or a wikilink reads as a task: `1. [[]]`
       // captures `[` from `[[]` and Obsidian reports the plain marker `-`.
+      //
+      // And the box must be FOLLOWED by whitespace, which is the same requirement seen
+      // from the other side: `- [ ]` with its line ending there is not a task, and
+      // `- [ ]x` with no separator is not one either -- Obsidian reports `-` for both.
+      // So a task is a box delimited on both sides, not merely a bracket pair.
       const marker = /^(?:[-*+]|\d{1,9}[.)])[ \t]*\[[^[]\][ \t]*$/u.test(
         itemLine,
       )
         ? null
-        : /^(?:[-*+]|\d{1,9}[.)])\s*\[([^[])\]/u.exec(
+        : /^(?:[-*+]|\d{1,9}[.)])\s*\[([^[])\](?=[ \t])/u.exec(
             source.slice(item.position.start.offset!),
           );
       // A ROOT item takes the same line-start clamp `sections` and `headings` already
