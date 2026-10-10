@@ -828,10 +828,17 @@ describe("positioned oracle", () => {
     // not a list to Obsidian, while one written on the definition's own line is.
     //
     // The rest: 1 quote START (clamp refuted at 15 -> 25), and
-    // `probe/empty-container/nested-list`, which wants `parent:-2` for a nested list the
-    // un-nesting rule cannot reach -- there the trailing block sits at indent 4, inside the
-    // nested item, so the outer item has no later child and only the blank line BEFORE the
-    // nested list distinguishes it.
+    // `probe/empty-container/nested-list` (`-` / blank / `  -` / blank / `    foo`), which
+    // wants `parent:-2` for a nested list the un-nesting rule cannot reach -- the trailing
+    // block sits at indent 4, inside the nested item, so the outer item has no later child.
+    //
+    // "A blank line BEFORE the nested list un-nests it" is REFUTED: of the nested lists
+    // with one, Obsidian reports 1 un-nested and 2 NESTED (`1.  foo` / blank / `    - bar`
+    // and `- a` / blank / `    - b` both at parent:0). Indent against the parent's content
+    // column does not separate them either -- it is equal in one nesting case and one
+    // un-nesting case. What differs is that the un-nesting outer item is EMPTY, which is
+    // one case and belongs to the `probe/empty-container/*` family's own rules rather than
+    // to this one.
     listItems: 4,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
