@@ -21,6 +21,26 @@ import { visit } from "unist-util-visit";
  *
  * Running last means a pass may move a node freely and only has to keep its
  * offsets honest, which is the invariant `test/parity/points.test.ts` gates.
+ *
+ * **And that gate only sees the FINAL tree, so a pass reading `point.column` mid-pipeline
+ * is unprotected.** `definitionColumnTransform` compared its computed column against
+ * `start.column` on a node an earlier pass had moved by offset alone -- column 2 against
+ * offset 26 -- so it silently declined the case it existed for, and nothing caught it
+ * because this pass repaired the point afterwards either way. The tell was an edit that
+ * changed no output at all.
+ *
+ * So: a pass running before this one must read `offset` and derive the column itself.
+ * Audited across `src/lib`, eight places read a `.column`:
+ *
+ * - `line-map.ts` derives an offset FROM a column, which is correct there and nowhere
+ *   else -- `shiftByMap` places a freshly parsed fragment, whose line and column are
+ *   authoritative and whose offset is an index into the fragment string.
+ * - `callout.ts` and `task-char.ts` only increment, so they inherit whatever drift exists
+ *   rather than acting on it.
+ * - `comment-tail.ts`, `footnote-bare.ts`, `list-deep-continuation.ts`, `math-fence.ts`
+ *   and `setext-underline.ts` each READ a column to compute something. Whether any is
+ *   wrong depends on whether its node can arrive already moved, which is a per-pass
+ *   question and not yet answered for those five.
  */
 /**
  * One point, for a pass that splices a node and knows only its offset.
