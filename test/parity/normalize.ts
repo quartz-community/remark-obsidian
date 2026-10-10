@@ -1654,18 +1654,26 @@ function parsesAsMapping(body: string): boolean {
     // So this is not the parser difference it was recorded as. Every line that opens a
     // quoted scalar must show that quote at least twice, and there must be a mapping key
     // to find at all -- which is what still rejects an empty block and a bare scalar.
+    // The leniency is about quotes ONLY. A DUPLICATE KEY still reports nothing:
+    // `footnote-prefix: 2.` over `footnote-prefix: 3.` yields no position, where every one
+    // of the 48 unique-key documents that reach here yields one. `js-yaml` throws on the
+    // duplicate exactly as it throws on the unterminated quote, so without this the
+    // fallback rescued both and only one of them should be rescued.
     const lines = body.split("\n").filter((line) => line.trim() !== "");
     if (lines.length === 0) return false;
-    let keys = 0;
+    const seen = new Set<string>();
     for (const line of lines) {
+      const key = /^\s*([^:#]+):/u.exec(line);
+      if (!key) return false;
+      const name = key[1]!.trim();
+      if (seen.has(name)) return false;
+      seen.add(name);
       const opener = /^\s*[^:#]+:\s*(['"])/u.exec(line);
-      if (!/^\s*[^:#]+:/u.test(line)) return false;
-      keys += 1;
       if (!opener) continue;
       const quote = opener[1]!;
       if (line.split(quote).length - 1 < 2) return false;
     }
-    return keys > 0;
+    return seen.size > 0;
   }
   return (
     typeof parsed === "object" &&

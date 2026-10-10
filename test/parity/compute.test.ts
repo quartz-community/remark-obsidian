@@ -839,7 +839,7 @@ describe("positioned oracle", () => {
     // against whichever parser Obsidian embeds is out of scope for this package --
     // Quartz's FrontMatter plugin owns the YAML, and `remark-frontmatter` is not even in
     // the pinned chain.
-    frontmatterPosition: 1,
+    frontmatterPosition: 0,
   };
 
   it("diverges on no more cases than the recorded ceiling", () => {
