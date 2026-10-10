@@ -548,11 +548,13 @@ describe("positioned oracle", () => {
     // the recorded reference-gap probe. `fuzz/embed/24` is span/ordering inside a `%%`,
     // which is also one of the 3 `embeds`.
     //
-    // `blocks` 5, all named: 2 where we INVENT a block (`  ^blk](...` and
-    // `![[\[^1]]]`, both with a `]` right after the identifier -- and the embed one has a
-    // measured rule behind it already, since an IMAGE does not free a caret where a LINK
-    // does), 1 nested-item start column, and the 2 zero-width `3:0` blocks from
-    // `hunt/inline-footnote-double-parse/*` which Obsidian reports and we do not.
+    // `blocks` 4, all named. The embed half closed: an EMBED's bracket does not free a
+    // block identifier where a LINK's does, so `![[\[^1]]]` registers nothing while
+    // `[[\[^1]` registers `1`. What is left is 1 we still invent -- `  ^blk](![[...`, where
+    // the caret is followed by `](` so the `]` run gate lets it through and nothing ever
+    // closes the bracket, a different hole in the same gate -- plus 1 nested-item start
+    // column and the 2 zero-width `3:0` blocks from `hunt/inline-footnote-double-parse/*`
+    // that Obsidian reports and we do not.
     links: 3,
     // 31 -> 16 -> 6. First the missing collector (a markdown image was never indexed at
     // all), then the display field: the cache reports an image's alt as WRITTEN, not as
@@ -637,7 +639,7 @@ describe("positioned oracle", () => {
     //      (`9@3:0-3:0`) that we do not produce at all.
     //   1  `block-ref/on-list-item` reports the nested item's start column, the same
     //      content-column convention as elsewhere but applied to a block id.
-    blocks: 5,
+    blocks: 4,
     // 71, of which 44 are span-only and they do NOT share one rule -- measured, after
     // "Obsidian ends an item at its last content character and we run on to the next
     // line start" was recorded here from two examples. It holds for 34. The other 10
