@@ -773,6 +773,19 @@ describe("positioned oracle", () => {
     //   MISSING  two `hunt/ordered-item-under-definition` rows plus
     //            `probe/straddle-fold/list-under-definition`, where we invent an item
     //            Obsidian does not report at all.
+    // Holding at 15 across a corpus 23 cases larger, with the un-nesting rule closed.
+    //
+    // THE THREE EARLIER REFUTATIONS OF THAT RULE WERE ONE BUG, not evidence. Each
+    // predicate read `kids`, which is the LIST's children -- the sibling items -- where the
+    // rule is about the ITEM's own later children. So all three measured as costs without
+    // ever exercising the rule, and the dump that settled it showed the predicate fixing
+    // ZERO cases, which is the signature: a wrong rule trades cases, a wrong IMPLEMENTATION
+    // fixes none of its targets.
+    //
+    // What remains, all named: 7 END (unclosed constructs, both directions), 3 MISSING,
+    // 2 wanting a `parent:-2` sentinel we never emit (`probe/empty-container/nested-list`
+    // and `probe/nest-trail/blank-before-nest`, which is a blank line BEFORE the nested
+    // list), 1 quote START (clamp refuted at 15 -> 25), and 2 new item-end probes.
     listItems: 15,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed

@@ -2310,12 +2310,28 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // `* foo` / `  * bar` / blank / `  baz` reports `bar` at `parent:-1`, i.e. NOT nested,
   // which no rule here predicts. Does the trailing indented paragraph cause it?
   //
-  // ANSWERED, yes: the indented spelling un-nests and the root-level one does not. Three
-  // predicates for it are nonetheless refuted in `normalize.ts` -- each fixes these 3 rows
-  // and breaks 4 others -- so what is still wanted is a wave varying the trailing block's
-  // KIND and INDENT against a fixed nested list, which is the axis all three missed.
+  // ANSWERED, and `probe/nest-trail/*` settled the axis: the trailing block's INDENT
+  // decides it, not its kind. Paragraph, heading, quote and fence all un-nest at indent 2
+  // while a paragraph at indent 4 stays nested, because at 4 it is a child of `- b` and at
+  // 2 it is a sibling of the nested list. Implemented.
   ["probe/nest-parent/blank-then-indented", "- a\n  - b\n\n  c\n"],
   ["probe/nest-parent/blank-then-root", "- a\n  - b\n\nc\n"],
+  // Varying the trailing block's KIND and INDENT against one fixed nested list, which is
+  // the axis all three refuted predicates were blind to.
+  ["probe/nest-trail/para-four", "- a\n  - b\n\n    c\n"],
+  ["probe/nest-trail/heading", "- a\n  - b\n\n  # c\n"],
+  ["probe/nest-trail/quote", "- a\n  - b\n\n  > c\n"],
+  ["probe/nest-trail/fence", "- a\n  - b\n\n  ```\n  c\n  ```\n"],
+  ["probe/nest-trail/no-blank", "- a\n  - b\n  c\n"],
+  ["probe/nest-trail/blank-before-nest", "- a\n\n  - b\n\n  c\n"],
+  // Where an item ENDS when a delimited construct inside it never closes. The corpus has
+  // this in both directions -- `- ```` / `  code` / `- item` ends at 1:11 where we run to
+  // 3:0, while `- - ```` / `    fake` / `    ```` / `after` ends at 3:9 where we stop at
+  // 2:7 -- so the sibling's presence and the construct's closure are the axes.
+  ["probe/item-end/fence-unclosed-alone", "- ```\n  code\n"],
+  ["probe/item-end/fence-closed-sibling", "- ```\n  code\n  ```\n- item\n"],
+  ["probe/item-end/math-unclosed-sibling", "- $$\n  x\n- item\n"],
+  ["probe/item-end/loose-then-sibling", "- a\n\n  b\n\n- c\n"],
   // A definition freed by a comment CLOSER on its own line takes the column one past that
   // closer (`> %% [^1]: freed` is 4:4), where a container prefix gives the content column.
   // Both on one line, so the two candidate columns differ.

@@ -2547,9 +2547,34 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         // Three strikes, so this stops here rather than taking a fourth guess. What it
         // wants is a probe varying the TRAILING BLOCK's kind and indent against a fixed
         // nested list, which is the axis none of the three predicates could see.
+        // A nested list does not nest when its own parent ITEM carries a further block
+        // after it behind a blank line. Probed on the axis three earlier predicates
+        // missed, and the answer is the trailing block's INDENT, not its kind:
+        //
+        //   `- a` / `  - b` / blank / `  c`      indent 2  ->  parent:-1
+        //   `- a` / `  - b` / blank / `  # c`    indent 2  ->  parent:-1
+        //   `- a` / `  - b` / blank / `  > c`    indent 2  ->  parent:-1
+        //   `- a` / `  - b` / blank / `    c`    indent 4  ->  parent:0
+        //   `- a` / `  - b` / `  c`   (no blank) indent 2  ->  parent:0
+        //
+        // Paragraph, heading, quote and fence all un-nest at indent 2, so the kind is
+        // irrelevant -- and mdast already draws the line in the right place, since an
+        // indent-4 block becomes a child of `- b` while an indent-2 one is a sibling of
+        // the nested list inside the outer item. So the test is simply whether THIS ITEM
+        // has a later child, and the earlier attempts read the LIST's children (the
+        // sibling items) rather than the item's own, which is why they measured as
+        // refutations without ever exercising the rule.
+        const nestedEnd = nested.position?.end?.offset;
+        const unnested =
+          nestedEnd !== undefined &&
+          ((item as ParentNode).children ?? []).some((sibling) => {
+            const from = sibling.position?.start?.offset;
+            if (from === undefined || from < nestedEnd) return false;
+            return /\n[ \t>]*\n/u.test(source.slice(nestedEnd, from));
+          });
         walkList(
           nested,
-          sameLine ? (own === 0 ? -1 : -own) : own,
+          sameLine || unnested ? (own === 0 ? -1 : -own) : own,
           onOwnLine || tabbed ? undefined : itemContentColumn(item),
         );
       }
