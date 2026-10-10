@@ -2213,8 +2213,16 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         // `![^1](url)` registers nothing, because an image's alt is not a place a block
         // identifier can live. `![[\[^1]]]` is the wikilink spelling of that, and it
         // differs from the registering `[[\[^1]` by exactly the leading `!`.
+        //
+        // And a `]` can only CLOSE a bracket that opened, which is the identical argument
+        // the marker test below makes for `*_=~`. `  ^blk](![[...` has nothing but spaces
+        // before the caret, so its `]` closes nothing and Obsidian registers no block,
+        // where every registering form has its `[` run in front.
+        const before = raw.slice(0, at);
         const closerRun =
-          after.startsWith("]") && !raw.slice(0, at).includes("![[");
+          after.startsWith("]") &&
+          !before.includes("![[") &&
+          before.includes("[");
         if (!closerRun && !/^[*_=~]/u.test(after)) continue;
         // A marker can only *close* something that opened, so the same marker has to
         // appear before the caret somewhere on the line. `x ^a_b` has `_b` after the
