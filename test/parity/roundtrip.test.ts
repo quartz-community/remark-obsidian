@@ -331,28 +331,29 @@ describe("round-trip", () => {
      *      and the reference follows on pass 2, exactly as `[foo]: <>` does.
      *   1  `probe/bracket-nest/label-autolink-closer` restructures a label and an
      *      autolink against each other, +30 bytes. Its own rule.
-     *   1  `fuzz/inline-footnote/11` is the one to fix FIRST despite being a
-     *      singleton, because it is the only case that LOSES content rather than
-     *      growing: `- ^[i` / `e]#a/b` is written `* ^[i` / `  e]#a/b` and then
-     *      collapsed to `* ^[ie]#a/b`, dropping the line ending inside the inline
-     *      footnote. Growth is untidy; silently deleting an author's line break is
-     *      data loss, and it is the only one of the 27 that does it.
+     *   1  `fuzz/inline-footnote/11` loses a line ending: `- ^[i` / `e]#a/b` is
+     *      written `* ^[i` / `  e]#a/b` and then collapsed to `* ^[ie]#a/b`.
      *
-     *      Diagnosed, and it is a PARSE bug rather than a serialiser one, which is why
-     *      it is in this file and not fixable from a handler. Pass 1 writes a faithful
-     *      form; re-parsing it is what loses the break, and the continuation INDENT is
-     *      the discriminator:
+     * TWO CORRECTIONS to earlier readings of this family, both measured:
      *
-     *          '^[i' / 'e]'      -> footnote > [text 'i', break, text 'e']
-     *          '^[i' / '  e]'    -> footnote > [text 'ie']
+     * It is NOT the only case that loses content. Four of the 27 shrink, and two of
+     * those are genuinely lossy rather than escape churn -- the inline footnote above,
+     * and `token/display-math/nested`, where `$$$$x^2$$$$` is written `$$x^2$$` and
+     * then `$x^2$`, shedding a delimiter pair per pass and demoting display math to
+     * inline. That one is arguably worse, because it changes what the construct MEANS
+     * rather than how much whitespace it carries, and it sits inside the math family
+     * that is otherwise written off as inherent spelling debt. The other two shrinks
+     * (`probe/math-unclosed/definition`, one `commonmark/emphasis-and-strong-emphasis`)
+     * are re-escaping that happens to net shorter.
      *
-     *      So `inline-footnote.ts` keeps the line ending when the next line starts at
-     *      column 0 and swallows it when the line is indented. Note that construct is
-     *      the only one of its family not using `planBody`, which `highlight.ts`,
-     *      `legacy-delete.ts` and `legacy-emphasis.ts` all use precisely to give every
-     *      line ending its own token and emit the indent as `linePrefix` -- consumed
-     *      but not content. That is the shape to copy, and it is also why the bug does
-     *      not show on the three constructs that already do it.
+     * And the inline-footnote cause is NOT the continuation indent. That reading came
+     * from a tree dumped in a LIST context; measured at root, `^[i` / `e]` collapses to
+     * `text 'ie'` exactly as `^[i` / `  e]` does, so the indent is not the
+     * discriminator and the break is already gone without it. Giving the indent its own
+     * `linePrefix` token -- the `planBody` shape the sibling constructs use -- was
+     * built and is INERT: identical trees, unstable unchanged at 27. Reverted.
+     * Whatever loses the break happens before that point, so find it in the text
+     * subtokenization rather than in `atBoundary`.
      *
      * So this is not 32 separate defects. Two handlers -- an empty wikilink and an
      * undefined shortcut reference -- would address 9 of the 17 actionable ones, and the
