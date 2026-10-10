@@ -614,6 +614,15 @@ describe("positioned oracle", () => {
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
+    // The 2 remaining are a YAML IMPLEMENTATION difference, not a rule gap, so they are
+    // unlikely to be worth closing. The rule itself holds -- Obsidian reports no
+    // position unless the block parses as a non-empty mapping, and `title: "unterminated`
+    // reports nothing. But `footnote-prefix: '2.''` throws in `js-yaml` and Obsidian
+    // still reports `0:0-2:3`, as does `footnote-prefix: "2.\\"`. Both are unterminated
+    // strings by one reading and valid by another, and chasing YAML edge-case parity
+    // against whichever parser Obsidian embeds is out of scope for this package --
+    // Quartz's FrontMatter plugin owns the YAML, and `remark-frontmatter` is not even in
+    // the pinned chain.
     frontmatterPosition: 2,
   };
 
