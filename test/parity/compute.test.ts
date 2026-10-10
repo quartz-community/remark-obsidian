@@ -518,6 +518,28 @@ describe("positioned oracle", () => {
     // bracket becomes a link rather than a footnote reference and so never claims the
     // caret. That is a tree question and this collector reads lines, so it needs a
     // different mechanism than the escape check.
+    // The 7 remaining, attributed:
+    //
+    //   2  a bracket that becomes a LINK frees the caret, so `[^1](u)` registers `1`
+    //      and `[^blk](u)` registers `blk`. We register neither.
+    //
+    //      NOT IMPLEMENTED, because the counter-example is CONFOUNDED and the corpus
+    //      cannot separate it. Of the three `[^name](` occurrences, two register and
+    //      the third -- `![^1](url)` over `[^1]: one` -- does not, and it differs in
+    //      TWO ways at once: it is an IMAGE rather than a link, and it HAS a definition
+    //      for the label. Either could be the discriminator.
+    //
+    //      Two probes would separate them and neither exists: `![^1](url)` with NO
+    //      definition, and `[^1](u)` WITH one. They cannot simply be added here --
+    //      a new case arrives `unreviewed` and fails the gate until a recording triages
+    //      it -- so they belong in the next corpus wave.
+    //
+    //   2  we INVENT a block id: `  ^blk](![[d.pdf#page=3]]` and `![[\[^1]]]` both
+    //      report nothing in Obsidian.
+    //   2  `hunt/inline-footnote-double-parse/*` report a ZERO-WIDTH block at 3:0
+    //      (`9@3:0-3:0`) that we do not produce at all.
+    //   1  `block-ref/on-list-item` reports the nested item's start column, the same
+    //      content-column convention as elsewhere but applied to a block id.
     blocks: 7,
     // 71, of which 44 are span-only and they do NOT share one rule -- measured, after
     // "Obsidian ends an item at its last content character and we run on to the next
