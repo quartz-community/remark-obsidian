@@ -327,6 +327,24 @@ describe("positioned oracle", () => {
     // 0:12. These are the recorded definition end-line family -- Obsidian ends a
     // definition at an unclosed opener inside it while we let the construct run on --
     // and that is a parse-extent question, not a projection clamp.
+    // PROBED, and it is NOT the single rule the earlier note implied. Wave two varied
+    // the container prefix and the answer alternates between two different columns:
+    //
+    //     '>   [^1]: def'               bracket 4, content col 2 -> obs 0:2  content
+    //     '1. item' / '   [^1]: x'      bracket 3, content col 3 -> obs 2:3  (equal)
+    //     '- item' / '  [^1]: x'        bracket 2, content col 2 -> obs 2:2  (equal)
+    //     '1. item' / '    [^1]: def'   bracket 4, content col 3 -> obs 2:4  BRACKET
+    //     ' [^1]: def'                  bracket 1, content col 0 -> obs 0:0  content
+    //
+    // So neither min nor max of the two: a same-line container prefix gives the content
+    // column, and a continuation indented PAST the content column gives the bracket.
+    // The equal rows cannot discriminate, which is why three earlier probes looked like
+    // confirmation of one rule.
+    //
+    // The implemented pass handles the content-column half and is scoped to a
+    // spaces-only prefix; the bracket half needs the indent compared against the
+    // containing item's content column, and `>  [^1]: def` additionally needs a quote
+    // marker in the prefix to be allowed at all.
     footnotes: 7,
     footnoteRefs: 3,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
