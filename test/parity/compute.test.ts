@@ -659,6 +659,17 @@ describe("positioned oracle", () => {
     //      (`9@3:0-3:0`) that we do not produce at all.
     //   1  `block-ref/on-list-item` reports the nested item's start column, the same
     //      content-column convention as elsewhere but applied to a block id.
+    // Both remaining rows MUST NOT BE FIXED. They are the only two zero-width entries
+    // among 72 golden blocks, and both sit past the end of their document:
+    // `inline ^[^9] real[^7]` registers `9@3:0-3:0` on a three-line note.
+    //
+    // The cause is the renderer relocating an inline footnote's body to a trailing
+    // section, where the `^9` inside it is then read as an identifier. That is a position
+    // in a region the author never wrote, so emitting it would mean inventing a block at
+    // an offset the source does not have -- the governing rule read in the other
+    // direction, and a wrong offset is worse than a missing one. The recorder reads `text`
+    // off a clone with `.footnotes` removed for exactly this reason; `blocks` is read from
+    // the undisturbed root, which is why these two leak through.
     blocks: 2,
     // 71, of which 44 are span-only and they do NOT share one rule -- measured, after
     // "Obsidian ends an item at its last content character and we run on to the next

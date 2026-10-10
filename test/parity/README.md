@@ -1131,6 +1131,15 @@ corpus, and the distinct causes are known — one byte-order-mark document, and 
 author's `P1`, where Obsidian's cache reports a column short by the width of a
 `%%` marker. Fixing those two would be a regression.
 
+**A second must-not-fix group: two zero-width `blocks` entries.** They are the only two of
+72 and both sit past the end of their document — `inline ^[^9] real[^7]` registers
+`9@3:0-3:0` on a three-line note. The renderer relocates an inline footnote's body to a
+trailing section and the `^9` inside it is read as an identifier there, so the position
+belongs to a region the author never wrote. Emitting it would invent a block at an offset
+the source does not have. Note the recorder already removes `.footnotes` before reading
+`text` for this reason, while `blocks` is read from the undisturbed root — so this is the
+harness's own asymmetry showing through rather than a parse gap.
+
 **The `P1` family is wider than those two, and it is worth naming because it is the one
 group here that must NOT be driven to zero.** Measured across the remaining `links`,
 `embeds` and `footnoteRefs` rows: four of them are short by exactly 2 with a `%%` in the
