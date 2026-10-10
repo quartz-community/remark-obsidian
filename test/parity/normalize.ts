@@ -2175,14 +2175,23 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       const own = item.position.start.line - 1;
       for (const nested of (item as unknown as { children: Node[] }).children) {
         if (nested.type !== "list") continue;
-        // `parent` is a LINE NUMBER in Obsidian's cache, so nesting that happens
-        // *within* one line cannot be expressed and is reported as a root item instead.
-        // `*\t*\t*` is three items all on line 0, and Obsidian reports `parent:-1` for
-        // all three where tree nesting would make the last two children of the first.
+        // `*\t*\t*` is three items all on line 0 and Obsidian reports `parent:-1` for
+        // all three, where tree nesting would make the last two children of the first.
+        // The legacy arbiter nests it exactly as we do, three levels deep.
         //
-        // Not a parse difference: the legacy arbiter nests this exactly as we do, three
-        // levels deep, so the tree is right and only this projection was over-reporting
-        // what the field can hold.
+        // The ORIGINAL EXPLANATION FOR THIS IS REFUTED and the rule is kept only because
+        // it measures better. It said `parent` is a line number so nesting within one
+        // line cannot be expressed -- but `- [ ] 1.` is the same shape in our tree,
+        // `listItem@0:0 > list@0:6 > listItem@0:6`, and Obsidian reports `parent:0` for
+        // the inner one. A same-line parent on line 0 IS expressible, so the field is not
+        // the constraint.
+        //
+        // So the discriminator is unknown and these two cases contradict each other on
+        // identical structure. Obsidian's own parse is probably flat for `*\t*\t*` and
+        // nested for `- [ ] 1.`, which this projection cannot see. Keeping the rule costs
+        // 4 cases (`task/reparse-ordered`, `-paren`, `-bullet`,
+        // `probe/straddle-fold/task-r*`, all of them `- [ ] <marker>`) and closes 5, so it
+        // stays until probes settle which side is which -- not because it is understood.
         const at = nested.position?.start?.line;
         const sameLine = at !== undefined && at - 1 === own;
         walkList(nested, sameLine ? (own === 0 ? -1 : -own) : own);
