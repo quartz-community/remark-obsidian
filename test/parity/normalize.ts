@@ -2376,7 +2376,19 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         break;
       }
     }
-    const blank = hasSibling ? blankBefore(base.line) : undefined;
+    // The blank-line end belongs to a SINGLE-LINE item only. Measured on both sides by
+    // dumping which ids need this branch and which want the content end:
+    //
+    //   needs the blank line   `- foo` / blank / `- bar` ends at 1:0, and 7 more -- every
+    //                          one an item whose content is one line
+    //   wants content end      `- a` / blank / `  b` ends at 2:3, `- $$` / `  x` at 1:3,
+    //                          `-   foo` / blank / `    notcode` at 2:11 -- every one an
+    //                          item spanning several lines
+    //
+    // Removing the branch outright costs 14 -> 17, which is what kept it unconditional;
+    // the line count is what separates the two groups, and `base` already carries it.
+    const oneLine = base.line === item.position!.start.line;
+    const blank = hasSibling && oneLine ? blankBefore(base.line) : undefined;
     if (blank !== undefined) {
       return { line: base.line + 1, column: 1, offset: blank };
     }

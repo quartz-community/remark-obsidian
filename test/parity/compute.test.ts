@@ -782,13 +782,19 @@ describe("positioned oracle", () => {
     // ZERO cases, which is the signature: a wrong rule trades cases, a wrong IMPLEMENTATION
     // fixes none of its targets.
     //
-    // What remains, all named: 7 END (unclosed constructs, both directions), 3 MISSING,
-    // 1 quote START (clamp refuted at 15 -> 25), 2 new item-end probes, and
-    // `probe/empty-container/nested-list`, which wants `parent:-2` for a nested list the
-    // un-nesting rule does not reach -- there the trailing block sits at indent 4, inside
-    // the nested item, so the outer item has no later child and only the blank line BEFORE
-    // the nested list distinguishes it.
-    listItems: 14,
+    // The item END family is down to the cases where Obsidian reaches FURTHER than we do,
+    // which is the opposite direction from everything closed so far: `fuzz/footnote/18`,
+    // `callout/nested-task-list` and both `hunt/gen-nested-list-fence` rows, where an item
+    // absorbs a lazy line, a nested callout, or a line past a closed fence. The run-past
+    // half is gone -- a single-line item ends at the following blank, a multi-line one at
+    // its last content character.
+    //
+    // The rest: 3 MISSING (items we invent that Obsidian does not report), 1 quote START
+    // (clamp refuted at 15 -> 25), and `probe/empty-container/nested-list`, which wants
+    // `parent:-2` for a nested list the un-nesting rule cannot reach -- there the trailing
+    // block sits at indent 4, inside the nested item, so the outer item has no later child
+    // and only the blank line BEFORE the nested list distinguishes it.
+    listItems: 9,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
