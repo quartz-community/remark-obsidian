@@ -1828,6 +1828,15 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     const to = child.position.end.offset;
     if (from === undefined || to === undefined) return;
     if (!/^\^[A-Za-z0-9-]+$/u.test(source.slice(from, to).trim())) return;
+    // A leading space keeps it prose: `^blk` alone is reported as no section at all,
+    // while ` ^blk` is reported as `paragraph@0:0-0:5`. The space sits BEFORE the
+    // paragraph's start offset, so trimming the node's own slice never sees it and the
+    // line prefix has to be checked instead.
+    if (
+      source.slice(lineStarts[child.position.start.line - 1] ?? 0, from) !== ""
+    ) {
+      return;
+    }
 
     const next = tree.children[index + 1];
     const abutted =

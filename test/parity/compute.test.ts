@@ -330,7 +330,7 @@ describe("positioned oracle", () => {
     // we emitted a `paragraph` section Obsidian consumes -- and the cluster A fix closed
     // them along with two more, exactly as the recorded coupling predicted. The 27
     // remaining are all SPAN.
-    sections: 27,
+    sections: 26,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
     // invented, which is the shape of a missing collector rather than a parse bug.
@@ -408,7 +408,7 @@ describe("positioned oracle", () => {
     // bracket becomes a link rather than a footnote reference and so never claims the
     // caret. That is a tree question and this collector reads lines, so it needs a
     // different mechanism than the escape check.
-    blocks: 9,
+    blocks: 8,
     // 71, of which 44 are span-only and they do NOT share one rule -- measured, after
     // "Obsidian ends an item at its last content character and we run on to the next
     // line start" was recorded here from two examples. It holds for 34. The other 10
