@@ -788,12 +788,17 @@ describe("positioned oracle", () => {
     // ZERO cases, which is the signature: a wrong rule trades cases, a wrong IMPLEMENTATION
     // fixes none of its targets.
     //
-    // The item END family is down to the cases where Obsidian reaches FURTHER than we do,
-    // which is the opposite direction from everything closed so far: `fuzz/footnote/18`,
-    // `callout/nested-task-list` and both `hunt/gen-nested-list-fence` rows, where an item
-    // absorbs a lazy line, a nested callout, or a line past a closed fence. The run-past
-    // half is gone -- a single-line item ends at the following blank, a multi-line one at
-    // its last content character.
+    // The END family is down to 2. Both `hunt/gen-nested-list-fence` rows closed once the
+    // lazy absorb learned to join the INNERMOST open item instead of the outermost -- see
+    // `container-lazy.ts`. The run-past half closed earlier, so what is left reaches
+    // further than we do in a way a lazy paragraph cannot explain:
+    //
+    //   `fuzz/footnote/18`        `[^1]: -` / `y^2$` -- an EMPTY item absorbs the line,
+    //                            where lazy continuation needs an open paragraph
+    //   `callout/nested-task-list`  a task item absorbs a nested CALLOUT, so a container
+    //                            rather than a paragraph joins the item
+    //
+    // Both want a container-level change rather than a projection rule.
     //
     // The MISSING three are closed: a list FOLDED into a definition from a later line is
     // not a list to Obsidian, while one written on the definition's own line is.
@@ -803,7 +808,7 @@ describe("positioned oracle", () => {
     // un-nesting rule cannot reach -- there the trailing block sits at indent 4, inside the
     // nested item, so the outer item has no later child and only the blank line BEFORE the
     // nested list distinguishes it.
-    listItems: 6,
+    listItems: 4,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.

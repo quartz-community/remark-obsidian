@@ -184,11 +184,28 @@ export function containerLazyTransform(tree: Root, source: string): void {
     if (/\n[ \t]*\n/.test(trailing)) continue;
 
     const parent = container as List | Blockquote;
-    const target =
+    let target =
       parent.type === "list"
         ? parent.children[parent.children.length - 1]
         : parent;
     if (!target || !("children" in target)) continue;
+
+    // A lazy line joins the INNERMOST open item, not the outermost. `- - ``` ` /
+    // `    fake` / `    ``` ` / `after` reports the inner item spanning to the end of
+    // `after` -- `0:2-3:9` -- where pushing onto the outer item left the inner one at
+    // `2:7`. Descending while the last child is a list is the whole fix; a blockquote
+    // keeps its own target because there is no item to descend into.
+    const descended: (List | ListItem)[] = [];
+    while (parent.type === "list") {
+      const kids = (target as ParentLike).children;
+      const last = kids?.[kids.length - 1];
+      if (!last || last.type !== "list") break;
+      const inner = (last as ParentLike).children;
+      const item = inner?.[inner.length - 1];
+      if (!item || !("children" in item)) break;
+      descended.push(target as ListItem, last as List);
+      target = item as typeof target;
+    }
 
     // Display math is absorbed only onto a paragraph, which is lazy continuation's
     // actual precondition: a container continues lazily when its last open block is
@@ -209,7 +226,11 @@ export function containerLazyTransform(tree: Root, source: string): void {
       const split = splitLazyHeading(next, source);
       if (!split) continue;
       (target.children as unknown[]).push(split.content);
-      for (const point of [parent.position?.end, target.position?.end]) {
+      for (const point of [
+        parent.position?.end,
+        target.position?.end,
+        ...descended.map((n) => n.position?.end),
+      ]) {
         if (point) Object.assign(point, { ...split.content.position!.end });
       }
       children.splice(index + 1, 1, split.underline);
@@ -222,6 +243,13 @@ export function containerLazyTransform(tree: Root, source: string): void {
     }
     if (target !== parent && target.position && next.position?.end) {
       target.position.end = { ...next.position.end };
+    }
+    // Every container descended through has to be stretched over the absorbed block too,
+    // which is the same reason `trailingEmptyItem` returns its chain.
+    for (const node of descended) {
+      if (node.position && next.position?.end) {
+        node.position.end = { ...next.position.end };
+      }
     }
     children.splice(index + 1, 1);
   }
