@@ -2618,6 +2618,24 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     if ((parent as Node | null)?.type === "listItem") return;
     if (inComment.has(node)) return;
     if (!node.position) return;
+    // A list FOLDED into a footnote definition from a later line is not a list to
+    // Obsidian at all: `2.` cannot interrupt a paragraph, so `[^1]: body` / `2. item`
+    // is lazy continuation text and reports no item. `listUnderDefinitionTransform`
+    // folds it for the `text` projection and leaves a list node behind, which this
+    // collector then counted.
+    //
+    // Measured on both sides, because a list inside a definition is NOT generally
+    // unreported: of the cases whose tree has one, FOUR agree on the item count and all
+    // four have the list on the definition's OWN line (`[^1]: - x`), while the three we
+    // over-report have it on a later line. The line is the discriminator.
+    const host = parent as Node | null;
+    if (
+      host?.type === "footnoteDefinition" &&
+      host.position &&
+      node.position.start.line > host.position.start.line
+    ) {
+      return;
+    }
     const line = node.position.start.line - 1;
     walkList(node, line === 0 ? -1 : -line);
   });
