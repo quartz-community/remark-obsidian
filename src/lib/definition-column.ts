@@ -72,7 +72,20 @@ export function definitionColumnTransform(tree: Root, source: string): void {
       : host
         ? contentColumn(source, host)
         : 0;
-    if (column === undefined || column >= start.column - 1) return;
+    if (column === undefined) return;
+    // A LIST-ITEM host needs the indent to clear its content column by TWO, not one.
+    // Probed with one host against a varying indent, which is what separates the two
+    // shapes that had contradicted each other for weeks:
+    //
+    //   `- item`  / blank / `    [^1]:`   content 2, indent 4, gap 2  ->  column 2
+    //   `- item`  / blank / `     [^1]:`  content 2, indent 5, gap 3  ->  column 2
+    //   `1. item` / blank / `    [^1]:`   content 3, indent 4, gap 1  ->  column 4
+    //
+    // The last one is the bracket, and `hunt/list-item-label-margin/1` is the same shape.
+    // A root or quote host keeps the one-column test: ` [^1]: def` is column 0 at gap 1,
+    // and `>  [^1]: def` is column 2 at gap 1, so the stricter rule belongs to the item.
+    const gap = host && !quoted ? 2 : 1;
+    if (column > start.column - 1 - gap) return;
 
     start.column = column + 1;
     start.offset = bol + column;

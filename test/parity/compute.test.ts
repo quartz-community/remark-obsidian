@@ -364,7 +364,18 @@ describe("positioned oracle", () => {
     // `    [^1]: x` is `2:2`, the content column, at the same indent of 4. So the ordered
     // marker's width is implicated rather than the indent alone, and `1.  foo` putting
     // content at column 4 is a recorded separator quirk that may be the same bug.
-    footnotes: 3,
+    // Down to 1. The two-rule START split is settled and both halves now hold: a
+    // container prefix on the definition's own line gives the CONTENT column, and a
+    // LIST-ITEM host additionally requires the indent to clear that column by two -- at a
+    // gap of one Obsidian reports the bracket instead. Probed with one host against a
+    // varying indent; see `definition-column.ts` for the table.
+    //
+    // The one left is `> %% [^1]: freed`, where a comment CLOSER on the line contributes a
+    // column one past itself (4:4) rather than the quote's content column (0:2). Probing
+    // the single-line spellings came back with NO definition at all -- `%% h %% [^1]: x`
+    // and `> %% h %% [^1]: x` define nothing -- so the freed definition needs the comment
+    // to have OPENED on an earlier line, which is a third rule and not this one.
+    footnotes: 1,
     footnoteRefs: 3,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
