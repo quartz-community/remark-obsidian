@@ -538,14 +538,24 @@ describe("positioned oracle", () => {
     //   The rest: `commonmark/links/503` wants `foo bä` where we give `foo%20bä` (a
     //   percent-decode in the target), `hunt/image-alt-with-brackets/4` wants the alt
     //   `x` where we give `x<fn>`, and three are ordering or span inside a `%%` comment.
-    links: 7,
+    // The every-`#`-is-a-separator rule closed 3 links and 1 embed. It had been refuted
+    // once at 7 -> 9 as a blanket replace; measuring BOTH sides is what separated the two,
+    // since of the entries whose target holds 2+ `#`, four convert all and zero convert
+    // only the first, and the two matching neither shape turn out not to reach the join.
+    //
+    // The 4 links left: `wikilink/empty-target-with-alias` wants display `|b` for `[[|b]]`
+    // -- an empty path with a pipe makes the WHOLE inner the display, where we treat it as
+    // an alias and show nothing. `hunt/image-alt-with-brackets/4` wants alt `x` against
+    // our `x⟨fn⟩`, so a dangling footnote marker is not in an alt. `probe/caret-link/*` is
+    // the recorded reference-gap probe. `fuzz/embed/24` is span/ordering inside a `%%`.
+    links: 4,
     // 31 -> 16 -> 6. First the missing collector (a markdown image was never indexed at
     // all), then the display field: the cache reports an image's alt as WRITTEN, not as
     // rendered, so it keeps a nested construct's brackets. `![foo [bar](u)](v)` displays
     // `foo [bar](u)` where mdast's flattened `alt` gives `foo bar`, and
     // `![alt [^9]](/url)` displays `alt [^9]` against our `alt `. Sliced from the source
     // between the opener and the LAST `](`, since the alt may hold one itself.
-    embeds: 4,
+    embeds: 3,
     tags: 0,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
     // block identifier and the fix closed eleven cases, its own eight included.

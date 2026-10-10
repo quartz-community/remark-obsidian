@@ -2107,9 +2107,18 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     // A vault heading search strips its whole `#` run from the display. `[[#H2]]` already
     // displays `H2` because the single `#` is the separator, and `[[## heading text]]`
     // displays `heading text` where the second `#` survived into the heading.
-    const shownHeading = inner.startsWith("#")
-      ? heading.replace(/^#+[ \t]*/u, "")
-      : heading;
+    // EVERY `#` is a heading separator in the display, not just the one the node split on.
+    // `[[a#^blk a#^blk]]` displays `a > ^blk a > ^blk`, and the node carries only the first
+    // split, so the rest have to be converted here.
+    //
+    // Measured on both sides, which is what distinguishes this from the blanket version
+    // refuted earlier at 7 -> 9: of the entries whose target holds two or more `#`, FOUR
+    // convert all of them and ZERO convert only the first. The two that match neither
+    // shape are not counter-examples -- `[[a#b#c|d]]` has an alias so it never reaches
+    // this join, and `[[## heading text]]` takes the strip branch above.
+    const shownHeading = (
+      inner.startsWith("#") ? heading.replace(/^#+[ \t]*/u, "") : heading
+    ).replaceAll("#", " > ");
     const shown = hasAlias
       ? node.alias
       : [shownPath, shownHeading].filter(Boolean).join(" > ");
