@@ -2332,6 +2332,16 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/item-end/fence-closed-sibling", "- ```\n  code\n  ```\n- item\n"],
   ["probe/item-end/math-unclosed-sibling", "- $$\n  x\n- item\n"],
   ["probe/item-end/loose-then-sibling", "- a\n\n  b\n\n- c\n"],
+  // Which block does an identifier inside a nested container name? Measured: 64 of 68
+  // golden entries name a ROOT-level child and NONE names an inner node -- but
+  // `block-ref/on-list-item` reports `nested-id@1:2-2:16`, which is the nested item at the
+  // column `listItems` projects for it rather than the column its tree node carries. So
+  // either it is an outlier or the root-level rule has a nested-container exception, and
+  // one case cannot say which.
+  ["probe/block-nest/own-line", "- a\n  - b\n    ^id\n"],
+  ["probe/block-nest/trailing", "- a\n  - b ^id\n"],
+  ["probe/block-nest/outer-own-line", "- a\n\n  ^id\n"],
+  ["probe/block-nest/in-quote", "> - a\n> - b ^id\n"],
   // A definition freed by a comment CLOSER on its own line takes the column one past that
   // closer (`> %% [^1]: freed` is 4:4), where a container prefix gives the content column.
   // Both on one line, so the two candidate columns differ.

@@ -2315,9 +2315,59 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     ) {
       continue;
     }
-    blocks.push(
-      `${id.name}@${atOffset(lineStart)}-${atPoint(child.position!.end)}`,
-    );
+    // An identifier inside a NESTED list item names that item, not the root block.
+    // Probed, because one corpus case could not say whether it was a rule or an outlier:
+    //
+    //   `- a` / `  - b` / `    ^id`  ->  id@1:2-2:7   the nested item
+    //   `- a` / `  - b ^id`          ->  id@1:2-1:9   the nested item
+    //   `- a` / blank / `  ^id`      ->  id@0:0-2:5   root: the OUTER item is not nested
+    //   `> - a` / `> - b ^id`        ->  id@0:0-1:9   root: a sibling item is not nested
+    //
+    // The column is the parent's content column, the same one `listItems` projects, which
+    // is why matching the identifier's span against raw tree nodes found nothing and made
+    // this look like an outlier: 64 of 68 entries name a root child and NONE names an
+    // inner node at its own tree column.
+    let span = `${atOffset(lineStart)}-${atPoint(child.position!.end)}`;
+    if (child.type === "list") {
+      // The marker scan is inlined because `itemContentColumn` is declared below this
+      // pass, and hoisting it would reorder a file the rest of which reads top-down.
+      const contentColumnOf = (host: Node): number | undefined => {
+        const from = host.position?.start?.offset;
+        if (from === undefined) return undefined;
+        const bol = lineStarts[host.position!.start.line - 1] ?? 0;
+        const nl = source.indexOf("\n", from);
+        const text = source.slice(bol, nl === -1 ? undefined : nl);
+        const opener = /^[ \t]*(?:>[ \t]?)*(?:[-*+]|\d{1,9}[.)])[ \t]*/u.exec(
+          text,
+        );
+        return opener ? opener[0].length : undefined;
+      };
+      // The identifier's own line, not the child's first one. `lineStart` is where the
+      // block begins and `id.index` is an offset into its whole text, so using the former
+      // alone made this pass INERT -- it compared the list's opening line against every
+      // item's range and matched the outer item every time.
+      const idOffset = lineStart + id.index;
+      let line = 0;
+      for (let at = 0; at < lineStarts.length; at++) {
+        if (lineStarts[at]! <= idOffset) line = at;
+        else break;
+      }
+      let found: { item: Node; column: number } | undefined;
+      visit(child, "list", (inner: Node, _i, host) => {
+        if ((host as Node | null)?.type !== "listItem") return;
+        for (const item of (inner as ParentNode).children) {
+          const at = item.position;
+          if (!at || at.start.line - 1 > line || at.end.line - 1 < line)
+            continue;
+          const column = contentColumnOf(host as Node);
+          if (column !== undefined) found = { item, column };
+        }
+      });
+      if (found) {
+        span = `${found.item.position!.start.line - 1}:${found.column}-${atPoint(found.item.position!.end)}`;
+      }
+    }
+    blocks.push(`${id.name}@${span}`);
   }
 
   // A repeated block identifier: the LAST one wins. `x ^b` / '' / `y ^b` registers only

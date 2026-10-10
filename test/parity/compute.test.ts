@@ -659,7 +659,7 @@ describe("positioned oracle", () => {
     //      (`9@3:0-3:0`) that we do not produce at all.
     //   1  `block-ref/on-list-item` reports the nested item's start column, the same
     //      content-column convention as elsewhere but applied to a block id.
-    blocks: 3,
+    blocks: 2,
     // 71, of which 44 are span-only and they do NOT share one rule -- measured, after
     // "Obsidian ends an item at its last content character and we run on to the next
     // line start" was recorded here from two examples. It holds for 34. The other 10

@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-10T20:23:04.306Z",
+  "recordedAt": "2026-10-10T21:32:37.791Z",
   "cases": {
     "probe/label-bracket/full-unmatched-undefined": {
       "id": "probe/label-bracket/full-unmatched-undefined",
@@ -81571,6 +81571,217 @@
             "-|parent:-1@4:0-4:3"
           ],
           "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-nest/own-line": {
+      "id": "probe/block-nest/own-line",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\n  - b\n    ^id\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">a\n<ul>\n<li dir=\"auto\">b<br>\n</li>\n</ul>\n</li>\n</ul>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\n  - b\n    ^id"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:3",
+            "-|parent:0@1:2-2:7"
+          ],
+          "blocks": [
+            "id@1:2-2:7"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-nest/trailing": {
+      "id": "probe/block-nest/trailing",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\n  - b ^id\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">a\n<ul>\n<li dir=\"auto\">b </li>\n</ul>\n</li>\n</ul>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\n  - b ^id"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:9"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:3",
+            "-|parent:0@1:2-1:9"
+          ],
+          "blocks": [
+            "id@1:2-1:9"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-nest/outer-own-line": {
+      "id": "probe/block-nest/outer-own-line",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\n\n  ^id\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>a</p>\n</li>\n</ul>",
+        "projections": {
+          "text": "a",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\n\n  ^id"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:5"
+          ],
+          "blocks": [
+            "id@0:0-2:5"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/block-nest/in-quote": {
+      "id": "probe/block-nest/in-quote",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> - a\n> - b ^id\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<ul>\n<li dir=\"auto\">a</li>\n<li dir=\"auto\">b </li>\n</ul>\n</blockquote>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> - a\n> - b ^id"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:9"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:2-0:5",
+            "-|parent:-1@1:2-1:9"
+          ],
+          "blocks": [
+            "id@0:0-1:9"
+          ],
           "frontmatterLinks": []
         }
       },
