@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-import { parseOurs } from "./chain.js";
+import { applyTextTransform, parseOurs } from "./chain.js";
 import { computeOurs } from "./normalize.js";
 import type { ComputedMeta, GoldenCase } from "./types.js";
 
@@ -56,9 +56,13 @@ function divergedKeys(golden: GoldenCase): readonly string[] {
   if (!want) return [];
   let fewest: readonly string[] | undefined;
   for (const profile of PROFILES) {
+    // The transformed source, as `compare.ts` already passes to `metaOurs`. The tree is
+    // parsed from it, so handing the raw markdown here puts every node offset one
+    // character out for a document with a byte-order mark -- which named
+    // `probe/line-ending/bom-heading` `#` instead of `H`.
     const ours = computeOurs(
       parseOurs(golden.markdown, profile),
-      golden.markdown,
+      applyTextTransform(golden.markdown),
     );
     const diverged = KEYS.filter((key) => {
       const theirs = want[key as keyof ComputedMeta];
@@ -352,11 +356,13 @@ describe("positioned oracle", () => {
     // the underline DIRECTLY under the definition and declines when `para` intervenes,
     // which is also why the heading is named `para` rather than `[ref]: /url`.
     //
-    // The one left is a NAME bug, not a position: `probe/line-ending/bom-heading` is
-    // `1:H` to Obsidian and `1:#` here, so the name extraction reads one character
-    // early -- `applyTextTransform` strips the leading BOM while the node offsets still
-    // index the original string.
-    headings: 1,
+    // The sixth was a NAME bug and is also fixed: `probe/line-ending/bom-heading` was
+    // `1:#` here against Obsidian's `1:H`, because THIS FILE passed the raw markdown as
+    // the source while the tree is parsed from the transformed one. A byte-order mark is
+    // stripped by `applyTextTransform`, so every node offset was one character out.
+    // `compare.ts` already passed the transformed source to `metaOurs`; this call site
+    // did not. The key is now 0.
+    headings: 0,
     // 33 -> 27. The 4 we-INVENT rows were the standalone block-identifier paragraphs --
     // we emitted a `paragraph` section Obsidian consumes -- and the cluster A fix closed
     // them along with two more, exactly as the recorded coupling predicted. The 27
@@ -623,7 +629,10 @@ describe("positioned oracle", () => {
 
   it("reproduces the inline footnote naming the probes established", () => {
     const of = (markdown: string) =>
-      computeOurs(parseOurs(markdown, "quartz-default"), markdown);
+      computeOurs(
+        parseOurs(markdown, "quartz-default"),
+        applyTextTransform(markdown),
+      );
     // The name counts every inline footnote in document order and does not
     // restart in a new block; an empty body is a reference, and takes a number.
     expect(of("^[one] and ^[two]\n").footnotes).toEqual([
