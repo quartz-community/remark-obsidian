@@ -330,6 +330,23 @@ describe("positioned oracle", () => {
     // we emitted a `paragraph` section Obsidian consumes -- and the cluster A fix closed
     // them along with two more, exactly as the recorded coupling predicted. The 27
     // remaining are all SPAN.
+    // The 26 are all SPAN, and 11 of 14 sampled want the end at the LAST CONTENT
+    // CHARACTER rather than past the line ending -- `- $$y` is `list@0:0-0:5` against
+    // our `1:0`, `$$` over `Math$$` is `math@0:0-1:6` against our `2:0`, and
+    // `[foo]: /url` over `"title" ok` is `paragraph@0:0-1:10` against our `2:0`.
+    //
+    // ATTEMPTED AND REFUTED: clamping every section end back over its line ending
+    // takes this 26 -> 70, a 44-case over-fire, because the matching majority ends at
+    // next-line-column-0 and Obsidian agrees with them. So the clamp needs a
+    // discriminator, and the obvious candidate from the sample is whether the block is
+    // the LAST in the document -- every one of the eleven is a final block with no
+    // content after it. Test that before widening anything.
+    //
+    // Two of the fourteen are different rules and should not be folded in:
+    // `probe/line-ending/lone-cr` (`a\rb\r`) is `paragraph@0:0-1:1` against our
+    // `0:0-0:3`, a lone-CR line-ending question, and one
+    // `commonmark/link-reference-definitions` case differs on the START line, not the
+    // end: `heading@1:0-2:3` against our `heading@0:0-2:3`.
     sections: 26,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
