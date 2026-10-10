@@ -1934,17 +1934,31 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       const CLAMPED = ["list", "footnoteDefinition", "paragraph"];
       const end = child.position!.end;
       let at = end.offset;
-      // `math` stays OUT, twice measured. The 3 remaining rows all want the clamp --
-      // `$$` / `Math$$` is `1:6` to Obsidian against mdast's `2:0` -- but:
+      // `math` is clamped only when its closing `$$` shares a line with CONTENT. Measured
+      // by cross-tabbing every math row where clamping changes the answer, after two
+      // cheaper predicates failed:
       //
       //   math in CLAMPED outright                      3 -> 34
-      //   math clamped only when its span ends in `$$`  3 -> 4
+      //   math clamped when its SPAN ends in `$$`       3 -> 4
+      //   math clamped when its LAST LINE ends in `$$`  this
+      //                      and is not all dollars
       //
-      // So "closes on a content line" is not the discriminator either, and whatever
-      // separates these 3 from the ~31 that want mdast's end is not visible in the span's
-      // own text. The next thing to try is the node's `meta`, since an unclosed `$$` puts
-      // its body there rather than in `value` -- a recorded quirk of stock `mathFlow`.
-      if (CLAMPED.includes(child.type) && at !== undefined) {
+      // The span test fails on a bare closer line: `tail $$` / `x` / `$$` ends in `$$` and
+      // wants mdast's end, as does `$$$$`. The last-line test separates those from
+      // `$$` / `Math$$`, which is `1:6` to Obsidian against mdast's `2:0`. `meta` is NOT
+      // the signal -- it is empty on all 54 math rows, so the `mathFlow` info-string quirk
+      // does not discriminate here.
+      const lastLine = /[^\r\n]*$/u.exec(
+        source.slice(0, at).replace(/[\r\n]+$/u, ""),
+      )![0];
+      const contentClosedMath =
+        child.type === "math" &&
+        /\$\$[ \t]*$/u.test(lastLine) &&
+        !/^[ \t]*\$+[ \t]*$/u.test(lastLine);
+      if (
+        (CLAMPED.includes(child.type) || contentClosedMath) &&
+        at !== undefined
+      ) {
         while (at > 0 && (source[at - 1] === "\n" || source[at - 1] === "\r"))
           at -= 1;
       }

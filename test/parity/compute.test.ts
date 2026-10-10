@@ -495,11 +495,11 @@ describe("positioned oracle", () => {
     // site: a heading's children are inline and on its own line, so the test is safe
     // there, while a block container's first child legitimately begins later.
     //
-    // The lone-CR row was not a parse rule at all: `normalize-points.ts` indexed only
-    // `\n`, so it REBUILT micromark's correct two-line paragraph onto one line. Fixed at
-    // the source. The 3 left are all END -- 2 `html` and 1 `math`, both delimited
-    // constructs whose unclosed form runs to end of input.
-    sections: 3,
+    // CLOSED at 0. The last three were display math whose closing `$$` shares a line with
+    // content, which the section-end clamp now covers for `math` under exactly that test --
+    // see `normalize.ts` for the two cheaper predicates that failed first and for the
+    // measurement showing `meta` is not the discriminator.
+    sections: 0,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
     // invented, which is the shape of a missing collector rather than a parse bug.
