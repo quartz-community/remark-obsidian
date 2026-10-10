@@ -1941,13 +1941,25 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       }
       const shownEnd =
         at !== undefined && at !== end.offset ? atOffset(at) : atPoint(end);
-      // Narrowing a section's start to its first child's line -- the fix that works for
-      // the `headings` key -- is REFUTED here at 9 -> 83. A heading's children are inline
-      // and on its own line, so the test is safe there; a block container's first child
-      // legitimately begins later, and clamping to it moves ~74 sections that agree. The
-      // 5 setext-after-definition rows need the node type restricting to `heading` at
-      // least, and probably the same upstream-overlap test rather than a child's line.
-      return `${child.type}@${sectionStart(child.position!.start)}-${shownEnd}`;
+      // A setext heading that upstream overlaps with the definition above it begins at its
+      // CONTENT's line: `[ref]: /url` / `para` / `===` is `heading@1:0` to Obsidian while
+      // the node claims `0:0`, overlapping the definition's own `0:0-0:11`.
+      //
+      // Restricted to `heading` deliberately. Applied to every type this is REFUTED at
+      // 9 -> 83, because a heading's children are inline and sit on its own line -- making
+      // "first child on a different line" a safe test, already measured across 225
+      // agreeing nodes with none -- while a block container's first child legitimately
+      // begins later and ~74 agreeing sections move.
+      const head =
+        child.type === "heading"
+          ? (child as unknown as { children?: Node[] }).children?.[0]
+          : undefined;
+      const startPoint =
+        head?.position &&
+        head.position.start.line !== child.position!.start.line
+          ? head.position.start
+          : child.position!.start;
+      return `${child.type}@${sectionStart(startPoint)}-${shownEnd}`;
     });
 
   const spanOf = (node: Node): string =>

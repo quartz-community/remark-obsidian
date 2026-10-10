@@ -490,14 +490,15 @@ describe("positioned oracle", () => {
     // final blocks 51, clamping only lists 29, and excluding `math` and `comment` by type
     // still cost 3 -- each fitted a subset. The per-type composition of the divergences
     // is what no amount of reasoning from examples produced.
-    // The 9 remaining split 5 START / 4 END by first difference. The START five are the
-    // setext-after-definition overlap -- `[ref]: /url` / `para` / `===` is `heading@1:0`
-    // to Obsidian and `heading@0:0` here, the same upstream node overlap the `headings`
-    // key had. Narrowing to the first child's line, which fixed `headings`, is REFUTED
-    // here at 9 -> 83: a heading's children are inline and on its own line, while a block
-    // container's first child legitimately begins later, so ~74 agreeing sections move.
-    // Restricting the test to `heading` nodes is the obvious next shape.
-    sections: 9,
+    // The START five closed by restricting the first-child test to `heading` nodes. The
+    // unrestricted version is REFUTED at 9 -> 83 and the reason is recorded at the call
+    // site: a heading's children are inline and on its own line, so the test is safe
+    // there, while a block container's first child legitimately begins later.
+    //
+    // The 4 left are all END, and each has a distinct cause: 2 `html`, 1 `math`, and
+    // `probe/line-ending/lone-cr`, where a lone CR is a line ending to Obsidian
+    // (`paragraph@0:0-1:1`) and not to us (`0:0-0:3`).
+    sections: 4,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
     // invented, which is the shape of a missing collector rather than a parse bug.
