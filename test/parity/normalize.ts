@@ -1999,8 +1999,19 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       pathSlashes > 0 && !node.path.endsWith("\\")
         ? node.path + "\\".repeat(pathSlashes)
         : node.path;
-    const shown =
-      node.alias || [shownPath, heading].filter(Boolean).join(" > ");
+    // An EMPTY alias displays empty rather than falling back to the path: `[[a|]]`
+    // resolves to `a` and displays nothing at all. `node.alias` is `""` either way, so
+    // the written form is what distinguishes "no alias" from "an alias that is empty".
+    const hasAlias = inner.includes("|");
+    // A vault heading search strips its whole `#` run from the display. `[[#H2]]` already
+    // displays `H2` because the single `#` is the separator, and `[[## heading text]]`
+    // displays `heading text` where the second `#` survived into the heading.
+    const shownHeading = inner.startsWith("#")
+      ? heading.replace(/^#+[ \t]*/u, "")
+      : heading;
+    const shown = hasAlias
+      ? node.alias
+      : [shownPath, shownHeading].filter(Boolean).join(" > ");
     (node.embedded ? embeds : links).push(
       `${original}=>${target}|${shown}@${spanOf(node)}`,
     );

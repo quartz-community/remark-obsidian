@@ -459,7 +459,7 @@ describe("positioned oracle", () => {
     //     entry we invented -- the same missing-collector signature as the markdown link
     //     and the markdown image. Consistent with the recorded asymmetry: a DEFINITION
     //     inside a comment does not define, a reference does.
-    links: 8,
+    links: 7,
     // 31 -> 16 -> 6. First the missing collector (a markdown image was never indexed at
     // all), then the display field: the cache reports an image's alt as WRITTEN, not as
     // rendered, so it keeps a nested construct's brackets. `![foo [bar](u)](v)` displays
