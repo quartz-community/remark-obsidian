@@ -1763,9 +1763,37 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
 
     if (node.type === "footnoteDefinition" && node.position) {
       const id = String((node as unknown as { identifier: string }).identifier);
-      footnotes.push(
-        `${id}@${atPoint(node.position.start)}-${atPoint(node.position.end)}`,
-      );
+      // A definition ends at its last CONTENT character, but only where mdast ran the span
+      // into the NEXT BLOCK's line. `> [^9]: stray` / `> [^a]: kept` ends at `3:2` here and
+      // `2:13` to Obsidian. The `sections` projection already clamps a `footnoteDefinition`;
+      // this collector never got it.
+      //
+      // The guard is the whole rule. Stripping trailing whitespace unconditionally costs
+      // 7 -> 11: `[^1]: ` ends at `0:6` to Obsidian with the trailing space INCLUDED, and
+      // `[^1]:` / `      ` keeps its entire blank continuation line. So a definition owns
+      // the horizontal whitespace on its own last line, and only a CROSSED line boundary is
+      // surplus -- which is exactly "is there content after us on this line".
+      //
+      // A `>` is surrendered only as part of such a crossed line, never scanned off the
+      // content itself, so a definition whose body genuinely ends in one keeps it.
+      let at = node.position.end.offset;
+      const tail =
+        at === undefined ? "" : /^[^\r\n]*/u.exec(source.slice(at))![0];
+      if (/[^ \t]/u.test(tail)) {
+        while (at !== undefined && at > 0) {
+          let k = at;
+          while (k > 0 && source[k - 1] !== "\n" && source[k - 1] !== "\r")
+            k -= 1;
+          if (k === 0) break;
+          if (/^[ \t>]*$/u.test(source.slice(k, at))) at = k - 1;
+          else break;
+        }
+      }
+      const shownEnd =
+        at !== undefined && at !== node.position.end.offset
+          ? atOffset(at)
+          : atPoint(node.position.end);
+      footnotes.push(`${id}@${atPoint(node.position.start)}-${shownEnd}`);
       return;
     }
 

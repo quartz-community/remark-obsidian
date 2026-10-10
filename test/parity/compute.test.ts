@@ -345,7 +345,21 @@ describe("positioned oracle", () => {
     // spaces-only prefix; the bracket half needs the indent compared against the
     // containing item's content column, and `>  [^1]: def` additionally needs a quote
     // marker in the prefix to be allowed at all.
-    footnotes: 7,
+    // 7 -> 4. The END three were one clamp: mdast runs a definition's span to wherever
+    // the next block starts, so `> [^9]: stray` / `> [^a]: kept` ended at `3:2` against
+    // Obsidian's `2:13`. Guarded on content FOLLOWING the end on that line, which is the
+    // whole rule -- stripping trailing whitespace unconditionally costs 7 -> 11, because
+    // `[^1]: ` keeps its trailing space and `[^1]:` / `      ` keeps its whole blank
+    // continuation line.
+    //
+    // The 4 left are all START, and the probe table says they are TWO rules, which is why
+    // no single column fits: a same-line container prefix gives the CONTENT column
+    // (`>   [^1]:` -> `0:2`, and `> %% [^1]:` -> `4:4`, one past the comment closer),
+    // while a continuation line indented past that column gives the BRACKET (`1. item` /
+    // `    [^1]:` -> `2:4`). Equal-column rows cannot discriminate, so the fix needs the
+    // indent compared against the containing block's content column and a quote marker
+    // allowed in the prefix.
+    footnotes: 4,
     footnoteRefs: 3,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
