@@ -1013,39 +1013,47 @@ A corollary worth keeping: the letter-case hypothesis for this same bucket died 
 one measurement — **zero** documents differ only by case, because Obsidian
 lowercases a label exactly as mdast does (`[^Note]:` is recorded as `note`).
 
-### The largest referee bucket is one rule: a commented definition degrades to a reference
+### Mining the referee's reference bucket, with the numbers that killed my own lead
 
-Mined with the both-sides split that worked on the corpus, the reference-set bucket is
-**562 we-miss, 506 we-invent, 38 both** — and the we-miss half has a dominant shape. Every
-one of the ten shortest is a definition inside a `%%` comment:
+Measured end to end so none of it needs re-deriving. Run the referee, then these
+predicates; every count below is from the 6818-document corpus at 70.8% agreement.
 
-```
-> %%            / [^3]: Text          we miss ref "3"
-%%              / 1.  [^ch2*]: def    we miss ref "ch2*"
-%%              / +    [^Note]: def   we miss ref "note"
-%%              / '  +       [^3]: It' we miss ref "3"
->   ⇥[^1]: Text [^3]                  we miss ref "3"
-```
+**The bucket, split both ways.** 562 we-miss, 506 we-invent, 38 both. 600 documents hold at
+least one missing reference.
 
-This harness already holds both halves of the rule and implements only one. A **definition**
-inside a comment does not define — `definedFootnotes` has that right, and fixing the
-referee's own walk to stop counting buried definitions moved 146 documents. A **reference**
-inside one still counts, measured at 710 documents agreeing because of it. What follows and
-was never implemented: when the definition does not define, its label is still a
-**reference**, and we emit neither.
+**A commented definition degrades to a reference — real, but 97 documents, not 562.**
+The rule is sound and this harness already holds both halves of it: a definition inside a
+comment does not define (`definedFootnotes` has that right), and a reference inside one
+still counts (710 documents agree because of it). The consequence never implemented is
+that when the definition fails, its label is still a reference — `%%` / `[^3]: Text`
+should yield a `footnoteReference` named `3` and we emit nothing.
 
-So `%%` / `[^3]: Text` should yield a `footnoteReference` named `3`. That single rule is the
-largest identified lead anywhere in this work — the bucket is 562 documents against the
-corpus's remaining 71 positional rows — and it needs the reference half of
-`parseComments`, not another projection.
+Its actual size, narrowed by three successive predicates:
 
-Two cautions before implementing it. The 506 we-invent half is a _different_ shape
-(`2) <div>` / `Text[^2]` invents `2`), so closing one may move the other in either
-direction. And the referee compares exact positions, so a reference synthesised at the
-wrong offset trades a missing name for a wrong one — the rule this repo already has about
-a wrong offset being worse than a missing one.
+| predicate                                                | documents | refs disagree |
+| -------------------------------------------------------- | --------: | ------------: |
+| holds a `%%` and a definition-shaped line                |      1673 |           498 |
+| the definition line is inside an **open** `%%` span      |       439 |           220 |
+| ...and the definition's **own label** is the missing ref |         — |        **97** |
 
-### References, once the definitions agree
+**And the base-rate trap I walked into.** I picked this shape from the ten shortest
+we-miss documents and called it a 562-document lead. Of the 1673 documents carrying the
+shape, **1175 AGREE**. Selection by brevity is selection, and the README already says to
+compute a base rate before believing a count — this is the fourth selector to die that
+way, after probes-per-case, co-occurrence and construct frequency.
+
+**Label composition is not a cluster either.** Of the missing names: 487 plain word, 226
+non-ASCII, 157 ASCII punctuation. No charset story, so `[^👩‍💻]` and `[^نیم‌فاصله]`
+failing is incidental rather than causal.
+
+**What this means for sequencing.** 97 documents is still the largest single identified
+rule left — the corpus has 71 positional rows in total — but it is not the landslide the
+earlier note claimed, and it competes with ordinary corpus work rather than dwarfing it.
+Two cautions stand: it belongs in the reference half of `parseComments` rather than in a
+projection, and the referee compares exact positions, so a reference synthesised at the
+wrong offset trades a missing name for a wrong one.
+
+### References, once the definitions agree### References, once the definitions agree
 
 Fixing the walk exposed the family underneath it: **1011** documents whose
 definitions now agree _exactly_ while their references do not. It splits 809 "we
