@@ -2097,22 +2097,46 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
   // An item's span covers its own content only: `- a` over `  - b` ends at the
   // `a`, not after the nested list, so the end comes from the last child that
   // is not itself a list.
-  const itemEnd = (item: Node) => {
+  //
+  // A blank or space-only line separating the item from the NEXT ITEM OF THE SAME LIST
+  // extends it to the start of that line: `-` / '' / `- b` ends at 1:0, and so does
+  // `- a` / ' ' / `- b`, while `- a` / `- b` ends at the `a` because no blank intervenes.
+  //
+  // The sibling is the trigger, not the blank. Testing "a blank with anything after it"
+  // instead takes this ceiling 64 -> 97, because `- a` / '' / `para` has a blank and a
+  // following BLOCK, and a following block does not move the end. `-  ` / ' ' has no
+  // sibling either, which is why it stays at 0:3 with a blank line beneath it.
+  const blankBefore = (line: number): number | undefined => {
+    const from = lineStarts[line];
+    if (from === undefined) return undefined;
+    const to = lineStarts[line + 1] ?? source.length;
+    return source.slice(from, to).trim() === "" ? from : undefined;
+  };
+  const itemEnd = (item: Node, hasSibling: boolean) => {
     const children = (item as unknown as { children: Node[] }).children;
+    let base = item.position!.end;
     for (let index = children.length - 1; index >= 0; index--) {
       const child = children[index]!;
-      if (child.type !== "list" && child.position) return child.position.end;
+      if (child.type !== "list" && child.position) {
+        base = child.position.end;
+        break;
+      }
     }
-    return item.position!.end;
+    const blank = hasSibling ? blankBefore(base.line) : undefined;
+    return blank === undefined
+      ? base
+      : { line: base.line + 1, column: 1, offset: blank };
   };
   const walkList = (list: Node, parent: number): void => {
-    for (const item of (list as unknown as { children: Node[] }).children) {
+    const kids = (list as unknown as { children: Node[] }).children;
+    for (const [at, item] of kids.entries()) {
       if (item.type !== "listItem" || !item.position) continue;
+      const hasSibling = at + 1 < kids.length;
       const marker = /^[-*+]\s*\[(.)\]/u.exec(
         source.slice(item.position.start.offset!),
       );
       listItems.push(
-        `${marker ? JSON.stringify(marker[1]) : "-"}|parent:${parent}@${atPoint(item.position.start)}-${atPoint(itemEnd(item))}`,
+        `${marker ? JSON.stringify(marker[1]) : "-"}|parent:${parent}@${atPoint(item.position.start)}-${atPoint(itemEnd(item, hasSibling))}`,
       );
       const own = item.position.start.line - 1;
       for (const nested of (item as unknown as { children: Node[] }).children) {

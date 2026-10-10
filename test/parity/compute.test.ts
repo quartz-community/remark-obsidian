@@ -438,14 +438,13 @@ describe("positioned oracle", () => {
     // Obsidian ends later are the blank-separated branch. `itemEnd` in `normalize.ts`
     // already implements the nested-child exclusion and needs the other two branches.
     //
-    // ATTEMPTED AND REFUTED, so refine before retrying: implementing the blank branch
-    // as "a blank or space-only line with ANY content after it" takes this ceiling
-    // 64 -> 97, a 33-case regression. The branch must be narrower than the table
-    // suggested -- every recorded 1:0 case has a SIBLING ITEM after the blank
-    // (`-` / '' / `- b`, `- a` / ' ' / `- b`), so the test is almost certainly "the
-    // next thing is another item of the SAME list" and not "something follows".
-    // `- a` / '' / `para` is the shape that over-fired: a following BLOCK does not
-    // move the end, and the corpus has many of those.
+    // The blank branch LANDED once its trigger was narrowed, and the first attempt is
+    // worth keeping as the measurement: implementing it as "a blank or space-only line
+    // with ANY content after it" took this ceiling 64 -> 97, a 33-case regression,
+    // because `- a` / '' / `para` has a blank and a following BLOCK and a block does
+    // not move the end. The SIBLING is the trigger. `-  ` / ' ' has no sibling either,
+    // which is why it stays at 0:3 with a blank line beneath it. 64 -> 59 with the
+    // narrow version; the nested-child exclusion was already there.
     // The 18 we-INVENT rows are attributed and are NOT the span question above:
     //
     //   2  FIXED: items inside a `%%` comment were counted, where the `links`, `tags`
@@ -459,7 +458,7 @@ describe("positioned oracle", () => {
     //      do, three levels deep, so the tree was right and this projection was
     //      over-reporting what the field can hold. One case in the family remains.
     //   1  `- [] a` / `- [ ]x`, a task-character difference.
-    listItems: 64,
+    listItems: 59,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
