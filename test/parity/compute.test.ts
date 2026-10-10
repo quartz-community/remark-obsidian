@@ -437,6 +437,15 @@ describe("positioned oracle", () => {
     // the 34 where we end later are the last-content-char branch, and the 10 where
     // Obsidian ends later are the blank-separated branch. `itemEnd` in `normalize.ts`
     // already implements the nested-child exclusion and needs the other two branches.
+    //
+    // ATTEMPTED AND REFUTED, so refine before retrying: implementing the blank branch
+    // as "a blank or space-only line with ANY content after it" takes this ceiling
+    // 64 -> 97, a 33-case regression. The branch must be narrower than the table
+    // suggested -- every recorded 1:0 case has a SIBLING ITEM after the blank
+    // (`-` / '' / `- b`, `- a` / ' ' / `- b`), so the test is almost certainly "the
+    // next thing is another item of the SAME list" and not "something follows".
+    // `- a` / '' / `para` is the shape that over-fired: a following BLOCK does not
+    // move the end, and the corpus has many of those.
     // The 18 we-INVENT rows are attributed and are NOT the span question above:
     //
     //   2  FIXED: items inside a `%%` comment were counted, where the `links`, `tags`
