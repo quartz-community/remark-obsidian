@@ -376,13 +376,13 @@ describe("positioned oracle", () => {
     // `> %% h %% [^1]: x` define NOTHING, so a freed definition needs the comment to have
     // OPENED on an earlier line.
     //
-    // Extending `definition-column.ts` to accept a `%%` in the prefix is INERT, and
-    // instrumenting it says why it is worth another look rather than a rewrite: the pass
-    // fires, matches the prefix `> %% `, computes column 4 and writes it -- and the final
-    // tree still reports 4:5. So a LATER pass restores the bracket position.
-    // `definitionTrimTransform` runs at `index.ts:810`, after this one and before points
-    // are normalised from offsets, which makes it the candidate to trace first.
-    footnotes: 1,
+    // CLOSED at 0. The `%%`-closer column needed two changes, and the second was the real
+    // one: the pass compared against `start.column`, which a definition arrives with STALE
+    // -- `> %% [^1]: freed` carries column 2 against offset 26 -- so it declined the very
+    // case it had just been extended for, invisibly, because the final tree showed the
+    // bracket either way. Deriving the bracket from the offset is what `normalize-points`
+    // already says every earlier pass must do.
+    footnotes: 0,
     footnoteRefs: 3,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.

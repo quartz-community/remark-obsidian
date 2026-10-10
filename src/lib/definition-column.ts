@@ -57,7 +57,11 @@ export function definitionColumnTransform(tree: Root, source: string): void {
     // Definition` is column 0, not 3. Honouring it moved 25 of those documents into
     // agreement with zero parity regressions. The legacy stack is an arbiter, not an
     // oracle, and the recorded Obsidian answers win where they disagree.
-    const quoted = /^((?:>[ \t]?)+)[ \t]*$/u.exec(prefix);
+    // A comment CLOSER contributes a content column too, one past itself: `> %%` /
+    // `> hidden` / `> %% [^1]: freed` reports the definition at 4:4, where the `%%` sits
+    // at columns 2 and 3. Only a closer needs handling -- `%% h %% [^1]: x` and
+    // `> %% h %% [^1]: x` define NOTHING, so a definition behind an opener never arrives.
+    const quoted = /^((?:>[ \t]?)+(?:%%)?)[ \t]*$/u.exec(prefix);
     if (!quoted && !/^[ \t]+$/u.test(prefix)) return;
 
     // A quote contributes its own content column, which is the marker plus the one space
@@ -85,7 +89,19 @@ export function definitionColumnTransform(tree: Root, source: string): void {
     // A root or quote host keeps the one-column test: ` [^1]: def` is column 0 at gap 1,
     // and `>  [^1]: def` is column 2 at gap 1, so the stricter rule belongs to the item.
     const gap = host && !quoted ? 2 : 1;
-    if (column > start.column - 1 - gap) return;
+    // The bracket's column comes from the OFFSET, not from `start.column`. A definition
+    // arrives here with a stale column -- `> %% [^1]: freed` carries column 2 against
+    // offset 26, which is column 5 -- because an earlier pass moved it by offset and left
+    // the rest of the point behind, which is precisely what `normalizePointsTransform`
+    // runs last to repair. Reading the stale field made this pass decline the case it was
+    // extended for, and the decline was invisible: the final tree showed the bracket
+    // position either way.
+    //
+    // This is the repo's own rule applied to itself. `normalize-points.ts` states that
+    // offsets are what the passes maintain and the rest of a point is rebuilt from them,
+    // so any pass running before it must read the offset.
+    const bracket = start.offset - bol;
+    if (column > bracket - gap) return;
 
     start.column = column + 1;
     start.offset = bol + column;
