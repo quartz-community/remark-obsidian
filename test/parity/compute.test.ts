@@ -459,6 +459,23 @@ describe("positioned oracle", () => {
     //     entry we invented -- the same missing-collector signature as the markdown link
     //     and the markdown image. Consistent with the recorded asymmetry: a DEFINITION
     //     inside a comment does not define, a reference does.
+    // The 7 remaining include two readings that are REFUTED, both measured:
+    //
+    //   EVERY `#` becomes ` > `, not just the separator. `[[a#^blk a#^blk]]` displays
+    //   `a > ^blk a > ^blk` and we show `a > ^blk a#^blk`. Replacing every `#` in the
+    //   heading takes links 7 -> 9 and embeds 4 -> 6, so the rule is narrower than
+    //   every hash -- a `#` inside other content must survive.
+    //
+    //   `[[|b]]` resolves to `|b` and displays `|b`, where we show nothing: the empty
+    //   path swallows the bar instead of aliasing it. Requiring the bar to have really
+    //   split -- `inner.startsWith(path + '|')` -- is much worse still, 7 -> 12 and
+    //   4 -> 7, because `path` is TRIMMED: `[[ a | b ]]` has path `a` and an inner that
+    //   starts with a space, so the test fails for every padded wikilink. Any retry has
+    //   to compare against the raw segment, not the node's field.
+    //
+    //   The rest: `commonmark/links/503` wants `foo bä` where we give `foo%20bä` (a
+    //   percent-decode in the target), `hunt/image-alt-with-brackets/4` wants the alt
+    //   `x` where we give `x<fn>`, and three are ordering or span inside a `%%` comment.
     links: 7,
     // 31 -> 16 -> 6. First the missing collector (a markdown image was never indexed at
     // all), then the display field: the cache reports an image's alt as WRITTEN, not as
