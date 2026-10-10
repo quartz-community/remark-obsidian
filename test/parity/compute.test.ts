@@ -340,6 +340,26 @@ describe("positioned oracle", () => {
     // Two are NOT that rule and want separate treatment: `probe/line-ending/bom-heading`
     // differs on the NAME (obs `1:H`, ours `1:#`), and
     // `commonmark/link-reference-definitions/*` differs on the LINE (obs 1, ours 0).
+    // The 6 remaining split 5 + 1, both attributed:
+    //
+    //   5  a setext heading preceded by a DEFINITION line reports the wrong start
+    //      LINE. `[ref]: /url` / `para` / `===` is `1:para@1:0` to Obsidian and
+    //      `1:para@0:0` here -- the name is already right, so the content is `para`
+    //      while the node's position still points at the definition's line. One
+    //      `commonmark/link-reference-definitions` case and four
+    //      `hunt/setext-paragraph-count-ignores-*`.
+    //
+    //      NOT `definitionSetextTransform`: that pass requires the underline to sit
+    //      DIRECTLY under the definition (one line ending, nothing else) and declines
+    //      here because `para` intervenes -- which is also why the heading is named
+    //      `para` and not `[ref]: /url`. So the wrong start comes from the parse or an
+    //      earlier pass, and the next step is to bisect which.
+    //
+    //   1  `probe/line-ending/bom-heading` reports the wrong NAME, not a position:
+    //      `\uFEFF# H` is `1:H` to Obsidian and `1:#` here, so the name extraction
+    //      reads one character early. `applyTextTransform` strips the leading BOM
+    //      while the node offsets still index the original, which is the off-by-one
+    //      to look for.
     headings: 6,
     // 33 -> 27. The 4 we-INVENT rows were the standalone block-identifier paragraphs --
     // we emitted a `paragraph` section Obsidian consumes -- and the cluster A fix closed
