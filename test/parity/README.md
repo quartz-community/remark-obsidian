@@ -1131,6 +1131,13 @@ corpus, and the distinct causes are known — one byte-order-mark document, and 
 author's `P1`, where Obsidian's cache reports a column short by the width of a
 `%%` marker. Fixing those two would be a regression.
 
+**A third: one embed ordering outlier.** `fuzz/embed/75` lists its second embed first, and
+of the 25 recorded link and embed arrays with two or more entries, 24 are in source order
+and that is the only exception. Its earlier embed sits inside `$...$` inside a callout, so
+the renderer resolves it late. Matching it would mean inventing an ordering rule 24 cases
+contradict — and the whole value of ordering being positional is that a consumer can rely
+on it.
+
 **A second must-not-fix group: two zero-width `blocks` entries.** They are the only two of
 72 and both sit past the end of their document — `inline ^[^9] real[^7]` registers
 `9@3:0-3:0` on a three-line note. The renderer relocates an inline footnote's body to a

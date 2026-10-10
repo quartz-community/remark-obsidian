@@ -588,6 +588,13 @@ describe("positioned oracle", () => {
     // `foo [bar](u)` where mdast's flattened `alt` gives `foo bar`, and
     // `![alt [^9]](/url)` displays `alt [^9]` against our `alt `. Sliced from the source
     // between the opener and the LAST `](`, since the alt may hold one itself.
+    // At its floor: one row is the `P1` cache defect (`fuzz/embed/24`) and the other is
+    // an ORDERING outlier that must not be chased. `fuzz/embed/75` lists `img.png` at
+    // 1:38 before `d.pdf#page=3` at 1:15, and of the 25 recorded link and embed arrays
+    // holding two or more entries, 24 are in source order and that one is the only
+    // exception. Its earlier embed is wrapped in `$...$` inside a callout, so the
+    // renderer resolves it late; matching it would mean inventing an ordering rule 24
+    // cases contradict.
     embeds: 2,
     tags: 0,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
