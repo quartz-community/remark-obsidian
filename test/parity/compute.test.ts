@@ -561,13 +561,21 @@ describe("positioned oracle", () => {
     //           after the checkbox report a plain marker, 0 report a task, and of the 86
     //           entries with content after the checkbox, 76 report a task. 59 -> 55.
     //
-    // ATTEMPTED AND REFUTED on START: reporting a nested item at its parent's content
-    // column takes this 59 -> 65. The blast-radius check that preceded it was NOT a
-    // measurement and that is the lesson -- it counted the 34 agreeing nested entries
-    // and their start columns (1, 2, 4, 6), then INFERRED those equal the parent's
-    // content column because they agree. That inference is what failed. Measure the
-    // predicate itself next time: for each agreeing nested entry, compute the parent's
-    // content column and compare it to the reported start.
+    // START is PARTLY FIXED, and the two attempts are worth keeping side by side.
+    //
+    // The first reported a nested item at its parent's content column unconditionally
+    // and took the ceiling 59 -> 65. Its blast-radius check was not a measurement: it
+    // counted the agreeing nested entries and their start columns (1, 2, 4, 6) and then
+    // INFERRED those equal the parent's content column because they agree.
+    //
+    // The real predicate, computed over every nested entry Obsidian reports, is that 37
+    // of 44 have the start equal to the parent's content column. All 7 exceptions are
+    // accounted for: 4 are a same-line task re-parse (`- [ ] 1.`, where Obsidian reports
+    // the marker column 6 and not the parent's 2), 2 are tab-indented and counted in
+    // characters, and the seventh was my own separator bug -- `1.  foo` puts content at
+    // column 4, not 3. Excluding the first two and fixing the third takes 41 -> 38.
+    //
+    // So the remaining START rows are NOT this rule; they need their own pass.
     // The END (ours at column 0) group is FIXED, and the both-sides measurement is what
     // made it possible:
     //
@@ -580,7 +588,7 @@ describe("positioned oracle", () => {
     // the right answer, so the clamp belongs only on the FALLBACK path after the
     // blank-separated branch has declined. Structural, not a heuristic about unclosed
     // constructs. 55 -> 41.
-    listItems: 41,
+    listItems: 38,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.

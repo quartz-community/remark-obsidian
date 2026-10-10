@@ -2166,7 +2166,32 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     const line = source.lastIndexOf("\n", at - 1) + 1;
     return { line: base.line - 1, column: at - line + 1, offset: at };
   };
-  const walkList = (list: Node, parent: number): void => {
+  /**
+   * The column an item's own content starts at, past its marker and the whole separator.
+   *
+   * The separator run matters: `1.  foo` puts content at column 4, not 3, and getting
+   * that wrong is what made an earlier measurement of this rule look inconsistent.
+   */
+  const itemContentColumn = (item: Node): number | undefined => {
+    const from = item.position?.start?.offset;
+    if (from === undefined) return undefined;
+    const bol = lineStarts[item.position!.start.line - 1] ?? 0;
+    const nl = source.indexOf("\n", from);
+    const line = source.slice(bol, nl === -1 ? undefined : nl);
+    const opener = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]*/u.exec(line);
+    return opener ? opener[0].length : undefined;
+  };
+
+  // A NESTED item reports its PARENT'S content column, not its own marker's.
+  // `- Item one` over `    - Nested item` is `1:2` with the marker at column 4.
+  //
+  // Measured on both sides rather than inferred, which an earlier attempt at this did
+  // not do: of the 44 nested entries Obsidian reports, 37 have the start equal to the
+  // parent's content column. All 7 exceptions are accounted for and excluded here --
+  // 4 are a same-line task re-parse (`- [ ] 1.`, where Obsidian reports the marker
+  // column 6 and not the parent's 2) and 2 are tab-indented, where the column is counted
+  // in characters. The seventh was this function's own separator bug, now fixed.
+  const walkList = (list: Node, parent: number, hostColumn?: number): void => {
     const kids = (list as unknown as { children: Node[] }).children;
     for (const [at, item] of kids.entries()) {
       if (item.type !== "listItem" || !item.position) continue;
@@ -2184,8 +2209,12 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       const marker = /^[-*+][ \t]*\[.\][ \t]*$/u.test(itemLine)
         ? null
         : /^[-*+]\s*\[(.)\]/u.exec(source.slice(item.position.start.offset!));
+      const startAt =
+        hostColumn === undefined
+          ? atPoint(item.position.start)
+          : `${item.position.start.line - 1}:${hostColumn}`;
       listItems.push(
-        `${marker ? JSON.stringify(marker[1]) : "-"}|parent:${parent}@${atPoint(item.position.start)}-${atPoint(itemEnd(item, hasSibling))}`,
+        `${marker ? JSON.stringify(marker[1]) : "-"}|parent:${parent}@${startAt}-${atPoint(itemEnd(item, hasSibling))}`,
       );
       const own = item.position.start.line - 1;
       for (const nested of (item as unknown as { children: Node[] }).children) {
@@ -2209,7 +2238,24 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         // stays until probes settle which side is which -- not because it is understood.
         const at = nested.position?.start?.line;
         const sameLine = at !== undefined && at - 1 === own;
-        walkList(nested, sameLine ? (own === 0 ? -1 : -own) : own);
+        // Excluded: a same-line child reports its own marker column, and a tab-indented
+        // one is counted in characters rather than columns.
+        const firstKid = (nested as unknown as { children?: Node[] })
+          .children?.[0];
+        const kidFrom = firstKid?.position?.start?.offset;
+        const kidBol =
+          kidFrom === undefined
+            ? undefined
+            : (lineStarts[firstKid!.position!.start.line - 1] ?? 0);
+        const tabbed =
+          kidFrom !== undefined &&
+          kidBol !== undefined &&
+          source.slice(kidBol, kidFrom).includes("\t");
+        walkList(
+          nested,
+          sameLine ? (own === 0 ? -1 : -own) : own,
+          sameLine || tabbed ? undefined : itemContentColumn(item),
+        );
       }
     }
   };
