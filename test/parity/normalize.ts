@@ -2572,9 +2572,16 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
             if (from === undefined || from < nestedEnd) return false;
             return /\n[ \t>]*\n/u.test(source.slice(nestedEnd, from));
           });
+        // The un-nested VALUE is `-(the nested list's own line)`, which is the same
+        // convention a root list uses -- not the parent item's line. The two coincide
+        // whenever the nested list sits on the line after its item, which is every case
+        // that drove the rule, so `-own` read as correct. A blank line BEFORE the nested
+        // list separates them: `- a` / blank / `  - b` / blank / `  c` reports
+        // `parent:-2`, and the nested list is on line 2 while the item is on line 0.
+        const nestedLine = (nested.position?.start?.line ?? 1) - 1;
         walkList(
           nested,
-          sameLine || unnested ? (own === 0 ? -1 : -own) : own,
+          sameLine || unnested ? (nestedLine === 0 ? -1 : -nestedLine) : own,
           onOwnLine || tabbed ? undefined : itemContentColumn(item),
         );
       }

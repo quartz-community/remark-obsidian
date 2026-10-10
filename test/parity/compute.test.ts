@@ -783,10 +783,12 @@ describe("positioned oracle", () => {
     // fixes none of its targets.
     //
     // What remains, all named: 7 END (unclosed constructs, both directions), 3 MISSING,
-    // 2 wanting a `parent:-2` sentinel we never emit (`probe/empty-container/nested-list`
-    // and `probe/nest-trail/blank-before-nest`, which is a blank line BEFORE the nested
-    // list), 1 quote START (clamp refuted at 15 -> 25), and 2 new item-end probes.
-    listItems: 15,
+    // 1 quote START (clamp refuted at 15 -> 25), 2 new item-end probes, and
+    // `probe/empty-container/nested-list`, which wants `parent:-2` for a nested list the
+    // un-nesting rule does not reach -- there the trailing block sits at indent 4, inside
+    // the nested item, so the outer item has no later child and only the blank line BEFORE
+    // the nested list distinguishes it.
+    listItems: 14,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
