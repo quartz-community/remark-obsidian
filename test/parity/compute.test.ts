@@ -518,7 +518,7 @@ describe("positioned oracle", () => {
     //   The rest: `commonmark/links/503` wants `foo bä` where we give `foo%20bä` (a
     //   percent-decode in the target), `hunt/image-alt-with-brackets/4` wants the alt
     //   `x` where we give `x<fn>`, and three are ordering or span inside a `%%` comment.
-    links: 8,
+    links: 7,
     // 31 -> 16 -> 6. First the missing collector (a markdown image was never indexed at
     // all), then the display field: the cache reports an image's alt as WRITTEN, not as
     // rendered, so it keeps a nested construct's brackets. `![foo [bar](u)](v)` displays

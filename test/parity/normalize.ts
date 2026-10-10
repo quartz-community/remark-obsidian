@@ -1979,8 +1979,22 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         node.position.start.offset!,
         node.position.end.offset!,
       );
+      // A percent escape in the destination is decoded: `[link](foo%20b&auml;)` resolves
+      // to `foo bä`. THIN EVIDENCE and the pass says so -- exactly one corpus entry holds
+      // a `%XX` in its written form, so there are no controls and the blast radius is
+      // that one entry by construction. Kept because decoding a destination is standard
+      // and Obsidian is unambiguous here; a malformed escape falls back to the raw url
+      // rather than throwing.
+      let resolved = url;
+      if (/%[0-9A-Fa-f]{2}/u.test(url)) {
+        try {
+          resolved = decodeURIComponent(url);
+        } catch {
+          resolved = url;
+        }
+      }
       links.push(
-        `${original}=>${url}|${mdastText(node).trim()}@${spanOf(node)}`,
+        `${original}=>${resolved}|${mdastText(node).trim()}@${spanOf(node)}`,
       );
       return;
     }
