@@ -358,6 +358,27 @@ describe("positioned oracle", () => {
     // 26 by node type before the next attempt; a 14-case sample chosen for brevity
     // over-represented unclosed math and single-item lists.
     //
+    // Dumped by type, and a THIRD hypothesis is refuted. The 26 group as 14 `list` END,
+    // 5 `heading` START, 3 `math` END, 2 `paragraph` END, 1 `footnoteDefinition` END and
+    // 1 lone-CR paragraph. Ending a LIST section at its last item -- the rule already
+    // shipped for `itemEnd`, and the type holding 14 of the 26 -- takes the ceiling
+    // 26 -> 55. Three attempts, all worse than doing nothing:
+    //
+    //     baseline                  26
+    //     clamp every block         70
+    //     clamp only final blocks   77
+    //     clamp only list blocks    55
+    //
+    // So the discriminator is not position and not node type. Most matching `list`
+    // sections want mdast's end and only fourteen want the item end, which means it
+    // turns on something INSIDE the list -- every one of the fourteen has an unclosed
+    // or straddling construct in its last item (`$$y`, `~~~~del~~`, an indented `%%`,
+    // a fence that outlives the item). That is the next thing to test, and it should be
+    // tested as a PREDICATE over the 26 before being written as code.
+    //
+    // Stopped here deliberately: three consecutive refutations on one key means the
+    // hypotheses are coming from the shape of the sample rather than from a rule.
+    //
     // Two of the fourteen are different rules and should not be folded in:
     // `probe/line-ending/lone-cr` (`a\rb\r`) is `paragraph@0:0-1:1` against our
     // `0:0-0:3`, a lone-CR line-ending question, and one
