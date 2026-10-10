@@ -294,15 +294,30 @@ describe("positioned oracle", () => {
     // containing block's content column, not the position of the `[`. The 11 closed were
     // every space-indented definition in the corpus. A tab in the prefix is excluded and
     // keeps its own rule -- see the pass.
-    // All 6 are SPAN now, the name-level rule being fully closed, and they are NOT one
-    // convention -- the column divergences run in both directions:
+    // All 6 are SPAN, the name-level rule being fully closed, and they split 3 START /
+    // 3 END with NO single convention. Measured, including the blast radius a clamp
+    // would have -- which is the number three `sections` attempts failed to take:
     //
-    //     '>  [^1]: def'                obs 1@0:2   ours 1@0:3   (we are one too far)
-    //     '1. item' / '' / '    [^1]:'  obs 1@2:4   ours 1@2:3   (we are one short)
+    //     matching footnote entries whose obs end is column 0:  0
     //
-    // The other three are definition END lines: `[^9]: orphan` over `    <!--` ends at
-    // 3:8 for Obsidian and 4:0 for us, and `> [^2]: body` over `> - item` ends at 0:12
-    // against our 1:2. So at least three rules in six cases; probe before fixing.
+    // So an end clamp here is free of risk by construction, unlike on `sections`. The
+    // six still do not support one:
+    //
+    //   START, and in BOTH directions, so at least two rules:
+    //     '>  [^1]: def'                 obs 1@0:2    ours 1@0:3   (we are one too far)
+    //     'hunt/label-after-comment...'  obs 1@4:4    ours 1@4:5
+    //     '1. item' / '' / '    [^1]:'   obs 1@2:4    ours 1@2:3   (we are one short)
+    //
+    //   END, and these are EXTENT rather than a clamp:
+    //     'hunt/definition-block-owns...' obs 9@2:0-3:8   ours 9@2:0-4:0
+    //     'hunt/quoted-definition-own...' obs 2@0:2-0:12  ours 2@0:2-1:2
+    //     'hunt/quoted-orphan-deletion...' obs 9@2:2-2:13 ours 9@2:2-3:2
+    //
+    // The middle one is the tell: inside a blockquote our end sits after `> ` on the
+    // NEXT line, so backing up over whitespace stops at the `>` and never reaches
+    // 0:12. These are the recorded definition end-line family -- Obsidian ends a
+    // definition at an unclosed opener inside it while we let the construct run on --
+    // and that is a parse-extent question, not a projection clamp.
     footnotes: 6,
     footnoteRefs: 2,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
