@@ -2177,10 +2177,22 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       raw[beforeAt - 2] === "\\" &&
       (closersAfter === 0 ||
         bracketStillOpen(source, from, lineStart + id.index - 2));
+    // A bracket that becomes a LINK frees the caret without needing an escape, because
+    // the label is a label and never a footnote reference: `[^1](u)` registers the block
+    // `1` and `[^blk](u)` registers `blk`. An IMAGE does not -- `![^1](url)` registers
+    // nothing -- and probing separated those two, which the corpus could not: its only
+    // counter-example was both an image AND carried a definition for the label, so either
+    // could have been the discriminator. `probe/caret-link/image-no-def` and
+    // `/link-with-def` settled it as image-versus-link.
+    const linkLabel =
+      before === "[" &&
+      raw[beforeAt - 2] !== "!" &&
+      raw.slice(id.index + 1 + id.name.length).startsWith("](");
     if (
       !(setext && beforeAt === 0) &&
       !wrapped &&
       !escapedBracket &&
+      !linkLabel &&
       !(before && /\s/u.test(before))
     ) {
       continue;

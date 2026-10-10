@@ -554,8 +554,11 @@ describe("positioned oracle", () => {
     // different mechanism than the escape check.
     // The 7 remaining, attributed:
     //
-    //   2  a bracket that becomes a LINK frees the caret, so `[^1](u)` registers `1`
-    //      and `[^blk](u)` registers `blk`. We register neither.
+    //   FIXED: a bracket that becomes a LINK frees the caret without an escape, so
+    //      `[^1](u)` registers `1` and `[^blk](u)` registers `blk`, while an IMAGE does
+    //      not -- `![^1](url)` registers nothing. Probing separated those, which the
+    //      corpus could not: its only counter-example was both an image AND carried a
+    //      definition, so either could have been the discriminator. 9 -> 5.
     //
     //      NOT IMPLEMENTED, because the counter-example is CONFOUNDED and the corpus
     //      cannot separate it. Of the three `[^name](` occurrences, two register and
@@ -574,7 +577,7 @@ describe("positioned oracle", () => {
     //      (`9@3:0-3:0`) that we do not produce at all.
     //   1  `block-ref/on-list-item` reports the nested item's start column, the same
     //      content-column convention as elsewhere but applied to a block id.
-    blocks: 9,
+    blocks: 5,
     // 71, of which 44 are span-only and they do NOT share one rule -- measured, after
     // "Obsidian ends an item at its last content character and we run on to the next
     // line start" was recorded here from two examples. It holds for 34. The other 10
