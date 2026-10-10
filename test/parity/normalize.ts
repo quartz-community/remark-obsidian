@@ -2323,9 +2323,16 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         : /^(?:[-*+]|\d{1,9}[.)])\s*\[(.)\]/u.exec(
             source.slice(item.position.start.offset!),
           );
+      // A ROOT item takes the same line-start clamp `sections` and `headings` already
+      // use: an item indented one to three spaces begins at column 0, so ` - a` is
+      // `0:0` and not `0:1`. 19 of the 31 remaining divergences on this key are that,
+      // tab-indented ones included (`  - foo` is `0:0` against our `0:2`).
+      //
+      // A NESTED item keeps the parent's content column instead, which is a separate
+      // measured rule and must not be clamped to zero.
       const startAt =
         hostColumn === undefined
-          ? atPoint(item.position.start)
+          ? sectionStart(item.position.start)
           : `${item.position.start.line - 1}:${hostColumn}`;
       listItems.push(
         `${marker ? JSON.stringify(marker[1]) : "-"}|parent:${parent}@${startAt}-${atPoint(itemEnd(item, hasSibling))}`,

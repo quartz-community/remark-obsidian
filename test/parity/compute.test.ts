@@ -687,7 +687,18 @@ describe("positioned oracle", () => {
     // the right answer, so the clamp belongs only on the FALLBACK path after the
     // blank-separated branch has declined. Structural, not a heuristic about unclosed
     // constructs. 55 -> 41.
-    listItems: 34,
+    // 34 -> 18. The dominant cluster was a ROOT item's start column: 19 of the 31 rows
+    // had Obsidian reporting a SMALLER column than us, and it is the same line-start
+    // clamp `sections` and `headings` already use -- ` - a` is `0:0` not `0:1`, and
+    // `  - foo` is `0:0` not `0:2`. Measured by dumping the first difference per case
+    // rather than inferred.
+    //
+    // What remains, by first difference: 7 END, 3 PARENT, 2 MARKER, and a handful of
+    // START rows that are NOT the clamp. The PARENT three are the known same-line
+    // contradiction; `document/tab-indentation` is `parent:-1` to Obsidian and `parent:0`
+    // here, so a tab-indented child of a task does NOT nest even though a space-indented
+    // one does.
+    listItems: 18,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
