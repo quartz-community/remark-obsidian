@@ -19,11 +19,16 @@ const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]/u;
  * that out, and Obsidian's own section agrees with them -- ` [^1]: def` is reported as
  * `footnoteDefinition@0:0-0:10`, starting at zero rather than at the bracket.
  *
- * Fires only where the definition's own line prefix is whitespace, which is what keeps
- * the cases that already agree out of reach: `- [^1]: def` reports 0:2, `-  [^1]: def`
- * reports 0:3, `> [^1]: def` and `>  [^1]: def` both report 0:2, and `- [ ] [^1]: def`
- * and `- [ ]  [^1]: def` both report 0:6. Those have a marker in the prefix, so none of
- * them reaches this pass.
+ * Fires where the definition's own line prefix is whitespace, or a quote prefix followed
+ * by whitespace. A LIST marker in the prefix keeps the pass away from cases that already
+ * agree: `- [^1]: def` reports 0:2, `-  [^1]: def` reports 0:3, and `- [ ] [^1]: def` and
+ * `- [ ]  [^1]: def` both report 0:6.
+ *
+ * A quote marker used to be excluded on the same reasoning and that was wrong. `> [^1]:
+ * def` agrees at 0:2 only because the bracket happens to sit AT the content column; move
+ * it and the agreement goes with it, since `>  [^1]: def` and `>   [^1]: def` are 0:2 to
+ * Obsidian as well. So a quote contributes a content column of its own -- the marker plus
+ * the one space it consumes -- exactly as a list item does.
  */
 export function definitionColumnTransform(tree: Root, source: string): void {
   if (source === "") return;
@@ -42,15 +47,27 @@ export function definitionColumnTransform(tree: Root, source: string): void {
 
     const bol = source.lastIndexOf("\n", start.offset - 1) + 1;
     const prefix = source.slice(bol, start.offset);
-    // Spaces only. A tab in the prefix has its own rule with its own evidence: the
-    // arbiter does not count a tab that follows a space, so ` \t[^1]: def` is re-parsed
-    // and placed back PAST that whitespace at offset 2, which this would overwrite with
-    // zero. Every recorded Obsidian golden behind the content-column rule is
-    // space-indented, so narrowing to spaces keeps both rules rather than picking one.
-    if (!/^ +$/u.test(prefix)) return;
+    // Spaces only, or a quote prefix followed by spaces. A tab is excluded and has its own
+    // rule with its own evidence: the arbiter does not count a tab that follows a space, so
+    // ` \t[^1]: def` is re-parsed and placed back PAST that whitespace at offset 2, which
+    // this would overwrite with zero. Every recorded Obsidian golden behind the
+    // content-column rule is space-indented, so narrowing keeps both rules rather than
+    // picking one.
+    const quoted = /^((?:>[ \t]?)+) *$/u.exec(prefix);
+    if (!quoted && !/^ +$/u.test(prefix)) return;
 
+    // A quote contributes its own content column, which is the marker plus the one space
+    // it consumes -- anything further along the prefix belongs to the definition. The
+    // docstring's claim that these "never reach this pass" was true and hid two cases:
+    // `> [^1]: def` agrees at 0:2 only because the bracket happens to sit AT the content
+    // column, while `>  [^1]: def` and `>   [^1]: def` are both 0:2 to Obsidian and were
+    // reported at the bracket.
     const host = items.get(node);
-    const column = host ? contentColumn(source, host) : 0;
+    const column = quoted
+      ? quoted[1]!.length
+      : host
+        ? contentColumn(source, host)
+        : 0;
     if (column === undefined || column >= start.column - 1) return;
 
     start.column = column + 1;

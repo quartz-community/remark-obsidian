@@ -352,14 +352,19 @@ describe("positioned oracle", () => {
     // `[^1]: ` keeps its trailing space and `[^1]:` / `      ` keeps its whole blank
     // continuation line.
     //
-    // The 4 left are all START, and the probe table says they are TWO rules, which is why
-    // no single column fits: a same-line container prefix gives the CONTENT column
-    // (`>   [^1]:` -> `0:2`, and `> %% [^1]:` -> `4:4`, one past the comment closer),
-    // while a continuation line indented past that column gives the BRACKET (`1. item` /
-    // `    [^1]:` -> `2:4`). Equal-column rows cannot discriminate, so the fix needs the
-    // indent compared against the containing block's content column and a quote marker
-    // allowed in the prefix.
-    footnotes: 4,
+    // The quote half of the START family is closed in `definition-column.ts`: a quote
+    // contributes a content column like a list item does, and `> [^1]:` only ever agreed
+    // because the bracket happens to sit AT that column.
+    //
+    // The 2 left are the other half of the two-rule split, and they pull OPPOSITE ways,
+    // which is why no single column has ever fit. `> %% [^1]: freed` is `4:4` -- one past
+    // the comment closer, so a construct on the line contributes a content column just as
+    // a container prefix does. `1. item` / `    [^1]: def` is `2:4`, the BRACKET, even
+    // though the item's content column is 3 -- while the docstring's own `- a` / blank /
+    // `    [^1]: x` is `2:2`, the content column, at the same indent of 4. So the ordered
+    // marker's width is implicated rather than the indent alone, and `1.  foo` putting
+    // content at column 4 is a recorded separator quirk that may be the same bug.
+    footnotes: 2,
     footnoteRefs: 3,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
