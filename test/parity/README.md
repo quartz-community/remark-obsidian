@@ -1170,8 +1170,30 @@ Definition spans are the open ground. Split by **which field** actually differs,
   has reversed a shipped rule rather than merely declined a new one.
 
   The 91 spaces-only rows are NOT the same rule and must not be folded into it — there
-  Obsidian reports the bracket where we report lower (`   [^注1]:` is 3 to it and 2 to us),
-  which is the opposite direction. That is why the remaining deltas still point both ways. **Probes are needed before any of it is treated as a rule**;
+  Obsidian reports a column HIGHER than ours, the opposite direction. Broken down by indent
+  width, they say something sharper than "the bracket":
+
+  | indent | Obsidian reports |
+  | -----: | ---------------: |
+  |      7 |            **4** |
+  |      6 |            **4** |
+  |      5 |            **4** |
+  |      4 |            **4** |
+  |      3 |                3 |
+  |      2 |                0 |
+
+  So it looks like `min(indent, 4)` rather than the bracket — `      [^x-y]: Definition` at
+  indent 6 is column 4, and `       [^1]: def` at indent 7 is column 4. Four is also exactly
+  where indented code begins, so these definitions can only be inside a list item, and a
+  constant 4 is the signature of the class the plugin's author documented as `P1`/`P2`: a
+  column computed as if some prefix were absent.
+
+  **Deliberately not implemented.** The indent-2 row reporting 0 is the root content-column
+  rule, so at least two regimes overlap here and this data cannot separate "inside a
+  container" from "at root" on its own. The note above about inferring a rule from
+  pattern-matched corpus data applies with full force — it has produced a wrong answer here
+  once already. This wants probes against the application, which is also the only way to
+  tell a real cap from a cache defect worth reporting rather than reproducing. **Probes are needed before any of it is treated as a rule**;
   inferring one from pattern-matched corpus data has already produced a wrong answer once,
   which is why the `%%` rules in `corpus.ts` are recorded instead.
 
