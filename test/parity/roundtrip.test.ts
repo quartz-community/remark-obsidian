@@ -317,12 +317,26 @@ describe("round-trip", () => {
      *      So it needs a handler returning the text verbatim -- `unsafe` cannot relax
      *      an escape that already exists -- the same mechanism `raw-html/626` and the
      *      math family need. Not a reference-handler change.
-     *   3  emphasis re-escaping, and one of them is the worst in the set:
-     *      `emphasis/nest-underscore-outer` grows 15 bytes into `&#x20;`/`&#x62;`
-     *      entities. The other two are `commonmark/emphasis-and-strong-emphasis/*`.
-     *   2  a backslash before a setext run doubling: `\===` becomes `\\===`.
-     *   3  singletons, including `fuzz/inline-footnote/11`, which SHRINKS by losing a
-     *      line ending inside an inline footnote (`^[i` / `  e]` becomes `^[ie]`).
+     *   3  emphasis marker choice escalating into entity encoding. `_a *b* c_` is
+     *      written `*a *b* c*` on pass 1, which re-parses as different nesting because
+     *      `*` is now ambiguous, so pass 2 defends it with `*a&#x20;*&#x62;*&#x20;c*`
+     *      -- 15 bytes of growth. `foo _*_` becomes `foo *\**` then `foo \*\*\*`.
+     *      Keeping `_` for the outer emphasis would make pass 1 unambiguous; the
+     *      marker choice is `mdast-util-to-markdown`'s.
+     *   2  a backslash before a setext run doubling: `\===` becomes `\\===`, in
+     *      `probe/straddle-fold/paragraph-merge` and
+     *      `hunt/fix-lazy-setext-chain-not-idempotent`.
+     *   1  `probe/label-shape/space-only-defined` is a FIFTH case of the failed
+     *      definition family above, not a singleton: `[^ ]: x` is escaped on pass 1
+     *      and the reference follows on pass 2, exactly as `[foo]: <>` does.
+     *   1  `probe/bracket-nest/label-autolink-closer` restructures a label and an
+     *      autolink against each other, +30 bytes. Its own rule.
+     *   1  `fuzz/inline-footnote/11` is the one to fix FIRST despite being a
+     *      singleton, because it is the only case that LOSES content rather than
+     *      growing: `- ^[i` / `e]#a/b` is written `* ^[i` / `  e]#a/b` and then
+     *      collapsed to `* ^[ie]#a/b`, dropping the line ending inside the inline
+     *      footnote. Growth is untidy; silently deleting an author's line break is
+     *      data loss, and it is the only one of the 27 that does it.
      *
      * So this is not 32 separate defects. Two handlers -- an empty wikilink and an
      * undefined shortcut reference -- would address 9 of the 17 actionable ones, and the
