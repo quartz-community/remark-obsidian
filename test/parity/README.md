@@ -812,16 +812,16 @@ PARITY_REFEREE_DIR=/tmp/of/test/obsidian-answers \
   npx tsx --conditions=development test/parity/referee.mts
 ```
 
-It took this package from 41.1% to 61.8% agreement, and seven of the rules in
+It took this package from 41.1% to 71.7% agreement, and seven of the rules in
 `src/lib` exist because of it. What it reports now, and what is known about each
 remaining family:
 
 | disagreement            | count | state                                                            |
 | ----------------------- | ----: | ---------------------------------------------------------------- |
-| reference set differs   |  1003 | mostly cascades from a missing or invented definition            |
-| same names, wrong spans |   721 | definition spans; the column family is the open one — see below  |
-| both sets differ        |   538 | as above, compounded                                             |
-| definition set differs  |   340 | the directly actionable bucket; 90.0% of documents already agree |
+| reference set differs   |   668 | mostly cascades from a missing or invented definition            |
+| same names, wrong spans |   489 | definition spans; see the measured split below                   |
+| both sets differ        |   438 | as above, compounded                                             |
+| definition set differs  |   335 | the directly actionable bucket; 90.0% of documents already agree |
 
 ### A parse fix can make the formatter corrupt the file
 
@@ -1112,23 +1112,34 @@ corpus, and the distinct causes are known — one byte-order-mark document, and 
 author's `P1`, where Obsidian's cache reports a column short by the width of a
 `%%` marker. Fixing those two would be a regression.
 
-Definition spans are the open ground, now ~810 across two families:
+Definition spans are the open ground. Split by **which field** actually differs, over the
+489 documents whose names all agree — so none of this needs re-deriving:
 
-- **End line** (310, was ~553). Obsidian ends a definition at an unclosed opener
-  inside it while we let the construct run on. The trailing-blank half is fixed —
-  micromark let an unclosed indented fence consume the blank after it and grow the
-  span by a line — and `%%` and the remaining fence cases need their own evidence.
-  Group by the line _we wrongly include_ against the one _Obsidian ends on_:
-  grouping by what follows Obsidian's end reports "blank" for most of them
-  whatever the cause, and sent me after a rule the legacy stack then refused.
-- **Start column** (440, with 62 more differing on both ends). Obsidian reports a column _short_ of where the `[`
-  actually is, by no constant amount: `    [^12]:` is column 2 to it and 4 to us,
-  `- [ ]    [^x]:` is 6 against 9, `- [ ]  [^x]:` is 6 against 7. This may be a
-  third instance of the class the author documented as `P1`/`P2` — a column
-  computed as if some prefix were absent — rather than anything to reproduce.
-  **Probes are needed before any of it is treated as a rule**; inferring one from
-  pattern-matched corpus data has already produced a wrong answer once, which is
-  why the `%%` rules in `corpus.ts` are recorded instead.
+| field differing  | documents |
+| ---------------- | --------: |
+| def END line     |   **272** |
+| def START column |   **199** |
+| both             |        13 |
+| ref column       |         4 |
+| all three        |         1 |
+
+- **End line** (272). Signed, `ours - obsidian` is **+1 on 148** documents, −1 on 65, +2 on
+  50, −2 on 20, +3 on 12 — so the mode is ending one line late, and the two-sided tail says
+  it is not one rule. **This bucket reads the tree, not a projection**, which is the thing
+  to know before chasing it: the content-end clamp that closed the corpus's `footnotes` END
+  rows lives in `normalize.ts` and therefore moved none of these 272. Applying the same rule
+  to the node's own `position` is the largest single identified family left in either
+  oracle, and it is not free — `listUnderDefinitionTransform` tests `source.slice(from, to)
+!== "\n"` against a definition's end offset, and `points.test.ts` gates offset honesty.
+- **Start column** (199, was 440). The quote content-column rule closed **60 documents** of
+  it in one commit, which is also the cross-oracle confirmation that the rule generalises
+  beyond the two corpus cases that motivated it. What remains is still not a constant: ours
+  is +2 on 44 documents, −2 on 43, −1 on 40, +1 on 35, +3 on 32, so it is several rules
+  pulling both ways rather than a shared offset. A tab in the prefix shows up immediately in
+  the examples (`>\t[1]: /u[^ä]`), and a tab is the one prefix `definition-column.ts`
+  deliberately declines. **Probes are needed before any of it is treated as a rule**;
+  inferring one from pattern-matched corpus data has already produced a wrong answer once,
+  which is why the `%%` rules in `corpus.ts` are recorded instead.
 
 ## A container cannot be _prepended over_ the way a text construct can
 
