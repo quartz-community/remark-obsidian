@@ -150,6 +150,11 @@ describe("positioned oracle", () => {
   const KNOWN_REFERENCE_GAPS = [
     "hunt/aftercloser-chain-eats-referenced-definition/0: P1, Obsidian's column is short by the `%%` marker",
     "hunt/continuation-masked-under-foreign-label/2: P1, Obsidian's column is short by the `%%` marker",
+    // A probe added to separate the caret-link confound, and it diverges by design until
+    // the rule it established is implemented: `[^1](u)` over `[^1]: one` registers the
+    // block `1` in Obsidian because the bracket becomes a LINK and never claims the
+    // caret, so the reference we report there is one Obsidian does not have.
+    "probe/caret-link/link-with-def: the bracket is a link, so the caret is a block id",
   ];
 
   it("places every footnote reference, except the classified cases", () => {
@@ -323,7 +328,7 @@ describe("positioned oracle", () => {
     // definition at an unclosed opener inside it while we let the construct run on --
     // and that is a parse-extent question, not a projection clamp.
     footnotes: 6,
-    footnoteRefs: 2,
+    footnoteRefs: 3,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
     // Obsidian reports a heading's column as its containing block's content column,
@@ -476,7 +481,7 @@ describe("positioned oracle", () => {
     //   The rest: `commonmark/links/503` wants `foo bä` where we give `foo%20bä` (a
     //   percent-decode in the target), `hunt/image-alt-with-brackets/4` wants the alt
     //   `x` where we give `x<fn>`, and three are ordering or span inside a `%%` comment.
-    links: 7,
+    links: 8,
     // 31 -> 16 -> 6. First the missing collector (a markdown image was never indexed at
     // all), then the display field: the cache reports an image's alt as WRITTEN, not as
     // rendered, so it keeps a nested construct's brackets. `![foo [bar](u)](v)` displays
@@ -557,7 +562,7 @@ describe("positioned oracle", () => {
     //      (`9@3:0-3:0`) that we do not produce at all.
     //   1  `block-ref/on-list-item` reports the nested item's start column, the same
     //      content-column convention as elsewhere but applied to a block id.
-    blocks: 7,
+    blocks: 9,
     // 71, of which 44 are span-only and they do NOT share one rule -- measured, after
     // "Obsidian ends an item at its last content character and we run on to the next
     // line start" was recorded here from two examples. It holds for 34. The other 10
@@ -649,7 +654,7 @@ describe("positioned oracle", () => {
     // the right answer, so the clamp belongs only on the FALLBACK path after the
     // blank-separated branch has declined. Structural, not a heuristic about unclosed
     // constructs. 55 -> 41.
-    listItems: 38,
+    listItems: 33,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
@@ -662,7 +667,7 @@ describe("positioned oracle", () => {
     // against whichever parser Obsidian embeds is out of scope for this package --
     // Quartz's FrontMatter plugin owns the YAML, and `remark-frontmatter` is not even in
     // the pinned chain.
-    frontmatterPosition: 2,
+    frontmatterPosition: 1,
   };
 
   it("diverges on no more cases than the recorded ceiling", () => {

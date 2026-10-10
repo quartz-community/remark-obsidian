@@ -1644,7 +1644,29 @@ function parsesAsMapping(body: string): boolean {
   try {
     parsed = load(body);
   } catch {
-    return false;
+    // Obsidian's YAML is more tolerant than `js-yaml` about an unterminated quoted
+    // scalar, and probing it settled exactly how. A quote counts as CLOSED when its
+    // character reappears on the line, escaping ignored:
+    //
+    //     'title: "unterminated'   no second `"`     -> no position reported
+    //     'footnote-prefix: "2.\"'  a second `"`      -> position reported
+    //     "x: '1''"                further `'`       -> position reported
+    //
+    // So this is not the parser difference it was recorded as. Every line that opens a
+    // quoted scalar must show that quote at least twice, and there must be a mapping key
+    // to find at all -- which is what still rejects an empty block and a bare scalar.
+    const lines = body.split("\n").filter((line) => line.trim() !== "");
+    if (lines.length === 0) return false;
+    let keys = 0;
+    for (const line of lines) {
+      const opener = /^\s*[^:#]+:\s*(['"])/u.exec(line);
+      if (!/^\s*[^:#]+:/u.test(line)) return false;
+      keys += 1;
+      if (!opener) continue;
+      const quote = opener[1]!;
+      if (line.split(quote).length - 1 < 2) return false;
+    }
+    return keys > 0;
   }
   return (
     typeof parsed === "object" &&
@@ -2265,9 +2287,11 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         item.position.start.offset!,
         itemLineEnd === -1 ? undefined : itemLineEnd,
       );
-      const marker = /^[-*+][ \t]*\[.\][ \t]*$/u.test(itemLine)
+      const marker = /^(?:[-*+]|\d{1,9}[.)])[ \t]*\[.\][ \t]*$/u.test(itemLine)
         ? null
-        : /^[-*+]\s*\[(.)\]/u.exec(source.slice(item.position.start.offset!));
+        : /^(?:[-*+]|\d{1,9}[.)])\s*\[(.)\]/u.exec(
+            source.slice(item.position.start.offset!),
+          );
       const startAt =
         hostColumn === undefined
           ? atPoint(item.position.start)
@@ -2296,7 +2320,16 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         // `probe/straddle-fold/task-r*`, all of them `- [ ] <marker>`) and closes 5, so it
         // stays until probes settle which side is which -- not because it is understood.
         const at = nested.position?.start?.line;
-        const sameLine = at !== undefined && at - 1 === own;
+        // A same-line child nests only when the parent is a TASK, which probing settled:
+        // `- [x] 1.` and `1. [ ] 2.` both report the child as `parent:0`, while `*\t*`
+        // reports both items at the root. The checkbox is the discriminator -- the
+        // reading view re-parses a task's content into a nested list and reports that
+        // nesting, where an ordinary same-line split is left flat.
+        const onOwnLine = at !== undefined && at - 1 === own;
+        // The PARENT value and the START column answer the same-line case differently.
+        // A task's child NESTS -- `- [ ] 1.` is `parent:0` -- while still reporting its
+        // OWN marker column, `0:6` and not the parent's content column 2.
+        const sameLine = onOwnLine && marker === null;
         // Excluded: a same-line child reports its own marker column, and a tab-indented
         // one is counted in characters rather than columns.
         const firstKid = (nested as unknown as { children?: Node[] })
@@ -2313,7 +2346,7 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         walkList(
           nested,
           sameLine ? (own === 0 ? -1 : -own) : own,
-          sameLine || tabbed ? undefined : itemContentColumn(item),
+          onOwnLine || tabbed ? undefined : itemContentColumn(item),
         );
       }
     }

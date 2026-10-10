@@ -2258,6 +2258,37 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // no section at all, but `^blk` over `</div>` is reported as a paragraph and a
   // leading space keeps it prose -- three answers with no rule between them, and
   // `stripBlockIds` currently drops the paragraph in all three.
+  // Does a caret inside a bracket pair that becomes a LINK free the caret for a block
+  // identifier? `[^1](u)` registers `1` and `![^1](url)` over `[^1]: one` registers
+  // nothing, and those two differ in TWO ways at once -- link versus image, and whether a
+  // definition exists. These separate the pair.
+  ["probe/caret-link/image-no-def", "![^1](url)\n"],
+  ["probe/caret-link/link-with-def", "[^1](u)\n\n[^1]: one\n"],
+  ["probe/caret-link/link-angle-dest", "[^1](<u>)\n"],
+  // Same-line list nesting is reported two ways and our tree cannot tell them apart:
+  // `- [ ] 1.` reports `parent:0` and `*\t*\t*` reports `parent:-1` for structurally
+  // identical nesting. Is the checkbox the discriminator, or the tab?
+  ["probe/same-line-nest/plain-dash", "- x - y\n"],
+  ["probe/same-line-nest/task-checked", "- [x] 1.\n"],
+  ["probe/same-line-nest/two-stars-tab", "*\t*\n"],
+  ["probe/same-line-nest/ordered-task", "1. [ ] 2.\n"],
+  // What makes a top-level section end at its last content character rather than at the
+  // next line's column 0? Four clamp variants have been refuted, so the discriminator is
+  // neither position nor node type.
+  ["probe/section-end/unclosed-strike", "- ~~x\n"],
+  ["probe/section-end/root-unclosed", "$$y\n"],
+  ["probe/section-end/item-then-text", "- a\nb\n"],
+  // Is `frontmatterPosition` really about the YAML parsing, or about what FOLLOWS the
+  // closing fence? The reported case ends `---` / `body` and the unreported one ends
+  // `---` / '' / `Body`, so the blank line is an untested alternative to YAML validity.
+  [
+    "probe/frontmatter-report/bad-no-blank",
+    '---\ntitle: "unterminated\n---\nbody\n',
+  ],
+  ["probe/frontmatter-report/good-blank", "---\na: b\n---\n\nbody\n"],
+  ["probe/frontmatter-report/scalar-no-blank", "---\nTitle\n---\nbody\n"],
+  ["probe/frontmatter-report/empty-no-blank", "---\n---\nbody\n"],
+  ["probe/frontmatter-report/quote-blank", "---\nx: '1''\n---\n\nbody\n"],
   ["probe/block-id-extent/alone-then-html", "^blk\n</div>\n"],
   ["probe/block-id-extent/alone-then-para", "^blk\npara\n"],
   ["probe/block-id-extent/alone-blank-para", "^blk\n\npara\n"],

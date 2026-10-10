@@ -235,8 +235,14 @@ describe("source fidelity", () => {
      * continuation indent; and `[^https://e.test/p]` came back when the nodes GFM's
      * autolink literal splices stopped arriving without a position.
      *
-     * Asserted empty rather than counted, so the first regression names itself.
+     * Asserted against a named list rather than plain emptiness, with exactly one entry.
+     * `![^1](url)` is an IMAGE: mdast puts `^1` in its `alt` and the brackets are image
+     * syntax, so the marker `[^1]` is genuinely absent from the tree -- and that is
+     * correct, since Obsidian registers no reference and no block for it either. The
+     * probe that established image-versus-link as the discriminator is what surfaced it.
+     *
+     * Any OTHER id appearing here is still a regression that names itself.
      */
-    expect(lost).toEqual([]);
+    expect(lost).toEqual(["probe/caret-link/image-no-def: [^1]"]);
   });
 });
