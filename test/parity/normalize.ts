@@ -2149,6 +2149,22 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     );
   }
 
+  // A repeated block identifier: the LAST one wins. `x ^b` / '' / `y ^b` registers only
+  // `b@2:0-2:4`, which is the same rule already measured for a duplicate footnote
+  // definition -- the earlier one's content is never indexed.
+  //
+  // THIN EVIDENCE, stated here because the corpus cannot adjudicate it: exactly one case
+  // holds a repeated identifier and there are no controls. Obsidian is unambiguous on
+  // that one, and the footnote-definition precedent is what makes it a rule rather than a
+  // fit, but a second shape would be worth recording if one turns up.
+  const lastBlock = new Map<string, string>();
+  for (const entry of blocks) {
+    const name = /^(.*)@\d+:\d+-\d+:\d+$/u.exec(entry)?.[1];
+    if (name !== undefined) lastBlock.set(name, entry);
+  }
+  blocks.length = 0;
+  blocks.push(...lastBlock.values());
+
   /**
    * List items, as `listItems` reports them.
    *

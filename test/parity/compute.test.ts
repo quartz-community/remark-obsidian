@@ -518,7 +518,7 @@ describe("positioned oracle", () => {
     // bracket becomes a link rather than a footnote reference and so never claims the
     // caret. That is a tree question and this collector reads lines, so it needs a
     // different mechanism than the escape check.
-    blocks: 8,
+    blocks: 7,
     // 71, of which 44 are span-only and they do NOT share one rule -- measured, after
     // "Obsidian ends an item at its last content character and we run on to the next
     // line start" was recorded here from two examples. It holds for 34. The other 10
