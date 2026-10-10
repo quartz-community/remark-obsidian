@@ -2262,6 +2262,30 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // identifier? `[^1](u)` registers `1` and `![^1](url)` over `[^1]: one` registers
   // nothing, and those two differ in TWO ways at once -- link versus image, and whether a
   // definition exists. These separate the pair.
+  // WHICH top-level node types end a section at their last content character, and which
+  // at the next line's column 0? Four clamp variants are refuted, so the discriminator is
+  // neither position nor node type as guessed -- `- ~~x` ends at content while `$$y` ends
+  // at 1:0, and these pin the rest of the type table.
+  ["probe/section-type/paragraph", "para\n"],
+  ["probe/section-type/heading-atx", "# H\n"],
+  ["probe/section-type/quote", "> q\n"],
+  ["probe/section-type/indented", "    code\n"],
+  ["probe/section-type/two-paras", "para\n\nsecond\n"],
+  ["probe/section-type/root-strike", "~~x\n"],
+  ["probe/section-type/root-comment", "%%c\n"],
+  // A nested item's start column against its parent's content column. 37 of 44 nested
+  // entries report the parent's content column; these vary the indent independently of
+  // the exceptions already known (same line, tabs).
+  ["probe/nested-start/three-space", "- a\n   - b\n"],
+  ["probe/nested-start/five-space", "- a\n     - b\n"],
+  ["probe/nested-start/wide-sep", "1.  a\n    - b\n"],
+  ["probe/nested-start/in-quote", "> - a\n>    - b\n"],
+  // A definition's start column diverges in BOTH directions -- `>  [^1]:` is 0:2 against
+  // our 0:3 while `1. item` over `    [^1]:` is 2:4 against our 2:3 -- so it is at least
+  // two rules and the container's prefix width is the obvious axis to vary.
+  ["probe/def-column/quote-three", ">   [^1]: def\n"],
+  ["probe/def-column/ordered-three", "1. item\n\n   [^1]: x\n"],
+  ["probe/def-column/bullet-two", "- item\n\n  [^1]: x\n"],
   ["probe/caret-link/image-no-def", "![^1](url)\n"],
   ["probe/caret-link/link-with-def", "[^1](u)\n\n[^1]: one\n"],
   ["probe/caret-link/link-angle-dest", "[^1](<u>)\n"],

@@ -327,7 +327,7 @@ describe("positioned oracle", () => {
     // 0:12. These are the recorded definition end-line family -- Obsidian ends a
     // definition at an unclosed opener inside it while we let the construct run on --
     // and that is a parse-extent question, not a projection clamp.
-    footnotes: 6,
+    footnotes: 7,
     footnoteRefs: 3,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
@@ -441,6 +441,24 @@ describe("positioned oracle", () => {
     // section containing it does not. That is worth knowing before a fifth attempt --
     // the 14 `list` END rows here are not the same rule as the 19 that were just fixed
     // one key over, however similar the examples look.
+    // PROBED BY TYPE, and the answer is CLOSURE rather than type. Wave two shows almost
+    // every type ending at its last content character:
+    //
+    //     'para' paragraph@0:0-0:4   '# H' heading@0:0-0:3   '> q' blockquote@0:0-0:3
+    //     '    code' code@0:0-0:8    '~~x' paragraph@0:0-0:3
+    //     '%%c' comment@0:0-1:0  <- next line      '$$y' math@0:0-1:0  <- next line
+    //
+    // Excluding `math` and `comment` by TYPE still costs 3 (26 -> 29), and the reason is
+    // that math is BOTH: the probe `$$y` is UNCLOSED and ends at 1:0, while the corpus
+    // case `$$` / `Math$$` is CLOSED and ends at content, `math@0:0-1:6`. So a construct
+    // that ran to end of input keeps mdast's end and a closed one is clamped -- which
+    // also explains `- $$y`, a LIST holding unclosed math, ending at content: the list
+    // itself is closed.
+    //
+    // That is the first reading consistent with every data point, and it is a property of
+    // the construct rather than of the node type, so it needs the source or a token to
+    // decide. mdast already ends a paragraph or heading at its content, which is why
+    // those agree without help.
     sections: 26,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
@@ -654,7 +672,7 @@ describe("positioned oracle", () => {
     // the right answer, so the clamp belongs only on the FALLBACK path after the
     // blank-separated branch has declined. Structural, not a heuristic about unclosed
     // constructs. 55 -> 41.
-    listItems: 33,
+    listItems: 34,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
