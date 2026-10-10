@@ -531,6 +531,24 @@ describe("positioned oracle", () => {
     //      do, three levels deep, so the tree was right and this projection was
     //      over-reporting what the field can hold. One case in the family remains.
     //   1  `- [] a` / `- [ ]x`, a task-character difference.
+    // The 59 break down by first difference as 21 START, 16 END (ours at column 0),
+    // 8 MARKER, 7 PARENT, 4 END (other) -- so at least five rules, not one.
+    //
+    //   START   `- Item one` / `    - Nested item` is `1:2` to Obsidian with the marker
+    //           at column 4, which looks like the content-column convention already
+    //           shipped for definitions and headings.
+    //   PARENT  `- [ ] 1.` is `parent:0` to Obsidian and `parent:-1` here, so the
+    //           reading-view task re-parse nests where we leave the items siblings.
+    //   MARKER  `- [ ]` over `![[*` reports `-` to Obsidian and `" "` here: a checkbox
+    //           with no content after it on its own line is not a task.
+    //
+    // ATTEMPTED AND REFUTED on START: reporting a nested item at its parent's content
+    // column takes this 59 -> 65. The blast-radius check that preceded it was NOT a
+    // measurement and that is the lesson -- it counted the 34 agreeing nested entries
+    // and their start columns (1, 2, 4, 6), then INFERRED those equal the parent's
+    // content column because they agree. That inference is what failed. Measure the
+    // predicate itself next time: for each agreeing nested entry, compute the parent's
+    // content column and compare it to the reported start.
     listItems: 59,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
