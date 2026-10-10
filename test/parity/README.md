@@ -1046,12 +1046,31 @@ way, after probes-per-case, co-occurrence and construct frequency.
 non-ASCII, 157 ASCII punctuation. No charset story, so `[^👩‍💻]` and `[^نیم‌فاصله]`
 failing is incidental rather than causal.
 
-**What this means for sequencing.** 97 documents is still the largest single identified
-rule left — the corpus has 71 positional rows in total — but it is not the landslide the
-earlier note claimed, and it competes with ordinary corpus work rather than dwarfing it.
-Two cautions stand: it belongs in the reference half of `parseComments` rather than in a
-projection, and the referee compares exact positions, so a reference synthesised at the
-wrong offset trades a missing name for a wrong one.
+**And then the rule died outright.** The 97 was still a conditional — "documents where the
+definition's own label is the missing reference" — which says nothing about how often the
+rule would be WRONG. Measured the only way that settles it, by asking whether Obsidian
+reports a reference at that exact label, line and column:
+
+| documents with a definition-shaped line inside an OPEN `%%` span | 809     |
+| ---------------------------------------------------------------- | ------- |
+| Obsidian reports a reference there for all of them (we gain)     | **444** |
+| Obsidian reports one for none of them (we break)                 | **329** |
+| mixed                                                            | 36      |
+
+57.5% is not a rule. Synthesising those references invents 329 documents' worth of
+positions Obsidian does not have, and a wrong offset is worse than a missing one — so
+something else discriminates, and the shape as stated cannot be implemented.
+
+**This is the fifth selector to die here, and the first to die twice.** It survived a base
+rate (1175 of 1673 agreeing) only because each narrowing was measured against the failing
+side alone; counting the side where the rule would FIRE is what finished it. The sequence is
+worth keeping as a worked example: ten shortest documents → 562 → 439 → 97 → refuted. Every
+step was a real measurement and the conclusion was wrong until the last one.
+
+What remains true and useful: the asymmetry itself is real (a definition inside a comment
+does not define, a reference inside one is indexed, 710 documents depend on it), and it
+belongs in the reference half of `parseComments` rather than in a projection if a correct
+form of the rule is ever found.
 
 ### References, once the definitions agree### References, once the definitions agree
 
