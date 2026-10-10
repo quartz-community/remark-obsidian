@@ -1919,14 +1919,24 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       return;
     }
     if (!isType<WikilinkNode>(node, "wikilink")) return;
-    const target =
-      node.heading === "" ? node.path : `${node.path}#${node.heading}`;
     // `original` is the source as written, which is what the cache reports and
     // what no field of the node reproduces on its own.
     const original = source.slice(
       node.position.start.offset!,
       node.position.end.offset!,
     );
+    // A trailing `#` with no heading after it stays in the TARGET: `[[page#]]` resolves
+    // to `page#`, not `page`. Tested before the first `|`, because a `#` inside an alias
+    // belongs to the display and not the target -- `[[a|b#c]]` and `[[a|#b]]` both
+    // resolve to `a`, and a predicate over the whole inner text would have moved them.
+    const inner = original.replace(/^!?\[\[/u, "").replace(/\]\]$/u, "");
+    const beforeAlias = inner.split("|", 1)[0] ?? "";
+    const target =
+      node.heading === ""
+        ? beforeAlias.endsWith("#")
+          ? `${node.path}#`
+          : node.path
+        : `${node.path}#${node.heading}`;
     // The cache joins a path and a fragment with ` > `, as `mdastText` does
     // for the rendered text: `[[page#heading]]` displays `page > heading`, not
     // the fragment alone. An alias replaces the whole thing.

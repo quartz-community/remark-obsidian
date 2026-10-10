@@ -395,15 +395,18 @@ describe("positioned oracle", () => {
     //     the DISPLAY text but not into the target -- `[[a#h\]]` resolves to `a#h` and
     //     displays `a > h\`. The tokenizer resolves the escape, so the node's `heading`
     //     has already lost it and only the source still knows.
-    //   - a trailing `#` is kept in the TARGET: `[[page#]]` resolves to `page#`, not
-    //     `page` (`wikilink/trailing-hash`).
+    //   - FIXED: a trailing `#` with no heading after it stays in the TARGET, so
+    //     `[[page#]]` resolves to `page#` and not `page`. Tested before the first `|`,
+    //     because a `#` inside an ALIAS belongs to the display -- `[[a|b#c]]` and
+    //     `[[a|#b]]` both resolve to `a`, and a predicate over the whole inner text
+    //     would have moved those two controls as well.
     //   - a link inside a `%%` comment IS indexed, and this collector returns SKIP on a
     //     comment node: `%%\![[d.pdf#page=3]]%%` and `a@e.test> %%[link](u)%%` both
     //     report a link in Obsidian and none here. Consistent with the recorded
     //     asymmetry that a definition inside a comment does not define while a reference
     //     inside one still counts -- but the SKIP predates the markdown-link collector
     //     and was presumably measured for wikilinks, so removing it needs its own delta.
-    links: 18,
+    links: 17,
     // 31 -> 16 -> 6. First the missing collector (a markdown image was never indexed at
     // all), then the display field: the cache reports an image's alt as WRITTEN, not as
     // rendered, so it keeps a nested construct's brackets. `![foo [bar](u)](v)` displays
