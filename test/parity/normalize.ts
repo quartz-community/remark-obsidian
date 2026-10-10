@@ -2147,9 +2147,24 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       }
     }
     const blank = hasSibling ? blankBefore(base.line) : undefined;
-    return blank === undefined
-      ? base
-      : { line: base.line + 1, column: 1, offset: blank };
+    if (blank !== undefined) {
+      return { line: base.line + 1, column: 1, offset: blank };
+    }
+    // Otherwise the end is the item's last CONTENT character. mdast lets a construct
+    // that outlives its item push the end onto the next line -- `- $$y` ends at 1:0 here
+    // and 0:5 in Obsidian, and `- a` / `    %%` / `    b` ends at 3:0 against 2:5.
+    //
+    // Scoped to this fallback deliberately. Of the entries whose end we report at column
+    // 0, nine agree with Obsidian and nineteen do not, so clamping all of them would fix
+    // 19 and break 9 -- and the nine are exactly the blank-separated ones returned above,
+    // where column 0 is the right answer.
+    let at = base.offset;
+    if (at === undefined) return base;
+    while (at > 0 && (source[at - 1] === "\n" || source[at - 1] === "\r"))
+      at -= 1;
+    if (at === base.offset) return base;
+    const line = source.lastIndexOf("\n", at - 1) + 1;
+    return { line: base.line - 1, column: at - line + 1, offset: at };
   };
   const walkList = (list: Node, parent: number): void => {
     const kids = (list as unknown as { children: Node[] }).children;
