@@ -1921,8 +1921,30 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     // The cache joins a path and a fragment with ` > `, as `mdastText` does
     // for the rendered text: `[[page#heading]]` displays `page > heading`, not
     // the fragment alone. An alias replaces the whole thing.
+    // A trailing backslash in the heading survives into the DISPLAY text but not into
+    // the target: `[[a#h\]]` resolves to `a#h` and displays `a > h\`. The tokenizer
+    // resolves the escape, so the node's `heading` has already lost it and only the
+    // source still knows. Counted rather than matched, because an anchored `/\\*$/` is
+    // a second-degree polynomial to the ReDoS lint.
+    const rawHeading = original.slice(
+      original.indexOf("#") + 1,
+      original.lastIndexOf("]]"),
+    );
+    let slashes = 0;
+    while (
+      node.heading !== "" &&
+      original.includes("#") &&
+      slashes < rawHeading.length &&
+      rawHeading[rawHeading.length - 1 - slashes] === "\\"
+    ) {
+      slashes += 1;
+    }
+    const heading =
+      slashes > 0 && !node.heading.endsWith("\\")
+        ? node.heading + "\\".repeat(slashes)
+        : node.heading;
     const shown =
-      node.alias || [node.path, node.heading].filter(Boolean).join(" > ");
+      node.alias || [node.path, heading].filter(Boolean).join(" > ");
     (node.embedded ? embeds : links).push(
       `${original}=>${target}|${shown}@${spanOf(node)}`,
     );

@@ -337,10 +337,10 @@ describe("positioned oracle", () => {
     //
     // The 31 remaining are attributed and are three separate things:
     //
-    //   - a trailing BACKSLASH in a wikilink's heading or alias is kept in the display
-    //     text and we drop it: `[[a#h\]]` displays `a > h\` and we give `a > h`. The
-    //     largest group, and the same shape in `fuzz/wikilink/13`, `/14`, `/16`,
-    //     `fuzz/embed/98` and `/110`.
+    //   - FIXED, 13 of them: a trailing BACKSLASH in a wikilink's heading survives into
+    //     the DISPLAY text but not into the target -- `[[a#h\]]` resolves to `a#h` and
+    //     displays `a > h\`. The tokenizer resolves the escape, so the node's `heading`
+    //     has already lost it and only the source still knows.
     //   - a trailing `#` is kept in the TARGET: `[[page#]]` resolves to `page#`, not
     //     `page` (`wikilink/trailing-hash`).
     //   - a link inside a `%%` comment IS indexed, and this collector returns SKIP on a
@@ -349,14 +349,14 @@ describe("positioned oracle", () => {
     //     asymmetry that a definition inside a comment does not define while a reference
     //     inside one still counts -- but the SKIP predates the markdown-link collector
     //     and was presumably measured for wikilinks, so removing it needs its own delta.
-    links: 31,
+    links: 18,
     // 31 -> 16 -> 6. First the missing collector (a markdown image was never indexed at
     // all), then the display field: the cache reports an image's alt as WRITTEN, not as
     // rendered, so it keeps a nested construct's brackets. `![foo [bar](u)](v)` displays
     // `foo [bar](u)` where mdast's flattened `alt` gives `foo bar`, and
     // `![alt [^9]](/url)` displays `alt [^9]` against our `alt `. Sliced from the source
     // between the opener and the LAST `](`, since the alt may hold one itself.
-    embeds: 6,
+    embeds: 5,
     tags: 1,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
     // block identifier and the fix closed eleven cases, its own eight included.
