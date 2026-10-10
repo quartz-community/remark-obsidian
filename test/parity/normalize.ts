@@ -1892,10 +1892,29 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
   const sections = tree.children
     .filter((child) => child.position)
     .filter((child) => standalone.get(child)?.consumed !== true)
-    .map(
-      (child) =>
-        `${child.type}@${sectionStart(child.position!.start)}-${atPoint(child.position!.end)}`,
-    );
+    .map((child) => {
+      // A section's end is clamped to its last CONTENT character only for the container
+      // types whose mdast span runs past it. Measured by dumping the divergences by type
+      // rather than reasoned from a sample, which is what two earlier attempts did:
+      //
+      //   clamp      list (14 rows), footnoteDefinition (1), paragraph (2)
+      //   keep       code (18 rows), html (2), math, comment -- an UNCLOSED delimited
+      //              construct runs to end of input and Obsidian reports that end
+      //
+      // `heading`, `blockquote` and a closed `code` need nothing: mdast already ends them
+      // at their content, which is why clamping every type cost 44 and excluding only
+      // `math` and `comment` still cost 3.
+      const CLAMPED = ["list", "footnoteDefinition", "paragraph"];
+      const end = child.position!.end;
+      let at = end.offset;
+      if (CLAMPED.includes(child.type) && at !== undefined) {
+        while (at > 0 && (source[at - 1] === "\n" || source[at - 1] === "\r"))
+          at -= 1;
+      }
+      const shownEnd =
+        at !== undefined && at !== end.offset ? atOffset(at) : atPoint(end);
+      return `${child.type}@${sectionStart(child.position!.start)}-${shownEnd}`;
+    });
 
   const spanOf = (node: Node): string =>
     `${atPoint(node.position!.start)}-${atPoint(node.position!.end)}`;
