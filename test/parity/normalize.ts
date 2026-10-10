@@ -1981,8 +1981,26 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       slashes > 0 && !node.heading.endsWith("\\")
         ? node.heading + "\\".repeat(slashes)
         : node.heading;
+    // The same asymmetry one segment along: when the PATH is the last segment, a
+    // trailing backslash in it survives into the display and not into the target.
+    // `[[target\]]` resolves to `target` and displays `target\`, unanimously across the
+    // four corpus cases that have one -- all four keep it, none drops it.
+    let pathSlashes = 0;
+    if (node.heading === "" && node.alias === "") {
+      const rawPath = inner.split(/[#|]/u, 1)[0] ?? "";
+      while (
+        pathSlashes < rawPath.length &&
+        rawPath[rawPath.length - 1 - pathSlashes] === "\\"
+      ) {
+        pathSlashes += 1;
+      }
+    }
+    const shownPath =
+      pathSlashes > 0 && !node.path.endsWith("\\")
+        ? node.path + "\\".repeat(pathSlashes)
+        : node.path;
     const shown =
-      node.alias || [node.path, heading].filter(Boolean).join(" > ");
+      node.alias || [shownPath, heading].filter(Boolean).join(" > ");
     (node.embedded ? embeds : links).push(
       `${original}=>${target}|${shown}@${spanOf(node)}`,
     );

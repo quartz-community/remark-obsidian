@@ -459,14 +459,14 @@ describe("positioned oracle", () => {
     //     entry we invented -- the same missing-collector signature as the markdown link
     //     and the markdown image. Consistent with the recorded asymmetry: a DEFINITION
     //     inside a comment does not define, a reference does.
-    links: 11,
+    links: 8,
     // 31 -> 16 -> 6. First the missing collector (a markdown image was never indexed at
     // all), then the display field: the cache reports an image's alt as WRITTEN, not as
     // rendered, so it keeps a nested construct's brackets. `![foo [bar](u)](v)` displays
     // `foo [bar](u)` where mdast's flattened `alt` gives `foo bar`, and
     // `![alt [^9]](/url)` displays `alt [^9]` against our `alt `. Sliced from the source
     // between the opener and the LAST `](`, since the alt may hold one itself.
-    embeds: 5,
+    embeds: 4,
     tags: 0,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
     // block identifier and the fix closed eleven cases, its own eight included.
