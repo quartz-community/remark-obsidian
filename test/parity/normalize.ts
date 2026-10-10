@@ -1790,8 +1790,22 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       parent === tree &&
       node.position
     ) {
+      // A setext heading whose content starts on a LATER line than the node does: the
+      // definition above it is a separate node and micromark still begins the heading at
+      // the definition's line, so the two overlap. `[ref]: /url` / `para` / `===` gives
+      // `definition@0:0-0:11` and `heading@0:0-2:3` on bare `remark-parse` + `remark-gfm`
+      // as well, so it is upstream, and Obsidian reports `1:para@1:0`.
+      //
+      // The first child's line is a perfect discriminator here, measured both ways: of
+      // the 225 heading nodes in cases that already agree, NONE has a child on a
+      // different line, and all 5 position divergences do.
+      const head = (node as unknown as { children?: Node[] }).children?.[0];
+      const start =
+        head?.position && head.position.start.line !== node.position.start.line
+          ? head.position.start
+          : node.position.start;
       headings.push(
-        `${node.depth}:${headingName(node, source)}@${sectionStart(node.position.start)}`,
+        `${node.depth}:${headingName(node, source)}@${sectionStart(start)}`,
       );
     }
     return;

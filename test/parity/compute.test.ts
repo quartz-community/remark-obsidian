@@ -340,27 +340,23 @@ describe("positioned oracle", () => {
     // Two are NOT that rule and want separate treatment: `probe/line-ending/bom-heading`
     // differs on the NAME (obs `1:H`, ours `1:#`), and
     // `commonmark/link-reference-definitions/*` differs on the LINE (obs 1, ours 0).
-    // The 6 remaining split 5 + 1, both attributed:
+    // 6 -> 1. The five were a setext heading whose content starts on a LATER line than
+    // the node: `[ref]: /url` / `para` / `===` reports `1:para@1:0` to Obsidian and
+    // reported `0:0` here. UPSTREAM -- bare `remark-parse` + `remark-gfm` gives
+    // `definition@0:0-0:11` beside `heading@0:0-2:3`, so the two overlap and none of
+    // our passes touch it. Corrected in the projection by taking the first child's
+    // line, which is a perfect discriminator: of the 225 heading nodes in agreeing
+    // cases none has a child on a different line, and all five divergences do.
     //
-    //   5  a setext heading preceded by a DEFINITION line reports the wrong start
-    //      LINE. `[ref]: /url` / `para` / `===` is `1:para@1:0` to Obsidian and
-    //      `1:para@0:0` here -- the name is already right, so the content is `para`
-    //      while the node's position still points at the definition's line. One
-    //      `commonmark/link-reference-definitions` case and four
-    //      `hunt/setext-paragraph-count-ignores-*`.
+    // `definitionSetextTransform` was the obvious suspect and is innocent: it requires
+    // the underline DIRECTLY under the definition and declines when `para` intervenes,
+    // which is also why the heading is named `para` rather than `[ref]: /url`.
     //
-    //      NOT `definitionSetextTransform`: that pass requires the underline to sit
-    //      DIRECTLY under the definition (one line ending, nothing else) and declines
-    //      here because `para` intervenes -- which is also why the heading is named
-    //      `para` and not `[ref]: /url`. So the wrong start comes from the parse or an
-    //      earlier pass, and the next step is to bisect which.
-    //
-    //   1  `probe/line-ending/bom-heading` reports the wrong NAME, not a position:
-    //      `\uFEFF# H` is `1:H` to Obsidian and `1:#` here, so the name extraction
-    //      reads one character early. `applyTextTransform` strips the leading BOM
-    //      while the node offsets still index the original, which is the off-by-one
-    //      to look for.
-    headings: 6,
+    // The one left is a NAME bug, not a position: `probe/line-ending/bom-heading` is
+    // `1:H` to Obsidian and `1:#` here, so the name extraction reads one character
+    // early -- `applyTextTransform` strips the leading BOM while the node offsets still
+    // index the original string.
+    headings: 1,
     // 33 -> 27. The 4 we-INVENT rows were the standalone block-identifier paragraphs --
     // we emitted a `paragraph` section Obsidian consumes -- and the cluster A fix closed
     // them along with two more, exactly as the recorded coupling predicted. The 27
