@@ -2286,6 +2286,36 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/def-column/quote-three", ">   [^1]: def\n"],
   ["probe/def-column/ordered-three", "1. item\n\n   [^1]: x\n"],
   ["probe/def-column/bullet-two", "- item\n\n  [^1]: x\n"],
+  // Does a definition's reported column CAP at 4? The referee's 91 spaces-only rows say
+  // indent 4, 5, 6 and 7 all report column 4, which reads as `min(indent, 4)` rather than
+  // the bracket -- and 4 is where indented code starts, so these can only be inside an
+  // item. Varying the indent against one fixed host is what separates a cap from a
+  // coincidence.
+  ["probe/def-cap/bullet-four", "- item\n\n    [^1]: x\n"],
+  ["probe/def-cap/bullet-five", "- item\n\n     [^1]: x\n"],
+  ["probe/def-cap/bullet-six", "- item\n\n      [^1]: x\n"],
+  ["probe/def-cap/bullet-seven", "- item\n\n       [^1]: x\n"],
+  ["probe/def-cap/ordered-four", "1. item\n\n    [^1]: x\n"],
+  // A tab-indented nested item's start column. `- [ ] parent` over `\t- [ ] child` reports
+  // 1:1 -- the marker's own index -- while ` - foo` / `   - bar` / `\t - baz` reports 2:1,
+  // which is NOT the marker. Separate the tab from the checkbox and from the straddle.
+  ["probe/tab-nest/bullet-tab", "- parent\n\t- child\n"],
+  ["probe/tab-nest/two-tabs", "- a\n\t\t- b\n"],
+  ["probe/tab-nest/tab-then-space", "- a\n\t - b\n"],
+  // A quote-nested item's indent. `> - a` over `>    - b` reports 1:4, and the 3-space
+  // spelling is already `probe/list-item/in-quote` reporting 1:4 as well -- so the parent's
+  // content column (`> - ` is 4) explains both, and a dedup check is what surfaced that.
+  // Only the 2-space spelling is still unprobed.
+  ["probe/quote-nest/two-space", "> - a\n>  - b\n"],
+  // `* foo` / `  * bar` / blank / `  baz` reports `bar` at `parent:-1`, i.e. NOT nested,
+  // which no rule here predicts. Does the trailing indented paragraph cause it?
+  ["probe/nest-parent/blank-then-indented", "- a\n  - b\n\n  c\n"],
+  ["probe/nest-parent/blank-then-root", "- a\n  - b\n\nc\n"],
+  // A definition freed by a comment CLOSER on its own line takes the column one past that
+  // closer (`> %% [^1]: freed` is 4:4), where a container prefix gives the content column.
+  // Both on one line, so the two candidate columns differ.
+  ["probe/def-after-comment/root-one-line", "%% h %% [^1]: x\n"],
+  ["probe/def-after-comment/quote-one-line", "> %% h %% [^1]: x\n"],
   ["probe/caret-link/image-no-def", "![^1](url)\n"],
   ["probe/caret-link/link-with-def", "[^1](u)\n\n[^1]: one\n"],
   ["probe/caret-link/link-angle-dest", "[^1](<u>)\n"],

@@ -2408,7 +2408,11 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     const bol = lineStarts[item.position!.start.line - 1] ?? 0;
     const nl = source.indexOf("\n", from);
     const line = source.slice(bol, nl === -1 ? undefined : nl);
-    const opener = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]*/u.exec(line);
+    // A quote prefix is stepped over, or an item inside one has no content column at all
+    // and its child falls back to the bracket. `> - a` over `>    - b` is 1:4 to Obsidian,
+    // which is `> - `; the 3-space spelling already matched at 1:4 for the same reason,
+    // and that pair is what shows the parent's content column explains both indents.
+    const opener = /^[ \t]*(?:>[ \t]?)*(?:[-*+]|\d{1,9}[.)])[ \t]*/u.exec(line);
     return opener ? opener[0].length : undefined;
   };
 
@@ -2508,6 +2512,16 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
           kidFrom !== undefined &&
           kidBol !== undefined &&
           source.slice(kidBol, kidFrom).includes("\t");
+        // A nested list does NOT nest when its parent item carries content AFTER it --
+        // probed, and NOT implementable as stated. `- a` / `  - b` / blank / `  c` reports
+        // BOTH items at `parent:-1`, while `- a` / `  - b` / blank / `c`, where the
+        // paragraph is at root instead of in the item, reports the child at `parent:0`. So
+        // the fact is established and `commonmark/lists/325` is the same shape.
+        //
+        // Testing "the item has a child starting at or after the nested list's end" costs
+        // 19 -> 21: it also fires on items whose trailing content Obsidian still nests
+        // through. Something narrower is needed -- the blank line is the obvious next axis,
+        // since both probes have one and the rule has to separate them some other way.
         walkList(
           nested,
           sameLine ? (own === 0 ? -1 : -own) : own,

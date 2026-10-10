@@ -364,7 +364,7 @@ describe("positioned oracle", () => {
     // `    [^1]: x` is `2:2`, the content column, at the same indent of 4. So the ordered
     // marker's width is implicated rather than the indent alone, and `1.  foo` putting
     // content at column 4 is a recorded separator quirk that may be the same bug.
-    footnotes: 2,
+    footnotes: 3,
     footnoteRefs: 3,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
@@ -762,7 +762,7 @@ describe("positioned oracle", () => {
     //   MISSING  two `hunt/ordered-item-under-definition` rows plus
     //            `probe/straddle-fold/list-under-definition`, where we invent an item
     //            Obsidian does not report at all.
-    listItems: 16,
+    listItems: 19,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.

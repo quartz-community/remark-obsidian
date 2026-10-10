@@ -1188,12 +1188,27 @@ Definition spans are the open ground. Split by **which field** actually differs,
   constant 4 is the signature of the class the plugin's author documented as `P1`/`P2`: a
   column computed as if some prefix were absent.
 
-  **Deliberately not implemented.** The indent-2 row reporting 0 is the root content-column
-  rule, so at least two regimes overlap here and this data cannot separate "inside a
-  container" from "at root" on its own. The note above about inferring a rule from
-  pattern-matched corpus data applies with full force — it has produced a wrong answer here
-  once already. This wants probes against the application, which is also the only way to
-  tell a real cap from a cache defect worth reporting rather than reproducing. **Probes are needed before any of it is treated as a rule**;
+  **And the probes refuted it.** Five `probe/def-cap/*` cases put one host in front of a
+  varying indent, and `min(indent, 4)` is simply wrong:
+
+  | probe                             | host content column | indent | Obsidian |
+  | --------------------------------- | ------------------: | -----: | -------- |
+  | `- item` / blank / `    [^1]:`    |                   2 |      4 | **2**    |
+  | `- item` / blank / `     [^1]:`   |                   2 |      5 | **2**    |
+  | `- item` / blank / `      [^1]:`  |                   2 |      6 | no def   |
+  | `- item` / blank / `       [^1]:` |                   2 |      7 | no def   |
+  | `1. item` / blank / `    [^1]:`   |                   3 |      4 | **4**    |
+
+  So a bullet host reports its CONTENT column at indents 4 and 5, and at 6 the line is
+  indented code relative to that column and there is no definition at all — which is why
+  the referee's rows looked capped: its documents are dense, and whatever host they sit in
+  is not the one the shape suggested. The ordered host reporting the bracket at the same
+  indent is the real asymmetry, and the gap between indent and content column (2 against 1)
+  is the axis that separates them.
+
+  This is the probe wave earning its cost in the usual way: not by closing cases, but by
+  killing a rule that read as obvious from referee data alone. The warning above about
+  inferring rules from pattern-matched corpus data now has a second instance. **Probes are needed before any of it is treated as a rule**;
   inferring one from pattern-matched corpus data has already produced a wrong answer once,
   which is why the `%%` rules in `corpus.ts` are recorded instead.
 
