@@ -37,10 +37,28 @@ import { visit } from "unist-util-visit";
  *   authoritative and whose offset is an index into the fragment string.
  * - `callout.ts` and `task-char.ts` only increment, so they inherit whatever drift exists
  *   rather than acting on it.
- * - `comment-tail.ts`, `footnote-bare.ts`, `list-deep-continuation.ts`, `math-fence.ts`
- *   and `setext-underline.ts` each READ a column to compute something. Whether any is
- *   wrong depends on whether its node can arrive already moved, which is a per-pass
- *   question and not yet answered for those five.
+ * - The remaining five were instrumented over the whole corpus, counting how often the
+ *   point they read carries a column that disagrees with its own offset:
+ *
+ *       comment-tail             15 agree,    0 stale
+ *       list-deep-continuation    1 agree,    0 stale
+ *       math-fence               78 agree,    0 stale
+ *       footnote-bare           984 agree,   21 STALE
+ *       setext-underline         74 agree,    1 STALE
+ *
+ *   `footnote-bare` is stale 21 times and HARMLESS, which is the distinction that
+ *   matters: it writes `offset` independently of the column, so this pass rebuilds the
+ *   column correctly afterwards and nothing downstream ever sees the bad value.
+ *
+ *   `setext-underline` was the real one, at a single occurrence. Its column is not a
+ *   point it writes but a DECISION -- how much of a setext underline counts as the
+ *   container's own indent -- and a decision cannot be repaired after the fact. Fixed to
+ *   derive from the offset.
+ *
+ *   So the rule is sharper than "read the offset": a stale column read into a point is
+ *   repaired here, while one read into a branch is not. Frequency is the wrong sort by a
+ *   long way -- the pass that was stale 21 times needed no change and the pass that was
+ *   stale once did.
  */
 /**
  * One point, for a pass that splices a node and knows only its offset.

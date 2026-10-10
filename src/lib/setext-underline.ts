@@ -168,8 +168,28 @@ export function setextUnderlineTransform(
       // column one, so reading the indent off the heading alone treated `  Foo` over
       // `  ===` as container-relative and made a heading CommonMark's own example 84
       // says is a paragraph.
-      const container =
-        node.type === "root" ? 0 : (heading.position?.start?.column ?? 1) - 1;
+      // Derived from the OFFSET, not read off `column`. A heading can arrive here already
+      // moved by an earlier pass, with its column left behind -- measured across the
+      // corpus, 1 of 75 headings reaching this line carries a stale one -- and unlike a
+      // point this pass writes, the value is a DECISION: it is how much of the underline
+      // is treated as the container's own indent. `normalizePointsTransform` cannot repair
+      // a decision after the fact, which is what makes this the one read of the five
+      // audited that had to change.
+      const headStart = heading.position?.start;
+      let container = 0;
+      if (node.type !== "root" && headStart) {
+        if (headStart.offset === undefined) container = headStart.column - 1;
+        else {
+          let bol = headStart.offset;
+          while (
+            bol > 0 &&
+            source[bol - 1] !== "\n" &&
+            source[bol - 1] !== "\r"
+          )
+            bol--;
+          container = headStart.offset - bol;
+        }
+      }
       const indent = /^[ \t]*/u.exec(rawUnderline)?.[0].length ?? 0;
       const underline =
         indent >= container ? rawUnderline.slice(container) : rawUnderline;
