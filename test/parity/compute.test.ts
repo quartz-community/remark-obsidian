@@ -419,6 +419,24 @@ describe("positioned oracle", () => {
     // least two rules -- one where we overrun and one where we stop short of a blank or
     // space-only line the item absorbs -- and it wants its own probe family before any
     // of it is implemented. A blanket "end at the last content character" regresses the 10.
+    // The 44 SPAN rows are ONE rule with three branches, not the "two opposing rules"
+    // recorded earlier, and it is derivable from probes already in the corpus --
+    // `probe/list-item/*`, `probe/empty-container/*` and `probe/space-line/*` hold 20
+    // cases with recorded `listItems`, so no new recording is needed:
+    //
+    //     '- a' / '- b'          0:0-0:3   immediately followed -> last content char
+    //     '- a' / '  - b'        0:0-0:3   a nested child is EXCLUDED
+    //     '-  ' / ' '            0:0-0:3   nothing follows -> last content char
+    //     '-' / '' / '- b'       0:0-1:0   blank separates it from a SIBLING ->
+    //                                      the start of that blank line
+    //     '- a' / ' ' / '- b'    0:0-1:0   a space-only line counts as blank
+    //     '- a' / '' / '  foo'   0:0-2:5   blank, but the content is ABSORBED, so the
+    //                                      item runs to the absorbed end instead
+    //
+    // That one rule explains the split in BOTH directions, which is why it read as two:
+    // the 34 where we end later are the last-content-char branch, and the 10 where
+    // Obsidian ends later are the blank-separated branch. `itemEnd` in `normalize.ts`
+    // already implements the nested-child exclusion and needs the other two branches.
     // The 18 we-INVENT rows are attributed and are NOT the span question above:
     //
     //   2  FIXED: items inside a `%%` comment were counted, where the `links`, `tags`
