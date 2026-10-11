@@ -1668,22 +1668,27 @@ left).
 
 **Four gaps found and queued, with their size in the referee corpus:**
 
-| rule | what Obsidian does that we do not                                                                                                              |                                corpus |
-| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------: |
-| A2c  | a `2.` item right under a callout title DEFINES, because the title line closes its block and so is not a paragraph the marker has to interrupt | 8 definitions missed, 1 already right |
-| F4   | a column-0 `%%` after a quote that held one opens a FRESH comment running to the end of the note, so a label below it defines nothing          |                                    12 |
-| C3   | in a PIPELESS table a label line holding a pipe is a ROW, not a definition — the opposite of C1's piped case, which we already have            |                                     9 |
-| E5b  | a name may not hold ASCII whitespace, so `a[^x [y]` is no reference at all                                                                     |                          3, unanimous |
+| rule | what Obsidian does that we do not                                                                                                                                                                                            |                                corpus |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------: |
+| A2c  | a `2.` item right under a callout title DEFINES, because the title line closes its block and so is not a paragraph the marker has to interrupt                                                                               | 8 definitions missed, 1 already right |
+| F4   | **CLOSED.** A comment opened inside a quote needs its closer inside too, so a column-0 `%%` cannot close it — see `commentQuoteExtentTransform`. The quote's own extent is still wrong there, which no corpus case exercises |                                was 12 |
+| C3   | in a PIPELESS table a label line holding a pipe is a ROW, not a definition — the opposite of C1's piped case, which we already have                                                                                          |                                     9 |
+| E5b  | a name may not hold ASCII whitespace, so `a[^x [y]` is no reference at all                                                                                                                                                   |                          3, unanimous |
 
 E5b carries its own trap, and the goldens have it both ways: zero Obsidian entries here hold
 ASCII whitespace in a name, while the referee's answers hold **six** that are `a\u00a0b` and
 `a\u3000b` — a no-break and an ideographic space. So the rule rejects ASCII whitespace and
 must keep accepting those, which is the `\s`-carries-hidden-members lesson again.
 
-The scale is the honest part: each of the four is 3 to 12 cases and each needs real work --
-a paragraph split and re-parse for A2c, comment-extent changes for F4, table-row
-classification for C3, and converting a node back to text for E5b, which is the raw-slice
-hazard. They are queued with evidence rather than guessed at.
+The scale is the honest part: each is 3 to 12 cases and each needs real work -- a paragraph
+split and re-parse for A2c, table-row classification for C3, and converting a node back to
+text for E5b, which is the raw-slice hazard. They are queued with evidence rather than
+guessed at.
+
+**Two of the five are now closed**: E4 by `definitionWindowTransform` and F4 by one filter in
+`commentQuoteExtentTransform`. Both were found by reading their rules document rather than by
+measuring our own corpus, which is the argument for having done it: neither shape appears in
+our 3,378 cases at all, and both are real.
 
 ## The legacy stack is an arbiter, not an oracle
 
