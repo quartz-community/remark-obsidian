@@ -1103,6 +1103,29 @@ earlier note said. But a reference with no position is a real defect for a consu
 is the one item of the four with a clear case, and the case is usability rather than
 agreement. `points.test.ts` already gates the count.
 
+**Item 4, localised.** Bisecting the option flags on the smallest reproduction --
+`> plain text` / `>⇥code[^2]` / blank / `use[^1]` -- gives one answer:
+`bareFootnoteRefs: false` takes the document from 2 unplaced nodes to 0. So every one of
+the 451 comes from `footnote-bare.ts`, through `alignToSource`, which maps an index in a
+node's VALUE back to an offset in the source. These hosts are the case it cannot map: a
+quote strips `> ` from every line and a tab is re-expanded, so the value and the slice
+differ by exactly the characters the alignment has to skip. The governing rule names the
+shape -- a raw source slice is the right source for a position and the wrong source for a
+value -- and `alignToSource` exists to bridge it.
+
+Two indent-skip variants of that bridge are already recorded as refuted in
+`footnote-bare.ts`, with their parity and referee numbers, so this is known-hard rather
+than unexplored. What is new here is the two oracle answers it has to satisfy at once, from
+documents that differ by one character:
+
+    >[!note]  / `>     code[^2]`   five spaces -> indented CODE, and Obsidian indexes NO
+                                   reference, so ours should not exist at all
+    > plain   / `>⇥code[^2]`       a tab -> NOT code, and Obsidian indexes the reference
+                                   at 1:6, so ours needs that exact position
+
+Both reduce the unplaced count and both are correct, which makes this the one item of the
+four where the work is defined and the evidence is already in hand.
+
 **The honest summary.** Three of the four items do not survive measurement as tractable
 work, and the one that does is not the one ranked highest. The corpus is the better
 instrument for the long tails: its cases are small enough that one case is one cause, which
