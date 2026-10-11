@@ -1187,6 +1187,19 @@ needs a repair that re-parses such a `code` node, not a column rule. Two probes 
 `replicate` and listed in `KNOWN_REFERENCE_GAPS` with that reasoning; four of the six
 already match.
 
+**The repair was attempted and CRASHED, which is the useful part.** The plan was sound —
+the `code` node already carries its content with four columns stripped, so re-parsing the
+original line and splicing the result back is far less work than replacing micromark's tab
+accounting. What it misses is that the dedent differs per container: `prefixLength` here
+understands a `>` run, so for a list line it strips nothing, the whole `+⇥   [^1]: def`
+re-parses as a NEW LIST, and splicing a list into a `listItem` throws inside micromark's
+tokenizer on the next pass.
+
+So the repair needs the container's own prefix width, which is `>` runs for a quote and the
+marker plus its separator for an item — and those are exactly the two things measured
+elsewhere in this file. It is a bounded piece of work with a known shape, not an open
+question, and the crash is why it is recorded rather than half-shipped.
+
 ### The referee cannot adjudicate a rule that needs the containing BLOCK
 
 A real limit of this oracle, found trying to re-measure the definition content-column rule
