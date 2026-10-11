@@ -135,6 +135,26 @@ function endsInOpenParagraph(node: ParentLike): boolean {
   return last === undefined ? false : endsInOpenParagraph(last);
 }
 
+/**
+ * Root children only, and two attempts to widen that are recorded here because the case
+ * they aim at looks reachable and is not.
+ *
+ * `[^1]: -` / `y^2$` puts an empty list item and the lazy paragraph inside a
+ * `footnoteDefinition`, where Obsidian carries the item to `1:4` and we stop at `0:7`.
+ *
+ *   walking EVERY parent                    `listItems` 4 -> 7, and it broke
+ *                                           `callout with a block title` in the unit
+ *                                           suite -- a callout's children are a
+ *                                           container-and-sibling pair too, so absorbing
+ *                                           there folds a title's body into it
+ *   walking the root plus definitions       INERT: all 406 tests pass and the count does
+ *                                           not move, so the pair is reached and declined
+ *                                           by one of the guards below rather than never
+ *                                           seen
+ *
+ * So the next step is to find WHICH guard declines it, not to widen the walk again. The
+ * second attempt is what establishes that, and it is the reason this stays root-only.
+ */
 export function containerLazyTransform(tree: Root, source: string): void {
   const children = tree.children;
 
