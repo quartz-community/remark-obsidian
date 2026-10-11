@@ -1160,6 +1160,28 @@ work, and the one that does is not the one ranked highest. The corpus is the bet
 instrument for the long tails: its cases are small enough that one case is one cause, which
 is exactly what the referee's dense documents are not.
 
+### The referee cannot adjudicate a rule that needs the containing BLOCK
+
+A real limit of this oracle, found trying to re-measure the definition content-column rule
+on it rather than on the corpus's five probes.
+
+The rule needs the host list item's content column. The referee stores only `text`, `defs`
+and `refs`, so the host has to be recovered from the text — and a "nearest preceding
+marker" scan is wrong often enough to make the result useless. Tabulated by `(content, gap)`
+it contradicts itself: content 2 with gap 2 gives the content column 22 times and the
+bracket 8 times, content 2 with gap 0 gives the content column 21 times and 0 seven times.
+The same pair cannot have two answers, so the pair is not what was measured.
+
+The way out is not a better scan. Recovering the host from OUR tree would work, but then
+the measurement is conditioned on our own parse being right about the host, which is the
+thing in question when the column is wrong.
+
+So: **a rule whose premise is structural belongs to the corpus, where a case is small enough
+that the host is unambiguous.** The referee is the better oracle for anything positional
+whose premise is in the same line, and the worse one for anything that needs to know what
+block it is in. That is the complement of the lesson below, and the two together explain why
+the five corpus probes settled the gap rule and 61 referee entries could not.
+
 ### Grouping referee rows by a LINE-LOCAL shape attributes to the line what belongs to the document
 
 The fourth counting heuristic to die here, and the most carefully built: the 394 definitions
