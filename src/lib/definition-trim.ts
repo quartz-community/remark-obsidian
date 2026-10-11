@@ -3,6 +3,7 @@ import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 
 /** Nothing but whitespace, allowing a container's own prefix. */
+const REGION = /%%|<!--|-->/u;
 const BLANK = /^[ \t]*(?:>[ \t]*)*$/u;
 
 /**
@@ -78,6 +79,29 @@ export function definitionTrimTransform(tree: Root, source: string): void {
         after.trim() === "%%" ||
         /^(?:#{1,6} |```|~~~|\[\^[^\]]*\]:|---|===|___|\*\*\*)/u.test(after);
       if (opensBlock && !/^[ \t>]/u.test(after)) last = start;
+    }
+
+    // A definition ending at the START of a line ends on the PREVIOUS one. Our end is
+    // then one line past its own content, holding only that line's ending, and Obsidian
+    // reports the content line -- 119 referee rows against 1, where the blank-line trim
+    // above cannot fire because the preceding line has content.
+    //
+    // Guarded on the definition not having opened a `%%` region that is still open at
+    // that line, which is the whole reason the unguarded form was refuted: there the
+    // line is the definition's own closer, so Obsidian ends ON it at a non-zero column
+    // rather than before it. The guard costs 4 referee rows and buys back the 4
+    // `hunt/definition-block-owns-region-opener/*` cases, and the main gate is the
+    // contract.
+    if (
+      last === end &&
+      end > start &&
+      (node.position?.end?.column ?? 0) === 1
+    ) {
+      let region = false;
+      for (let line = start; line < end; line++) {
+        if (REGION.test(lines[line - 1] ?? "")) region = true;
+      }
+      if (!region) last = end - 1;
     }
     if (last === end) return;
 
