@@ -92,11 +92,14 @@ export function definitionContinuationTransform(
  * block gains nothing and breaks **16** cases, among them
  * `hunt/interrupting-block-keeps-definition-open` and
  * `hunt/lazy-continuation-paragraph-lines`. An interrupting block really does end a
- * definition; only a paragraph continues one. The absorbed block is appended to the definition
- * rather than pushed inside a trailing container: Obsidian renders an unreferenced
- * definition as nothing, so its `html` is empty and the only evidence available --
- * the definition's `sections` span and an empty rendered `text` -- is satisfied
- * either way. Nesting it would be inventing structure nothing measures.
+ * definition; only a paragraph continues one. The absorbed block goes INSIDE a trailing
+ * list item when there is one, and beside the definition otherwise.
+ *
+ * That used to read the other way, and the reasoning was sound for the evidence of its
+ * time: an unreferenced definition renders as nothing, so `html` and `text` cannot tell
+ * a nested block from a sibling, and nesting looked like inventing structure nothing
+ * measured. The `listItems` counter measures it. `[^1]: -` / `y^2$` reports the item
+ * spanning `0:6-1:4`, which only holds if the paragraph is inside the empty item.
  */
 export function definitionLazyTransform(tree: Root, source: string): void {
   if (source === "") return;
@@ -133,9 +136,29 @@ export function definitionLazyTransform(tree: Root, source: string): void {
       );
       if (BARE_COLON.test(firstLine)) continue;
 
-      definition.children.push(block as never);
-      if (definition.position && block.position) {
-        definition.position.end = { ...block.position.end };
+      // Into the trailing LIST ITEM when there is one, not beside it. The docstring
+      // above used to say nesting would be inventing structure nothing measures, and
+      // that was true of the evidence available then -- an unreferenced definition
+      // renders as nothing, so `html` and `text` cannot tell the two apart. The
+      // `listItems` counter does: `[^1]: -` / `y^2$` reports the item spanning
+      // `0:6-1:4`, which requires the paragraph to sit INSIDE the empty item.
+      const tail = definition.children[definition.children.length - 1];
+      const host =
+        tail?.type === "list"
+          ? tail.children[tail.children.length - 1]
+          : undefined;
+      if (host) {
+        (host.children as RootContent[]).push(block as never);
+        for (const node of [host, tail, definition]) {
+          if (node.position && block.position) {
+            node.position.end = { ...block.position.end };
+          }
+        }
+      } else {
+        definition.children.push(block as never);
+        if (definition.position && block.position) {
+          definition.position.end = { ...block.position.end };
+        }
       }
       parent.children.splice(index, 1);
     }

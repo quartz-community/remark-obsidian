@@ -839,7 +839,7 @@ describe("positioned oracle", () => {
     // un-nesting case. What differs is that the un-nesting outer item is EMPTY, which is
     // one case and belongs to the `probe/empty-container/*` family's own rules rather than
     // to this one.
-    listItems: 4,
+    listItems: 3,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
