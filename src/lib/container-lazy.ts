@@ -152,8 +152,14 @@ function endsInOpenParagraph(node: ParentLike): boolean {
  *                                           by one of the guards below rather than never
  *                                           seen
  *
- * So the next step is to find WHICH guard declines it, not to widen the walk again. The
- * second attempt is what establishes that, and it is the reason this stays root-only.
+ * Instrumented, and the guard is `CONTAINERS.has(container.type)` -- so when this pass
+ * runs the definition's children are NOT yet a list and a paragraph. The `-` becomes a
+ * list only in a later pass, which means no walk widened here can ever see the pair and
+ * both attempts above were aimed at the wrong thing.
+ *
+ * So the case is an ORDERING question: either this absorb runs again after the list
+ * forms, or the empty-item extension belongs to whichever pass creates it. Worth knowing
+ * before anyone widens the walk a third time.
  */
 export function containerLazyTransform(tree: Root, source: string): void {
   const children = tree.children;
