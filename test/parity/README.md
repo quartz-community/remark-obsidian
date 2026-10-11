@@ -1709,6 +1709,42 @@ on this oracle at all. Both stay queued, with those numbers attached rather than
 example coverage and not corpus frequency — the same category error as reading their 99.2%
 as an agreement figure comparable to ours.
 
+### Keying a table on one side's answer excludes the evidence against you
+
+The sharpest measurement-design error here yet, because the table it produced looked like a
+clean win and was four-to-one against.
+
+With the column-0 pullback landed, the largest remaining `endLine` family is 91 rows where
+we absorb exactly one line too many. Classifying that extra line by kind, counting both
+columns, gives what reads as an obvious rule:
+
+| kind of the line after Obsidian's end | we absorb | we stop |
+| ------------------------------------- | --------: | ------: |
+| quote                                 |   **102** |     348 |
+| blank                                 |        84 |    3130 |
+| list marker                           |        14 |     227 |
+
+102 wrong against 348 already right, and stopping more cannot break a definition that
+already stops — so "a definition does not absorb a quote line" reads as 102 gains for zero
+losses. Implementing it as a truncation and scoring every end it MOVES says otherwise:
+
+    better 91    worse 395    same 22    untouched 4459
+
+Every one of the 395 was a definition whose end already agreed, sitting PAST a quote line
+that Obsidian absorbs too. The table could not show them: it is keyed on the line after
+**Obsidian's** end, so by construction it only ever sees lines Obsidian does not absorb.
+The `stop` column conflated "right" with "ends even earlier", and the whole mass of
+agreements where a quote line is absorbed by both sides was outside the table's domain.
+
+So: **a predicate's table must be keyed on where the rule would FIRE, not on where the
+disagreement is.** This is the base-rate lesson in a new shape -- the earlier instances were
+about believing a count without its denominator, and this one is about a denominator that
+cannot contain the counter-examples at all. The cheap guard is the one used here: implement
+the rule as a transformation of our own answers and score better/worse/same against the
+oracle, which needs no new oracle data and cannot be keyed wrong.
+
+A definition absorbs quote lines, 395 times. The 91 are something else.
+
 ### The definition-column bucket is not line-local either
 
 102 documents now differ **only** in a definition's start column, names and lines all
