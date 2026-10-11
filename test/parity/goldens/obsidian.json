@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-11T07:00:33.891Z",
+  "recordedAt": "2026-10-11T08:10:50.475Z",
   "cases": {
     "probe/label-bracket/full-unmatched-undefined": {
       "id": "probe/label-bracket/full-unmatched-undefined",
@@ -81597,6 +81597,376 @@
           "listItems": [
             "-|parent:-1@0:0-2:13"
           ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-tab/root-one": {
+      "id": "probe/def-tab/root-one",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "\t[^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<pre><code>[^1]: def\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n<p dir=\"auto\">use1</p>",
+        "projections": {
+          "text": "[^1]: def use1",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "code",
+              "text": "\t[^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "code@0:0-0:10",
+            "paragraph@2:0-2:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-tab/root-two": {
+      "id": "probe/def-tab/root-two",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "\t\t[^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<pre><code>\t[^1]: def\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n<p dir=\"auto\">use1</p>",
+        "projections": {
+          "text": "[^1]: def use1",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "code",
+              "text": "\t\t[^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "code@0:0-0:11",
+            "paragraph@2:0-2:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-tab/spaces-then-tab": {
+      "id": "probe/def-tab/spaces-then-tab",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "  \t[^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "footnoteDefinition",
+              "text": "  \t[^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@0:0-0:12"
+          ],
+          "footnoteRefs": [
+            "1@2:3"
+          ],
+          "headings": [],
+          "sections": [
+            "footnoteDefinition@0:0-0:12",
+            "paragraph@2:0-2:7",
+            "text@3:0-3:0",
+            "element@3:0-3:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-tab/quote-spaces-tab": {
+      "id": "probe/def-tab/quote-spaces-tab",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": ">   \t[^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n</blockquote>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": ">   \t[^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@0:2-0:14"
+          ],
+          "footnoteRefs": [
+            "1@2:3"
+          ],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:14",
+            "paragraph@2:0-2:7",
+            "text@3:0-3:0",
+            "element@3:0-3:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A TAB FOLLOWING A SPACE does not reach the four-column indented-code threshold. Probed across six shapes: `\\t[^1]: def`, `\\t\\t[^1]: def` and `    [^1]: def` yield NO definition, while `  \\t[^1]: def` defines at column 0, `>   \\t[^1]: def` at column 2 and `+\\t   [^1]: def` at column 2. So a leading tab counts four columns and a tab after a space does not -- the same asymmetry the arbiter shows for ` \\t[^1]: def`. micromark follows CommonMark and advances to the next tab stop either way, so it makes these lines indented CODE and no definition exists to place; verified unchanged at HEAD~3, so this is micromark's own tab handling rather than any pass here. Closing it needs a repair that re-parses such a code node, and the referee holds 127 definitions on tab-prefixed lines that we miss."
+    },
+    "probe/def-tab/marker-tab-spaces": {
+      "id": "probe/def-tab/marker-tab-spaces",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "+\t   [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\"></li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "+\t   [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@0:2-0:14"
+          ],
+          "footnoteRefs": [
+            "1@2:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-0:14",
+            "paragraph@2:0-2:7",
+            "text@3:0-3:0",
+            "element@3:0-3:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:14"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A TAB FOLLOWING A SPACE does not reach the four-column indented-code threshold. Probed across six shapes: `\\t[^1]: def`, `\\t\\t[^1]: def` and `    [^1]: def` yield NO definition, while `  \\t[^1]: def` defines at column 0, `>   \\t[^1]: def` at column 2 and `+\\t   [^1]: def` at column 2. So a leading tab counts four columns and a tab after a space does not -- the same asymmetry the arbiter shows for ` \\t[^1]: def`. micromark follows CommonMark and advances to the next tab stop either way, so it makes these lines indented CODE and no definition exists to place; verified unchanged at HEAD~3, so this is micromark's own tab handling rather than any pass here. Closing it needs a repair that re-parses such a code node, and the referee holds 127 definitions on tab-prefixed lines that we miss."
+    },
+    "probe/def-tab/four-spaces": {
+      "id": "probe/def-tab/four-spaces",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<pre><code>[^1]: def\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n<p dir=\"auto\">use1</p>",
+        "projections": {
+          "text": "[^1]: def use1",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "code",
+              "text": "    [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "code@0:0-0:13",
+            "paragraph@2:0-2:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
           "blocks": [],
           "frontmatterLinks": []
         }

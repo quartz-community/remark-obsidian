@@ -155,6 +155,18 @@ describe("positioned oracle", () => {
     // block `1` in Obsidian because the bracket becomes a LINK and never claims the
     // caret, so the reference we report there is one Obsidian does not have.
     "probe/caret-link/link-with-def: the bracket is a link, so the caret is a block id",
+    // A tab FOLLOWING A SPACE does not reach the four-column indented-code threshold, so
+    // Obsidian defines these and micromark makes them `code`. Probed across six shapes:
+    // `\t[^1]: def`, `\t\t[^1]: def` and `    [^1]: def` yield NO definition, while
+    // `  \t[^1]: def` is column 0, `>   \t[^1]: def` is column 2 and `+\t   [^1]: def` is
+    // column 2 -- so a LEADING tab counts four columns and one after a space does not.
+    //
+    // micromark follows CommonMark and advances to the next tab stop either way, and the
+    // tree is unchanged at HEAD~3, so this is its own tab handling rather than a pass
+    // here. The reference is unplaceable because the definition it belongs to never
+    // exists. The referee holds 127 definitions on tab-prefixed lines that we miss.
+    "probe/def-tab/quote-spaces-tab: a tab after a space is not code to Obsidian",
+    "probe/def-tab/marker-tab-spaces: a tab after a space is not code to Obsidian",
   ];
 
   it("places every footnote reference, except the classified cases", () => {
@@ -382,8 +394,8 @@ describe("positioned oracle", () => {
     // case it had just been extended for, invisibly, because the final tree showed the
     // bracket either way. Deriving the bracket from the offset is what `normalize-points`
     // already says every earlier pass must do.
-    footnotes: 1,
-    footnoteRefs: 3,
+    footnotes: 3,
+    footnoteRefs: 5,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
     // Obsidian reports a heading's column as its containing block's content column,

@@ -2320,6 +2320,22 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/def-cc/bullet-wide-sep", "-   p\n\n     [^1]: def\n\nuse[^1]\n"],
   ["probe/def-cc/bullet-two-sep", "*  p\n\n    [^1]: def\n\nuse[^1]\n"],
   ["probe/def-cc/paren-marker", "1) p\n\n    [^1]: def\n\nuse[^1]\n"],
+  // Does a TAB count as one column or as four for the indented-code threshold? micromark
+  // follows CommonMark and advances to the next multiple of four, so `\t[^1]: def` is
+  // indented code and yields no definition here. The referee says Obsidian defines 127
+  // definitions on tab-prefixed lines that we do not, and separately that `>⇥code[^2]`
+  // keeps its reference while `>     code[^2]` does not -- both of which only hold if a
+  // tab is ONE column.
+  //
+  // Its own `listItems` rule already says so: `⇥ - baz` reports column 1, not 4. These
+  // isolate the same question for a definition, where the referee's documents are too
+  // dense to answer it (17%, 22% and 10% missed across the three tab positions).
+  ["probe/def-tab/root-one", "\t[^1]: def\n\nuse[^1]\n"],
+  ["probe/def-tab/root-two", "\t\t[^1]: def\n\nuse[^1]\n"],
+  ["probe/def-tab/spaces-then-tab", "  \t[^1]: def\n\nuse[^1]\n"],
+  ["probe/def-tab/quote-spaces-tab", ">   \t[^1]: def\n\nuse[^1]\n"],
+  ["probe/def-tab/marker-tab-spaces", "+\t   [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-tab/four-spaces", "    [^1]: def\n\nuse[^1]\n"],
   // A tab-indented nested item's start column. `- [ ] parent` over `\t- [ ] child` reports
   // 1:1 -- the marker's own index -- while ` - foo` / `   - bar` / `\t - baz` reports 2:1,
   // which is NOT the marker. Separate the tab from the checkbox and from the straddle.

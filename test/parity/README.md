@@ -1160,6 +1160,33 @@ work, and the one that does is not the one ranked highest. The corpus is the bet
 instrument for the long tails: its cases are small enough that one case is one cause, which
 is exactly what the referee's dense documents are not.
 
+### A tab after a space is not indented code
+
+Measured because the referee holds **127** Obsidian definitions on tab-prefixed lines that
+we do not produce, and its own documents are too dense to say why: splitting them by where
+the tab sits gives 17%, 22% and 10% missed across the three positions, which is no rule at
+all. Six probes answer it in isolation:
+
+| document         | Obsidian          |
+| ---------------- | ----------------- |
+| `⇥[^1]: def`     | no definition     |
+| `⇥⇥[^1]: def`    | no definition     |
+| `    [^1]: def`  | no definition     |
+| `  ⇥[^1]: def`   | definition, col 0 |
+| `>   ⇥[^1]: def` | definition, col 2 |
+| `+⇥   [^1]: def` | definition, col 2 |
+
+So a **leading** tab counts its four columns and reaches the indented-code threshold, while
+a tab **after a space** does not. That is the same asymmetry the legacy arbiter shows for
+` ⇥[^1]: def`, recorded in `definition-column.ts` long before this.
+
+micromark follows CommonMark and advances to the next tab stop either way, so it makes these
+lines `code` and there is no definition to place or position. Verified unchanged at HEAD~3,
+so this is micromark's own tab handling and not any pass here — which also means closing it
+needs a repair that re-parses such a `code` node, not a column rule. Two probes are
+`replicate` and listed in `KNOWN_REFERENCE_GAPS` with that reasoning; four of the six
+already match.
+
 ### The referee cannot adjudicate a rule that needs the containing BLOCK
 
 A real limit of this oracle, found trying to re-measure the definition content-column rule
