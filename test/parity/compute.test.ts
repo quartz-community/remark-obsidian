@@ -382,7 +382,7 @@ describe("positioned oracle", () => {
     // case it had just been extended for, invisibly, because the final tree showed the
     // bracket either way. Deriving the bracket from the offset is what `normalize-points`
     // already says every earlier pass must do.
-    footnotes: 0,
+    footnotes: 1,
     footnoteRefs: 3,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
@@ -517,7 +517,7 @@ describe("positioned oracle", () => {
     // content, which the section-end clamp now covers for `math` under exactly that test --
     // see `normalize.ts` for the two cheaper predicates that failed first and for the
     // measurement showing `meta` is not the discriminator.
-    sections: 0,
+    sections: 1,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
     // invented, which is the shape of a missing collector rather than a parse bug.
@@ -839,7 +839,7 @@ describe("positioned oracle", () => {
     // un-nesting case. What differs is that the un-nesting outer item is EMPTY, which is
     // one case and belongs to the `probe/empty-container/*` family's own rules rather than
     // to this one.
-    listItems: 3,
+    listItems: 4,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.

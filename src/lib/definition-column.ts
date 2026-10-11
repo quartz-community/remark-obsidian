@@ -2,7 +2,7 @@ import type { FootnoteDefinition, ListItem, Root } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 
-const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]/u;
+const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/u;
 
 /**
  * A footnote definition starts at its containing block's content column.
@@ -92,26 +92,32 @@ export function definitionColumnTransform(tree: Root, source: string): void {
     // column, while `>  [^1]: def` and `>   [^1]: def` are both 0:2 to Obsidian and were
     // reported at the bracket.
     const host = items.get(node);
-    const column = tabbed
-      ? tabbed[0].length + 1
-      : quoted
-        ? quoted[1]!.length
-        : host
-          ? contentColumn(source, host)
-          : 0;
+    // A TAB in the definition's own indent puts it just past the tab run, whatever the
+    // host's content column is: `- p` / blank / `⇥ [^1]: def` is column 1 and
+    // `-⇥p` / blank / `⇥  [^1]: def` is column 1 too. Same rule the `listItems` key
+    // measured across four cases -- a tab contributes exactly one column.
+    // Counted rather than matched: `/^(\t+)[ \t]*$/` is a second-degree polynomial to the
+    // ReDoS lint, since both quantifiers can consume a tab.
+    let tabRun = 0;
+    while (tabRun < prefix.length && prefix[tabRun] === "\t") tabRun += 1;
+    const indentTabs =
+      tabRun > 0 && !/[^ \t]/u.test(prefix) ? tabRun : undefined;
+    const column = indentTabs
+      ? indentTabs
+      : tabbed
+        ? tabbed[0].length + 1
+        : quoted
+          ? quoted[1]!.length
+          : host
+            ? contentColumn(source, host)
+            : 0;
     if (column === undefined) return;
-    // A LIST-ITEM host needs the indent to clear its content column by TWO, not one.
-    // Probed with one host against a varying indent, which is what separates the two
-    // shapes that had contradicted each other for weeks:
-    //
-    //   `- item`  / blank / `    [^1]:`   content 2, indent 4, gap 2  ->  column 2
-    //   `- item`  / blank / `     [^1]:`  content 2, indent 5, gap 3  ->  column 2
-    //   `1. item` / blank / `    [^1]:`   content 3, indent 4, gap 1  ->  column 4
-    //
-    // The last one is the bracket, and `hunt/list-item-label-margin/1` is the same shape.
-    // A root or quote host keeps the one-column test: ` [^1]: def` is column 0 at gap 1,
-    // and `>  [^1]: def` is column 2 at gap 1, so the stricter rule belongs to the item.
-    const gap = host && !quoted && !tabbed ? 2 : 1;
+    // One column for every host. The gap-TWO rule this replaces was fitted to
+    // `1. item` / `    [^1]:` reporting the bracket at 4 while `- item` / `    [^1]:`
+    // reports 2 -- and the single-digit-dot adjustment in `contentColumn` explains that
+    // pair directly, so the gap is not what separated them. Twelve probes now fit
+    // `min(indent, contentColumn)` with no gap term at all.
+    const gap = indentTabs ? 0 : 1;
     // The bracket's column comes from the OFFSET, not from `start.column`. A definition
     // arrives here with a stale column -- `> %% [^1]: freed` carries column 2 against
     // offset 26, which is column 5 -- because an earlier pass moved it by offset and left
@@ -137,6 +143,20 @@ function contentColumn(source: string, item: ListItem): number | undefined {
   if (from === undefined) return undefined;
   const bol = source.lastIndexOf("\n", from - 1) + 1;
   const nl = source.indexOf("\n", from);
-  const opener = MARKER.exec(source.slice(bol, nl === -1 ? undefined : nl));
-  return opener ? opener[0]!.length : undefined;
+  const line = source.slice(bol, nl === -1 ? undefined : nl);
+  const opener = MARKER.exec(line);
+  if (!opener) return undefined;
+  // A SINGLE-DIGIT marker ending in a dot counts one column more than it occupies, which
+  // is the `1.  foo` quirk already recorded for list items, reaching the definition column
+  // too. Twelve probes vary the marker's width against the indent and all twelve fit
+  // `min(indent, contentColumn)` with this one adjustment:
+  //
+  //   `- `    2    indent 3,4,5  ->  2 2 2        `12. `  4    indent 4,5,6  ->  4 4 4
+  //   `1. `   3+1  indent 3,4,5  ->  3 4 4        `*  `   3    indent 4      ->  3
+  //   `1) `   3    indent 4      ->  3            `-   `  4    indent 5      ->  4
+  //
+  // `1. ` against `1) ` is what isolates it: same width, same indent, columns 4 and 3.
+  return /^[ \t]*\d\.[ \t]$/u.test(opener[0]!)
+    ? opener[0]!.length + 1
+    : opener[0]!.length;
 }

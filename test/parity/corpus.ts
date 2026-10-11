@@ -2296,6 +2296,30 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/def-cap/bullet-six", "- item\n\n      [^1]: x\n"],
   ["probe/def-cap/bullet-seven", "- item\n\n       [^1]: x\n"],
   ["probe/def-cap/ordered-four", "1. item\n\n    [^1]: x\n"],
+  // The definition content-column rule, on the shapes the REFEREE surfaced and cannot
+  // adjudicate -- it stores no structure, so the host item's content column has to be
+  // recovered from text and that is wrong too often to tabulate. These are the same
+  // documents reduced to one host and one definition, where the host is unambiguous.
+  //
+  // `- p` / blank / `   [^1]: def` is the one to watch: content column 2, indent 3, so a
+  // gap of ONE, and the referee says Obsidian reports 2. The gap-2 rule measured from
+  // `probe/def-cap/*` says the bracket. If both hold, the marker's width is in the rule.
+  ["probe/def-gap/bullet-three", "- p\n\n   [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-gap/bullet-tab-space", "- p\n\n\t [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-gap/bullet-tab-two", "-\tp\n\n\t  [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-gap/marker-tab-sep", "- \tp\n\n  [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-gap/ordered-three", "1. p\n\n   [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-gap/ordered-five", "1. p\n\n     [^1]: def\n\nuse[^1]\n"],
+  // Pinning the host's CONTENT COLUMN, which the six probes above imply is not what we
+  // compute. They fit `obs = contentColumn when the indent reaches it, else the bracket`
+  // only if `- ` is 2 and `1. ` is FOUR -- the recorded `1.  foo` ordered-marker quirk.
+  // These vary the marker's width independently of the indent to settle it.
+  ["probe/def-cc/two-digit-four", "12. p\n\n    [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-cc/two-digit-five", "12. p\n\n     [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-cc/two-digit-six", "12. p\n\n      [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-cc/bullet-wide-sep", "-   p\n\n     [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-cc/bullet-two-sep", "*  p\n\n    [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-cc/paren-marker", "1) p\n\n    [^1]: def\n\nuse[^1]\n"],
   // A tab-indented nested item's start column. `- [ ] parent` over `\t- [ ] child` reports
   // 1:1 -- the marker's own index -- while ` - foo` / `   - bar` / `\t - baz` reports 2:1,
   // which is NOT the marker. Separate the tab from the checkbox and from the straddle.

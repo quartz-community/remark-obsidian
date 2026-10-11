@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-10T21:32:37.791Z",
+  "recordedAt": "2026-10-11T07:00:33.891Z",
   "cases": {
     "probe/label-bracket/full-unmatched-undefined": {
       "id": "probe/label-bracket/full-unmatched-undefined",
@@ -80743,6 +80743,859 @@
           "tags": [],
           "listItems": [
             "-|parent:-1@0:0-2:11"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-gap/bullet-three": {
+      "id": "probe/def-gap/bullet-three",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- p\n\n   [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>p</p>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "p use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- p\n\n   [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@2:2-2:12"
+          ],
+          "footnoteRefs": [
+            "1@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:12",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:12"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-gap/bullet-tab-space": {
+      "id": "probe/def-gap/bullet-tab-space",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- p\n\n\t [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>p</p>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "p use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- p\n\n\t [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@2:1-2:11"
+          ],
+          "footnoteRefs": [
+            "1@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:11",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:11"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-gap/bullet-tab-two": {
+      "id": "probe/def-gap/bullet-tab-two",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "-\tp\n\n\t  [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>p</p>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "p use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "-\tp\n\n\t  [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@2:1-2:12"
+          ],
+          "footnoteRefs": [
+            "1@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:12",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:12"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-gap/marker-tab-sep": {
+      "id": "probe/def-gap/marker-tab-sep",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- \tp\n\n  [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<pre><code>p\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "p use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- \tp\n\n  [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@2:2-2:11"
+          ],
+          "footnoteRefs": [
+            "1@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:11",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:11"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "`- \\tp` / blank / `  [^1]: def` reports the LIST spanning 0:0-2:11 and the definition at column 2, so Obsidian takes the definition into the item even though the two-space indent is short of the item's content column of 3. We end the list at 0:4 and put the definition at root, where our own root rule then gives column 0. The probe was added to pin the definition content-column rule and settled it for eleven of twelve shapes; this one is a host-detection divergence underneath that rule, not a column rule, and it wants its own evidence."
+    },
+    "probe/def-gap/ordered-three": {
+      "id": "probe/def-gap/ordered-three",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "1. p\n\n   [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\">\n<p>p</p>\n</li>\n</ol>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "p use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1. p\n\n   [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@2:3-2:12"
+          ],
+          "footnoteRefs": [
+            "1@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:12",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:12"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-gap/ordered-five": {
+      "id": "probe/def-gap/ordered-five",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "1. p\n\n     [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\">\n<p>p</p>\n</li>\n</ol>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "p use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1. p\n\n     [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@2:4-2:14"
+          ],
+          "footnoteRefs": [
+            "1@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:14",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:14"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-cc/two-digit-four": {
+      "id": "probe/def-cc/two-digit-four",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "12. p\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ol start=\"12\">\n<li dir=\"auto\">\n<p>p</p>\n</li>\n</ol>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "p use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "12. p\n\n    [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@2:4-2:13"
+          ],
+          "footnoteRefs": [
+            "1@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:13",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:13"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-cc/two-digit-five": {
+      "id": "probe/def-cc/two-digit-five",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "12. p\n\n     [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ol start=\"12\">\n<li dir=\"auto\">\n<p>p</p>\n</li>\n</ol>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "p use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "12. p\n\n     [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@2:4-2:14"
+          ],
+          "footnoteRefs": [
+            "1@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:14",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:14"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-cc/two-digit-six": {
+      "id": "probe/def-cc/two-digit-six",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "12. p\n\n      [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ol start=\"12\">\n<li dir=\"auto\">\n<p>p</p>\n</li>\n</ol>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "p use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "12. p\n\n      [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@2:4-2:15"
+          ],
+          "footnoteRefs": [
+            "1@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:15",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:15"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-cc/bullet-wide-sep": {
+      "id": "probe/def-cc/bullet-wide-sep",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "-   p\n\n     [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>p</p>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "p use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "-   p\n\n     [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@2:4-2:14"
+          ],
+          "footnoteRefs": [
+            "1@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:14",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:14"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-cc/bullet-two-sep": {
+      "id": "probe/def-cc/bullet-two-sep",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "*  p\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>p</p>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "p use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "*  p\n\n    [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@2:3-2:13"
+          ],
+          "footnoteRefs": [
+            "1@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:13",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:13"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-cc/paren-marker": {
+      "id": "probe/def-cc/paren-marker",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "1) p\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\">\n<p>p</p>\n</li>\n</ol>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "p use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1) p\n\n    [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@2:3-2:13"
+          ],
+          "footnoteRefs": [
+            "1@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:13",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:13"
           ],
           "blocks": [],
           "frontmatterLinks": []
