@@ -68,7 +68,16 @@ export function commentQuoteExtentTransform(tree: Root, source: string): void {
     // then the last thing in it.
     const ownEnd = comment.position?.end?.offset;
     if (ownEnd === undefined) return;
-    const own = source.slice(from, ownEnd);
+    // A closer has to be INSIDE the quote. A `%%` at column 0 belongs to whatever follows
+    // the quote, so it cannot close a comment opened within it: `> %%` / `> x` / `%%` /
+    // `[^1]: def` is a quote and then a FRESH comment running to the end of the note, so
+    // nothing is defined. Counting that marker as the closer left the definition live.
+    // The sibling project states this as F4, measured over 12 documents here.
+    const own = source
+      .slice(from, ownEnd)
+      .split("\n")
+      .filter((line, offset) => offset === 0 || QUOTE_PREFIX.test(line))
+      .join("\n");
     if (own.slice(MARKER.length).includes(MARKER)) return;
 
     comment.value = source
