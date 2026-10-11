@@ -430,6 +430,12 @@ function bracketLabelReferences(tree: Root, source: string): void {
       const label = source.slice(markerAt + 2, close);
       if (!label.includes("[")) continue;
       if (label.includes("\n") || /^\s*$/u.test(label)) continue;
+      // A name may not hold ASCII whitespace: `a[^x [y] b` is no reference in
+      // Obsidian, where we claimed one named `x [y`. The test has to be ASCII
+      // rather than `\s`, because the referee's answers hold six names carrying
+      // U+00A0 or U+3000 that Obsidian DOES accept -- `\s` covers U+00A0 and
+      // would reject them. The sibling project states this as E5b.
+      if (/[ \t\v\f]/u.test(label)) continue;
 
       const outer = balancedClose(source, markerAt);
       if (outer !== -1) {

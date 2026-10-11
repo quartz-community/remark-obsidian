@@ -1668,27 +1668,66 @@ left).
 
 **Four gaps found and queued, with their size in the referee corpus:**
 
-| rule | what Obsidian does that we do not                                                                                                                                                                                            |                                corpus |
-| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------: |
-| A2c  | a `2.` item right under a callout title DEFINES, because the title line closes its block and so is not a paragraph the marker has to interrupt                                                                               | 8 definitions missed, 1 already right |
-| F4   | **CLOSED.** A comment opened inside a quote needs its closer inside too, so a column-0 `%%` cannot close it — see `commentQuoteExtentTransform`. The quote's own extent is still wrong there, which no corpus case exercises |                                was 12 |
-| C3   | in a PIPELESS table a label line holding a pipe is a ROW, not a definition — the opposite of C1's piped case, which we already have                                                                                          |                                     9 |
-| E5b  | a name may not hold ASCII whitespace, so `a[^x [y]` is no reference at all                                                                                                                                                   |                          3, unanimous |
+| rule | what Obsidian does that we do not                                                                                                                                                                                            |                                  corpus |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------: |
+| A2c  | a `2.` item right under a callout title DEFINES, because the title line closes its block and so is not a paragraph the marker has to interrupt                                                                               | **0 in the referee corpus** (see below) |
+| F4   | **CLOSED.** A comment opened inside a quote needs its closer inside too, so a column-0 `%%` cannot close it — see `commentQuoteExtentTransform`. The quote's own extent is still wrong there, which no corpus case exercises |                                  was 12 |
+| C3   | in a PIPELESS table a label line holding a pipe is a ROW, not a definition — the opposite of C1's piped case, which we already have                                                                                          |            **4** actionable of 7 shapes |
+| E5b  | **CLOSED.** A name may not hold ASCII whitespace, so `a[^x [y]` is no reference at all — see the guard in `footnote-bare.ts`                                                                                                 |                                   was 3 |
 
 E5b carries its own trap, and the goldens have it both ways: zero Obsidian entries here hold
 ASCII whitespace in a name, while the referee's answers hold **six** that are `a\u00a0b` and
 `a\u3000b` — a no-break and an ideographic space. So the rule rejects ASCII whitespace and
 must keep accepting those, which is the `\s`-carries-hidden-members lesson again.
 
-The scale is the honest part: each is 3 to 12 cases and each needs real work -- a paragraph
-split and re-parse for A2c, table-row classification for C3, and converting a node back to
-text for E5b, which is the raw-slice hazard. They are queued with evidence rather than
-guessed at.
+**Three of the five are now closed**: E4 by `definitionWindowTransform`, F4 by one filter in
+`commentQuoteExtentTransform`, and E5b by one guard in `footnote-bare.ts`. All three were
+found by reading their rules document rather than by measuring our own corpus, which is the
+argument for having done it: **none of the three shapes appears in our 3,378 cases at all**,
+and all three are real.
 
-**Two of the five are now closed**: E4 by `definitionWindowTransform` and F4 by one filter in
-`commentQuoteExtentTransform`. Both were found by reading their rules document rather than by
-measuring our own corpus, which is the argument for having done it: neither shape appears in
-our 3,378 cases at all, and both are real.
+E5b is the cheapest of the three and was mis-scoped in both directions before measuring. The
+note above predicted it needed "converting a node back to text, which is the raw-slice
+hazard" — it did not. Both failing documents come from the one pass in `footnote-bare.ts`
+that exists to claim a label containing `[`, so the fix is a guard at the point of creation
+and no node is ever built. **Where a defect is "we invent a node", look for the pass that
+invents it before reaching for a pass that removes it.** The two differ by exactly the hazard.
+
+### Re-measuring the last two gaps shrank them, and one to nothing
+
+Their rules document gives sizes in its own terms, and those are not sizes in ours. Measured
+here against the same 6,818 documents:
+
+| gap | their figure | actionable here | why it moved                                                                       |
+| --- | -----------: | --------------: | ---------------------------------------------------------------------------------- |
+| C3  |            9 |           **4** | 3 of the 7 shapes we already decline, for unrelated reasons                        |
+| A2c |            8 |           **0** | the shape does not occur in the referee corpus; their 8 is from their own examples |
+
+So C3 is four definitions behind manual table-row construction, and A2c cannot be measured
+on this oracle at all. Both stay queued, with those numbers attached rather than theirs.
+**A size quoted from another project's notes is a size in their metric**, which for A2c means
+example coverage and not corpus frequency — the same category error as reading their 99.2%
+as an agreement figure comparable to ours.
+
+### The definition-column bucket is not line-local either
+
+102 documents now differ **only** in a definition's start column, names and lines all
+correct. That is the most precisely-bounded bucket left and the shape that produced the
+content-column formula, so it was the obvious next target.
+
+It is not tractable from this oracle. Grouping the rows by the prefix of their definition's
+line gives 44 distinct shapes, and the same prefix carries **opposite** deltas:
+
+| prefix | rows | ours | obsidian |
+| ------ | ---: | ---: | -------: |
+| `····` |   14 |    2 |    **4** |
+| `····` |   11 |    4 |    **2** |
+| `····` |    3 |    0 |    **4** |
+
+Four spaces of indent, three different answers. So the column is decided by the host
+container, which the referee does not store — the structural limit recorded two sections
+above, reached from a different direction. The corpus is the instrument for this bucket, and
+`probe/def-cap/*` is where it already lives.
 
 ## The legacy stack is an arbiter, not an oracle
 
