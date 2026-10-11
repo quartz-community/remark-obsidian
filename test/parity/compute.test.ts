@@ -171,13 +171,6 @@ describe("positioned oracle", () => {
     // the MARKER'S SEPARATOR rather than indentation after a space, so `+\t   [^1]: def`
     // turns on micromark's list-item tab straddle instead of the code threshold.
     "probe/def-tab/marker-tab-spaces: the tab is the marker's own separator",
-    // C3: in a PIPELESS table a label line holding a pipe is a ROW, not a definition, so
-    // the reference below it resolves against nothing and Obsidian reports neither. The
-    // piped control defines and so does the one after a blank line, which is what makes
-    // the pipe the axis rather than the table. Closing it needs manual table-row
-    // construction -- micromark's own footnote construct wins the line on a re-parse, so
-    // the row has to be built and spliced.
-    "probe/table-label/pipeless: the label line is a table row",
   ];
 
   it("places every footnote reference, except the classified cases", () => {
@@ -413,10 +406,11 @@ describe("positioned oracle", () => {
     // `- a` / `  - b` / blank / `    [^1]: def`. Overwriting keeps the innermost. The guard
     // read as an optimisation and was load-bearing in the wrong direction.
     //
-    // `probe/table-label/pipeless` remains: no definition at all, because its label line
-    // is a table row -- C3, which needs manual row construction.
-    footnotes: 3,
-    footnoteRefs: 5,
+    // `probe/table-label/pipeless` is CLOSED too, by `tableLabelRowTransform`: its label
+    // line is a table row, so there is no definition and no resolved reference. Both of the
+    // wave's fixable findings are now shipped and the key is back where it started.
+    footnotes: 2,
+    footnoteRefs: 4,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
     // Obsidian reports a heading's column as its containing block's content column,
@@ -553,11 +547,11 @@ describe("positioned oracle", () => {
     // 1 -> 3 with the probe wave, both of them structural rather than positional:
     // `probe/def-end/quote-nested-host` has the list absorbing a quote-prefixed lazy
     // line where we end the list and open a blockquote, and `probe/table-label/pipeless`
-    // has the table spanning its label row. Note the other eleven new probes diverge on
-    // `sections` ONLY by two zero-width `text`/`element` entries past the document, which
-    // `sourceBacked` filters -- the renderer's relocated footnote section, already
-    // classified as must-not-fix for `blocks`.
-    sections: 3,
+    // had the table spanning its label row, which `tableLabelRowTransform` now does too.
+    // Note the other eleven new probes diverge on `sections` ONLY by two zero-width
+    // `text`/`element` entries past the document, which `sourceBacked` filters -- the
+    // renderer's relocated footnote section, already classified must-not-fix for `blocks`.
+    sections: 2,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
     // invented, which is the shape of a missing collector rather than a parse bug.

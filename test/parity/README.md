@@ -1672,7 +1672,7 @@ left).
 | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------: |
 | A2c  | a `2.` item right under a callout title DEFINES, because the title line closes its block and so is not a paragraph the marker has to interrupt                                                                               | **0 in the referee corpus** (see below) |
 | F4   | **CLOSED.** A comment opened inside a quote needs its closer inside too, so a column-0 `%%` cannot close it — see `commentQuoteExtentTransform`. The quote's own extent is still wrong there, which no corpus case exercises |                                  was 12 |
-| C3   | in a PIPELESS table a label line holding a pipe is a ROW, not a definition — the opposite of C1's piped case, which we already have                                                                                          |            **4** actionable of 7 shapes |
+| C3   | **CLOSED** by `tableLabelRowTransform`. In a pipeless table a label line holding a pipe is a ROW — the pipe is the axis, confirmed against three controls                                                                    |            **4** actionable of 7 shapes |
 | E5b  | **CLOSED.** A name may not hold ASCII whitespace, so `a[^x [y]` is no reference at all — see the guard in `footnote-bare.ts`                                                                                                 |                                   was 3 |
 
 E5b carries its own trap, and the goldens have it both ways: zero Obsidian entries here hold
@@ -1680,8 +1680,9 @@ ASCII whitespace in a name, while the referee's answers hold **six** that are `a
 `a\u3000b` — a no-break and an ideographic space. So the rule rejects ASCII whitespace and
 must keep accepting those, which is the `\s`-carries-hidden-members lesson again.
 
-**Three of the five are now closed**: E4 by `definitionWindowTransform`, F4 by one filter in
-`commentQuoteExtentTransform`, and E5b by one guard in `footnote-bare.ts`. All three were
+**Four of the five are now closed**: E4 by `definitionWindowTransform`, F4 by one filter in
+`commentQuoteExtentTransform`, E5b by one guard in `footnote-bare.ts`, and C3 by
+`tableLabelRowTransform`. Only A2c remains, and it has no instance in the referee corpus. All three were
 found by reading their rules document rather than by measuring our own corpus, which is the
 argument for having done it: **none of the three shapes appears in our 3,378 cases at all**,
 and all three are real.
@@ -1708,6 +1709,28 @@ on this oracle at all. Both stay queued, with those numbers attached rather than
 **A size quoted from another project's notes is a size in their metric**, which for A2c means
 example coverage and not corpus frequency — the same category error as reading their 99.2%
 as an agreement figure comparable to ours.
+
+### `visit` reads a visitor's numeric return as a traversal index
+
+An instrumentation trap, and the most dangerous kind: it corrupts counts in a scratch script
+while the tree under test is perfectly fine.
+
+`unist-util-visit` lets a visitor steer the walk by returning an index, and an arrow function
+with a concise body returns its expression. `Array.prototype.push` returns the array's new
+length. So this double-counts every node:
+
+    visit(tree, "footnoteDefinition", (n) => d.push(n.identifier));    // ["1","1"]
+    visit(tree, "footnoteDefinition", (n) => { d.push(n.identifier); }); // ["1"]
+
+Proven side by side on a tree holding exactly one definition, after a full object-identity
+dump confirmed no node appears twice. It showed up twice in one session -- once as
+`refs=["x y","x y"]` and once as `defs=[1,1]` -- and was dismissed as unreproducible the
+first time, which is the part worth not repeating.
+
+No conclusion here rested on it: the referee scripts and every ceiling measurement use their
+own recursive walks, and the two probes that hit it were testing emptiness, which doubling
+cannot change. But a counting measurement built this way would have been wrong by exactly a
+factor the eye cannot see. **Always give a `visit` visitor a block body.**
 
 ### Keying a table on one side's answer excludes the evidence against you
 

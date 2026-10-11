@@ -67,6 +67,7 @@ import { mathMidlineTransform } from "./lib/math-midline.js";
 import { listUnderDefinitionTransform } from "./lib/list-under-definition.js";
 import { tableRowStyleTransform } from "./lib/table-row-style.js";
 import { tablePipeStyleTransform } from "./lib/table-pipe-style.js";
+import { tableLabelRowTransform } from "./lib/table-label-row.js";
 import { tableShortDelimiterTransform } from "./lib/table-short-delimiter.js";
 import {
   htmlSetextTransform,
@@ -691,6 +692,11 @@ export default function remarkObsidian(
       self.parse(markdown),
     );
     tableShortDelimiterTransform(tree, String(file), (markdown) =>
+      self.parse(markdown),
+    );
+    // After the three table passes, so the table it folds a label row into has
+    // already settled its own shape and extent.
+    tableLabelRowTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
     // Before the interrupt fold: demoting the heading is what lets a definition

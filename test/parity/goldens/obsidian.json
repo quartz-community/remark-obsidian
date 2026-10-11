@@ -82353,8 +82353,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "C3: in a pipeless table a label line holding a pipe is a ROW, not a definition. Confirmed against the piped control, which defines, and the blank-line control, which also defines. Closing it needs manual table-row construction."
+      "triage": "match",
+      "note": "C3: in a pipeless table a label line holding a pipe is a row, not a definition. Closed by `tableLabelRowTransform`."
     },
     "probe/table-label/piped": {
       "id": "probe/table-label/piped",
