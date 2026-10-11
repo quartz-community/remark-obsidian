@@ -165,8 +165,12 @@ describe("positioned oracle", () => {
     // tree is unchanged at HEAD~3, so this is its own tab handling rather than a pass
     // here. The reference is unplaceable because the definition it belongs to never
     // exists. The referee holds 127 definitions on tab-prefixed lines that we miss.
-    "probe/def-tab/quote-spaces-tab: a tab after a space is not code to Obsidian",
-    "probe/def-tab/marker-tab-spaces: a tab after a space is not code to Obsidian",
+    // `probe/def-tab/quote-spaces-tab` was here and is CLOSED: the container-aware repair
+    // strips the quote's own prefix before measuring, so `>   \t[^1]: def` is a definition
+    // at column 2. The list sibling remains, and its cause is different -- there the tab is
+    // the MARKER'S SEPARATOR rather than indentation after a space, so `+\t   [^1]: def`
+    // turns on micromark's list-item tab straddle instead of the code threshold.
+    "probe/def-tab/marker-tab-spaces: the tab is the marker's own separator",
   ];
 
   it("places every footnote reference, except the classified cases", () => {
@@ -394,8 +398,8 @@ describe("positioned oracle", () => {
     // case it had just been extended for, invisibly, because the final tree showed the
     // bracket either way. Deriving the bracket from the offset is what `normalize-points`
     // already says every earlier pass must do.
-    footnotes: 3,
-    footnoteRefs: 5,
+    footnotes: 2,
+    footnoteRefs: 4,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
     // Obsidian reports a heading's column as its containing block's content column,

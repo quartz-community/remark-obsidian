@@ -1187,18 +1187,24 @@ needs a repair that re-parses such a `code` node, not a column rule. Two probes 
 `replicate` and listed in `KNOWN_REFERENCE_GAPS` with that reasoning; four of the six
 already match.
 
-**The repair was attempted and CRASHED, which is the useful part.** The plan was sound —
-the `code` node already carries its content with four columns stripped, so re-parsing the
-original line and splicing the result back is far less work than replacing micromark's tab
-accounting. What it misses is that the dedent differs per container: `prefixLength` here
-understands a `>` run, so for a list line it strips nothing, the whole `+⇥   [^1]: def`
-re-parses as a NEW LIST, and splicing a list into a `listItem` throws inside micromark's
-tokenizer on the next pass.
+**The repair crashed on the first attempt and lands on the second**, and the difference
+between the two is one line of reasoning worth keeping. The plan was sound: the `code` node
+already carries its content with four columns stripped, so re-parsing the original line and
+splicing it back is far less work than replacing micromark's tab accounting. The first
+attempt reused the quote-only `prefixLength`, so a list line was left whole, the entire
+`+⇥   [^1]: def` re-parsed as a NEW LIST, and splicing a list into a `listItem` threw inside
+micromark's tokenizer.
 
-So the repair needs the container's own prefix width, which is `>` runs for a quote and the
-marker plus its separator for an item — and those are exactly the two things measured
-elsewhere in this file. It is a bounded piece of work with a known shape, not an open
-question, and the crash is why it is recorded rather than half-shipped.
+Stripping **the container's own prefix** first — a `>` run for a quote, the marker and its
+separator for an item — fixes it: `>   ⇥[^1]: def` is now a definition at column 2, the
+referee moves 75.2% → 75.4%, and the `footnotes` and `footnoteRefs` ceilings each fall by
+one.
+
+The list sibling stays `replicate` and its cause is DIFFERENT, which the probe pair is what
+shows: in `+⇥   [^1]: def` the tab is the marker's own separator rather than indentation
+after a space, so it turns on micromark's list-item tab straddle — `containerState.size`
+counting characters while `factorySpace` consumes columns — and not on the code threshold at
+all. Two shapes that look identical in a prefix dump, one rule each.
 
 ### The referee cannot adjudicate a rule that needs the containing BLOCK
 

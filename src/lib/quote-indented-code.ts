@@ -108,6 +108,79 @@ export function quoteIndentedCodeTransform(
     }
   });
 
+  // An indented `code` block a container produced from a TAB AFTER A SPACE is not code to
+  // Obsidian. micromark follows CommonMark and advances a tab to the next tab stop, so
+  // `>   ⇥[^1]: def` measures six columns past the quote's content column and becomes code;
+  // Obsidian counts a tab after a space as ONE column, measures three, and reports a
+  // definition. Six `probe/def-tab/*` cases establish the asymmetry -- a LEADING tab does
+  // reach the threshold, so `⇥[^1]: def` really is code -- and the referee holds 127
+  // definitions on tab-prefixed lines this loses.
+  //
+  // The CONTAINER'S OWN PREFIX has to come off before the indent is measured or re-parsed,
+  // and getting that wrong is what made a first attempt throw: reusing the quote-only
+  // `prefixLength` left a list line whole, so `+⇥   [^1]: def` re-parsed as a new LIST and
+  // splicing a list into a `listItem` broke the next pass.
+  visit(tree, (node: Node) => {
+    const holder = node as Partial<ParentNode>;
+    if (!Array.isArray(holder.children)) return;
+    const kind = holder.type;
+    if (kind !== "blockquote" && kind !== "callout" && kind !== "listItem") {
+      return;
+    }
+    for (let index = 0; index < holder.children.length; index++) {
+      const block = holder.children[index];
+      if (block?.type !== "code" || block.lang !== null) continue;
+      const from = block.position?.start?.offset;
+      const to = block.position?.end?.offset;
+      const line = block.position?.start?.line;
+      if (from === undefined || to === undefined || line === undefined)
+        continue;
+
+      const bol = source.lastIndexOf("\n", from - 1) + 1;
+      const whole = source.slice(bol, to);
+      // One line only, so the splice stays a single node.
+      if (whole.includes("\n")) continue;
+
+      // The container's prefix: a `>` run for a quote, the marker and its separator for an
+      // item on its own first line. An item whose code starts on a later line carries only
+      // indentation and is left alone, since its width is the measured content column
+      // rather than anything on this line.
+      const opener =
+        kind === "listItem"
+          ? /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/u.exec(whole)
+          : /^(?:[ \t]*>[ \t]?)+/u.exec(whole);
+      if (!opener) continue;
+      const rest = whole.slice(opener[0].length);
+      if (!rest.includes("\t")) continue;
+
+      let columns = 0;
+      let seenSpace = false;
+      let eaten = 0;
+      for (const character of rest) {
+        if (character === " ") {
+          columns += 1;
+          seenSpace = true;
+          eaten += 1;
+          continue;
+        }
+        if (character === "\t") {
+          columns += seenSpace ? 1 : 4 - (columns % 4);
+          eaten += 1;
+          continue;
+        }
+        break;
+      }
+      if (columns >= CODE_INDENT) continue;
+
+      const content = rest.slice(eaten);
+      const parsed = reparse(content);
+      if (parsed.children.length !== 1) continue;
+      const replacement = parsed.children[0]!;
+      shift(replacement, bol + opener[0].length + eaten, line - 1);
+      holder.children.splice(index, 1, replacement);
+    }
+  });
+
   visit(tree, (node: Node) => {
     const parent = node as Partial<ParentNode>;
     if (!Array.isArray(parent.children)) return;
