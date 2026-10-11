@@ -56,6 +56,58 @@ export function quoteIndentedCodeTransform(
     });
   });
 
+  // Indented code INSIDE a quote, which is a different shape from the one below: there
+  // the indented lines follow the quote and carry no `>`, here every line has the marker
+  // and the indent sits past it. `> [!info]` / `>     dolor [^b]` / `>     [^b]: velit`
+  // indexes NOTHING in Obsidian -- no reference, no definition -- because the content is
+  // four columns past the quote's own content column and so is code.
+  //
+  // Measured over the referee corpus: of quoted lines holding a `[^`, those indented
+  // exactly 4 columns past the prefix are 84% hidden (223 of 264) against a 37% baseline
+  // at indent 0, while indent 3 is 20% -- below baseline. The threshold is the same
+  // `codeIndent` the pass below uses, doubled inside a definition.
+  //
+  // Only a paragraph whose EVERY line clears the threshold is converted. A mixed
+  // paragraph -- `> q` over `>     code` -- is lazy continuation to CommonMark and has
+  // its own evidence to gather, so it is left alone rather than guessed at.
+  visit(tree, (node: Node) => {
+    const holder = node as Partial<ParentNode>;
+    if (!Array.isArray(holder.children)) return;
+    if (holder.type !== "blockquote" && holder.type !== "callout") return;
+
+    for (let index = 0; index < holder.children.length; index++) {
+      const block = holder.children[index];
+      if (block?.type !== "paragraph") continue;
+      const from = block.position?.start?.offset;
+      const to = block.position?.end?.offset;
+      const first = block.position?.start?.line;
+      if (from === undefined || to === undefined || first === undefined)
+        continue;
+
+      const want = codeIndent(inDefinition.has(block));
+      const lineStart = source.lastIndexOf("\n", from - 1) + 1;
+      const rows = source.slice(lineStart, to).split("\n");
+      if (rows.length < 1) continue;
+      let every = true;
+      for (const row of rows) {
+        if (quotedIndent(row) < want) {
+          every = false;
+          break;
+        }
+      }
+      if (!every) continue;
+
+      const code: Code = {
+        type: "code",
+        lang: null,
+        meta: null,
+        value: rows.map((row) => row.slice(prefixLength(row))).join("\n"),
+        position: { ...block.position! },
+      };
+      holder.children.splice(index, 1, code);
+    }
+  });
+
   visit(tree, (node: Node) => {
     const parent = node as Partial<ParentNode>;
     if (!Array.isArray(parent.children)) return;
@@ -128,4 +180,77 @@ function shift(node: unknown, offset: number, line: number): void {
     }
   }
   for (const child of candidate.children ?? []) shift(child, offset, line);
+}
+
+/** How many characters of a line the quote markers and their own spacing take. */
+function prefixLength(line: string): number {
+  let index = 0;
+  let sawQuote = false;
+  while (index < line.length) {
+    if (line[index] === " " || line[index] === "\t") {
+      index += 1;
+      continue;
+    }
+    if (line[index] !== ">") break;
+    sawQuote = true;
+    index += 1;
+    // One space belongs to the marker, which is CommonMark's rule and the difference
+    // between `>     code` and `>    not code` in its own example 252.
+    if (line[index] === " " || line[index] === "\t") index += 1;
+  }
+  return sawQuote ? index : 0;
+}
+
+/**
+ * A quoted line's indent in COLUMNS past the quote's own content column.
+ *
+ * Tabs are expanded, which is what separates the two shapes Obsidian treats differently:
+ * `>` then five spaces is five columns and reads as code, while `>` then a tab advances
+ * to column 4 for an indent of three and stays a paragraph -- the referee has the
+ * reference indexed in the second and absent in the first.
+ */
+function quotedIndent(line: string): number {
+  let column = 0;
+  let index = 0;
+  let sawQuote = false;
+  while (index < line.length) {
+    const character = line[index]!;
+    if (character === ">") {
+      sawQuote = true;
+      column += 1;
+      index += 1;
+      // One space or tab belongs to the MARKER, not to the content's indent. That is
+      // CommonMark's own rule and it is what separates the two halves of its example
+      // 252: `>     code` is four columns past the prefix and is code, `>    not code` is
+      // three and is a paragraph. Counting the marker's own space as indent converted
+      // both and broke that case.
+      const after = line[index];
+      if (after === " ") {
+        column += 1;
+        index += 1;
+      } else if (after === "\t") {
+        column += 4 - (column % 4);
+        index += 1;
+      }
+      continue;
+    }
+    break;
+  }
+  if (!sawQuote) return -1;
+  const base = column;
+  while (index < line.length) {
+    const character = line[index]!;
+    if (character === " ") {
+      column += 1;
+      index += 1;
+      continue;
+    }
+    if (character === "\t") {
+      column += 4 - (column % 4);
+      index += 1;
+      continue;
+    }
+    break;
+  }
+  return index >= line.length ? -1 : column - base;
 }

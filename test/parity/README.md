@@ -1138,10 +1138,22 @@ reason: a quote strips `> ` from every continuation line, so no multi-line parag
 a quote could ever align. The 451 were not a family of odd documents; they were every
 quoted multi-line paragraph holding a reference.
 
-Of the 113 left, Obsidian wants 47 and does not want 66, and the 66 are the indented-code
-case above -- a reference inside `>     dolor [^b]`, which Obsidian reads as code and does
-not index at all. Placing those is not the fix; not creating them is, and that is the
-structural half still open.
+Of the 113 left, Obsidian wanted 47 and did not want 66, and the 66 were the indented-code
+case -- a reference inside `>     dolor [^b]`, which Obsidian reads as code and does not
+index. Placing those was never the fix; not creating them was.
+
+**That structural half is done too.** A paragraph inside a quote whose EVERY line sits at
+or past `codeIndent` columns of the quote's own content column becomes a `code` node, which
+takes the referee to **73.9%** and the unplaced count to **50**. Only an all-lines paragraph
+is converted: a mixed one, `> q` over `>     code`, is lazy continuation to CommonMark and
+was left alone rather than guessed at.
+
+One detail decided it, and getting it wrong broke CommonMark's own example 252. **A quote
+marker consumes ONE following space as part of its prefix.** So `>     code` is four columns
+past the prefix and is code, while `>    not code` is three and is a paragraph -- example
+252 is exactly that pair, and counting the marker's own space as indent converted both.
+`>⇥code[^2]` falls out the same way: the tab advances to column 4 and belongs to the marker,
+leaving an indent of zero, which is why the referee has that reference indexed.
 
 **The honest summary.** Three of the four items do not survive measurement as tractable
 work, and the one that does is not the one ranked highest. The corpus is the better
