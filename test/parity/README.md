@@ -1072,6 +1072,42 @@ does not define, a reference inside one is indexed, 710 documents depend on it),
 belongs in the reference half of `parseComments` rather than in a projection if a correct
 form of the rule is ever found.
 
+### The four-item plan, worked through and mostly refuted
+
+Written after the coverage metrics, in the order recommended, with what each turned out to be.
+
+**Item 1 — definition `endLine`, 381 entries. A LONG TAIL, not three families.** An earlier
+measurement on document counts had split it into "we absorb a `>` continuation", "we run
+past an unclosed fence" and "we stop short of unclosed math", which read like three fixes.
+At entry level it is **112 distinct shapes, largest 27**, in both directions: 275 rows where
+we run longer and 106 where Obsidian does. And 60 of the 381 are in documents holding **no
+fence, comment or math at all**, so the unclosed-construct story cannot even cover the set.
+There is no dominant family here to attack.
+
+**Item 2 — refuted outright. See the section below.**
+
+**Item 3 — definition `startCol`, 188 entries. Four directions, no single rule.** The two
+content-column rules already landed (tab prefix −25 documents, quote prefix −60) took the
+family from 440 to this. What remains splits 79 spaces-only where Obsidian reports HIGHER,
+65 tab-prefix where it reports LOWER, 26 spaces-only LOWER, 14 tab HIGHER. Both prefixes go
+both ways, so the prefix is not the axis and a constant offset is ruled out. The README's
+standing note applies: this wants probes against the application, and a constant column is
+the signature of the author's `P1` defect rather than a rule.
+
+**Item 4 — the 451 unplaced nodes. Worth doing, for a different reason than I gave.** Every
+one is a `footnoteReference`: 432 inside a paragraph, 17 inside a heading, 2 inside a
+`delete`. The referee EXCLUDES them from its set comparison, so driving the count down moves
+agreement in either direction and it is a bad target for this metric — which is what the
+earlier note said. But a reference with no position is a real defect for a consumer:
+`obsidian-linter` splices by offset, and a positionless node is one it cannot touch. So this
+is the one item of the four with a clear case, and the case is usability rather than
+agreement. `points.test.ts` already gates the count.
+
+**The honest summary.** Three of the four items do not survive measurement as tractable
+work, and the one that does is not the one ranked highest. The corpus is the better
+instrument for the long tails: its cases are small enough that one case is one cause, which
+is exactly what the referee's dense documents are not.
+
 ### Grouping referee rows by a LINE-LOCAL shape attributes to the line what belongs to the document
 
 The fourth counting heuristic to die here, and the most carefully built: the 394 definitions
