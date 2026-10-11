@@ -60,7 +60,24 @@ export function definitionTrimTransform(tree: Root, source: string): void {
     const column = node.position?.start?.column ?? 1;
     if (last === end && column > 1 && end > start) {
       const after = lines[start] ?? "";
-      if (after.trim() === "%%" && !/^[ \t]/u.test(after)) last = start;
+      // A column-0 line that OPENS A BLOCK cannot continue a nested definition. Split by
+      // that line's kind over the referee corpus, counting both sides:
+      //
+      //   next line a definition   11 end on own line,  0 absorb
+      //   next line a heading       4 end on own line,  0 absorb
+      //   next line a fence         4 end on own line,  0 absorb
+      //   next line a bare `%%`    10 end on own line,  0 absorb
+      //   next line a thematic     1 end on own line,  0 absorb
+      //   next line plain TEXT      5 end on own line, 27 absorb  <- lazy continuation
+      //   next line a list marker  42 end on own line, 13 absorb  <- not clean
+      //
+      // So plain text is genuine lazy continuation and is left alone, a list marker has
+      // thirteen counter-examples and is left alone, and the four block openers plus the
+      // bare comment are unanimous.
+      const opensBlock =
+        after.trim() === "%%" ||
+        /^(?:#{1,6} |```|~~~|\[\^[^\]]*\]:|---|===|___|\*\*\*)/u.test(after);
+      if (opensBlock && !/^[ \t>]/u.test(after)) last = start;
     }
     if (last === end) return;
 
