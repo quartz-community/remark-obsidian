@@ -1618,6 +1618,42 @@ The general point is the one the `%%` detour made too: **an attempt that fails w
 is worth more than a prediction that sounds right.** The predicted cause for the tab case
 was plausible and wrong, and only probing the threshold showed it.
 
+## What the sibling project does differently, and what its 99.2% measures
+
+`obsidian-footnotes` reports 99.2% agreement on the corpus this harness vendors as its
+referee, where we report 75.4%. Both halves of that gap are worth knowing, and neither is
+the one I assumed.
+
+**Their comparison is looser in three specific ways**, from `scripts/oracle/compare.mts`:
+
+- A definition is matched by `(line, folded name)` and its **column is never compared** —
+  stored in the answers, never read. Our referee compares `[name, line, column, lastLine]`
+  exactly, so our whole `startCol` family is invisible to theirs.
+- A definition's end is compared after two normalisations: `lastLine` pulls an end at column
+  0 of a later line back one line, applied to OBSIDIAN's side when packing, and `trimmedEnd`
+  strips trailing blank lines from the reader's.
+- References are compared by `(line, column)` strictly, but obs references with an empty
+  name are dropped, inline ids are dropped, and a reader reference whose name is in the
+  answer's `unknown` list is skipped. Empty inline footnotes alone were ~1,300 of 20,000
+  notes in their run.
+
+Implementing their comparison against our tree gives **78.81%**, so the metric accounts for
+about three points of the gap and not twenty-four.
+
+**The rest is architecture.** They parse with `remark-parse@8.0.3`, `remark-footnotes@2.0.0`
+and `remark-math@3.0.1` — the actual generation Obsidian forked — and add Obsidian's rules
+as named tokenizers through remark-parse's own extension points, vendoring the list reader
+and the tokenizer loop. We parse with micromark and repair toward the same target in ~70
+passes. That is not a gap we can close by copying: this package exists to be a remark plugin
+inside Quartz's modern unified pipeline, and remark-parse 8 cannot sit in it.
+
+**What IS transferable is their rules document**, `docs/obsidian-reading-rules.md`: 145 lines,
+every rule lettered and stated in plain sentences, derived clean-room from the same oracle.
+Checked ours against it rule by rule. Already correct here: F1 (a `%%` opener holds no other
+`%`, so `%%%` and `%% 50%` are paragraphs), B9 (two lists with only blank lines between them
+are one list), B3 (a lazy line is left out of an item's minimum indent). **One real gap
+found: E4, the 1,024-character interrupt window** — see `definitionWindowTransform`.
+
 ## The legacy stack is an arbiter, not an oracle
 
 Obsidian runs a **fork** of `remark-parse@8`, so a local install of

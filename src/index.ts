@@ -121,6 +121,7 @@ import { commentRegionTransform } from "./lib/comment-region.js";
 import {
   definitionContinuationTransform,
   definitionLazyTransform,
+  definitionWindowTransform,
 } from "./lib/definition-continuation.js";
 import { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 
@@ -672,6 +673,8 @@ export default function remarkObsidian(
     // first line opened nothing to continue leaves its next line behind whether
     // comments are on or not.
     definitionLazyTransform(tree, String(file));
+    // After the lazy absorb, so the window sees the definition at its full extent.
+    definitionWindowTransform(tree, String(file));
     definitionTabTransform(tree, String(file));
     // Before the bare-reference pass: a `[^1]` the fence swallows is code, and
     // code is literal, so it must stop looking like a reference first.

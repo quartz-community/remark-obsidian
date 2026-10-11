@@ -189,3 +189,66 @@ function dedent(
 
   return { text: text.join("\n"), starts, lines };
 }
+
+/** How far ahead `remark-footnotes@2` looks for something that could end a definition. */
+const INTERRUPT_WINDOW = 1024;
+
+/**
+ * Nothing can end a footnote definition more than 1,024 characters into it.
+ *
+ * `remark-footnotes@2` looks for an interrupting construct only within the definition's
+ * first 1,024 characters, counted from the start of its label line, and Obsidian inherits
+ * that. A heading, fence, list item, label, quote or table starting at or after that point
+ * is ordinary lazy text of the definition instead:
+ *
+ *     '[^1]: ' + 'x'.repeat(1018) + '\n# H'    one definition over two lines, no heading
+ *     '[^1]: ' + 'x'.repeat(1014) + '\n# H'    a definition and a heading
+ *
+ * A blank line still ends the definition at any length, which is why only an abutting
+ * sibling is absorbed here.
+ *
+ * micromark has no such window, so it ends the definition wherever the construct is. The
+ * rule is the sibling project's E4, measured there across 185 notes with label and
+ * continuation lines from 900 to 2,100 characters; this corpus holds 47 definitions with an
+ * ender at or past the window.
+ *
+ * KNOWN INCOMPLETE, and the half that is missing is named rather than hidden: the absorbed
+ * block keeps its own node type, so a heading past the window becomes a `heading` INSIDE
+ * the definition where Obsidian has ordinary text. The definition's extent is then right --
+ * which is what the metadata oracle compares and what a consumer editing by offset needs --
+ * while the `headings` projection would report one Obsidian does not. No corpus case
+ * exercises that today (`headings` sits at 0), and the faithful repair means folding the
+ * line into the preceding paragraph as text, which is the raw-slice hazard this repo has
+ * been bitten by six times: the marker was consumed by the parse, so re-adding it from the
+ * source would re-introduce whatever escapes the parse resolved.
+ */
+export function definitionWindowTransform(tree: Root, source: string): void {
+  if (source === "") return;
+
+  visit(tree, (node: Node) => {
+    const parent = node as Partial<{ children: RootContent[] }>;
+    if (!Array.isArray(parent.children)) return;
+
+    for (let index = parent.children.length - 1; index > 0; index--) {
+      const block = parent.children[index];
+      const definition = parent.children[index - 1];
+      if (definition?.type !== "footnoteDefinition") continue;
+      const from = definition.position?.start?.offset;
+      const end = definition.position?.end?.offset;
+      const at = block?.position?.start?.offset;
+      const to = block?.position?.end?.offset;
+      if (from === undefined || end === undefined) continue;
+      if (at === undefined || to === undefined) continue;
+      // Counted from the label line's start, which is the definition's own start.
+      if (at - from < INTERRUPT_WINDOW) continue;
+      // Abutting, so a blank line still ends the definition.
+      if (!/^\n[ \t]*$/u.test(source.slice(end, at))) continue;
+
+      definition.children.push(block as never);
+      if (definition.position && block.position) {
+        definition.position.end = { ...block.position.end };
+      }
+      parent.children.splice(index, 1);
+    }
+  });
+}
