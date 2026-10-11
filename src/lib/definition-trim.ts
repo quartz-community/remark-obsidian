@@ -36,6 +36,18 @@ export function definitionTrimTransform(tree: Root, source: string): void {
 
     let last = end;
     while (last > start && BLANK.test(lines[last - 1] ?? "")) last--;
+    // Pulling a column-1 end back one line is REFUTED, and the reason is worth keeping
+    // because the shape looks unambiguous and is not. `[^1]: def` over `    ``` ` over
+    // `> Text[^Ä]` ends at 2:0 here and on line 1 in Obsidian, so the surplus is the line
+    // ending itself. But `[^1]: one` / `    %%` / `hidden[^2] text` / `%%` also ends at a
+    // column-1 position -- 5:0, the start of its own closer line -- and Obsidian wants
+    // 5:2, the END of that line. One case wants the previous line, the other wants this
+    // line, and the position cannot tell them apart: it turns on whether that line is the
+    // definition's own content.
+    //
+    // Measured: referee 74.2% -> 74.7%, +33 documents, against 4 main-gate regressions
+    // (`hunt/definition-block-owns-region-opener/0-3`) and compute `footnotes` 0 -> 5,
+    // `sections` 0 -> 4. The main gate is the contract, so this does not ship.
     if (last === end) return;
 
     // Back to the end of that line, which is where the content stops.

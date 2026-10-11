@@ -29,7 +29,11 @@ export function listUnderDefinitionTransform(tree: Root, source: string): void {
       const from = definition.position?.end?.offset;
       const to = list.position?.start?.offset;
       if (from === undefined || to === undefined) continue;
-      if (source.slice(from, to) !== "\n") continue;
+      // One line ending, then whatever indent the list carries. Requiring exactly `"\n"`
+      // rejected every INDENTED list, which is most of them: `[^Ω]: def` over
+      // `  10.     Some words` is one definition to Obsidian, ending on line 1, and the
+      // two-space indent alone was enough to leave it a sibling here.
+      if (!/^\n[ \t]*$/u.test(source.slice(from, to))) continue;
 
       (definition as FootnoteDefinition).children.push(list as never);
       if (definition.position && list.position?.end) {
