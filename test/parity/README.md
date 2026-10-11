@@ -1072,7 +1072,44 @@ does not define, a reference inside one is indexed, 710 documents depend on it),
 belongs in the reference half of `parseComments` rather than in a projection if a correct
 form of the rule is ever found.
 
-### References, once the definitions agree### References, once the definitions agree
+### Grouping referee rows by a LINE-LOCAL shape attributes to the line what belongs to the document
+
+The fourth counting heuristic to die here, and the most carefully built: the 394 definitions
+we report that Obsidian does not were grouped by the prefix of the line they sit on, which
+looked like a clean partition —
+
+| prefix of the invented definition's line | rows |
+| ---------------------------------------- | ---: |
+| column 0                                 |  179 |
+| quote run then a TAB                     |  102 |
+| list marker                              |   41 |
+| indent 1–3                               |   35 |
+| indent 4+                                |   19 |
+| indent has a TAB                         |   15 |
+
+and suggested an obvious rule for 136 of them: four columns of indent is indented CODE, so
+no definition. The `probe/def-cap/*` wave had already measured Obsidian agreeing with that
+at indent 6 against a content column of 2.
+
+**Both halves fall apart on measurement.** Of the definition lines whose prefix is a quote
+run then a tab, Obsidian DOES define the label in **54** and does not in 241 — and the
+counter-examples are indistinguishable from the positives: `>\t[^Note]: def` is defined
+while `>\t[^Note]: tempor…` is not. Same prefix, same label, opposite answers. In isolation
+`\t[^b]: Definition` and `    [^n]: body` already yield no definition in bare `remark-gfm`
+and here, so those rows are not line-local either.
+
+So the prefix is not what decides. These are dense documents and the deciding factor is
+upstream context — a fence, a comment span, or a definition above that ended in the wrong
+place. Which points back at the same root cause as the 381 `endLine` rows, and is why the
+invented-definition count is mostly a cascade rather than a family of its own: of the 179
+column-0 rows, **154** are ordinary-looking definitions with a colon, a space and no
+duplicate, meaning they sit inside something for Obsidian and at root for us.
+
+The rule, stated for the next person: **on this corpus, a shape you can see in one line is
+almost never the cause.** The corpus's own cases are small enough for line-local grouping to
+work; the referee's are not.
+
+### References, once the definitions agree
 
 Fixing the walk exposed the family underneath it: **1011** documents whose
 definitions now agree _exactly_ while their references do not. It splits 809 "we
