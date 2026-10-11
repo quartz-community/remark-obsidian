@@ -48,6 +48,20 @@ export function definitionTrimTransform(tree: Root, source: string): void {
     // Measured: referee 74.2% -> 74.7%, +33 documents, against 4 main-gate regressions
     // (`hunt/definition-block-owns-region-opener/0-3`) and compute `footnotes` 0 -> 5,
     // `sections` 0 -> 4. The main gate is the contract, so this does not ship.
+    // A NESTED definition cannot absorb a bare `%%` sitting at column 0: that line is
+    // outside the container the definition lives in, so it cannot continue it. Measured
+    // over the referee corpus, splitting by the definition's own column:
+    //
+    //   definition at column 0, next line a bare `%%`   absorbs 53, ends on own line  1
+    //   definition nested,      next line a bare `%%`   absorbs  0, ends on own line 10
+    //
+    // Ten of ten, no counter-examples. micromark takes the line as lazy paragraph
+    // continuation and no option flag governs it, so the repair belongs here.
+    const column = node.position?.start?.column ?? 1;
+    if (last === end && column > 1 && end > start) {
+      const after = lines[start] ?? "";
+      if (after.trim() === "%%" && !/^[ \t]/u.test(after)) last = start;
+    }
     if (last === end) return;
 
     // Back to the end of that line, which is where the content stops.
