@@ -1649,10 +1649,41 @@ inside Quartz's modern unified pipeline, and remark-parse 8 cannot sit in it.
 
 **What IS transferable is their rules document**, `docs/obsidian-reading-rules.md`: 145 lines,
 every rule lettered and stated in plain sentences, derived clean-room from the same oracle.
-Checked ours against it rule by rule. Already correct here: F1 (a `%%` opener holds no other
-`%`, so `%%%` and `%% 50%` are paragraphs), B9 (two lists with only blank lines between them
-are one list), B3 (a lazy line is left out of an item's minimum indent). **One real gap
-found: E4, the 1,024-character interrupt window** — see `definitionWindowTransform`.
+Thirty-three of its examples were run against this package directly; **thirty matched**.
+
+Already correct here, and worth naming because each took work to get right: A2/A4 (a callout
+title stands alone, and text after the marker is block content), A3 (only the quote's first
+line can be a title), B1 (a tab after a marker starts an item, two tabs are code), B4 (a
+column-0 label under an item defines nothing), B8 (a task box holds any one character), C1
+(a label line ends a piped table), D1 (wikilink extent, including `[[a [[b]] [^5]]]` leaving
+`[^5]` live), D2 (frontmatter closing-line rest is Markdown), D3 (a setext underline under a
+label), D5 (`%%` does not end a definition), E2 (`[^1]: [^2]: x` is two definitions), E3
+(everything inside `^[...]` is dead), F1 (an opener holds no other `%`, so `%%%` and
+`%% 50%` are paragraphs), F3, B9 (two lists with only blank lines between them are one
+list), B3 (a lazy line is left out of an item's minimum indent), M1 (`$$` pairs from the
+left).
+
+**One gap found and fixed: E4**, the 1,024-character interrupt window — see
+`definitionWindowTransform`.
+
+**Four gaps found and queued, with their size in the referee corpus:**
+
+| rule | what Obsidian does that we do not                                                                                                              |                                corpus |
+| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------: |
+| A2c  | a `2.` item right under a callout title DEFINES, because the title line closes its block and so is not a paragraph the marker has to interrupt | 8 definitions missed, 1 already right |
+| F4   | a column-0 `%%` after a quote that held one opens a FRESH comment running to the end of the note, so a label below it defines nothing          |                                    12 |
+| C3   | in a PIPELESS table a label line holding a pipe is a ROW, not a definition — the opposite of C1's piped case, which we already have            |                                     9 |
+| E5b  | a name may not hold ASCII whitespace, so `a[^x [y]` is no reference at all                                                                     |                          3, unanimous |
+
+E5b carries its own trap, and the goldens have it both ways: zero Obsidian entries here hold
+ASCII whitespace in a name, while the referee's answers hold **six** that are `a\u00a0b` and
+`a\u3000b` — a no-break and an ideographic space. So the rule rejects ASCII whitespace and
+must keep accepting those, which is the `\s`-carries-hidden-members lesson again.
+
+The scale is the honest part: each of the four is 3 to 12 cases and each needs real work --
+a paragraph split and re-parse for A2c, comment-extent changes for F4, table-row
+classification for C3, and converting a node back to text for E5b, which is the raw-slice
+hazard. They are queued with evidence rather than guessed at.
 
 ## The legacy stack is an arbiter, not an oracle
 
