@@ -83,6 +83,7 @@ import { mathUnclosedContainerTransform } from "./lib/math-unclosed-container.js
 import { thematicBreakTabTransform } from "./lib/thematic-break-tab.js";
 import { labelPrecedenceTransform } from "./lib/label-precedence.js";
 import { setextDefinitionTransform } from "./lib/setext-definition.js";
+import { itemHtmlExtentTransform } from "./lib/item-html-extent.js";
 import { shortCommentTransform } from "./lib/short-comment.js";
 import { definitionBlankTailTransform } from "./lib/definition-blank-tail.js";
 import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
@@ -644,6 +645,11 @@ export default function remarkObsidian(
       self.parse(markdown),
     );
     containerLazyTransform(tree, String(file));
+    // Directly after the absorb above, which is what makes the lazy paragraph a SIBLING of
+    // the item's html in the first place. Placed with the other html passes it was INERT:
+    // the pair does not exist yet there, and it is not gated on `math` either, which an
+    // earlier placement inside that branch silently was.
+    itemHtmlExtentTransform(tree, String(file));
     // The complement of the pass above: that one needs no blank line, this one
     // needs exactly the blank line it rejects.
     listEmptyItemTransform(tree, String(file), (markdown) => reparse(markdown));
