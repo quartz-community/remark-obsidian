@@ -152,14 +152,26 @@ function endsInOpenParagraph(node: ParentLike): boolean {
  *                                           by one of the guards below rather than never
  *                                           seen
  *
- * Instrumented, and the guard is `CONTAINERS.has(container.type)` -- so when this pass
- * runs the definition's children are NOT yet a list and a paragraph. The `-` becomes a
- * list only in a later pass, which means no walk widened here can ever see the pair and
- * both attempts above were aimed at the wrong thing.
+ * Instrumented, and the guard is `CONTAINERS.has(container.type)` -- when this pass runs
+ * the definition's children are not yet a list and a paragraph. That case was then closed
+ * in `definition-continuation.ts`, which is the pass that actually assembles the pair, so
+ * neither widening was ever going to reach it.
  *
- * So the case is an ORDERING question: either this absorb runs again after the list
- * forms, or the empty-item extension belongs to whichever pass creates it. Worth knowing
- * before anyone widens the walk a third time.
+ * A THIRD widening was built for `callout/nested-task-list`, where `> [!note]` /
+ * `> - [ ] Outer` / `> > [!todo]` / `> > - [x] Inner` reports the outer task spanning to
+ * the end of the inner one -- Obsidian puts the nested callout INSIDE the item where
+ * CommonMark makes it a sibling. It works, and it is refused:
+ *
+ *   walk callout children, allow a callout after a list   `listItems` 3 -> 2
+ *   ...and decline when the container follows a           unit suite green
+ *      `calloutTitle`, since `> [!note] - item` / `> body`
+ *      keeps its body beside the title's list
+ *   round-trip unstable                                   27 -> 30
+ *
+ * Three more documents whose formatting changes on a second pass, for one parity case.
+ * That trade is refused by the standard this repo already holds -- a consumer reformatting
+ * a vault must reach a fixed point -- and the `calloutTitle` guard is the piece worth
+ * keeping if anyone returns to it, since it is what made the unit suite pass.
  */
 export function containerLazyTransform(tree: Root, source: string): void {
   const children = tree.children;
