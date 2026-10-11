@@ -62,7 +62,22 @@ export function definitionColumnTransform(tree: Root, source: string): void {
     // at columns 2 and 3. Only a closer needs handling -- `%% h %% [^1]: x` and
     // `> %% h %% [^1]: x` define NOTHING, so a definition behind an opener never arrives.
     const quoted = /^((?:>[ \t]?)+(?:%%)?)[ \t]*$/u.exec(prefix);
-    if (!quoted && !/^[ \t]+$/u.test(prefix)) return;
+    // A list marker whose separator run holds a TAB. Measured over the referee corpus by
+    // what column Obsidian reports for a definition behind a marker:
+    //
+    //   separator one character, space or tab   contentCol   600 + 184
+    //   separator longer, all spaces            BRACKET      282
+    //   separator longer, holds a tab           contentCol    61
+    //
+    // Zero counter-examples in the last bucket, and the third is what we already do. So a
+    // tab anywhere in the run puts the definition at the marker plus ONE character and
+    // the rest of the run belongs to the definition, while a run of spaces leaves it at
+    // the bracket. `1.⇥ [^Ω]: def` is column 3, not 4.
+    const tabbed =
+      /^([ \t]*(?:[-*+]|\d{1,9}[.)]))(?=[ \t]*\t[ \t]*$)[ \t]{2,}$/u.exec(
+        prefix,
+      );
+    if (!quoted && !tabbed && !/^[ \t]+$/u.test(prefix)) return;
 
     // A quote contributes its own content column, which is the marker plus the one space
     // it consumes -- anything further along the prefix belongs to the definition. The
@@ -71,11 +86,13 @@ export function definitionColumnTransform(tree: Root, source: string): void {
     // column, while `>  [^1]: def` and `>   [^1]: def` are both 0:2 to Obsidian and were
     // reported at the bracket.
     const host = items.get(node);
-    const column = quoted
-      ? quoted[1]!.length
-      : host
-        ? contentColumn(source, host)
-        : 0;
+    const column = tabbed
+      ? tabbed[1]!.length + 1
+      : quoted
+        ? quoted[1]!.length
+        : host
+          ? contentColumn(source, host)
+          : 0;
     if (column === undefined) return;
     // A LIST-ITEM host needs the indent to clear its content column by TWO, not one.
     // Probed with one host against a varying indent, which is what separates the two
@@ -88,7 +105,7 @@ export function definitionColumnTransform(tree: Root, source: string): void {
     // The last one is the bracket, and `hunt/list-item-label-margin/1` is the same shape.
     // A root or quote host keeps the one-column test: ` [^1]: def` is column 0 at gap 1,
     // and `>  [^1]: def` is column 2 at gap 1, so the stricter rule belongs to the item.
-    const gap = host && !quoted ? 2 : 1;
+    const gap = host && !quoted && !tabbed ? 2 : 1;
     // The bracket's column comes from the OFFSET, not from `start.column`. A definition
     // arrives here with a stale column -- `> %% [^1]: freed` carries column 2 against
     // offset 26, which is column 5 -- because an earlier pass moved it by offset and left
