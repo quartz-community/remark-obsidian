@@ -73,10 +73,16 @@ export function definitionColumnTransform(tree: Root, source: string): void {
     // tab anywhere in the run puts the definition at the marker plus ONE character and
     // the rest of the run belongs to the definition, while a run of spaces leaves it at
     // the bracket. `1.⇥ [^Ω]: def` is column 3, not 4.
+    //
+    // Split into a match plus two plain tests rather than one pattern: the combined form
+    // nests `[ \t]` quantifiers around a lookahead and the ReDoS lint rejects it as a
+    // second-degree polynomial, which it is.
+    const marker = /^[ \t]*(?:[-*+]|\d{1,9}[.)])/u.exec(prefix);
+    const run = marker ? prefix.slice(marker[0].length) : "";
     const tabbed =
-      /^([ \t]*(?:[-*+]|\d{1,9}[.)]))(?=[ \t]*\t[ \t]*$)[ \t]{2,}$/u.exec(
-        prefix,
-      );
+      marker && run.length > 1 && run.includes("\t") && !/[^ \t]/u.test(run)
+        ? marker
+        : null;
     if (!quoted && !tabbed && !/^[ \t]+$/u.test(prefix)) return;
 
     // A quote contributes its own content column, which is the marker plus the one space
@@ -87,7 +93,7 @@ export function definitionColumnTransform(tree: Root, source: string): void {
     // reported at the bracket.
     const host = items.get(node);
     const column = tabbed
-      ? tabbed[1]!.length + 1
+      ? tabbed[0].length + 1
       : quoted
         ? quoted[1]!.length
         : host
