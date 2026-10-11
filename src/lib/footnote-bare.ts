@@ -157,15 +157,29 @@ function referenceAt(
  * a placement rule alone cannot do it.
  */
 function alignToSource(source: string, value: string): SourceAlignment | null {
-  const strict = alignRun(source, value, false);
-  return strict ?? alignRun(source, value, true);
+  const strict = alignRun(source, value, "strict");
+  if (strict) return strict;
+  const indent = alignRun(source, value, "indent");
+  if (indent) return indent;
+  // A quote strips `> ` from every continuation line, so a multi-line paragraph inside
+  // one has a value its own source slice cannot reproduce by skipping whitespace alone:
+  // `> q` / `>   near [^b]` gives the slice `q\n>   near [^b]` against the value
+  // `q\nnear [^b]`. Both earlier modes fail, every spliced node loses its position, and
+  // the referee corpus holds 451 of them -- all `footnoteReference`, 432 inside a
+  // paragraph.
+  //
+  // Third rather than widening `indent`: a mode only runs when the ones before it fail,
+  // so an alignment that already succeeds cannot be changed by this. That matters because
+  // two earlier widenings of the indent skip are refuted below with their numbers.
+  return alignRun(source, value, "quote");
 }
 
 function alignRun(
   source: string,
   value: string,
-  skipIndent: boolean,
+  mode: "strict" | "indent" | "quote",
 ): SourceAlignment | null {
+  const skipIndent = mode !== "strict";
   const escaped: boolean[] = [];
   const at: number[] = [];
   const rebuilt: string[] = [];
@@ -184,11 +198,16 @@ function alignRun(
       escaped.push(false);
       rebuilt.push("\n");
       let ahead = index + 1;
-      while (
+      const blank = () =>
         ahead < source.length &&
-        (source[ahead] === " " || source[ahead] === "\t")
-      ) {
-        ahead += 1;
+        (source[ahead] === " " || source[ahead] === "\t");
+      while (blank()) ahead += 1;
+      if (mode === "quote") {
+        // A run of quote markers, each able to carry its own indent on either side.
+        while (ahead < source.length && source[ahead] === ">") {
+          ahead += 1;
+          while (blank()) ahead += 1;
+        }
       }
       index = ahead - 1;
       continue;

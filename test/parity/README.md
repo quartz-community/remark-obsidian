@@ -1126,6 +1126,23 @@ documents that differ by one character:
 Both reduce the unplaced count and both are correct, which makes this the one item of the
 four where the work is defined and the evidence is already in hand.
 
+**Done, and it was the largest single move on this oracle to date.** A third alignment mode
+that skips a quote marker run after each line ending -- tried only after the strict and
+indent modes fail, so an alignment that already succeeds cannot change -- takes the referee
+from **72.1% to 73.6%, +103 documents**, and the unplaced count from **451 to 113**. Zero
+parity regressions, no corpus ceiling moved.
+
+The bug was wider than the code-block framing suggested. `> q` / `>   near [^b]` is two
+columns of indent, nothing to do with code, and its children were unplaced for the same
+reason: a quote strips `> ` from every continuation line, so no multi-line paragraph inside
+a quote could ever align. The 451 were not a family of odd documents; they were every
+quoted multi-line paragraph holding a reference.
+
+Of the 113 left, Obsidian wants 47 and does not want 66, and the 66 are the indented-code
+case above -- a reference inside `>     dolor [^b]`, which Obsidian reads as code and does
+not index at all. Placing those is not the fix; not creating them is, and that is the
+structural half still open.
+
 **The honest summary.** Three of the four items do not survive measurement as tractable
 work, and the one that does is not the one ranked highest. The corpus is the better
 instrument for the long tails: its cases are small enough that one case is one cause, which
