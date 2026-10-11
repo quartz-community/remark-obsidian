@@ -171,6 +171,13 @@ describe("positioned oracle", () => {
     // the MARKER'S SEPARATOR rather than indentation after a space, so `+\t   [^1]: def`
     // turns on micromark's list-item tab straddle instead of the code threshold.
     "probe/def-tab/marker-tab-spaces: the tab is the marker's own separator",
+    // C3: in a PIPELESS table a label line holding a pipe is a ROW, not a definition, so
+    // the reference below it resolves against nothing and Obsidian reports neither. The
+    // piped control defines and so does the one after a blank line, which is what makes
+    // the pipe the axis rather than the table. Closing it needs manual table-row
+    // construction -- micromark's own footnote construct wins the line on a re-parse, so
+    // the row has to be built and spliced.
+    "probe/table-label/pipeless: the label line is a table row",
   ];
 
   it("places every footnote reference, except the classified cases", () => {
@@ -398,8 +405,13 @@ describe("positioned oracle", () => {
     // case it had just been extended for, invisibly, because the final tree showed the
     // bracket either way. Deriving the bracket from the offset is what `normalize-points`
     // already says every earlier pass must do.
-    footnotes: 2,
-    footnoteRefs: 4,
+    // 2 -> 4 with `probe/def-host/*` and `probe/table-label/*`. Both new entries are
+    // recorded gaps rather than regressions: `probe/def-host/nested-bullet` wants the
+    // INNERMOST item's content column (`- a` / `  - b` / blank / `    [^1]: def` is
+    // column 4, where we give the outer item's 2), and `probe/table-label/pipeless` has
+    // no definition at all because its label line is a table row -- C3.
+    footnotes: 4,
+    footnoteRefs: 5,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
     // Obsidian reports a heading's column as its containing block's content column,
@@ -533,7 +545,14 @@ describe("positioned oracle", () => {
     // content, which the section-end clamp now covers for `math` under exactly that test --
     // see `normalize.ts` for the two cheaper predicates that failed first and for the
     // measurement showing `meta` is not the discriminator.
-    sections: 1,
+    // 1 -> 3 with the probe wave, both of them structural rather than positional:
+    // `probe/def-end/quote-nested-host` has the list absorbing a quote-prefixed lazy
+    // line where we end the list and open a blockquote, and `probe/table-label/pipeless`
+    // has the table spanning its label row. Note the other eleven new probes diverge on
+    // `sections` ONLY by two zero-width `text`/`element` entries past the document, which
+    // `sourceBacked` filters -- the renderer's relocated footnote section, already
+    // classified as must-not-fix for `blocks`.
+    sections: 3,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
     // invented, which is the shape of a missing collector rather than a parse bug.
@@ -855,7 +874,10 @@ describe("positioned oracle", () => {
     // un-nesting case. What differs is that the un-nesting outer item is EMPTY, which is
     // one case and belongs to the `probe/empty-container/*` family's own rules rather than
     // to this one.
-    listItems: 4,
+    // 4 -> 5: `probe/def-end/quote-nested-host`, the same lazy-quote absorption as its
+    // `sections` row. `containerLazyTransform` absorbs a PLAIN lazy line into the
+    // innermost item and declines a quote-prefixed one.
+    listItems: 5,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.

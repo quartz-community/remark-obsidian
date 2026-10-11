@@ -2320,6 +2320,53 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/def-cc/bullet-wide-sep", "-   p\n\n     [^1]: def\n\nuse[^1]\n"],
   ["probe/def-cc/bullet-two-sep", "*  p\n\n    [^1]: def\n\nuse[^1]\n"],
   ["probe/def-cc/paren-marker", "1) p\n\n    [^1]: def\n\nuse[^1]\n"],
+
+  // What ENDS a definition, on the one family the referee cannot settle. Its largest
+  // remaining span disagreement is 91 rows where we absorb one line too many, and the
+  // line is a quote -- but a truncation rule scores better 91 / WORSE 395, because a
+  // definition absorbs a quote line far more often than not. The referee's documents are
+  // too dense to say what separates the two, so these vary the quote line's indent, the
+  // blank before it, and the definition's own host, one axis at a time.
+  ["probe/def-end/quote-plain", "[^1]: def\n> quote\n\nuse[^1]\n"],
+  ["probe/def-end/quote-indented", "[^1]: def\n  > quote\n\nuse[^1]\n"],
+  ["probe/def-end/quote-blank-before", "[^1]: def\n\n> quote\n\nuse[^1]\n"],
+  [
+    "probe/def-end/quote-after-body",
+    "[^1]: def\n    more\n> quote\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-end/quote-nested-host",
+    "- a\n\n  [^1]: def\n> quote\n\nuse[^1]\n",
+  ],
+  ["probe/def-end/quote-deeper", "[^1]: def\n>> quote\n\nuse[^1]\n"],
+
+  // The definition START COLUMN inside a host, which is the bucket the referee reports
+  // 102 documents for and provably cannot adjudicate: the same four-space prefix carries
+  // ours=2/obs=4 fourteen times and ours=4/obs=2 eleven times, so the host decides and
+  // the referee stores no structure. `probe/def-cap/*` and `probe/def-cc/*` settled the
+  // bullet and ordered hosts; these are the hosts they did not cover.
+  ["probe/def-host/quote", "> a\n\n    [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-host/nested-bullet", "- a\n  - b\n\n    [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-host/list-in-quote", "> - a\n\n    [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-host/callout", "> [!note] a\n\n    [^1]: def\n\nuse[^1]\n"],
+
+  // C3 from the sibling project's rules: in a PIPELESS table a label line holding a pipe
+  // is a ROW, not a definition. Seven referee shapes agree and four are ours to fix, but
+  // closing it needs manual table-row construction, so the rule is worth pinning on
+  // isolated cases first.
+  //
+  // The no-pipe CONTROL is already recorded as `hunt/label-after-pipeless-table/0` and
+  // already matches -- `a | b` / `--- | ---` / `[^1]: x` defines at 2:0-2:7 -- so adding a
+  // probe for it would only displace a triaged case and its note. The pipe is the axis.
+  ["probe/table-label/pipeless", "a | b\n--- | ---\n[^1]: x | y\n\nuse[^1]\n"],
+  [
+    "probe/table-label/piped",
+    "| a | b |\n| --- | --- |\n[^1]: x | y\n\nuse[^1]\n",
+  ],
+  [
+    "probe/table-label/pipeless-blank",
+    "a | b\n--- | ---\n\n[^1]: x | y\n\nuse[^1]\n",
+  ],
   // Does a TAB count as one column or as four for the indented-code threshold? micromark
   // follows CommonMark and advances to the next multiple of four, so `\t[^1]: def` is
   // indented code and yields no definition here. The referee says Obsidian defines 127
