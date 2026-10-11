@@ -33,10 +33,14 @@ const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/u;
 export function definitionColumnTransform(tree: Root, source: string): void {
   if (source === "") return;
 
+  // The INNERMOST enclosing item owns the definition's column. `visit` is pre-order, so
+  // an outer item is seen before the inner one and overwriting is what keeps the inner:
+  // `- a` / `  - b` / blank / `    [^1]: def` is column 4 in Obsidian, the inner item's
+  // content column, where keeping the first writer gave the outer item's 2.
   const items = new Map<Node, ListItem>();
   visit(tree, "listItem", (item: Node) => {
     visit(item, (inner: Node) => {
-      if (!items.has(inner)) items.set(inner, item as ListItem);
+      items.set(inner, item as ListItem);
     });
   });
 

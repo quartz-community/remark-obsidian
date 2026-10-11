@@ -405,12 +405,17 @@ describe("positioned oracle", () => {
     // case it had just been extended for, invisibly, because the final tree showed the
     // bracket either way. Deriving the bracket from the offset is what `normalize-points`
     // already says every earlier pass must do.
-    // 2 -> 4 with `probe/def-host/*` and `probe/table-label/*`. Both new entries are
-    // recorded gaps rather than regressions: `probe/def-host/nested-bullet` wants the
-    // INNERMOST item's content column (`- a` / `  - b` / blank / `    [^1]: def` is
-    // column 4, where we give the outer item's 2), and `probe/table-label/pipeless` has
-    // no definition at all because its label line is a table row -- C3.
-    footnotes: 4,
+    // 2 -> 4 with `probe/def-host/*` and `probe/table-label/*`, then 4 -> 3.
+    //
+    // `probe/def-host/nested-bullet` is CLOSED. The host map in `definitionColumnTransform`
+    // kept the FIRST item to claim a node, and `visit` is pre-order, so an outer item
+    // always won and a nested definition got the outer content column -- 2 instead of 4 for
+    // `- a` / `  - b` / blank / `    [^1]: def`. Overwriting keeps the innermost. The guard
+    // read as an optimisation and was load-bearing in the wrong direction.
+    //
+    // `probe/table-label/pipeless` remains: no definition at all, because its label line
+    // is a table row -- C3, which needs manual row construction.
+    footnotes: 3,
     footnoteRefs: 5,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
