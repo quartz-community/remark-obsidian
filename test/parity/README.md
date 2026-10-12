@@ -1279,15 +1279,27 @@ So 426 of 1,491 disagreements are tab-positioned, against 512 where a tab is pre
 incidental -- which is exactly the distinction every earlier frequency selector could not
 make, and the reason this one is worth acting on.
 
-**The mechanism is already documented and already known to be hard.** Three tab rules are
-implemented -- a tab after a space does not reach the four-column code threshold while a
-leading one does, a tab in a list marker's separator puts the definition at the marker, and a
-tab-indented list item begins just past its tab run. What remains is micromark's list-item
-tab **straddle**: `containerState.size` counts characters while `factorySpace` consumes
-columns, so a tab crossing a container boundary is split and half a tab has no character
-count at all. `commonmark/tabs/9` and `probe/def-tab/marker-tab-spaces` are the two recorded
-cases, the second `replicate` with that cause attached, and comparing the indent unexpanded
-is refuted at 0 gains against 4 regressions.
+**Three tab rules are implemented** -- a tab after a space does not reach the four-column
+code threshold while a leading one does, a tab in a list marker's separator puts the
+definition at the marker, and a tab-indented list item begins just past its tab run.
+`commonmark/tabs/9` and `probe/def-tab/marker-tab-spaces` are the two recorded cases that
+remain, and comparing the indent unexpanded is refuted at 0 gains against 4 regressions.
+
+**And the mechanism these notes kept attributing it to does not exist.** "`containerState.size`
+counts characters while `factorySpace` consumes columns" has been repeated here and in several
+commit messages, and it is false: the vendored list reader sets `size` from
+`sliceSerialize(token, true)`, whose second argument is `expandTabs`, so the count is ALREADY
+in columns. Rewriting it to expand tabs explicitly is byte-identical on every tab case tried
+-- `+⇥   [^1]: def`, `- ⇥p`, `- foo`/`⇥- bar`, ` - foo`/`   - bar`/`⇥- baz`, `-⇥foo`/`⇥bar`
+and `1.⇥x`/`⇥y` all parse the same before and after -- and the referee does not move.
+
+`list-tab-straddle.ts` had already corrected this in its own docstring: "The cause recorded
+from the prediction was wrong: it said `containerState.size` counts characters while
+`factorySpace` counts columns. The real boundary is a threshold." That correction was made
+when the pass was written and the summary here never picked it up, so the wrong cause stayed
+in circulation and got re-derived from memory as the obvious next fix. **A correction recorded
+in a source file does not propagate to a summary that paraphrases it**, and the summary is
+what gets read when choosing work.
 
 The sibling project reached this by vendoring `remark-parse@8`'s list reader wholesale, which
 is not available here -- but `container-lazy.ts` records that `disable: {null: [...]}` DOES
