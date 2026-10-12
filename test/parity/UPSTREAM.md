@@ -145,6 +145,53 @@ this is the only exception. Its earlier embed sits inside `$...$` inside a callo
 renderer resolves it late. The value of the ordering being positional is that a consumer can
 rely on it.
 
+## These do not explain the referee's remaining disagreements
+
+Worth stating with numbers, because the claim reads as plausible and is wrong by three
+orders of magnitude. Of the **1,609** documents where the referee and this package still
+disagree:
+
+| defect                             | can it reach this oracle?         | documents |
+| ---------------------------------- | --------------------------------- | --------: |
+| `%%` column shortfall (5)          | yes, via a reference column       |     **2** |
+| frontmatter `---` interaction (1)  | yes, in principle                 |     **0** |
+| overlapping definition/heading (2) | no — neither node is a footnote   |         0 |
+| autolink angle growth (3)          | no — serialiser only              |         0 |
+| html tail line endings (4)         | no — serialiser only              |         0 |
+| zero-width `blocks` (6)            | no — the referee stores no blocks |         0 |
+| embed ordering (7)                 | no — the referee stores no embeds |         0 |
+
+Four of the seven cannot appear here by construction: this oracle compares **parse** output,
+so both serialiser defects are invisible to it, and it stores only `text`, `defs` and `refs`,
+so the two about other node types have nothing to disagree with.
+
+**The frontmatter one is already neutralised.** 56 documents open with a rejected `---`, and
+12 of them disagree — 21.4% against a 23.6% base rate, so they fail marginally _less_ than
+average. `lrdFootnoteTransform` converts the node back and the defect costs us nothing on
+this corpus.
+
+**And the `%%` figure is another base-rate trap**, the fifth of its shape here. 47.1% of
+disagreeing documents hold a `%%` against 31.1% of all documents, a lift of 1.52, which
+reads as a lead. The actionable count is **2 rows**: the defect is a two-column shortfall,
+and only two reference rows are off by exactly two with a `%%` on the line. The lift says
+`%%` documents are harder for _us_ — comment extents, regions, freed definitions — not that
+Obsidian is wrong about them.
+
+So the remaining 1,609 are ours. They sit in five buckets —
+
+    refSet 560 · both 402 · defSet 320 · defSpan 232 · defCol 102
+
+— and four of the five are measured as **not line-local**, each refutation recorded in
+`README.md`: `defCol` has the same prefix carrying opposite deltas, the `defSpan` quote
+family scores 91 better against 395 worse, `defSet`'s invented definitions survive no prefix
+grouping, and `refSet` is largely a cascade from a definition placed wrongly. All four need
+the containing **block**, which this oracle does not store.
+
+That is the honest ceiling on it, and it is a limit of the instrument rather than a count of
+what is left to fix. The corpus against real Obsidian is the instrument for the rest, which
+the probe wave demonstrated by finding a nested-host column bug the referee provably could
+not adjudicate.
+
 ## Withdrawn: the harness's own Reading-View correction
 
 Previously listed here as an eighth item: the recorder writes Reading View's `text` into the
