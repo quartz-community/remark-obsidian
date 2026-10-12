@@ -1921,14 +1921,15 @@ like the fix not working until you test the minimal form directly.
 
 ## Files
 
-| File                     | Role                                         |
-| ------------------------ | -------------------------------------------- |
-| `corpus.ts`              | Deterministic case generator                 |
-| `chain.ts`               | Pinned Quartz pipeline and feature profiles  |
-| `normalize.ts`           | Our projections, from mdast                  |
-| `types.ts`               | Shared projection and golden shapes          |
-| `compare.ts`             | Diffing and gate policy                      |
-| `oracle.e2e.ts`          | Recorder; runs inside Obsidian               |
-| `parity.test.ts`         | The gate; no Obsidian required               |
-| `goldens/obsidian.json`  | Recorded output, version-stamped and triaged |
-| `fuzz/contradictions.ts` | Shapes holding both a match and a divergence |
+| File                     | Role                                            |
+| ------------------------ | ----------------------------------------------- |
+| `corpus.ts`              | Deterministic case generator                    |
+| `chain.ts`               | Pinned Quartz pipeline and feature profiles     |
+| `normalize.ts`           | Our projections, from mdast                     |
+| `types.ts`               | Shared projection and golden shapes             |
+| `compare.ts`             | Diffing and gate policy                         |
+| `oracle.e2e.ts`          | Recorder; runs inside Obsidian                  |
+| `parity.test.ts`         | The gate; no Obsidian required                  |
+| `goldens/obsidian.json`  | Recorded output, version-stamped and triaged    |
+| `fuzz/contradictions.ts` | Shapes holding both a match and a divergence    |
+| `UPSTREAM.md`            | Defects found in upstream packages and Obsidian |
