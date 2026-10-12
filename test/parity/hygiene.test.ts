@@ -8,6 +8,7 @@ import { unified } from "unified";
 import { describe, expect, it } from "vitest";
 
 import remarkObsidian from "../../src/index.js";
+import { buildCorpus } from "./corpus.js";
 import { applyTextTransform, PROFILES } from "./chain.js";
 import type { Root } from "mdast";
 
@@ -155,5 +156,92 @@ describe("triage hygiene", () => {
       .filter(([, entry]) => !allowed.has(entry.triage))
       .map(([id, entry]) => `${id} [${entry.triage}]`);
     expect(offenders).toEqual([]);
+  });
+});
+
+/**
+ * The corpus and the goldens describe the same documents.
+ *
+ * Cases are deduplicated by markdown, so a newly designed probe REPLACES an incidental fuzz
+ * case holding the same source -- which is an improvement, and the hazard these notes already
+ * record: a case that keeps its id while changing content moves a triage state onto a
+ * different document, and a case that vanishes takes its recorded reason with it. Both were
+ * being checked by hand after every recording, which is how the C3 no-pipe control nearly
+ * displaced `hunt/label-after-pipeless-table/0` and its note.
+ */
+describe("corpus and goldens agree", () => {
+  const corpus = buildCorpus();
+
+  it("generates no two cases from the same markdown", () => {
+    const byMarkdown = new Map<string, string[]>();
+    for (const entry of corpus) {
+      byMarkdown.set(entry.markdown, [
+        ...(byMarkdown.get(entry.markdown) ?? []),
+        entry.id,
+      ]);
+    }
+    const collisions = [...byMarkdown.values()]
+      .filter((ids) => ids.length > 1)
+      .map((ids) => ids.join(" <-> "));
+    expect(collisions).toEqual([]);
+  });
+
+  it("records the same markdown for every id the goldens hold", () => {
+    const drifted = corpus
+      .filter((entry) => golden.cases[entry.id] !== undefined)
+      .filter((entry) => golden.cases[entry.id]!.markdown !== entry.markdown)
+      .map((entry) => entry.id);
+    expect(drifted).toEqual([]);
+  });
+});
+
+/**
+ * Each preset clears exactly the flags its documentation claims.
+ *
+ * The README's table is the contract -- `strict` turns off the divergences this package
+ * inherited from `remark-parse@8` and keeps Obsidian's own constructs on. A new option added
+ * without a preset entry is silently `legacy`-only, which is the kind of drift nothing else
+ * here would catch: both profiles would keep passing and the published table would be wrong.
+ */
+describe("preset coherence", () => {
+  it("leaves Obsidian's own constructs on under `strict`", () => {
+    const obsidian = [
+      "wikilinks",
+      "highlights",
+      "comments",
+      "tags",
+      "math",
+      "frontmatter",
+      "callouts",
+      "inlineFootnotes",
+    ] as const;
+    const processor = unified()
+      .use(remarkParse)
+      .use(remarkGfm)
+      .use(remarkObsidian, { preset: "strict" });
+    expect(processor).toBeTruthy();
+    // Asserted through behaviour rather than by reading the options back, since the
+    // resolved set is private: each construct has to still parse.
+    const parse = (markdown: string) => {
+      const source = applyTextTransform(markdown);
+      return JSON.stringify(processor.runSync(processor.parse(source), source));
+    };
+    const present: Record<string, boolean> = {
+      wikilinks: parse("[[a]]\n").includes('"wikilink"'),
+      highlights: parse("==a==\n").includes('"highlight"'),
+      comments: parse("%%a%%\n").includes('"comment"'),
+      tags: parse("#tag\n").includes('"tag"'),
+      math: parse("$a$\n").includes("Math"),
+      callouts: parse("> [!note] t\n").includes('"callout"'),
+    };
+    expect(present).toEqual({
+      wikilinks: true,
+      highlights: true,
+      comments: true,
+      tags: true,
+      math: true,
+      callouts: true,
+    });
+    expect(obsidian.length).toBeGreaterThan(0);
   });
 });

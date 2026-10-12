@@ -1957,6 +1957,51 @@ container, which the referee does not store — the structural limit recorded tw
 above, reached from a different direction. The corpus is the instrument for this bucket, and
 `probe/def-cap/*` is where it already lives.
 
+## mdast has a content model, and the obvious library does not check it
+
+`mdast-util-assert` was the obvious tool and it validates node **shape** only. Verified
+against controls rather than assumed, which is the only reason that is known: it ACCEPTS a
+`listItem` at the root, a `tableCell` under root, a `paragraph` nested in a `paragraph`, a
+`list` holding a paragraph, and a node whose type is `nonsense`. It rejects a missing `type`,
+a non-array `children`, and a literal carrying children -- real but narrow.
+
+So it is kept as a cheap shape gate, at **0 violations across 6,806 trees**, because every
+pass here that builds a node by hand could break that. And the containment check had to be
+written: CommonMark's two content classes plus this package's own nodes, with an unmodelled
+type REPORTED rather than ignored, since a silent pass for a node nobody listed is how such a
+table rots.
+
+It found **24 violations, and all 24 are one defect**:
+
+| violation                    | count |
+| ---------------------------- | ----: |
+| `listItem > text`            |     8 |
+| `listItem > break`           |     6 |
+| `callout > text`             |     4 |
+| `blockquote > text`          |     2 |
+| `footnoteDefinition > text`  |     2 |
+| `footnoteDefinition > break` |     2 |
+
+`mathUnclosedContainerTransform` replaces a flow `math` node with a phrasing `text` node
+directly inside a block container that requires flow content. The `text`, and the `break`
+beside it, belong in a `paragraph`.
+
+**Three gates now point at the math-demotion area independently** -- this, the overlapping
+`listItem` spans from the span checker, and 5 of the 12 non-idempotent cases. None of the
+three existed this morning, and none would have found it alone: the span checker sees a
+symptom in the list item, idempotence sees the second-run divergence, and only the content
+model names the cause.
+
+Two more checks landed with it, both cheap and both closing a hole that was being watched by
+hand. **The corpus and the goldens must describe the same documents** -- cases dedupe by
+markdown, so a designed probe replaces an incidental fuzz case with the same source, and a
+case keeping its id while changing content would move a triage state onto a different
+document. That was being checked by hand after every recording, and it is how the C3 no-pipe
+control nearly displaced `hunt/label-after-pipeless-table/0` and its note. And **each preset
+has to keep what its documentation claims**: a new option added without a preset entry is
+silently `legacy`-only, both profiles keep passing, and the published table in the root
+README quietly becomes wrong.
+
 ## Running the chain twice is not a no-op, in 23 of 6,806 pairs
 
 Distinct from the round-trip gate, which checks parse -> serialise -> parse converges. This
