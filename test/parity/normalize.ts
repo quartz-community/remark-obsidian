@@ -2220,6 +2220,12 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       }
       continue;
     }
+    // Code holds no identifier, indented or fenced. `    ^blk` at four columns registers
+    // nothing where `   ^blk` at three registers, and the node type is what separates them
+    // exactly -- the first is a `code` child and the second a paragraph. Deriving the
+    // column here instead would have to re-answer the container-relative indent question
+    // that `quote-indented-code.ts` exists for.
+    if (child.type === "code") continue;
     const from = child.position?.start?.offset;
     const to = child.position?.end?.offset;
     if (from === undefined || to === undefined) continue;
@@ -2330,11 +2336,24 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       before === "[" &&
       raw[beforeAt - 2] !== "!" &&
       raw.slice(id.index + 1 + id.name.length).startsWith("](");
+    // An inline code span's CLOSING backtick frees the caret, where ordinary text does
+    // not. Found by `goldmark-obsidian`'s block-id suite and confirmed against the
+    // application: `` `Line.`^blk `` registers `blk` and renders only `Line.`, while
+    // `Line.^blk` and `` `Line`.^blk `` both register nothing and render the caret -- so
+    // it is the backtick itself and not merely the punctuation before the caret.
+    // `## `Title`^blk` registers too, so it is not paragraph-specific.
+    //
+    // The opener has to exist, by the same argument the `*_=~` test makes: a closer can
+    // only close something that opened. `probe/block-id-inline/code-wraps` is the other
+    // side of this and stays untouched -- an identifier INSIDE a span registers nothing.
+    const codeCloser =
+      before === "`" && raw.slice(0, beforeAt - 1).includes("`");
     if (
       !(setext && beforeAt === 0) &&
       !wrapped &&
       !escapedBracket &&
       !linkLabel &&
+      !codeCloser &&
       !(before && /\s/u.test(before))
     ) {
       continue;

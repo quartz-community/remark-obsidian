@@ -721,7 +721,16 @@ describe("positioned oracle", () => {
     // direction, and a wrong offset is worse than a missing one. The recorder reads `text`
     // off a clone with `.footnotes` removed for exactly this reason; `blocks` is read from
     // the undisturbed root, which is why these two leak through.
-    blocks: 2,
+    // 2 -> 3 with `probe/block-nest/both-ids`, which matches the MAIN gate -- `compareCase`
+    // does not compare `blocks`, so this is visible only here. An outer list item carrying
+    // its own identifier registers it in Obsidian alongside the inner item's; the line scan
+    // iterates ROOT children and takes the last candidate on the span, so a list holding
+    // two identifiers reports only the last. Closing it means scanning per list item.
+    //
+    // Found by `goldmark-obsidian`'s block-id suite, whose other two disagreements with us
+    // were real and are now fixed -- a code-span closer frees the caret, and a `code` child
+    // holds no identifier.
+    blocks: 3,
     // 71, of which 44 are span-only and they do NOT share one rule -- measured, after
     // "Obsidian ends an item at its last content character and we run on to the next
     // line start" was recorded here from two examples. It holds for 34. The other 10

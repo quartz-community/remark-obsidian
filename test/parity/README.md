@@ -1795,6 +1795,53 @@ container, which the referee does not store — the structural limit recorded tw
 above, reached from a different direction. The corpus is the instrument for this bucket, and
 `probe/def-cap/*` is where it already lives.
 
+## Other implementations are arbiters too, and mining their tests works
+
+Four third-party Obsidian-markdown parsers were checked for test data this package could
+use: `Nodsoft/MoltenObsidian` (C#), `paddyd/obsidianmd-parser` and
+`danymat/Obsidian-Markdown-Parser` (Python), and `powerman/goldmark-obsidian` (Go).
+
+**`goldmark-obsidian` is the one with directly comparable data.** `testdata/block_id.txt`
+holds 28 block-identifier cases in a markdown/HTML golden format with an explicit
+"supported"/"not supported" verdict per case. Running all 28 against this package: **19
+agree, 9 differ**, in four groups.
+
+One group was **their** error, which is the whole reason the same rule applies here as to the
+legacy stack. Their case 300 asserts an identifier inside a block quote is "not supported";
+`probe/block-id/in-quote` has recorded `> text ^blk` registering `blk` since long before, and
+it matches. So a third-party implementation is an arbiter -- it tells you where to look, not
+what the answer is.
+
+**The other three groups were real, and all three are now closed.** Each was probed against
+the application first, with controls:
+
+| question                       | Obsidian                   | was ours   |
+| ------------------------------ | -------------------------- | ---------- |
+| `` `Line.`^blk ``              | registers, renders `Line.` | nothing    |
+| `` `Line`.^blk ``              | nothing (control)          | nothing    |
+| `Line.^blk`                    | nothing (control)          | nothing    |
+| ``## `Title`^blk``             | registers                  | nothing    |
+| `    ^blk` (four columns)      | nothing                    | registers  |
+| `   ^blk` (three columns)      | registers (control)        | registers  |
+| `- Item ^one` / `  - Sub ^two` | **both**                   | inner only |
+
+So an inline code span's **closing backtick** frees the caret where ordinary text does not,
+and four columns is indented code holding no identifier. Both landed; the nested pair is
+recorded in the `blocks` ceiling with its cause -- the line scan iterates root children and
+takes the last candidate, so a list holding two identifiers reports only the last.
+
+Two notes for the next pass at this:
+
+- **The other three repositories had nothing comparable.** MoltenObsidian's tests are vault
+  and tag plumbing, and both Python parsers test their own object model against a fixture
+  vault rather than markdown against expected output. Worth the ten minutes to check, not
+  worth returning to.
+- **Check the field exists before believing a comparison.** `goldmark-obsidian` also has a
+  20-case task suite, and comparing it reported 3/20 agreement -- because `tasks` is not a
+  key of the `compute` projection at all. Tasks live in `listItems` as `" "|parent:...`, and
+  we get them right. That is the "a field that does not exist reads as agreement with
+  whatever you expected" trap, inverted: here it read as total disagreement.
+
 ## The legacy stack is an arbiter, not an oracle
 
 Obsidian runs a **fork** of `remark-parse@8`, so a local install of

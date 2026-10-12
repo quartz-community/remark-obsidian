@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-12T07:19:47.812Z",
+  "recordedAt": "2026-10-12T08:11:38.498Z",
   "cases": {
     "probe/label-bracket/full-unmatched-undefined": {
       "id": "probe/label-bracket/full-unmatched-undefined",
@@ -13518,6 +13518,367 @@
         }
       },
       "triage": "match"
+    },
+    "probe/block-delim/backtick-then-id": {
+      "id": "probe/block-delim/backtick-then-id",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "`Line.`^blk\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><code>Line.</code></p>",
+        "projections": {
+          "text": "Line.",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "`Line.`^blk"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:11"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:11"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "An inline code span's closing backtick frees the caret. Found by `goldmark-obsidian`'s block-id suite."
+    },
+    "probe/block-delim/text-then-id": {
+      "id": "probe/block-delim/text-then-id",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "Line.^blk\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">Line.^blk</p>",
+        "projections": {
+          "text": "Line.^blk",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "Line.^blk"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:9"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "Control: ordinary text before the caret registers nothing. Already matched."
+    },
+    "probe/block-delim/backtick-then-period": {
+      "id": "probe/block-delim/backtick-then-period",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "`Line`.^blk\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><code>Line</code>.^blk</p>",
+        "projections": {
+          "text": "Line.^blk",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "`Line`.^blk"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:11"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "Control: a backtick then a period registers nothing, so it is the backtick and not the punctuation. Already matched."
+    },
+    "probe/block-delim/heading-backtick": {
+      "id": "probe/block-delim/heading-backtick",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "## `Title`^blk\n",
+      "obsidian": {
+        "html": "<h2 data-heading=\"`Title`^blk\" dir=\"auto\"><code>Title</code></h2>",
+        "projections": {
+          "text": "Title",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "2:`Title`^blk"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "## `Title`^blk"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "2:`Title`^blk"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "2:`Title`^blk@0:0"
+          ],
+          "sections": [
+            "heading@0:0-0:14"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:14"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "The code-span closer rule is not paragraph-specific."
+    },
+    "probe/block-indent/four": {
+      "id": "probe/block-indent/four",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "    ^blk\n",
+      "obsidian": {
+        "html": "<pre><code>^blk\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>",
+        "projections": {
+          "text": "^blk",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "code",
+              "text": "    ^blk"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "code@0:0-0:8"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "Four columns is indented code and holds no identifier; the scan now skips a `code` child."
+    },
+    "probe/block-indent/three": {
+      "id": "probe/block-indent/three",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "   ^blk\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">   </p>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "   ^blk"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [
+            "blk@0:0-0:7"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "Control: three columns still registers. Already matched."
+    },
+    "probe/block-nest/both-ids": {
+      "id": "probe/block-nest/both-ids",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- Item ^one\n  - Sub ^two\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">Item \n<ul>\n<li dir=\"auto\">Sub </li>\n</ul>\n</li>\n</ul>",
+        "projections": {
+          "text": "Item Sub",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- Item ^one\n  - Sub ^two"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:12"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:11",
+            "-|parent:0@1:2-1:12"
+          ],
+          "blocks": [
+            "one@0:0-0:11",
+            "two@1:2-1:12"
+          ],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "Matches the main gate, which does not compare `blocks`; the divergence is on the positioned oracle and is recorded in its ceiling. An OUTER list item carrying its own identifier registers it in Obsidian alongside the inner item's, and the blocks line scan iterates ROOT children taking the last candidate, so a list holding two reports only the last."
     },
     "probe/list-item/two-roots": {
       "id": "probe/list-item/two-roots",

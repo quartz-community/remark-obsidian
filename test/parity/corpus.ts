@@ -546,6 +546,29 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/block-id/uppercase", "text ^BLK\n"],
   ["probe/block-id/trailing-space", "text ^blk \n"],
   ["probe/block-id/two-ids", "text ^one ^two\n"],
+  // Three questions raised by `goldmark-obsidian`'s own block-id suite, which disagrees
+  // with us on 9 of its 28 cases. It is an arbiter and not an oracle -- its case 300
+  // asserts an identifier inside a block quote is "not supported", and
+  // `probe/block-id/in-quote` already records Obsidian registering one -- so each of these
+  // settles a reading of theirs against the application rather than adopting it.
+  //
+  // What DELIMITS an identifier. They register `^good` after an inline code span's closing
+  // backtick and refuse it after a letter or a period, so the closer counts as a boundary
+  // where ordinary text does not. `probe/block-id-inline/code-wraps` covers an identifier
+  // INSIDE a span and is a different question.
+  ["probe/block-delim/backtick-then-id", "`Line.`^blk\n"],
+  ["probe/block-delim/text-then-id", "Line.^blk\n"],
+  ["probe/block-delim/backtick-then-period", "`Line`.^blk\n"],
+  ["probe/block-delim/heading-backtick", "## `Title`^blk\n"],
+  // Four columns is indented CODE, where they register nothing and we register `blk`.
+  // ` ^blk` at one column already records as a live identifier, so the threshold is the
+  // question and three columns is the control for it.
+  ["probe/block-indent/four", "    ^blk\n"],
+  ["probe/block-indent/three", "   ^blk\n"],
+  // An OUTER item carrying its own identifier while the inner one does too. They register
+  // both; we register only the inner. `- a` / `  - b ^id` is already recorded with the
+  // outer item NOT named, but there the outer has no identifier of its own.
+  ["probe/block-nest/both-ids", "- Item ^one\n  - Sub ^two\n"],
   // `listItems[].parent` encodes nesting as a negative number for a root item,
   // and the two values recorded so far -- -1 for an item on line 0 and -10 for
   // one on line 10 -- fit no formula yet. A child's value should be a real line
