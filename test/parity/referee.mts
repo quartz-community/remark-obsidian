@@ -89,6 +89,34 @@ function ours(text: string) {
             at.start.column - 1,
             at.end.line - 1,
           ]);
+      } else if (at) {
+        // A definition buried in a comment does not define, and its label is still
+        // indexed as a REFERENCE. `> %%` over `[^3]: Text` reports no definition and a
+        // reference at 1:0 -- the quoted `%%` runs to the end of the note, the definition
+        // fails, and the name is indexed anyway. Measured here at +123 documents against 7,
+        // and all 7 are notes where a FENCE sits inside the comment and our comment extent
+        // differs from Obsidian's, which is a separate and already-tracked class.
+        //
+        // This rule was refuted four times before, at 444/329, 578/237 and 540/273, and
+        // written up as permanently abandoned. Every one of those measurements classified
+        // the premise with a hand-rolled `%%` scan over the note's text, and that scan was
+        // the thing being measured. Splitting out the control exposed it: of the label
+        // lines it called "inside an open comment" with no definition, 319 were notes where
+        // Obsidian DOES define the label, so the premise never applied and they were not
+        // counter-examples at all. Removing them took the rule from 57.5% to 81.5%, and
+        // teaching the scan about fences took it to 86%.
+        //
+        // The scan was never needed. Our own parser computes comment extents, so asking the
+        // TREE which definitions are buried is both exact and what a consumer sees. That is
+        // the measurement that settles it, and it is the one that should have been run first.
+        //
+        // It belongs in this projection rather than in the tree: a `footnoteDefinition`
+        // nested inside a `comment` is more informative than a reference, a formatter needs
+        // the definition's own span to rewrite the line, and synthesising a reference node
+        // would put a construct in the tree that no source character spells. Where
+        // Obsidian's INDEX reinterprets a node, the reinterpretation belongs downstream --
+        // the same rule that keeps a dangling reference and a surplus table cell in the tree.
+        refs.push([id(), at.start.line - 1, at.start.column - 1]);
       }
     } else if (candidate.type === "footnoteReference") {
       if (!at) unplaced++;

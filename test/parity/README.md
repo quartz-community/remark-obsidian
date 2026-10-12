@@ -1067,6 +1067,47 @@ side alone; counting the side where the rule would FIRE is what finished it. The
 worth keeping as a worked example: ten shortest documents → 562 → 439 → 97 → refuted. Every
 step was a real measurement and the conclusion was wrong until the last one.
 
+### ...and then the rule turned out to be real, because the PREMISE was what I was measuring
+
+Four refutations, written up above as permanent, and all four were measuring the wrong thing.
+Every one classified "is this label inside an open comment?" with a hand-rolled `%%` scan
+over the note's text -- and that scan, not the rule, is what the numbers described.
+
+The control that exposes it is one line: of the label lines the scan called buried and
+definition-less, how many does Obsidian nevertheless DEFINE?
+
+    550x  def=false ref=true     the rule holds
+    319x  def=true  ref=false    Obsidian defines it, so the premise never applied
+    125x  def=false ref=false    genuine counter-examples
+
+The 319 are not counter-examples; they are notes where the scan is wrong about the comment's
+extent. Dropping them moves the rule from 57.5% to **81.5%**, and teaching the scan about
+fenced code -- a `%%` inside a fence is not an opener, and my scan went out of phase on it --
+to **86%**. The column was never the problem: 550 of the hits are at the label's exact
+column and **zero** are at a different one.
+
+The scan was never needed at all. **Our own parser computes comment extents**, so asking the
+tree which definitions are buried is exact, free, and the same thing a consumer sees.
+Measured that way the rule gains **123 documents against 7**, taking the referee from 76.4%
+to **78.1%** -- the second-largest single move recorded here. The 7 losses are all notes with
+a fence inside the comment, where our extent differs from Obsidian's, which is a separate and
+already-tracked class.
+
+Three lessons, and the first is the expensive one:
+
+- **A predicate that stands in for the premise is part of what you are measuring.** Four
+  measurements agreed with each other because they shared one scan, and the agreement read as
+  confirmation. Where a rule's premise is structural, compute it from the tree -- which is the
+  same conclusion the structural-adjudication limit reaches from the other side, and it was
+  available on all four earlier attempts.
+- **"Refuted" and "abandoned" are different claims**, and the write-up conflated them. One
+  coarse predicate was refuted four times; the rule was never tested.
+- It belongs in the **projection**, not the tree. A `footnoteDefinition` nested in a `comment`
+  is more informative than a reference, a formatter needs the definition's own span to rewrite
+  the line, and synthesising a reference node would put a construct in the tree that no source
+  character spells. Where Obsidian's INDEX reinterprets a node, the reinterpretation belongs
+  downstream -- the rule that already keeps a dangling reference and a surplus table cell.
+
 What remains true and useful: the asymmetry itself is real (a definition inside a comment
 does not define, a reference inside one is indexed, 710 documents depend on it), and it
 belongs in the reference half of `parseComments` rather than in a projection if a correct
