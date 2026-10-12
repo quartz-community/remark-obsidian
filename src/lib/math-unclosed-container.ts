@@ -105,13 +105,33 @@ export function mathUnclosedContainerTransform(
       // reduced onto exactly that. The emptiness test above is what distinguishes a
       // genuine container from a lazy line at column zero, and it is sufficient.
 
+      // Without its trailing line endings. A `math` node follows the code-fence template,
+      // so its span runs through the ending after the block -- which is correct for a flow
+      // node and wrong for the text replacing it: `[^1]: $$y^2` gave a paragraph ending at
+      // 12 inside a definition ending at 11, and `remark-breaks` then turned the surplus
+      // ending into a `break` node sitting past its own parent too.
+      //
+      // Counted rather than matched: the ReDoS lint reads a trailing-anchored `\n+$` as a
+      // second-degree polynomial, and `definition-trim.ts` records the same substitution.
+      let kept = written.length;
+      while (
+        kept > 0 &&
+        (written[kept - 1] === "\n" || written[kept - 1] === "\r")
+      ) {
+        kept -= 1;
+      }
+      const trimmed = written.slice(0, kept);
+      const shed = written.length - kept;
+      const end = { ...math.position!.end };
+      if (shed > 0 && end.offset !== undefined) {
+        end.offset -= shed;
+        end.line -= shed;
+        end.column = trimmed.length - trimmed.lastIndexOf("\n");
+      }
       const text: Text = {
         type: "text",
-        value: written,
-        position: {
-          start: { ...math.position!.start },
-          end: { ...math.position!.end },
-        },
+        value: trimmed,
+        position: { start: { ...math.position!.start }, end },
       };
       // Wrapped in a paragraph, because `math` is FLOW content and `text` is PHRASING: a
       // bare text node is legal inside a `calloutTitle`, which holds phrasing, and illegal
@@ -131,10 +151,12 @@ export function mathUnclosedContainerTransform(
           : ({
               type: "paragraph",
               children: [text],
-              position: {
-                start: { ...math.position!.start },
-                end: { ...math.position!.end },
-              },
+              // The TRIMMED end, the same one the text carries. Giving the wrapper the
+              // math node's original end left the paragraph past its own container while
+              // the text inside it was correct, and the invariant count not moving is what
+              // caught that -- a partial fix measures as no fix, which is the only reading
+              // a ceiling can give.
+              position: { start: { ...math.position!.start }, end: { ...end } },
             } as unknown as RootContent);
       parent.children.splice(index, 1, replacement);
     }

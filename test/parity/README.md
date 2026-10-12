@@ -2006,6 +2006,24 @@ whose cause it addressed. The containment ceiling is now an ABSOLUTE assertion r
 ceiling -- a node in an illegal position is a defect under any reading, unlike a span that
 merely disagrees with Obsidian, so there is no argument for carrying one.
 
+**Three of the four symptoms are now closed, in three separate fixes.** The content model
+took the paragraph wrap; the `listItem/listItem` overlap took a clamp and turned out to be
+`remark-math`'s, now `UPSTREAM.md` item 5; and the last span row went when the wrapper
+stopped inheriting the math node's trailing line ending -- a `math` span runs through the
+ending after its block, which is right for a flow node and wrong for the phrasing node
+replacing it.
+
+The span ceiling is 134 from 142, and **the five idempotence entries did not move.** So the
+"one defect, four symptoms" reading was itself too tidy: three of them shared a cause and the
+fourth does not, which only became visible once the three were gone.
+
+One process note from the trailing-ending fix, because it is the clearest instance of a
+ceiling earning its keep. The first attempt trimmed the TEXT's end and left the wrapping
+paragraph on the math node's original end, so the text inside was correct and its parent was
+still wrong -- and the violation count did not move at all. A partial fix measures as no fix,
+which is the only reading a count can give, and that is exactly the feedback a boolean
+"passes/fails" gate could not have provided.
+
 Two more checks landed with it, both cheap and both closing a hole that was being watched by
 hand. **The corpus and the goldens must describe the same documents** -- cases dedupe by
 markdown, so a designed probe replaces an incidental fuzz case with the same source, and a
