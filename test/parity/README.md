@@ -794,6 +794,45 @@ Obsidian resolved it to the current note, and embedded the note into itself six 
 deep. Reproducing that needs vault resolution and recursive inlining — the renderer's job,
 and this harness models no vault.
 
+## Score a rule before building it, because repairs lose and extensions win
+
+A measured pattern in what succeeds here, and it is not about effort. Every change that
+landed extended an ALREADY-MEASURED rule to a new input class: `referenceLinks` was right on
+110 of 111 cases before a line was wired in, the container-lazy fix added two entries to an
+existing guard list, the definition-column rule gained a second node type. Every change that
+was refused added a NEW REPAIR for a single observed shape, and each scored `+1 corpus case`
+against `-4` to `-27` referee documents.
+
+That is structural. A repair that fires on one shape fires on many shapes in documents
+carrying six or eight constructs, so the blast radius is always larger than the thing
+measured. The standing rule here -- measure a predicate on both sides before implementing --
+was being applied to CASES rather than to the implementation's blast radius.
+
+`score.mts` closes that. A candidate rule is written as a transformation of OUR OWN ANSWERS,
+applied to all 6,818 documents, and scored by whether each document moves toward the recorded
+answer or away from it. No tree surgery, no pass ordering, no re-parse, and it cannot be keyed
+wrong the way a disagreement table can.
+
+Its own control is the two most recently refused rules, and it reproduces both:
+
+    quote-truncate   better 61  worse 351  same 107   agreement 5336 -> 5095
+    comment-fold     better  9  worse  18  same  11   agreement 5336 -> 5333
+
+The tab work cost three implementation cycles and the comment fold four to reach conclusions
+this gives in one run.
+
+**And it reports what no implementation measurement can: a rule's CEILING.** `comment-fold`
+changes 38 documents of 6,818, so its best possible outcome was +9. Four cycles were spent on
+a rule that could never have been worth more than nine documents. **Read the
+`better + worse + same` total first** -- if it is small the rule is not worth building however
+the sign comes out, and that is the question implementing a pass can never answer in advance.
+
+Two consequences for how the remaining work is chosen. The unit is now a RULE WITH A MEASURED
+BLAST RADIUS, not a diverging case -- a single case is only ever a lead toward one. And a rule
+that is CORRECT and scores negative is a real outcome: record it with its score and leave it,
+rather than retrying it at a different scope, which is what three tab scopings and four
+comment-fold iterations each established the expensive way.
+
 ## Asking Obsidian directly, in two seconds
 
 `parity:record` boots Obsidian under Xvfb, renders all 3,403 corpus cases and rewrites the
@@ -2628,6 +2667,7 @@ like the fix not working until you test the minimal form directly.
 | `parity.test.ts`         | The gate; no Obsidian required                     |
 | `goldens/obsidian.json`  | Recorded output, version-stamped and triaged       |
 | `ask.mts`                | Asks a running Obsidian about arbitrary markdown   |
+| `score.mts`              | Scores a candidate rule over the whole referee     |
 | `delta.mts`              | What a change gained and broke, before committing  |
 | `invariants.test.ts`     | Structural invariants on the tree itself           |
 | `option-matrix.test.ts`  | Every option toggled, looking for crashes          |
