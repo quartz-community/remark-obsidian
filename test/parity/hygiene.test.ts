@@ -20,20 +20,36 @@ const golden = JSON.parse(fs.readFileSync(goldens, "utf8")) as {
 };
 
 /**
- * Running the transform chain twice over one tree changes nothing.
+ * Where the chain is ORDER-COUPLED: a pass that relocates a node, before a pass that reads
+ * where it sits.
  *
- * Not the same property as the round-trip gate, which checks parse -> serialise -> parse
- * converges. This checks the chain itself: ~70 passes that splice, fold and re-span nodes,
- * every one of which sees its own output on a second run. A pass that appends rather than
- * replaces, or widens a span it already widened, is a latent defect -- it needs no unusual
- * input to be wrong, only to run twice, which `unified` makes trivially possible for any
- * consumer holding a processor and a tree.
+ * This began as an idempotence gate -- "running the chain twice over one tree changes
+ * nothing" -- and that framing was a category error worth recording, because the test passed
+ * review and the number looked like a defect count. **The chain is a pipeline from a fresh
+ * parse, not a fixed-point operator**, and nothing in it claims otherwise. A consumer parses
+ * once and runs once; `unified` makes a second `runSync` possible but no pass is written for
+ * it.
  *
- * It also catches a specific hazard this repo has met four times: a pass that reads a raw
- * source slice to rebuild a value. On the first run the slice matches the node; on the second
- * it is re-applied to a value that already absorbed it. The round-trip gate found that class
- * through the serialiser, which only sees it when the output is re-parsed; this sees it
- * directly.
+ * What the 23 actually mark is real and narrower. Instrumenting `math/list-boundary`:
+ *
+ *     after parse   line=3 col=4 off=23 v=""          micromark's node, at the closing `$$`
+ *     after run 1   line=1 col=10 off=9 v="   Math"   a pass relocated it to the opener
+ *     after run 2   line=1 col=10 off=9 v="Math"
+ *
+ * `mathFenceTransform` reads `position.start.line` to index `data.lineOffsets`, and on the
+ * first run it sees micromark's line while on the second it sees the relocated one. Neither
+ * `lineOffsets` nor the offsets changed -- verified, both identical across all three stages.
+ * So this is not the stale-point hazard the `.column` audit covers; it is two passes coupled
+ * through a position that one of them moves.
+ *
+ * That coupling IS worth a gate, because it is invisible to every other check here: both
+ * passes are correct on a fresh parse, the parity gate is green, and the order is undocumented
+ * in `src/index.ts`. The list is the set of places where swapping those two passes would
+ * change output, which is a fragility map rather than a bug list -- and `pass-order.mts`
+ * reports the same coupling from the other direction.
+ *
+ * Held as a LIST so the set cannot grow unnoticed. A NEW entry means a newly order-coupled
+ * pair, which is worth knowing; a entry disappearing means a coupling was removed.
  */
 function runTwice(markdown: string, profile: keyof typeof PROFILES) {
   const processor = unified()
@@ -49,10 +65,10 @@ function runTwice(markdown: string, profile: keyof typeof PROFILES) {
 }
 
 /**
- * The 23 case/profile pairs where a second run changes the tree, of 6,806.
+ * The 23 case/profile pairs where a second run reads a position the first run moved, of 6,806.
  *
- * A LIST rather than a count, so a fix that trades one case for another cannot hide. Grouped
- * by what they share:
+ * A LIST rather than a count, so a change that trades one case for another cannot hide.
+ * Grouped by what they share:
  *
  * - **Math inside a container, 5 cases.** `math/list-boundary`, `math/midline-list`,
  *   `math/unclosed-quote-lazy`, `fuzz/math/12`, `probe/math-marker/dash-opener-alone`. The
@@ -97,8 +113,8 @@ const NON_IDEMPOTENT = [
   "task/escaped-marker [all-features]",
 ] as const;
 
-describe("transform idempotence", () => {
-  it("changes no tree on a second run beyond the recorded set", () => {
+describe("chain order-coupling", () => {
+  it("couples no more pass pairs through a moved position than recorded", () => {
     const offenders: string[] = [];
     for (const [id, entry] of Object.entries(golden.cases)) {
       for (const profile of Object.keys(PROFILES) as Array<

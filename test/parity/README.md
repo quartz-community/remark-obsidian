@@ -2034,15 +2034,39 @@ has to keep what its documentation claims**: a new option added without a preset
 silently `legacy`-only, both profiles keep passing, and the published table in the root
 README quietly becomes wrong.
 
-## Running the chain twice is not a no-op, in 23 of 6,806 pairs
+## A gate can assert a property the system never claimed
 
-Distinct from the round-trip gate, which checks parse -> serialise -> parse converges. This
-checks the **chain itself**: ~70 passes that splice, fold and re-span nodes, every one of
-which sees its own output on a second run. A pass that appends rather than replaces, or
-widens a span it already widened, needs no unusual input to be wrong -- only to run twice,
-which `unified` makes trivial for any consumer holding a processor and a tree.
+Added as an idempotence gate -- "running the chain twice over one tree changes nothing" --
+which read as obviously correct, passed review, and produced a number that looked like a
+defect count. It was a category error. **The chain is a pipeline from a fresh parse, not a
+fixed-point operator**, and nothing in it claims otherwise: a consumer parses once and runs
+once, and no pass is written to see its own output.
 
-23 of 6,806 case/profile pairs change, in 12 cases, and they group:
+Instrumenting one case is what settled it:
+
+    after parse   line=3 col=4 off=23 v=""          micromark's node, at the closing `$$`
+    after run 1   line=1 col=10 off=9 v="   Math"   a pass relocated it to the opener
+    after run 2   line=1 col=10 off=9 v="Math"
+
+`mathFenceTransform` reads `position.start.line` to index `data.lineOffsets`, so on the first
+run it sees micromark's line and on the second the relocated one. Neither `lineOffsets` nor
+any offset changed -- both verified identical across all three stages -- so this is not the
+stale-point hazard the `.column` audit covers. It is two passes coupled through a position
+that one of them moves.
+
+**That coupling is worth a gate; "idempotence" was the wrong name for it.** The coupling is
+invisible to every other check here -- both passes are correct on a fresh parse, the parity
+gate is green, and the order is undocumented in `src/index.ts` -- and `pass-order.mts` reports
+the same coupling from the other direction. So the test stays, relabelled as a fragility map:
+a new entry means a newly coupled pair, not a new bug.
+
+Three fixes were made against the old framing before it was questioned, and all three were
+real defects found by OTHER gates, so none is wasted. But the 23 were never going to fall to
+them, and reading them as a backlog is what sent me looking. **Ask what property a gate
+asserts before acting on its count**, and prefer instrumenting one case to reasoning about
+twenty-three.
+
+The 23 group as follows, which is still the useful breakdown:
 
 - **Math inside a container, 5 cases.** And `math/list-boundary` is also one of the
   invariant checker's overlapping-`listItem` cases -- the math block outlives the item
