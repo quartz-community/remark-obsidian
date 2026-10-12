@@ -34,14 +34,19 @@ const CEILING = {
   // and `text` groups as expected, and the `footnoteReference` (4) and `wikilink` (2) groups
   // with them -- they were the same fold seen through a different child type, which the
   // per-child-type grouping had made look like separate families.
-  // A callout's title is split out of the paragraph that held it, and the paragraph keeps
-  // its original start -- `> [!note] Title` / `> [[target]]` gives `calloutTitle[10..15]`
-  // beside `paragraph[2..28]`, so the two overlap by the title's whole width.
-  "SIBLINGS OVERLAP: callout > calloutTitle/paragraph": 26,
-  // NOT OURS. Bare `remark-parse` + `remark-gfm` produce this for `[ref]: /url` / `para` /
-  // `===`: the heading's start is the definition's start, so the definition is contained in
-  // its own following sibling. Filed in `UPSTREAM.md` as item 2, and reproducing it is the
-  // reason this group must not be driven to zero by changing our own output.
+  // CLOSED. The body paragraph kept the start it had before the title was lifted out of it,
+  // which is the `>` marker's content column, so `> [!note] Title` / `> [[target]]` left
+  // `paragraph[2..28]` beside `calloutTitle[10..15]` -- overlapping by the title's whole
+  // width. Syncing the paragraph's start to its first remaining child closed all 26.
+  // NOT OURS, and the ONLY entry left. Bare `remark-parse` + `remark-gfm` produce this for
+  // `[ref]: /url` / `para` / `===`: the heading's start is the definition's start, so the
+  // definition is contained in its own following sibling. Filed in `UPSTREAM.md` as item 2.
+  //
+  // The ceiling opened at 142 across 8 groups and is now this one group of 10, every other
+  // violation closed in five fixes. It must NOT be driven to zero: doing so would mean
+  // diverging from upstream's own output, which is a different kind of claim from fixing a
+  // defect. Unlike item 5, nothing here reads these spans and we do not synthesise them --
+  // they arrive from `remark-parse` and pass straight through.
   "SIBLINGS OVERLAP: root > definition/heading": 10,
   // CLOSED by `listItemExtentTransform`. It was `remark-math` extending an item past its
   // sibling's start when a `$$` opener shares its line with content, reproduced on bare

@@ -502,6 +502,27 @@ export function calloutTransform(
       } as unknown as (typeof quote.children)[number]);
     }
 
+    // The body paragraph's own start, once the title nodes have been lifted out of it.
+    //
+    // It kept the start it had before the split, which is the `>` marker's content column,
+    // so `> [!note] Title` / `> [[target]]` left `paragraph[2..28]` beside
+    // `calloutTitle[10..15]` -- two siblings overlapping by the title's whole width. 26 of
+    // the span checker's violations were this, and a consumer splicing by offset cannot
+    // order an edit in the title against one in the body while they do.
+    //
+    // Only the start moves, and only forward to a child the paragraph still holds. The
+    // paragraph is dropped entirely a few lines above when the title took everything, so
+    // this only ever runs on one with content left.
+    for (const child of quote.children) {
+      if (child.type !== "paragraph") continue;
+      const first = (child.children as Positioned[])[0]?.position?.start;
+      const start = child.position?.start;
+      if (!first || !start) break;
+      if (start.offset === undefined || first.offset === undefined) break;
+      if (first.offset > start.offset) child.position!.start = { ...first };
+      break;
+    }
+
     const callout = node as unknown as Callout;
     callout.type = "callout";
     callout.calloutType = (calloutType ?? "").trim();
