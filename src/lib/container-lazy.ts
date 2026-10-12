@@ -203,7 +203,19 @@ export function containerLazyTransform(tree: Root, source: string): void {
         // the list with the `---` left as a thematic break. A blockquote is the
         // other way round and keeps the heading at root, which is why this is
         // restricted rather than general.
-        !(next.type === "heading" && container.type === "list")
+        !(next.type === "heading" && container.type === "list") &&
+        // A quote, but only after a list. `- a` / blank / `  [^1]: def` / `> quote`
+        // reports ONE list spanning to the quote's line, with the single item spanning it
+        // too -- so the quote-prefixed line continues the item rather than opening a block
+        // of its own. Restricted to a list by the same reasoning as the two entries above
+        // and with the same evidence shape, a recorded probe per container.
+        !(next.type === "blockquote" && container.type === "list") &&
+        // A list, but only after a callout. `> [!note] title` / `2. [^1]: def` reports one
+        // callout spanning the marker's line, with a `listItem` inside it. Note the
+        // ordered item opens at all only because a callout title is not a paragraph --
+        // `calloutTitleInterruptTransform` is the pass for that, and this is where the
+        // result ends up nested.
+        !(next.type === "list" && container.type === "callout")
       ) {
         continue;
       }

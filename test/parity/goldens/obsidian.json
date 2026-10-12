@@ -5746,8 +5746,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Not A2c. `2.` at column 0 already opens a root list here, because the block before it is a callout rather than a paragraph, so there is nothing to interrupt -- `calloutTitleInterruptTransform` never fires. Obsidian instead absorbs that line into the callout as lazy continuation, which is the same gap as `probe/def-end/quote-nested-host`: `containerLazyTransform` absorbs a plain lazy line into the innermost item and declines one that opens a list or carries a quote prefix."
+      "triage": "match",
+      "note": "The ordered item opens because a callout title is not a paragraph, and the resulting list is then absorbed into the callout as lazy continuation. Closed by `calloutTitleInterruptTransform` plus a narrow widening of `containerLazyTransform`."
     },
     "probe/autolink/scheme": {
       "id": "probe/autolink/scheme",
@@ -82628,8 +82628,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A quote line lazily continues the list item that holds the definition, so Obsidian reports one list section spanning it; we end the list and open a blockquote. The definition's own span agrees. `containerLazyTransform` absorbs a plain lazy line but not a quote-prefixed one."
+      "triage": "match",
+      "note": "A quote-prefixed line continues the list item that holds the definition rather than opening a block: Obsidian reports one list spanning it, with the single item spanning it too. Closed by a narrow widening of `containerLazyTransform`."
     },
     "probe/def-end/quote-deeper": {
       "id": "probe/def-end/quote-deeper",

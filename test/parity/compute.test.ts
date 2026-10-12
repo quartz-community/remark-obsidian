@@ -544,9 +544,9 @@ describe("positioned oracle", () => {
     // content, which the section-end clamp now covers for `math` under exactly that test --
     // see `normalize.ts` for the two cheaper predicates that failed first and for the
     // measurement showing `meta` is not the discriminator.
-    // 1 -> 3 with the probe wave, both of them structural rather than positional:
-    // `probe/def-end/quote-nested-host` has the list absorbing a quote-prefixed lazy
-    // line where we end the list and open a blockquote, and `probe/table-label/pipeless`
+    // 1 -> 3 -> 1, both closed. `probe/def-end/quote-nested-host` and
+    // `probe/title-interrupt/two-lazy` were the two lazy-absorption cases, and both went
+    // with the quote-after-list and list-after-callout widenings; `probe/table-label/pipeless`
     // had the table spanning its label row, which `tableLabelRowTransform` now does too.
     // `probe/title-interrupt/two-lazy` is the third, and it is NOT A2c: `2.` at column 0
     // already opens a root list there, because what precedes it is a callout rather than a
@@ -555,7 +555,7 @@ describe("positioned oracle", () => {
     // Note the other eleven new probes diverge on `sections` ONLY by two zero-width
     // `text`/`element` entries past the document, which `sourceBacked` filters -- the
     // renderer's relocated footnote section, already classified must-not-fix for `blocks`.
-    sections: 3,
+    sections: 1,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
     // invented, which is the shape of a missing collector rather than a parse bug.
@@ -886,10 +886,11 @@ describe("positioned oracle", () => {
     // un-nesting case. What differs is that the un-nesting outer item is EMPTY, which is
     // one case and belongs to the `probe/empty-container/*` family's own rules rather than
     // to this one.
-    // 4 -> 5: `probe/def-end/quote-nested-host`, the same lazy-quote absorption as its
-    // `sections` row. `containerLazyTransform` absorbs a PLAIN lazy line into the
-    // innermost item and declines a quote-prefixed one.
-    listItems: 5,
+    // 4 -> 5 -> 4. `probe/def-end/quote-nested-host` is CLOSED: `containerLazyTransform`
+    // now accepts a quote-prefixed line after a LIST, which is the same shape as the `html`
+    // and `heading` entries it already restricted to a list, with the same evidence -- one
+    // recorded probe per container.
+    listItems: 4,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
