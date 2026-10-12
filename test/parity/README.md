@@ -1247,6 +1247,54 @@ after a space, so it turns on micromark's list-item tab straddle — `containerS
 counting characters while `factorySpace` consumes columns — and not on the code threshold at
 all. Two shapes that look identical in a prefix dump, one rule each.
 
+### Re-running the other stand-in measurements: one refuted harder, one advanced
+
+The commented-definition lesson -- that a predicate standing in for a structural premise is
+part of what you measure -- applies to two more conclusions recorded here, both of which were
+reached with a line scan. Both were re-run against the TREE.
+
+**The quote-absorption truncation is refuted harder, and that is the useful outcome.** The
+line-scan version scored 91 better against 395 worse, and the obvious explanation was that
+the 395 are definitions INSIDE a quote, where quote-prefixed lines are their own
+continuation. Asking the tree which definitions sit in a `blockquote` or `callout` and
+scoring each group separately:
+
+    definition at ROOT    better 20   worse  85   (19%)
+    definition in a QUOTE better 71   worse 310   (19%)
+
+Identical ratios. The definition's own nesting is not the discriminator and the truncation
+rule is simply wrong, which is now established on the premise computed rather than guessed.
+
+**The definition start-column bucket advanced from "no rule" to a legible 88.7% one.** The
+line-prefix grouping gave the same four-space prefix carrying opposite deltas and the bucket
+was written off as not line-local. Deriving the host list item from the tree instead, and
+restricting to the 106 disagreeing columns, Obsidian's answer equals the tree-derived host
+content column in 37 of them -- and the informative rows, where the host column and the
+bracket differ, point at one rule:
+
+    45x picks bracket   hostCol=2 indent=1 bracket=1
+    38x picks bracket   hostCol=2 indent=0 bracket=5
+    36x picks bracket   hostCol=2 indent=0 bracket=3
+    31x picks hostCol   hostCol=2 indent=4 bracket=4
+
+`indent >= hostContentColumn ? hostContentColumn : bracket` holds on **1452 of 1637 rows
+(88.7%)**, and it agrees with every `probe/def-cap/*` answer too.
+
+**It is not implemented, and the 185 failures say why rather than merely how many.** Some
+have Obsidian reporting a column that is NEITHER the host content column nor the bracket --
+`hostCol=6 indent=4 bracket=4 obs=2` and `hostCol=10 indent=4 bracket=4 obs=2` -- which can
+only mean our innermost `listItem` is not Obsidian's host there. And `hostCol=2 indent=4
+bracket=4` appears answering 4 twelve times and 2 thirty-one times, so identical inputs give
+opposite answers and something outside the three numbers decides it. The premise is still
+contaminated, one level up.
+
+So the standing rule applies to itself: the current implementation is backed by twelve probes
+recorded against the application, and replacing it with an 88.7% rule fitted to this corpus
+-- where the host identification is demonstrably wrong in some rows -- would trade verified
+behaviour for fitted behaviour. The next step is a probe wave varying the definition's indent
+against the host's content column where the two disagree, which is four or five cases, not
+another referee predicate.
+
 ### The referee cannot adjudicate a rule that needs the containing BLOCK
 
 A real limit of this oracle, found trying to re-measure the definition content-column rule
