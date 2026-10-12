@@ -827,6 +827,35 @@ document this channel for its own plugin:
   string literal, and quoting it twice is how a probe silently becomes a different document --
   these notes already record a tab and a U+00A0 surviving one layer and not the other.
 
+### The referee is a reliable target, measured rather than assumed
+
+Worth settling before more work is spent against it, and impossible to settle cheaply until
+now: of the 1,482 documents where this package and the referee still disagree, how many are
+OURS to fix and how many are the referee being stale against 1.14.4? Its answers were
+recorded by a sibling project against its own Obsidian version, so a stale corpus would cap
+the achievable number and every point chased past that cap would be a regression against the
+real application.
+
+Eighteen disagreeing documents sampled at a fixed stride over the corpus, shortest first,
+and their DEFINITIONS compared three ways against live 1.14.4:
+
+| outcome                                                       | count |
+| ------------------------------------------------------------- | ----: |
+| live agrees with the referee, so **we are wrong**             |    12 |
+| live agrees with the referee once inline ids are dropped      |     2 |
+| definitions agree all three ways; the disagreement is in REFS |     4 |
+| **live agrees with us, so the referee is stale**              | **0** |
+
+Zero. The referee is not stale on any sampled document, so the remaining disagreements are
+real work and the target is sound.
+
+Two details the sample also pins. Live `footnotes` includes INLINE footnotes under synthetic
+ids like `[inline0`, which the sibling project's recorder drops by design -- that accounts for
+the two near-misses and is a recording convention rather than a disagreement. And live
+`footnoteRefs` lists only references whose name HAS a definition, so it cannot adjudicate the
+reference side at all; that is what the project's synthesised-definition method exists for,
+and comparing refs against live Obsidian needs the same trick rather than a direct read.
+
 ### It earned its place in the first four minutes
 
 Asked `> %%` / `[^3]: Text` and got `footnoteRefs: []`, where the referee's recorded answer
