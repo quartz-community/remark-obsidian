@@ -1291,9 +1291,34 @@ contaminated, one level up.
 So the standing rule applies to itself: the current implementation is backed by twelve probes
 recorded against the application, and replacing it with an 88.7% rule fitted to this corpus
 -- where the host identification is demonstrably wrong in some rows -- would trade verified
-behaviour for fitted behaviour. The next step is a probe wave varying the definition's indent
-against the host's content column where the two disagree, which is four or five cases, not
-another referee predicate.
+behaviour for fitted behaviour. The next step is a probe wave, not another referee predicate.
+
+**And the probes already existed, and they refute it.** `probe/definition-column/*` and
+`probe/def-column/*` are thirteen recorded column cases, all `match`. The referee's 88.7%
+rule holds on **five** of them:
+
+    " [^1]: def"         obs 0, rule says 1    no host, so the root clamp wins
+    "  [^1]: def"        obs 0, rule says 2
+    "   [^1]: def"       obs 0, rule says 3
+    ">  [^1]: def"       obs 2, rule says 3    host column wins at indent 0
+    ">   [^1]: def"      obs 2, rule says 4
+    "- [ ]  [^1]: def"   obs 6, rule says 7
+
+(Two further reported failures were my scratch script reading line 0 of a two-line probe
+rather than the definition's line, so the honest score is six genuine counter-examples out of
+eleven valid cases.)
+
+Three are the root clamp -- with no host the column is 0, not the bracket -- and three are
+padded hosts where Obsidian reports the host's content column even though the indent is 0, so
+`indent >= hostCol` is not a condition at all. The real rule is close to what is implemented:
+the host's content column when there is a host, else 0. The referee's `indent` signal was the
+contaminated host identification showing through.
+
+**That is the thread closed properly, and it closes in favour of the existing code.** The
+lesson stands exactly as stated -- compute a structural premise from the tree -- and so does
+its corollary: a tree-derived premise is still OUR tree, and where probes against the
+application already exist they outrank a rule fitted to 1,637 referee rows. Checking them
+cost one script; implementing the rule would have cost six verified cases.
 
 ### The referee cannot adjudicate a rule that needs the containing BLOCK
 
