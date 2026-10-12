@@ -1795,6 +1795,54 @@ container, which the referee does not store — the structural limit recorded tw
 above, reached from a different direction. The corpus is the instrument for this bucket, and
 `probe/def-cap/*` is where it already lives.
 
+## Reducing a referee disagreement needs an invariant, and two obvious ones fail
+
+`referee-shrink.mts` deletes lines from a disagreeing note, re-bases the recorded answer, and
+keeps a deletion while the disagreement survives -- so a dense note becomes the shortest
+document that still disagrees, which is what the corpus can then adjudicate. Getting the
+stopping condition right took three attempts and the two failures are the useful part.
+
+**"Still disagrees" has a degenerate attractor.** A definition's answer carries `lastLine`, so
+deleting its body leaves an extent nothing in the shorter document can satisfy; the
+disagreement is then preserved by construction and every deletion looks productive. All 150
+notes walked down to one line, and the top forms were `[^ch2*]: def`, `[^3]: Text`,
+`[^note]: Definition` and a seven-space `[^1]: def` -- every one of which this package already
+gets right. Guarding the spans of recorded entries fixes that half.
+
+**And it is still not enough, because the disagreement can CHANGE.** `> %%` over
+`[^3]: Text` is a note where Obsidian reports no definition and a reference at the label: the
+quoted `%%` runs to the end of the note, the definition fails, and the name is indexed anyway.
+Delete the `> %%` and the remainder still disagrees -- now because we report a definition
+Obsidian would also report, against a re-based answer describing nothing. The shrink took
+that step and printed `[^3]: Text` as a minimal form of a rule about comments.
+
+So the invariant is the **signature**: every answer entry we miss has to stay missed, and no
+entry we do not report may appear. A deletion that trades one defect for another is not a
+reduction of the first. With that, 121 of the 150 shortest notes reduce to 115 distinct
+minimal forms, and they are legible:
+
+    2x  "> %%\n[^3]: Text"
+    2x  "%%\n1.  [^ch2*]: def"
+    2x  ">%%\n[^ch2*]: Definition"
+    2x  "> > %%\n[^note]: Definition"
+    2x  "  %%\n-     [^1]: Definition"
+    2x  "  10.     %%\n    [^1]: def"
+    2x  "- %%\n\n\t[^2]: body text"
+
+**An unclosed `%%` above a label line dominates the list**, which is the
+commented-definition-degrades-to-a-reference rule -- refuted four times here at 444/329,
+578/237 and 540/273 and recorded as permanently abandoned. Those measurements grouped a
+coarse predicate over dense documents; these are two-line forms where one case is one cause,
+so it is different data about the same rule rather than a fifth attempt at the same
+measurement. The next step for it is a probe wave, not another referee predicate.
+
+Two standing cautions. Re-basing is exact about line numbers and says nothing about whether
+Obsidian would read the remaining lines the same way, so **every form it prints is a lead to
+record, never a rule to implement** -- the same standard a third-party implementation's tests
+get. And the signature invariant makes reduction conservative on purpose: 29 of the 150 did
+not reduce at all, which is the honest outcome for a note whose defect needs its whole
+context.
+
 ## Other implementations are arbiters too, and mining their tests works
 
 Four third-party Obsidian-markdown parsers were checked for test data this package could
@@ -1975,15 +2023,17 @@ like the fix not working until you test the minimal form directly.
 
 ## Files
 
-| File                     | Role                                            |
-| ------------------------ | ----------------------------------------------- |
-| `corpus.ts`              | Deterministic case generator                    |
-| `chain.ts`               | Pinned Quartz pipeline and feature profiles     |
-| `normalize.ts`           | Our projections, from mdast                     |
-| `types.ts`               | Shared projection and golden shapes             |
-| `compare.ts`             | Diffing and gate policy                         |
-| `oracle.e2e.ts`          | Recorder; runs inside Obsidian                  |
-| `parity.test.ts`         | The gate; no Obsidian required                  |
-| `goldens/obsidian.json`  | Recorded output, version-stamped and triaged    |
-| `fuzz/contradictions.ts` | Shapes holding both a match and a divergence    |
-| `UPSTREAM.md`            | Defects found in upstream packages and Obsidian |
+| File                     | Role                                             |
+| ------------------------ | ------------------------------------------------ |
+| `corpus.ts`              | Deterministic case generator                     |
+| `chain.ts`               | Pinned Quartz pipeline and feature profiles      |
+| `normalize.ts`           | Our projections, from mdast                      |
+| `types.ts`               | Shared projection and golden shapes              |
+| `compare.ts`             | Diffing and gate policy                          |
+| `oracle.e2e.ts`          | Recorder; runs inside Obsidian                   |
+| `parity.test.ts`         | The gate; no Obsidian required                   |
+| `goldens/obsidian.json`  | Recorded output, version-stamped and triaged     |
+| `fuzz/contradictions.ts` | Shapes holding both a match and a divergence     |
+| `referee.mts`            | Measurement against the sibling project's oracle |
+| `referee-shrink.mts`     | Reduces referee disagreements to minimal forms   |
+| `UPSTREAM.md`            | Defects found in upstream packages and Obsidian  |
