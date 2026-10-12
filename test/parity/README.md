@@ -1949,6 +1949,34 @@ Three findings, and one was mine from the same day:
 
 Two limits before trusting the output.
 
+### The 42 sensitive units against the 29 claims
+
+Cross-referencing which position-sensitive units carry an ordering comment: **16 do, 26 do
+not.** The audit cannot say what each of the 26 depends on, but it does give the DIRECTION
+free, which is most of the value:
+
+- `top=DIFF bottom=same` -- the pass needs something built BEFORE it, so it has a lower
+  bound and no upper one. `shortComment`, `quoteMerge`, `fenceOutlives`, `mathOutlives`,
+  `calloutTitleInterrupt`, `blankFootnoteLabel`, `htmlSetext`, `multilineSetext`,
+  `definitionLazy`, `definitionBlankTail`, `blankLabelReference`, `if(keepComments)`,
+  `if(positionedBreaks)`.
+- `top=same bottom=DIFF` -- the pass must run BEFORE something, so an upper bound and no
+  lower one. `lrdFootnote`, `legacyDefinition`, `legacyDefinitionPromote`,
+  `quoteIndentedCode`, `indentTab`, `definitionTab`, `tableRowStyle`, `tableLabelRow`,
+  `restoreInlinePositions`, `lazySetext`, `setextUnderline`, `footnoteLabel`,
+  `if(comments)`, `if(frontmatter)`, `if(customTaskChars)`, `if(math)`,
+  `if(labelPrecedence)`.
+- `top=DIFF bottom=DIFF` -- pinned on both sides. `if(callouts)`, `containerLazy`,
+  `mathMidline`, `invisibleBlankLine`, `bareCheckbox`, `containerSetext`, `tableInterrupt`,
+  `definitionTrim`, `normalizePoints`, `if(bareFootnoteRefs)`, `if(taskReparse)`.
+
+**And the cross-reference found a real defect rather than only a gap.** `normalizePoints`
+came back undocumented, which is absurd for the pass the whole offset-honesty discipline
+rests on -- and it was: the `// Last, so every pass above only has to keep its offsets
+honest.` comment had drifted two passes up the file, where it read as a claim about
+`linkNbspTitle`. A detector that attributes a comment to the call below it is what surfaced
+that, and nothing else would have: both passes are in the right place, so no test could fail.
+
 **"Position-independent" means "on this corpus".** A pass can be genuinely constrained and
 come back free because no recorded case exercises the interaction -- the same caveat as the
 zero-regression lesson, where a clean delta against a corpus holding no case for the rule told

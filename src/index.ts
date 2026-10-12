@@ -843,12 +843,16 @@ export default function remarkObsidian(
     // After every pass that reads a newline out of a text value, and before points
     // are normalised from the offsets it sets.
     if (opts.positionedBreaks) breakPositionsTransform(tree, String(file));
-    // Last, so every pass above only has to keep its offsets honest.
     // Late, and order-free: it only ever rewrites a `link`'s own `url` and `title`,
-    // which nothing else here reads.
+    // which nothing else here reads. `pass-order.mts` confirms it -- identical output at
+    // both extremes of the chain.
     linkNbspTitleTransform(tree);
     // After every pass that can rewrite a paragraph's span, since it matches on one.
     blankLabelReferenceTransform(tree, String(file));
+    // Last, so every pass above only has to keep its offsets honest. This comment was
+    // orphaned two passes above, where it read as a claim about `linkNbspTitle`; the
+    // ordering audit is what surfaced it, since the detector attributes a comment to the
+    // call below it and found this pass undocumented.
     normalizePointsTransform(tree, String(file));
   };
 
