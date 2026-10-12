@@ -26,6 +26,19 @@ const BLANK = /^[ \t]*(?:>[ \t]*)*$/u;
  * Only the definition's own end point moves. Its children already end where they
  * end, and the blank was never any node's content.
  */
+/** One past the index of the line ending before `offset`, so column 1 is a line start. */
+function lineStartAt(source: string, offset: number): number {
+  return source.lastIndexOf("\n", offset - 1) + 2;
+}
+
+/** Whether an offset sits at the very start of its line. */
+function endAtLineStart(source: string, offset: number | undefined): boolean {
+  if (offset === undefined) return false;
+  return (
+    offset === 0 || source[offset - 1] === "\n" || source[offset - 1] === "\r"
+  );
+}
+
 export function definitionTrimTransform(tree: Root, source: string): void {
   if (source === "") return;
 
@@ -58,7 +71,18 @@ export function definitionTrimTransform(tree: Root, source: string): void {
     //
     // Ten of ten, no counter-examples. micromark takes the line as lazy paragraph
     // continuation and no option flag governs it, so the repair belongs here.
-    const column = node.position?.start?.column ?? 1;
+    // Derived from the OFFSET, not read off the point. Instrumented over the corpus,
+    // this site reads a stale column 28 times against 1354 agreeing -- an earlier pass
+    // moved the definition by offset and left the rest of the point behind, which is
+    // exactly what `normalizePointsTransform` runs last to repair. A stale column read
+    // into a POINT is repaired there; one read into a BRANCH, as both of this file's are,
+    // is not. The audit table in `normalize-points.ts` had not been extended to cover
+    // this file.
+    const startOffset = node.position?.start?.offset;
+    const column =
+      startOffset === undefined
+        ? (node.position?.start?.column ?? 1)
+        : startOffset - (lineStartAt(source, startOffset) - 1);
     if (last === end && column > 1 && end > start) {
       const after = lines[start] ?? "";
       // A column-0 line that OPENS A BLOCK cannot continue a nested definition. Split by
@@ -95,7 +119,9 @@ export function definitionTrimTransform(tree: Root, source: string): void {
     if (
       last === end &&
       end > start &&
-      (node.position?.end?.column ?? 0) === 1
+      // The end sits at the start of its line, derived from the offset for the reason
+      // above: this read was stale 12 times against 224 agreeing.
+      endAtLineStart(source, node.position?.end?.offset)
     ) {
       let region = false;
       for (let line = start; line < end; line++) {

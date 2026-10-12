@@ -46,6 +46,25 @@ import { visit } from "unist-util-visit";
  *       footnote-bare           984 agree,   21 STALE
  *       setext-underline         74 agree,    1 STALE
  *
+ * **This table went stale, which is its own lesson: an audit of call sites is only true
+ * for the call sites that existed when it was written.** Three more reads appeared after
+ * it and none were covered -- `container-lazy` (which never fires on the corpus) and both
+ * of `definition-trim`'s, which were instrumented the same way and came back
+ *
+ *       definition-trim:start  1354 agree,   28 STALE
+ *       definition-trim:end     224 agree,   12 STALE
+ *
+ * Both were BRANCHES, so neither was repairable here, and both now derive their column
+ * from the offset. The repair is currently inert -- 0 parity regressions and the referee
+ * unchanged at 78.1% -- because none of the 40 stale reads happened to flip an outcome on
+ * this corpus. That is a latent defect removed rather than a measurable gain, and the
+ * distinction is worth stating plainly: an inert soundness fix and an inert mistake look
+ * identical from the numbers.
+ *
+ * Adding a pass that reads a `.column` means re-running this audit. The procedure is a
+ * `console.error` at the site comparing the point's column against one derived from its
+ * own offset, with the corpus parsed under both profiles.
+ *
  *   `footnote-bare` is stale 21 times and HARMLESS, which is the distinction that
  *   matters: it writes `offset` independently of the column, so this pass rebuilds the
  *   column correctly afterwards and nothing downstream ever sees the bad value.
