@@ -1909,6 +1909,50 @@ container, which the referee does not store — the structural limit recorded tw
 above, reached from a different direction. The corpus is the instrument for this bucket, and
 `probe/def-cap/*` is where it already lives.
 
+## 29 ordering claims, validated as a set for the first time
+
+`src/index.ts` orders ~74 passes and carries 29 ordering claims in comments. Each came from a
+real failure, and **a stale claim reads exactly like a live one**, so the set had never been
+checked. `pass-order.mts` checks it: rewrite the chain, hash every corpus case's tree under
+both profiles, restore the file in a `finally`.
+
+Moving each pass to BOTH extremes of the chain -- the strong test, since a pass that is
+byte-identical running first and running last has no constraint the corpus can see -- gives
+**18 position-independent of 47**, and 29 position-sensitive. Adjacent swaps, the cheap and
+much weaker version, find only **3** of 46 pairs order-dependent:
+`tableInterrupt`/`paragraphMerge`, `definitionTrim`/`definitionBlankTail`, and
+`blankLabelReference`/`normalizePoints`. A claim spanning ten passes is invisible to a swap
+with a neighbour, which is why the extremes test is the default.
+
+Three findings, and one was mine from the same day:
+
+- **`calloutTitleInterrupt` had a real, undocumented constraint.** It reads `calloutTitle`,
+  which does not exist until `calloutTransform` builds it, so at the top of the chain it finds
+  nothing and an ordered item below a title stays a paragraph. Now documented with its
+  evidence.
+- **`tableLabelRow`'s "after the three table passes" is UNEXERCISED.** Running it first is
+  byte-identical over the whole corpus, because micromark builds the `table` node before any
+  transform runs, so the node it needs always exists. I wrote that claim the same day as the
+  pass, from reasoning rather than measurement. It stays in that position -- it is the safe
+  one -- with the comment now honest about its evidence.
+- **`normalizePoints` last is confirmed**, in both modes. That is the claim the whole
+  offset-honesty discipline rests on, and the one that most needed to be true.
+
+Two limits before trusting the output.
+
+**It covers the 47 unconditional passes, not all 74.** Twenty-seven sit inside `if (opts.x)`
+guards at a deeper indent, and moving one means moving its guard too -- `frontmatterTail`,
+`definitionColumn`, `labelPrecedence`, `commentRegion` and the rest are unaudited. The "First,
+because it rewrites the whole document" claim belongs to `frontmatterTail` and so is not among
+the claims this validates, which is worth knowing before reading `shortComment`'s free result
+as contradicting it.
+
+**"Position-independent" means "on this corpus".** A pass can be genuinely constrained and
+come back free because no recorded case exercises the interaction -- the same caveat as the
+zero-regression lesson, where a clean delta against a corpus holding no case for the rule told
+us nothing and cost a shipped regression. A free result retires a CLAIM, not a constraint, and
+the honest follow-up is a probe that would exercise it.
+
 ## Reducing a referee disagreement needs an invariant, and two obvious ones fail
 
 `referee-shrink.mts` deletes lines from a disagreeing note, re-bases the recorded answer, and
@@ -2137,17 +2181,18 @@ like the fix not working until you test the minimal form directly.
 
 ## Files
 
-| File                     | Role                                             |
-| ------------------------ | ------------------------------------------------ |
-| `corpus.ts`              | Deterministic case generator                     |
-| `chain.ts`               | Pinned Quartz pipeline and feature profiles      |
-| `normalize.ts`           | Our projections, from mdast                      |
-| `types.ts`               | Shared projection and golden shapes              |
-| `compare.ts`             | Diffing and gate policy                          |
-| `oracle.e2e.ts`          | Recorder; runs inside Obsidian                   |
-| `parity.test.ts`         | The gate; no Obsidian required                   |
-| `goldens/obsidian.json`  | Recorded output, version-stamped and triaged     |
-| `fuzz/contradictions.ts` | Shapes holding both a match and a divergence     |
-| `referee.mts`            | Measurement against the sibling project's oracle |
-| `referee-shrink.mts`     | Reduces referee disagreements to minimal forms   |
-| `UPSTREAM.md`            | Defects found in upstream packages and Obsidian  |
+| File                     | Role                                               |
+| ------------------------ | -------------------------------------------------- |
+| `corpus.ts`              | Deterministic case generator                       |
+| `chain.ts`               | Pinned Quartz pipeline and feature profiles        |
+| `normalize.ts`           | Our projections, from mdast                        |
+| `types.ts`               | Shared projection and golden shapes                |
+| `compare.ts`             | Diffing and gate policy                            |
+| `oracle.e2e.ts`          | Recorder; runs inside Obsidian                     |
+| `parity.test.ts`         | The gate; no Obsidian required                     |
+| `goldens/obsidian.json`  | Recorded output, version-stamped and triaged       |
+| `fuzz/contradictions.ts` | Shapes holding both a match and a divergence       |
+| `referee.mts`            | Measurement against the sibling project's oracle   |
+| `referee-shrink.mts`     | Reduces referee disagreements to minimal forms     |
+| `pass-order.mts`         | Which passes depend on their position in the chain |
+| `UPSTREAM.md`            | Defects found in upstream packages and Obsidian    |

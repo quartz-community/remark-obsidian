@@ -695,11 +695,20 @@ export default function remarkObsidian(
     tableShortDelimiterTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
-    // After the three table passes, so the table it folds a label row into has
-    // already settled its own shape and extent.
+    // Placed after the three table passes so the table it folds a label row into has
+    // settled its shape, and `pass-order.mts` reports that claim as UNEXERCISED: running
+    // this pass first is byte-identical over the whole corpus. micromark builds the table
+    // before any transform runs, so the node it needs always exists; the ordering only
+    // matters for a table whose shape one of those passes changes in a way that moves the
+    // label row, which no recorded case does. Kept here because it is the safe position and
+    // the claim is now honest about its evidence.
     tableLabelRowTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
+    // After the callout passes, and this one IS exercised -- `pass-order.mts` reports a
+    // different tree when it runs first. It reads `calloutTitle`, which does not exist
+    // until `calloutTransform` has built it, so at the top it finds nothing and the
+    // ordered item below a title stays a paragraph.
     calloutTitleInterruptTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
