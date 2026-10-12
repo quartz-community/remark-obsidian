@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-11T20:12:57.233Z",
+  "recordedAt": "2026-10-12T07:19:47.812Z",
   "cases": {
     "probe/label-bracket/full-unmatched-undefined": {
       "id": "probe/label-bracket/full-unmatched-undefined",
@@ -5453,6 +5453,301 @@
         }
       },
       "triage": "match"
+    },
+    "probe/title-interrupt/two-in-callout": {
+      "id": "probe/title-interrupt/two-in-callout",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] title\n> 2. item\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">title</div></div><div class=\"callout-content\">\n<ol start=\"2\">\n<li dir=\"auto\">item</li>\n</ol>\n</div></div>",
+        "projections": {
+          "text": "title item",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] title\n> 2. item"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-1:9"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@1:2-1:9"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "A2c: a callout title is not a paragraph, so an ordered item below it opens a list whatever its start number. Closed by `calloutTitleInterruptTransform`."
+    },
+    "probe/title-interrupt/two-in-quote": {
+      "id": "probe/title-interrupt/two-in-quote",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> text\n> 2. item\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>text<br>\n2. item</p>\n</blockquote>",
+        "projections": {
+          "text": "text 2. item",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> text\n> 2. item"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:9"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "A2c: a callout title is not a paragraph, so an ordered item below it opens a list whatever its start number. Closed by `calloutTitleInterruptTransform`."
+    },
+    "probe/title-interrupt/one-in-callout": {
+      "id": "probe/title-interrupt/one-in-callout",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] title\n> 1. item\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">title</div></div><div class=\"callout-content\">\n<ol>\n<li dir=\"auto\">item</li>\n</ol>\n</div></div>",
+        "projections": {
+          "text": "title item",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] title\n> 1. item"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "callout@0:0-1:9"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@1:2-1:9"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "A2c: a callout title is not a paragraph, so an ordered item below it opens a list whatever its start number. Closed by `calloutTitleInterruptTransform`."
+    },
+    "probe/title-interrupt/two-with-definition": {
+      "id": "probe/title-interrupt/two-with-definition",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] title\n> 2. [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">title</div></div><div class=\"callout-content\">\n<ol start=\"2\">\n<li dir=\"auto\"></li>\n</ol>\n</div></div>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "title use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] title\n> 2. [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@1:5-1:14"
+          ],
+          "footnoteRefs": [
+            "1@3:3"
+          ],
+          "headings": [],
+          "sections": [
+            "callout@0:0-1:14",
+            "paragraph@3:0-3:7",
+            "text@4:0-4:0",
+            "element@4:0-4:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@1:2-1:14"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "A2c: a callout title is not a paragraph, so an ordered item below it opens a list whatever its start number. Closed by `calloutTitleInterruptTransform`."
+    },
+    "probe/title-interrupt/two-lazy": {
+      "id": "probe/title-interrupt/two-lazy",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [!note] title\n2. [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">title</div></div><div class=\"callout-content\">\n<ol start=\"2\">\n<li dir=\"auto\"></li>\n</ol>\n</div></div>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "title use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "callout",
+              "text": "> [!note] title\n2. [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@1:3-1:12"
+          ],
+          "footnoteRefs": [
+            "1@3:3"
+          ],
+          "headings": [],
+          "sections": [
+            "callout@0:0-1:12",
+            "paragraph@3:0-3:7",
+            "text@4:0-4:0",
+            "element@4:0-4:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@1:0-1:12"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Not A2c. `2.` at column 0 already opens a root list here, because the block before it is a callout rather than a paragraph, so there is nothing to interrupt -- `calloutTitleInterruptTransform` never fires. Obsidian instead absorbs that line into the callout as lazy continuation, which is the same gap as `probe/def-end/quote-nested-host`: `containerLazyTransform` absorbs a plain lazy line into the innermost item and declines one that opens a list or carries a quote prefix."
     },
     "probe/autolink/scheme": {
       "id": "probe/autolink/scheme",

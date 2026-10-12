@@ -548,10 +548,14 @@ describe("positioned oracle", () => {
     // `probe/def-end/quote-nested-host` has the list absorbing a quote-prefixed lazy
     // line where we end the list and open a blockquote, and `probe/table-label/pipeless`
     // had the table spanning its label row, which `tableLabelRowTransform` now does too.
+    // `probe/title-interrupt/two-lazy` is the third, and it is NOT A2c: `2.` at column 0
+    // already opens a root list there, because what precedes it is a callout rather than a
+    // paragraph, so there is nothing to interrupt. Obsidian absorbs the line into the
+    // callout as lazy continuation -- the same gap as `probe/def-end/quote-nested-host`.
     // Note the other eleven new probes diverge on `sections` ONLY by two zero-width
     // `text`/`element` entries past the document, which `sourceBacked` filters -- the
     // renderer's relocated footnote section, already classified must-not-fix for `blocks`.
-    sections: 2,
+    sections: 3,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
     // invented, which is the shape of a missing collector rather than a parse bug.

@@ -261,6 +261,27 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/callout-title/quote", "> [!note] > inner\n"],
   ["probe/callout-title/fence", "> [!note] ```\n"],
   ["probe/callout-title/pipes", "> [!note] | a |\n"],
+  // A2c, the last of the five gaps the sibling project's rules document exposed, and the
+  // only one with NO instance in the referee corpus -- so the corpus is the only instrument
+  // for it. Their claim: a `2.` item directly under a callout title starts a list, because
+  // the title line closes its own block and so is not a paragraph the marker has to
+  // interrupt. CommonMark lets an ordered item interrupt a paragraph only when it starts
+  // at 1, which is what makes the premise testable: if the title is a paragraph, `2.` stays
+  // text, and if it is not, a list opens.
+  //
+  // Both controls matter. A plain quote's first line IS a paragraph, so `2.` must stay
+  // text there; and `1.` interrupts whatever precedes it, so it must open a list in both.
+  ["probe/title-interrupt/two-in-callout", "> [!note] title\n> 2. item\n"],
+  ["probe/title-interrupt/two-in-quote", "> text\n> 2. item\n"],
+  ["probe/title-interrupt/one-in-callout", "> [!note] title\n> 1. item\n"],
+  [
+    "probe/title-interrupt/two-with-definition",
+    "> [!note] title\n> 2. [^1]: def\n\nuse[^1]\n",
+  ],
+  [
+    "probe/title-interrupt/two-lazy",
+    "> [!note] title\n2. [^1]: def\n\nuse[^1]\n",
+  ],
   // Autolinks, which one probe has been standing in for.
   ["probe/autolink/scheme", "<https://e.test/p>\n"],
   ["probe/autolink/email", "<a@b.test>\n"],

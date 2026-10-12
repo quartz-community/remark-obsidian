@@ -1670,7 +1670,7 @@ left).
 
 | rule | what Obsidian does that we do not                                                                                                                                                                                            |                                  corpus |
 | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------: |
-| A2c  | a `2.` item right under a callout title DEFINES, because the title line closes its block and so is not a paragraph the marker has to interrupt                                                                               | **0 in the referee corpus** (see below) |
+| A2c  | **CLOSED** by `calloutTitleInterruptTransform`. A callout title is not a paragraph, so an ordered item below it opens a list whatever its start number — both controls hold                                                  | **0 in the referee corpus** (see below) |
 | F4   | **CLOSED.** A comment opened inside a quote needs its closer inside too, so a column-0 `%%` cannot close it — see `commentQuoteExtentTransform`. The quote's own extent is still wrong there, which no corpus case exercises |                                  was 12 |
 | C3   | **CLOSED** by `tableLabelRowTransform`. In a pipeless table a label line holding a pipe is a ROW — the pipe is the axis, confirmed against three controls                                                                    |            **4** actionable of 7 shapes |
 | E5b  | **CLOSED.** A name may not hold ASCII whitespace, so `a[^x [y]` is no reference at all — see the guard in `footnote-bare.ts`                                                                                                 |                                   was 3 |
@@ -1680,9 +1680,16 @@ ASCII whitespace in a name, while the referee's answers hold **six** that are `a
 `a\u3000b` — a no-break and an ideographic space. So the rule rejects ASCII whitespace and
 must keep accepting those, which is the `\s`-carries-hidden-members lesson again.
 
-**Four of the five are now closed**: E4 by `definitionWindowTransform`, F4 by one filter in
-`commentQuoteExtentTransform`, E5b by one guard in `footnote-bare.ts`, and C3 by
-`tableLabelRowTransform`. Only A2c remains, and it has no instance in the referee corpus. All three were
+**All five are now closed**: E4 by `definitionWindowTransform`, F4 by one filter in
+`commentQuoteExtentTransform`, E5b by one guard in `footnote-bare.ts`, C3 by
+`tableLabelRowTransform`, and A2c by `calloutTitleInterruptTransform`.
+
+A2c is the one that could only be settled on the corpus -- it has **no instance** in the
+referee corpus at all, so the 8 their document reports is a count of their own examples. Five
+probes settled it, and the two controls are what make it a rule about the TITLE rather than
+about the marker: `> text` / `> 2. item` keeps `2. item` as text, because a quote's first
+line genuinely is a paragraph, and `> [!note] title` / `> 1. item` was already a list because
+1 interrupts anything. All three were
 found by reading their rules document rather than by measuring our own corpus, which is the
 argument for having done it: **none of the three shapes appears in our 3,378 cases at all**,
 and all three are real.
