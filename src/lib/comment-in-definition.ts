@@ -46,6 +46,19 @@ const CONTINUATION_INDENT = /^(?: {1,4}|\t)/u;
  * lines for the same underlying reason; it needs no spans because it rebuilds a value
  * the tokenizer owns.
  */
+/** Extends a parent's end to its last positioned child, never past it. */
+function syncEnd(host: Paragraph): void {
+  const end = host.position?.end;
+  if (!end) return;
+  for (const child of host.children) {
+    const childEnd = child.position?.end;
+    if (!childEnd || childEnd.offset === undefined) continue;
+    if (end.offset === undefined || childEnd.offset > end.offset) {
+      host.position!.end = { ...childEnd };
+    }
+  }
+}
+
 function pushCommentLines(
   host: Paragraph,
   source: string,
@@ -184,5 +197,19 @@ export function commentInDefinitionTransform(
       }
       children.splice(index + 1, 1);
     }
+
+    // The host's own end, last, once every push into it is done.
+    //
+    // This pass folds a comment's lines back into a paragraph and extended the
+    // DEFINITION's end for each block it absorbed while leaving the paragraph where it
+    // was, so `[^1]: one` / `%%` / blank / `use[^1]` gave `paragraph[6..9]` holding
+    // children out to 12. 92 of the span checker's 142 violations were that, in two
+    // shapes -- the folded `text` and the `break` before it -- and they are one defect
+    // counted twice.
+    //
+    // A node's span has to cover its children, which is the invariant the gate asserts and
+    // the reason `obsidian-linter` can order edits at all. Only the end moves, and only
+    // forward to a child the paragraph already holds.
+    syncEnd(host);
   }
 }

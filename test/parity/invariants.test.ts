@@ -26,12 +26,14 @@ import type { GoldenCase } from "./types.js";
  * group carries its attribution.
  */
 const CEILING = {
-  // 46 + 46. One cause: a `%%` folded back into a definition's paragraph arrives as a
-  // `break` plus a `text` whose spans run past the paragraph's own end, because the fold
-  // extends the children and not the host. `[^1]: one` / `%%` / blank / `use[^1]` has
-  // `paragraph[6..9]` holding children out to 12.
-  "child ENDS AFTER parent: paragraph > break": 46,
-  "child ENDS AFTER parent: paragraph > text": 46,
+  // CLOSED, all FOUR `child ENDS AFTER parent` groups at once -- 98 violations, where only
+  // 92 were attributed. `commentInDefinitionTransform` folds a comment's lines back into a
+  // paragraph and extended the DEFINITION's end for each block it absorbed while leaving the
+  // paragraph where it was, so `[^1]: one` / `%%` / blank / `use[^1]` had `paragraph[6..9]`
+  // holding children out to 12. Syncing the host's end to its last child closed the `break`
+  // and `text` groups as expected, and the `footnoteReference` (4) and `wikilink` (2) groups
+  // with them -- they were the same fold seen through a different child type, which the
+  // per-child-type grouping had made look like separate families.
   // A callout's title is split out of the paragraph that held it, and the paragraph keeps
   // its original start -- `> [!note] Title` / `> [[target]]` gives `calloutTitle[10..15]`
   // beside `paragraph[2..28]`, so the two overlap by the title's whole width.
@@ -46,8 +48,6 @@ const CEILING = {
   // `remark-parse` + `remark-math@6.0.0` and filed in `UPSTREAM.md`. Repaired rather than
   // only reported, unlike the `definition`/`heading` entry below, because this one is in the
   // tree this package SHIPS.
-  "child ENDS AFTER parent: paragraph > footnoteReference": 4,
-  "child ENDS AFTER parent: paragraph > wikilink": 2,
   // CLOSED. It arrived as `footnoteDefinition > break`, became `> paragraph` when the
   // demoted math was wrapped, and went when the wrapper stopped inheriting the math node's
   // trailing line ending: a `math` span runs through the ending after its block, which is
