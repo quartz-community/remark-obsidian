@@ -1916,13 +1916,22 @@ real failure, and **a stale claim reads exactly like a live one**, so the set ha
 checked. `pass-order.mts` checks it: rewrite the chain, hash every corpus case's tree under
 both profiles, restore the file in a `finally`.
 
-Moving each pass to BOTH extremes of the chain -- the strong test, since a pass that is
+Moving each unit to BOTH extremes of the chain -- the strong test, since a pass that is
 byte-identical running first and running last has no constraint the corpus can see -- gives
-**18 position-independent of 47**, and 29 position-sensitive. Adjacent swaps, the cheap and
-much weaker version, find only **3** of 46 pairs order-dependent:
-`tableInterrupt`/`paragraphMerge`, `definitionTrim`/`definitionBlankTail`, and
-`blankLabelReference`/`normalizePoints`. A claim spanning ten passes is invisible to a swap
-with a neighbour, which is why the extremes test is the default.
+**20 position-independent of 62**, and 42 position-sensitive. Adjacent swaps, the cheap and
+much weaker version, find only 3 of 46 pairs order-dependent. A claim spanning ten passes is
+invisible to a swap with a neighbour, which is why the extremes test is the default.
+
+**The first version of this tool reported 18 of 47 and was wrong, in a way worth keeping.**
+It recognised only bare `xTransform(...)` calls, so the 27 passes inside `if (opts.x)` guards
+were neither moved nor counted -- and, far worse, its "top" insertion point was the first
+BARE call, which sits below several option-gated blocks that run before it. Every pass it
+moved to "the top" was therefore moved to the middle. Teaching it to move a guard as a unit
+with its body flipped `shortComment` and `definitionLazy` from free to sensitive and changed
+`tableInterrupt`'s profile. **An audit is only as good as its block set, and an incomplete
+one does not fail loudly -- it reports a smaller, confidently wrong answer.** That is the
+stale-table lesson from `normalize-points.ts` recurring within a day, in the tool written to
+catch that class of thing.
 
 Three findings, and one was mine from the same day:
 
@@ -1939,13 +1948,6 @@ Three findings, and one was mine from the same day:
   offset-honesty discipline rests on, and the one that most needed to be true.
 
 Two limits before trusting the output.
-
-**It covers the 47 unconditional passes, not all 74.** Twenty-seven sit inside `if (opts.x)`
-guards at a deeper indent, and moving one means moving its guard too -- `frontmatterTail`,
-`definitionColumn`, `labelPrecedence`, `commentRegion` and the rest are unaudited. The "First,
-because it rewrites the whole document" claim belongs to `frontmatterTail` and so is not among
-the claims this validates, which is worth knowing before reading `shortComment`'s free result
-as contradicting it.
 
 **"Position-independent" means "on this corpus".** A pass can be genuinely constrained and
 come back free because no recorded case exercises the interaction -- the same caveat as the

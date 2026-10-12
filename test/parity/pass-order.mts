@@ -21,12 +21,12 @@
  * for the rule has told you nothing. So a free result retires a CLAIM, not the constraint --
  * the right follow-up is a probe that would exercise it.
  *
- * **It covers the 47 UNCONDITIONAL passes, not all 74.** Twenty-seven more sit inside
- * `if (opts.x)` guards at a deeper indent, and moving one means moving its guard with it --
- * `frontmatterTail`, `definitionColumn`, `labelPrecedence`, `commentRegion` and the rest of
- * the option-gated set are therefore unaudited. That matters for reading the output: the
- * "First, because it rewrites the whole document" claim belongs to `frontmatterTail` and is
- * NOT among the claims this validates.
+ * It moves an `if (opts.x)` guard as ONE unit with its body, which is required rather than
+ * convenient: moving a guarded pass out of its guard changes WHAT runs, not WHEN. The first
+ * version recognised only bare calls, and so its "top" was the first bare call -- below
+ * several option-gated blocks that run before it. Every pass it moved to "the top" went to
+ * the middle, and it reported 18 of 47 where the complete set reports 20 of 62. An
+ * incomplete block set does not fail loudly; it returns a smaller, confidently wrong answer.
  *
  * Needs no Obsidian. Reports and exits; gates nothing.
  */
@@ -45,24 +45,36 @@ interface Block {
   readonly end: number;
 }
 
-/** Each pass call, with any comment lines immediately above it. */
+const count = (text: string, char: string): number =>
+  text.split(char).length - 1;
+
+/**
+ * Each movable unit, with any comment lines immediately above it.
+ *
+ * Two shapes, and an option-gated pass needs its GUARD moved with it or the move changes
+ * WHAT runs rather than WHEN: a bare `xTransform(...)` at the chain's own indent, and an
+ * `if (opts.x)` whose body holds one or more. The 27 passes inside those guards are
+ * invisible to a scan for calls alone, which is the limitation the first version carried.
+ */
 function blocksOf(lines: readonly string[]): Block[] {
   const found: Block[] = [];
   for (const [n, line] of lines.entries()) {
     const call = /^ {4}([A-Za-z][A-Za-z0-9]*)Transform\(/u.exec(line);
-    if (!call) continue;
+    const guard = /^ {4}if \(opts\.([A-Za-z][A-Za-z0-9]*)/u.exec(line);
+    if (!call && !guard) continue;
     let start = n;
     while (start > 0 && /^ {4}\/\//u.test(lines[start - 1] ?? "")) start -= 1;
     let end = n;
-    let depth =
-      (line.match(/\(/gu) ?? []).length - (line.match(/\)/gu) ?? []).length;
+    const braced = guard !== null && line.includes("{");
+    const open = braced ? "{" : "(";
+    const close = braced ? "}" : ")";
+    let depth = count(line, open) - count(line, close);
     while (depth > 0 && end + 1 < lines.length) {
       end += 1;
       const next = lines[end] ?? "";
-      depth +=
-        (next.match(/\(/gu) ?? []).length - (next.match(/\)/gu) ?? []).length;
+      depth += count(next, open) - count(next, close);
     }
-    found.push({ name: call[1]!, start, end });
+    found.push({ name: guard ? `if(${guard[1]!})` : call![1]!, start, end });
   }
   return found;
 }
