@@ -1957,6 +1957,38 @@ container, which the referee does not store — the structural limit recorded tw
 above, reached from a different direction. The corpus is the instrument for this bucket, and
 `probe/def-cap/*` is where it already lives.
 
+## Running the chain twice is not a no-op, in 23 of 6,806 pairs
+
+Distinct from the round-trip gate, which checks parse -> serialise -> parse converges. This
+checks the **chain itself**: ~70 passes that splice, fold and re-span nodes, every one of
+which sees its own output on a second run. A pass that appends rather than replaces, or
+widens a span it already widened, needs no unusual input to be wrong -- only to run twice,
+which `unified` makes trivial for any consumer holding a processor and a tree.
+
+23 of 6,806 case/profile pairs change, in 12 cases, and they group:
+
+- **Math inside a container, 5 cases.** And `math/list-boundary` is also one of the
+  invariant checker's overlapping-`listItem` cases -- the math block outlives the item
+  holding it, so on a second run the passes that read the item's extent see a different one.
+  **Two independent gates, added an hour apart, pointing at one defect**, which is the whole
+  argument for having both rather than picking the better one.
+- **A comment straddling a container, 4 cases.** A comment's value is rebuilt from a raw
+  source slice, so a second run re-applies the slice to a value that already absorbed it --
+  the governing rule met for a fifth time: a raw slice is the right source for a position and
+  the wrong one for a value. The round-trip gate found that class through the serialiser,
+  which only sees it once output is re-parsed; this sees it directly.
+- `commonmark/raw-html/626` is already recorded as refused for growing the author's file on
+  every format pass, so its instability is known and deliberate.
+- Two singletons, one of which is the only entry appearing under one profile and not both.
+
+Held as a LIST rather than a count, so a fix that trades one case for another cannot hide.
+
+Two smaller checks landed beside it. **Every non-`match` case must carry a reason** -- a
+`replicate` with no note is indistinguishable from a case nobody has looked at, and these
+notes record that happening once at 106 of 107, found by hand rather than by a gate. And
+**no triage state outside the documented seven**, which costs nothing and makes the state
+table in this file load-bearing rather than descriptive.
+
 ## 24 options, two tested configurations, and a crash nothing was watching for
 
 The parity gate compares two profiles. There are 24 boolean options, so it exercises two
@@ -2335,6 +2367,7 @@ like the fix not working until you test the minimal form directly.
 | `delta.mts`              | What a change gained and broke, before committing  |
 | `invariants.test.ts`     | Structural invariants on the tree itself           |
 | `option-matrix.test.ts`  | Every option toggled, looking for crashes          |
+| `hygiene.test.ts`        | Chain idempotence, and triage notes                |
 | `fuzz/contradictions.ts` | Shapes holding both a match and a divergence       |
 | `referee.mts`            | Measurement against the sibling project's oracle   |
 | `referee-shrink.mts`     | Reduces referee disagreements to minimal forms     |
