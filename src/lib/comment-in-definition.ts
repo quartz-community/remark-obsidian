@@ -138,6 +138,29 @@ export function commentInDefinitionTransform(
 ): void {
   if (source === "") return;
 
+  // ROOT CHILDREN ONLY, and that is a measured gap rather than a choice. A definition
+  // absorbs each following line until a blank one, whatever contains it -- asked of a
+  // running Obsidian directly, `> [^1]: def` / `> %%` / `> x` / `> %%` is ONE definition
+  // ending at 3:4, and the unquoted `[^1]: def` / `%%` / `x` / `%%` ends at 3:2 the same
+  // way. Seven shapes agree and the `%%` is not special, including `> %% y %%` on one line.
+  //
+  // Five of the seven already match. The two that do not are the quoted MULTI-LINE comment:
+  // at root a `%%` after a definition folds into the definition's own paragraph, so the
+  // comment ends up among its children and the test below finds it, while inside a quote
+  // the comment forms as the definition's SIBLING and this loop never reaches it -- so the
+  // definition stops at its first line, 0:11 against Obsidian's 3:4. A single `> %%` works
+  // only because nothing cut it loose to begin with.
+  //
+  // Two attempts are reverted rather than left in. Widening the host list to every
+  // container is INERT, because the trigger needs a comment among the definition's children
+  // and the quoted one is a sibling. Adding a sibling branch needs the adjacency test to
+  // accept an EMPTY gap -- the definition's end usually sits exactly at the comment's start,
+  // so testing for a line ending makes that inert too -- and the version that got that far
+  // left type errors behind, which is where it was stopped.
+  //
+  // What it needs is the sibling branch plus `pushCommentLines` reached with the comment's
+  // own span, and the controls to keep passing: a blank line genuinely does end the
+  // definition.
   const children = tree.children;
   for (let index = 0; index < children.length; index++) {
     const definition = children[index];
