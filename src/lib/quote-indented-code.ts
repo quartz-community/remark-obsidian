@@ -170,9 +170,24 @@ export function quoteIndentedCodeTransform(
       // and ours is wrong either way. So the referee is reliable here and the repair
       // over-reaches on dense documents, however sound the isolated rule is.
       //
-      // What it would need is a repair scoped to the item's own first line without
-      // re-parsing anything that can change an enclosing block's extent, which is the same
-      // constraint that made the first version of the pass below throw.
+      // Three scopings tried, each measured against the referee, and all three are a net
+      // loss for the one corpus case they close:
+      //
+      //     unrestricted                       78.3% -> 77.9%   -27 documents
+      //     ...plus a fence guard              78.3% -> 77.9%   -27, recovers none
+      //     ...plus root-level items only      78.3% -> 78.0%   -16
+      //
+      // Narrowing helps and does not reach break-even, so the shape of the repair is wrong
+      // rather than its scope. Re-parsing an item's content produces a node with its own
+      // extent, and in a dense document that extent competes with every enclosing block --
+      // which is the same constraint that made the first version of the pass below throw by
+      // splicing a list into a `listItem`.
+      //
+      // So this belongs in the list construct's own indent accounting, where the tab is
+      // measured once and nothing downstream has to be re-parsed. `legacy-list.ts` is the
+      // vendored copy that would carry it, and note that its `size` is already in columns --
+      // `sliceSerialize(token, true)` expands tabs -- so the change is not the
+      // long-cited "characters versus columns" one, which does not exist.
       if (!rest.includes("\t")) continue;
 
       let columns = 0;

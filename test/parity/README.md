@@ -1354,14 +1354,26 @@ column rules already landed. The one that does not is `- ⇥p` / blank / `  [^1]
 Obsidian takes the definition INTO the item at column 2 while `-  p` with two spaces leaves
 it at root column 0 -- the separator's tab is what moves the item's content column to 2.
 
-**The repair is attempted, measured and reverted.** Re-parsing the item's content when the
-separator holds a tab closes `probe/def-tab/marker-tab-spaces` and costs the referee 27
-documents, 78.3% to 77.9%; a fence guard recovers none of them. Which oracle to believe was
-settled by ASKING Obsidian about the regressed documents rather than reasoning about them: on
-the first, live 1.14.4 agrees with the referee exactly and our new answer is wrong by one end
-line, and on the second all three differ with ours wrong either way. So the referee is
-reliable here and the repair over-reaches on dense documents, however sound the isolated rule
-is. Recorded in the pass with those numbers.
+**The repair is attempted three ways, measured each time, and reverted.** Each scoping closes
+`probe/def-tab/marker-tab-spaces` and each is a net loss against the referee:
+
+    unrestricted                     78.3% -> 77.9%   -27 documents
+    ...plus a fence guard            78.3% -> 77.9%   -27, recovers none
+    ...plus root-level items only    78.3% -> 78.0%   -16
+
+Narrowing helps and never reaches break-even, which says the SHAPE of the repair is wrong
+rather than its scope: re-parsing an item's content produces a node with its own extent, and
+in a dense document that extent competes with every enclosing block. It is the same
+constraint that made the first version of that pass throw by splicing a list into a
+`listItem`. So the rule belongs in the list construct's own indent accounting, where the tab
+is measured once and nothing downstream is re-parsed -- `legacy-list.ts` is the vendored copy
+that would carry it.
+
+Which oracle to believe was settled by ASKING Obsidian about the regressed documents rather
+than reasoning about them: on the first, live 1.14.4 agrees with the referee EXACTLY and our
+new answer is wrong by one end line; on the second all three differ and ours is wrong either
+way. So the referee is reliable here and the repair over-reaches, however sound the isolated
+rule is.
 
 That three-way check is the clearest demonstration of what `ask.mts` changes. The same
 question a day ago would have been "the corpus says better, the referee says worse, pick
