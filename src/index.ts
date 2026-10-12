@@ -47,6 +47,7 @@ import {
 import { quoteMergeTransform } from "./lib/quote-merge.js";
 import { indentTabTransform } from "./lib/indent-tab.js";
 import { listEmptyNestTransform } from "./lib/list-empty-nest.js";
+import { listItemExtentTransform } from "./lib/list-item-extent.js";
 import { listTabTransform } from "./lib/list-tab.js";
 import { listTabStraddleTransform } from "./lib/list-tab-straddle.js";
 import { quoteTabTransform } from "./lib/quote-tab.js";
@@ -849,6 +850,9 @@ export default function remarkObsidian(
     linkNbspTitleTransform(tree);
     // After every pass that can rewrite a paragraph's span, since it matches on one.
     blankLabelReferenceTransform(tree, String(file));
+    // After every pass that can move a list item's end, and before points are rebuilt.
+    // The overlap it repairs comes from `remark-math`; its own file carries the controls.
+    listItemExtentTransform(tree);
     // Last, so every pass above only has to keep its offsets honest. This comment was
     // orphaned two passes above, where it read as a claim about `linkNbspTitle`; the
     // ordering audit is what surfaced it, since the detector attributes a comment to the

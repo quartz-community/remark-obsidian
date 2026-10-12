@@ -41,10 +41,11 @@ const CEILING = {
   // its own following sibling. Filed in `UPSTREAM.md` as item 2, and reproducing it is the
   // reason this group must not be driven to zero by changing our own output.
   "SIBLINGS OVERLAP: root > definition/heading": 10,
-  // A display-math block inside a list item ends after the next item begins:
-  // `1. Hello $$` / `   Math` / `   $$` / `2.` gives `listItem[0..28]` beside
-  // `listItem[26..28]`.
-  "SIBLINGS OVERLAP: list > listItem/listItem": 6,
+  // CLOSED by `listItemExtentTransform`. It was `remark-math` extending an item past its
+  // sibling's start when a `$$` opener shares its line with content, reproduced on bare
+  // `remark-parse` + `remark-math@6.0.0` and filed in `UPSTREAM.md`. Repaired rather than
+  // only reported, unlike the `definition`/`heading` entry below, because this one is in the
+  // tree this package SHIPS.
   "child ENDS AFTER parent: paragraph > footnoteReference": 4,
   "child ENDS AFTER parent: paragraph > wikilink": 2,
   // Was `footnoteDefinition > break` before the demoted math was wrapped in a paragraph;

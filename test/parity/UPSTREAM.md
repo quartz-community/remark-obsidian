@@ -120,26 +120,55 @@ two add, and because the block is unclosed it re-absorbs the surplus on the next
 from the value, keeping one when the value is entirely line endings so the block does not
 vanish. Interior line endings are content and stay.
 
-## 5–7. Obsidian `metadataCache`
+## 5. `remark-math` extends a list item past its sibling's start
+
+**`remark-math` 6.0.0** (`micromark-extension-math` 3.1.0, `mdast-util-math` 3.0.0), via bare
+`remark-parse` 11.
+
+```
+1. Hello $$
+   Math
+   $$
+2.
+```
+
+| pipeline                       | items                    |
+| ------------------------------ | ------------------------ |
+| `remark-parse` alone           | `[0..25]` `[26..28]`     |
+| `remark-parse` + `remark-math` | **`[0..28]`** `[26..28]` |
+
+The first item's end moves from 25 to 28, past the second item's start at 26, so two root
+siblings of the same list overlap. A consumer splicing by offset cannot order edits across
+them.
+
+**Controls.** `- a $$` / `  x` / `  $$` / `- b` behaves identically, so it is not the ordered
+marker. And `1. $$` / `   x` / `   $$` / `2.` is **correct** — `[0..16]` and `[17..19]` — so
+the trigger is content BEFORE the opener on the item's own line, not the math block itself.
+
+**Workaround here:** `src/lib/list-item-extent.ts` clamps an item's end to the next item's
+start. Repaired rather than only reported, unlike item 2 below, because this one appears in
+the tree this package ships.
+
+## 6–8. Obsidian `metadataCache`
 
 These are recorded from the goldens rather than reproduced here, since they need the
 application. Each is enumerated in `test/parity/README.md` with its case ids, and each is
 classified **must-not-fix** — reproducing them in our own offsets would be strictly worse
 than diverging, because a consumer splicing at those offsets would corrupt the file.
 
-**5. A reported column is short by the width of a `%%` marker.** Four rows across
+**6. A reported column is short by the width of a `%%` marker.** Four rows across
 `links`, `embeds` and `footnoteRefs` — `fuzz/embed/24` on two of its rows, plus
 `hunt/aftercloser-chain-eats-referenced-definition/0` and
 `hunt/continuation-masked-under-foreign-label/2`. The sibling project's author documents
 this class as `P1`, so this is corroboration on specific inputs rather than a new finding.
 
-**6. Zero-width `blocks` entries past the end of the document.** `inline ^[^9] real[^7]`
+**7. Zero-width `blocks` entries past the end of the document.** `inline ^[^9] real[^7]`
 registers `9@3:0-3:0` on a three-line note. The renderer relocates an inline footnote's body
 to a trailing section and the `^9` inside it is read as a block identifier **there**, so the
 position names a region the author never wrote. Both of the corpus's 72 `blocks` entries
 that are zero-width are this.
 
-**7. An embed array is not in source order.** `fuzz/embed/75` lists its second embed first;
+**8. An embed array is not in source order.** `fuzz/embed/75` lists its second embed first;
 24 of the 25 recorded link and embed arrays with two or more entries are source-ordered and
 this is the only exception. Its earlier embed sits inside `$...$` inside a callout, so the
 renderer resolves it late. The value of the ordering being positional is that a consumer can
