@@ -1957,6 +1957,32 @@ container, which the referee does not store — the structural limit recorded tw
 above, reached from a different direction. The corpus is the instrument for this bucket, and
 `probe/def-cap/*` is where it already lives.
 
+## 24 options, two tested configurations, and a crash nothing was watching for
+
+The parity gate compares two profiles. There are 24 boolean options, so it exercises two
+points in a space of 2^24 -- and **a crash is the one failure mode it cannot see**, because
+it only ever compares successful parses. A fuzz sweep found 55 crashes in 4,000 documents
+once, the first any oracle here had surfaced, and nothing since has watched for them outside
+the two configured profiles.
+
+`option-matrix.test.ts` toggles each option one at a time against both presets and parses the
+whole corpus: 48 corpus parses, and **no single toggle throws on any of the 3,403 cases**.
+That is a guarantee this package did not have an hour ago, and the honest scope is narrow --
+a crash needing two options to co-occur is still invisible, since all pairs would be 1,104
+parses and belongs in a scheduled job rather than a push gate.
+
+Correctness is deliberately not asserted, because there is no oracle for an arbitrary option
+combination: Obsidian has no such configuration. The only honest question left is the
+objective one.
+
+**And the first version asserted one thing too many.** It also counted positionless nodes per
+configuration, expecting 50 -- a number taken from the referee's output, which measures 6,818
+NOTES while this measures 3,403 corpus cases. The real figure is 6, and `points.test.ts`
+already gates it BY KIND, which is strictly stronger. A weaker duplicate of an existing gate
+is worse than no gate, because it reads as independent confirmation; it was removed rather
+than corrected. Two lessons in one assertion -- a measurement in the wrong coordinate system
+looks like strong evidence, and the coordinate system here was which corpus.
+
 ## The tree's own consistency was never checked, and 142 things are wrong with it
 
 Four gates covered projections, positions against Obsidian, offset-versus-column agreement,
@@ -2308,6 +2334,7 @@ like the fix not working until you test the minimal form directly.
 | `goldens/obsidian.json`  | Recorded output, version-stamped and triaged       |
 | `delta.mts`              | What a change gained and broke, before committing  |
 | `invariants.test.ts`     | Structural invariants on the tree itself           |
+| `option-matrix.test.ts`  | Every option toggled, looking for crashes          |
 | `fuzz/contradictions.ts` | Shapes holding both a match and a divergence       |
 | `referee.mts`            | Measurement against the sibling project's oracle   |
 | `referee-shrink.mts`     | Reduces referee disagreements to minimal forms     |
