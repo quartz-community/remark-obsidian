@@ -1957,6 +1957,43 @@ container, which the referee does not store — the structural limit recorded tw
 above, reached from a different direction. The corpus is the instrument for this bucket, and
 `probe/def-cap/*` is where it already lives.
 
+## The tree's own consistency was never checked, and 142 things are wrong with it
+
+Four gates covered projections, positions against Obsidian, offset-versus-column agreement,
+and serialisation convergence. **All four pass on a tree that is internally inconsistent**,
+and ~70 repair passes here write spans by hand, which is precisely where that breaks.
+`invariants.test.ts` checks the tree against itself: no child reaching past its parent, no
+two siblings overlapping, no span running off the end of the source. It found 142 violations
+in 8 groups on the first run, from three distinct causes, each a hand-written span:
+
+    [^1]: one / %% / blank / use[^1]                                              92 cases
+        footnoteDefinition[0..12]
+          paragraph[6..9]          children run to 12; the `%%` fold never extended the host
+
+    > [!note] Title / > [[target]]                                                26 cases
+        calloutTitle[10..15]
+        paragraph[2..28]           the paragraph kept its pre-split start
+
+    1. Hello $$ / '   Math' / '   $$' / 2.                                         6 cases
+        listItem[0..28]
+        listItem[26..28]           the math block outlives the item that holds it
+
+**The gate validates itself on a known case.** The remaining large group, 10 of
+`root > definition/heading`, is the overlap filed in `UPSTREAM.md` as item 2 and reproducible
+on bare `remark-parse` + `remark-gfm`. The checker found it without being told, and that
+group must NOT be driven to zero -- doing so would mean diverging from upstream's own output.
+
+Why it matters beyond tidiness: `obsidian-linter` splices by offset. Two overlapping siblings
+give it no edit order, and a child reaching past its parent lets it delete text belonging to
+neither. A wrong offset is worse than a missing one -- the rule this repo already applies to
+its own passes, and had never applied to its own trees.
+
+Held as a CEILING with every group attributed, for the reason `compute` holds one: the
+violations are real and pre-existing, and a gate that is red from the first commit gets
+ignored. The second assertion in the file is absolute rather than a ceiling, because a span
+running off the end of the source or ending before it starts is never debt: that list is
+empty and must stay empty.
+
 ## 29 ordering claims, validated as a set for the first time
 
 `src/index.ts` orders ~74 passes and carries 29 ordering claims in comments. Each came from a
@@ -2269,6 +2306,8 @@ like the fix not working until you test the minimal form directly.
 | `oracle.e2e.ts`          | Recorder; runs inside Obsidian                     |
 | `parity.test.ts`         | The gate; no Obsidian required                     |
 | `goldens/obsidian.json`  | Recorded output, version-stamped and triaged       |
+| `delta.mts`              | What a change gained and broke, before committing  |
+| `invariants.test.ts`     | Structural invariants on the tree itself           |
 | `fuzz/contradictions.ts` | Shapes holding both a match and a divergence       |
 | `referee.mts`            | Measurement against the sibling project's oracle   |
 | `referee-shrink.mts`     | Reduces referee disagreements to minimal forms     |
