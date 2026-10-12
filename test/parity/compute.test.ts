@@ -26,6 +26,7 @@ const KEYS = [
   "tags",
   "blocks",
   "listItems",
+  "referenceLinks",
   "frontmatterPosition",
 ] as const;
 
@@ -635,6 +636,23 @@ describe("positioned oracle", () => {
     // cases contradict.
     embeds: 2,
     tags: 0,
+    // ZERO on arrival, and the arrival is the point. `referenceLinks` is Obsidian's own
+    // answer for link reference definitions and the recorder has stored it on every case
+    // since the first run -- the `KEYS` list above simply never named it, so 111 non-empty
+    // answers about a construct family these notes call hard sat dormant in the goldens.
+    //
+    // Measured before wiring: 110 of 111 agreed, and the two that disagreed either way
+    // settled a rule instead of needing a harness clamp. `link-reference-definitions/193`
+    // indents a definition three spaces and is reported at column 0;
+    // `commonmark/lists/317` puts one inside a list item and is reported at the item's
+    // content column of 2. That is `definitionColumnTransform`'s `min(indent,
+    // hostContentColumn)` exactly, and that pass had only ever visited `footnoteDefinition`.
+    // Extending it to `definition` took this to 111 with 0 parity regressions.
+    //
+    // So a projection can be recorded for months and compared never. Auditing what the
+    // recorder stores against what `KEYS` reads is a two-line check that nothing did until
+    // now -- `frontmatter` (54 cases) and `frontmatterLinks` (2) are still unread.
+    referenceLinks: 0,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
     // block identifier and the fix closed eleven cases, its own eight included.
     //

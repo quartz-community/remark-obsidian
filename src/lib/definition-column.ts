@@ -44,7 +44,14 @@ export function definitionColumnTransform(tree: Root, source: string): void {
     });
   });
 
-  visit(tree, "footnoteDefinition", (node: Node) => {
+  // Both definition kinds, because Obsidian applies one rule to them. A LINK reference
+  // definition's column follows `min(indent, hostContentColumn)` exactly as a footnote
+  // definition's does: `   [foo]: /url` at root is reported at column 0, and
+  // `- a` / `- b` / blank / `  [ref]: /url` inside an item is reported at the item's content
+  // column of 2. Both come from `referenceLinks`, which the recorder has stored on every
+  // case since the first run and which nothing compared until now -- 111 non-empty answers
+  // that were dormant in the goldens.
+  visit(tree, ["footnoteDefinition", "definition"], (node: Node) => {
     const definition = node as FootnoteDefinition;
     const start = definition.position?.start;
     if (!start || start.offset === undefined) return;

@@ -2741,6 +2741,28 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       ? spanOf(yaml)
       : undefined;
 
+  // Obsidian's own answer for link reference definitions, which was RECORDED on every case
+  // from the first run and never compared. `referenceLinks` sits in `computeMetadataAsync`'s
+  // output beside `sections` and `listItems`, the recorder has always stored it, and
+  // `compute.test.ts`'s `KEYS` list simply did not name it -- so 111 non-empty answers about
+  // a construct family these notes call hard were dormant in the goldens.
+  //
+  // Measured before being wired in: 110 of 111 agreed already, and the two that disagreed
+  // either way settled the rule rather than needing a clamp here.
+  // `commonmark/link-reference-definitions/193` indents a definition three spaces and is
+  // reported at column 0; `commonmark/lists/317` puts one inside a list item and is reported
+  // at column 2, the item's content column. That is `definitionColumnTransform`'s rule
+  // exactly -- `min(indent, hostContentColumn)` -- which had only ever visited
+  // `footnoteDefinition`. Extending it to `definition` is the fix, so this projection reads
+  // the tree straight and clamps nothing.
+  const referenceLinks: string[] = [];
+  visit(tree, "definition", (node: Node) => {
+    const at = node.position;
+    if (!at?.start || !at.end) return;
+    const url = (node as unknown as { url?: string }).url ?? "";
+    referenceLinks.push(`${url}@${atPoint(at.start)}-${atPoint(at.end)}`);
+  });
+
   return {
     footnotes,
     footnoteRefs,
@@ -2751,6 +2773,7 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     tags,
     blocks,
     listItems,
+    referenceLinks,
     ...(frontmatterPosition === undefined ? {} : { frontmatterPosition }),
   };
 }
