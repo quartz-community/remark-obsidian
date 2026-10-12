@@ -794,6 +794,63 @@ Obsidian resolved it to the current note, and embedded the note into itself six 
 deep. Reproducing that needs vault resolution and recursive inlining — the renderer's job,
 and this harness models no vault.
 
+## Asking Obsidian directly, in two seconds
+
+`parity:record` boots Obsidian under Xvfb, renders all 3,403 corpus cases and rewrites the
+goldens: seventy seconds, and it only answers for documents already committed to `corpus.ts`.
+So every question cost a corpus edit, a collision check, a recording and a triage pass -- a
+commit cycle per question, which is most of why probing felt expensive and why progress
+tapered.
+
+The Obsidian CLI (1.13+) evaluates JavaScript in the running app, so the same
+`computeMetadataAsync` the recorder uses can be called on any string:
+
+    npx tsx --conditions=development test/parity/ask.mts '[^1]: def' 'use[^1]'
+
+**Three questions in 1.3 seconds**, nothing written, no corpus change, no goldens moved. Use
+it to settle a rule, then PROMOTE the shapes that settled something into `corpus.ts` -- the
+corpus is still what the gate asserts, and a probe nobody recorded proves nothing to CI.
+
+Four details are load-bearing, three taken from `quartz-syncer`'s operability notes, which
+document this channel for its own plugin:
+
+- **`2>/dev/null`**, or every call is buried in GTK and Electron warnings.
+- **Obsidian must be running with a vault open.** A cold `obsidian eval` launches the app and
+  returns the launcher's log lines; with no vault open it returns nothing at all, silently.
+  `ask.mts` checks liveness first for exactly that reason -- both failure modes otherwise read
+  as "Obsidian found no metadata in this document".
+- **The result window is roughly 5-15 ms.** Anything logged after `eval` returns is lost and
+  the call reports success with empty output, so an `await` cannot be answered in one call.
+  Stash onto a global and read it back with a second synchronous eval; `ask.mts` batches every
+  question into one stash because the per-call overhead is the expensive part.
+- **Markdown goes base64-encoded.** It passes through a shell argument and then a JavaScript
+  string literal, and quoting it twice is how a probe silently becomes a different document --
+  these notes already record a tab and a U+00A0 surviving one layer and not the other.
+
+### It earned its place in the first four minutes
+
+Asked `> %%` / `[^3]: Text` and got `footnoteRefs: []`, where the referee's recorded answer
+for that exact note is `refs: [["3",1,0]]`. That reads as the referee corpus being stale
+against 1.14.4 -- and the commented-definition rule, the second-largest referee gain recorded
+here at +123 documents, is fitted to it.
+
+It is not stale. `footnoteRefs` lists only references whose name HAS a definition, which the
+next question confirms: in `%%` / `[^1]: buried` / `%%` / `use[^1]` even the live `use[^1]`
+outside the comment is absent, because the buried definition defines nothing. The sibling
+project's `refs` field is broader by construction -- it re-parses each note with a SYNTHESISED
+definition for every undefined name, which these notes already record -- so the two fields
+answer different questions.
+
+Supplying the definition settles it on live 1.14.4:
+
+    > %% / [^3]: Text / blank / [^3]: synthesised
+        footnotes    = ["3@3:0"]     only the live definition defines
+        footnoteRefs = ["3@1:0"]     the BURIED label is indexed as a reference
+
+Exactly the referee's answer. So the rule holds on the current release, and a question that
+would have cost a recording cycle cost four seconds -- including raising a false alarm and
+clearing it, which is the part a slow loop discourages anyone from doing.
+
 ## The referee: a second, independent oracle
 
 `referee.mts` replays ~6800 notes recorded from Obsidian's own
@@ -2504,6 +2561,7 @@ like the fix not working until you test the minimal form directly.
 | `oracle.e2e.ts`          | Recorder; runs inside Obsidian                     |
 | `parity.test.ts`         | The gate; no Obsidian required                     |
 | `goldens/obsidian.json`  | Recorded output, version-stamped and triaged       |
+| `ask.mts`                | Asks a running Obsidian about arbitrary markdown   |
 | `delta.mts`              | What a change gained and broke, before committing  |
 | `invariants.test.ts`     | Structural invariants on the tree itself           |
 | `option-matrix.test.ts`  | Every option toggled, looking for crashes          |
