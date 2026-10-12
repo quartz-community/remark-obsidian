@@ -2124,11 +2124,16 @@ behave as attributed:
 | group                                         | opened |   now |
 | --------------------------------------------- | -----: | ----: |
 | `paragraph > break` / `text` end late         |     92 | **0** |
-| `callout > calloutTitle/paragraph` overlap    |     26 |    26 |
+| `callout > calloutTitle/paragraph` overlap    |     26 | **0** |
 | `root > definition/heading` -- upstream, KEEP |     10 |    10 |
 | `list > listItem/listItem` overlap            |      6 | **0** |
 | `paragraph > footnoteReference` / `wikilink`  |      6 | **0** |
 | `footnoteDefinition > break`                  |      2 | **0** |
+
+**132 of 142 closed in five fixes, and the 10 that remain are upstream's and must stay.** The
+gate is now a statement rather than a backlog: every span this package writes covers its
+children and sits inside its parent, and the one group left arrives from `remark-parse` and
+passes straight through.
 
 The comment-fold fix closed **98** where 92 were attributed: the `footnoteReference` and
 `wikilink` groups were the same fold seen through a different child type, so grouping
