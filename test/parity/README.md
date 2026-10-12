@@ -833,6 +833,39 @@ that is CORRECT and scores negative is a real outcome: record it with its score 
 rather than retrying it at a different scope, which is what three tab scopings and four
 comment-fold iterations each established the expensive way.
 
+### Its first real use retired the 426-document tab family
+
+The tab family was the largest localised group on this oracle and the last candidate big
+enough to justify construct-level work in `legacy-list.ts`. Scoring it instead of building it
+took six runs and no parser change:
+
+| candidate                                                | better | worse | touched |
+| -------------------------------------------------------- | -----: | ----: | ------: |
+| `tab-marker-column` -- the column behind a tab separator |      0 |     0 |   **0** |
+| `tab-marker-defines` -- a label there defines            |     23 |   114 |     138 |
+| ...end absorbing to the blank line                       |     24 |   114 |     138 |
+| ...marker at column 0 only                               |     10 |    60 |      70 |
+| ...and the separator starting with the tab               |     10 |    16 |      26 |
+| ...and fence interiors excluded                          |     10 |    14 |      24 |
+
+Each narrowing came from an example the previous scoping made worse, which is the loop the
+harness is for -- an indented `  2)⇥[^Note]:` nested in another item, a `+ ⇥[^Ω]:` whose
+space-then-tab was already measured as defining nothing, and a label inside an unclosed
+` ` ```` fence.
+
+**Two findings, and the second is the one that matters.** The column rule is already complete:
+`tab-marker-column` touches ZERO documents of 6,818, so nothing we place behind a tab
+separator sits at the wrong column. And the defining rule caps at **ten documents** -- 24
+touched at its narrowest, 10 of them better. It is still net negative, and even a perfect
+version could not be worth more than ten.
+
+So the 426-document tab family is a CORRELATE, not a rule. A tab marks a document as hard --
+that is what the base-rate test showed, P(disagree | tab) 30.5% against 14.8% -- and the
+actual tab rule underneath it is worth ten. Construct-level work in `legacy-list.ts` was about
+to be justified on the 426, and the ceiling says it should not be.
+
+That is the most expensive mistake this harness has prevented, and it cost six scoring runs.
+
 ## Asking Obsidian directly, in two seconds
 
 `parity:record` boots Obsidian under Xvfb, renders all 3,403 corpus cases and rewrites the

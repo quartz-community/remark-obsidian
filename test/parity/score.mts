@@ -65,6 +65,9 @@ interface Rule {
 
 const QUOTE_PREFIX = /^[ \t]*>/u;
 const COMMENT_LINE = /^[ \t>]*%%/u;
+/** A marker whose separator run holds a tab, then a label. Split to keep the lint happy. */
+const TAB_MARKER = /^((?:[ \t]*>)*[ \t]*(?:[-*+]|\d{1,9}[.)]))([ \t]*)/u;
+const LABEL = /^\[\^([^\]]*)\]:/u;
 
 const RULES: readonly Rule[] = [
   {
@@ -109,6 +112,111 @@ const RULES: readonly Rule[] = [
             }
           }
           return [d[0], d[1], d[2], end];
+        }),
+      };
+    },
+  },
+  {
+    name: "tab-marker-defines",
+    what: "a label behind a marker whose separator holds a tab defines, at marker+1",
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      const extra: Def[] = [];
+      for (const [index, line] of lines.entries()) {
+        const marker = TAB_MARKER.exec(line);
+        if (!marker || !marker[2]!.includes("\t")) continue;
+        const label = LABEL.exec(line.slice(marker[0].length));
+        if (!label) continue;
+        if (ours.defs.some((d) => d[1] === index)) continue;
+        // Column is the marker plus ONE, the measured rule for a tab separator: `+⇥   [^1]:
+        // def` is column 2 and `1.⇥   [^1]: def` is column 3.
+        //
+        // The END absorbs every following non-blank line, which is the other measured rule
+        // -- a definition runs to the blank line whatever the lines hold. Scoring the
+        // label's own line instead gave `better 23 worse 114 same 1`, and a `same` of one
+        // against 114 worse is the tell that the end was wrong rather than the rule: every
+        // added definition counted as both a missing entry and an extra one.
+        let end = index;
+        while (end + 1 < lines.length && (lines[end + 1] ?? "").trim() !== "") {
+          end += 1;
+        }
+        extra.push([
+          (label[1] ?? "").toLowerCase(),
+          index,
+          marker[1]!.length + 1,
+          end,
+        ]);
+      }
+      return extra.length === 0
+        ? ours
+        : { defs: [...ours.defs, ...extra], refs: ours.refs };
+    },
+  },
+  {
+    name: "tab-marker-defines-root",
+    what: "...and only when the marker itself sits at column 0",
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      const extra: Def[] = [];
+      // Fence interiors are not a tab question at all: `\`\`\`\`` opened and never closed
+      // puts every later line in code, and a label there defines nothing. One of the three
+      // documents the previous scoping made worse was exactly that.
+      const fenced = new Set<number>();
+      let open = false;
+      for (const [index, line] of lines.entries()) {
+        if (/^[ \t>]*(?:```|~~~)/u.test(line)) {
+          open = !open;
+          fenced.add(index);
+          continue;
+        }
+        if (open) fenced.add(index);
+      }
+      for (const [index, line] of lines.entries()) {
+        if (fenced.has(index)) continue;
+        const marker = TAB_MARKER.exec(line);
+        if (!marker || !marker[2]!.includes("\t")) continue;
+        // Two further narrowings, each from a document the looser rule makes worse.
+        //
+        // The marker sits at column 0: every example of the unrestricted rule going wrong
+        // adds a definition behind an INDENTED marker, `  2)⇥[^Note]:` nested in another
+        // item, while every shape the rule was measured on had its marker at column 0.
+        //
+        // And the separator STARTS with the tab. `+ ⇥[^Ω]: Text` defines nothing, which was
+        // measured directly as probe 3 of the first batch -- a tab AFTER a space does not
+        // behave like one immediately after the marker, and `[ \t]*` matched both.
+        if (/^[ \t]/u.test(line)) continue;
+        if (!marker[2]!.startsWith("\t")) continue;
+        const label = LABEL.exec(line.slice(marker[0].length));
+        if (!label) continue;
+        if (ours.defs.some((d) => d[1] === index)) continue;
+        let end = index;
+        while (end + 1 < lines.length && (lines[end + 1] ?? "").trim() !== "") {
+          end += 1;
+        }
+        extra.push([
+          (label[1] ?? "").toLowerCase(),
+          index,
+          marker[1]!.length + 1,
+          end,
+        ]);
+      }
+      return extra.length === 0
+        ? ours
+        : { defs: [...ours.defs, ...extra], refs: ours.refs };
+    },
+  },
+  {
+    name: "tab-marker-column",
+    what: "a definition we already place behind a tab separator sits at marker+1",
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      return {
+        refs: ours.refs,
+        defs: ours.defs.map((d): Def => {
+          const marker = TAB_MARKER.exec(lines[d[1]] ?? "");
+          if (!marker || !marker[2]!.includes("\t")) return d;
+          const want = marker[1]!.length + 1;
+          return want === d[2] ? d : [d[0], d[1], want, d[3]];
         }),
       };
     },
@@ -164,6 +272,9 @@ for (const rule of RULES) {
   let untouched = 0;
   let agreedBefore = 0;
   let agreedAfter = 0;
+  // A few documents the rule makes WORSE, which is what says whether the rule is wrong or
+  // its approximation is. Three is enough to tell those apart and short enough to read.
+  const examples: string[] = [];
 
   for (const answer of answers) {
     let ours: Facts;
@@ -184,8 +295,14 @@ for (const rule of RULES) {
       continue;
     }
     if (now < before) better += 1;
-    else if (now > before) worse += 1;
-    else same += 1;
+    else if (now > before) {
+      worse += 1;
+      if (examples.length < 3) {
+        examples.push(
+          `${JSON.stringify(answer.text).slice(0, 96)}\n        answer=${JSON.stringify(answer.defs)}\n        after =${JSON.stringify(after.defs)}`,
+        );
+      }
+    } else same += 1;
   }
 
   const verdict = better > worse ? "NET POSITIVE" : "net negative";
@@ -195,6 +312,8 @@ for (const rule of RULES) {
       `   (untouched ${untouched})`,
   );
   console.log(
-    `    documents in full agreement : ${agreedBefore} -> ${agreedAfter}   ${verdict}\n`,
+    `    documents in full agreement : ${agreedBefore} -> ${agreedAfter}   ${verdict}`,
   );
+  for (const example of examples) console.log(`      worse: ${example}`);
+  console.log("");
 }
