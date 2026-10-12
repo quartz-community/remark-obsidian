@@ -35,22 +35,17 @@
  * five counting selectors have died. A 14-character document can only be wrong about one
  * thing.
  *
- * `ours` is duplicated from `referee.mts` rather than imported: that file is a script and
- * runs its measurement on import, so there is nothing to import from it without splitting a
- * working tool in two for one caller.
+ * Both this tool and `referee.mts` read our facts through `referee-facts.ts`. They were
+ * separate copies for exactly one run, during which the commented-definition rule landed in
+ * `referee.mts` alone and this tool spent a pass reducing notes against three-commit-old
+ * behaviour -- its output still dominated by `%%` forms the rule had closed.
  */
 import fs from "node:fs";
 import path from "node:path";
 
-import { parseOurs } from "./chain.js";
+import { refereeFacts } from "./referee-facts.js";
 
-interface Point {
-  readonly line: number;
-  readonly column: number;
-}
-
-type Def = readonly [string, number, number, number];
-type Ref = readonly [string, number, number];
+import type { Def, Ref } from "./referee-facts.js";
 
 interface Entry {
   readonly id?: string;
@@ -67,40 +62,6 @@ const limit = Number(process.argv[2] ?? "300");
 if (!fs.existsSync(dir)) {
   console.log(`referee-shrink: no corpus at ${dir}`);
   process.exit(0);
-}
-
-function ours(text: string): { defs: Def[]; refs: Ref[] } {
-  const defs: Def[] = [];
-  const refs: Ref[] = [];
-  const walk = (node: unknown, inComment: boolean): void => {
-    const candidate = node as {
-      type?: string;
-      identifier?: string;
-      position?: { start: Point; end: Point };
-      children?: unknown[];
-    };
-    const at = candidate.position;
-    if (candidate.type === "footnoteDefinition") {
-      if (!inComment && at) {
-        defs.push([
-          String(candidate.identifier),
-          at.start.line - 1,
-          at.start.column - 1,
-          at.end.line - 1,
-        ]);
-      }
-    } else if (candidate.type === "footnoteReference" && at) {
-      refs.push([
-        String(candidate.identifier),
-        at.start.line - 1,
-        at.start.column - 1,
-      ]);
-    }
-    const buried = inComment || candidate.type === "comment";
-    for (const child of candidate.children ?? []) walk(child, buried);
-  };
-  walk(parseOurs(text, "all-features"), false);
-  return { defs, refs };
 }
 
 const key = (rows: readonly (readonly unknown[])[]) =>
@@ -124,7 +85,7 @@ const key = (rows: readonly (readonly unknown[])[]) =>
 function signature(text: string, defs: readonly Def[], refs: readonly Ref[]) {
   let mine;
   try {
-    mine = ours(text);
+    mine = refereeFacts(text);
   } catch {
     return "threw";
   }
@@ -144,7 +105,7 @@ function signature(text: string, defs: readonly Def[], refs: readonly Ref[]) {
 function disagrees(text: string, defs: readonly Def[], refs: readonly Ref[]) {
   let mine;
   try {
-    mine = ours(text);
+    mine = refereeFacts(text);
   } catch {
     return true;
   }
@@ -230,4 +191,46 @@ console.log(
 console.log("  top forms, shortest first within a count:\n");
 for (const { count, text } of sorted.slice(0, 25)) {
   console.log(`  ${String(count).padStart(3)}x  ${JSON.stringify(text)}`);
+}
+
+// A long tail is fragmented by text and concentrated by SHAPE -- the lesson that retired
+// exact-string dedup on the fuzz sweep applies here too, since 349 distinct forms from 400
+// notes means the top-25 list describes almost nothing. These features are structural and
+// overlapping on purpose: a form can be both tab-indented and marker-hosted.
+const feature: Array<[string, (text: string) => boolean]> = [
+  ["holds a tab", (t) => t.includes("\t")],
+  ["holds a `%%`", (t) => t.includes("%%")],
+  [
+    "a list marker hosts the label",
+    (t) => /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+.*\[\^/mu.test(t),
+  ],
+  ["a quote marker on some line", (t) => /^[ \t]*>/mu.test(t)],
+  ["more than one line", (t) => t.includes("\n")],
+  [
+    "an indented continuation line",
+    (t) =>
+      t
+        .split("\n")
+        .slice(1)
+        .some((l) => /^[ \t]+\S/u.test(l)),
+  ],
+  [
+    "a second label on another line",
+    (t) => t.split("\n").filter((l) => /\[\^[^\]]*\]:/u.test(l)).length > 1,
+  ],
+  [
+    "a reference outside any label",
+    (t) => t.split("\n").some((l) => /\[\^[^\]]*\](?!:)/u.test(l)),
+  ],
+  ["math `$`", (t) => t.includes("$")],
+  ["a fence", (t) => /(?:```|~~~)/u.test(t)],
+];
+console.log(
+  "\n  shape features over all " + sorted.length + " distinct forms:",
+);
+for (const [name, test] of feature) {
+  const hits = sorted.filter((s) => test(s.text)).length;
+  console.log(
+    `  ${String(hits).padStart(4)}  ${((100 * hits) / sorted.length).toFixed(0).padStart(3)}%  ${name}`,
+  );
 }

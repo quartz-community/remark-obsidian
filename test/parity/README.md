@@ -1247,6 +1247,54 @@ after a space, so it turns on micromark's list-item tab straddle — `containerS
 counting characters while `factorySpace` consumes columns — and not on the code threshold at
 all. Two shapes that look identical in a prefix dump, one rule each.
 
+### The largest localised family is TABS, and it is the first feature here to beat its base rate
+
+Classifying the reduction tool's 349 minimal forms by SHAPE rather than by text -- the lesson
+that retired exact-string dedup on the fuzz sweep -- gives one feature well clear of the
+others:
+
+| feature over the 349 distinct minimal forms | share |
+| ------------------------------------------- | ----: |
+| holds a tab                                 |   50% |
+| an indented continuation line               |   68% |
+| a reference outside any label               |   82% |
+| a list marker hosts the label               |   32% |
+| holds a `%%`                                |   19% |
+
+The 82% and 68% are the generator: nearly every note has them. The tab figure is the one that
+survives its base rate, which is the test four earlier selectors failed:
+
+    notes holding a tab:  all 45.0%   disagreeing 62.9%   lift 1.40
+    P(disagree | tab)    = 30.5%
+    P(disagree | no tab) = 14.8%      odds ratio 2.06
+
+**And it localises.** Asking whether the tab sits on a line either side actually disagrees
+about, rather than anywhere in the note:
+
+    426  tab ON a disagreeing line
+    512  tab elsewhere in the note
+    553  no tab at all
+
+So 426 of 1,491 disagreements are tab-positioned, against 512 where a tab is present and
+incidental -- which is exactly the distinction every earlier frequency selector could not
+make, and the reason this one is worth acting on.
+
+**The mechanism is already documented and already known to be hard.** Three tab rules are
+implemented -- a tab after a space does not reach the four-column code threshold while a
+leading one does, a tab in a list marker's separator puts the definition at the marker, and a
+tab-indented list item begins just past its tab run. What remains is micromark's list-item
+tab **straddle**: `containerState.size` counts characters while `factorySpace` consumes
+columns, so a tab crossing a container boundary is split and half a tab has no character
+count at all. `commonmark/tabs/9` and `probe/def-tab/marker-tab-spaces` are the two recorded
+cases, the second `replicate` with that cause attached, and comparing the indent unexpanded
+is refuted at 0 gains against 4 regressions.
+
+The sibling project reached this by vendoring `remark-parse@8`'s list reader wholesale, which
+is not available here -- but `container-lazy.ts` records that `disable: {null: [...]}` DOES
+reach container constructs, so replacing micromark's `list` whole is a route this package has
+already used once. That is the shape of the remaining work, and it is now sized: 426 notes,
+one mechanism.
+
 ### Re-running the other stand-in measurements: one refuted harder, one advanced
 
 The commented-definition lesson -- that a predicate standing in for a structural premise is
