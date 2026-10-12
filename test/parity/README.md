@@ -1342,7 +1342,32 @@ definition at the marker, and a tab-indented list item begins just past its tab 
 `commonmark/tabs/9` and `probe/def-tab/marker-tab-spaces` are the two recorded cases that
 remain, and comparing the indent unexpanded is refuted at 0 gains against 4 regressions.
 
-**And the mechanism these notes kept attributing it to does not exist.** "`containerState.size`
+**And the real rule is now measured, directly.** Asked of a running Obsidian rather than
+inferred: `+⇥   x`, `+⇥    x`, `+⇥     x`, `- ⇥p`, `- ⇥⇥x` and `1.⇥   x` all report a plain
+`list` with one item and NO `code` section. Four and five following spaces would both clear
+the indented-code threshold if the tab were expanded, so **a tab in the marker's own
+separator means the content is never code, at any space count.** We make `code` of six of
+those seven.
+
+Ten questions also pinned the definition side, and nine of the ten now agree after the
+column rules already landed. The one that does not is `- ⇥p` / blank / `  [^1]: def`, where
+Obsidian takes the definition INTO the item at column 2 while `-  p` with two spaces leaves
+it at root column 0 -- the separator's tab is what moves the item's content column to 2.
+
+**The repair is attempted, measured and reverted.** Re-parsing the item's content when the
+separator holds a tab closes `probe/def-tab/marker-tab-spaces` and costs the referee 27
+documents, 78.3% to 77.9%; a fence guard recovers none of them. Which oracle to believe was
+settled by ASKING Obsidian about the regressed documents rather than reasoning about them: on
+the first, live 1.14.4 agrees with the referee exactly and our new answer is wrong by one end
+line, and on the second all three differ with ours wrong either way. So the referee is
+reliable here and the repair over-reaches on dense documents, however sound the isolated rule
+is. Recorded in the pass with those numbers.
+
+That three-way check is the clearest demonstration of what `ask.mts` changes. The same
+question a day ago would have been "the corpus says better, the referee says worse, pick
+one" -- and the honest answer needed a third opinion that used to cost a recording cycle.
+
+**The mechanism these notes previously attributed it to does not exist.** "`containerState.size`
 counts characters while `factorySpace` consumes columns" has been repeated here and in several
 commit messages, and it is false: the vendored list reader sets `size` from
 `sliceSerialize(token, true)`, whose second argument is `expandTabs`, so the count is ALREADY

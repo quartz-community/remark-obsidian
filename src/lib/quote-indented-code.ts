@@ -151,6 +151,28 @@ export function quoteIndentedCodeTransform(
           : /^(?:[ \t]*>[ \t]?)+/u.exec(whole);
       if (!opener) continue;
       const rest = whole.slice(opener[0].length);
+      // ATTEMPTED AND REVERTED, with numbers, because the RULE is confirmed and the repair
+      // is not. A tab in the marker's own separator means the content is never code at any
+      // number of following spaces -- asked of a running Obsidian directly rather than
+      // inferred, and `+⇥   x`, `+⇥    x`, `+⇥     x`, `- ⇥p`, `- ⇥⇥x` and `1.⇥   x` all
+      // report a plain `list` with one item and NO `code` section, where four and five
+      // spaces would both clear the threshold if the tab were expanded. We make `code` of
+      // six of those seven.
+      //
+      // The test below cannot reach them: the opener pattern's `[ \t]+` swallows the whole
+      // separator, so a tab there never appears in `rest`. Re-parsing `rest` when the
+      // separator holds a tab fixes `probe/def-tab/marker-tab-spaces` and costs the referee
+      // 27 documents -- 78.3% to 77.9% -- and a fence guard recovers none of them.
+      //
+      // Which oracle to believe was settled by asking Obsidian about the regressed documents
+      // rather than reasoning about them. On the first, live 1.14.4 agrees with the referee
+      // EXACTLY and our new answer is wrong by one end line; on the second all three differ
+      // and ours is wrong either way. So the referee is reliable here and the repair
+      // over-reaches on dense documents, however sound the isolated rule is.
+      //
+      // What it would need is a repair scoped to the item's own first line without
+      // re-parsing anything that can change an enclosing block's extent, which is the same
+      // constraint that made the first version of the pass below throw.
       if (!rest.includes("\t")) continue;
 
       let columns = 0;
