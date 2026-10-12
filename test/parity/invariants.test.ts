@@ -47,7 +47,12 @@ const CEILING = {
   "SIBLINGS OVERLAP: list > listItem/listItem": 6,
   "child ENDS AFTER parent: paragraph > footnoteReference": 4,
   "child ENDS AFTER parent: paragraph > wikilink": 2,
-  "child ENDS AFTER parent: footnoteDefinition > break": 2,
+  // Was `footnoteDefinition > break` before the demoted math was wrapped in a paragraph;
+  // the wrap moved which node reports it and not the cause. The math node's own span still
+  // outlives the container holding it, which is also the `listItem/listItem` overlap below
+  // and the five math entries in `hygiene.test.ts`'s idempotence list. One defect, three
+  // symptoms, and the wrap addressed a fourth.
+  "child ENDS AFTER parent: footnoteDefinition > paragraph": 2,
 } as const;
 
 interface Point {
@@ -210,22 +215,20 @@ const CONTENT_MODEL: Record<string, Set<string> | "none"> = {
 };
 
 /**
- * All 24 are ONE defect: `mathUnclosedContainerTransform` replaces a flow `math` node with a
- * phrasing `text` node, directly inside a block container that requires flow content. The
- * `text` and the `break` beside it belong in a `paragraph`.
+ * ZERO, and an absolute assertion rather than a ceiling.
  *
- * Three gates now point at the math-demotion area independently -- this, the overlapping
- * `listItem` spans above, and 5 of the 12 non-idempotent cases in `hygiene.test.ts`. None of
- * the three existed yesterday and none would have found it alone.
+ * It opened at 24 violations across six shapes, all ONE defect:
+ * `mathUnclosedContainerTransform` replaced a flow `math` node with a phrasing `text` node
+ * directly inside a block container that requires flow content. Wrapping the text in a
+ * paragraph closed all 24, and the `break` half went with it -- `remark-breaks` splits a text
+ * value's line endings in place, so an unwrapped value had put its `break` nodes in the
+ * container too.
+ *
+ * Absolute because the content model is not debt. A node in an illegal position is a defect
+ * under any reading, unlike a span that merely disagrees with Obsidian, and there is no
+ * argument for carrying one.
  */
-const CONTAINMENT_CEILING = {
-  "listItem > text": 8,
-  "listItem > break": 6,
-  "callout > text": 4,
-  "blockquote > text": 2,
-  "footnoteDefinition > text": 2,
-  "footnoteDefinition > break": 2,
-} as const;
+const CONTAINMENT_CEILING = {} as const;
 
 function containmentOf(tree: unknown): string[] {
   const found: string[] = [];

@@ -113,7 +113,30 @@ export function mathUnclosedContainerTransform(
           end: { ...math.position!.end },
         },
       };
-      parent.children.splice(index, 1, text as unknown as RootContent);
+      // Wrapped in a paragraph, because `math` is FLOW content and `text` is PHRASING: a
+      // bare text node is legal inside a `calloutTitle`, which holds phrasing, and illegal
+      // as a direct child of a quote, a callout, a list item or a definition. Splicing it
+      // unwrapped broke mdast's content model 24 times across six shapes, and the `break`
+      // half of those came from downstream -- `remark-breaks` splits a text value's line
+      // endings in place, so an unwrapped value put its `break` nodes directly in the
+      // container too.
+      //
+      // Three gates found this before the cause was known, which is why the wrap is here
+      // rather than in any of them: the span checker reported overlapping `listItem` spans,
+      // `hygiene`'s idempotence check reported five math cases changing on a second run, and
+      // only the content model named it.
+      const replacement: RootContent =
+        node.type === "calloutTitle"
+          ? (text as unknown as RootContent)
+          : ({
+              type: "paragraph",
+              children: [text],
+              position: {
+                start: { ...math.position!.start },
+                end: { ...math.position!.end },
+              },
+            } as unknown as RootContent);
+      parent.children.splice(index, 1, replacement);
     }
   });
 }

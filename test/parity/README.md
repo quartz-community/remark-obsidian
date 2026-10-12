@@ -1971,7 +1971,7 @@ written: CommonMark's two content classes plus this package's own nodes, with an
 type REPORTED rather than ignored, since a silent pass for a node nobody listed is how such a
 table rots.
 
-It found **24 violations, and all 24 are one defect**:
+It found **24 violations, and all 24 were one defect -- now zero**:
 
 | violation                    | count |
 | ---------------------------- | ----: |
@@ -1991,6 +1991,20 @@ beside it, belong in a `paragraph`.
 three existed this morning, and none would have found it alone: the span checker sees a
 symptom in the list item, idempotence sees the second-run divergence, and only the content
 model names the cause.
+
+**Wrapping the demoted text in a paragraph closed all 24, and nothing else**, which is the
+useful part of the result. The span checker's count did not fall -- one entry was RENAMED
+from `footnoteDefinition > break` to `footnoteDefinition > paragraph`, because the wrap
+changed which node reports the violation and not the cause -- and the idempotence list did
+not move either. The math node's own span still outlives the container holding it, and that
+is the `listItem/listItem` overlap and the five idempotence entries both. One defect with
+four symptoms; the content-model one is fixed and three remain.
+
+That is worth stating plainly because the opposite reading was available and wrong: three
+gates lighting up together looked like one fix would clear all three, and it cleared the one
+whose cause it addressed. The containment ceiling is now an ABSOLUTE assertion rather than a
+ceiling -- a node in an illegal position is a defect under any reading, unlike a span that
+merely disagrees with Obsidian, so there is no argument for carrying one.
 
 Two more checks landed with it, both cheap and both closing a hole that was being watched by
 hand. **The corpus and the goldens must describe the same documents** -- cases dedupe by
