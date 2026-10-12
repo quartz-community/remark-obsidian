@@ -2118,6 +2118,28 @@ in 8 groups on the first run, from three distinct causes, each a hand-written sp
 on bare `remark-parse` + `remark-gfm`. The checker found it without being told, and that
 group must NOT be driven to zero -- doing so would mean diverging from upstream's own output.
 
+**142 is now 36**, in four fixes, and the counts are worth keeping because two of them did not
+behave as attributed:
+
+| group                                         | opened |   now |
+| --------------------------------------------- | -----: | ----: |
+| `paragraph > break` / `text` end late         |     92 | **0** |
+| `callout > calloutTitle/paragraph` overlap    |     26 |    26 |
+| `root > definition/heading` -- upstream, KEEP |     10 |    10 |
+| `list > listItem/listItem` overlap            |      6 | **0** |
+| `paragraph > footnoteReference` / `wikilink`  |      6 | **0** |
+| `footnoteDefinition > break`                  |      2 | **0** |
+
+The comment-fold fix closed **98** where 92 were attributed: the `footnoteReference` and
+`wikilink` groups were the same fold seen through a different child type, so grouping
+violations by child type had made one defect look like four families. And the math-demotion
+fixes closed three groups that had read as one -- the content model, the sibling overlap and
+the trailing line ending each needed their own change.
+
+So the grouping a checker reports by is a presentation choice, and it shapes which defects
+look related. Both readings here were wrong in opposite directions, and only fixing them
+showed it.
+
 Why it matters beyond tidiness: `obsidian-linter` splices by offset. Two overlapping siblings
 give it no edit order, and a child reaching past its parent lets it delete text belonging to
 neither. A wrong offset is worse than a missing one -- the rule this repo already applies to
