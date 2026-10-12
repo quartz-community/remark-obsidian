@@ -158,9 +158,37 @@ export function commentInDefinitionTransform(
   // so testing for a line ending makes that inert too -- and the version that got that far
   // left type errors behind, which is where it was stopped.
   //
-  // What it needs is the sibling branch plus `pushCommentLines` reached with the comment's
-  // own span, and the controls to keep passing: a blank line genuinely does end the
-  // definition.
+  // A WORKING version exists and is reverted on measurement, and the diagnosis is complete
+  // enough that the next attempt should not re-derive it. Three things are needed and all
+  // three are easy to mistake for inert:
+  //
+  //   1. The host list widened to every container, since a quoted definition is never a
+  //      root child.
+  //   2. A sibling branch: if the definition's last child is not a comment, take the NEXT
+  //      SIBLING when it is one and the gap between them is empty or a single line ending
+  //      with the quote's prefix stripped. The gap is usually EMPTY -- the definition's end
+  //      sits exactly at the comment's start -- so testing only for a line ending makes the
+  //      whole branch inert.
+  //   3. The DEFINITION's own end moved to the folded comment's end. `syncEnd` below extends
+  //      the paragraph and the while loop extends the definition only for blocks IT absorbs,
+  //      so without this the definition still ends at its first line while its paragraph
+  //      covers the comment.
+  //
+  // Any one or two of those alone measures as no change, which is how this took four
+  // attempts: the branch was demonstrably REACHED -- instrumented, `next=comment
+  // defEnd=14` -- while the output stayed identical.
+  //
+  // With all three, six of the seven measured shapes match where five did. The seventh is
+  // `> [^1]: def` / `> %%` / `> x`, an UNCLOSED comment whose end `commentQuoteExtentTransform`
+  // extends to the quote's end 79 lines later in `src/index.ts` -- so this pass folds the
+  // pre-extension span and ends the definition at 1:4 where Obsidian says 2:3. Closing that
+  // needs this pass to run after that one, which is a large reorder; `pass-order.mts` reports
+  // this pass as position-sensitive in both directions.
+  //
+  // Measured: 0 parity regressions, and the referee 78.3% -> 78.2%, four documents lost for
+  // one live-confirmed shape gained. The referee has been sampled against live Obsidian and
+  // is not stale, so that is a real loss and the trade is refused. The attempt is kept at
+  // /tmp only; what ships is this note.
   const children = tree.children;
   for (let index = 0; index < children.length; index++) {
     const definition = children[index];
