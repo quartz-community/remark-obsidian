@@ -823,9 +823,28 @@ absorption to `start !== 1` fixes both, with 0 parity regressions and the refere
 Two things that matters for. **A rule justified on one case is scoped to that case's
 accidents**, and the accident here was the marker's start number -- nothing in the corpus,
 the referee, the compute oracle, or the invariant gates covered the composition that exposed
-it. And the remaining twelve are pre-existing divergences in a dimension that had never been
-swept, which is a better backlog than anything the referee's buckets still hold: each is two
-lines long and one cause.
+it. And the remaining divergences are pre-existing, in a dimension that had never been swept,
+which is a better backlog than anything the referee's buckets still hold: each is two lines
+long and one cause.
+
+Working them down: **14 to 10 in two fixes.** A callout line after a list continues the list
+exactly as a quote does -- the rule landed earlier the same day named only `blockquote`, and
+a callout line arrives as its own node type, so `- item` / `> [!note] title` kept a separate
+`callout` section where Obsidian reports one `list`. Same rule, two node types, found because
+the sweep tries every pair.
+
+The `X > comment` family is four of the remaining ten and needs TWO halves, which is why an
+attempt at one of them is recorded in `comment-hoist.ts` rather than shipped. A column-zero
+`%%` does not belong to the container above it -- the rule `definition-trim.ts` already
+measures at ten against zero for a nested definition -- and lifting it out puts it in the
+right PLACE while leaving its EXTENT wrong: an unclosed `%%` runs to the end of the note,
+which a root `%%` already does here and a freshly lifted one does not, because the pass that
+extends a root comment has already run. Position without extent costs one referee document
+and changes no `compose` row, since each row is binary.
+
+**That is the compositional lesson applied to the fix rather than the input**: two passes,
+each correct, in an order that makes one of them useless. `pass-order.mts` reports this pass
+position-sensitive, and the sweep is what made the coupling visible.
 
 ## Score a rule before building it, because repairs lose and extensions win
 
