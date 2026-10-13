@@ -214,7 +214,14 @@ function absorbPass(tree: Root, source: string): void {
       if (
         next.type !== "footnoteDefinition" &&
         next.type !== "table" &&
-        next.type !== "math" &&
+        // Math, but only after a LIST, which is the same restriction `html`, `heading`,
+        // `blockquote` and `code` already carry and the fourth measured instance of a list
+        // and a quote differing. `- item` / `text` / `$$` reports one `list` spanning the
+        // `$$`, while `> quote` / `$$` reports `blockquote` and then a ROOT `math` that runs
+        // to the end of the note -- so a quote does not take the opener in at all.
+        // `compose.mts --isolate` is what separated them; the pair sweep had both as one
+        // shape.
+        !(next.type === "math" && container.type === "list") &&
         // Html, but only after a list. `- x` over `</div>` is one list to Obsidian
         // while `> x` over `</div>` is a blockquote *and* an html, exactly as
         // `para` over `</div>` is -- so a quote behaves like a paragraph here and a
