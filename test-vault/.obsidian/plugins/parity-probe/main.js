@@ -127,6 +127,24 @@ function project(root) {
     code: Array.from(clone.querySelectorAll("code"))
       .filter((el) => el.parentElement?.tagName.toLowerCase() !== "pre")
       .map(textOf),
+    // RENDERED headings, which is a different question from INDEXED headings and the one
+    // `metadataCache` cannot answer. Obsidian paints a heading inside a container and does
+    // not index it -- `> text` / `> ---` reports `headings: []` while rendering an h2 -- so
+    // an index-only oracle is structurally blind to that whole class. With both in hand the
+    // divergence is measurable instead of merely registered.
+    headings: Array.from(clone.querySelectorAll("h1,h2,h3,h4,h5,h6")).map(
+      (el) =>
+        `${el.tagName.slice(1)}:${(el.getAttribute("data-heading") ?? textOf(el)).trim()}`,
+    ),
+    // Target and display SEPARATELY, which the cache's projection cannot express. The
+    // harness formats a link as `${original}=>${link}|${displayText}@${span}`, and that
+    // string is not round-trippable -- `[[a|b|c]]` records as `a|b|c`, which could be target
+    // `a|b` and display `c`. So no rule about a link's TARGET alone has been measurable.
+    // The DOM keeps them in different attributes, so here it is.
+    links: Array.from(clone.querySelectorAll("a.internal-link")).map((el) => ({
+      target: el.getAttribute("data-href") ?? "",
+      display: textOf(el),
+    })),
     math: Array.from(root.querySelectorAll(".math")).map((el) => {
       const tex = el.querySelector("mjx-math")?.getAttribute("data-latex");
       return {

@@ -52,6 +52,10 @@ export interface DomFacts {
   readonly strike: readonly string[];
   readonly code: readonly string[];
   readonly math: ReadonlyArray<{ display: boolean; tex?: string }>;
+  /** RENDERED headings -- a different question from the INDEXED ones `ask.mts` returns. */
+  readonly headings: readonly string[];
+  /** Target and display kept apart, which the cache's single projection string cannot. */
+  readonly links: ReadonlyArray<{ target: string; display: string }>;
   readonly text: string;
 }
 

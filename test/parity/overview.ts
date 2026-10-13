@@ -370,12 +370,12 @@ export const SCOPE: readonly ScopeBoundary[] = [
     why: "reproducing the P1 column defect would write a wrong offset into our tree, and a consumer splicing by offset would corrupt the file",
   },
   {
-    what: "a link's TARGET in isolation",
-    why: "the projection string ${original}=>${link}|${display}@${span} is not round-trippable, so only whole-string comparison is sound",
+    what: "a link's TARGET in isolation -- CLOSED",
+    why: "was: the projection string ${original}=>${link}|${display}@${span} is not round-trippable, since `[[a|b|c]]` records as `a|b|c` and could be target `a|b`. The DOM keeps them in separate attributes, so `ask-dom.ts` now reports `{target, display}` and `[[a|b|c]]` is unambiguously target `a`, display `b|c`",
   },
   {
-    what: "rendering-only divergence",
-    why: "metadataCache indexes rather than renders: a setext inside a container is painted and not indexed, so an index oracle is structurally blind to it",
+    what: "rendering-only divergence -- CLOSED",
+    why: 'was: metadataCache indexes rather than renders, so an index oracle cannot see a construct Obsidian paints and does not index. `ask-dom.ts` reports RENDERED headings beside the cache\'s indexed ones: `> text` / `> ---` is `["2:text"]` rendered against `[]` indexed, which makes the class measurable rather than merely registered',
   },
   {
     what: "proxy fidelity past the seed layer",
@@ -390,7 +390,15 @@ export const SCOPE: readonly ScopeBoundary[] = [
     why: "the comparison normalises whitespace AROUND a formula, and compares the link projection only as a whole string, so no corpus size can expose a divergence that lives inside either",
   },
   {
-    what: "crashes needing two options at once",
-    why: "option-matrix sweeps single toggles on every push; the 1104-parse pair sweep runs behind PARITY_OPTION_PAIRS=1 because it is minutes rather than seconds",
+    what: "crashes needing two options at once -- CLOSED",
+    why: "was unmeasured; the pair sweep now runs behind PARITY_OPTION_PAIRS=1 at 552 configurations against the whole corpus, zero crashes. Opt-in because it is 16 minutes, not because it is unavailable",
+  },
+  {
+    what: "the eight unindexed inline constructs -- CLOSED",
+    why: "was: highlight, emphasis, strong, underscore, strike, imath, dmath and codespan report nothing to metadataCache, so only the 70-second recorder could see them. `test-vault/.obsidian/plugins/parity-probe` exposes a detached MarkdownRenderer, validated against the goldens at 663 of 663, and both inline axes now compare all eight",
+  },
+  {
+    what: "real Reading View past the seed layer -- STILL OPEN",
+    why: "three call paths exist and two are validated against each other: the probe and the recorder agree 663 of 663, and both are DETACHED renders. Neither is the real Reading View, which is cross-checked only for the seed layer unless PARITY_FULL_PROXY_CHECK=1. Closing it means driving an actual view from the plugin, which is a different piece of work from rendering a string",
   },
 ];
