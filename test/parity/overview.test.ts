@@ -84,6 +84,34 @@ describe("parity overview", () => {
     expect(SCOPE.filter((entry) => entry.why.trim() === "")).toEqual([]);
   });
 
+  it("gates every oracle, or records why it cannot be gated", () => {
+    // The authoritative claim, asserted instead of believed.
+    //
+    // "Every metric either has an exact assertion or a recorded reason it cannot" was said
+    // out loud and was FALSE: enumerating the fifteen oracles found eleven gated, two with a
+    // reason, and THREE with neither -- `proxy fidelity`, `pass order` and `rule scorer`.
+    // A claim nobody checks is a claim that drifts, and this one drifted within the same
+    // session it was made in.
+    //
+    // Structural rather than prose: `ungated` is a field, so this cannot pass on an entry
+    // that merely contains the words "not gated" somewhere in its `blind` list.
+    const unaccounted = ORACLES.filter(
+      (oracle) =>
+        oracle.test === undefined && (oracle.ungated ?? "").trim() === "",
+    ).map((oracle) => oracle.name);
+    expect(unaccounted).toEqual([]);
+  });
+
+  it("does not let an oracle claim both a gate and a reason for having none", () => {
+    // The two are exclusive by meaning. An entry carrying both is one whose status nobody
+    // can read off it -- and the likeliest cause is a gate added later without the stale
+    // excuse being removed, which is how a gated oracle comes to look optional.
+    const contradictory = ORACLES.filter(
+      (oracle) => oracle.test !== undefined && oracle.ungated !== undefined,
+    ).map((oracle) => oracle.name);
+    expect(contradictory).toEqual([]);
+  });
+
   it("tells you how to run every swept axis", () => {
     // The composition oracle's `command` spelled the flag list out separately and was stale
     // within a day -- still `[--matrix|--inside|--nested|--isolate]` after two more axes

@@ -50,6 +50,20 @@ export interface Oracle {
   readonly ceilingAt?: string;
   /** The test enforcing it, if any. */
   readonly test?: string;
+  /**
+   * Why this oracle has NO gate -- required for exactly those that have none.
+   *
+   * A structural field rather than a sentence inside `blind`, because the assertion over it
+   * has to be sound: matching prose for "not gated" would pass on any entry that happens to
+   * contain the words, which is theatre rather than a gate. With a field, "every oracle is
+   * either gated or says why not" is checkable, and `overview.test.ts` checks it.
+   *
+   * That assertion is what turned an overstated claim into a true one. Enumerating the
+   * fifteen oracles by hand found ELEVEN gated, two with a reason, and THREE with neither --
+   * `proxy fidelity`, `pass order` and `rule scorer` -- after "it is now authoritative" had
+   * already been said out loud. The hand count was right and the claim was not.
+   */
+  readonly ungated?: string;
 }
 
 export const ORACLES: readonly Oracle[] = [
@@ -117,8 +131,9 @@ export const ORACLES: readonly Oracle[] = [
       "positionless nodes -- it excludes them, which is why driving that count down moves agreement either way",
       "anything that is not a definition or a reference",
       "a net total hides a one-for-one trade; use --ids and diff the member set",
-      "DELIBERATELY not gated: the corpus is a sibling project's test data on its own release cycle, so an exact figure would fail CI when THEY change it, and a floor would be the kind of bound `roundtrip` was just converted away from. A measurement is the honest form",
     ],
+    ungated:
+      "the corpus is a sibling project's test data on its own release cycle, so an exact figure would fail CI when THEY change it, and a floor would be the kind of bound `roundtrip` was converted away from",
   },
   {
     name: "tree invariants",
@@ -243,6 +258,8 @@ export const ORACLES: readonly Oracle[] = [
       "the block separator, normalised away because Reading View runs block divs together while the proxy's newlines collapse to a space -- both counts are reported so the blunt one never stands alone",
       "it needs CDP focus emulation; without it reading mode renders NOTHING and every capture is empty, which reads as agreement with whatever you expected",
     ],
+    ungated:
+      "it audits whether the GOLDENS' capture method is faithful, so the goldens cannot be the thing it is checked against; and it needs the app plus a CDP command, which CI has neither of",
   },
   {
     name: "DOM probe fidelity",
@@ -254,8 +271,9 @@ export const ORACLES: readonly Oracle[] = [
     blind: [
       "strike and code, which the recorder has no projection for, so there is no golden to agree with",
       "it compares two call paths into the SAME renderer, not the renderer against reality",
-      "needs no gate of its own: the probe's answers are baked into `goldens/compose.json` at RECORD time, exactly as the recorder's are baked into `obsidian.json`, so the golden is what CI defends",
     ],
+    ungated:
+      "the probe's answers are baked into `goldens/compose.json` at RECORD time, exactly as the recorder's are baked into `obsidian.json`, so the golden is what CI defends",
   },
   {
     name: "pass order",
@@ -265,6 +283,8 @@ export const ORACLES: readonly Oracle[] = [
     blind: [
       "position-independent means ON THIS CORPUS: a free result retires a CLAIM, not a constraint",
     ],
+    ungated:
+      "by choice rather than necessity -- it needs no Obsidian, but it REWRITES `src/index.ts` in place and restores it in a `finally`, which a push gate should not do to a working tree, and it rehashes every corpus tree under both profiles per unit",
   },
   {
     name: "rule scorer",
@@ -275,6 +295,8 @@ export const ORACLES: readonly Oracle[] = [
       "anything outside definitions and references, inheriting the referee's blindness",
       "a rule touching nothing is NOT ADJUDICABLE rather than negative",
     ],
+    ungated:
+      "there is nothing to gate: it scores HYPOTHETICAL rules, so with no candidate under consideration it asserts nothing about the package. It also inherits the referee's non-vendored corpus",
   },
 ];
 
