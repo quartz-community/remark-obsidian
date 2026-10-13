@@ -283,13 +283,13 @@ export const AXES: readonly Axis[] = [
     name: "inline x inline",
     sequences: 196,
     swept: true,
-    note: "--inline; 7 diverge, ALL one rule -- an inline closer frees a caret for a block id",
+    note: "--inline; opened 7, ALL one rule (an inline closer frees a caret for a block id), fixed to 1 -- `#tag^blk`, where a tag has no closer so the caret follows a word character and needs its own evidence",
   },
   {
     name: "inline x block",
     sequences: 224,
     swept: true,
-    note: "--inline-block; 5 diverge, 3 of them the P1 cache defect and MUST NOT be fixed",
+    note: "--inline-block; opened 5, AT ITS FLOOR at 4 -- every one the P1 cache defect, offsets short by the `%%` width, MUST NOT be fixed",
   },
   {
     name: "option pairs (crash only)",

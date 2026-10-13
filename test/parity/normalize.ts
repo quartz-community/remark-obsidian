@@ -2226,6 +2226,19 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     // column here instead would have to re-answer the container-relative indent question
     // that `quote-indented-code.ts` exists for.
     if (child.type === "code") continue;
+    // Nor does an html line, which `compose.mts --inline-block` found: `<div> ^blk` registers
+    // NOTHING in Obsidian while we invented `blk`. Separated by a blank line it registers
+    // normally, and the same identifier after prose registers too, so it is the html host
+    // and not the caret:
+    //
+    //     <div> ^blk            blocks []               the identifier is swallowed
+    //     <div> / '' / ^blk     blocks [blk@0:0-0:5]    its own block, so it names <div>
+    //     para ^blk             blocks [blk@0:0-0:9]    ordinary
+    //
+    // Excluded by node TYPE for the same reason `code` is: the host is what decides, and
+    // re-deriving it from the line would have to re-answer which `<` runs are html blocks,
+    // which `legacy-html-blocks` and `textarea-not-raw.ts` exist for.
+    if (child.type === "html") continue;
     const from = child.position?.start?.offset;
     const to = child.position?.end?.offset;
     if (from === undefined || to === undefined) continue;
