@@ -952,6 +952,34 @@ document this channel for its own plugin:
   string literal, and quoting it twice is how a probe silently becomes a different document --
   these notes already record a tab and a U+00A0 surviving one layer and not the other.
 
+### A projection string is not round-trippable, and reading a field out of one is a trap
+
+Fifteen under-covered wikilink and embed shapes swept with `ask.mts` -- block links, embed
+sizes, heading-plus-alias, multiple pipes, nested brackets -- against live Obsidian. **All
+fifteen match.** That family is solid, which is worth knowing given nested brackets carry
+three designed probes against 39% of independently discovered sweep causes.
+
+The sweep cost two wrong comparisons to establish, both the same mistake, and it is a trap
+worth naming. The link projection is built as
+
+    `${original}=>${link}|${displayText}@${span}`
+
+so `[[a|b|c]]` records as `[[a|b|c]]=>a|b|c@0:0-0:9`, which is target `a` and display `b|c`
+concatenated. **That string cannot be parsed back into its fields**: `a|b|c` could equally be
+target `a|b` with display `c`, and no reader can tell. Both of my extractions were wrong --
+once taking the whole `=>` tail as the target, once splitting on the LAST pipe -- and each
+reported fifteen or one divergences that do not exist.
+
+The comparison the gate performs is safe because both sides are built by the same formatter
+and compared whole. So: **compare these strings, never parse them.** Any rule about a link's
+TARGET specifically needs the recorder to store the target separately, which it does not --
+and that is the real reason link and embed rules have been hard to measure here, rather than
+anything about the constructs.
+
+Two corpus cases already covered the shape that looked wrong -- `wikilink/multiple-alias-separators`
+and `embed/alt-and-dimensions`, both `match` -- which is the cheaper check that would have
+caught it: **before believing a sweep's divergence, look for a corpus case with that shape.**
+
 ### The referee is a reliable target, measured rather than assumed
 
 Worth settling before more work is spent against it, and impossible to settle cheaply until
