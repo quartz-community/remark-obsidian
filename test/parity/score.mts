@@ -218,6 +218,11 @@ const RULES: readonly Rule[] = [
       // those 137 is a line this mis-classifies.
       let fence: { char: string; size: number } | undefined;
       for (const [index, line] of lines.entries()) {
+        // The QUOTE RUN only. Stripping the list marker too looks like the obvious next
+        // step -- a fence opened as `> 1.    ``` ` reads as four columns of indent otherwise
+        // -- and it scores WORSE: 32 better against 32 worse becomes 84 against 100, because
+        // it then finds fences on lines that are not fences and drops definitions that
+        // should stay. The detection has a sweet spot and this is past it.
         const bare = line.replace(/^(?:[ \t]*>)*/u, "");
         const run = /^([ \t]*)(`{3,}|~{3,})([^`~]*)$/u.exec(bare);
         if (fence === undefined) {

@@ -862,16 +862,29 @@ an opener under four columns of indent -- score **32 against 32**, with the touc
 falling from 246 to 67. Exactly break-even, which means the 137 was mostly my detection
 rather than the rule.
 
-Its remaining misses are container-prefix shaped: a fence opened as `> 1.    ``` ` inside a
-callout's list item reads as four columns of indent once only the `>` run is stripped, and a
-document opening with `---` frontmatter can put the tracking out of phase. So the rule's
-honest ceiling is **32 documents**, and reaching it needs the same container-aware prefix
-machinery that `quote-indented-code.ts` already carries.
+**And stripping the container prefix, the obvious next step, scores worse.** A fence opened as
+`> 1.    ``` ` inside a callout's list item reads as four columns of indent when only the `>`
+run comes off, so taking the list marker too looks right -- and it moves 32/32 to **84 better
+against 100 worse**, because it then finds fences on lines that are not fences and drops
+definitions that should stay. The detection has a sweet spot and that is past it.
 
-That is a modest target, measured, and three times the tab rule's. It is also the largest
-demonstrated rule left on this oracle -- which is itself the finding: **no remaining referee
-bucket contains a rule above about thirty documents.** The buckets are 300-400 each and they
-are not rules.
+So the best achievable score for the largest remaining rule is **exactly break-even**, over
+67 documents touched. Four scopings were tried: naive (103/137), CommonMark fences (32/32),
+CommonMark plus container prefix (84/100), and back. There is no narrowing in this family that
+is net positive.
+
+That is the finding, and it is about the oracle rather than this rule: **no remaining referee
+bucket contains a rule worth building.** The buckets are 300-400 documents each; the largest
+demonstrated rule inside any of them touches 67 and breaks even. They are a long tail of
+context-specific interactions, which is consistent with everything else measured here -- the
+tab family being a correlate rather than a cause, four counting selectors dying, and
+line-local groupings refuting on contact.
+
+What that implies for the referee as a target: 78.3% is close to what this approach yields,
+on an oracle whose own comparison is looser than ours in three documented ways. Further
+progress wants a different kind of evidence -- recorded probes against the application for
+specific constructs, which `ask.mts` now makes cheap -- rather than more mining of this
+corpus.
 
 ### Its first real use retired the 426-document tab family
 
