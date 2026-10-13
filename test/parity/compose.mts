@@ -89,6 +89,12 @@ function askBatch(documents: readonly string[]): unknown[] {
 interface Facts {
   readonly defs: readonly string[];
   readonly sections: readonly string[];
+  // Compared as well as `sections`, because a container can swallow a construct without
+  // moving any root section: `normalize.ts` records that Obsidian RENDERS a heading inside a
+  // container and does not INDEX it, so our projection drops one our tree keeps, and only a
+  // second oracle can tell "both report none" from "neither was asked". These notes carry
+  // five instances of a family read as clean because one projection was never compared.
+  readonly headings: readonly string[];
 }
 
 function theirs(answer: unknown): Facts {
@@ -98,6 +104,11 @@ function theirs(answer: unknown): Facts {
       position: { start: { line: number; col: number }; end: { line: number } };
     }>;
     sections?: Array<{ type: string; position: { start: { line: number } } }>;
+    headings?: Array<{
+      heading: string;
+      level: number;
+      position: { start: { line: number; col: number } };
+    }>;
   };
   return {
     defs: (compute.footnotes ?? []).map(
@@ -107,6 +118,14 @@ function theirs(answer: unknown): Facts {
     sections: (compute.sections ?? [])
       .map((s) => `${s.type}@${s.position.start.line}`)
       .filter((s) => !/^(?:text|element)@/u.test(s)),
+    // `level:name@line:col`, which is what `normalize.ts` builds for the compute oracle.
+    // Dropping the position reported 52 divergences that were purely the two sides being
+    // formatted differently -- the goldmark `tasks` trap inverted, where a mismatched
+    // projection reads as total disagreement rather than as agreement.
+    headings: (compute.headings ?? []).map(
+      (h) =>
+        `${h.level}:${h.heading}@${h.position.start.line}:${h.position.start.col}`,
+    ),
   };
 }
 
@@ -115,6 +134,7 @@ function ours(text: string): Facts {
   const computed = computeOurs(parseOurs(source, "all-features"), source) as {
     footnotes?: readonly string[];
     sections?: readonly string[];
+    headings?: readonly string[];
   };
   return {
     defs: (computed.footnotes ?? []).map((entry) =>
@@ -126,6 +146,7 @@ function ours(text: string): Facts {
         return `${type}@${(rest ?? "").split(":")[0]}`;
       })
       .filter((entry) => !/^(?:text|element)@/u.test(entry)),
+    headings: computed.headings ?? [],
   };
 }
 
@@ -172,11 +193,55 @@ const ABSORBABLES = ["comment", "math", "indented", "thematic"];
  * cell is a rule this package already encodes, which is evidence rather than absence, and it
  * is what makes a guard list auditable against the application instead of against a backlog.
  */
+/**
+ * The inner prefix each container gives its own content.
+ *
+ * A quote marker takes one following space, and a list item's content column is its marker
+ * plus one -- which is why the bullet and ordered prefixes differ by a column. `linkdef` has
+ * no inside at all, and the matrix above measures it absorbing nothing, so it is not a
+ * container here either.
+ */
+const INNER: ReadonlyArray<readonly [string, string]> = [
+  ["bullet", "  "],
+  ["ordered", "   "],
+  ["quote", "> "],
+  ["callout", "> "],
+];
+
+/**
+ * `--inside` maps the OTHER axis: what each block does INSIDE each container.
+ *
+ * `--matrix` maps adjacency -- a container, then a block at column 0 -- and that axis is now
+ * four cells from clean. This is its complement, and the corpus samples it without ever
+ * tabulating it: `CONTEXTS` in `corpus.ts` splices constructs into containers, but by
+ * construct rather than as a complete table, so a cell nobody thought to sample is
+ * indistinguishable from one that works.
+ *
+ * There is no absorption bit to derive here, because a block inside a quote is not a root
+ * section at all -- so the comparison is the full `sections` and `defs` equality the pair
+ * sweep uses, and the map is the set of cells that disagree.
+ */
+const inside = process.argv.includes("--inside");
 const matrix = process.argv.includes("--matrix");
 const isolate = process.argv.includes("--isolate");
 const triples = process.argv.includes("--triples");
 const cases: Array<{ name: string; text: string; followerLine?: number }> = [];
 const syntaxOf = new Map(BLOCKS);
+if (inside) {
+  for (const [container, prefix] of INNER) {
+    const head = syntaxOf.get(container)!;
+    for (const [innerName, innerSyntax] of BLOCKS) {
+      const body = innerSyntax
+        .split("\n")
+        .map((line) => `${prefix}${line}`)
+        .join("\n");
+      cases.push({
+        name: `${container} [ ${innerName} ]`,
+        text: `${head}\n${body}\n\nuse[^1]\n`,
+      });
+    }
+  }
+}
 if (matrix) {
   for (const container of CONTAINERS) {
     const head = syntaxOf.get(container)!;
@@ -203,7 +268,7 @@ if (isolate) {
     }
   }
 }
-for (const [firstName, first] of isolate || matrix ? [] : BLOCKS) {
+for (const [firstName, first] of isolate || matrix || inside ? [] : BLOCKS) {
   for (const [secondName, second] of BLOCKS) {
     if (triples) {
       for (const [thirdName, third] of BLOCKS) {
@@ -259,12 +324,13 @@ for (let at = 0; at < cases.length; at += BATCH) {
     }
     const same =
       JSON.stringify(want.defs) === JSON.stringify(got.defs) &&
-      JSON.stringify(want.sections) === JSON.stringify(got.sections);
+      JSON.stringify(want.sections) === JSON.stringify(got.sections) &&
+      JSON.stringify(want.headings) === JSON.stringify(got.headings);
     if (same) continue;
     diverged.push(
       `${entry.name}\n      md   ${JSON.stringify(entry.text)}\n` +
-        `      obs  defs=${JSON.stringify(want.defs)} sections=${JSON.stringify(want.sections)}\n` +
-        `      ours defs=${JSON.stringify(got.defs)} sections=${JSON.stringify(got.sections)}`,
+        `      obs  defs=${JSON.stringify(want.defs)} sections=${JSON.stringify(want.sections)} h=${JSON.stringify(want.headings)}\n` +
+        `      ours defs=${JSON.stringify(got.defs)} sections=${JSON.stringify(got.sections)} h=${JSON.stringify(got.headings)}`,
     );
   }
 }

@@ -1071,6 +1071,67 @@ rather than as four separate judgements. Two notes for anyone extending it:
   break, so the map's `heading R/R` is the correct net outcome of an intermediate absorption,
   not evidence the entry is unused.
 
+### The other axis: what each block does INSIDE each container
+
+`--matrix` maps adjacency. `--inside` maps its complement, 4 containers x 16 blocks with the
+container's own prefix on every line of the inner block, and there is no absorption bit to
+derive -- a block inside a quote is not a root section at all -- so the comparison is the full
+projection equality the pair sweep uses.
+
+The corpus samples this axis without ever tabulating it. `CONTEXTS` splices constructs into
+containers by construct rather than as a complete table, so a cell nobody thought to sample
+has always been indistinguishable from one that works.
+
+**2 of 64 diverge, and both are one cause**: a `---` or `===` inside a callout. Micromark
+reads the title line plus the underline as a SETEXT HEADING, so `calloutTransform` -- which
+requires `children[0]` to be a paragraph on the quote's first line -- declines, and the
+callout degrades to a plain blockquote:
+
+| input                                  | Obsidian      | ours           |
+| -------------------------------------- | ------------- | -------------- |
+| `> [!note] title` / `> ---`            | `callout@0-1` | `blockquote@0` |
+| `> [!note] title` / `> ===`            | `callout@0-1` | `blockquote@0` |
+| `> [!note] title` / `> body` / `> ---` | `callout@0-2` | (agrees)       |
+
+Five controls against live 1.14.4 pin the rule, and the important one is the NEGATIVE: a
+setext underline inside a container produces **no heading at all** in Obsidian. `> text` /
+`> ---` reports `blockquote` with `headings: []`, and so does `- item` / `  ===`, while a
+root `title` / `===` reports `[["title", 1]]` -- so `headings` is a working oracle for this
+and the absence is real rather than the field being empty.
+
+That half we already get right, in the PROJECTION rather than the tree: `normalize.ts`
+records that Obsidian renders a heading inside a container and does not index it, so our
+projection drops a `heading` node our tree keeps. AST represents source, projection
+represents rendering -- the governing rule, holding here without any change.
+
+So the callout degradation is the whole of it, and the fix belongs in `calloutTransform`'s
+first-child test rather than in setext handling.
+
+### Widening an oracle that finds nothing is still worth the run
+
+`compose.mts` compared `defs` and `sections` only. These notes carry five instances of a
+family read as clean because one projection was never compared, so `headings` was wired into
+all four sweeps.
+
+It adds **zero** divergences -- inside 2, matrix 4, pairs 4, isolate 20, identical to before.
+That is a confirmation rather than a find, and it is the result worth having: the heading
+projection agrees across all 540 sequences in this space, including the container-nested
+heading rule above.
+
+It cost one near-miss on the way. The first version formatted Obsidian's side as
+`level:name` while ours carries `level:name@line:col`, and reported **52 phantom pair
+divergences** -- the goldmark `tasks` trap inverted, where a mismatched projection reads as
+total disagreement rather than as agreement. Inspecting one row rather than believing the
+count is what caught it, and the honest tell was that `heading > heading` cells were
+diverging, which no plausible rule explains.
+
+**And the edit that was supposed to fix it silently did nothing.** A `python3` replace matched
+a multi-line string prettier had already collapsed to one line, printed success, and left the
+old format in place -- so the corrected run reproduced the same 52 exactly and read as "the
+format was not the problem". That is the seventh silent miss of this kind here. **Use the edit
+tool for prettier-formatted text**, and when a fix changes a count by nothing at all, check
+that the fix is in the file.
+
 ## Score a rule before building it, because repairs lose and extensions win
 
 A measured pattern in what succeeds here, and it is not about effort. Every change that
