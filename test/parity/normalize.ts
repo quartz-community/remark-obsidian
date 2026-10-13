@@ -2348,12 +2348,32 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     // side of this and stays untouched -- an identifier INSIDE a span registers nothing.
     const codeCloser =
       before === "`" && raw.slice(0, beforeAt - 1).includes("`");
+    // The same rule for the two other inline closers that carry one, found by
+    // `compose.mts --inline` -- the inline-pair axis had seven divergences and every one
+    // was this: a caret directly after a construct's closing delimiter.
+    //
+    //     [[Note]]^blk   ![[Note]]^blk   ^[body]^blk   [^1]^blk    before = `]`
+    //     $x$^blk        $$y$$^blk                                 before = `$`
+    //
+    // Obsidian registers the identifier in all six and we registered none, while the
+    // `*_=~` run and the backtick were already handled -- so the rule was implemented for
+    // some closers and not the rest, which is why exactly those six failed.
+    //
+    // The opener must exist, by the identical argument: a closer can only close something
+    // that opened. That is what keeps the existing counter-examples dead -- `$x^2` has `x`
+    // before the caret rather than `$`, and `[[a#^blk` has `#`, so neither is reached.
+    const bracketCloser =
+      before === "]" && raw.slice(0, beforeAt - 1).includes("[");
+    const mathCloser =
+      before === "$" && raw.slice(0, beforeAt - 1).includes("$");
     if (
       !(setext && beforeAt === 0) &&
       !wrapped &&
       !escapedBracket &&
       !linkLabel &&
       !codeCloser &&
+      !bracketCloser &&
+      !mathCloser &&
       !(before && /\s/u.test(before))
     ) {
       continue;
