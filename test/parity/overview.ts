@@ -117,6 +117,7 @@ export const ORACLES: readonly Oracle[] = [
       "positionless nodes -- it excludes them, which is why driving that count down moves agreement either way",
       "anything that is not a definition or a reference",
       "a net total hides a one-for-one trade; use --ids and diff the member set",
+      "DELIBERATELY not gated: the corpus is a sibling project's test data on its own release cycle, so an exact figure would fail CI when THEY change it, and a floor would be the kind of bound `roundtrip` was just converted away from. A measurement is the honest form",
     ],
   },
   {
@@ -199,11 +200,16 @@ export const ORACLES: readonly Oracle[] = [
     test: "chain.test.ts",
   },
   {
-    name: "composition sweeps",
-    // `--all` runs every axis and prints one table; per-axis flags live on AXES rather than
-    // being spelled out here, because the spelled-out version went stale within a day.
-    command: "tsx test/parity/compose.mts --all   (35 of 1152 at last run)",
-    gate: "sweep",
+    name: "composition axes",
+    // `--all` measures every axis; per-axis flags live on AXES rather than being spelled out
+    // here, because the spelled-out version went stale within a day. No count is quoted
+    // either: `compose.test.ts` holds the exact per-axis diverging set, which is the only
+    // copy that cannot drift.
+    command:
+      "tsx test/parity/compose.mts --all to measure, --record to re-record the golden",
+    gate: "ceiling",
+    ceilingAt: "compose.test.ts",
+    test: "compose.test.ts",
     compares: [
       "defs",
       "sections",
@@ -248,6 +254,7 @@ export const ORACLES: readonly Oracle[] = [
     blind: [
       "strike and code, which the recorder has no projection for, so there is no golden to agree with",
       "it compares two call paths into the SAME renderer, not the renderer against reality",
+      "needs no gate of its own: the probe's answers are baked into `goldens/compose.json` at RECORD time, exactly as the recorder's are baked into `obsidian.json`, so the golden is what CI defends",
     ],
   },
   {
@@ -295,7 +302,7 @@ export const AXES: readonly Axis[] = [
     how: "compose.mts",
     sequences: 256,
     swept: true,
-    note: "every ordered pair of 16 block constructs",
+    note: "every ordered pair of 16 block constructs -- GATED by compose.test.ts against a committed golden, so a regression fails CI",
   },
   {
     name: "block > spacer > absorbable",
