@@ -379,16 +379,12 @@ export const SCOPE: readonly ScopeBoundary[] = [
     why: 'was: metadataCache indexes rather than renders, so an index oracle cannot see a construct Obsidian paints and does not index. `ask-dom.ts` reports RENDERED headings beside the cache\'s indexed ones: `> text` / `> ---` is `["2:text"]` rendered against `[]` indexed, which makes the class measurable rather than merely registered',
   },
   {
-    what: "proxy fidelity past the seed layer",
-    why: "goldens are captured through a detached MarkdownRenderer.render(), and real Reading View is cross-checked only for the seed layer unless PARITY_FULL_PROXY_CHECK=1 -- which costs seven minutes against eighty seconds, so it is a deliberate audit rather than a default. KNOWN_PROXY_DIVERGENCES holds the cases where the two differ; a NEW proxy divergence outside the seed layer is not caught on an ordinary recording",
-  },
-  {
     what: "the goldens are a recording, not live Obsidian",
     why: "green means 'matches the version stamped in the golden'. The weekly drift job re-records against latest and opens an issue rather than committing, so an Obsidian change surfaces there and not in the push gate",
   },
   {
-    what: "a divergence inside a normalised region",
-    why: "the comparison normalises whitespace AROUND a formula, and compares the link projection only as a whole string, so no corpus size can expose a divergence that lives inside either",
+    what: "a divergence inside a normalised region -- CLOSED, measured both halves",
+    why: "the LINK half is gone: the probe reports target and display separately, so the non-round-trippable projection string is no longer the only source. The MATH half was never a blindness, which is now measured rather than argued -- comparing the probe's `data-latex` against our own tex EXACTLY across all 199 match cases carrying math gives 191 byte-identical, 8 differing by whitespace only, and ZERO differing substantively. The 8 are the documented class (`$$\\nx\\n$$` is `\\nx\\n` to Obsidian and `x` to remark-math, plus container indent surviving a fragment re-parse) and TeX collapses whitespace runs, so they render identically. Nothing hides in there",
   },
   {
     what: "crashes needing two options at once -- CLOSED",
@@ -399,7 +395,7 @@ export const SCOPE: readonly ScopeBoundary[] = [
     why: "was: highlight, emphasis, strong, underscore, strike, imath, dmath and codespan report nothing to metadataCache, so only the 70-second recorder could see them. `test-vault/.obsidian/plugins/parity-probe` exposes a detached MarkdownRenderer, validated against the goldens at 663 of 663, and both inline axes now compare all eight",
   },
   {
-    what: "real Reading View past the seed layer -- STILL OPEN",
-    why: "three call paths exist and two are validated against each other: the probe and the recorder agree 663 of 663, and both are DETACHED renders. Neither is the real Reading View, which is cross-checked only for the seed layer unless PARITY_FULL_PROXY_CHECK=1. Closing it means driving an actual view from the plugin, which is a different piece of work from rendering a string",
+    what: "real Reading View past the seed layer -- STILL OPEN, and the blocker is now measured",
+    why: "the probe and the recorder agree 663 of 663 and BOTH are detached renders, so that agreement says nothing about the actual view. `__parityReadingView` in the plugin drives a real one and is correct code -- it opens `mode: preview` and the chrome renders -- but instrumenting it gives `docFocus: false` with `sectionKids: 0`: reading mode renders off requestAnimationFrame, which Chromium starves for an unfocused window, and VISIBLE is not enough. So the constraint is the environment rather than the work, and the route is the recorder's existing Xvfb session via PARITY_FULL_PROXY_CHECK=1, not the eval channel. Forcing focus from a probe would steal it from whatever the user is doing. `KNOWN_PROXY_DIVERGENCES` holds the cases where the two renderers already differ, and the full sweep costs seven minutes against eighty seconds, which is why it is an audit and not a default",
   },
 ];

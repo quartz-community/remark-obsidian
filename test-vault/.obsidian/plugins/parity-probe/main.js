@@ -66,8 +66,78 @@ module.exports = class ParityProbe extends obsidian.Plugin {
       }
     };
 
+    /**
+     * The same projection, from a REAL Reading View rather than a detached render.
+     *
+     * The goldens are captured through `MarkdownRenderer.render()`, and so is `__parityProbe`
+     * above -- two call paths into the same renderer, which is why they agree 663 of 663 and
+     * why that agreement says nothing about the actual view. `oracle.e2e.ts` cross-checks the
+     * real one for the SEED LAYER only, because the full sweep costs seven minutes against
+     * eighty seconds; a new proxy divergence outside that layer is not caught on an ordinary
+     * recording. This makes the real view askable per document instead.
+     *
+     * MEASURED: THIS DOES NOT WORK THROUGH `obsidian eval` ON A DESKTOP SESSION, and the
+     * reason is worth keeping because it is not a bug in this function. Instrumented rather
+     * than guessed at:
+     *
+     *     viewType "markdown"   mode "preview"   htmlLen 4369
+     *     previewSection true   sectionKids 0    previewViewLen 0
+     *     docFocus FALSE        visibility "visible"
+     *
+     * The view opens in reading mode and its chrome renders; the content never does. Reading
+     * mode drives rendering off `requestAnimationFrame`, which Chromium starves for a window
+     * that is not FOCUSED -- visible is not enough. The parity README records exactly this
+     * for the recorder, which is why that path runs under Xvfb with a window manager that
+     * maps and focuses the window.
+     *
+     * So the code is right and the ENVIRONMENT is the constraint. It will render under the
+     * recorder's Xvfb session, which is where a full real-view sweep belongs -- the existing
+     * `PARITY_FULL_PROXY_CHECK=1` path. Forcing focus from here would steal it from whatever
+     * the user is doing, which is a visible side effect on someone's desktop and not
+     * something a probe should do.
+     *
+     * The second hazard still applies wherever it does run: reading mode renders by VIEWPORT,
+     * so a long document is partly unrendered. `sections` is returned for that reason -- a
+     * caller can tell a truncated capture from a complete one instead of trusting it, and a
+     * zero means nothing rendered at all.
+     *
+     * The temp file is deleted in a `finally`. It sits in a git-tracked vault, so leaving one
+     * behind would show up as a stray working-tree change in an unrelated commit.
+     */
+    window.__parityReadingView = async function parityReadingView(markdown) {
+      const probePath = "__parity_reading_probe__.md";
+      let file = app.vault.getAbstractFileByPath(probePath);
+      if (file) await app.vault.modify(file, markdown);
+      else file = await app.vault.create(probePath, markdown);
+
+      const leaf = app.workspace.getLeaf(true);
+      try {
+        await leaf.openFile(file, { state: { mode: "preview" } });
+        let host = null;
+        for (let wait = 0; wait < 120; wait++) {
+          host =
+            leaf.view?.containerEl?.querySelector(
+              ".markdown-preview-section",
+            ) ?? null;
+          const ready =
+            host !== null &&
+            host.children.length > 0 &&
+            !host.querySelector(".math:not(.is-loaded)");
+          if (ready) break;
+          await new Promise((resolve) => setTimeout(resolve, 25));
+        }
+        if (host === null) return { error: "reading view never rendered" };
+        return { ...project(host), sections: host.children.length };
+      } finally {
+        leaf.detach();
+        const stale = app.vault.getAbstractFileByPath(probePath);
+        if (stale) await app.vault.delete(stale, true);
+      }
+    };
+
     plugin.register(() => {
       delete window.__parityProbe;
+      delete window.__parityReadingView;
     });
   }
 };
