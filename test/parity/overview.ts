@@ -200,8 +200,8 @@ export const ORACLES: readonly Oracle[] = [
   },
   {
     name: "composition sweeps",
-    command:
-      "tsx test/parity/compose.mts [--matrix|--inside|--nested|--isolate]",
+    // Derived from AXES rather than spelled out, because the spelled-out version went stale.
+    command: "tsx test/parity/compose.mts -- see AXES for each axis's flag",
     gate: "sweep",
     compares: [
       "defs",
@@ -245,54 +245,72 @@ export interface Axis {
   readonly sequences: number | null;
   readonly swept: boolean;
   readonly note: string;
+  /**
+   * How to run it, as the flag or env var -- the SINGLE source for that string.
+   *
+   * The composition oracle's `command` used to spell the flag list out separately and went
+   * stale within a day: it still read `[--matrix|--inside|--nested|--isolate]` after
+   * `--inline` and `--inline-block` were added. A second copy of a fact is the thing that
+   * rots, which is the lesson this whole file exists for -- so the printer derives the
+   * command from these and there is no list to forget.
+   */
+  readonly how?: string;
 }
 
 /** Composition axes, swept and unswept. The unswept rows are the point. */
 export const AXES: readonly Axis[] = [
   {
     name: "block > block (pairs)",
+    how: "compose.mts",
     sequences: 256,
     swept: true,
     note: "every ordered pair of 16 block constructs",
   },
   {
     name: "block > spacer > absorbable",
+    how: "compose.mts --isolate",
     sequences: 140,
     swept: true,
     note: "--isolate; proved container STATE, not adjacency",
   },
   {
     name: "container x follower (absorption)",
+    how: "compose.mts --matrix",
     sequences: 80,
     swept: true,
     note: "--matrix; one absorption bit per side",
   },
   {
     name: "block inside container",
+    how: "compose.mts --inside",
     sequences: 64,
     swept: true,
     note: "--inside",
   },
   {
     name: "nested containers, both halves",
+    how: "compose.mts --nested",
     sequences: 192,
     swept: true,
     note: "--nested",
   },
   {
     name: "inline x inline",
+    how: "compose.mts --inline",
     sequences: 196,
     swept: true,
     note: "--inline; opened 7, ALL one rule (an inline closer frees a caret for a block id), fixed to 1 -- `#tag^blk`, where a tag has no closer so the caret follows a word character and needs its own evidence",
   },
   {
     name: "inline x block",
+    how: "compose.mts --inline-block",
     sequences: 224,
     swept: true,
     note: "--inline-block; opened 5, AT ITS FLOOR at 4 -- every one the P1 cache defect, offsets short by the `%%` width, MUST NOT be fixed",
   },
   {
     name: "option pairs (crash only)",
+    how: "PARITY_OPTION_PAIRS=1 vitest run option-matrix",
     sequences: 552,
     swept: true,
     note: "PARITY_OPTION_PAIRS=1; 552 configs x 3403 cases, ZERO crashes, ~16 min so opt-in",

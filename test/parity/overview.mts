@@ -35,6 +35,8 @@ for (const axis of AXES) {
   console.log(
     `  ${axis.name.padEnd(34)}${String(axis.sequences ?? "?").padStart(5)}  ${mark.padEnd(10)}${axis.note}`,
   );
+  if (axis.how !== undefined)
+    console.log(`  ${" ".repeat(34)}       run: ${axis.how}`);
 }
 
 rule("SCOPE -- deliberately not measured");

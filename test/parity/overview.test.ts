@@ -72,4 +72,31 @@ describe("parity overview", () => {
   it("argues every scope boundary", () => {
     expect(SCOPE.filter((entry) => entry.why.trim() === "")).toEqual([]);
   });
+
+  it("tells you how to run every swept axis", () => {
+    // The composition oracle's `command` spelled the flag list out separately and was stale
+    // within a day -- still `[--matrix|--inside|--nested|--isolate]` after two more axes
+    // existed. The flags now live on the axis and the printer derives the command, so this
+    // asserts the remaining half: a swept axis you cannot run is a number nobody can check,
+    // which is how a measured figure becomes folklore.
+    const unrunnable = AXES.filter(
+      (axis) => axis.swept && (axis.how ?? "").trim() === "",
+    ).map((axis) => axis.name);
+    expect(unrunnable).toEqual([]);
+  });
+
+  it("records no composition count in prose that nothing asserts", () => {
+    // The composition axes have NO committed expectation -- they need a running Obsidian, so
+    // there is no golden and no gate. Their counts therefore live in `note` as prose, and
+    // prose cannot be trusted the way an exact ceiling can.
+    //
+    // This does not fix that; it refuses to let it be forgotten. Every unswept axis must say
+    // so, and every swept one must carry a runnable command, so a reader can always
+    // re-measure rather than believe the number. The honest status of these axes is
+    // "reproducible on demand", not "asserted".
+    const silent = AXES.filter(
+      (axis) => !axis.swept && (axis.note ?? "").trim() === "",
+    ).map((axis) => axis.name);
+    expect(silent).toEqual([]);
+  });
 });
