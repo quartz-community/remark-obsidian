@@ -1,3 +1,5 @@
+import type { Root } from "mdast";
+
 import { parseOurs } from "./chain.js";
 
 export interface Point {
@@ -42,8 +44,25 @@ export interface Facts {
  *   7, where all 7 are notes with a fence inside the comment and our comment extent differs
  *   from Obsidian's.
  */
-export function refereeFacts(text: string): Facts {
+/**
+ * The same facts, with the tree they came from.
+ *
+ * `refereeFacts` parses a tree and discards it, which made `score.mts` unable to express any
+ * rule needing container state -- it had to approximate "this line continues that item" with
+ * a backward line scan, and every such approximation scored well on distance and badly on
+ * agreement. Reading the tree is free, since it is already parsed; only MUTATING it is
+ * order-dependent and expensive, and a scored rule still does neither.
+ */
+export function refereeFactsWithTree(text: string): Facts & { tree: Root } {
   const tree = parseOurs(text, "all-features");
+  return { ...factsOf(tree), tree };
+}
+
+export function refereeFacts(text: string): Facts {
+  return factsOf(parseOurs(text, "all-features"));
+}
+
+function factsOf(tree: Root): Facts {
   const defs: Def[] = [];
   const refs: Ref[] = [];
   let unplaced = 0;

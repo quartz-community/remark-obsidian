@@ -43,7 +43,9 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { refereeFacts, type Def, type Ref } from "./referee-facts.js";
+import type { Root } from "mdast";
+
+import { refereeFactsWithTree, type Def, type Ref } from "./referee-facts.js";
 
 interface Answer {
   readonly text: string;
@@ -56,11 +58,24 @@ interface Facts {
   readonly refs: readonly Ref[];
 }
 
-/** A candidate rule: our facts in, our facts out. Never touches the tree. */
+/**
+ * A candidate rule: our facts in, our facts out, with the TREE to read.
+ *
+ * The tree is passed because it is already parsed -- `refereeFacts` built it and used to
+ * discard it -- and because without it no rule needing container state can be expressed. The
+ * first version withheld it on the reasoning that a scored rule should need "no tree
+ * surgery", which conflated READING the tree with MUTATING it. Only the second is
+ * order-dependent, and a rule here still does neither: it returns facts.
+ *
+ * That omission cost four scopings of one candidate, each approximating "this line continues
+ * that item" with a backward line scan and each scoring well on distance and badly on
+ * agreement -- the signature of a rule whose shape is right and whose boundary needs state a
+ * scan does not have.
+ */
 interface Rule {
   readonly name: string;
   readonly what: string;
-  readonly apply: (text: string, ours: Facts) => Facts;
+  readonly apply: (text: string, ours: Facts, tree: Root) => Facts;
 }
 
 const QUOTE_PREFIX = /^[ \t]*>/u;
@@ -321,6 +336,45 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "lazy-after-list-tree",
+    what: "a root definition reachable back to a list with no blank line is swallowed",
+    apply: (text, ours, tree) => {
+      // The same rule as `drop-defs-after-list-code`, asked of the TREE instead of a
+      // backward line scan. The scan could not tell whether the item was still open, and
+      // every document it got wrong was a column-0 definition after indented content where
+      // the item had in fact closed. The tree knows: a definition that should have been
+      // absorbed is a ROOT sibling of the list, reachable back to it across siblings with no
+      // blank line between any pair.
+      const kids = tree.children;
+      const gapIsBlank = (from: number, to: number) =>
+        text.slice(from, to).includes("\n\n");
+      const swallowed = new Set<number>();
+      for (const [index, child] of kids.entries()) {
+        if (child.type !== "footnoteDefinition") continue;
+        const start = child.position?.start;
+        if (!start || start.column !== 1) continue;
+        let at = index - 1;
+        let edge = child.position?.start?.offset;
+        while (at >= 0) {
+          const prev = kids[at]!;
+          const prevEnd = prev.position?.end?.offset;
+          if (prevEnd === undefined || edge === undefined) break;
+          if (gapIsBlank(prevEnd, edge)) break;
+          if (prev.type === "list") {
+            swallowed.add(start.line - 1);
+            break;
+          }
+          edge = prev.position?.start?.offset;
+          at -= 1;
+        }
+      }
+      return {
+        refs: ours.refs,
+        defs: ours.defs.filter((d) => !swallowed.has(d[1])),
+      };
+    },
+  },
+  {
     name: "drop-defs-after-list-code",
     what: "a definition after a list+code run with no blank line is swallowed by the list",
     apply: (text, ours) => {
@@ -484,13 +538,13 @@ for (const rule of RULES) {
   const examples: string[] = [];
 
   for (const answer of answers) {
-    let ours: Facts;
+    let ours: Facts & { tree: Root };
     try {
-      ours = refereeFacts(answer.text);
+      ours = refereeFactsWithTree(answer.text);
     } catch {
       continue;
     }
-    const after = rule.apply(answer.text, ours);
+    const after = rule.apply(answer.text, ours, ours.tree);
     const unchanged =
       key(ours.defs) === key(after.defs) && key(ours.refs) === key(after.refs);
     const before = distance(ours, answer);

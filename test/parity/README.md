@@ -2161,9 +2161,32 @@ tree -- and the scorer does not**, because a scored rule transforms facts rather
 by design.
 
 So this is the first candidate whose negative score is a limit of the SCORER rather than
-evidence against the rule, and the two outcomes must not be confused. It wants implementing
-where `containerLazyTransform` already works, gated by the delta tool and the referee the way
-that pass's two accepted widenings were -- not another approximation here.
+evidence against the rule, and the two outcomes must not be confused.
+
+### Giving the scorer the tree flipped it by 36 documents
+
+The limit was self-inflicted. `refereeFacts` parses a tree and discarded it, so a rule could
+only see text -- and the stated reason was that a scored rule should need "no tree surgery",
+which conflates READING the tree with MUTATING it. Only the second is order-dependent. The
+tree is already parsed, so reading it is free, and a rule still returns facts.
+
+Asking the same rule of the tree instead of a backward scan:
+
+| version                           | better | worse | agreement |
+| --------------------------------- | -----: | ----: | --------: |
+| line scan, four scopings, best of |     31 |    20 |       -15 |
+| **the tree**                      | **82** |    26 |   **+21** |
+
+A root `footnoteDefinition` at column 0, reachable back across adjacent root siblings to a
+`list` with no blank line between any pair, is swallowed by that list. The scan could not tell
+whether the item was still open; the tree can, because an absorbed definition is a root
+SIBLING of the list rather than a child of it.
+
+**That is the first net-positive rule on agreement found here**, and it was hidden behind one
+line of the harness's own design. The lesson is about the tool rather than the rule:
+**withholding information from a measurement to keep it cheap can cost more than the
+measurement saves** -- four scopings of this candidate were spent approximating state that was
+sitting in a discarded variable.
 
 ## What the sibling project does differently, and what its 99.2% measures
 
