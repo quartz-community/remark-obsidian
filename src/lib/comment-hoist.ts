@@ -1,4 +1,4 @@
-import type { List, Paragraph, Root, RootContent } from "mdast";
+import type { Paragraph, Root, RootContent } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 import type { Comment } from "./types.js";
@@ -80,6 +80,33 @@ function pullBack(node: ParentNode): void {
 }
 
 /**
+ * The ancestor chain down to the node holding a column-zero `comment`, deepest first.
+ *
+ * Returned as a PATH rather than just the holder, because lifting the comment shortens every
+ * container above it: `> > quote` / `%%` has to shrink the inner quote and the outer one, and
+ * pulling back only the holder leaves the outer span still covering a line it no longer owns
+ * -- which `invariants.test.ts` would report as a child outside its parent.
+ *
+ * Searched from the END of each child list, since the comment this pass exists for is the
+ * last thing in its container. A comment at index 0 is a different shape -- `- %%`, where the
+ * marker is the item's own content -- and the caller declines it.
+ */
+function findColumnZeroComment(node: ParentNode): ParentNode[] | undefined {
+  const children = node.children;
+  if (!Array.isArray(children)) return undefined;
+
+  for (let index = children.length - 1; index >= 0; index--) {
+    const child = children[index] as Node;
+    if (child.type === "comment" && child.position?.start?.column === 1) {
+      return index > 0 ? [node] : undefined;
+    }
+    const deeper = findColumnZeroComment(child as unknown as ParentNode);
+    if (deeper) return [node, ...deeper];
+  }
+  return undefined;
+}
+
+/**
  * A column-zero `%%` does not belong to the container above it.
  *
  * `- item` / `text` / `%%` and `> quote` / `%%` report `list`/`comment` and
@@ -118,21 +145,23 @@ function liftContainerComment(tree: Root, source: string): void {
     const container = tree.children[index];
     if (!container || !CONTAINERS.has(container.type)) continue;
 
-    // A quote holds the comment itself; a list holds it in its last item.
-    const host = (container.type === "list"
-      ? (container as List).children[(container as List).children.length - 1]
-      : container) as unknown as ParentNode | undefined;
-    if (!host || !Array.isArray(host.children)) continue;
+    // Searched to any DEPTH, not just the container's own children. `> > quote` / `%%` and
+    // `- - item` / `%%` put the comment in the INNER container, so a one-level lookup -- a
+    // quote's own children, or a list's last item -- finds nothing and the comment stays
+    // buried. `compose.mts --nested` found five such shapes across both marker types, and
+    // every ancestor on the way down has to shrink, not just the one holding it.
+    const path = findColumnZeroComment(container as unknown as ParentNode);
+    if (!path) continue;
 
+    const host = path[path.length - 1]!;
     const at = host.children.findIndex(
       (child) =>
-        child.type === "comment" && child.position?.start?.column === 1,
+        (child as Node).type === "comment" &&
+        (child as Node).position?.start?.column === 1,
     );
-    // `at === 0` would empty the container, which is a different shape (`- %%`, where the
-    // marker is the item's own content) and is left alone.
     if (at <= 0) continue;
 
-    const comment = host.children[at] as Comment;
+    const comment = host.children[at] as unknown as Comment;
     const from = comment.position?.start?.offset;
     if (from === undefined) continue;
 
@@ -148,10 +177,8 @@ function liftContainerComment(tree: Root, source: string): void {
     if (source.slice(from + MARKER.length).includes(MARKER)) continue;
 
     host.children.splice(at);
-    pullBack(host);
-    if ((host as unknown) !== (container as unknown)) {
-      pullBack(container as unknown as ParentNode);
-    }
+    // Deepest first, so each ancestor shrinks onto a child that has already shrunk.
+    for (const ancestor of [...path].reverse()) pullBack(ancestor);
     tree.children.splice(index + 1, 0, comment as unknown as RootContent);
 
     comment.value = source.slice(from + MARKER.length);

@@ -1132,6 +1132,48 @@ format was not the problem". That is the seventh silent miss of this kind here. 
 tool for prettier-formatted text**, and when a fix changes a count by nothing at all, check
 that the fix is in the file.
 
+## Nesting: the inside half changes nothing, the after half changes four rules
+
+`--nested` runs six container pairs -- `> >`, `> -`, `- >`, `- -`, `> > [!note]` and
+`> [!note]` over `> >` -- against all sixteen followers, in both halves of the axis: `[ B ]`
+puts the follower inside the innermost container, and `> B` puts it at column 0 after the
+nesting. 192 sequences.
+
+**The inside half is clean on arrival: 0 of 96.** Every rule `--inside` establishes at one
+level holds at two, including `- - item` whose inner content column is four and therefore
+collides with the indented-code threshold. That retires an axis rather than opening one, which
+is worth as much here -- the corpus reaches nesting only incidentally, so "nesting is fine"
+was an assumption with nothing behind it.
+
+**The after half opened 13, in four families**, and this is where a depth-one rule genuinely
+breaks:
+
+| family                       | cases | what it is                                               |
+| ---------------------------- | ----: | -------------------------------------------------------- |
+| `nested > comment`           |     5 | the lift found nothing, because it looked one level deep |
+| `nested > setext`            |     4 | correct at depth ONE and wrong at depth two              |
+| `nested > math`              |     2 | the known extent bug, unchanged by nesting               |
+| `quote > callout > footnote` |     1 | definition column 2 against our 0                        |
+
+The comment family was `liftContainerComment` not recursing: `> > quote` / `%%` and
+`- - item` / `%%` put the comment in the INNER container, so a quote's own children and a
+list's last item both come back empty. Searching to any depth and shrinking EVERY ancestor on
+the way out -- deepest first, so each shrinks onto a child that already has -- closes all five
+and takes the referee to **5389/6818, +3 with nothing lost**. That is the "extend an
+already-measured rule to a new input class" shape these notes record as the one that lands.
+
+**`nested > setext` is the find.** At depth one `quote > setext` is `R/R` and agrees; at depth
+two, `> > quote` / `title` / `===` reports a ROOT `heading@1` in Obsidian -- with
+`headings: ["1:title@1:0"]`, so it is indexed, unlike every setext INSIDE a container -- and
+we absorb both lazy lines into the quote and report no heading at all. Four of the six
+nestings show it. So the lazy-continuation-versus-setext precedence that
+`container-setext.ts` and `lazy-setext.ts` encode is depth-sensitive, and nothing measured it
+until now.
+
+That is the user's hypothesis confirmed in the one place it held: three of the four families
+are rules already known, and the fourth is a rule that is right at one level of nesting and
+wrong at two.
+
 ## Score a rule before building it, because repairs lose and extensions win
 
 A measured pattern in what succeeds here, and it is not about effort. Every change that

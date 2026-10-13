@@ -221,12 +221,65 @@ const INNER: ReadonlyArray<readonly [string, string]> = [
  * section at all -- so the comparison is the full `sections` and `defs` equality the pair
  * sweep uses, and the map is the set of cells that disagree.
  */
+/**
+ * Nested containers, as `[name, the opening lines, the inner content prefix]`.
+ *
+ * The prefix is the column the INNERMOST container gives its own content, which is what a
+ * follower has to carry to be inside it: a quote marker and one space per level, a bullet's
+ * marker plus one, and `- - item` reaching four -- exactly the indented-code threshold, which
+ * is the collision this axis exists to test.
+ *
+ * Written out rather than composed from `INNER`, because the opening line is not the two
+ * single-level heads concatenated: `> - item` is one line, not `> quote` then `- item`.
+ */
+const NESTED: ReadonlyArray<readonly [string, string, string]> = [
+  ["quote > quote", "> > quote", "> > "],
+  ["quote > bullet", "> - item", ">   "],
+  ["bullet > quote", "- > quote", "  > "],
+  ["bullet > bullet", "- - item", "    "],
+  ["quote > callout", "> > [!note] title", "> > "],
+  ["callout > quote", "> [!note] title\n> > quote", "> > "],
+];
+
+/**
+ * `--nested` asks whether two levels of container change any rule one level established.
+ *
+ * `--inside` is clean at depth one over all 64 cells, which says nothing about depth two: the
+ * corpus reaches nesting only incidentally, and `> > %%` is already known to have a rule of
+ * its own -- a comment opened inside a quote needs its closer inside too, which is the F4
+ * gap `commentQuoteExtentTransform` closed. A rule that holds at one level and breaks at two
+ * is the shape every compositional defect here has had.
+ */
+const nested = process.argv.includes("--nested");
 const inside = process.argv.includes("--inside");
 const matrix = process.argv.includes("--matrix");
 const isolate = process.argv.includes("--isolate");
 const triples = process.argv.includes("--triples");
 const cases: Array<{ name: string; text: string; followerLine?: number }> = [];
 const syntaxOf = new Map(BLOCKS);
+if (nested) {
+  for (const [name, head, prefix] of NESTED) {
+    for (const [innerName, innerSyntax] of BLOCKS) {
+      const body = innerSyntax
+        .split("\n")
+        .map((line) => `${prefix}${line}`)
+        .join("\n");
+      // Both halves of the axis. `[ B ]` puts the follower INSIDE the innermost container,
+      // which is `--inside` at depth two; `> B` puts it at column 0 AFTER the nesting, which
+      // is `--matrix` at depth two. The absorption rules live on the second one, and every
+      // divergence left in this whole space is an absorption or an extent, so testing only
+      // the inside half would retire the cheaper question and leave the real one open.
+      cases.push({
+        name: `${name} [ ${innerName} ]`,
+        text: `${head}\n${body}\n\nuse[^1]\n`,
+      });
+      cases.push({
+        name: `${name} > ${innerName}`,
+        text: `${head}\n${innerSyntax}\n\nuse[^1]\n`,
+      });
+    }
+  }
+}
 if (inside) {
   for (const [container, prefix] of INNER) {
     const head = syntaxOf.get(container)!;
@@ -268,7 +321,9 @@ if (isolate) {
     }
   }
 }
-for (const [firstName, first] of isolate || matrix || inside ? [] : BLOCKS) {
+for (const [firstName, first] of isolate || matrix || inside || nested
+  ? []
+  : BLOCKS) {
   for (const [secondName, second] of BLOCKS) {
     if (triples) {
       for (const [thirdName, third] of BLOCKS) {
