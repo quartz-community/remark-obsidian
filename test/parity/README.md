@@ -881,10 +881,41 @@ indented code and a thematic break behave after a container?** -- over twenty pa
 which diverge. Against 1,482 referee documents whose largest demonstrated rule touches 67 and
 breaks even, that is a far better-shaped target.
 
-It also licenses the next step the question implies: with seven known-good constructs, a
-THREE-element sweep can put a clean construct between a container and an absorbable and see
-whether the interaction survives one block of separation. `compose.mts --triples` is wired for
-that, at 4,096 sequences and roughly a minute.
+### ...and inserting a known-good spacer says it is container STATE, not adjacency
+
+With seven clean constructs available as spacers, the discriminating experiment is
+`container > spacer > absorbable`: 5 containers x 7 spacers x 4 absorbables, 140 sequences
+rather than the full triple cross-product's 4,096. An ADJACENCY rule stops diverging once
+something clean sits between; a container-STATE rule keeps diverging. That is the ambiguity
+which cost four attempts on the comment fold.
+
+**43 of 140 diverge**, against 10 of 256 for the pairs, and the breakdown is unambiguous:
+
+| role       | counts                                                                              |
+| ---------- | ----------------------------------------------------------------------------------- |
+| container  | callout 13, bullet 10, ordered 10, quote 10, **linkdef 0** (of 28)                  |
+| spacer     | footnote 12, setext 9, table 9, paragraph 9, html 4, **heading 0, fence 0** (of 20) |
+| absorbable | **comment 18, math 16**, indented 5, thematic 4 (of 35)                             |
+
+Three things fall out.
+
+**It is container state.** The interaction reaches across every block the container can
+absorb -- footnote, setext, table, paragraph, html, all of which `containerLazyTransform`
+already accepts -- and stops dead at the two that END the container, `heading` and `fence`,
+each at zero of twenty. So the absorbable is mishandled whenever the container is still open,
+whatever sits between.
+
+**`linkdef` is not a container.** It diverges in pairs and never in triples, zero of
+twenty-eight, so a link-reference definition does not hold anything open; its two pair
+divergences are about the definition line itself.
+
+**The target is two constructs.** `comment` and `math` are 34 of the 43. So the whole open
+compositional surface reduces to one question: **how do `%%` and `$$` behave after an open
+container?**
+
+That is the slimming the triangulation was for, and the arithmetic is worth stating plainly:
+1,482 referee documents whose best rule touches 67 and breaks even, down to 20 pairs, down to
+two constructs with a named precondition. Each case is three lines long and one cause.
 
 ## Score a rule before building it, because repairs lose and extensions win
 

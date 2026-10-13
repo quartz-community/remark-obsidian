@@ -129,9 +129,53 @@ function ours(text: string): Facts {
   };
 }
 
+/**
+ * The discriminating experiment, rather than the full cross-product.
+ *
+ * Every diverging pair is `container > absorbable`, and the containers contribute nothing of
+ * their own: the absorbables are `comment`, `math`, indented code and `thematic`. Seven
+ * constructs -- heading, setext, fence, table, footnote, html, paragraph -- appear in ZERO
+ * diverging pairs across all 32 of their compositions, so they are safe to use as a SPACER.
+ *
+ * Putting a known-good construct between a container and an absorbable asks the one question
+ * the pairs cannot: does the interaction need ADJACENCY, or does it reach across a block? An
+ * adjacency rule stops diverging once something clean sits between; a container-state rule
+ * keeps diverging. That is the same ambiguity that cost four attempts on the comment fold.
+ *
+ * 5 containers x 7 spacers x 4 absorbables is 140 sequences, against 4,096 for the full
+ * triple cross-product, and it answers the question the full sweep would bury.
+ */
+const CONTAINERS = ["bullet", "ordered", "quote", "callout", "linkdef"];
+const SPACERS = [
+  "heading",
+  "setext",
+  "fence",
+  "table",
+  "footnote",
+  "html",
+  "paragraph",
+];
+const ABSORBABLES = ["comment", "math", "indented", "thematic"];
+
+const isolate = process.argv.includes("--isolate");
 const triples = process.argv.includes("--triples");
 const cases: Array<{ name: string; text: string }> = [];
-for (const [firstName, first] of BLOCKS) {
+const syntaxOf = new Map(BLOCKS);
+if (isolate) {
+  for (const container of CONTAINERS) {
+    for (const spacer of SPACERS) {
+      for (const absorbable of ABSORBABLES) {
+        cases.push({
+          name: `${container} > ${spacer} > ${absorbable}`,
+          text:
+            `${syntaxOf.get(container)!}\n${syntaxOf.get(spacer)!}\n` +
+            `${syntaxOf.get(absorbable)!}\n\nuse[^1]\n`,
+        });
+      }
+    }
+  }
+}
+for (const [firstName, first] of isolate ? [] : BLOCKS) {
   for (const [secondName, second] of BLOCKS) {
     if (triples) {
       for (const [thirdName, third] of BLOCKS) {
@@ -177,7 +221,7 @@ for (let at = 0; at < cases.length; at += BATCH) {
 }
 
 console.log(`  ${diverged.length} of ${cases.length} diverge\n`);
-for (const entry of diverged.slice(0, 40)) console.log(`  ${entry}`);
-if (diverged.length > 40) {
-  console.log(`  ... and ${diverged.length - 40} more`);
+for (const entry of diverged.slice(0, 200)) console.log(`  ${entry}`);
+if (diverged.length > 200) {
+  console.log(`  ... and ${diverged.length - 200} more`);
 }
