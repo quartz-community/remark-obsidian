@@ -991,6 +991,86 @@ Three things to carry:
   confirmation while measuring something slightly different, so `--ids` shares the gate's own
   comparison.
 
+## The absorption map: one bit per cell, including the cells we get right
+
+The pair and isolate sweeps answer "where are we wrong". That is what a backlog needs and not
+what a MAP needs -- "a list absorbs an unclosed `$$` and a quote does not" is the useful unit,
+and it was only known because one cell had been chased by hand. `compose.mts --matrix` derives
+it for every cell instead: 5 containers x 16 followers, **80 questions**, one bit per side.
+`sections` is root-level, so a follower is ABSORBED exactly when no root section starts on its
+line, and `R` means it kept its own section.
+
+    follower   bullet ordered   quote callout linkdef
+    bullet        A/A     R/R     R/R     R/R     R/R
+    ordered       R/R     A/A     R/R     R/R     R/R
+    quote         A/A     A/A     A/A     A/A     R/R
+    callout       A/A     A/A     A/A     A/A     R/R
+    heading       R/R     R/R     R/R     R/R     R/R
+    setext        A/A     A/A     R/R     R/R     R/R
+    indented      A/A     A/A     R/R    *R/A     R/R
+    fence         R/R     R/R     R/R     R/R     R/R
+    comment       R/R     R/R     R/R     R/R     R/R
+    thematic      R/R     R/R     R/R     R/R    *A/R
+    table         A/A     A/A     A/A     A/A     R/R
+    math          A/A     A/A     R/R     R/R     R/R
+    footnote      A/A     A/A     A/A     A/A     R/R
+    linkdef       A/A     A/A     A/A     A/A     R/R
+    html          A/A     A/A     R/R     R/R     R/R
+    paragraph     A/A     A/A     A/A     A/A     R/R
+
+### The list/quote asymmetry is a CLASS of exactly four, not four coincidences
+
+These notes recorded it as "the third measured instance", then "the fourth", as though
+instances were accumulating. They are one rule over one closed set. **`setext`, `indented`,
+`math` and `html` are absorbed by a list and kept at root by a quote or callout** -- and
+nothing else in the sixteen behaves that way. Every other follower is uniform across the four
+real containers.
+
+The rest of the map reads as four more rules, each now stated over the whole follower set
+rather than inferred from whichever cell was being debugged:
+
+- **Absorbed by nothing**: `heading`, `fence`, `comment`, `thematic`. These end any container,
+  which is the same fact the isolate sweep found from the other side -- `heading` and `fence`
+  as spacers diverge in 0 of 20.
+- **Absorbed by all four**: `quote`, `callout`, `table`, `footnote`, `linkdef`, `paragraph`.
+- **Same marker only**: a bullet list absorbs a bullet and a `1.` list absorbs an ordered,
+  and crosswise both are `R` -- CommonMark's rule that a different marker starts a new list.
+- **`linkdef` absorbs nothing**, confirming from a third direction that it is not a container.
+  Its one `A` is `thematic`, because `[ref]: /url` / `---` is a setext HEADING.
+
+### And it splits the divergences into three kinds, which the sweeps could not
+
+5 of 80 diverge and only **2** are absorption errors. The other three have the absorption bit
+AGREEING and something else wrong, which a divergence flag cannot distinguish:
+
+| cell                 | kind       | obs                           | ours                                   |
+| -------------------- | ---------- | ----------------------------- | -------------------------------------- |
+| `bullet > math`      | EXTENT     | `list@0` + `paragraph@3`      | `list@0` -- we swallow the trailer too |
+| `ordered > math`     | EXTENT     | as above                      | as above                               |
+| `callout > indented` | ABSORPTION | `callout@0`+`code@1`+`para@3` | `callout@0` + `paragraph@3`            |
+| `linkdef > indented` | NODE TYPE  | `definition@0`+`code@1`       | `definition@0` + `paragraph@1`         |
+| `linkdef > thematic` | ABSORPTION | `heading@0` (setext)          | `definition@0` + `thematicBreak@1`     |
+
+So the two `math` rows are not "we fail to absorb" at all -- both sides absorb, and we then run
+past the blank line. That is `math-outlives.ts`, which eleven cases depend on, and it is a
+different piece of work from a guard list entry.
+
+### The map is the specification the guard list never had
+
+`containerLazyTransform`'s chain was built one entry at a time, each justified on the case
+being debugged -- which is exactly the shape these notes warn about, a rule scoped to one
+case's accidents. Audited against the map, its net behaviour agrees in all 78 undisputed
+cells, including the entries whose restriction to `list` now reads as the asymmetry class
+rather than as four separate judgements. Two notes for anyone extending it:
+
+- Some cells agree through a DIFFERENT mechanism than the guard list. `quote > quote` is `A/A`
+  while the guard admits a `blockquote` only after a list, because ordinary CommonMark lazy
+  continuation already handles it in the tokenizer. The map measures the NET result, which is
+  the thing that matters, and it cannot attribute a cell to a pass.
+- `heading` is absorbed by the pass and then split back into a paragraph plus a thematic
+  break, so the map's `heading R/R` is the correct net outcome of an intermediate absorption,
+  not evidence the entry is unused.
+
 ## Score a rule before building it, because repairs lose and extensions win
 
 A measured pattern in what succeeds here, and it is not about effort. Every change that

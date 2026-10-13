@@ -157,10 +157,38 @@ const SPACERS = [
 ];
 const ABSORBABLES = ["comment", "math", "indented", "thematic"];
 
+/**
+ * `--matrix` reports the RULE in every container/follower cell, not just the divergences.
+ *
+ * The pair and isolate sweeps answer "where are we wrong", which is what a backlog needs and
+ * not what a MAP needs. "A list absorbs an unclosed `$$` and a quote does not" is the useful
+ * unit, and the only reason it is known is that one cell was chased by hand -- the sweeps
+ * print a divergence either way and never state what Obsidian actually did.
+ *
+ * So this derives one bit per cell from `sections`, for BOTH sides: does the follower appear
+ * as its own ROOT section, or has the container swallowed it? `sections` is root-level, so a
+ * follower starting on the container's next line is absorbed exactly when no section starts
+ * at that line. Printing the cells we AGREE on matters as much as the others -- an agreeing
+ * cell is a rule this package already encodes, which is evidence rather than absence, and it
+ * is what makes a guard list auditable against the application instead of against a backlog.
+ */
+const matrix = process.argv.includes("--matrix");
 const isolate = process.argv.includes("--isolate");
 const triples = process.argv.includes("--triples");
-const cases: Array<{ name: string; text: string }> = [];
+const cases: Array<{ name: string; text: string; followerLine?: number }> = [];
 const syntaxOf = new Map(BLOCKS);
+if (matrix) {
+  for (const container of CONTAINERS) {
+    const head = syntaxOf.get(container)!;
+    for (const [followerName, follower] of BLOCKS) {
+      cases.push({
+        name: `${container} > ${followerName}`,
+        text: `${head}\n${follower}\n\nuse[^1]\n`,
+        followerLine: head.split("\n").length,
+      });
+    }
+  }
+}
 if (isolate) {
   for (const container of CONTAINERS) {
     for (const spacer of SPACERS) {
@@ -175,7 +203,7 @@ if (isolate) {
     }
   }
 }
-for (const [firstName, first] of isolate ? [] : BLOCKS) {
+for (const [firstName, first] of isolate || matrix ? [] : BLOCKS) {
   for (const [secondName, second] of BLOCKS) {
     if (triples) {
       for (const [thirdName, third] of BLOCKS) {
@@ -195,6 +223,21 @@ for (const [firstName, first] of isolate ? [] : BLOCKS) {
 
 console.log(`compose: ${cases.length} sequences\n`);
 const diverged: string[] = [];
+const rules = new Map<string, { obs: boolean; us: boolean }>();
+
+/**
+ * Whether the container swallowed a follower starting on `line`.
+ *
+ * `sections` is root-level, so the follower is absorbed exactly when no root section starts
+ * on its line. The string is `${type}@${startLine}`, built in this file with one `@` and a
+ * numeric tail -- so unlike the LINK projection, which these notes record as not
+ * round-trippable because `a|b|c` cannot be split back into target and display, this one has
+ * an unambiguous delimiter and may be read.
+ */
+const absorbed = (facts: Facts, line: number): boolean =>
+  !facts.sections.some(
+    (section) => Number(section.slice(section.lastIndexOf("@") + 1)) === line,
+  );
 const BATCH = 60;
 for (let at = 0; at < cases.length; at += BATCH) {
   const slice = cases.slice(at, at + BATCH);
@@ -208,6 +251,12 @@ for (let at = 0; at < cases.length; at += BATCH) {
       diverged.push(`${entry.name}  THREW ${String(error).slice(0, 60)}`);
       continue;
     }
+    if (entry.followerLine !== undefined) {
+      rules.set(entry.name, {
+        obs: absorbed(want, entry.followerLine),
+        us: absorbed(got, entry.followerLine),
+      });
+    }
     const same =
       JSON.stringify(want.defs) === JSON.stringify(got.defs) &&
       JSON.stringify(want.sections) === JSON.stringify(got.sections);
@@ -218,6 +267,26 @@ for (let at = 0; at < cases.length; at += BATCH) {
         `      ours defs=${JSON.stringify(got.defs)} sections=${JSON.stringify(got.sections)}`,
     );
   }
+}
+
+if (matrix) {
+  const width = Math.max(...BLOCKS.map(([name]) => name.length));
+  const head = CONTAINERS.map((c) => c.slice(0, 7).padStart(8)).join("");
+  console.log(
+    `  absorbed by the container?  A = absorbed, R = own root section`,
+  );
+  console.log(`  a cell is "obs/ours", and a disagreeing cell is marked *\n`);
+  console.log(`  ${"follower".padEnd(width)}${head}`);
+  for (const [followerName] of BLOCKS) {
+    const cells = CONTAINERS.map((container) => {
+      const rule = rules.get(`${container} > ${followerName}`);
+      if (!rule) return "     -  ";
+      const pair = `${rule.obs ? "A" : "R"}/${rule.us ? "A" : "R"}`;
+      return `${rule.obs === rule.us ? " " : "*"}${pair}`.padStart(8);
+    }).join("");
+    console.log(`  ${followerName.padEnd(width)}${cells}`);
+  }
+  console.log("");
 }
 
 console.log(`  ${diverged.length} of ${cases.length} diverge\n`);
