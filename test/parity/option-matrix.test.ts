@@ -108,4 +108,49 @@ describe("option matrix", () => {
       expect(offenders).toEqual([]);
     }, 600_000);
   }
+
+  /**
+   * The PAIR sweep, behind `PARITY_OPTION_PAIRS=1`.
+   *
+   * The docstring above records that a crash needing two options to co-occur is invisible to
+   * the single-toggle sweep, and says all pairs "belongs in a scheduled job". That left the
+   * axis unmeasured with a note explaining why -- which these notes classify as a tripwire
+   * rather than an answer, so it is now runnable.
+   *
+   * Both flags are turned OFF together, which is the direction that removes a pass: an option
+   * defaulting on and cleared leaves whatever it was repairing unrepaired, and two such gaps
+   * at once is the combination the single sweep cannot reach. Turning pairs ON cannot expose
+   * a missing-pass interaction, since `all-features` already has everything on and is swept
+   * every push.
+   *
+   * 24 choose 2 is 276 pairs against each preset, and each pair parses the whole corpus --
+   * minutes rather than seconds, which is why it is opt-in rather than a push gate. The
+   * `SCOPE` entry in `overview.ts` names this variable, so the two must stay in step.
+   */
+  const pairsWanted = process.env.PARITY_OPTION_PAIRS === "1";
+  it.skipIf(!pairsWanted)(
+    "never throws with any PAIR of options cleared",
+    () => {
+      const offenders: string[] = [];
+      for (const preset of ["legacy", "strict"] as const) {
+        for (let i = 0; i < FLAGS.length; i++) {
+          for (let j = i + 1; j < FLAGS.length; j++) {
+            const options = {
+              preset,
+              [FLAGS[i]!]: false,
+              [FLAGS[j]!]: false,
+            };
+            const result = sweep(options);
+            if (result.crashes > 0) {
+              offenders.push(
+                `${preset} ${FLAGS[i]}=false ${FLAGS[j]}=false: ${result.crashes} crashes, first ${result.first}`,
+              );
+            }
+          }
+        }
+      }
+      expect(offenders).toEqual([]);
+    },
+    3_600_000,
+  );
 });

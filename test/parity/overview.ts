@@ -203,10 +203,19 @@ export const ORACLES: readonly Oracle[] = [
     command:
       "tsx test/parity/compose.mts [--matrix|--inside|--nested|--isolate]",
     gate: "sweep",
-    compares: ["defs", "sections", "headings"],
+    compares: [
+      "defs",
+      "sections",
+      "headings",
+      "links",
+      "embeds",
+      "tags",
+      "footnoteRefs",
+      "blocks",
+    ],
     blind: [
-      "INLINE constructs entirely -- all 16 BLOCKS entries are block-level",
-      "text, math, links, tags, tasks, highlights, emphasis: not compared here",
+      "the CONTENT of highlight, emphasis, strong, underscore, strike, imath, dmath and codespan -- measured: `==hi== *em* **st** ~~del~~ $x$ `c`` reports NOTHING to metadataCache, so the inline axes use those eight as wrappers only",
+      "text, math, tasks, highlights, emphasis: DOM projections, not in the cache",
       "rows are binary, so a position-without-extent fix moves nothing",
     ],
   },
@@ -273,20 +282,26 @@ export const AXES: readonly Axis[] = [
   {
     name: "inline x inline",
     sequences: 196,
-    swept: false,
-    note: "14 inline constructs, no pair matrix exists",
+    swept: true,
+    note: "--inline; 7 diverge, ALL one rule -- an inline closer frees a caret for a block id",
   },
   {
     name: "inline x block",
     sequences: 224,
-    swept: false,
-    note: "14 inline constructs at 16 block positions",
+    swept: true,
+    note: "--inline-block; 5 diverge, 3 of them the P1 cache defect and MUST NOT be fixed",
   },
   {
     name: "option pairs (crash only)",
-    sequences: 1104,
+    sequences: 552,
+    swept: true,
+    note: "PARITY_OPTION_PAIRS=1; 552 configs x 3403 cases, ZERO crashes, ~16 min so opt-in",
+  },
+  {
+    name: "inline CONTENT of the eight unindexed constructs",
+    sequences: null,
     swept: false,
-    note: "single toggles are covered; pairs are not",
+    note: "highlight/emphasis/strong/underscore/strike/imath/dmath/codespan are invisible to metadataCache; needs the DOM, so the recorder rather than compose",
   },
 ];
 

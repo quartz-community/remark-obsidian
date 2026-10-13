@@ -86,6 +86,29 @@ function askBatch(documents: readonly string[]): unknown[] {
   return JSON.parse(raw) as unknown[];
 }
 
+interface Point {
+  readonly line: number;
+  readonly col: number;
+}
+interface Span {
+  readonly start: Point;
+  readonly end: Point;
+}
+interface Reference {
+  readonly original: string;
+  readonly link: string;
+  readonly displayText: string;
+  readonly position: Span;
+}
+
+/** Exactly `oracle.e2e.ts`'s spelling, so the two sides are comparable. */
+const at = (point: Point | undefined): string =>
+  `${point?.line ?? 0}:${point?.col ?? 0}`;
+const span = (position: Span | undefined): string =>
+  `${at(position?.start)}-${at(position?.end)}`;
+const reference = (entry: Reference): string =>
+  `${entry.original}=>${entry.link}|${entry.displayText}@${span(entry.position)}`;
+
 interface Facts {
   readonly defs: readonly string[];
   readonly sections: readonly string[];
@@ -95,6 +118,20 @@ interface Facts {
   // second oracle can tell "both report none" from "neither was asked". These notes carry
   // five instances of a family read as clean because one projection was never compared.
   readonly headings: readonly string[];
+  /**
+   * The inline-visible cache keys, formatted exactly as `oracle.e2e.ts` formats them.
+   *
+   * Added for the inline axes and compared on EVERY axis, because a block sweep that ignores
+   * links and tags cannot see a container eating a wikilink -- the same reason `headings` was
+   * wired in, which found nothing and was still worth running. Matching the recorder's
+   * spelling character for character is the part that matters: formatting `headings` as
+   * `level:name` instead of `level:name@line:col` reported 52 divergences that did not exist.
+   */
+  readonly links: readonly string[];
+  readonly embeds: readonly string[];
+  readonly tags: readonly string[];
+  readonly refs: readonly string[];
+  readonly blocks: readonly string[];
 }
 
 function theirs(answer: unknown): Facts {
@@ -109,6 +146,11 @@ function theirs(answer: unknown): Facts {
       level: number;
       position: { start: { line: number; col: number } };
     }>;
+    links?: Reference[];
+    embeds?: Reference[];
+    tags?: Array<{ tag: string; position: Span }>;
+    footnoteRefs?: Array<{ id: string; position: Span }>;
+    blocks?: Record<string, { id: string; position: Span }>;
   };
   return {
     defs: (compute.footnotes ?? []).map(
@@ -126,6 +168,15 @@ function theirs(answer: unknown): Facts {
       (h) =>
         `${h.level}:${h.heading}@${h.position.start.line}:${h.position.start.col}`,
     ),
+    links: (compute.links ?? []).map(reference),
+    embeds: (compute.embeds ?? []).map(reference),
+    tags: (compute.tags ?? []).map((t) => `${t.tag}@${span(t.position)}`),
+    refs: (compute.footnoteRefs ?? []).map(
+      (f) => `${f.id}@${at(f.position.start)}`,
+    ),
+    blocks: Object.values(compute.blocks ?? {}).map(
+      (b) => `${b.id}@${span(b.position)}`,
+    ),
   };
 }
 
@@ -135,6 +186,11 @@ function ours(text: string): Facts {
     footnotes?: readonly string[];
     sections?: readonly string[];
     headings?: readonly string[];
+    links?: readonly string[];
+    embeds?: readonly string[];
+    tags?: readonly string[];
+    footnoteRefs?: readonly string[];
+    blocks?: readonly string[];
   };
   return {
     defs: (computed.footnotes ?? []).map((entry) =>
@@ -147,6 +203,11 @@ function ours(text: string): Facts {
       })
       .filter((entry) => !/^(?:text|element)@/u.test(entry)),
     headings: computed.headings ?? [],
+    links: computed.links ?? [],
+    embeds: computed.embeds ?? [],
+    tags: computed.tags ?? [],
+    refs: computed.footnoteRefs ?? [],
+    blocks: computed.blocks ?? [],
   };
 }
 
@@ -201,6 +262,38 @@ const ABSORBABLES = ["comment", "math", "indented", "thematic"];
  * no inside at all, and the matrix above measures it absorbing nothing, so it is not a
  * container here either.
  */
+/**
+ * The inline constructs, and what each one is worth asking about.
+ *
+ * SIX of the fourteen are indexed by `metadataCache` and so adjudicable here -- wikilink,
+ * embed, tag, inline footnote, footnote reference and block identifier. The other EIGHT are
+ * invisible to it: `==hi== *em* **st** ~~del~~ $x$ \`c\`` reports nothing at all, measured
+ * before this was built rather than discovered after.
+ *
+ * They are included anyway, as WRAPPERS, because that is where the interaction lives and the
+ * cache can still see it: `==[[Note]]==` reports the wikilink at column 2, `*#tag*` reports
+ * the tag, `~~[^1]~~` reports the reference. So this sweep answers "does an indexed construct
+ * survive inside, or beside, each of the other thirteen" -- and does NOT answer anything
+ * about highlight, emphasis, strong, strikethrough, math or code-span CONTENT, which needs
+ * the DOM and therefore the recorder. `overview.ts` registers that blindness.
+ */
+const INLINE: ReadonlyArray<readonly [string, string]> = [
+  ["wikilink", "[[Note]]"],
+  ["embed", "![[Note]]"],
+  ["tag", "#tag"],
+  ["inlinefn", "^[body]"],
+  ["footref", "[^1]"],
+  ["blockid", "^blk"],
+  ["highlight", "==hi=="],
+  ["emphasis", "*em*"],
+  ["strong", "**st**"],
+  ["underscore", "_us_"],
+  ["strike", "~~del~~"],
+  ["imath", "$x$"],
+  ["dmath", "$$y$$"],
+  ["codespan", "`c`"],
+];
+
 const INNER: ReadonlyArray<readonly [string, string]> = [
   ["bullet", "  "],
   ["ordered", "   "],
@@ -250,6 +343,19 @@ const NESTED: ReadonlyArray<readonly [string, string, string]> = [
  * gap `commentQuoteExtentTransform` closed. A rule that holds at one level and breaks at two
  * is the shape every compositional defect here has had.
  */
+/**
+ * `--inline` sweeps every ordered pair of the 14 inline constructs, adjacent on one line.
+ *
+ * `--inline-block` puts each inline construct inside each of the 16 block constructs, which
+ * is the other half: `# [[Note]]` and `> #tag` ask whether a BLOCK host swallows an indexed
+ * inline construct, where `--inline` asks whether an inline WRAPPER does.
+ *
+ * Every document ends with a real definition for `[^1]`, because `footnoteRefs` lists only
+ * references whose name HAS one -- a probe for reference behaviour that defines nothing
+ * proves nothing, which these notes record costing a whole wave of eight cases.
+ */
+const inlinePairs = process.argv.includes("--inline");
+const inlineBlock = process.argv.includes("--inline-block");
 const nested = process.argv.includes("--nested");
 const inside = process.argv.includes("--inside");
 const matrix = process.argv.includes("--matrix");
@@ -257,6 +363,34 @@ const isolate = process.argv.includes("--isolate");
 const triples = process.argv.includes("--triples");
 const cases: Array<{ name: string; text: string; followerLine?: number }> = [];
 const syntaxOf = new Map(BLOCKS);
+const DEFINE = "\n\n[^1]: def\n";
+if (inlinePairs) {
+  for (const [firstName, first] of INLINE) {
+    for (const [secondName, second] of INLINE) {
+      cases.push({
+        name: `${firstName} + ${secondName}`,
+        text: `${first}${second}${DEFINE}`,
+      });
+    }
+  }
+}
+if (inlineBlock) {
+  const syntax = new Map(BLOCKS);
+  for (const [blockName] of BLOCKS) {
+    const host = syntax.get(blockName)!;
+    for (const [inlineName, inlineSyntax] of INLINE) {
+      // Appended to the host's LAST line, so `| a | b |` / `| --- |` keeps its delimiter row
+      // and a fence keeps its opener. A construct spliced into the middle of a two-line host
+      // is a different question and not this one.
+      const lines = host.split("\n");
+      lines[lines.length - 1] = `${lines[lines.length - 1]} ${inlineSyntax}`;
+      cases.push({
+        name: `${blockName} [ ${inlineName} ]`,
+        text: `${lines.join("\n")}${DEFINE}`,
+      });
+    }
+  }
+}
 if (nested) {
   for (const [name, head, prefix] of NESTED) {
     for (const [innerName, innerSyntax] of BLOCKS) {
@@ -321,9 +455,9 @@ if (isolate) {
     }
   }
 }
-for (const [firstName, first] of isolate || matrix || inside || nested
-  ? []
-  : BLOCKS) {
+const skipPairs =
+  isolate || matrix || inside || nested || inlinePairs || inlineBlock;
+for (const [firstName, first] of skipPairs ? [] : BLOCKS) {
   for (const [secondName, second] of BLOCKS) {
     if (triples) {
       for (const [thirdName, third] of BLOCKS) {
@@ -380,12 +514,19 @@ for (let at = 0; at < cases.length; at += BATCH) {
     const same =
       JSON.stringify(want.defs) === JSON.stringify(got.defs) &&
       JSON.stringify(want.sections) === JSON.stringify(got.sections) &&
-      JSON.stringify(want.headings) === JSON.stringify(got.headings);
+      JSON.stringify(want.headings) === JSON.stringify(got.headings) &&
+      JSON.stringify(want.links) === JSON.stringify(got.links) &&
+      JSON.stringify(want.embeds) === JSON.stringify(got.embeds) &&
+      JSON.stringify(want.tags) === JSON.stringify(got.tags) &&
+      JSON.stringify(want.refs) === JSON.stringify(got.refs) &&
+      JSON.stringify(want.blocks) === JSON.stringify(got.blocks);
     if (same) continue;
     diverged.push(
       `${entry.name}\n      md   ${JSON.stringify(entry.text)}\n` +
         `      obs  defs=${JSON.stringify(want.defs)} sections=${JSON.stringify(want.sections)} h=${JSON.stringify(want.headings)}\n` +
-        `      ours defs=${JSON.stringify(got.defs)} sections=${JSON.stringify(got.sections)} h=${JSON.stringify(got.headings)}`,
+        `      ours defs=${JSON.stringify(got.defs)} sections=${JSON.stringify(got.sections)} h=${JSON.stringify(got.headings)}\n` +
+        `      obs  l=${JSON.stringify(want.links)} e=${JSON.stringify(want.embeds)} t=${JSON.stringify(want.tags)} r=${JSON.stringify(want.refs)} b=${JSON.stringify(want.blocks)}\n` +
+        `      ours l=${JSON.stringify(got.links)} e=${JSON.stringify(got.embeds)} t=${JSON.stringify(got.tags)} r=${JSON.stringify(got.refs)} b=${JSON.stringify(got.blocks)}`,
     );
   }
 }
