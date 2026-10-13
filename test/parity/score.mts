@@ -445,6 +445,53 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "lazy-chain-through-break",
+    what: "a list's chain to a definition survives an intervening thematic break",
+    apply: (text, ours, tree) => {
+      // `code` was the link that broke the chain and accepting it gained 43 documents. The
+      // other node types that can sit between a list and a definition are `thematicBreak`
+      // and a link-reference `definition`; `html`, `heading`, `paragraph`, `table` and
+      // `math` are already accepted after a list. This asks whether the chain should survive
+      // those two as well.
+      const through = new Set([
+        "code",
+        "html",
+        "heading",
+        "paragraph",
+        "table",
+        "math",
+        "thematicBreak",
+        "definition",
+      ]);
+      const kids = tree.children;
+      const swallowed = new Set<number>();
+      for (const [index, child] of kids.entries()) {
+        if (child.type !== "footnoteDefinition") continue;
+        const start = child.position?.start;
+        if (!start || start.column !== 1) continue;
+        let at = index - 1;
+        let edge = start.offset;
+        while (at >= 0) {
+          const prev = kids[at]!;
+          const prevEnd = prev.position?.end?.offset;
+          if (prevEnd === undefined || edge === undefined) break;
+          if (text.slice(prevEnd, edge).includes("\n\n")) break;
+          if (prev.type === "list") {
+            swallowed.add(start.line - 1);
+            break;
+          }
+          if (!through.has(prev.type)) break;
+          edge = prev.position?.start?.offset;
+          at -= 1;
+        }
+      }
+      return {
+        refs: ours.refs,
+        defs: ours.defs.filter((d) => !swallowed.has(d[1])),
+      };
+    },
+  },
+  {
     name: "lazy-after-any-container",
     what: "...and the same reaching back to a quote or callout, not only a list",
     apply: (text, ours, tree) => {

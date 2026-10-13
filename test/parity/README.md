@@ -2238,6 +2238,17 @@ own `html` and `heading` entries (both restricted to a list for the same reason)
 fix was right and the general one would have cost 27 documents -- which is exactly the trade
 the scorer exists to find before a pass is written rather than after.
 
+**Widening the CHAIN is refuted too.** `code` was the link that broke it, and the other node
+types that can sit between a list and a definition are `thematicBreak` and a link-reference
+`definition`. Letting the chain survive those scores **3 better against 23 worse, agreement
+-20**: a thematic break and a link-reference definition are real blocks that end the list,
+where indented code is continuation.
+
+So two adjacent widenings were tested and both cost ~25 documents, which puts the landed
+scoping at a **local optimum** -- `code` after a `list`, and nothing more. Two runs to
+establish that, against the four implementation cycles the comment fold cost to establish
+less.
+
 ## What the sibling project does differently, and what its 99.2% measures
 
 `obsidian-footnotes` reports 99.2% agreement on the corpus this harness vendors as its
