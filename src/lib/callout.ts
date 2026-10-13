@@ -168,8 +168,21 @@ export function calloutTransform(
 ): void {
   visit(tree, "blockquote", (node: Node) => {
     const quote = node as Blockquote;
+    // A `heading` as well as a `paragraph`. A setext underline written INSIDE the quote makes
+    // micromark read the marker line and the underline as one setext heading, so
+    // `> [!note] title` / `> ---` arrived as `blockquote { heading }` and was declined here --
+    // degrading the callout to a plain blockquote, where Obsidian reports `callout@0-1`.
+    // `compose.mts --inside` found both forms, `---` and `===`, and they were its only two
+    // divergences of 64.
+    //
+    // The underline is consumed either way: six controls against live 1.14.4 report an EMPTY
+    // `headings` for every setext inside a container, column-zero or prefixed, while a root
+    // `title` / `===` reports one -- so Obsidian paints a heading there and indexes none,
+    // which is the asymmetry `normalize.ts` and `container-setext.ts` both already record.
     const first = quote.children[0];
-    if (!first || first.type !== "paragraph") return;
+    if (!first || (first.type !== "paragraph" && first.type !== "heading")) {
+      return;
+    }
 
     const paragraph = first as Paragraph;
     // On the blockquote's own first line, not merely in its first child. An empty `>`
