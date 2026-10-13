@@ -123,10 +123,7 @@ export function lazySetextTransform(
     const pFrom = paragraph.position?.start?.offset;
     const pTo = paragraph.position?.end?.offset;
     if (pFrom === undefined || pTo === undefined) continue;
-    const owned = source
-      .slice(pFrom, pTo)
-      .split("\n")
-      .map((line) => line.replace(/^[ \t]*>[ \t]?/u, ""));
+    const owned = source.slice(pFrom, pTo).split("\n").map(stripQuotes);
     const keptLines = owned.slice(0, Math.max(owned.length - drop, 0));
     const keptText = keptLines.join("\n");
 
@@ -162,13 +159,47 @@ export function lazySetextTransform(
   }
 }
 
-/** The node whose children hold the quote's trailing paragraph. */
+/**
+ * The node whose children hold the quote's trailing paragraph, at any DEPTH.
+ *
+ * It used to return the container itself, which is only right at one level of nesting:
+ * `> > quote` / `title` / `===` has an inner `blockquote` as the outer one's last child, so
+ * the paragraph test below failed and the whole pass declined -- leaving the lazy lines
+ * absorbed where Obsidian reports a root `heading@1`. Obsidian's answer is IDENTICAL at both
+ * depths, so the depth-sensitivity was entirely ours. `compose.mts --nested` found it in four
+ * of its six nestings.
+ */
 function lastParagraphHost(
   container: RootContent,
 ): { children: RootContent[]; position?: Node["position"] } | null {
   const host = container as unknown as { children?: RootContent[] };
   if (!Array.isArray(host.children)) return null;
+
+  const last = host.children[host.children.length - 1];
+  if (last && last.type !== "paragraph") {
+    const deeper = lastParagraphHost(last);
+    if (deeper) return deeper;
+  }
   return host as { children: RootContent[]; position?: Node["position"] };
+}
+
+/**
+ * Strip a RUN of quote markers from a line, not just one.
+ *
+ * A nested quote spends two prefixes on every line, so a single replace left `> ` on the
+ * front of the kept text and the rebuilt paragraph carried a stray marker. Written as a
+ * counting loop because the pattern form `(?:>[ \t]?)+` is a quantifier inside a quantifier
+ * and the ReDoS lint rejects it -- the same substitution `container-lazy.ts` and
+ * `mdast/wikilink.ts` already record for `\s+$`.
+ */
+function stripQuotes(line: string): string {
+  let rest = line.replace(/^[ \t]+/u, "");
+  while (rest.startsWith(">")) {
+    rest = rest.slice(1);
+    if (rest.startsWith(" ") || rest.startsWith("\t")) rest = rest.slice(1);
+    rest = rest.replace(/^[ \t]+/u, "");
+  }
+  return rest;
 }
 
 /** Offsets are what matter; `normalizePointsTransform` rebuilds line and column. */
