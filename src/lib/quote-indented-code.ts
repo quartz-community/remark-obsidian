@@ -2,6 +2,8 @@ import type { Code, Root, RootContent } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 
+import { calloutTransform } from "./callout.js";
+
 interface ParentNode extends Node {
   children: RootContent[];
 }
@@ -224,7 +226,14 @@ export function quoteIndentedCodeTransform(
 
     for (let index = 0; index < parent.children.length; index++) {
       const quote = parent.children[index];
-      if (quote?.type !== "blockquote") continue;
+      // A callout as well as a plain quote. `compose.mts --matrix` measures `indented` as
+      // one of exactly four followers a LIST absorbs and a quote or callout keeps at root --
+      // with `setext`, `math` and `html` -- and the quote half was already right here while
+      // the callout half absorbed the code. `calloutTransform` runs two passes earlier and
+      // has already retyped the node, so a `blockquote`-only test cannot see it: the same
+      // "one rule, two node types" shape as the callout-after-list absorption and the two
+      // sibling visitors in this file, which both name `callout` explicitly.
+      if (quote?.type !== "blockquote" && quote?.type !== "callout") continue;
 
       const start = quote.position?.start?.offset;
       const end = quote.position?.end?.offset;
@@ -255,6 +264,20 @@ export function quoteIndentedCodeTransform(
 
       const replacement = parsed.children[0]!;
       for (const child of [replacement]) shift(child, start, line - 1);
+
+      // `reparse` is `self.parse`, the PARSER rather than the transform chain, so a callout
+      // comes back as the plain `blockquote` micromark produces and loses its title node and
+      // its `calloutType`. Re-running the real pass is what restores it -- a local
+      // reconstruction would be a second, weaker copy of `calloutTransform`, and the shift
+      // above has already put the replacement back on the document's own coordinates, which
+      // is what that pass needs to read its marker line out of `source`.
+      if (quote.type === "callout") {
+        calloutTransform(
+          { type: "root", children: [replacement] } as Root,
+          source,
+          reparse,
+        );
+      }
 
       const tail = lines.slice(cut);
       const block: Code = {
