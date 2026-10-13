@@ -1162,17 +1162,44 @@ the way out -- deepest first, so each shrinks onto a child that already has -- c
 and takes the referee to **5389/6818, +3 with nothing lost**. That is the "extend an
 already-measured rule to a new input class" shape these notes record as the one that lands.
 
-**`nested > setext` is the find.** At depth one `quote > setext` is `R/R` and agrees; at depth
-two, `> > quote` / `title` / `===` reports a ROOT `heading@1` in Obsidian -- with
-`headings: ["1:title@1:0"]`, so it is indexed, unlike every setext INSIDE a container -- and
-we absorb both lazy lines into the quote and report no heading at all. Four of the six
-nestings show it. So the lazy-continuation-versus-setext precedence that
-`container-setext.ts` and `lazy-setext.ts` encode is depth-sensitive, and nothing measured it
-until now.
+**`nested > setext` was the find, and it is closed.** At depth one `quote > setext` is `R/R`
+and agrees; at depth two, `> > quote` / `title` / `===` reports a ROOT `heading@1` in
+Obsidian -- with `headings: ["1:title@1:0"]`, so it is indexed, unlike every setext INSIDE a
+container -- and we absorbed both lazy lines into the quote and reported no heading at all.
+Obsidian's answer is IDENTICAL at both depths, so the depth-sensitivity was entirely ours.
 
-That is the user's hypothesis confirmed in the one place it held: three of the four families
-are rules already known, and the fourth is a rule that is right at one level of nesting and
-wrong at two.
+Two causes, both the same shape as the comment lift beside it:
+
+- `lastParagraphHost` returned the container itself, so at depth two it found the INNER quote
+  as the last child, failed its paragraph test and declined the whole pass. It now descends.
+- The quote-marker strip removed ONE marker per line where a nested quote spends two, leaving
+  a stray `> ` in the rebuilt paragraph. A counting loop, since `(?:>[ \t]?)+` is a
+  quantifier inside a quantifier and the ReDoS lint rejects it.
+
+Four of the six nestings showed it, and closing it took `--nested` from 7 to **3** with the
+referee unmoved and no corpus regression.
+
+So the axis reads: **the inside half needed nothing, and the after half needed two
+recursions.** Three of the four families it opened were rules already known and only
+mis-scoped by one level of depth; neither was a new rule about nesting, which is why the
+inside half was clean. The three cells left are the two `nested > math` extent rows and one
+definition column.
+
+### What the four axes cost and found, end to end
+
+| sweep       | sequences | opened | now   |
+| ----------- | --------: | -----: | ----- |
+| pairs       |       256 |     14 | **4** |
+| `--isolate` |       140 |     43 | 19    |
+| `--matrix`  |        80 |      5 | 4     |
+| `--inside`  |        64 |      2 | **0** |
+| `--nested`  |       192 |     13 | 3     |
+
+Every fix that landed from them extended a rule already measured to a node type or a nesting
+depth it had not been scoped for -- a callout where a quote was named, a callout where a
+blockquote was named, an inner container where a root child was assumed, twice. Not one was a
+new repair for a new shape, which is the distinction `score.mts` exists to enforce and the
+reason these landed at zero corpus cost and +10 referee documents with nothing lost.
 
 ## Score a rule before building it, because repairs lose and extensions win
 
