@@ -445,6 +445,42 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "lazy-after-any-container",
+    what: "...and the same reaching back to a quote or callout, not only a list",
+    apply: (text, ours, tree) => {
+      // The generalisation of `lazy-after-list-tree`, which landed at +43 documents for
+      // lists. If a definition reachable back to a LIST is swallowed by it, the question is
+      // whether a quote or a callout behaves the same way -- the containers
+      // `containerLazyTransform` already treats alike everywhere else.
+      const containers = new Set(["list", "blockquote", "callout"]);
+      const kids = tree.children;
+      const swallowed = new Set<number>();
+      for (const [index, child] of kids.entries()) {
+        if (child.type !== "footnoteDefinition") continue;
+        const start = child.position?.start;
+        if (!start || start.column !== 1) continue;
+        let at = index - 1;
+        let edge = start.offset;
+        while (at >= 0) {
+          const prev = kids[at]!;
+          const prevEnd = prev.position?.end?.offset;
+          if (prevEnd === undefined || edge === undefined) break;
+          if (text.slice(prevEnd, edge).includes("\n\n")) break;
+          if (containers.has(prev.type)) {
+            swallowed.add(start.line - 1);
+            break;
+          }
+          edge = prev.position?.start?.offset;
+          at -= 1;
+        }
+      }
+      return {
+        refs: ours.refs,
+        defs: ours.defs.filter((d) => !swallowed.has(d[1])),
+      };
+    },
+  },
+  {
     name: "drop-defs-after-list-code",
     what: "a definition after a list+code run with no blank line is swallowed by the list",
     apply: (text, ours) => {

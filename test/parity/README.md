@@ -2227,6 +2227,17 @@ scored prediction was +21 and the implementation delivered +43, which is the rig
 for a scorer to be wrong in: it reads only the facts a rule rewrites, while the pass also
 fixes the `sections` and `listItems` those documents disagreed on.
 
+**And the obvious generalisation is refuted in one run.** Reaching back to any container
+rather than a list -- a quote or a callout, which `containerLazyTransform` treats alike
+everywhere else -- scores **3 better against 31 worse, agreement -27**. So the absorption is
+LIST-SPECIFIC: a list swallows a following column-0 definition and a quote does not.
+
+That is the third measured instance of lists and quotes differing here, after the setext
+underline (a quote gives up its last lazy line to a heading, a list does not) and this pass's
+own `html` and `heading` entries (both restricted to a list for the same reason). The scoped
+fix was right and the general one would have cost 27 documents -- which is exactly the trade
+the scorer exists to find before a pass is written rather than after.
+
 ## What the sibling project does differently, and what its 99.2% measures
 
 `obsidian-footnotes` reports 99.2% agreement on the corpus this harness vendors as its
