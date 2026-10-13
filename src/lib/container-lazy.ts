@@ -238,7 +238,14 @@ function absorbPass(tree: Root, source: string): void {
         // too -- so the quote-prefixed line continues the item rather than opening a block
         // of its own. Restricted to a list by the same reasoning as the two entries above
         // and with the same evidence shape, a recorded probe per container.
-        !(next.type === "blockquote" && container.type === "list") &&
+        // A CALLOUT counts as a quote here, which `compose.mts` caught: `- item` /
+        // `> [!note] title` reports one `list` section in Obsidian and reported a separate
+        // `callout` here, because a callout line arrives as its own node type rather than a
+        // `blockquote` and this test named only the latter. Same rule, two node types.
+        !(
+          (next.type === "blockquote" || next.type === "callout") &&
+          container.type === "list"
+        ) &&
         // A list, but only after a callout. `> [!note] title` / `2. [^1]: def` reports one
         // callout spanning the marker's line, with a `listItem` inside it. Note the
         // ordered item opens at all only because a callout title is not a paragraph --
