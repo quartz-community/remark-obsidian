@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest";
 import { CHAIN_MANIFEST } from "./chain.js";
 import {
   compareCase,
+  PROFILE_NAMES,
   formatPinDrift,
   formatResult,
   isGateFailure,
@@ -94,6 +95,35 @@ describe.skipIf(!goldens)("Obsidian parity", () => {
       failures.map((f) => f.id),
       summary.join("\n"),
     ).toEqual([]);
+  });
+
+  it("masks no case behind the non-shipping profile but the recorded four", () => {
+    // `compareCase` returns on the FIRST profile with zero divergences, and
+    // `quartz-default` -- the options Quartz actually passes -- is tried first. So a matched
+    // case reporting any other profile DIVERGES under the shipping configuration and passes
+    // only because a second configuration was tried.
+    //
+    // That is deliberate: the either-profile rule is what distinguishes "this package cannot
+    // do it" from "Quartz's default config disables it". But it masks SILENTLY, and nothing
+    // reported the masked set, so a future divergence under the profile Quartz ships would
+    // have been invisible behind a green gate. It is a property of iteration order, which is
+    // no way to learn where parity stands.
+    //
+    // All four are one family: `enableCheckbox` is false upstream, so custom task characters
+    // are off in Quartz and these cases cannot match there by construction.
+    const MASKED = [
+      "task/custom-char",
+      "task/ordered-custom-status",
+      "task/quote-callout-status",
+      "task/status-alphabet",
+    ];
+    const shipping = PROFILE_NAMES[0]!;
+    const masked = cases
+      .map((c) => compareCase(c, mathTex))
+      .filter((r) => r.matched && r.profile !== shipping)
+      .map((r) => r.id)
+      .sort();
+    expect(masked, `shipping profile is ${shipping}`).toEqual(MASKED);
   });
 
   it("deliberate divergences still produce their pinned output", () => {

@@ -12,6 +12,35 @@ import remarkObsidian from "../../src/index.js";
 import { PROFILES } from "./chain.js";
 import type { GoldenCase } from "./types.js";
 
+/**
+ * The cases that do not reach a fixed point, enumerated.
+ *
+ * Attributed in the docstring on the assertion below. Held as a LIST rather than a count so
+ * that a fix and a regression are equally visible: both change the set, and neither can hide
+ * inside a bound.
+ */
+const UNSTABLE: readonly string[] = [
+  "commonmark/emphasis-and-strong-emphasis/417",
+  "commonmark/emphasis-and-strong-emphasis/450",
+  "commonmark/link-reference-definitions/196",
+  "commonmark/link-reference-definitions/200",
+  "commonmark/link-reference-definitions/202",
+  "commonmark/link-reference-definitions/216",
+  "emphasis/nest-underscore-outer",
+  "fuzz/inline-footnote/11",
+  "hunt/fix-lazy-setext-chain-not-idempotent/1",
+  "probe/bracket-nest/label-autolink-closer",
+  "probe/label-shape/space-only-defined",
+  "probe/math-indent/one-space-empty-body",
+  "probe/math-retry/five-double-closer",
+  "probe/math-retry/five-single-closer",
+  "probe/math-space/space-body-trailing-period",
+  "probe/straddle-fold/paragraph-merge",
+  "token/display-math/doubled-open",
+  "token/display-math/nested",
+  "token/display-math/whitespace-body",
+];
+
 const goldenPath = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   "goldens",
@@ -361,6 +390,16 @@ describe("round-trip", () => {
      * `toMarkdown` handler's return value is appended without passing through
      * `state.safe`.
      */
-    expect(unstable.length).toBeLessThanOrEqual(27);
+    // An EXACT set, not a bound. This was `toBeLessThanOrEqual(27)` while the real figure
+    // was 19, so eight new instabilities could land green -- the only measured slack in any
+    // ceiling here, and the odd one out: `compute`, both `invariants` ceilings and
+    // `points` all assert `toEqual` against an enumerated set, so a new divergence changes
+    // a count and fails.
+    //
+    // A bound also rots in the other direction. Every fix below 27 was invisible, which is
+    // why the docstring above still described a 27-case family that has been 19 for some
+    // time. An exact list makes a fix fail the gate too, forcing the number and its
+    // attribution to move together.
+    expect([...unstable].sort()).toEqual(UNSTABLE);
   });
 });

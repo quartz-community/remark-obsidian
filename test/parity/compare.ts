@@ -39,7 +39,14 @@ export interface CaseResult {
   readonly crash?: string;
 }
 
-const PROFILE_NAMES = Object.keys(PROFILES) as ProfileName[];
+/**
+ * Tried in order, and the FIRST with zero divergences wins -- so index 0 is the shipping
+ * configuration and any other profile matching means the shipping one diverged.
+ *
+ * Exported so `parity.test.ts` can gate the masked set against the same array this file
+ * iterates, rather than re-deriving it and risking a disagreement with the gate.
+ */
+export const PROFILE_NAMES = Object.keys(PROFILES) as ProfileName[];
 
 /**
  * Line up the `math` projection with what the recording can actually show.
