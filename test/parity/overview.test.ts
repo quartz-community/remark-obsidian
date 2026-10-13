@@ -62,11 +62,22 @@ describe("parity overview", () => {
     expect(ORACLES.filter((oracle) => oracle.blind.length === 0)).toEqual([]);
   });
 
-  it("keeps the unswept axes visible rather than dropping them", () => {
-    // The point of the axis register is the NOT SWEPT rows: an axis nobody has measured is
-    // indistinguishable from one that passes unless it is listed. Asserting at least one
-    // keeps a future tidy-up from deleting the backlog.
-    expect(AXES.some((axis) => !axis.swept)).toBe(true);
+  it("accounts for every axis, swept or not", () => {
+    // This asserted `AXES.some(axis => !axis.swept)` -- "there must be at least one unswept
+    // axis" -- to stop a tidy-up from deleting the backlog. It fired the moment the last
+    // unswept axis was closed, which is the gate being wrong rather than the register: it
+    // conflated "do not lose the backlog" with "a backlog must exist".
+    //
+    // What it meant is that no axis may be silent. A swept one must say how to re-run it,
+    // since these counts have no committed expectation and are only trustworthy if a reader
+    // can reproduce them; an unswept one must say why. Either way the row carries its own
+    // status, which is the property that actually stops an axis going quiet.
+    const silent = AXES.filter((axis) =>
+      axis.swept
+        ? (axis.how ?? "").trim() === ""
+        : (axis.note ?? "").trim() === "",
+    ).map((axis) => axis.name);
+    expect(silent).toEqual([]);
   });
 
   it("argues every scope boundary", () => {
@@ -83,20 +94,5 @@ describe("parity overview", () => {
       (axis) => axis.swept && (axis.how ?? "").trim() === "",
     ).map((axis) => axis.name);
     expect(unrunnable).toEqual([]);
-  });
-
-  it("records no composition count in prose that nothing asserts", () => {
-    // The composition axes have NO committed expectation -- they need a running Obsidian, so
-    // there is no golden and no gate. Their counts therefore live in `note` as prose, and
-    // prose cannot be trusted the way an exact ceiling can.
-    //
-    // This does not fix that; it refuses to let it be forgotten. Every unswept axis must say
-    // so, and every swept one must carry a runnable command, so a reader can always
-    // re-measure rather than believe the number. The honest status of these axes is
-    // "reproducible on demand", not "asserted".
-    const silent = AXES.filter(
-      (axis) => !axis.swept && (axis.note ?? "").trim() === "",
-    ).map((axis) => axis.name);
-    expect(silent).toEqual([]);
   });
 });

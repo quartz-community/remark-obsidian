@@ -31,6 +31,8 @@
 import { execFileSync } from "node:child_process";
 
 import { applyTextTransform, parseOurs } from "./chain.js";
+import { askDom } from "./ask-dom.js";
+import { projectOurs } from "./normalize.js";
 import { computeOurs } from "./normalize.js";
 
 /** One line of block syntax each, chosen so every pair is a legal document. */
@@ -86,6 +88,45 @@ function askBatch(documents: readonly string[]): unknown[] {
   return JSON.parse(raw) as unknown[];
 }
 
+/** `delete` and `inlineCode` text from our tree, for the two projections `Projections` lacks. */
+function inlineFromTree(markdown: string): {
+  strike: string[];
+  code: string[];
+} {
+  const tree = parseOurs(applyTextTransform(markdown), "all-features");
+  const strike: string[] = [];
+  const code: string[] = [];
+  const textOf = (node: unknown): string => {
+    const n = node as { value?: unknown; children?: unknown[] };
+    if (typeof n.value === "string") return n.value;
+    return (n.children ?? []).map(textOf).join("");
+  };
+  const walk = (node: unknown): void => {
+    const n = node as { type: string; children?: unknown[] };
+    // The two regions the REAL projections exclude, and this walker must exclude the same
+    // ones or it is a different oracle. Both were found the hard way: the first version
+    // walked everything and reported four divergences that were all its own fault --
+    // `%% ~~del~~` and `` %% `c` `` came back with content, and so did `[^1]: def ~~del~~`.
+    //
+    //   `comment`            renders nothing, so nothing inside one reaches a projection.
+    //   `footnoteDefinition` is RELOCATED by the renderer into a trailing `.footnotes`
+    //                        block, which `oracle.e2e.ts` removes from the clone before
+    //                        reading -- so a construct inside a definition is not in
+    //                        Obsidian's capture at all.
+    //
+    // `highlights` and `emphasis` already honoured both, which is why only the two
+    // hand-rolled lists diverged -- the tell that the sweep tool was wrong rather than the
+    // package. That is the fourth time a new oracle's first findings have been bugs in the
+    // oracle here.
+    if (n.type === "comment" || n.type === "footnoteDefinition") return;
+    if (n.type === "delete") strike.push(textOf(n));
+    if (n.type === "inlineCode") code.push(textOf(n));
+    for (const child of n.children ?? []) walk(child);
+  };
+  walk(tree);
+  return { strike, code };
+}
+
 interface Point {
   readonly line: number;
   readonly col: number;
@@ -132,6 +173,25 @@ interface Facts {
   readonly tags: readonly string[];
   readonly refs: readonly string[];
   readonly blocks: readonly string[];
+  /**
+   * The DOM half, present only on the inline axes.
+   *
+   * Eight of the fourteen inline constructs report nothing to `metadataCache`, so the cache
+   * keys above cannot adjudicate them at all -- they were swept as wrappers only. These come
+   * from `ask-dom.ts`, validated against the committed goldens at 663 of 663.
+   *
+   * `strike` and `code` are derived from OUR TREE here rather than added to `Projections`,
+   * because widening `PROJECTION_KEYS` changes what the main gate compares and would force a
+   * re-recording. A sweep tool may read the tree directly; the gate may not grow a key
+   * without a golden behind it.
+   */
+  readonly dom?: {
+    readonly highlights: readonly string[];
+    readonly emphasis: readonly string[];
+    readonly strike: readonly string[];
+    readonly code: readonly string[];
+    readonly mathDisplay: readonly boolean[];
+  };
 }
 
 function theirs(answer: unknown): Facts {
@@ -208,6 +268,19 @@ function ours(text: string): Facts {
     tags: computed.tags ?? [],
     refs: computed.footnoteRefs ?? [],
     blocks: computed.blocks ?? [],
+  };
+}
+
+/** Our side of the DOM half, from the main-gate projections plus two tree-derived lists. */
+function oursDom(markdown: string): NonNullable<Facts["dom"]> {
+  const projected = projectOurs(markdown, "all-features");
+  const { strike, code } = inlineFromTree(markdown);
+  return {
+    highlights: projected.highlights,
+    emphasis: projected.emphasis,
+    strike,
+    code,
+    mathDisplay: projected.math.map((entry) => entry.display),
   };
 }
 
@@ -496,11 +569,34 @@ const BATCH = 60;
 for (let at = 0; at < cases.length; at += BATCH) {
   const slice = cases.slice(at, at + BATCH);
   const answers = askBatch(slice.map((entry) => entry.text));
+  // The DOM half costs a second round-trip, so it is fetched only where it can decide
+  // anything: eight of the fourteen inline constructs are invisible to the cache, and none
+  // of the block axes has an inline construct in it at all.
+  const domWanted = inlinePairs || inlineBlock;
+  const domAnswers = domWanted
+    ? askDom(slice.map((entry) => entry.text))
+    : undefined;
   for (const [index, entry] of slice.entries()) {
-    const want = theirs(answers[index]);
+    const domTheirs = domAnswers?.[index];
+    const want: Facts = {
+      ...theirs(answers[index]),
+      ...(domTheirs === undefined
+        ? {}
+        : {
+            dom: {
+              highlights: domTheirs.highlights,
+              emphasis: domTheirs.emphasis,
+              strike: domTheirs.strike,
+              code: domTheirs.code,
+              mathDisplay: domTheirs.math.map((entry) => entry.display),
+            },
+          }),
+    };
     let got: Facts;
     try {
-      got = ours(entry.text);
+      got = domWanted
+        ? { ...ours(entry.text), dom: oursDom(entry.text) }
+        : ours(entry.text);
     } catch (error) {
       diverged.push(`${entry.name}  THREW ${String(error).slice(0, 60)}`);
       continue;
@@ -519,14 +615,18 @@ for (let at = 0; at < cases.length; at += BATCH) {
       JSON.stringify(want.embeds) === JSON.stringify(got.embeds) &&
       JSON.stringify(want.tags) === JSON.stringify(got.tags) &&
       JSON.stringify(want.refs) === JSON.stringify(got.refs) &&
-      JSON.stringify(want.blocks) === JSON.stringify(got.blocks);
+      JSON.stringify(want.blocks) === JSON.stringify(got.blocks) &&
+      JSON.stringify(want.dom) === JSON.stringify(got.dom);
     if (same) continue;
     diverged.push(
       `${entry.name}\n      md   ${JSON.stringify(entry.text)}\n` +
         `      obs  defs=${JSON.stringify(want.defs)} sections=${JSON.stringify(want.sections)} h=${JSON.stringify(want.headings)}\n` +
         `      ours defs=${JSON.stringify(got.defs)} sections=${JSON.stringify(got.sections)} h=${JSON.stringify(got.headings)}\n` +
         `      obs  l=${JSON.stringify(want.links)} e=${JSON.stringify(want.embeds)} t=${JSON.stringify(want.tags)} r=${JSON.stringify(want.refs)} b=${JSON.stringify(want.blocks)}\n` +
-        `      ours l=${JSON.stringify(got.links)} e=${JSON.stringify(got.embeds)} t=${JSON.stringify(got.tags)} r=${JSON.stringify(got.refs)} b=${JSON.stringify(got.blocks)}`,
+        `      ours l=${JSON.stringify(got.links)} e=${JSON.stringify(got.embeds)} t=${JSON.stringify(got.tags)} r=${JSON.stringify(got.refs)} b=${JSON.stringify(got.blocks)}` +
+        (want.dom === undefined
+          ? ""
+          : `\n      obs  dom=${JSON.stringify(want.dom)}\n      ours dom=${JSON.stringify(got.dom)}`),
     );
   }
 }

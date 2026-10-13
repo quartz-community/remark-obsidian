@@ -212,11 +212,28 @@ export const ORACLES: readonly Oracle[] = [
       "tags",
       "footnoteRefs",
       "blocks",
+      "highlights",
+      "emphasis",
+      "strike",
+      "code",
+      "math",
     ],
     blind: [
-      "the CONTENT of highlight, emphasis, strong, underscore, strike, imath, dmath and codespan -- measured: `==hi== *em* **st** ~~del~~ $x$ `c`` reports NOTHING to metadataCache, so the inline axes use those eight as wrappers only",
-      "text, math, tasks, highlights, emphasis: DOM projections, not in the cache",
+      "the `text` projection, and `tasks` -- neither is compared on any axis",
       "rows are binary, so a position-without-extent fix moves nothing",
+      "the DOM half is fetched only on the inline axes, since no block axis holds an inline construct",
+    ],
+  },
+  {
+    name: "DOM probe fidelity",
+    command: "tsx test/parity/probe-agrees.mts",
+    gate: "measurement",
+    compares: [
+      "the probe's highlights, emphasis and math against the committed goldens",
+    ],
+    blind: [
+      "strike and code, which the recorder has no projection for, so there is no golden to agree with",
+      "it compares two call paths into the SAME renderer, not the renderer against reality",
     ],
   },
   {
@@ -317,9 +334,10 @@ export const AXES: readonly Axis[] = [
   },
   {
     name: "inline CONTENT of the eight unindexed constructs",
-    sequences: null,
-    swept: false,
-    note: "highlight/emphasis/strong/underscore/strike/imath/dmath/codespan are invisible to metadataCache; needs the DOM, so the recorder rather than compose",
+    sequences: 420,
+    swept: true,
+    how: "compose.mts --inline / --inline-block (DOM half via ask-dom.ts)",
+    note: "CLOSED by the parity-probe plugin: highlight/emphasis/strong/underscore/strike/imath/dmath/codespan report nothing to metadataCache, so a detached MarkdownRenderer supplies them. All eight AGREE across both inline axes",
   },
 ];
 
