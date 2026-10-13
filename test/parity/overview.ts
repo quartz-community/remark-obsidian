@@ -200,8 +200,9 @@ export const ORACLES: readonly Oracle[] = [
   },
   {
     name: "composition sweeps",
-    // Derived from AXES rather than spelled out, because the spelled-out version went stale.
-    command: "tsx test/parity/compose.mts -- see AXES for each axis's flag",
+    // `--all` runs every axis and prints one table; per-axis flags live on AXES rather than
+    // being spelled out here, because the spelled-out version went stale within a day.
+    command: "tsx test/parity/compose.mts --all   (35 of 1152 at last run)",
     gate: "sweep",
     compares: [
       "defs",

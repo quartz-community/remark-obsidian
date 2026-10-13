@@ -436,6 +436,67 @@ const isolate = process.argv.includes("--isolate");
 const triples = process.argv.includes("--triples");
 const cases: Array<{ name: string; text: string; followerLine?: number }> = [];
 const syntaxOf = new Map(BLOCKS);
+/**
+ * `--all` runs every axis and prints one table, so progress is a single command.
+ *
+ * These axes have NO committed expectation -- they need a running Obsidian, so there is no
+ * golden and nothing fails when a count worsens. That makes reproducibility the only thing
+ * standing in for a gate, and a figure nobody re-runs becomes folklore. One command that
+ * reports all seven is what makes "better numbers" a measurement rather than a memory.
+ *
+ * Spawned per axis rather than looped in process, because each mode is selected from
+ * `process.argv` at module scope; re-entering would need the flags to become parameters and
+ * every call site to change. A subprocess per axis costs seconds against sweeps that take
+ * minutes.
+ */
+if (process.argv.includes("--all")) {
+  const { spawnSync } = await import("node:child_process");
+  const AXES: ReadonlyArray<readonly [string, readonly string[]]> = [
+    ["block > block (pairs)", []],
+    ["container x follower", ["--matrix"]],
+    ["block inside container", ["--inside"]],
+    ["container > spacer > absorbable", ["--isolate"]],
+    ["nested containers", ["--nested"]],
+    ["inline x inline", ["--inline"]],
+    ["inline x block", ["--inline-block"]],
+  ];
+  let total = 0;
+  let swept = 0;
+  const rows: string[] = [];
+  for (const [name, flags] of AXES) {
+    const run = spawnSync(
+      "npx",
+      ["tsx", "--conditions=development", "test/parity/compose.mts", ...flags],
+      {
+        encoding: "utf8",
+        env: { ...process.env, NODE_OPTIONS: "--conditions=development" },
+      },
+    );
+    const found = /(\d+) of (\d+) diverge/u.exec(run.stdout ?? "");
+    if (!found) {
+      rows.push(`  ${name.padEnd(32)}FAILED TO RUN`);
+      continue;
+    }
+    const diverge = Number(found[1]);
+    const of = Number(found[2]);
+    total += diverge;
+    swept += of;
+    rows.push(
+      `  ${name.padEnd(32)}${String(diverge).padStart(4)} of ${String(of).padStart(5)}`,
+    );
+  }
+  console.log("compose: every axis\n");
+  for (const row of rows) console.log(row);
+  console.log(
+    `\n  ${"TOTAL".padEnd(32)}${String(total).padStart(4)} of ${String(swept).padStart(5)}`,
+  );
+  console.log(
+    "\n  Lower is better. No axis has a committed expectation, so this number is" +
+      "\n  reproducible rather than asserted -- re-run it, do not remember it.",
+  );
+  process.exit(0);
+}
+
 const DEFINE = "\n\n[^1]: def\n";
 if (inlinePairs) {
   for (const [firstName, first] of INLINE) {
