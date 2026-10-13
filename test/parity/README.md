@@ -2068,6 +2068,32 @@ The general point is the one the `%%` detour made too: **an attempt that fails w
 is worth more than a prediction that sounds right.** The predicted cause for the tab case
 was plausible and wrong, and only probing the threshold showed it.
 
+## Their vendored list reader has nothing left to give
+
+The reference-implementation route's most concrete artifact: `obsidian-footnotes` vendors
+`remark-parse` 8.0.3's list tokenizer because one had to change, and its header names exactly
+what changed. Two things, both documented in place:
+
+- **The de-indent minimum.** `remark-parse` strips an item's continuation lines by the
+  SMALLEST indentation among them, so a lazy line at zero made that minimum zero, nothing was
+  stripped, and every four-space line after it became indented code. Obsidian leaves
+  unindented lines out of that minimum.
+- **The task box.** Any one character, `/^\[(.)][ \t]/` in Obsidian's own `app.js`, so `[/]`,
+  `[-]` and `[>]` are boxes and `- [/] [^a]: text` is a definition inside a task item.
+
+**Neither is a gap here.** The first has no analogue to port: micromark computes an item's
+content column per line rather than stripping a whole item by a minimum, so the pass that
+needed patching does not exist, and the BEHAVIOUR it produces is already ours -- `- a` /
+`lazy` / `    [^1]: def` and four siblings all match live Obsidian. The second is
+`customTaskChars`, and all four box characters match including the definition's position and
+the recorded task character.
+
+So the one tokenizer they had to vendor is the one we do not need, which is the cleanest
+available answer to "should we adopt their parser". The value in that project is its
+MEASUREMENTS -- the rules document, the lettered comments in its source, and the recorded
+oracle this harness uses as a referee -- not its code. Its architecture solves a problem
+`remark-parse` 8 has and micromark does not.
+
 ## Tracing their SOURCE finds rules their document does not letter
 
 Their rules document was mined once and gave five gaps, all now closed. Their source is a
