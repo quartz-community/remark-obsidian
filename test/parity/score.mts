@@ -206,6 +206,116 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "drop-defs-in-fence",
+    what: "a definition inside a fenced block is not a definition (CommonMark fences)",
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      const fenced = new Set<number>();
+      // CommonMark's rules, not a toggle on any backtick run. A closer has to use the SAME
+      // character, be at least as long as the opener, and carry no info string -- and an
+      // opener indented four or more columns past its container is indented code rather
+      // than a fence. The naive toggle scored 103 better against 137 worse; every one of
+      // those 137 is a line this mis-classifies.
+      let fence: { char: string; size: number } | undefined;
+      for (const [index, line] of lines.entries()) {
+        const bare = line.replace(/^(?:[ \t]*>)*/u, "");
+        const run = /^([ \t]*)(`{3,}|~{3,})([^`~]*)$/u.exec(bare);
+        if (fence === undefined) {
+          if (
+            run &&
+            (run[1] ?? "").replace(/\t/gu, "    ").length < 4 &&
+            run[2]!.startsWith("`") === (run[2]![0] === "`")
+          ) {
+            fence = { char: run[2]![0]!, size: run[2]!.length };
+            fenced.add(index);
+          }
+          continue;
+        }
+        fenced.add(index);
+        if (
+          run &&
+          run[2]![0] === fence.char &&
+          run[2]!.length >= fence.size &&
+          (run[3] ?? "").trim() === ""
+        ) {
+          fence = undefined;
+        }
+      }
+      return {
+        refs: ours.refs,
+        defs: ours.defs.filter((d) => !fenced.has(d[1])),
+      };
+    },
+  },
+  {
+    name: "drop-defs-in-comment",
+    what: "a definition inside an open `%%` span is not a definition",
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      const buried = new Set<number>();
+      let open = false;
+      for (const [index, line] of lines.entries()) {
+        const marks = (line.match(/%%/gu) ?? []).length;
+        if (open && marks === 0) buried.add(index);
+        for (let n = 0; n < marks; n++) open = !open;
+      }
+      return {
+        refs: ours.refs,
+        defs: ours.defs.filter((d) => !buried.has(d[1])),
+      };
+    },
+  },
+  {
+    name: "defs-end-before-opener",
+    what: "a definition ends before a following column-0 block opener",
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      const opener =
+        /^(?:#{1,6} |```|~~~|\[\^[^\]]*\]:|---|===|___|\*\*\*|%%)/u;
+      return {
+        refs: ours.refs,
+        defs: ours.defs.map((d): Def => {
+          for (let line = d[1] + 1; line <= d[3]; line++) {
+            if (opener.test(lines[line] ?? ""))
+              return [d[0], d[1], d[2], line - 1];
+          }
+          return d;
+        }),
+      };
+    },
+  },
+  {
+    name: "refs-add-bare",
+    what: "every `[^name]` outside a label is a reference we may be missing",
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      const extra: Ref[] = [];
+      for (const [index, line] of lines.entries()) {
+        for (const hit of line.matchAll(/\[\^([^\]]+)\](?!:)/gu)) {
+          const column = hit.index ?? 0;
+          const name = (hit[1] ?? "").toLowerCase();
+          if (ours.refs.some((r) => r[1] === index && r[2] === column))
+            continue;
+          extra.push([name, index, column]);
+        }
+      }
+      return extra.length === 0
+        ? ours
+        : { defs: ours.defs, refs: [...ours.refs, ...extra] };
+    },
+  },
+  {
+    name: "refs-drop-undefined",
+    what: "a reference whose name has no definition is not reported",
+    apply: (_text, ours) => {
+      const named = new Set(ours.defs.map((d) => d[0].toLowerCase()));
+      return {
+        defs: ours.defs,
+        refs: ours.refs.filter((r) => named.has(r[0].toLowerCase())),
+      };
+    },
+  },
+  {
     name: "tab-marker-column",
     what: "a definition we already place behind a tab separator sits at marker+1",
     apply: (text, ours) => {

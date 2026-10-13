@@ -833,6 +833,46 @@ that is CORRECT and scores negative is a real outcome: record it with its score 
 rather than retrying it at a different scope, which is what three tab scopings and four
 comment-fold iterations each established the expensive way.
 
+### Nine candidates scored in one run, and what the ceilings say
+
+With the unit changed from cases to rules, the obvious next question is which bucket contains
+a rule worth building. Nine candidates, one run, no parser change:
+
+| candidate                                                | better | worse | touched |
+| -------------------------------------------------------- | -----: | ----: | ------: |
+| `refs-drop-undefined` -- an undefined name is not a ref  |    124 |  5116 |    5300 |
+| `refs-add-bare` -- every `[^x]` outside a label is a ref |    117 |  3266 |    3429 |
+| `drop-defs-in-fence` (naive fence toggle)                |    103 |   137 |     246 |
+| `drop-defs-in-comment` -- buried definitions dropped     |     85 |   218 |     309 |
+| `quote-truncate`                                         |     61 |   351 |     519 |
+| `tab-marker-defines`                                     |     24 |   114 |     138 |
+| `defs-end-before-opener`                                 |      8 |    67 |     102 |
+| `tab-marker-column`                                      |      0 |     0 |   **0** |
+
+The two largest ceilings are unreachable and say so loudly. `refs-drop-undefined` breaks
+5,116 documents, which is the governing rule here stated in reverse -- a dangling reference
+stays in the tree, because dropping it is the renderer's job -- and `refs-add-bare` breaks
+3,266, so we are not systematically missing bare references either. Both were worth one run
+each to rule out.
+
+**`drop-defs-in-fence` is the one with a real ceiling, and fixing its own detection halves
+it.** A naive toggle on any backtick run scored 103 against 137; CommonMark's actual rules --
+the closer matching the opener's character, at least its length, carrying no info string, and
+an opener under four columns of indent -- score **32 against 32**, with the touched set
+falling from 246 to 67. Exactly break-even, which means the 137 was mostly my detection
+rather than the rule.
+
+Its remaining misses are container-prefix shaped: a fence opened as `> 1.    ``` ` inside a
+callout's list item reads as four columns of indent once only the `>` run is stripped, and a
+document opening with `---` frontmatter can put the tracking out of phase. So the rule's
+honest ceiling is **32 documents**, and reaching it needs the same container-aware prefix
+machinery that `quote-indented-code.ts` already carries.
+
+That is a modest target, measured, and three times the tab rule's. It is also the largest
+demonstrated rule left on this oracle -- which is itself the finding: **no remaining referee
+bucket contains a rule above about thirty documents.** The buckets are 300-400 each and they
+are not rules.
+
 ### Its first real use retired the 426-document tab family
 
 The tab family was the largest localised group on this oracle and the last candidate big
