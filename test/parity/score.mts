@@ -321,6 +321,63 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "drop-defs-lazy-after-item",
+    what: "a column-0 definition lazily continuing a list item is not a definition",
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      // Traced from `obsidian-footnotes`' rule F5 and its three controls, each confirmed
+      // against live Obsidian: `1. p` / `  10.     q` / `⇥%%` / `[^1]: def` reports NO
+      // definition, and the same with six spaces or with plain text in place of the `%%`
+      // also reports none -- the item's content continues and the column-0 label is lazy
+      // continuation rather than a definition. Only the four-space `%%` ends the list, which
+      // is F5 itself and which we already get right.
+      // Lazy continuation proper: the item's content has to still be an OPEN PARAGRAPH on
+      // the line before, and the label itself has to sit at column 0. The crude version --
+      // everything after a marker until a blank line -- scored 160 better against 161 worse
+      // because it counted frontmatter and quoted content as item continuation.
+      // Frontmatter is not a list. A leading `---` block holding `tags:` / `  - test`
+      // opened the tracker on the YAML sequence item and dropped every definition below it;
+      // that was most of the 45 the previous scoping made worse.
+      let body = 0;
+      if (lines[0]?.trim() === "---") {
+        for (let line = 1; line < lines.length; line++) {
+          if (lines[line]?.trim() === "---") {
+            body = line + 1;
+            break;
+          }
+        }
+      }
+      const inItem = new Set<number>();
+      let open = false;
+      let prevWasContent = false;
+      for (const [index, line] of lines.entries()) {
+        if (index < body) continue;
+        if (line.trim() === "") {
+          open = false;
+          prevWasContent = false;
+          continue;
+        }
+        if (/^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]/u.test(line)) {
+          open = true;
+          prevWasContent = true;
+          continue;
+        }
+        // A container prefix of its own means the line belongs to something else.
+        if (/^[ \t]*>/u.test(line)) {
+          open = false;
+          prevWasContent = false;
+          continue;
+        }
+        if (open && prevWasContent && !/^[ \t]/u.test(line)) inItem.add(index);
+        prevWasContent = open;
+      }
+      return {
+        refs: ours.refs,
+        defs: ours.defs.filter((d) => !inItem.has(d[1])),
+      };
+    },
+  },
+  {
     name: "tab-marker-column",
     what: "a definition we already place behind a tab separator sits at marker+1",
     apply: (text, ours) => {

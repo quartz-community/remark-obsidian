@@ -2068,6 +2068,44 @@ The general point is the one the `%%` detour made too: **an attempt that fails w
 is worth more than a prediction that sounds right.** The predicted cause for the tab case
 was plausible and wrong, and only probing the threshold showed it.
 
+## Tracing their SOURCE finds rules their document does not letter
+
+Their rules document was mined once and gave five gaps, all now closed. Their source is a
+second, richer vein: `src/parsing/` is 4,253 lines and its comments carry rule letters WITH
+evidence counts, which the document does not. Grepping for those letters turns up
+`C4 C5 F5 M2` -- four that the document's prose never numbers and that the earlier audit
+therefore never checked.
+
+Three are marked "Stock", meaning `remark-parse` already does them. **F5 is Obsidian's own**,
+and it is the rule that explained the single unexplained note in their first three thousand:
+
+> An opener indented four spaces still ends a list item. `1. p` / `  10.     q` / `    %%`
+> ends the list and is read as top-level indented code; a tab, six spaces, or plain text in
+> its place stays in the item.
+
+Confirmed against live 1.14.4 with all three controls, and **we already get F5 itself right**.
+What we get wrong is every control: where the line stays in the item, the column-0
+`[^1]: def` below it is lazy continuation and defines NOTHING, and we report a definition in
+all three.
+
+So the find is not F5 but its complement, and scoring it says why it is hard:
+
+| scoping                                   | better | worse | agreement |
+| ----------------------------------------- | -----: | ----: | --------: |
+| everything after a marker to a blank line |    160 |   161 |      -101 |
+| ...genuine lazy continuation only         |     60 |    45 |       -30 |
+| ...and frontmatter excluded               |     59 |    45 |       -30 |
+
+160 better is the largest signal any candidate has shown here, and the rule is net positive
+on DISTANCE while still negative on full agreement -- 30 documents that agreed exactly no
+longer do. Each refinement is a line of container tracking reimplemented badly in the
+scorer, which is the same structural wall every line-local approach here meets: expressing
+"this line lazily continues that item" needs the parser's container state, not a scan.
+
+The lesson for the method rather than the rule: **their source is worth tracing for rules
+their prose omits**, and a rule that scores well on distance and badly on agreement is one
+whose SHAPE is right and whose boundary is wrong.
+
 ## What the sibling project does differently, and what its 99.2% measures
 
 `obsidian-footnotes` reports 99.2% agreement on the corpus this harness vendors as its
