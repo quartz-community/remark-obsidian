@@ -2188,6 +2188,24 @@ line of the harness's own design. The lesson is about the tool rather than the r
 measurement saves** -- four scopings of this candidate were spent approximating state that was
 sitting in a discarded variable.
 
+**And it landed, at +43 documents.** `containerLazyTransform` now accepts an indented-code
+node after a list, which is what the chain needed: the tab-indented `%%` arrives as a root
+`code` node and breaks the absorption, so accepting it lets the pass reach the definition it
+already accepted. Two details were measured rather than assumed:
+
+- The pass runs its loop BACKWARD and absorbs at most one sibling per container, so a
+  `list` / `code` / `footnoteDefinition` chain collapses one link per pass. It now repeats
+  until the child count stops falling.
+- Fenced code had to be excluded. A bare ``` arrives as `code` with a null `lang` exactly as
+  indented code does, so the node type cannot tell them apart and the source line has to --
+  accepting both cost `list/fence-interruption` and `hunt/gen-list-fence-outlives-item/9`,
+  because a fence after a list is its own block and the list genuinely ends at it.
+
+referee 78.3% to **78.9%**, 0 parity regressions, round-trip unchanged at 19 unstable. The
+scored prediction was +21 and the implementation delivered +43, which is the right direction
+for a scorer to be wrong in: it reads only the facts a rule rewrites, while the pass also
+fixes the `sections` and `listItems` those documents disagreed on.
+
 ## What the sibling project does differently, and what its 99.2% measures
 
 `obsidian-footnotes` reports 99.2% agreement on the corpus this harness vendors as its

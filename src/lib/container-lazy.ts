@@ -174,6 +174,35 @@ function endsInOpenParagraph(node: ParentLike): boolean {
  * keeping if anyone returns to it, since it is what made the unit suite pass.
  */
 export function containerLazyTransform(tree: Root, source: string): void {
+  // Repeated until nothing moves, because the loop runs backward and absorbs at most one
+  // sibling per container per pass -- so a `list` / `code` / `footnoteDefinition` chain
+  // collapses one link at a time. Bounded by the child count, which strictly decreases on
+  // every absorb.
+  let before = -1;
+  while (before !== tree.children.length) {
+    before = tree.children.length;
+    absorbPass(tree, source);
+  }
+}
+
+/**
+ * Indented code, not a fence.
+ *
+ * A bare ``` or ~~~ fence arrives as `code` with a null `lang` exactly as indented code
+ * does, so the node type cannot tell them apart and the source has to. Accepting both cost
+ * `list/fence-interruption` and `hunt/gen-list-fence-outlives-item/9` -- a fence after a
+ * list is its own block and the list genuinely ends at it.
+ */
+function isIndentedCode(node: RootContent, source: string): boolean {
+  const from = node.position?.start?.offset;
+  if (from === undefined) return false;
+  const bol = source.lastIndexOf("\n", from - 1) + 1;
+  const nl = source.indexOf("\n", from);
+  const line = source.slice(bol, nl === -1 ? undefined : nl);
+  return !/^[ \t]*(?:```|~~~)/u.test(line);
+}
+
+function absorbPass(tree: Root, source: string): void {
   const children = tree.children;
 
   for (let index = children.length - 2; index >= 0; index--) {
@@ -215,7 +244,24 @@ export function containerLazyTransform(tree: Root, source: string): void {
         // ordered item opens at all only because a callout title is not a paragraph --
         // `calloutTitleInterruptTransform` is the pass for that, and this is where the
         // result ends up nested.
-        !(next.type === "list" && container.type === "callout")
+        !(next.type === "list" && container.type === "callout") &&
+        // Indented code, but only after a list, and the reason is a chain rather than this
+        // node on its own. `1. p` / `  10.     q` / `⇥%%` / `[^1]: def` has Obsidian
+        // continuing the list through both later lines and reporting NO definition, while
+        // the tab-indented `%%` arrives here as a ROOT `code` node that breaks the
+        // absorption chain and leaves the definition exposed. Accepting the `code` lets the
+        // repeat below reach the definition, which this pass already accepts.
+        //
+        // Scored before implementing, over all 6,818 referee documents: a root definition at
+        // column 0 reachable back across adjacent root siblings to a list is swallowed by it,
+        // 82 better against 26 worse, agreement +21. That is the first net-positive rule
+        // measured against this oracle, and it only became measurable once `score.mts` was
+        // given the tree -- the same rule approximated with a line scan scored -15.
+        !(
+          next.type === "code" &&
+          container.type === "list" &&
+          isIndentedCode(next, source)
+        )
       ) {
         continue;
       }
