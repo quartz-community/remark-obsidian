@@ -147,6 +147,23 @@ function project(root) {
   // frontmatter removed, because the renderer RELOCATES a footnote body to a trailing section
   // and comparing a relocated tail against in-place mdast proves nothing.
   const clone = root.cloneNode(true);
+  // A REAL Reading View wraps the note in chrome a detached render has none of: the filename
+  // as an inline title, the Properties panel, header and footer spacers. Without this the
+  // real-view capture reads
+  // `"__parity_reading_probe__PropertiesAdd propertyhi em c ⟨math⟩"` where the detached one
+  // reads `"hi em c ⟨math⟩"`, and the two are not comparable.
+  //
+  // The selector list is `oracle.e2e.ts`'s `stripSelector`, copied deliberately rather than
+  // reasoned out: the recorder already solved this for its seed-layer cross-check, and
+  // inventing a second list is how two oracles end up almost agreeing. Harmless on the
+  // detached path, where none of these elements exist.
+  for (const el of Array.from(
+    clone.querySelectorAll(
+      ".markdown-preview-pusher,.mod-header,.mod-footer,.metadata-container,.inline-title,.frontmatter-container",
+    ),
+  )) {
+    el.remove();
+  }
   // Math becomes a SENTINEL before any text is read, exactly as the recorder does it.
   // Without this the probe reads MathJax's rendered glyphs where the golden holds `⟨math⟩`,
   // and validating against the committed goldens reported two "divergences" that were only

@@ -96,6 +96,79 @@ export function probeStatus(): string | undefined {
  * is slower than computing metadata -- each document waits on MathJax -- so the poll budget
  * is larger, but the batching argument is identical.
  */
+/**
+ * Whether a real Reading View will actually render, and the one command that makes it.
+ *
+ * Reading mode drives rendering off `requestAnimationFrame`, which Chromium starves for an
+ * UNFOCUSED window -- visible is not enough. Instrumented before this was built: the view
+ * opens with `mode: "preview"` and 4369 bytes of chrome, and `sectionKids` stays 0 while
+ * `document.hasFocus()` is false.
+ *
+ * The fix is focus EMULATION over the Chrome DevTools Protocol, which the Obsidian CLI
+ * exposes. It makes the page report itself focused without taking focus from the desktop, so
+ * nothing is stolen from whoever is using the machine:
+ *
+ *     obsidian dev:cdp method=Emulation.setFocusEmulationEnabled params='{"enabled":true}'
+ *
+ * With that in place a real Reading View renders and agrees with the detached render
+ * byte-for-byte. Without it every capture comes back empty, which reads as "Obsidian renders
+ * nothing here" -- the silent failure mode this file's own docstring warns about, so it is
+ * checked rather than assumed.
+ */
+export function readingViewReady(): string | undefined {
+  const problem = probeStatus();
+  if (problem !== undefined) return problem;
+  const raw = evaluate(
+    "JSON.stringify({focus: document.hasFocus(), reading: typeof window.__parityReadingView})",
+  );
+  if (raw === "") return "obsidian eval returned nothing";
+  const state = JSON.parse(raw) as { focus: boolean; reading: string };
+  if (state.reading !== "function") {
+    return "parity-probe is loaded without __parityReadingView; reload the plugin";
+  }
+  if (!state.focus) {
+    return (
+      "the window is not focused, so reading mode will render nothing. Run:\n" +
+      "  obsidian dev:cdp method=Emulation.setFocusEmulationEnabled params='{\"enabled\":true}'"
+    );
+  }
+  return undefined;
+}
+
+/**
+ * The same projections from a REAL Reading View, one document per call.
+ *
+ * Not batched, unlike `askDom`: each document is written to the vault, opened in a leaf and
+ * torn down, so the cost is dominated by the view lifecycle rather than by the eval
+ * round-trip. Batching would only hide which document hung.
+ */
+export function askReadingView(
+  documents: readonly string[],
+): Array<DomFacts & { sections?: number; error?: string }> {
+  const problem = readingViewReady();
+  if (problem !== undefined) throw new Error(problem);
+
+  const out: Array<DomFacts & { sections?: number; error?: string }> = [];
+  for (const text of documents) {
+    const encoded = JSON.stringify(
+      Buffer.from(text, "utf8").toString("base64"),
+    );
+    evaluate(
+      `window.__rv='pending';(async()=>{try{` +
+        `const md=new TextDecoder().decode(Uint8Array.from(atob(${encoded}),c=>c.charCodeAt(0)));` +
+        `window.__rv=JSON.stringify(await window.__parityReadingView(md))}` +
+        `catch(e){window.__rv=JSON.stringify({error:String(e&&e.message||e).slice(0,200)})}})()`,
+    );
+    let raw = "pending";
+    for (let attempt = 0; attempt < 240 && raw === "pending"; attempt++) {
+      raw = evaluate("window.__rv");
+    }
+    if (raw === "pending") throw new Error("reading view did not finish");
+    out.push(JSON.parse(raw) as DomFacts & { sections?: number });
+  }
+  return out;
+}
+
 export function askDom(documents: readonly string[]): DomFacts[] {
   const problem = probeStatus();
   if (problem !== undefined) throw new Error(problem);

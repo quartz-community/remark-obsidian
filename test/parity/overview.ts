@@ -226,6 +226,19 @@ export const ORACLES: readonly Oracle[] = [
     ],
   },
   {
+    name: "proxy fidelity (detached vs real Reading View)",
+    command:
+      "obsidian dev:cdp method=Emulation.setFocusEmulationEnabled params='{\"enabled\":true}' then tsx test/parity/proxy-agrees.mts [n]",
+    gate: "measurement",
+    compares: [
+      "highlights, emphasis, strike, code, text and math display, detached against a real view",
+    ],
+    blind: [
+      "the block separator, normalised away because Reading View runs block divs together while the proxy's newlines collapse to a space -- both counts are reported so the blunt one never stands alone",
+      "it needs CDP focus emulation; without it reading mode renders NOTHING and every capture is empty, which reads as agreement with whatever you expected",
+    ],
+  },
+  {
     name: "DOM probe fidelity",
     command: "tsx test/parity/probe-agrees.mts",
     gate: "measurement",
@@ -395,7 +408,7 @@ export const SCOPE: readonly ScopeBoundary[] = [
     why: "was: highlight, emphasis, strong, underscore, strike, imath, dmath and codespan report nothing to metadataCache, so only the 70-second recorder could see them. `test-vault/.obsidian/plugins/parity-probe` exposes a detached MarkdownRenderer, validated against the goldens at 663 of 663, and both inline axes now compare all eight",
   },
   {
-    what: "real Reading View past the seed layer -- STILL OPEN, and the blocker is now measured",
-    why: "the probe and the recorder agree 663 of 663 and BOTH are detached renders, so that agreement says nothing about the actual view. `__parityReadingView` in the plugin drives a real one and is correct code -- it opens `mode: preview` and the chrome renders -- but instrumenting it gives `docFocus: false` with `sectionKids: 0`: reading mode renders off requestAnimationFrame, which Chromium starves for an unfocused window, and VISIBLE is not enough. So the constraint is the environment rather than the work, and the route is the recorder's existing Xvfb session via PARITY_FULL_PROXY_CHECK=1, not the eval channel. Forcing focus from a probe would steal it from whatever the user is doing. `KNOWN_PROXY_DIVERGENCES` holds the cases where the two renderers already differ, and the full sweep costs seven minutes against eighty seconds, which is why it is an audit and not a default",
+    what: "real Reading View past the seed layer -- CLOSED",
+    why: "was blocked, then measured, then closed. `__parityReadingView` drives an actual view; it rendered nothing because reading mode runs off requestAnimationFrame, which Chromium starves for an UNFOCUSED window (`docFocus: false`, `sectionKids: 0`, while the chrome rendered fine). The unlock is CDP focus EMULATION, which reports the page as focused without taking focus from the desktop: `obsidian dev:cdp method=Emulation.setFocusEmulationEnabled params=\'{\"enabled\":true}\'`. With it, `proxy-agrees.mts` compares the detached render against a real Reading View per document: 150 of 150 strided match cases AGREE, 14 of them only after normalising the block separator -- which is a capture artifact (Reading View appends block divs with no whitespace; the proxy\'s markup newlines collapse to a space) and already documented as the reason a corrected `text` is only commensurable for a single-block document. So the proxy is faithful beyond the seed layer, measured rather than assumed",
   },
 ];
