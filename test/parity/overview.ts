@@ -326,4 +326,20 @@ export const SCOPE: readonly ScopeBoundary[] = [
     what: "rendering-only divergence",
     why: "metadataCache indexes rather than renders: a setext inside a container is painted and not indexed, so an index oracle is structurally blind to it",
   },
+  {
+    what: "proxy fidelity past the seed layer",
+    why: "goldens are captured through a detached MarkdownRenderer.render(), and real Reading View is cross-checked only for the seed layer unless PARITY_FULL_PROXY_CHECK=1 -- which costs seven minutes against eighty seconds, so it is a deliberate audit rather than a default. KNOWN_PROXY_DIVERGENCES holds the cases where the two differ; a NEW proxy divergence outside the seed layer is not caught on an ordinary recording",
+  },
+  {
+    what: "the goldens are a recording, not live Obsidian",
+    why: "green means 'matches the version stamped in the golden'. The weekly drift job re-records against latest and opens an issue rather than committing, so an Obsidian change surfaces there and not in the push gate",
+  },
+  {
+    what: "a divergence inside a normalised region",
+    why: "the comparison normalises whitespace AROUND a formula, and compares the link projection only as a whole string, so no corpus size can expose a divergence that lives inside either",
+  },
+  {
+    what: "crashes needing two options at once",
+    why: "option-matrix sweeps single toggles on every push; the 1104-parse pair sweep runs behind PARITY_OPTION_PAIRS=1 because it is minutes rather than seconds",
+  },
 ];

@@ -56,13 +56,91 @@ for (const [state, count] of [...triage].sort((a, b) => b[1] - a[1])) {
   console.log(`    ${state.padEnd(14)}${count}`);
 }
 
+/**
+ * `--live` answers "where does parity stand" in one command.
+ *
+ * It reports the corpus headline in-process and then defers to the SUITE for every ceiling,
+ * rather than recomputing any of them. That is deliberate: a dashboard that recalculates a
+ * ceiling holds a second copy of it, and a second copy is what goes stale -- the failure this
+ * whole file exists to prevent. So the ceilings are reported as "the gate that owns this
+ * holds / does not hold", which is the only claim that cannot drift.
+ */
 if (process.argv.includes("--live")) {
-  rule("LIVE");
-  const refereeDir = process.env.PARITY_REFEREE_DIR;
+  rule("LIVE -- corpus, in process");
+  const { compareCase, PROFILE_NAMES } = await import("./compare.js");
+  const file = JSON.parse(
+    fs.readFileSync(path.join(here, "goldens", "obsidian.json"), "utf8"),
+  ) as {
+    oracle?: { mathTex?: boolean };
+    obsidian: { app: string };
+    cases: Record<string, Parameters<typeof compareCase>[0]>;
+  };
+  const mathTex = file.oracle?.mathTex ?? false;
+  const shipping = PROFILE_NAMES[0]!;
+
+  let matched = 0;
+  let masked = 0;
+  const diverging: string[] = [];
+  for (const entry of Object.values(file.cases)) {
+    const result = compareCase(entry, mathTex);
+    if (!result.matched) {
+      diverging.push(`${result.id} [${result.triage}]`);
+      continue;
+    }
+    matched++;
+    if (result.profile !== shipping) masked++;
+  }
+  const total = Object.keys(file.cases).length;
+  console.log(`  recorded against Obsidian ${file.obsidian.app}`);
+  console.log(`  matched            ${matched} / ${total}`);
   console.log(
-    refereeDir === undefined
-      ? "  referee: PARITY_REFEREE_DIR unset, skipped"
-      : `  referee corpus at ${refereeDir} -- run referee.mts for the figure`,
+    `  masked by profile  ${masked}  (pass only outside ${shipping})`,
   );
-  console.log("  compose: needs a running Obsidian; run compose.mts per axis");
+  console.log(`  diverging          ${diverging.length}`);
+  for (const entry of diverging) console.log(`      ${entry}`);
+
+  rule("LIVE -- every parity ceiling, via the gate that owns it");
+  console.log(
+    "  running test/parity only -- unit suites elsewhere are not parity oracles.\n" +
+      "  No ceiling value is recomputed here; each gate asserts its own.\n",
+  );
+  const { spawnSync } = await import("node:child_process");
+  const run = spawnSync(
+    "npx",
+    ["vitest", "run", "--reporter=basic", "test/parity"],
+    {
+      encoding: "utf8",
+      env: { ...process.env, NODE_OPTIONS: "--conditions=development" },
+    },
+  );
+  const lines = `${run.stdout ?? ""}${run.stderr ?? ""}`.split("\n");
+  for (const line of lines) {
+    if (/^\s*[✓×]\s+test\/parity\//u.test(line) || /Tests\s+\d/u.test(line)) {
+      console.log(`  ${line.trim()}`);
+    }
+  }
+  console.log(`\n  suite exit ${run.status}`);
+
+  const refereeDir = process.env.PARITY_REFEREE_DIR;
+  rule("LIVE -- referee");
+  if (refereeDir === undefined) {
+    console.log(
+      "  PARITY_REFEREE_DIR unset, skipped (the corpus is not vendored)",
+    );
+  } else {
+    const referee = spawnSync(
+      "npx",
+      ["tsx", "--conditions=development", "test/parity/referee.mts"],
+      { encoding: "utf8", env: process.env },
+    );
+    for (const line of `${referee.stdout ?? ""}`.split("\n").slice(0, 3)) {
+      if (line.trim() !== "") console.log(`  ${line.trim()}`);
+    }
+  }
+
+  rule("LIVE -- composition");
+  console.log("  needs a running Obsidian with a vault open; per axis:");
+  for (const axis of AXES.filter((a) => a.swept)) {
+    console.log(`      ${axis.name}`);
+  }
 }
