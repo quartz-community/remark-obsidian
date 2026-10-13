@@ -178,3 +178,29 @@ export const PROJECTION_KEYS = [
   "highlights",
   "emphasis",
 ] as const satisfies ReadonlyArray<keyof Projections>;
+
+/**
+ * The `metadataCache` projections the compute oracle compares.
+ *
+ * Beside `PROJECTION_KEYS` rather than inside `compute.test.ts`, so `overview.mts` can assert
+ * every key is registered without importing a TEST file -- which registers that file's own
+ * suites a second time, and did: the overview's seven checks reported as eleven.
+ *
+ * `frontmatter` and `frontmatterLinks` are deliberately absent. Both need the YAML parsed,
+ * which this package does not do, so `computeOurs` emits neither; `compute.test.ts` carries
+ * the argument. Anything else the recorder stores and this list omits is the
+ * `referenceLinks` trap, which sat recorded-but-uncompared for months.
+ */
+export const COMPUTE_KEYS = [
+  "footnotes",
+  "footnoteRefs",
+  "headings",
+  "sections",
+  "links",
+  "embeds",
+  "tags",
+  "blocks",
+  "listItems",
+  "referenceLinks",
+  "frontmatterPosition",
+] as const;

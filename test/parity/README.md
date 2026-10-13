@@ -3356,6 +3356,45 @@ a minimal form as a lead and confirm the rule with recorded probes. And a fixed
 cluster disappears from later reports while its documents keep failing, which looks
 like the fix not working until you test the minimal form directly.
 
+## One consolidated view, and why it needs its own gate
+
+`overview.mts` prints every oracle, axis and scope boundary in one place. It exists because
+of a measured failure rather than for presentation: three times in one session a metric was
+reported as MISSING when it was already present and already answering the question --
+`normalize.ts` had the container-nested-heading rule, `container-setext.ts` had the
+render-versus-index asymmetry, and `frontmatter` was already argued as scope rather than
+debt. The knowledge existed, spread across thirteen instruments and some thousands of lines
+of docstring, and re-deriving it produced wrong answers three times running.
+
+So the load-bearing column is not a number. It is **`blind` -- what each oracle CANNOT see**,
+because every one of those mistakes was about coverage and no amount of running the gates
+would have corrected them. Each entry also names the FILE that owns its ceiling rather than
+restating the value, so there is no second copy of a number to go stale.
+
+### Its own gate caught it being a tautology
+
+`overview.test.ts` asserts coverage: every `*.test.ts` registered, every `PROJECTION_KEYS`
+entry and every `COMPUTE_KEYS` entry claimed by some oracle, every named ceiling file
+present, and no oracle with an empty `blind` list.
+
+The first version was **worthless and looked fine**. The registry wrote
+`compares: [...PROJECTION_KEYS]`, so adding a key to the source list added it to the claim
+too -- and an unregistered projection passed. Proved by injecting `pretendNewProjection` into
+`COMPUTE_KEYS`: the gate stayed green. Spelling both key lists out by hand makes the registry
+an independent claim, and the same injection then fails with
+`expected [ 'pretendNewProjection' ] to deeply equal []`.
+
+That is the predicate-standing-in-for-the-premise error, committed inside the gate written to
+prevent a related one. **Verify a new gate by breaking what it watches**, and prefer a
+hand-maintained claim measured against generated truth over a claim derived from it. The
+registry deliberately imports nothing from `types.js`, with a comment saying so, because an
+absent import is invisible and adding it back would silently restore the tautology.
+
+A second, smaller trap on the way: the key list started life exported from
+`compute.test.ts`, and importing a TEST file registered its suites a second time -- the
+overview's seven checks reported as eleven. `COMPUTE_KEYS` now lives in `types.ts` beside
+`PROJECTION_KEYS`, which is where a projection key list belongs anyway.
+
 ## Files
 
 | File                     | Role                                               |
@@ -3368,6 +3407,8 @@ like the fix not working until you test the minimal form directly.
 | `oracle.e2e.ts`          | Recorder; runs inside Obsidian                     |
 | `parity.test.ts`         | The gate; no Obsidian required                     |
 | `goldens/obsidian.json`  | Recorded output, version-stamped and triaged       |
+| `overview.mts`           | One view of every oracle, axis and scope boundary  |
+| `overview.ts`            | That registry, gated against drift by its own test |
 | `ask.mts`                | Asks a running Obsidian about arbitrary markdown   |
 | `score.mts`              | Scores a candidate rule over the whole referee     |
 | `compose.mts`            | Sweeps sequences of block constructs vs Obsidian   |

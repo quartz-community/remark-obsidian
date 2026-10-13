@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { applyTextTransform, parseOurs } from "./chain.js";
 import { computeOurs } from "./normalize.js";
+import { COMPUTE_KEYS } from "./types.js";
 import type { ComputedMeta, GoldenCase } from "./types.js";
 
 /** Both compared profiles, as the main gate compares them. */
@@ -15,20 +16,6 @@ const goldenPath = path.join(
   "goldens",
   "obsidian.json",
 );
-
-const KEYS = [
-  "footnotes",
-  "footnoteRefs",
-  "headings",
-  "sections",
-  "links",
-  "embeds",
-  "tags",
-  "blocks",
-  "listItems",
-  "referenceLinks",
-  "frontmatterPosition",
-] as const;
 
 /**
  * Drop the zero-length `text`/`element` sections Obsidian appends for its
@@ -65,7 +52,7 @@ function divergedKeys(golden: GoldenCase): readonly string[] {
       parseOurs(golden.markdown, profile),
       applyTextTransform(golden.markdown),
     );
-    const diverged = KEYS.filter((key) => {
+    const diverged = COMPUTE_KEYS.filter((key) => {
       const theirs = want[key as keyof ComputedMeta];
       const expected =
         key === "sections" && Array.isArray(theirs)
@@ -638,7 +625,7 @@ describe("positioned oracle", () => {
     tags: 0,
     // ZERO on arrival, and the arrival is the point. `referenceLinks` is Obsidian's own
     // answer for link reference definitions and the recorder has stored it on every case
-    // since the first run -- the `KEYS` list above simply never named it, so 111 non-empty
+    // since the first run -- the `COMPUTE_KEYS` list simply never named it, so 111 non-empty
     // answers about a construct family these notes call hard sat dormant in the goldens.
     //
     // Measured before wiring: 110 of 111 agreed, and the two that disagreed either way
@@ -650,7 +637,7 @@ describe("positioned oracle", () => {
     // Extending it to `definition` took this to 111 with 0 parity regressions.
     //
     // So a projection can be recorded for months and compared never. Auditing what the
-    // recorder stores against what `KEYS` reads is a two-line check that nothing did until
+    // recorder stores against what `COMPUTE_KEYS` holds is a two-line check that nothing did until
     // now, and it has since been run to the end: `frontmatter` (54 non-empty cases) and
     // `frontmatterLinks` (2) are the only two still unread, and they are OUT OF SCOPE rather
     // than debt.
@@ -939,7 +926,7 @@ describe("positioned oracle", () => {
 
   it("diverges on no more cases than the recorded ceiling", () => {
     const counts: Record<string, number> = Object.fromEntries(
-      KEYS.map((key) => [key, 0]),
+      COMPUTE_KEYS.map((key) => [key, 0]),
     );
     for (const keys of diverged.values()) {
       for (const key of keys) counts[key] = (counts[key] ?? 0) + 1;
