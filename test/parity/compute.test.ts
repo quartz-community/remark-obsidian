@@ -651,7 +651,20 @@ describe("positioned oracle", () => {
     //
     // So a projection can be recorded for months and compared never. Auditing what the
     // recorder stores against what `KEYS` reads is a two-line check that nothing did until
-    // now -- `frontmatter` (54 cases) and `frontmatterLinks` (2) are still unread.
+    // now, and it has since been run to the end: `frontmatter` (54 non-empty cases) and
+    // `frontmatterLinks` (2) are the only two still unread, and they are OUT OF SCOPE rather
+    // than debt.
+    //
+    // Both need the YAML parsed to say anything, which this package deliberately does not do
+    // -- Quartz's own FrontMatter plugin owns it and `remark-frontmatter` is not in the
+    // pinned chain -- so `computeOurs` emits neither, and `frontmatterPosition` is the one
+    // frontmatter answer we can give. That is the same argument already recorded for the two
+    // `frontmatterPosition` rows, applied to the whole field.
+    //
+    // Worth stating positively, because "still unread" reads as a tripwire and this one has
+    // been checked: every recorded projection that is IN SCOPE is now compared, by this
+    // oracle or by `compareCase`. `referenceLinks` was the last real instance of the trap
+    // and it closed at 0 of 111.
     referenceLinks: 0,
     // 16, below the 17 it sat at before the probe wave: the wave settled the escaped
     // block identifier and the fix closed eleven cases, its own eight included.
