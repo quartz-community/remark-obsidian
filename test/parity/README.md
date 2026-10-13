@@ -944,6 +944,53 @@ reported only positive or negative. A rule that touches nothing is not a rule th
 is a rule this corpus has no opinion about, and reporting that as "net negative" would have
 read as evidence against it. `score.mts` now distinguishes four verdicts.
 
+### It landed, and the gate caught the regression the prediction had excused
+
+The fix is in `liftContainerComment`: a column-zero `comment` that is a container's DIRECT
+child is lifted to root, its extent re-derived to the end of the note, and the siblings it
+swallows become its CHILDREN -- the shape a root `%%` already produces, which is what keeps
+every reference in the tree.
+
+    compose pairs    9 -> 5  of 256
+    compose isolate 35 -> 23 of 140
+    referee         5379/6818, agreeing set BYTE-IDENTICAL to baseline
+    corpus          0 regressions
+
+**The first attempt measured referee -1, and it was a real regression -- not the noise the
+section above predicted.** This is worth stating plainly because the prediction was mine and
+it was wrong in the dangerous direction: having documented that this family cannot move the
+referee, a -1 was exactly the number I was prepared to wave through.
+
+`--ids` is what settled it. The summary says "78.9% became 78.9%", which cannot distinguish a
+hold from a one-for-one trade, so `referee.mts --ids` now prints the key of every agreeing
+document and the two dumps are diffed. The lost document was `probes.json#557`:
+
+    > q / %% / [^1]: def / %% / blank / use[^1] use[^2] use[^3]
+
+Obsidian buries that definition and indexes its label as a REFERENCE -- the
+commented-definition rule, worth +123 documents. The lift broke it through a coupling nothing
+documented: `commentRegionTransform`'s `rebuild` finds a closed region's host with
+`from < start && to > start`, so it needs a root child STRICTLY CONTAINING the opener.
+Lifting the comment to a root sibling starting exactly AT the region start, and shrinking the
+container off it, leaves no such child, so the region is never rebuilt and the buried
+definition goes live.
+
+Testing closedness BEFORE the surgery fixes it, and the scoping is principled rather than
+patched: an UNCLOSED comment needs the lift, because the tokenizer bounded its extent by the
+container; a CLOSED region was already `commentRegionTransform`'s job.
+
+Three things to carry:
+
+- **A documented "this instrument cannot see it" is a reason to look HARDER at any movement,
+  not a licence to discount it.** The write-up above is correct that the family is section
+  geometry -- and the -1 was still a different rule breaking.
+- **Verify a HOLD by identity, not by its total.** Two documents trading cancel perfectly in
+  a net figure. Any fix whose predicted effect on an oracle is zero should diff that oracle's
+  member set, which is one flag and one `comm`.
+- **Put the dump in the real tool.** A reimplemented agreement test reads as independent
+  confirmation while measuring something slightly different, so `--ids` shares the gate's own
+  comparison.
+
 ## Score a rule before building it, because repairs lose and extensions win
 
 A measured pattern in what succeeds here, and it is not about effort. Every change that

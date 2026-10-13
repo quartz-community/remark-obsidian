@@ -74,6 +74,21 @@ let unplaced = 0;
 const kinds = new Map<string, number>();
 const bump = (kind: string) => kinds.set(kind, (kinds.get(kind) ?? 0) + 1);
 
+/**
+ * `--ids` prints the KEY of every agreeing document and nothing else.
+ *
+ * A net figure cannot say which documents moved, and a section-geometry fix is expected to
+ * move this oracle by at most a document or two -- so "78.9% became 78.9%" and "one document
+ * traded for another" are indistinguishable from the summary. Diffing two id dumps names the
+ * document, which is the only way to tell a predicted wobble from a real regression.
+ *
+ * It belongs here rather than in a scratch script because the comparison must be the SAME
+ * one: a reimplemented agreement test reads as independent confirmation while actually
+ * measuring something slightly different.
+ */
+const wantIds = process.argv.includes("--ids");
+const agreed: string[] = [];
+
 for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
   const raw: unknown = JSON.parse(
     fs.readFileSync(path.join(dir, file), "utf8"),
@@ -82,8 +97,9 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
     Array.isArray(raw) ? raw : Object.values(raw as Record<string, unknown>)
   ) as Entry[];
 
-  for (const entry of entries) {
+  for (const [at, entry] of entries.entries()) {
     total++;
+    const key = `${file}#${at}`;
     let got;
     try {
       got = refereeFacts(entry.text);
@@ -97,6 +113,7 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
     const refsMatch = same(got.refs, entry.refs);
     if (defsMatch && refsMatch) {
       agree++;
+      if (wantIds) agreed.push(key);
       continue;
     }
     // Names first: finding a different *set* is a parse disagreement, while the
@@ -110,6 +127,11 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
     else if (!defsMatch) bump("definition set differs");
     else bump("reference set differs");
   }
+}
+
+if (wantIds) {
+  for (const key of agreed) console.log(key);
+  process.exit(0);
 }
 
 console.log(

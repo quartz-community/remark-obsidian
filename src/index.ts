@@ -570,7 +570,7 @@ export default function remarkObsidian(
         },
       );
     } else if (opts.comments) {
-      commentHoistTransform(tree);
+      commentHoistTransform(tree, String(file));
       commentTailTransform(tree, String(file), reparse);
       // After the hoist and tail passes, so a mis-paired region is a top-level
       // comment node by the time its signature is looked for.
