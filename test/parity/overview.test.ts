@@ -88,10 +88,13 @@ describe("parity overview", () => {
     // The authoritative claim, asserted instead of believed.
     //
     // "Every metric either has an exact assertion or a recorded reason it cannot" was said
-    // out loud and was FALSE: enumerating the fifteen oracles found eleven gated, two with a
-    // reason, and THREE with neither -- `proxy fidelity`, `pass order` and `rule scorer`.
-    // A claim nobody checks is a claim that drifts, and this one drifted within the same
-    // session it was made in.
+    // out loud and was FALSE: enumerating them found THREE with neither a gate nor a reason
+    // -- `proxy fidelity`, `pass order` and `rule scorer`. A claim nobody checks is a claim
+    // that drifts, and this one drifted within the same session it was made in.
+    //
+    // No tally is quoted, for the reason `ungated`'s own docstring gives: the first version
+    // of this comment said "eleven gated, two with a reason" and the partition is ten and
+    // five. The gate computes it; a sentence repeating it only rots.
     //
     // Structural rather than prose: `ungated` is a field, so this cannot pass on an entry
     // that merely contains the words "not gated" somewhere in its `blind` list.

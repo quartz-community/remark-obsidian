@@ -59,9 +59,15 @@ export interface Oracle {
    * either gated or says why not" is checkable, and `overview.test.ts` checks it.
    *
    * That assertion is what turned an overstated claim into a true one. Enumerating the
-   * fifteen oracles by hand found ELEVEN gated, two with a reason, and THREE with neither --
-   * `proxy fidelity`, `pass order` and `rule scorer` -- after "it is now authoritative" had
-   * already been said out loud. The hand count was right and the claim was not.
+   * oracles found THREE with neither a gate nor a reason -- `proxy fidelity`, `pass order`
+   * and `rule scorer` -- after "it is now authoritative" had already been said out loud.
+   *
+   * NO COUNT IS QUOTED HERE, deliberately, and the reason is the same mistake one layer up:
+   * the commit that added this assertion stated "eleven gated, four ungated" in its own
+   * message, and the real partition is ten and five. A hand-typed tally of a thing the gate
+   * already computes is the second-copy-that-rots pattern -- removed three times elsewhere in
+   * this file today -- so the gate asserts the PARTITION (total, and exclusive) and the
+   * numbers are read from `ORACLES` when anyone wants them.
    */
   readonly ungated?: string;
 }
