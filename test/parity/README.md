@@ -846,6 +846,46 @@ and changes no `compose` row, since each row is binary.
 each correct, in an order that makes one of them useless. `pass-order.mts` reports this pass
 position-sensitive, and the sweep is what made the coupling visible.
 
+## Which constructs are KNOWN GOOD, and why the corpus cannot tell you
+
+A fair question with a trap in it: if some constructs are fully correct, every divergence in
+`A + B` is attributable to B or to the interaction, never to A -- so the unknown surface
+shrinks. The trap is which instrument answers it.
+
+**Not the corpus.** Of 3,403 cases, 5 do not match, so grouping cases by the constructs they
+hold reports twelve constructs "clean" and the rest with one to three open -- and almost all
+of that is absence rather than evidence. A construct is "clean" mostly because it does not
+appear in those five documents. With a 99.85% match rate, per-construct cleanliness there is
+nearly vacuous.
+
+**`compose.mts` answers it properly**, because each of its 256 pairs names exactly two
+constructs and every construct appears in 32 of them:
+
+| construct                                                    |   as A | as B |  total |
+| ------------------------------------------------------------ | -----: | ---: | -----: |
+| comment                                                      |      0 |    4 |      4 |
+| math                                                         |      0 |    3 |      3 |
+| indented                                                     |      0 |    2 |      2 |
+| thematic                                                     |      0 |    1 |      1 |
+| bullet, ordered, quote, callout, linkdef                     | 2 each |    0 | 2 each |
+| **heading, setext, fence, table, footnote, html, paragraph** |      0 |    0 |  **0** |
+
+So **seven of sixteen are clean across all 32 of their compositions**, which is evidence
+rather than absence. And the divergences are sharply shaped: every one is
+`container > absorbable`, never the reverse, with the containers contributing nothing of
+their own and the absorbables being `comment` (4), `math` (3), `indented` (2) and `thematic`
+(1).
+
+That reduces the open compositional surface to one question -- **how do `comment`, `math`,
+indented code and a thematic break behave after a container?** -- over twenty pairs, ten of
+which diverge. Against 1,482 referee documents whose largest demonstrated rule touches 67 and
+breaks even, that is a far better-shaped target.
+
+It also licenses the next step the question implies: with seven known-good constructs, a
+THREE-element sweep can put a clean construct between a container and an absorbable and see
+whether the interaction survives one block of separation. `compose.mts --triples` is wired for
+that, at 4,096 sequences and roughly a minute.
+
 ## Score a rule before building it, because repairs lose and extensions win
 
 A measured pattern in what succeeds here, and it is not about effort. Every change that
