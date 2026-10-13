@@ -794,6 +794,39 @@ Obsidian resolved it to the current note, and embedded the note into itself six 
 deep. Reproducing that needs vault resolution and recursive inlining — the renderer's job,
 and this harness models no vault.
 
+## Composition is the axis nothing tested, and it found a same-day regression
+
+Every defect found here recently has been compositional rather than constructional: `- a` /
+`lazy` / `[^1]: def` parsed correctly while `list` / `code` / `definition` did not, the comment
+fold needed three changes at once with any one or two measuring as no change, the math
+demotion looked like one defect and was three, and the tab rule is right in isolation and
+wrong in documents carrying six constructs. `pass-order.mts` says the same thing about the
+pipeline: 42 of 62 passes are position-sensitive.
+
+The corpus tests a construct alone, a construct inside a container, and what follows an inline
+delimiter. **It does not test one block construct followed by another.** `compose.mts` does:
+every ordered pair of sixteen block constructs, adjacent with no blank line, then a blank line
+and `use[^1]` so the footnote projections report something.
+
+**256 sequences in four seconds, 14 diverging** -- and two of the fourteen were a regression
+landed the same day. The `list`-after-`callout` absorption had been justified on one corpus
+case, `probe/title-interrupt/two-lazy`, whose marker is `2.`; the sweep showed
+`> [!note] title` / `- item` and `/ 1. item` both losing their `list` section, which Obsidian
+keeps.
+
+The discriminator was in the corpus case all along. CommonMark lets an ordered item interrupt
+a paragraph only at **1**, so `2.` could not have opened a list and the line is lazy
+continuation -- while a bullet or a `1.` can interrupt and is a real list. Restricting the
+absorption to `start !== 1` fixes both, with 0 parity regressions and the referee unchanged at
+78.9%.
+
+Two things that matters for. **A rule justified on one case is scoped to that case's
+accidents**, and the accident here was the marker's start number -- nothing in the corpus,
+the referee, the compute oracle, or the invariant gates covered the composition that exposed
+it. And the remaining twelve are pre-existing divergences in a dimension that had never been
+swept, which is a better backlog than anything the referee's buckets still hold: each is two
+lines long and one cause.
+
 ## Score a rule before building it, because repairs lose and extensions win
 
 A measured pattern in what succeeds here, and it is not about effort. Every change that
@@ -2963,6 +2996,7 @@ like the fix not working until you test the minimal form directly.
 | `goldens/obsidian.json`  | Recorded output, version-stamped and triaged       |
 | `ask.mts`                | Asks a running Obsidian about arbitrary markdown   |
 | `score.mts`              | Scores a candidate rule over the whole referee     |
+| `compose.mts`            | Sweeps sequences of block constructs vs Obsidian   |
 | `delta.mts`              | What a change gained and broke, before committing  |
 | `invariants.test.ts`     | Structural invariants on the tree itself           |
 | `option-matrix.test.ts`  | Every option toggled, looking for crashes          |

@@ -244,7 +244,22 @@ function absorbPass(tree: Root, source: string): void {
         // ordered item opens at all only because a callout title is not a paragraph --
         // `calloutTitleInterruptTransform` is the pass for that, and this is where the
         // result ends up nested.
-        !(next.type === "list" && container.type === "callout") &&
+        !(
+          next.type === "list" &&
+          container.type === "callout" &&
+          // An ordered list whose start is NOT 1, which is the whole reason it is lazy
+          // continuation: CommonMark lets an ordered item interrupt a paragraph only at 1,
+          // so `2.` could not have opened a list here and the line continues the callout.
+          // A bullet or a `1.` CAN interrupt, and Obsidian reports a separate `list`
+          // section for both -- `> [!note] title` / `- item` is `callout, list, paragraph`.
+          //
+          // Landed unrestricted on one corpus case, `probe/title-interrupt/two-lazy`, whose
+          // marker is `2.`; `compose.mts` caught the over-reach by sweeping every ordered
+          // pair of block constructs, where `callout > bullet` and `callout > ordered` both
+          // diverged. No existing gate covered that composition.
+          typeof next.start === "number" &&
+          next.start !== 1
+        ) &&
         // Indented code, but only after a list, and the reason is a chain rather than this
         // node on its own. `1. p` / `  10.     q` / `⇥%%` / `[^1]: def` has Obsidian
         // continuing the list through both later lines and reporting NO definition, while
