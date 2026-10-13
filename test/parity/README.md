@@ -2132,6 +2132,39 @@ The lesson for the method rather than the rule: **their source is worth tracing 
 their prose omits**, and a rule that scores well on distance and badly on agreement is one
 whose SHAPE is right and whose boundary is wrong.
 
+### ...and this is the first rule the SCORER cannot express
+
+Narrowing it four times, each from an example the previous scoping made worse:
+
+| scoping                              | better | worse | agreement |
+| ------------------------------------ | -----: | ----: | --------: |
+| everything after a marker to a blank |    160 |   161 |      -101 |
+| genuine lazy continuation only       |     60 |    45 |       -30 |
+| after a list+indented run, no blank  |     68 |    40 |       -23 |
+| ...and the label at column 0         |     31 |    20 |       -15 |
+
+Every scoping is net positive on DISTANCE and negative on AGREEMENT, and each halves the
+loss without flipping it. That combination has not appeared for any other candidate: the tab
+rule had a hard ceiling of ten, the fence rule sat at exactly break-even, and both reference
+rules were catastrophic. This one keeps improving as it narrows.
+
+The tree says why. `- a` / `lazy` / `[^1]: def` ALREADY WORKS -- `containerLazyTransform`
+absorbs the plain lazy line and the definition with it -- so the broad rule was covering
+cases that pass. The real gap is the F5 control, where a tab-indented `%%` after a list
+becomes a ROOT `code` node and breaks the absorption chain, leaving the definition below it
+reported where Obsidian swallows it.
+
+Expressing "this line lazily continues that item" needs to know whether the item is still
+OPEN, and a backward line scan cannot: every remaining `worse` is a column-0 definition
+after indented content where the item had in fact closed. **We have that state -- in the
+tree -- and the scorer does not**, because a scored rule transforms facts rather than nodes
+by design.
+
+So this is the first candidate whose negative score is a limit of the SCORER rather than
+evidence against the rule, and the two outcomes must not be confused. It wants implementing
+where `containerLazyTransform` already works, gated by the delta tool and the referee the way
+that pass's two accepted widenings were -- not another approximation here.
+
 ## What the sibling project does differently, and what its 99.2% measures
 
 `obsidian-footnotes` reports 99.2% agreement on the corpus this harness vendors as its

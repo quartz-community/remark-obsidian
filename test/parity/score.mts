@@ -321,6 +321,41 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "drop-defs-after-list-code",
+    what: "a definition after a list+code run with no blank line is swallowed by the list",
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      // The NARROW version, and the broad one was wrong. `- a` / `lazy` / `[^1]: def`
+      // already works here -- `containerLazyTransform` absorbs the plain lazy line and the
+      // definition with it -- so a rule dropping every column-0 definition after an item
+      // was covering cases that already pass. The real gap is the F5 control: a
+      // tab-indented `%%` after a list becomes a ROOT `code` node, which breaks the
+      // absorption chain, and the definition below it is then reported where Obsidian
+      // swallows it. The shape is `list`, then an indented line, then the label, with no
+      // blank line anywhere between.
+      const swallowed = new Set<number>();
+      for (const [index, line] of lines.entries()) {
+        // Column 0 only: lazy continuation is by definition an UNINDENTED line. An
+        // indented label inside the item is a real definition there, and dropping those is
+        // what cost the previous scoping its agreement -- it removed labels at columns 1
+        // and 3 that the answer holds.
+        if (!/^\[\^[^\]]*\]:/u.test(line) || index < 2) continue;
+        const above = lines[index - 1] ?? "";
+        if (above.trim() === "" || !/^[ \t]/u.test(above)) continue;
+        // Walk back over indented lines to a list marker, stopping at any blank.
+        let at = index - 1;
+        while (at > 0 && /^[ \t]/u.test(lines[at] ?? "")) at -= 1;
+        if (/^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]/u.test(lines[at] ?? "")) {
+          swallowed.add(index);
+        }
+      }
+      return {
+        refs: ours.refs,
+        defs: ours.defs.filter((d) => !swallowed.has(d[1])),
+      };
+    },
+  },
+  {
     name: "drop-defs-lazy-after-item",
     what: "a column-0 definition lazily continuing a list item is not a definition",
     apply: (text, ours) => {
