@@ -375,6 +375,60 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "container-comment-swallows",
+    what: "a column-0 unclosed `%%` after a container swallows to the end of the note",
+    apply: (text, ours, tree) => {
+      // The container's own end line, from the TREE rather than a scan: "directly after a
+      // container" is exactly the state a backward line scan cannot see, and it is what four
+      // scopings of the tab candidate each approximated and each got wrong.
+      const lines = text.split("\n");
+      const ends: number[] = [];
+      for (const node of tree.children) {
+        if (node.type !== "list" && node.type !== "blockquote") continue;
+        const end = node.position?.end?.line;
+        if (end !== undefined) ends.push(end); // 1-based end == 0-based next line
+      }
+
+      let cut = Number.POSITIVE_INFINITY;
+      for (const next of ends) {
+        if (!/^%%/u.test(lines[next] ?? "")) continue;
+        // Unclosed from here to the end of the note. An opener alone on its line is the
+        // whole marker, so a closer means a SECOND `%%` somewhere below it.
+        const rest = lines.slice(next).join("\n").slice(2);
+        if (rest.includes("%%")) continue;
+        cut = Math.min(cut, next);
+      }
+      if (cut === Number.POSITIVE_INFINITY) return ours;
+
+      return {
+        defs: ours.defs.filter((d) => d[1] < cut),
+        refs: ours.refs.filter((r) => r[1] < cut),
+      };
+    },
+  },
+  {
+    name: "container-comment-swallows-defs",
+    what: "...and only the DEFINITIONS below it, leaving references indexed",
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const ends: number[] = [];
+      for (const node of tree.children) {
+        if (node.type !== "list" && node.type !== "blockquote") continue;
+        const end = node.position?.end?.line;
+        if (end !== undefined) ends.push(end);
+      }
+      let cut = Number.POSITIVE_INFINITY;
+      for (const next of ends) {
+        if (!/^%%/u.test(lines[next] ?? "")) continue;
+        const rest = lines.slice(next).join("\n").slice(2);
+        if (rest.includes("%%")) continue;
+        cut = Math.min(cut, next);
+      }
+      if (cut === Number.POSITIVE_INFINITY) return ours;
+      return { defs: ours.defs.filter((d) => d[1] < cut), refs: ours.refs };
+    },
+  },
+  {
     name: "refs-add-bare",
     what: "every `[^name]` outside a label is a reference we may be missing",
     apply: (text, ours) => {
@@ -719,7 +773,18 @@ for (const rule of RULES) {
     } else same += 1;
   }
 
-  const verdict = better > worse ? "NET POSITIVE" : "net negative";
+  // Three outcomes, not two. A rule that touches nothing, or trades evenly, is NEITHER
+  // positive nor negative, and labelling it "net negative" reads as evidence against a rule
+  // the corpus simply cannot adjudicate -- which is exactly the state
+  // `container-comment-swallows-defs` is in at zero documents touched.
+  const verdict =
+    better > worse
+      ? "NET POSITIVE"
+      : better < worse
+        ? "net negative"
+        : better + worse === 0
+          ? "NOT ADJUDICABLE -- touches nothing"
+          : "even trade";
   console.log(`  ${rule.name}  --  ${rule.what}`);
   console.log(
     `    documents it changes : better ${better}  worse ${worse}  same ${same}` +

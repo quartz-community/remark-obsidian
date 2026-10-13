@@ -917,6 +917,33 @@ That is the slimming the triangulation was for, and the arithmetic is worth stat
 1,482 referee documents whose best rule touches 67 and breaks even, down to 20 pairs, down to
 two constructs with a named precondition. Each case is three lines long and one cause.
 
+### A target one instrument cannot see at all
+
+Scoring the comment half before building it produced a result worth keeping, because it is
+not a refusal:
+
+| candidate                         | better | worse | verdict             |
+| --------------------------------- | -----: | ----: | ------------------- |
+| `container-comment-swallows`      |      0 |    10 | net -8              |
+| `container-comment-swallows-defs` |      0 |     0 | **not adjudicable** |
+
+The first drops every fact below the swallowing `%%`. All ten of its documents move the wrong
+way, and in each one the DEFINITIONS are identical -- the entire loss is references Obsidian
+still indexes below an unclosed opener. The second drops only definitions and touches
+**nothing**: across 6,818 documents there is not one where this rule changes which definitions
+exist.
+
+So the comment family is **section geometry only**. The referee's oracle cannot see it by
+construction, the same way four of the `UPSTREAM.md` defects cannot reach it, and the earlier
+attempt's referee -1 was never evidence against the fix -- it was the reference half of a rule
+that should only have touched geometry. A fix here is gated on `compose.mts` improving while
+the referee and the corpus hold STILL, and nothing in it may drop a reference.
+
+This is the first measured instance of a THIRD outcome from the scorer, which previously
+reported only positive or negative. A rule that touches nothing is not a rule that failed; it
+is a rule this corpus has no opinion about, and reporting that as "net negative" would have
+read as evidence against it. `score.mts` now distinguishes four verdicts.
+
 ## Score a rule before building it, because repairs lose and extensions win
 
 A measured pattern in what succeeds here, and it is not about effort. Every change that
