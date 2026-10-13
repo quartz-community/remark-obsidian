@@ -886,6 +886,27 @@ progress wants a different kind of evidence -- recorded probes against the appli
 specific constructs, which `ask.mts` now makes cheap -- rather than more mining of this
 corpus.
 
+### Re-asking a refused rule with the tree is not a universal fix
+
+The lazy-continuation rule flipped from -15 to +21 once `score.mts` could read the tree, so
+every rule refused on a line-scan approximation was worth re-asking. The tab rule is the
+control that says when it helps.
+
+Asked of the tree -- the shape being a `code` node INSIDE a `listItem` whose marker separator
+holds a tab, which is exactly what micromark produces for `+⇥   [^1]: def` and exactly why no
+definition is reported -- it scores **24 better against 25 worse, agreement +1**. The line-scan
+version was 10 better against 14. So the tree sharpened it slightly and did not unlock it.
+
+The reason is visible in the two documents it still gets wrong, which fail in OPPOSITE
+directions: one wants the definition's end at the label's own line, the other wants it
+extended over a following indented line, and the tree encodes neither -- the end is something
+Obsidian computes and our tree does not record. Fixing the end for one breaks the other.
+
+So the distinction is about WHAT was missing. The tree supplies container structure, which is
+what "does this line continue that item" needed. It does not supply a boundary Obsidian
+derives differently, which is what the tab rule's `endLine` needs. **Re-ask with the tree when
+the missing information is structural; expect nothing when it is a value neither side records.**
+
 ### Its first real use retired the 426-document tab family
 
 The tab family was the largest localised group on this oracle and the last candidate big

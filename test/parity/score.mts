@@ -168,6 +168,76 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "tab-marker-defines-tree",
+    what: "a label our parser made CODE inside a tab-separated item defines, at marker+1",
+    apply: (text, ours, tree) => {
+      // The tree version of `tab-marker-defines`, whose line-scan form capped at ten
+      // documents. The scan had to guess whether a label was nested, fenced, or inside an
+      // item; the tree knows exactly, because the shape this rule is about is a `code` node
+      // sitting INSIDE a `listItem` whose marker separator holds a tab -- that is what
+      // micromark produces for `+⇥   [^1]: def` and it is why no definition is reported.
+      const extra: Def[] = [];
+      const walk = (node: unknown): void => {
+        const self = node as {
+          type?: string;
+          position?: {
+            start: { line: number; column: number; offset?: number };
+          };
+          children?: unknown[];
+        };
+        if (self.type === "listItem") {
+          const from = self.position?.start?.offset;
+          if (from !== undefined) {
+            const bol = text.lastIndexOf("\n", from - 1) + 1;
+            const nl = text.indexOf("\n", from);
+            const line = text.slice(bol, nl === -1 ? undefined : nl);
+            const marker = TAB_MARKER.exec(line);
+            if (marker && marker[2]!.startsWith("\t")) {
+              for (const kid of (self.children ?? []) as Array<{
+                type?: string;
+                position?: { start: { line: number; offset?: number } };
+              }>) {
+                if (kid.type !== "code") continue;
+                const at = kid.position?.start?.offset;
+                if (at === undefined) continue;
+                const kbol = text.lastIndexOf("\n", at - 1) + 1;
+                const knl = text.indexOf("\n", at);
+                const kline = text.slice(kbol, knl === -1 ? undefined : knl);
+                const label = LABEL.exec(kline.replace(TAB_MARKER, ""));
+                if (!label) continue;
+                const row = kid.position!.start.line - 1;
+                if (ours.defs.some((d) => d[1] === row)) continue;
+                // The end absorbs following non-blank lines, which is the measured
+                // continuation rule. Using the label's own line put the end one short --
+                // the answer says 8 where that gave 7 -- and that accounted for most of the
+                // documents this made worse.
+                const lines = text.split("\n");
+                let end = row;
+                while (
+                  end + 1 < lines.length &&
+                  (lines[end + 1] ?? "").trim() !== ""
+                ) {
+                  end += 1;
+                }
+                extra.push([
+                  (label[1] ?? "").toLowerCase(),
+                  row,
+                  marker[1]!.length + 1,
+                  end,
+                ]);
+              }
+            }
+          }
+        }
+        for (const kid of self.children ?? []) walk(kid);
+      };
+      walk(tree);
+      return extra.length === 0
+        ? ours
+        : { defs: [...ours.defs, ...extra], refs: ours.refs };
+    },
+  },
+  {
     name: "tab-marker-defines-root",
     what: "...and only when the marker itself sits at column 0",
     apply: (text, ours) => {
