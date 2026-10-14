@@ -190,6 +190,21 @@ export const ORACLES: readonly Oracle[] = [
     test: "option-matrix.test.ts",
   },
   {
+    name: "recorded contradictions",
+    command:
+      "TOP=24 tsx test/parity/fuzz/contradictions.ts to see the shapes behind a failure",
+    gate: "absolute",
+    compares: [
+      "no skeleton shape holds both a `match` case and a `replicate` one",
+    ],
+    blind: [
+      "shapes with only diverging cases -- a contradiction needs both sides present",
+      "the skeleton collapses word runs, so two documents differing only in WORDS are one shape",
+      "triage states other than match/replicate, which are excluded by construction",
+    ],
+    test: "contradictions.test.ts",
+  },
+  {
     name: "hygiene",
     command: "npm test",
     gate: "ceiling",

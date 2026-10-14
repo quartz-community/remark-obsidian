@@ -3047,6 +3047,57 @@ eight including `sections`. A rule that changes something none of the three reco
 positions inside a table cell, say -- is still unmeasured, and the answer there is a probe wave
 rather than another flag.
 
+### Auditing the tooling itself: the gaps were all the same gap
+
+With every gate's blind spot closed, the next question is which TOOLS are known-incomplete and
+simply never finished. Grepping this file for its own admissions -- "not gated", "by hand",
+"opt-in", "wants re-running", "belongs in a scheduled job" -- turns up a single pattern rather
+than a list of unrelated holes:
+
+**Every `PARITY_*` opt-in exists and NOTHING sets it.**
+
+    defined in the harness : PARITY_FULL_PROXY_CHECK  PARITY_OPTION_PAIRS
+                             PARITY_FUZZ_FILE/FROM/COUNT  PARITY_GOLDEN_PATH
+                             PARITY_REFEREE_DIR
+    set by any workflow    : none
+
+Two of those are not parameters, they are deferred work with a note explaining the deferral:
+
+- **`PARITY_OPTION_PAIRS=1`.** `option-matrix.test.ts` sweeps single toggles and its own
+  docstring says a two-option crash "belongs in a scheduled job rather than a push gate". The
+  pair sweep was then written, behind that flag, with a one-hour timeout -- and the scheduled
+  job was never created. So the axis is implemented, skipped on every run, and measured by
+  nobody.
+- **`PARITY_FULL_PROXY_CHECK=1`.** The Reading-View cross-check sweeps the seed layer on every
+  recording and the whole corpus only under this flag, "when the goldens are re-recorded
+  against a new Obsidian". Nothing enforces that either.
+
+And one tool had no flag and no caller at all: **`fuzz/contradictions.ts`**, which this file
+calls "the only selector in this harness that has not gone blunt" and says to "re-run after
+every landing". A grep for `contradictions` across `test/`, `package.json` and `.github/`
+found the script and one mention in this file.
+
+**That is the lesson restated as a property of the repo rather than of a measurement.** These
+notes already record what an unrun opt-in costs -- the Reading-View correction sat behind the
+seven-minute flag and left a divergence in the backlog with no rule behind it, and the fix was
+to make it automatic rather than recommended. The same mistake is in the tooling three times
+over, and the tell is identical each time: a docstring that describes when someone SHOULD run
+something.
+
+#### Closed: the contradiction detector is a gate
+
+`contradictions.ts` now exports its computation and `contradictions.test.ts` asserts the set is
+**empty** -- not a count, for the reason every other ceiling here has stopped being one. It
+reports zero today, which is exactly when a detector is worth gating: the cost is one assertion
+and what it prevents is a contradiction appearing and waiting for someone to remember a script.
+Every landing re-partitions the triage, so this is genuinely re-measurable rather than a
+one-off audit.
+
+Break-tested by flipping one `match` case to `replicate` so its shape holds both sides, which
+fails with `"[[w]](w)"  1 diverging / 1 matching`. Registered in `overview.ts`, and the drift
+gate refused the commit until it was -- the second time that registry has caught an unregistered
+gate, after `rules-doc.test.ts`.
+
 ## Tracing their SOURCE finds rules their document does not letter
 
 Their rules document was mined once and gave five gaps, all now closed. Their source is a
