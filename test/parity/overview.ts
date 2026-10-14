@@ -365,7 +365,7 @@ export const AXES: readonly Axis[] = [
     how: "compose.mts --inline",
     sequences: 196,
     swept: true,
-    note: "--inline; opened 7, ALL one rule (an inline closer frees a caret for a block id), fixed to 1 -- `#tag^blk`, where a tag has no closer so the caret follows a word character and needs its own evidence",
+    note: "--inline; opened 7, ALL one rule (an inline closer frees a caret for a block id), now CLEAN over all 196. The last row was `#tag^blk`, and the mechanism is the tag's END rather than the word character before the caret -- read from the tree's `tag` nodes, so `word^blk` and `#1^blk` correctly register nothing",
   },
   {
     name: "inline x block",
