@@ -859,6 +859,78 @@ const RULES: readonly Rule[] = [
     // 0. Declining on those terms is the same trade as the quote-tab rule beside it.
     apply: (text, ours, tree) => nestedColumn(text, ours, tree, NESTING_QUOTE),
   },
+  {
+    name: "contained-definition-ends-on-own-line",
+    what: "a definition absorbed as a container's lazy content ends at its OWN line",
+    // The single rule behind EIGHT of the thirteen remaining `compose.mts` rows, which had
+    // been filed as two unrelated families -- six `> comment` rows and two
+    // `> footnote > indented` rows. Dumping the trees is what joined them:
+    //
+    //     > quote / [^1]: def / ⟨4 spaces⟩code      obs  blockquote@0, code@2, paragraph@4
+    //                                               ours blockquote@0 swallowing both
+    //     - item / [^1]: def / %%                   obs  list@0, comment@2
+    //                                               ours list@0 swallowing both
+    //
+    // UPSTREAM already spans the definition over BOTH lines -- bare `remark-parse` +
+    // `remark-gfm` gives `footnoteDefinition@1-2` before any pass here runs -- so the third
+    // line is the definition's own continuation and our container then absorbs the lot.
+    // Obsidian instead ends the definition at line 1 and starts a ROOT block at line 2,
+    // which its `defs` states directly: `1@1:0-1` against our `1@1:0-2`.
+    //
+    // So `comment` and `indented` were never the axis; what the split-off line BECOMES
+    // differs and the rule producing it is identical. That also explains why the absorption
+    // map is clean at 0 of 80 while these diverge: the per-type guard is right, and the
+    // continuation never reaches it.
+    //
+    // Scored here because closing it means surgery in `containerLazyTransform`'s
+    // `footnoteDefinition` absorption, which carries 43 referee documents -- the single
+    // largest landed move on that oracle. This is the measurement that says whether
+    // truncating a contained definition costs any of them.
+    //
+    // SCORED, REFUTED AS STATED: better 102, worse 495, agreement 5389 -> 5046.
+    //
+    // "Inside a container" is the wrong premise, and the counter-examples say so plainly:
+    // `> [!note]` / `> [^a$]: laborum est` / `>   more` wants the definition to end on line
+    // 4 and this truncates it to 3. Those definitions are PREFIXED -- written with the
+    // container's own marker -- so they are genuinely inside it with real multi-line
+    // content, which is a different thing from a column-0 definition the container absorbed
+    // LAZILY. See the narrowed rule below.
+    apply: (text, ours, tree) => {
+      const depthOf = depthsByLine(tree, NESTING_ANY);
+      return {
+        refs: ours.refs,
+        defs: ours.defs.map((d): Def => {
+          if ((depthOf.get(d[1]) ?? 0) < 1) return d;
+          return d[3] === d[1] ? d : [d[0], d[1], d[2], d[1]];
+        }),
+      };
+    },
+  },
+  {
+    name: "lazy-definition-ends-on-own-line",
+    what: "...the same, only for an UNPREFIXED definition the container absorbed lazily",
+    // The narrowing the broad rule's own counter-examples asked for: the label must begin at
+    // column 0 LITERALLY, which is what makes it lazy continuation rather than container
+    // content. Every `compose.mts` row behind this has the bracket as its line's first
+    // character, and every counter-example above carries a `>` prefix.
+    //
+    // That is the SECOND candidate tonight whose first scoping conflated "in a container"
+    // with "at column 0 inside one" -- the nested-column rule made the identical mistake
+    // with `/^[ \t>]/`. A container-membership test is not a lazy-continuation test, and the
+    // tree says the first while only the line says the second.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const depthOf = depthsByLine(tree, NESTING_ANY);
+      return {
+        refs: ours.refs,
+        defs: ours.defs.map((d): Def => {
+          if ((depthOf.get(d[1]) ?? 0) < 1) return d;
+          if (!(lines[d[1]] ?? "").startsWith("[")) return d;
+          return d[3] === d[1] ? d : [d[0], d[1], d[2], d[1]];
+        }),
+      };
+    },
+  },
 ];
 
 const dir =

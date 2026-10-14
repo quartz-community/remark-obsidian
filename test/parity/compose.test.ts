@@ -61,13 +61,23 @@ const GOLDEN = path.join(import.meta.dirname, "goldens/compose.json");
  *                       `%%` arrives as ONE paragraph with `%%` as a TEXT child, both lines
  *                       absorbed as lazy continuation, so there is nothing to lift. Needs
  *                       `%%` to interrupt lazy continuation -- tokenizer-level, not a guard.
- *     `footnote > indented` and `footnote > thematic`: a definition absorbed as a
- *                       container's lazy content is NOT a definition to Obsidian, so the
- *                       indented line after it is root `code` rather than the definition's
- *                       continuation. `callout > footnote > thematic` is the same cause seen
- *                       through `defs`: Obsidian reports none and we report one. Closing it
- *                       means surgery in `containerLazyTransform`'s `footnoteDefinition`
- *                       absorption, which 43 referee documents depend on.
+ *     `quote > footnote > indented`  the CALLOUT half of this is CLOSED, and the split is
+ *                       worth reading before touching the rest. Upstream reads `[^1]: def`
+ *                       plus an indented line as ONE definition, so the continuation sits
+ *                       INSIDE the definition where no absorption guard can see it;
+ *                       `definitionLazySplitTransform` splits it off and the existing guard
+ *                       chain then gets the tail right by its own node type, which it
+ *                       already does for all 80 matrix cells.
+ *
+ *                       The quote half needs MORE than that split, which live 1.14.4 states
+ *                       directly: a callout reports `defs 1@1:0-1` while a quote and a list
+ *                       report `defs []`. So a quote must also FLATTEN the definition, which
+ *                       is what it already does -- the lazy paragraph swallows the label and
+ *                       reports a reference. Splitting for a quote or a list produced a
+ *                       definition node Obsidian has none of and regressed `bullet` and
+ *                       `ordered > footnote > indented` from agreeing; compose went 13 to 14
+ *                       before the scoping was narrowed, which is the gate catching a rule
+ *                       applied one container type too wide.
  *     `quote > callout > footnote`  a definition column, confirmed over three depths; the
  *                       rule and why it is not implemented are recorded in
  *                       `definition-column.ts` at the early return it would have to change.
@@ -83,7 +93,6 @@ const DIVERGING: Record<Axis, readonly string[]> = {
     "bullet > footnote > comment",
     "bullet > html > comment",
     "callout > footnote > comment",
-    "callout > footnote > indented",
     "ordered > footnote > comment",
     "ordered > html > comment",
     "quote > footnote > comment",
