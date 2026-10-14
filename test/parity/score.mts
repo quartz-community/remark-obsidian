@@ -922,6 +922,115 @@ const RULES: readonly Rule[] = [
       ),
   },
   {
+    name: "b3-item-minimum-indent",
+    what: "an item's content column is the SMALLEST indentation among its own indented lines",
+    // Their B3, and the one open item that is a new rule rather than an extension. `- a` /
+    // `⟨1sp⟩lazy` / `⟨4sp⟩[^1]:` reports column 1 in Obsidian and 2 here, because the item's
+    // content column is the minimum over its lines and we use the marker's width.
+    //
+    // Column-0 lines are EXCLUDED, which is the other half of B3 -- "Obsidian leaves
+    // unindented lines out of the minimum" -- and the half that made the original probe set
+    // unable to see the rule at all: all five of its notes had a column-0 continuation.
+    //
+    // SCORED TWICE, NOT SHIPPED, and the pair is the result:
+    //
+    //     line ranges, minimum across overlapping items   better 0  worse 521
+    //     tree containment, innermost item wins           better 0  worse 117
+    //
+    // The second fixed two real defects in the predicate -- a definition our tree places
+    // inside an item but past a blank line was never reached, and `definition-column.ts`
+    // records that the INNERMOST item owns the column -- and the gain stayed at ZERO.
+    //
+    // ZERO BETTER OVER 1,833 SHAPED DOCUMENTS is the finding. The referee corpus holds the
+    // shape in abundance and not one of its answers is reached by this rule, while three
+    // probes against live 1.14.4 show the rule plainly:
+    //
+    //     - a / ⟨1sp⟩lazy / ⟨4sp⟩[^1]:        obs column 1, ours 2
+    //     -⟨3sp⟩a / ⟨1sp⟩lazy / ⟨4sp⟩[^1]:    obs column 1, ours 4
+    //
+    // So the rule is REAL and this corpus cannot adjudicate it: its shaped documents are
+    // items inside quotes and callouts, where indentation is measured from the container's
+    // content column rather than from column zero, and a root item with a sub-content
+    // continuation AND a column that differs is not among them.
+    //
+    // THE 2.05x LIFT WAS A CORRELATE. 895 documents hold the shape and 354 disagree against a
+    // 19.3% base rate, which read as the largest actionable family on this oracle. A rule that
+    // gains zero over all of them says the shape marks a document as HARD rather than naming
+    // its cause -- the tab family's signature exactly, at 2.06x and a ceiling of ten. Fifth
+    // selector to die this way, and the first to die after being measured as a lift rather
+    // than as a raw count.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const cols = (line: string): number => {
+        let column = 0;
+        for (const character of line) {
+          if (character === " ") column += 1;
+          else if (character === "\t") column += 4 - (column % 4);
+          else break;
+        }
+        return column;
+      };
+      const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/u;
+
+      /** The innermost host item of each definition, by tree containment. */
+      const floorOf = new Map<number, number>();
+      const hosts: Array<{ item: any; floor: number }> = [];
+      const walk = (node: unknown): void => {
+        const self = node as {
+          type?: string;
+          position?: { start: { line: number }; end: { line: number } };
+          children?: unknown[];
+        };
+        if (self.type === "listItem" && self.position) {
+          const first = self.position.start.line - 1;
+          const marker = MARKER.exec(lines[first] ?? "");
+          if (marker) {
+            let least = marker[0].length;
+            for (let at = first + 1; at <= self.position.end.line - 1; at++) {
+              const line = lines[at] ?? "";
+              if (line.trim() === "") continue;
+              const indent = cols(line);
+              if (indent > 0 && indent < least) least = indent;
+            }
+            hosts.push({ item: self, floor: least });
+          }
+        }
+        for (const child of self.children ?? []) walk(child);
+      };
+      walk(tree);
+
+      // Pre-order, so an outer item is pushed before an inner one and overwriting keeps the
+      // INNERMOST -- the same reason `definition-column.ts` overwrites rather than keeps.
+      for (const { item, floor } of hosts) {
+        const mark = (node: unknown): void => {
+          const self = node as {
+            type?: string;
+            position?: { start: { line: number } };
+            children?: unknown[];
+          };
+          if (
+            (self.type === "footnoteDefinition" ||
+              self.type === "definition") &&
+            self.position
+          ) {
+            floorOf.set(self.position.start.line - 1, floor);
+          }
+          for (const child of self.children ?? []) mark(child);
+        };
+        mark(item);
+      }
+
+      return {
+        refs: ours.refs,
+        defs: ours.defs.map((d): Def => {
+          const floor = floorOf.get(d[1]);
+          if (floor === undefined || floor >= d[2]) return d;
+          return [d[0], d[1], floor, d[3]];
+        }),
+      };
+    },
+  },
+  {
     name: "html-extent-item-block-tag",
     what: "a BLOCK TAG html in a list item swallows the following paragraph, as `<!--` already does",
     // `itemHtmlExtentTransform` carries this for the `<!--` opener only, and its own docstring

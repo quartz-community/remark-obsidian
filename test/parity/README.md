@@ -2656,6 +2656,39 @@ the file the sibling project patched, for exactly this rule.
 The usual caution applies before anyone starts: 354 is the documents the shape TOUCHES, not the
 gain. The tab family touched 426 and capped at ten.
 
+#### ...and that caution was the whole story: the lift is a CORRELATE
+
+Scored before anything was built, twice, and the pair is the result:
+
+| premise                                       | better | worse |
+| --------------------------------------------- | -----: | ----: |
+| host by line range, minimum across overlaps   |  **0** |   521 |
+| host by tree containment, innermost item wins |  **0** |   117 |
+
+The second fixed two genuine defects in the predicate -- a definition our tree places inside an
+item but past a blank line was never reached, and `definition-column.ts` records that the
+INNERMOST item owns the column -- and the gain stayed at ZERO.
+
+**Zero better over 1,833 shaped documents.** The corpus holds the shape in abundance and not one
+of its answers is reached by this rule, while the probes against live 1.14.4 show the rule
+plainly. Both things are true, and together they say the corpus cannot adjudicate it: its shaped
+documents are items inside quotes and callouts, where indentation is measured from the
+container's content column rather than from column zero, and a ROOT item with a sub-content
+continuation whose definition column actually differs is not among them.
+
+So **the 2.05x lift was a correlate, not a cause** -- the shape marks a document as HARD rather
+than naming what is wrong with it. That is the tab family's signature exactly, at 2.06x over 426
+documents with a demonstrated ceiling of ten. It is the fifth selector to die here and the first
+to die after surviving a base-rate test, which is worth stating because the base rate was
+introduced precisely to stop this: **a lift says the shape and the difficulty travel together,
+and still says nothing about which way the causation runs.**
+
+What survives: B3 is a real rule, confirmed by probe and still unimplemented, and it is still
+the one open item that is structural rather than an extension. What does not survive is the
+claim that it is the largest actionable family. Its size on this oracle is unmeasured, because
+this oracle cannot see it -- and the instrument that could is a probe wave against the
+application, which is where these notes already send every rule whose premise is structural.
+
 ## Tracing their SOURCE finds rules their document does not letter
 
 Their rules document was mined once and gave five gaps, all now closed. Their source is a
