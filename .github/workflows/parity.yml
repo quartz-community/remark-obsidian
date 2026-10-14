@@ -57,6 +57,14 @@ jobs:
       - name: Record goldens
         env:
           OBSIDIAN_APP_VERSION: ${{ inputs.appVersion || 'latest' }}
+          # The whole-corpus Reading-View cross-check, which `test/parity/README.md` says to run
+          # "when the goldens are re-recorded against a new Obsidian" -- which is exactly this
+          # job, and nothing was enforcing it. The detached renderer is a PROXY for reading
+          # mode, so an unfaithful capture pins the gate to behaviour Obsidian does not produce:
+          # that is how a golden recording detached-renderer output survived several attempts to
+          # find a parsing rule for it, because there was none. Seed-layer only is the default
+          # at ~80s; the full sweep is ~7 minutes, which is free in a weekly job.
+          PARITY_FULL_PROXY_CHECK: "1"
         run: npm run parity:record
 
       - name: Check for drift

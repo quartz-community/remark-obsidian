@@ -3098,6 +3098,27 @@ fails with `"[[w]](w)"  1 diverging / 1 matching`. Registered in `overview.ts`, 
 gate refused the commit until it was -- the second time that registry has caught an unregistered
 gate, after `rules-doc.test.ts`.
 
+#### Closed: both unrun opt-ins now have a job
+
+**`PARITY_OPTION_PAIRS=1`** runs weekly in `deep-checks.yml`, and it was MEASURED before being
+scheduled rather than trusted to its timeout: 276 pairs against each preset, each parsing the
+whole corpus, **~16 minutes, green**. The one-hour timeout in the test is headroom, not a
+duration -- and scheduling a sweep nobody had seen pass would have been scheduling a red job.
+Its own workflow rather than a job in `parity.yml`, because it needs no Obsidian and no display;
+a failure opens an issue naming the reproduce command.
+
+**`PARITY_FULL_PROXY_CHECK=1`** is now set on `parity.yml`'s recording step, which is precisely
+the condition this file already stated -- "when the goldens are re-recorded against a new
+Obsidian". The detached renderer is a PROXY for reading mode, so an unfaithful capture pins the
+gate to behaviour Obsidian does not produce, and that is how a golden recording
+detached-renderer output defeated several attempts to find a parsing rule for it. ~7 minutes
+against ~80 seconds, which is free in a weekly job.
+
+So the audit's score: of seven `PARITY_*` variables, five are genuine parameters
+(`PARITY_FUZZ_FILE/FROM/COUNT`, `PARITY_GOLDEN_PATH`, `PARITY_REFEREE_DIR`) and the two that
+were deferred work are now scheduled. **Nothing in the harness is now gated on someone
+remembering to run it.**
+
 ## Tracing their SOURCE finds rules their document does not letter
 
 Their rules document was mined once and gave five gaps, all now closed. Their source is a

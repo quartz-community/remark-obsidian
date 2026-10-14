@@ -1,0 +1,65 @@
+name: Deep checks
+
+# The scheduled home for sweeps that are too slow for a push gate and were therefore left
+# behind an opt-in flag that nothing set.
+#
+# `test/parity/README.md` records the audit: every `PARITY_*` variable in the harness existed
+# and no workflow set any of them. Two of those are not parameters but deferred work --
+# `option-matrix.test.ts` says a two-option crash "belongs in a scheduled job rather than a
+# push gate", and the pair sweep was written behind `PARITY_OPTION_PAIRS=1` with the job never
+# created. An opt-in nobody runs measures nothing, which these notes already paid for once when
+# the Reading-View cross-check sat behind its own flag and left a divergence in the backlog.
+#
+# Measured before scheduling, rather than trusting the timeout: the pair sweep is 276 pairs
+# against each preset, each parsing the whole corpus, and it runs in ~16 minutes green. The
+# one-hour timeout in the test is headroom, not a duration.
+#
+# No Obsidian and no display: this is a pure-parse crash sweep, which is why it is its own
+# workflow rather than a job inside `parity.yml`.
+
+on:
+  schedule:
+    - cron: "0 5 * * 2"
+  workflow_dispatch:
+
+jobs:
+  option-pairs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - name: Every PAIR of options cleared, against both presets
+        env:
+          PARITY_OPTION_PAIRS: "1"
+        run: npx vitest run test/parity/option-matrix.test.ts
+      - name: Open an issue if the sweep found a crash
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: "Option-pair sweep found a crash",
+              body: [
+                "The weekly two-option crash sweep failed.",
+                "",
+                "A crash needing two options to co-occur is invisible to the push gate, which",
+                "sweeps single toggles only. The failing pair and the first offending document",
+                "are named in the run log.",
+                "",
+                `Run: ${run}`,
+                "",
+                "Reproduce locally:",
+                "",
+                "```bash",
+                "PARITY_OPTION_PAIRS=1 npx vitest run test/parity/option-matrix.test.ts",
+                "```",
+              ].join("\n"),
+              labels: ["parity"],
+            });
