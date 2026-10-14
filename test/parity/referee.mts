@@ -63,8 +63,31 @@ if (!fs.existsSync(dir)) {
  * reports every such document as one where we invent a definition Obsidian
  * lacks. That was 247 of this corpus's disagreements and none of them were real.
  */
-const same = (a: unknown, b: unknown) =>
-  JSON.stringify(a) === JSON.stringify(b);
+/**
+ * An EMPTY-named reference is excluded from BOTH sides, which is the corpus's own convention.
+ *
+ * `^[]` is in Obsidian's cache as a reference with an empty name, and their rules document
+ * says so under E3 -- and then says Reading View renders nothing there, "so it is no
+ * reference; the oracle's comparison leaves it out". The producer of this corpus therefore
+ * does not compare the field, while we were comparing it, which made our figure stricter than
+ * the data was recorded for rather than more accurate.
+ *
+ * It is 20 answers here, 16 of which disagree ONLY by this, and we emit ZERO of them. Their
+ * own notes put it at ~1,300 notes, which is their 20,000-note run and not this corpus.
+ *
+ * Not a parse gap, and the app itself is undecided: E3 says Reading View renders nothing,
+ * while D7 records a day when it drew a marker `[1]` with an empty footnote. Synthesising a
+ * node for something that renders nothing is what this package refuses elsewhere, so the
+ * exclusion belongs in the comparison and is labelled in the output rather than folded in
+ * silently.
+ */
+const named = (rows: ReadonlyArray<readonly unknown[]>) =>
+  rows.filter((row) => row[0] !== "");
+
+const same = (
+  a: ReadonlyArray<readonly unknown[]>,
+  b: ReadonlyArray<readonly unknown[]>,
+) => JSON.stringify(named(a)) === JSON.stringify(named(b));
 const names = (rows: ReadonlyArray<readonly unknown[]>) =>
   JSON.stringify(rows.map((row) => row[0]).sort());
 
@@ -136,6 +159,9 @@ if (wantIds) {
 
 console.log(
   `referee: ${agree}/${total} agree (${((100 * agree) / total).toFixed(1)}%)`,
+);
+console.log(
+  "  empty-named references excluded from both sides, as the corpus's own comparator does",
 );
 console.log(`  nodes spliced without a position: ${unplaced}`);
 console.log("\ndisagreement kinds:");
