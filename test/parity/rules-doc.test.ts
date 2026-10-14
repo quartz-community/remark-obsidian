@@ -199,9 +199,14 @@ const DIVERGING_POSITIONS: readonly string[] = [
   // marker, an ordered marker, a task marker, and a quoted item where the answer is 3 because
   // the minimum is taken after the container's prefix and made absolute again.
   //
-  // NOT IMPLEMENTED, and the blocker is adjudication rather than difficulty. FIVE premises were
-  // scored against the referee's 6,818 documents -- see `score.mts` -- and every one of them
-  // gained ZERO:
+  // FOUR OF THE FIVE ARE NOW FIXED, by `deIndentFloor` in `definition-column.ts`: the minimum
+  // folded into `contentColumn`, which already had the five-space cap and the dot arithmetic
+  // the scored premises kept getting wrong. Cost on both oracles was NOTHING -- 0 corpus
+  // regressions, and the referee's agreeing set byte-identical by `--ids`, not merely equal in
+  // total.
+  //
+  // That zero is the whole reason the probes had to exist first. FIVE premises were scored
+  // against the referee's 6,818 documents -- see `score.mts` -- and every one gained ZERO:
   //
   //     host by line range, minimum across overlaps     better 0   worse 521
   //     host by tree containment, innermost wins        better 0   worse 117
@@ -221,10 +226,14 @@ const DIVERGING_POSITIONS: readonly string[] = [
   // harness's own standing rule is that a clean measurement against a corpus which cannot
   // adjudicate a rule is not evidence and reads exactly like evidence. These ten cases are
   // that gate: five pin the rule, five pin the boundaries it must not cross.
-  "B3 one-space lazy counts",
-  "B3 wide marker one-space lazy",
-  "B3 ordered one-space lazy",
-  "B3 task item one-space lazy",
+  //
+  // WHAT REMAINS is the QUOTED host, and it is a different code path rather than a smaller
+  // version of the same one. `contentColumn` returns undefined when the item's own line
+  // carries a `>` prefix, because its `MARKER` is anchored at column 0 -- so `> - a` never
+  // reaches the host branch at all and the `quoted` branch answers 2, the quote's own content
+  // column, where Obsidian reports 3. The minimum has to be taken after the container's prefix
+  // and made absolute again, and the branch that would do it has 60 referee documents of
+  // history behind its current answer. Left for its own measurement.
   "B3 quoted item one-space lazy",
 ];
 

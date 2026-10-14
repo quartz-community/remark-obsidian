@@ -179,6 +179,44 @@ export function definitionColumnTransform(tree: Root, source: string): void {
   });
 }
 
+/**
+ * B3: the SMALLEST indentation among the item's own lines, or Infinity if it has none.
+ *
+ * `remark-parse@8` strips an item's continuation lines by their smallest indentation, and
+ * Obsidian leaves UNINDENTED lines out of that minimum -- which is the whole rule, and the half
+ * this package was missing. Ten probes against live 1.14.4 are in `goldens/rules-doc.json`, and
+ * the five that already agreed are what make the other five a rule rather than a shape:
+ *
+ *     - a / lazy(col 0) / ⟨4sp⟩[^1]:    column 2   a column-0 line is EXCLUDED
+ *     - a / ⟨1sp⟩lazy   / ⟨4sp⟩[^1]:    column 1   an indented one is counted
+ *     -⟨3sp⟩a / ⟨1sp⟩lazy / ⟨4sp⟩[^1]:  column 1   marker width 4, answer still 1
+ *
+ * A tab counts to its four-column stop, as everywhere else here. Blank lines carry no
+ * indentation to minimise over and a column-0 line is a LAZY continuation, which Obsidian does
+ * not let pull the column down -- the two exclusions are different rules that happen to share
+ * a guard.
+ */
+function deIndentFloor(source: string, item: ListItem): number {
+  const from = item.position?.start?.offset;
+  const to = item.position?.end?.offset;
+  if (from === undefined || to === undefined) return Number.POSITIVE_INFINITY;
+  const second = source.indexOf("\n", from);
+  if (second === -1 || second >= to) return Number.POSITIVE_INFINITY;
+
+  let floor = Number.POSITIVE_INFINITY;
+  for (const line of source.slice(second + 1, to).split("\n")) {
+    let column = 0;
+    for (const character of line) {
+      if (character === " ") column += 1;
+      else if (character === "\t") column += 4 - (column % 4);
+      else break;
+    }
+    if (column === line.length) continue;
+    if (column > 0 && column < floor) floor = column;
+  }
+  return floor;
+}
+
 /** The column an item's own content begins at, past its marker and one space. */
 function contentColumn(source: string, item: ListItem): number | undefined {
   const from = item.position?.start?.offset;
@@ -188,6 +226,10 @@ function contentColumn(source: string, item: ListItem): number | undefined {
   const line = source.slice(bol, nl === -1 ? undefined : nl);
   const opener = MARKER.exec(line);
   if (!opener) return undefined;
+  // Applied to BOTH paths below, because the marker's width is only ever an upper bound: a
+  // continuation line indented below it pulls the content column down with it, and the
+  // five-space cap is the same quantity measured a different way.
+  const floor = deIndentFloor(source, item);
   // FIVE OR MORE spaces after the marker and the content column falls back to the marker plus
   // ONE, because CommonMark makes that much indentation the item's own indented CODE rather
   // than a wider content column.
@@ -214,7 +256,8 @@ function contentColumn(source: string, item: ListItem): number | undefined {
     const base = tabbed
       ? marker.length + (4 - (marker.length % 4))
       : marker.length + 1;
-    return !tabbed && /^[ \t]*\d\.$/u.test(marker) ? base + 1 : base;
+    const capped = !tabbed && /^[ \t]*\d\.$/u.test(marker) ? base + 1 : base;
+    return Math.min(capped, floor);
   }
   // A SINGLE-DIGIT marker ending in a dot counts one column more than it occupies, which
   // is the `1.  foo` quirk already recorded for list items, reaching the definition column
@@ -226,7 +269,8 @@ function contentColumn(source: string, item: ListItem): number | undefined {
   //   `1) `   3    indent 4      ->  3            `-   `  4    indent 5      ->  4
   //
   // `1. ` against `1) ` is what isolates it: same width, same indent, columns 4 and 3.
-  return /^[ \t]*\d\.[ \t]$/u.test(opener[0]!)
+  const width = /^[ \t]*\d\.[ \t]$/u.test(opener[0]!)
     ? opener[0]!.length + 1
     : opener[0]!.length;
+  return Math.min(width, floor);
 }
