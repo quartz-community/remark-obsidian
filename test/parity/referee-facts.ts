@@ -55,14 +55,56 @@ export interface Facts {
  */
 export function refereeFactsWithTree(text: string): Facts & { tree: Root } {
   const tree = parseOurs(text, "all-features");
-  return { ...factsOf(tree), tree };
+  return { ...factsOf(tree, text), tree };
 }
 
 export function refereeFacts(text: string): Facts {
-  return factsOf(parseOurs(text, "all-features"));
+  return factsOf(parseOurs(text, "all-features"), text);
 }
 
-function factsOf(tree: Root): Facts {
+/**
+ * Indented code, not a FENCE -- the node type cannot tell them apart.
+ *
+ * A bare ``` or ~~~ arrives as `code` with a null `lang` exactly as indented code does, which
+ * `container-lazy.ts` records for the same reason. It matters here because Obsidian indexes a
+ * label inside INDENTED code within a comment and does NOT index one inside a fence:
+ *
+ *     %%/⟨2sp⟩```/[^b]: Definition/⟨2sp⟩```        no reference
+ *     %%/⟨4sp⟩[^4]: ...                            reference at 1:4
+ *
+ * Scanning both cost 12 documents against 19 gained; scanning only the indented form is what
+ * makes the trade one-sided.
+ */
+function isIndented(
+  source: string,
+  at: { start: Point; end: Point } | undefined,
+): boolean {
+  const from = at?.start?.offset;
+  if (from === undefined) return false;
+  const bol = source.lastIndexOf("\n", from - 1) + 1;
+  const nl = source.indexOf("\n", from);
+  const line = source.slice(bol, nl === -1 ? undefined : nl);
+  return !/^[ \t>]*(?:```|~~~)/u.test(line);
+}
+
+/** A label, with no whitespace or bracket inside it -- the same shape `normalize.ts` scans. */
+const LABEL = /\[\^([^[\]\s]+)\]/gu;
+
+/** Zero-based line of an offset, as the referee counts them. */
+function lineOf(source: string, offset: number): number {
+  let line = 0;
+  for (let index = 0; index < offset; index++) {
+    if (source[index] === "\n") line += 1;
+  }
+  return line;
+}
+
+/** Zero-based column of an offset. */
+function columnOf(source: string, offset: number): number {
+  return offset - (source.lastIndexOf("\n", offset - 1) + 1);
+}
+
+function factsOf(tree: Root, source: string): Facts {
   const defs: Def[] = [];
   const refs: Ref[] = [];
   let unplaced = 0;
@@ -94,6 +136,47 @@ function factsOf(tree: Root): Facts {
     } else if (candidate.type === "footnoteReference") {
       if (!at) unplaced += 1;
       else refs.push([id(), at.start.line - 1, at.start.column - 1]);
+    }
+
+    // A BURIED `code` NODE'S CONTENT IS SCANNED, because nothing tokenizes it.
+    //
+    // Obsidian indexes every `[^name]` inside a comment at its real column, whatever block
+    // the line would otherwise form. Measured four ways against live 1.14.4:
+    //
+    //     %%/⟨2sp⟩+⟨7sp⟩[^3]: It   ref 3@1:10   code inside a list item
+    //     %%/⟨4sp⟩[^4]: ...        ref 4@1:4    indented code
+    //     %%/[^5]: plain           ref 5@1:0    an actual definition
+    //     %%/⟨4sp⟩plain [^6] ...   ref 6@1:10   a REFERENCE inside indented code
+    //
+    // The last row is why walking for a buried `footnoteDefinition` could never be enough:
+    // the rule is not about definitions. Rows one, two and four form a `code` node, whose
+    // inline content is never tokenized, so the walk saw nothing -- 237 documents, the
+    // largest single shape `shapes.mts` reports.
+    //
+    // SCOPED TO `code`, not to the whole comment. Scanning the comment's entire slice instead
+    // recovers this shape and then over-fires elsewhere, for a net 5439 -> 5400: a comment
+    // whose extent is wider than Obsidian's contributes every label inside the surplus, and
+    // our extent differing on a comment holding a fence is a known class with its own
+    // disagreements. Scanning only `code` touches exactly the nodes the walk cannot see.
+    //
+    // Read from the SOURCE SLICE rather than the node's value, for the reason
+    // `normalize.ts` records: inside a container the value has each line's prefix stripped,
+    // so a value index no longer says where the match sits.
+    if (inComment && candidate.type === "code" && isIndented(source, at)) {
+      const from = at?.start?.offset;
+      const to = at?.end?.offset;
+      if (from !== undefined && to !== undefined) {
+        for (const match of source.slice(from, to).matchAll(LABEL)) {
+          refs.push([
+            // FOLDED, as mdast folds an identifier and as the answers record them. Pushing
+            // the raw capture reported `Ä` against the answer's `ä`, for -251 documents.
+            match[1]!.toLowerCase(),
+            lineOf(source, from + match.index),
+            columnOf(source, from + match.index),
+          ]);
+        }
+      }
+      return;
     }
 
     const buried = inComment || candidate.type === "comment";
