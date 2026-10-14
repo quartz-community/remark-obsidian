@@ -1,0 +1,1194 @@
+{
+  "source": "https://github.com/Comprehensive-Jason/obsidian-footnotes/blob/master/docs/obsidian-reading-rules.md",
+  "recordedAt": "2026-10-14T09:59:39.487Z",
+  "obsidian": {
+    "app": "1.14.4"
+  },
+  "via": "test/parity/ask.mts against the running app's metadataCache.computeMetadataAsync",
+  "cases": [
+    {
+      "rule": "D4 blockid at end",
+      "markdown": "Oysters filter water.[^1] ^water1\n\n[^1]: a\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 35
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 0,
+              "col": 21,
+              "offset": 21
+            }
+          }
+        ],
+        "blocks": [
+          "water1"
+        ],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 2
+          }
+        ]
+      }
+    },
+    {
+      "rule": "D4 blockid mid-block",
+      "markdown": "Oysters filter water. ^water1[^1]\n\n[^1]: a\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 35
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 0,
+              "col": 29,
+              "offset": 29
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 2
+          }
+        ]
+      }
+    },
+    {
+      "rule": "G1 rule",
+      "markdown": "Results were mixed.\n[^1]\n---\n\n[^1]: a\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 30
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 1,
+              "col": 0,
+              "offset": 20
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          },
+          {
+            "type": "thematicBreak",
+            "start": 2
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 4
+          }
+        ]
+      }
+    },
+    {
+      "rule": "G1 definition",
+      "markdown": "text[^1] and[^2]\n[^2]\n[^1]: d\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "G1 table",
+      "markdown": "Some text.\n[^1]\n| a | b |\n| --- | --- |\n| c | d |\n\n[^1]: a\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 6,
+              "col": 0,
+              "offset": 51
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 1,
+              "col": 0,
+              "offset": 11
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 6
+          }
+        ]
+      }
+    },
+    {
+      "rule": "G1 code",
+      "markdown": "Para.\n[^1]\n    code line\n\n[^1]: a\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 26
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 1,
+              "col": 0,
+              "offset": 6
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 4
+          }
+        ]
+      }
+    },
+    {
+      "rule": "G1 prose",
+      "markdown": "The tide rose.\n[^1]\nOysters closed.\n\n[^1]: a\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 37
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 1,
+              "col": 0,
+              "offset": 15
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 4
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B10 label between items",
+      "markdown": "- apples\n[^1]: from the market\n- pears\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "E2 ordered on label line",
+      "markdown": "[^1]: 2. Aufl., S. 34\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 0,
+              "col": 0,
+              "offset": 0
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "footnoteDefinition",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "E2 lead quote label",
+      "markdown": "> Quote one.\n>\n[^1]: def\n> Quote two.\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 15
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "blockquote",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "F6 fence",
+      "markdown": "intro[^1] text\n\n# Footnotes\n\n[^1]: one\n\n```\nunclosed code",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 29
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 0,
+              "col": 5,
+              "offset": 5
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          },
+          {
+            "type": "heading",
+            "start": 2
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 4
+          },
+          {
+            "type": "code",
+            "start": 6
+          }
+        ]
+      }
+    },
+    {
+      "rule": "F6 comment",
+      "markdown": "intro[^1] text\n\n# Footnotes\n\n[^1]: one\n\n%%\nopen comment",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 29
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 0,
+              "col": 5,
+              "offset": 5
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          },
+          {
+            "type": "heading",
+            "start": 2
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 4
+          },
+          {
+            "type": "comment",
+            "start": 6
+          }
+        ]
+      }
+    },
+    {
+      "rule": "C2 piped indented row",
+      "markdown": "| a | b |\n| --- | --- |\n | c[^2] | d |\n\n[^2]: x\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "2",
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 40
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "2",
+            "start": {
+              "line": 2,
+              "col": 4,
+              "offset": 28
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "table",
+            "start": 0
+          },
+          {
+            "type": "paragraph",
+            "start": 2
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 4
+          }
+        ]
+      }
+    },
+    {
+      "rule": "C2 pipeless indented row",
+      "markdown": "a | b\n--- | ---\n    | c[^2] | d\n\n[^2]: x\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "2",
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 33
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "2",
+            "start": {
+              "line": 2,
+              "col": 7,
+              "offset": 23
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "table",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 4
+          }
+        ]
+      }
+    },
+    {
+      "rule": "D7 glued after bracket",
+      "markdown": "[text][^1]\n\n[^1]: a\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 12
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 2
+          }
+        ]
+      }
+    },
+    {
+      "rule": "D7 inside brackets",
+      "markdown": "as noted [see p. 5[^1]] here\n\n[^1]: a\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 30
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 0,
+              "col": 18,
+              "offset": 18
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 2
+          }
+        ]
+      }
+    },
+    {
+      "rule": "A1 pipe in type",
+      "markdown": "> [!note|meta]\n> [^1]: def\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 1,
+              "col": 2,
+              "offset": 17
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "callout",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "A1 two spaces",
+      "markdown": ">  [!note]\n> [^1]: def\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "blockquote",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "A1 double bang",
+      "markdown": "> [!!note]\n> [^1]: def\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 1,
+              "col": 2,
+              "offset": 13
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "callout",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "P2 column quirk",
+      "markdown": "1. > [!note] T\nab cd[^1]\n\n[^1]: a\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 3,
+              "col": 0,
+              "offset": 26
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 1,
+              "col": 8,
+              "offset": 23
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 3
+          }
+        ]
+      }
+    },
+    {
+      "rule": "A4 def on title line",
+      "markdown": "> [!note] [^1]: def\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 0,
+              "col": 10,
+              "offset": 10
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "callout",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "A4 indented title code",
+      "markdown": "> [!note]     code[^2]\n\n[^2]: x\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "2",
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 24
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "callout",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 2
+          }
+        ]
+      }
+    },
+    {
+      "rule": "A4 tab title live ref",
+      "markdown": "> [!note]\tTitle[^1]\n\n[^1]: x\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 21
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 0,
+              "col": 15,
+              "offset": 15
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "callout",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 2
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B1 tab marker defines",
+      "markdown": "-\t[^1]: def\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 0,
+              "col": 2,
+              "offset": 2
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B1 double tab is code",
+      "markdown": "-\t\t[^1]: def\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B1 space-tab is code",
+      "markdown": "- \t[^1]: def\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B2 inside at 2",
+      "markdown": "- a\n\n  [^1]: def\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 2,
+              "col": 2,
+              "offset": 7
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B2 code at 6",
+      "markdown": "- a\n\n      [^1]: def\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B5 two-dot no interrupt",
+      "markdown": "para\n2. item\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B7 empty item open",
+      "markdown": "+  \n\n\n    It[^2]\n\n[^2]: x\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "2",
+            "start": {
+              "line": 5,
+              "col": 0,
+              "offset": 18
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "2",
+            "start": {
+              "line": 3,
+              "col": 6,
+              "offset": 12
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 5
+          }
+        ]
+      }
+    },
+    {
+      "rule": "C1 indented delimiter",
+      "markdown": "| a | b |\n | --- | --- |\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "C1 both indented",
+      "markdown": " | a | b |\n | --- | --- |\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "table",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "C1 pipeless table",
+      "markdown": "a | b\n--- | ---\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "table",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "D6 lrd title over lines",
+      "markdown": "[foo]: /url\n\n'tit [^1]\nle'\n\n[^1]: x\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 5,
+              "col": 0,
+              "offset": 28
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "definition",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 5
+          }
+        ]
+      }
+    },
+    {
+      "rule": "D6 html attr over line",
+      "markdown": "a <span title=\"x\n[^9]: y\">z</span>\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "E1 seven hashes lazy",
+      "markdown": "[^1]: def\n####### H\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 0,
+              "col": 0,
+              "offset": 0
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "footnoteDefinition",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "E1 hash-no-space lazy",
+      "markdown": "[^1]: def\n#H\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 0,
+              "col": 0,
+              "offset": 0
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "footnoteDefinition",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "E5 bracket in name",
+      "markdown": "a[^^[x]]\n\n[^^[x]: d\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "^[x",
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 10
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "^[x",
+            "start": {
+              "line": 0,
+              "col": 1,
+              "offset": 1
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 2
+          }
+        ]
+      }
+    },
+    {
+      "rule": "E5 whitespace kills name",
+      "markdown": "a[^x [y]\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "F1 triple percent",
+      "markdown": "%%%\n[^1]: def\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "F1 percent fifty",
+      "markdown": "%% 50%\n[^1]: def\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "F2 closer behind quote",
+      "markdown": "%%\nhidden\n> %%\n[^1]: def\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 3,
+              "col": 0,
+              "offset": 15
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "comment",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 3
+          }
+        ]
+      }
+    },
+    {
+      "rule": "M1 pairs from left",
+      "markdown": "x $$ a $$ b [^1] $$ c $$ y\n\n[^1]: d\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 28
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 0,
+              "col": 12,
+              "offset": 12
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 2
+          }
+        ]
+      }
+    },
+    {
+      "rule": "M2 display block",
+      "markdown": "$$\na[^1]\n$$\n\n[^1]: d\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 13
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "math",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 4
+          }
+        ]
+      }
+    }
+  ]
+}

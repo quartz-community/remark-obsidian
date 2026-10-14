@@ -221,6 +221,24 @@ export const ORACLES: readonly Oracle[] = [
     test: "chain.test.ts",
   },
   {
+    name: "their rules document",
+    command:
+      "tsx test/parity/ask.mts to re-measure an example; the golden is goldens/rules-doc.json",
+    gate: "ceiling",
+    ceilingAt: "rules-doc.test.ts",
+    test: "rules-doc.test.ts",
+    compares: [
+      "footnote definitions and references with full positions, column and offset included",
+      "the block-identifier index",
+      "source-backed section starts, type-agnostic",
+    ],
+    blind: [
+      "`text` and every rendered projection: several of these examples turn on rendering, and `ask.mts` reads the raw cache with no equivalent of the recorder's `.footnotes` removal",
+      "anything their document does not state -- it is someone else's input set, which is exactly why it finds what our generator cannot",
+      "one entry is NOT ours: `P2 column quirk` is a cache defect we deliberately do not reproduce, so the diverging set is not a backlog",
+    ],
+  },
+  {
     name: "composition axes",
     // `--all` measures every axis; per-axis flags live on AXES rather than being spelled out
     // here, because the spelled-out version went stale within a day. No count is quoted
