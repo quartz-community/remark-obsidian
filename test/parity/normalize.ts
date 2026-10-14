@@ -2201,6 +2201,32 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
    * setext underline is dropped first, since `^blk` over `---` registers from
    * the content line above it.
    */
+  /**
+   * Where a `tag` node ends, so the identifier gate can ask whether one ends at the caret.
+   *
+   * A tag's end frees the caret exactly as a closing delimiter does -- `#tag^blk` registers
+   * `blk` in Obsidian where `word^blk` registers nothing, so it is the TAG and not merely a
+   * word character before the caret. Six controls, and the coupling is tight:
+   *
+   *     #tag^blk          tags ["#tag"]          blocks ["blk"]
+   *     word^blk          tags []                blocks []       no tag, no block
+   *     a#tag^blk         tags []                blocks []       no boundary, so no tag
+   *     #1^blk            tags []                blocks []       `#1` is not a tag either
+   *     #tag-1_a/b^blk    tags ["#tag-1_a/b"]    blocks ["blk"]  `-` `_` `/` are tag chars
+   *     #tag^blk more     tags ["#tag"]          blocks []       the existing tail gate
+   *
+   * Read from the TREE rather than matched with a pattern here. Our tag detection already
+   * agrees with Obsidian on all six, so asking the nodes reuses that decision exactly --
+   * including the two NEGATIVE rows, which a hand-rolled `#[\w/-]+` would get wrong in both
+   * directions. A second copy of the tag rule is the duplication this harness keeps
+   * removing.
+   */
+  const tagEnds = new Set<number>();
+  visit(tree, "tag", (node: Node) => {
+    const at = node.position?.end?.offset;
+    if (at !== undefined) tagEnds.add(at);
+  });
+
   const blocks: string[] = [];
   for (const child of tree.children) {
     // A standalone identifier never reaches the line scan below, which requires
@@ -2379,6 +2405,11 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       before === "]" && raw.slice(0, beforeAt - 1).includes("[");
     const mathCloser =
       before === "$" && raw.slice(0, beforeAt - 1).includes("$");
+    // A tag's END frees the caret, which is the same rule as a closing delimiter without a
+    // delimiter to close: a tag simply stops where its characters stop. `#tag^blk` registers
+    // `blk` while `word^blk` registers nothing, so it is the tag and not the word character.
+    // Asked of the tree rather than matched here, for the reason `tagEnds` records.
+    const tagCloser = tagEnds.has(lineStart + id.index);
     if (
       !(setext && beforeAt === 0) &&
       !wrapped &&
@@ -2387,6 +2418,7 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       !codeCloser &&
       !bracketCloser &&
       !mathCloser &&
+      !tagCloser &&
       !(before && /\s/u.test(before))
     ) {
       continue;

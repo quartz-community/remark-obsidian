@@ -87,8 +87,9 @@ const GOLDEN = path.join(import.meta.dirname, "goldens/compose.json");
  *     1 `quote > callout > footnote`  a definition column, confirmed over three depths; the
  *                        rule and why it is not implemented are recorded in
  *                        `definition-column.ts` at the early return it would have to change.
- *     1 `tag + blockid`  a tag has no closing delimiter, so the caret follows a word
- *                        character -- a different mechanism from the closer rule.
+ *     `tag + blockid` is CLOSED, and `--inline` is now clean over all 196: a tag's END frees
+ *                        the caret, asked of the tree's `tag` nodes rather than matched with a
+ *                        pattern, so the two NEGATIVE controls (`word^blk`, `#1^blk`) hold.
  *     1 `linkdef > thematic`  upstream's setext-under-definition reading, `UPSTREAM.md` 2.
  *     4 `comment [ ... ]` the P1 cache defect. MUST NOT be fixed.
  */
@@ -108,7 +109,7 @@ const DIVERGING: Record<Axis, readonly string[]> = {
     "quote > footnote > indented",
   ],
   nested: ["quote > callout > footnote"],
-  inline: ["tag + blockid"],
+  inline: [],
   "inline-block": [
     "comment [ embed ]",
     "comment [ inlinefn ]",
