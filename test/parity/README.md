@@ -1040,8 +1040,10 @@ rather than inferred from whichever cell was being debugged:
 
 ### And it splits the divergences into three kinds, which the sweeps could not
 
-5 of 80 diverge and only **2** are absorption errors. The other three have the absorption bit
-AGREEING and something else wrong, which a divergence flag cannot distinguish:
+When the matrix was built 5 of 80 diverged, and only **2** were absorption errors. The other
+three had the absorption bit AGREEING and something else wrong, which a divergence flag cannot
+distinguish. **All five are closed now** -- `matrix` is one of the four axes at zero -- but the
+taxonomy is why they could be worked at all, so the table stays as it was measured:
 
 | cell                 | kind       | obs                           | ours                                   |
 | -------------------- | ---------- | ----------------------------- | -------------------------------------- |
@@ -1054,6 +1056,22 @@ AGREEING and something else wrong, which a divergence flag cannot distinguish:
 So the two `math` rows are not "we fail to absorb" at all -- both sides absorb, and we then run
 past the blank line. That is `math-outlives.ts`, which eleven cases depend on, and it is a
 different piece of work from a guard list entry.
+
+Each kind needed a different fix, which is the taxonomy earning its keep:
+
+| kind       | closed by                                                                   |
+| ---------- | --------------------------------------------------------------------------- |
+| EXTENT     | `mathListExtentTransform` -- a new pass bounding `$$` at its blank line     |
+| ABSORPTION | `quote-indented-code.ts` accepting `callout`, re-running `calloutTransform` |
+| NODE TYPE  | `definitionIndentedCodeTransform` -- a new pass, not a guard                |
+
+Not one of the three was a guard-chain entry, which is the opposite of what the map's own
+section predicted -- worth knowing before reaching for the chain on the next cell.
+
+`linkdef > thematic` is the one worth re-reading, because the taxonomy called it ABSORPTION
+and that was **wrong**: `definitionSetextTransform` already implemented the rule and was
+declining the case on NODE TYPE, since `===` has no second reading and arrives as paragraph
+text while `---` arrives as a `thematicBreak`. A cell's kind is a hypothesis like any other.
 
 ### The map is the specification the guard list never had
 

@@ -60,8 +60,33 @@ these two edits.
 The heading's **content** begins on line 1, which is what its own `children` say; only the
 heading node's `position.start` is wrong.
 
-**No workaround here** — we do not produce the overlap in our own output, and nothing in
-this package depends on the heading's start. Filed for the ecosystem.
+**We DO produce the overlap in our own output.** An earlier revision of this item claimed we
+did not. That was wrong, and the measurement is one line:
+
+```
+[ref]: /url / bar / ---   →   definition@0-0, heading@0-2
+```
+
+The heading starts on line 0, inside the definition that precedes it. We pass upstream's
+positions straight through, so of course we reproduce them. The claim had been written from
+the premise that a defect filed against upstream is therefore absent downstream, which does
+not follow for a position we never rewrite.
+
+`INVARIANT_VIOLATIONS` in `compose.test.ts` already contradicted the prose, recording a
+`SIBLINGS OVERLAP: root > definition/heading` row for every composition sequence that hits
+this, and asserting the set EXACTLY so the count cannot drift unnoticed. Those rows **must
+not reach zero**: rewriting the heading's start to line 1 would make our tree disagree with
+every other `remark` consumer about the same document, and parity does not need it.
+
+**Parity is unaffected** because the `headings` projection reads the heading's first child's
+line rather than the node's own start, which is where Obsidian's answer lives too. So this is
+a tree-shape defect we inherit, NOT a parity defect — those are different things, and the
+distinction is why no fix is warranted here.
+
+**Still a live concern for consumers**, which is the part the old wording got backwards: a
+splice-by-offset consumer such as `obsidian-linter` sees these overlapping siblings in OUR
+output, not merely in bare `remark-parse`'s. Filed for the ecosystem, and worth stating
+plainly rather than disclaiming.
 
 ## 3. `<...>` autolink shorthand is offered for addresses CommonMark will not autolink
 

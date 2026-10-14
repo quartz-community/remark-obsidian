@@ -39,63 +39,45 @@ const GOLDEN = path.join(import.meta.dirname, "goldens/compose.json");
 /**
  * The sequences that diverge, by axis, every one attributed.
  *
- *     inline-block  all four are the P1 cache defect: Obsidian's offsets are short by the
- *                   width of the `%%` marker, so reproducing them would write a wrong offset
- *                   into our own tree. MUST NOT be fixed.
- *     isolate       the 19 are the same four absorbable families the matrix names, seen
- *                   through a spacer; `comment` and `math` dominate.
- *     `linkdef > indented` WAS here and is fixed -- an indented line after a link reference
- *     definition is code, which `definitionIndentedCodeTransform` now reproduces. The gate
- *     is what forced this list to move with the fix rather than drifting behind it.
+ * DERIVED, never written by hand. The first version was guessed -- `isolate` and `nested`
+ * left empty -- and the gate caught it instantly, which is the gate working and the author
+ * not. Re-derive from the golden with the snippet in `README.md` rather than editing by eye.
  *
- *     The MATH EXTENT family is closed -- `mathListExtentTransform` bounds an unclosed `$$`
- *     at its blank line when a list absorbs it, which took 12 rows across four axes. The two
- *     The two `> footnote > math` rows closed too, by walking the opener's chain back to the
- *     list across a `footnoteDefinition` -- the only spacer that survives as its own root
- *     sibling, since the rest are absorbed into the item's lazy paragraph first.
+ * NO COUNTS IN THIS PROSE. Four axes have reached zero (`pairs`, `matrix`, `inside`,
+ * `inline`) and each did so by a count in a sentence going stale while `DIVERGING` below
+ * moved correctly. The constant IS the count; read it there. What prose is good for is the
+ * CAUSE of a row, which no gate can infer, so that is all this says.
  *
- *     pairs/matrix  `linkdef > thematic` is -- both sides absorb the
- *                   opener and we run past the blank line, which is upstream in remark-math
- *                   and needs node surgery rather than a guard. `linkdef > indented` reports
- *                   a paragraph where Obsidian reports code; `linkdef > thematic` is
- *                   upstream's setext-under-definition reading, `UPSTREAM.md` item 2.
- *     nested        two `nested > math` are the same extent bug; `quote > callout > footnote`
- *                   is a definition column, 2 against our 0.
- *     DERIVED, not written by hand. The first version of this table was guessed -- `isolate`
- *     and `nested` were left empty -- and the gate caught it immediately, which is the gate
- *     working and the author not. Re-derive it from the golden rather than editing it by eye.
+ * FOUR AXES CLEAN. `inside` never diverged. `inline` closed when a tag's END was found to
+ * free the caret for a block identifier. `pairs` and `matrix` closed together on their last
+ * shared row, `linkdef > thematic`, whose cause is worth keeping: `definitionSetextTransform`
+ * already implemented the rule and declined this case on NODE TYPE alone, because `===` has
+ * no second reading and arrives as paragraph text while `---` arrives as a `thematicBreak`.
+ * One rule, two node types -- the same shape as `splitLazyHtml` beside `splitLazyHeading`.
  *
- *     inline        `#tag^blk` only: a tag has no closing delimiter, so the caret follows a
- *                   word character, which is a different mechanism from the closer rule and
- *                   needs its own evidence.
+ * EVERY REMAINING ROW, each with its cause measured rather than guessed:
  *
- * WHAT THE REMAINING 19 ARE, each with its cause measured rather than guessed:
- *
- *     5 `> comment`      the `%%` never becomes a comment node. `- item` / `[^1]: def` /
- *                        `%%` arrives as ONE paragraph with `%%` as a TEXT child, both lines
- *                        absorbed as lazy continuation, so there is nothing to lift. Needs
- *                        `%%` to interrupt lazy continuation -- tokenizer-level, not a guard.
- *     `html > thematic` is CLOSED: micromark hands an html lazy line and its setext
- *                        underline over as ONE html node, so `splitLazyHeading` never saw a
- *                        heading to take apart. `splitLazyHtml` does the same split for the
- *                        second node type.
- *     2 `footnote > indented` and 1 `footnote > thematic`: a definition absorbed as a
- *                        container's lazy content is NOT a definition to Obsidian, so the
- *                        indented line after it is root `code` rather than the definition's
- *                        continuation. `callout > footnote > thematic` is the same cause seen
- *                        through `defs`: Obsidian reports none and we report one.
- *     1 `quote > callout > footnote`  a definition column, confirmed over three depths; the
- *                        rule and why it is not implemented are recorded in
- *                        `definition-column.ts` at the early return it would have to change.
- *     `tag + blockid` is CLOSED, and `--inline` is now clean over all 196: a tag's END frees
- *                        the caret, asked of the tree's `tag` nodes rather than matched with a
- *                        pattern, so the two NEGATIVE controls (`word^blk`, `#1^blk`) hold.
- *     1 `linkdef > thematic`  upstream's setext-under-definition reading, `UPSTREAM.md` 2.
- *     4 `comment [ ... ]` the P1 cache defect. MUST NOT be fixed.
+ *     `> comment`       the `%%` never becomes a comment node. `- item` / `[^1]: def` /
+ *                       `%%` arrives as ONE paragraph with `%%` as a TEXT child, both lines
+ *                       absorbed as lazy continuation, so there is nothing to lift. Needs
+ *                       `%%` to interrupt lazy continuation -- tokenizer-level, not a guard.
+ *     `footnote > indented` and `footnote > thematic`: a definition absorbed as a
+ *                       container's lazy content is NOT a definition to Obsidian, so the
+ *                       indented line after it is root `code` rather than the definition's
+ *                       continuation. `callout > footnote > thematic` is the same cause seen
+ *                       through `defs`: Obsidian reports none and we report one. Closing it
+ *                       means surgery in `containerLazyTransform`'s `footnoteDefinition`
+ *                       absorption, which 43 referee documents depend on.
+ *     `quote > callout > footnote`  a definition column, confirmed over three depths; the
+ *                       rule and why it is not implemented are recorded in
+ *                       `definition-column.ts` at the early return it would have to change.
+ *     `comment [ ... ]` the P1 cache defect: Obsidian's offsets are short by the width of
+ *                       the `%%` marker, so reproducing them would write a wrong offset into
+ *                       our own tree. MUST NOT be fixed -- these four are the floor.
  */
 const DIVERGING: Record<Axis, readonly string[]> = {
-  pairs: ["linkdef > thematic"],
-  matrix: ["linkdef > thematic"],
+  pairs: [],
+  matrix: [],
   inside: [],
   isolate: [
     "bullet > footnote > comment",

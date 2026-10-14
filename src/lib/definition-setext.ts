@@ -35,13 +35,31 @@ export function definitionSetextTransform(tree: Root, source: string): void {
   for (let index = children.length - 2; index >= 0; index--) {
     const definition = children[index];
     const next = children[index + 1];
-    if (definition?.type !== "definition" || next?.type !== "paragraph") {
-      continue;
-    }
+    if (definition?.type !== "definition") continue;
+    // EITHER node type the underline can arrive as, which is the whole of this change.
+    // `===` has no second reading so micromark leaves it as paragraph text, and that half
+    // already worked; `---` is also a thematic break, so micromark builds one and the
+    // paragraph-only gate declined the very case the rule was written for:
+    //
+    //     [ref]: /url / ===   heading@0-1 (h1)   we already matched
+    //     [ref]: /url / ---   heading@0-1 (h2)   we gave definition + thematicBreak
+    //
+    // Both report NO referenceLink in Obsidian, so the definition really is consumed either
+    // way. One rule needing a second node type, the fourth instance in this session.
+    if (next?.type !== "paragraph" && next?.type !== "thematicBreak") continue;
 
-    const first = next.children[0];
-    if (first?.type !== "text") continue;
-    const line = first.value.split("\n")[0] ?? "";
+    let line: string;
+    if (next.type === "paragraph") {
+      const first = next.children[0];
+      if (first?.type !== "text") continue;
+      line = first.value.split("\n")[0] ?? "";
+    } else {
+      // A thematic break carries no children, so its own source slice is the underline.
+      const breakFrom = next.position?.start?.offset;
+      const breakTo = next.position?.end?.offset;
+      if (breakFrom === undefined || breakTo === undefined) continue;
+      line = source.slice(breakFrom, breakTo).split("\n")[0] ?? "";
+    }
     const marker = UNDERLINE.exec(line);
     if (!marker) continue;
 
@@ -83,8 +101,12 @@ export function definitionSetextTransform(tree: Root, source: string): void {
 
     // Whatever followed the underline stays a paragraph of its own. The underline's
     // text node and the break after it go; everything else keeps its own position.
-    const rest = next.children.slice(
-      next.children[1]?.type === "break" ? 2 : 1,
+    // Only the paragraph shape can carry anything past the underline. A thematic break is
+    // the whole line by construction, so there is no tail to preserve.
+    const rest = (
+      next.type === "paragraph"
+        ? next.children.slice(next.children[1]?.type === "break" ? 2 : 1)
+        : []
     ) as RootContent[];
     const replacement: RootContent[] = [heading];
     if (rest.length > 0) {
