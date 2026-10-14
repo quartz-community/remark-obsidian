@@ -3169,12 +3169,30 @@ Three things, none of which a flag fixes:
   by their own goldens, which is why B3 was landable -- but they are not in `corpus.ts`, so the
   main gate and every sweep built on it still cannot see those shapes. Promotion needs
   `parity:record`, which rewrites all 3,403 goldens and this project reserves for a human.
-- **Oracle coverage, which is not a gate property at all.** `footnoteRefs` lists only
-  references whose name HAS a definition, so it cannot adjudicate the reference side without
-  the synthesised-definition trick; 8 of 14 inline constructs report nothing to
-  `metadataCache`; and `P1`/`P2` are cache defects that must NOT be reproduced, so four
-  composition rows and several positional ones have a floor above zero by design. No
-  instrument can close these -- they are what the application exposes.
+- **Oracle coverage, which is not a gate property at all.** PARTLY CLOSED. The
+  `footnoteRefs` half is now `ask.mts --synth`: it appends a definition for every referenced
+  name and asks again, so a reference Obsidian would not otherwise report becomes visible.
+  `text[^1] more` answers `[]` plain and `1@0:4` synthesised.
+
+  **It carries its own safety check, and needed two goes.** Appending at the end leaves every
+  original offset intact, but an unclosed `%%` runs to the end of the note and SWALLOWS the
+  appended definitions -- so `refs: []` can mean "the probe never fired" rather than "Obsidian
+  indexes nothing". Three conditions now: the original region's `footnotes` and `sections` must
+  be untouched, and the synthesised definitions must actually have DEFINED. `%% [^2] buried`
+  correctly reports `safe=false`.
+
+  The first version also scanned the source for `[^x]:` labels and skipped those names, which
+  is wrong in precisely the case the flag exists for: `> %%` / `[^3]: Text` HAS a label and
+  Obsidian defines nothing, so the scan skipped the one document that needed augmenting and
+  returned an empty `refs` that read like an answer. Eighth instance of an inert probe looking
+  exactly like a working one. Augmenting every referenced name unconditionally fixes it -- a
+  duplicate definition is harmless, since the first wins -- and the result reproduces a
+  measurement these notes previously made by hand: `3@1:0`.
+
+  What remains is genuinely the application: 8 of 14 inline constructs report nothing to
+  `metadataCache`, and `P1`/`P2` are cache defects that must NOT be reproduced, so four
+  composition rows and several positional ones have a floor above zero by design. No instrument
+  closes those.
 
 So the measuring devices are in order and two known-weak spots remain inside them: the scorer's
 re-derivations, and the corpus's blindness to the probe shapes. Both are tractable and neither
