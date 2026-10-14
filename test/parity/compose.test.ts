@@ -57,10 +57,20 @@ const GOLDEN = path.join(import.meta.dirname, "goldens/compose.json");
  *
  * EVERY REMAINING ROW, each with its cause measured rather than guessed:
  *
- *     `> comment`       the `%%` never becomes a comment node. `- item` / `[^1]: def` /
- *                       `%%` arrives as ONE paragraph with `%%` as a TEXT child, both lines
- *                       absorbed as lazy continuation, so there is nothing to lift. Needs
- *                       `%%` to interrupt lazy continuation -- tokenizer-level, not a guard.
+ *     `> comment`       the CALLOUT row is CLOSED, and it was never "tokenizer-level" as
+ *                       this entry used to claim. The `%%` is the lazily-absorbed
+ *                       definition's own continuation, so splitting the definition produces
+ *                       a real comment node -- and an UNCLOSED one then has to take the end
+ *                       of the note, which the fragment re-parse cannot know. Obsidian
+ *                       reports TWO sections there, the callout and a comment swallowing the
+ *                       trailing paragraph.
+ *
+ *                       `bullet`, `ordered` and `quote > footnote > comment` remain for the
+ *                       same reason their `indented` siblings do: a quote and a list report
+ *                       `defs []`, so the definition must be FLATTENED as well as split.
+ *                       `bullet` and `ordered > html > comment` are a DIFFERENT mechanism --
+ *                       the spacer is an html block rather than a definition, so there is no
+ *                       definition to split and the family has not been investigated.
  *     `quote > footnote > indented`  the CALLOUT half of this is CLOSED, and the split is
  *                       worth reading before touching the rest. Upstream reads `[^1]: def`
  *                       plus an indented line as ONE definition, so the continuation sits
@@ -92,7 +102,6 @@ const DIVERGING: Record<Axis, readonly string[]> = {
   isolate: [
     "bullet > footnote > comment",
     "bullet > html > comment",
-    "callout > footnote > comment",
     "ordered > footnote > comment",
     "ordered > html > comment",
     "quote > footnote > comment",

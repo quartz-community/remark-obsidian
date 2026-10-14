@@ -58,7 +58,7 @@ export function commentHoistTransform(tree: Root, source: string): void {
 }
 
 /** The end of the note, as a point: an unclosed comment runs here. */
-function endPoint(source: string): {
+export function endPoint(source: string): {
   line: number;
   column: number;
   offset: number;

@@ -1,5 +1,7 @@
 import type { Root, RootContent } from "mdast";
 
+import { endPoint } from "./comment-hoist.js";
+
 /**
  * A CALLOUT only, which is the half Obsidian keeps a definition for.
  *
@@ -117,6 +119,28 @@ export function definitionLazySplitTransform(
     shiftOnto(head, from);
     for (const node of tail) shiftOnto(node, firstBreak + 1);
     children.splice(index, 1, head, ...(tail as RootContent[]));
+
+    // An UNCLOSED `%%` tail runs to the end of the note, which the fragment re-parse cannot
+    // know: it saw a two-character document and bounded the comment there. Obsidian reports
+    // `> [!note] title` / `[^1]: def` / `%%` as TWO sections, the callout and a comment that
+    // swallows the trailing paragraph, where a line-bounded comment leaves three.
+    //
+    // Every comment pass runs at the top of the chain, hundreds of lines before this one, so
+    // a comment created here never meets the pass that would extend it -- the same coupling
+    // `liftContainerComment` records, and this is its idiom: take the end of the note, drop
+    // the swallowed siblings, and let `commentParseTransform` re-derive the body as children
+    // from the span. That is what keeps a reference inside the comment indexable.
+    const last = tail[tail.length - 1];
+    const opener = last?.position?.start?.offset;
+    if (
+      last?.type === "comment" &&
+      opener !== undefined &&
+      !source.slice(opener + 2).includes("%%")
+    ) {
+      last.position!.end = endPoint(source);
+      delete (last as { children?: unknown }).children;
+      children.splice(index + tail.length + 1);
+    }
   }
 }
 
