@@ -1346,6 +1346,52 @@ progress wants a different kind of evidence -- recorded probes against the appli
 specific constructs, which `ask.mts` now makes cheap -- rather than more mining of this
 corpus.
 
+### ...and that conclusion was WRONG, because of how the buckets were grouped
+
+The paragraphs above are kept because the reasoning in them is sound and the conclusion is
+not. "A long tail of context-specific interactions" was inferred from grouping the disagreeing
+documents by their TEXT -- minimal forms, line shapes, construct frequency -- and every such
+grouping did refute on contact. Grouping them by WHAT DIFFERS gives the opposite answer.
+
+The signature is counts and deltas only, never anything document-specific, so two notes sharing
+a mechanism share a signature whatever text they carry: which definitions are missing or
+invented, by how many lines each end is out, whether a column differs, and the same for
+references. Over the disagreeing documents:
+
+|                             |         |
+| --------------------------- | ------: |
+| disagreeing documents       |   1,415 |
+| distinct delta-shapes       |  **72** |
+| share in the top ten shapes | **82%** |
+
+    235  ref-miss                 107  def-end+1
+    190  ref-extra                 87  def-col
+    140  def-miss                  68  def-miss+ref-extra
+    125  def-extra+ref-miss        57  def-end-1
+    123  def-extra                 32  def-end+2
+
+That is structure, not a tail. And two of the families are purely POSITIONAL -- `def-end±N` is
+213 documents and `def-col` 87 -- which means a single mechanism each rather than a cause per
+document.
+
+**The first lead from it landed immediately.** `score.mts` predicted better 48 / worse 0 for
+pulling a definition's end back off trailing blanks, and the implementation delivered referee
+**+36 with zero documents lost** -- the largest move on this oracle since the +43
+lazy-absorption rule. It was not even a new rule: `definitionTrimTransform` already carried it
+and applied it once, declining its blank loop whenever the end line held content and then
+exposing blanks with its own fallback.
+
+**And the metric is worth only 2.4 points, measured rather than estimated.** Implementing their
+comparator against our tree -- column never compared, both ends normalised, empty and inline
+references dropped -- gives 5,568 of 6,818 against our strict 5,403. So of the ~20-point gap to
+their reported 99.2%, about 2.4 points is the comparison and the rest is real.
+
+The lesson is about grouping rather than about the referee: **a selector over the INPUT and a
+selector over the ERROR are different instruments, and this file had only ever tried the first.**
+Four text-shaped selectors died here -- probes per open case, co-occurrence, construct
+frequency, line-local prefix -- and each death was recorded as evidence that the remainder was
+unstructured. It was evidence that the remainder is not structured BY TEXT.
+
 ### Re-asking a refused rule with the tree is not a universal fix
 
 The lazy-continuation rule flipped from -15 to +21 once `score.mts` could read the tree, so
