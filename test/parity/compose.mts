@@ -148,6 +148,115 @@ if (process.argv.includes("--all")) {
   process.exit(0);
 }
 
+/**
+ * `--dump <file>` / `--blast <file>`, over EVERY axis, and this is the geometry half.
+ *
+ * `referee.mts --blast` closed the same hole for `defs` and `refs`, which is all that oracle
+ * records. This gate is the one that holds `sections`, so a change that rewrites BLOCK
+ * GEOMETRY from one wrong answer to another is invisible everywhere else -- the referee cannot
+ * see sections at all, the corpus has five diverging cases in total, and these rows are
+ * BINARY: `agrees(want, got)` collapses eight projections to a boolean, so a row that was
+ * diverging and still diverges reports the same `1` either way.
+ *
+ * Sweeps all seven axes rather than the selected one, because a partial baseline would make
+ * the next comparison silently narrower than it looks -- and that is the failure mode this
+ * whole family of flags exists to catch.
+ */
+const valueOf = (flag: string): string | undefined => {
+  const at = process.argv.indexOf(flag);
+  return at === -1 ? undefined : process.argv[at + 1];
+};
+const dumpTo = valueOf("--dump");
+const blastFrom = valueOf("--blast");
+
+if (dumpTo !== undefined || blastFrom !== undefined) {
+  const snapshot: Record<string, { agreed: boolean; sig: string }> = {};
+  const baseline: Record<string, { agreed: boolean; sig: string }> =
+    blastFrom === undefined
+      ? {}
+      : (JSON.parse(fs.readFileSync(blastFrom, "utf8")) as typeof baseline);
+  const rows: Array<{
+    key: string;
+    bucket: "gained" | "lost" | "still wrong";
+    fields: string;
+  }> = [];
+
+  for (const ax of AXES) {
+    const want = theirsFor(ax);
+    for (const entry of casesFor(ax)) {
+      const key = `${ax}/${entry.name}`;
+      const theirs = want.get(entry.name);
+      if (theirs === undefined) continue;
+      let got: Facts;
+      try {
+        got = oursFor(entry.text, ax);
+      } catch (error) {
+        snapshot[key] = { agreed: false, sig: `THREW ${String(error)}` };
+        continue;
+      }
+      const agreed = agrees(theirs, got);
+      const sig = JSON.stringify(got);
+      snapshot[key] = { agreed, sig };
+      const was = baseline[key];
+      if (was !== undefined && was.sig !== sig) {
+        // WHICH projections moved, so a geometry-only change is legible as one.
+        const before = JSON.parse(was.sig) as Record<string, unknown>;
+        const fields = Object.keys(got).filter(
+          (field) =>
+            JSON.stringify(
+              (got as unknown as Record<string, unknown>)[field],
+            ) !== JSON.stringify(before[field]),
+        );
+        rows.push({
+          key,
+          bucket: agreed ? "gained" : was.agreed ? "lost" : "still wrong",
+          fields: fields.join(","),
+        });
+      }
+    }
+  }
+
+  if (dumpTo !== undefined) {
+    fs.writeFileSync(dumpTo, JSON.stringify(snapshot));
+    console.log(`dumped ${Object.keys(snapshot).length} rows to ${dumpTo}`);
+    process.exit(0);
+  }
+
+  const buckets = new Map<string, number>();
+  const fieldHits = new Map<string, number>();
+  for (const row of rows) {
+    buckets.set(row.bucket, (buckets.get(row.bucket) ?? 0) + 1);
+    for (const field of row.fields.split(",").filter(Boolean)) {
+      fieldHits.set(field, (fieldHits.get(field) ?? 0) + 1);
+    }
+  }
+  console.log(`blast radius against ${blastFrom}`);
+  console.log(
+    `  rows ALTERED : ${rows.length} of ${Object.keys(snapshot).length}`,
+  );
+  for (const bucket of ["gained", "lost", "still wrong"]) {
+    console.log(`    ${bucket.padEnd(12)} ${buckets.get(bucket) ?? 0}`);
+  }
+  if (fieldHits.size > 0) {
+    console.log("\n  projections that moved:");
+    for (const [field, count] of [...fieldHits].sort((a, b) => b[1] - a[1])) {
+      console.log(`    ${String(count).padStart(4)}  ${field}`);
+    }
+  }
+  const silent = rows.filter((row) => row.bucket === "still wrong");
+  if (silent.length > 0) {
+    console.log(
+      `\n  STILL WRONG -- rewritten while the row kept diverging. Binary rows cannot see these.`,
+    );
+    for (const row of silent.slice(0, 30)) {
+      console.log(`    ${row.key}  [${row.fields}]`);
+    }
+    if (silent.length > 30)
+      console.log(`    ... and ${silent.length - 30} more`);
+  }
+  process.exit(0);
+}
+
 const FLAGS: ReadonlyArray<readonly [string, Axis]> = [
   ["--matrix", "matrix"],
   ["--inside", "inside"],

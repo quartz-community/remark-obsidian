@@ -2963,6 +2963,53 @@ residual is that `--blast` compares `defs` and `refs` only, because that is what
 records -- a change that rewrites `sections` geometry between two wrong answers is still
 invisible on 6,818 documents, and `compose` is the gate that would have to say so.
 
+### The geometry half, closed: `compose.mts --dump/--blast`
+
+`compose` is the gate holding `sections`, and its rows were the binary ones -- `agrees(want,
+got)` collapses eight projections to a boolean, so a row diverging before and after reports the
+same `1` either way. The same two flags now sweep **all seven axes**, 1,152 rows, and name which
+projections moved:
+
+    rows ALTERED : 15 of 1152
+      gained 15    lost 0    still wrong 0
+
+    projections that moved:   sections 14   defs 3   headings 2   refs 1
+
+Fifteen rows, every one into agreement, and **nothing rewritten while still diverging**. The
+moved projections are overwhelmingly `sections`, which is the point: that is the geometry no
+other instrument here records.
+
+Break-tested, and the first attempt was itself wrong in a way worth keeping. Tampering two
+baseline rows reported nothing new, because the rows picked were ones this session FIXED -- so
+they were already in the `gained` 15 and the tamper changed which bucket they would have been
+in, not whether they appeared. Picking rows that diverge **both before and after** reports
+`still wrong 2` with `sections` named. **A break test has to break something the gate would
+otherwise be silent about**, and a row that already moved is not that.
+
+That re-pick also measured the surface directly instead of taking it on trust, and it is exactly
+what these notes claimed: **5 rows diverge both before and after** --
+`nested/quote > callout > footnote`, the scored-and-declined nested-definition column, and the
+four `inline-block/comment [ ... ]` rows that are the P1 cache defect which must not be fixed.
+
+### The instrument inventory, and the one hole left
+
+| gate                          | diverging units | assertion                | hole     |
+| ----------------------------- | --------------: | ------------------------ | -------- |
+| `referee.mts`                 |           1,316 | total + `--blast`        | closed   |
+| `delta.mts` (corpus)          |               5 | triage lists + `--blast` | closed   |
+| `compose.mts`                 |               5 | binary rows + `--blast`  | closed   |
+| `compute.test.ts` CEILING     |          **18** | **per-field COUNT**      | **OPEN** |
+| `compute.test.ts` gaps list   |               n | exact set, by identity   | none     |
+| `rules-doc.test.ts`           |               6 | exact set, by identity   | none     |
+| invariants, points, roundtrip |               0 | absolute property        | none     |
+
+`CEILING` is the last one, and it has the hole for the reason the referee total did: it asserts
+`{footnotes: 2, footnoteRefs: 4, sections: 1, links: 2, embeds: 2, blocks: 3, listItems: 4}` as
+**counts**, so one case ceasing to diverge while another starts holds the number exactly. 18
+units, which is small -- and this file already carries the lesson twice, once as "verify a HOLD
+by identity, not by its total" and once as the round-trip ceiling that could not tell untidy
+from unbounded, which is why that gate now asserts emptiness instead.
+
 ## Tracing their SOURCE finds rules their document does not letter
 
 Their rules document was mined once and gave five gaps, all now closed. Their source is a
