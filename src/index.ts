@@ -70,6 +70,7 @@ import { tableRowStyleTransform } from "./lib/table-row-style.js";
 import { tablePipeStyleTransform } from "./lib/table-pipe-style.js";
 import { calloutTitleInterruptTransform } from "./lib/callout-title-interrupt.js";
 import { tableLabelRowTransform } from "./lib/table-label-row.js";
+import { tableIndentedRowTransform } from "./lib/table-indented-row.js";
 import { tableShortDelimiterTransform } from "./lib/table-short-delimiter.js";
 import {
   htmlSetextTransform,
@@ -728,6 +729,12 @@ export default function remarkObsidian(
     // label row, which no recorded case does. Kept here because it is the safe position and
     // the claim is now honest about its evidence.
     tableLabelRowTransform(tree, String(file), (markdown) =>
+      self.parse(markdown),
+    );
+    // After every table pass, so the table is in its final shape before an indented body row
+    // is taken off it. Their rules document's C2: a row indented by even one space does not
+    // start with a pipe, so it is not a row and the table ends before it.
+    tableIndentedRowTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
     // After the callout passes, and this one IS exercised -- `pass-order.mts` reports a
