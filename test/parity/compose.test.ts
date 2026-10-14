@@ -48,8 +48,9 @@ const GOLDEN = path.join(import.meta.dirname, "goldens/compose.json");
  *
  *     The MATH EXTENT family is closed -- `mathListExtentTransform` bounds an unclosed `$$`
  *     at its blank line when a list absorbs it, which took 12 rows across four axes. The two
- *     `> footnote > math` rows that remain reach the list through a spacer, so the opener's
- *     previous sibling is a `footnoteDefinition` rather than the list itself.
+ *     The two `> footnote > math` rows closed too, by walking the opener's chain back to the
+ *     list across a `footnoteDefinition` -- the only spacer that survives as its own root
+ *     sibling, since the rest are absorbed into the item's lazy paragraph first.
  *
  *     pairs/matrix  `linkdef > thematic` is -- both sides absorb the
  *                   opener and we run past the blank line, which is upstream in remark-math
@@ -72,14 +73,12 @@ const DIVERGING: Record<Axis, readonly string[]> = {
   inside: [],
   isolate: [
     "bullet > footnote > comment",
-    "bullet > footnote > math",
     "bullet > html > comment",
     "bullet > html > thematic",
     "callout > footnote > comment",
     "callout > footnote > indented",
     "callout > footnote > thematic",
     "ordered > footnote > comment",
-    "ordered > footnote > math",
     "ordered > html > comment",
     "ordered > html > thematic",
     "quote > footnote > comment",

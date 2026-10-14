@@ -52,7 +52,28 @@ export function mathListExtentTransform(
   for (let index = tree.children.length - 1; index >= 1; index--) {
     const node = tree.children[index];
     if (node?.type !== "math") continue;
-    if (tree.children[index - 1]?.type !== "list") continue;
+
+    // Walk BACK to the list across any `footnoteDefinition` between, which is the chain
+    // `containerLazyTransform` already follows -- a column-zero definition adjacent to a list
+    // is swallowed by it, so the opener after one is still an opener after the list.
+    //
+    // `- item` / `[^1]: def` / `$$` leaves the definition as its own root sibling where every
+    // other spacer is absorbed into the item's lazy paragraph first, so this is the only
+    // widening the measured rows need: `bullet > footnote > math` and
+    // `ordered > footnote > math` were the two the direct test could not reach.
+    //
+    // Restricted to that one type on purpose. Widening the same chain to `thematicBreak` and
+    // `definition` is recorded in `container-lazy.ts` at 3 better against 23 worse, because
+    // those are real blocks that END a list rather than continue it.
+    let host = index - 1;
+    while (host >= 0 && tree.children[host]?.type === "footnoteDefinition") {
+      const gapFrom = tree.children[host]?.position?.end?.offset;
+      const gapTo = tree.children[host + 1]?.position?.start?.offset;
+      if (gapFrom === undefined || gapTo === undefined) break;
+      if (source.slice(gapFrom, gapTo).includes("\n\n")) break;
+      host--;
+    }
+    if (host < 0 || tree.children[host]?.type !== "list") continue;
 
     const math = node as unknown as MathNode;
     const from = math.position?.start?.offset;
