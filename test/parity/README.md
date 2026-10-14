@@ -2917,6 +2917,52 @@ change.** The total answers "did it help", `--ids` answers "which documents move
 `still wrong` answers "did I rewrite an answer into a different kind of wrong" -- which is the
 question a half-implemented rule needs asked.
 
+### Is that all of them? The surface is countable, and it is almost entirely one oracle
+
+Worth asking rather than assuming, because the obvious reading is that every gate here has the
+same hole. **The blind spot's size is exactly the number of units that currently DIVERGE** -- an
+agreeing unit cannot be rewritten into a different wrong answer, and a unit that starts
+agreeing or stops is already reported. So the exposure per oracle is countable:
+
+| oracle                        | units | currently diverging | instrumented           |
+| ----------------------------- | ----: | ------------------: | ---------------------- |
+| referee `defs`/`refs`         | 6,818 |           **1,316** | `referee.mts --blast`  |
+| corpus, ~10 projections each  | 3,403 |               **5** | `delta.mts --blast`    |
+| `compose` 7 axes, binary rows | 1,152 |               **5** | no, and see below      |
+| rules-doc                     |    76 |                   6 | exact-set assertions   |
+| invariants, spans, round-trip |     - |                   - | absolute, not relative |
+
+**1,316 of the ~1,330 diverging units in the whole harness are in the referee**, which is why
+that is where the 27 were and why it was worth a flag. The last row does not participate at
+all: those gates assert a property rather than compare against a recording, so there is no
+"different kind of wrong" for them to absorb -- a span either overlaps or it does not.
+
+`delta.mts --blast` exists now too, and the answer it gives is the useful kind of boring:
+
+    answers ALTERED : 0 of 3403
+      gained 0    lost 0    still wrong 0
+
+**Zero**, over this session's entire 24 commits of `src`. Not one corpus answer changed, which
+is the same fact these notes keep recording from the other side -- the shapes those rules fire
+on have no instance in the corpus at all. And because a zero from a new instrument is
+indistinguishable from an inert one, it was break-tested: tampering with three baseline entries
+reports `1 gained / 2 still wrong` with their triage states, so the instrument works and the
+corpus really is insensitive to this work.
+
+The break test also produced the number that bounds everything: **only 5 of 3,403 corpus cases
+diverge at all.** So that gate's entire blind-spot surface is five cases, whatever its
+projection count, and it is measured at zero.
+
+`compose` is the one left uninstrumented, deliberately. Its rows are binary, so it has the hole
+by construction -- and its surface is the 5 rows that remain, four of which are the P1 cache
+defect that must not be fixed and one scored-and-declined. A flag there could find at most five
+things, all of which are already written down.
+
+So: **the hole was real, it was one oracle, and it is now the one that reports it.** The honest
+residual is that `--blast` compares `defs` and `refs` only, because that is what the referee
+records -- a change that rewrites `sections` geometry between two wrong answers is still
+invisible on 6,818 documents, and `compose` is the gate that would have to say so.
+
 ## Tracing their SOURCE finds rules their document does not letter
 
 Their rules document was mined once and gave five gaps, all now closed. Their source is a
