@@ -42,6 +42,10 @@ const GOLDEN = path.join(import.meta.dirname, "goldens/compose.json");
  *                   into our own tree. MUST NOT be fixed.
  *     isolate       the 19 are the same four absorbable families the matrix names, seen
  *                   through a spacer; `comment` and `math` dominate.
+ *     `linkdef > indented` WAS here and is fixed -- an indented line after a link reference
+ *     definition is code, which `definitionIndentedCodeTransform` now reproduces. The gate
+ *     is what forced this list to move with the fix rather than drifting behind it.
+ *
  *     pairs/matrix  `bullet`/`ordered > math` is the extent bug -- both sides absorb the
  *                   opener and we run past the blank line, which is upstream in remark-math
  *                   and needs node surgery rather than a guard. `linkdef > indented` reports
@@ -58,18 +62,8 @@ const GOLDEN = path.join(import.meta.dirname, "goldens/compose.json");
  *                   needs its own evidence.
  */
 const DIVERGING: Record<Axis, readonly string[]> = {
-  pairs: [
-    "bullet > math",
-    "linkdef > indented",
-    "linkdef > thematic",
-    "ordered > math",
-  ],
-  matrix: [
-    "bullet > math",
-    "linkdef > indented",
-    "linkdef > thematic",
-    "ordered > math",
-  ],
+  pairs: ["bullet > math", "linkdef > thematic", "ordered > math"],
+  matrix: ["bullet > math", "linkdef > thematic", "ordered > math"],
   inside: [],
   isolate: [
     "bullet > footnote > comment",

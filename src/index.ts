@@ -116,6 +116,7 @@ import {
 import { quoteIndentedCodeTransform } from "./lib/quote-indented-code.js";
 import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 import { calloutTransform } from "./lib/callout.js";
+import { definitionIndentedCodeTransform } from "./lib/definition-indented-code.js";
 import { commentHoistTransform } from "./lib/comment-hoist.js";
 import { commentTailTransform } from "./lib/comment-tail.js";
 import { commentDefinitionExtentTransform } from "./lib/comment-definition-extent.js";
@@ -645,6 +646,13 @@ export default function remarkObsidian(
     if (opts.callouts) {
       calloutTransform(tree, String(file), (markdown) => self.parse(markdown));
     }
+    // Beside the quote one, which carries the same rule for a quote, callout or list-item
+    // host. This one's host is a LINK reference definition, and the scoping that matters is
+    // what it excludes: a `footnoteDefinition`'s indented line is its own content, which 42
+    // corpus cases depend on.
+    definitionIndentedCodeTransform(tree, String(file), (markdown) =>
+      self.parse(markdown),
+    );
     quoteIndentedCodeTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
