@@ -1205,13 +1205,19 @@ definition column.
 
 ### What the four axes cost and found, end to end
 
-| sweep       | sequences | opened | now   |
-| ----------- | --------: | -----: | ----- |
-| pairs       |       256 |     14 | **4** |
-| `--isolate` |       140 |     43 | 19    |
-| `--matrix`  |        80 |      5 | 4     |
-| `--inside`  |        64 |      2 | **0** |
-| `--nested`  |       192 |     13 | 3     |
+| sweep            | sequences | opened | now   |
+| ---------------- | --------: | -----: | ----- |
+| pairs            |       256 |     14 | **0** |
+| `--matrix`       |        80 |      5 | **0** |
+| `--inside`       |        64 |      2 | **0** |
+| `--inline`       |       196 |      1 | **0** |
+| `--isolate`      |       140 |     43 | 8     |
+| `--nested`       |       192 |     13 | 1     |
+| `--inline-block` |       224 |      4 | 4     |
+
+**Four of the seven axes are at zero**, and `--inline-block` is at its floor rather than
+open -- all four of its rows are the P1 cache defect. So the live backlog is nine rows, in
+the two axes that put a spacer or a second container between the two constructs.
 
 Every fix that landed from them extended a rule already measured to a node type or a nesting
 depth it had not been scoped for -- a callout where a quote was named, a callout where a
@@ -3477,10 +3483,48 @@ file's own first assertion tests for exactly that, and it passed only because th
 not in the corpus.
 
 `violationsOf` now lives in `invariant-checks.ts` and `compose.test.ts` runs it over every
-sequence, which needs no Obsidian because the checks compare the tree against itself. Eleven
-sequences contradict themselves: **seven are the upstream `definition/heading` overlap and must
-not reach zero**, and four are ours, each named so a fix has somewhere to land. All four
-involve a definition or a list absorbed into a container.
+sequence, which needs no Obsidian because the checks compare the tree against itself. It
+opened eleven self-contradicting sequences: the upstream `definition/heading` overlap, which
+**must not reach zero**, and four of ours.
+
+**All four of ours are closed, and they were one defect.** A transform that locates a node by
+DESCENDING edited it and left the nodes it had descended PAST spanning the old extent. Three
+passes, one mistake, found in three shapes:
+
+| violation                                       | pass                         | shape                  |
+| ----------------------------------------------- | ---------------------------- | ---------------------- |
+| `start AFTER end: footnoteDefinition` 16→15     | `lazySetextTransform`        | end set past own start |
+| `start AFTER end: text` 8→7                     | `lazySetextTransform`        | same, one level down   |
+| `child ENDS AFTER parent: blockquote > list`    | `lazySetextTransform`        | shrunk inward, gap     |
+| `child ENDS AFTER parent: listItem > paragraph` | `footnoteInterruptTransform` | stretched outward, gap |
+
+So the rule, which is worth more than the four fixes: **the descent is the unit of work.** A
+helper that recurses to find a node must return the PATH it took, because the caller's edit
+invalidates the span of every node on it. `paragraphHostPath` and `lastParagraphOf` both
+return their path now, and each docstring points at the other.
+
+Two of them were a NEGATIVE SPAN — a start after its own end — which is categorically broken
+rather than untidy: a splice-by-offset consumer such as `obsidian-linter` cannot order an
+edit against it. The other two were a child outliving its parent.
+
+**And one of the four was a divergence too.** Dropping the emptied `footnoteDefinition` rather
+than clamping it closed `isolate|callout > footnote > thematic`, because Obsidian reports no
+definition there — a definition absorbed as a container's lazy content is not a definition to
+it. The repair and the parity answer coincided, which is the shape worth looking for: a
+consistency fix that also moves an oracle is not a coincidence, it means the inconsistency
+WAS the divergence.
+
+An empty "ours" group makes the gate stricter rather than vestigial, because the set is
+asserted exactly — a new span defect anywhere in the 1,152 sequences now surfaces as an
+unexpected key instead of being absorbed into a tolerated group.
+
+**Attribution is a claim, and this harness has now been wrong about one in both directions.**
+`UPSTREAM.md` item 2 asserted we do not reproduce upstream's `definition/heading` overlap; one
+line of measurement shows `definition@0-0` followed by `heading@0-2`, and this very gate had
+been recording seven of them all along. Conversely the `listItem` defect was checked against
+bare `remark-parse` (consistent) and `+ remark-gfm` (also consistent, by a different shape)
+before being called ours — our tree is a hybrid of the two. **Measure both upstream configs
+before blaming or absolving either side.**
 
 Two gate widenings in one day, with opposite outcomes: `headings` added ZERO divergences across
 540 sequences and was still worth running, while this one surfaced four defects. Which it would
@@ -3488,11 +3532,23 @@ be was not knowable in advance, and that is the argument for running both.
 
 ### What the remaining rows are
 
-Attributed in `compose.test.ts`'s own docstring rather than here, so the list cannot drift from
-the gate that holds it. The shape of it: five `> comment` rows need `%%` to interrupt lazy
-continuation, which is tokenizer-level rather than a guard; three footnote-spacer rows turn on
-a lazily-absorbed definition not being a definition; and **four are the P1 cache defect and must
-not be fixed**, so the floor is four rather than zero.
+Attributed in `compose.test.ts`'s own docstring rather than here, so the list cannot drift
+from the gate that holds it -- and with no counts here either, for the same reason the gate
+dropped its own: three separate tallies in that docstring went stale while `DIVERGING`
+directly below them moved correctly.
+
+The shape of what is left, in three groups:
+
+- **`> comment`** needs `%%` to interrupt lazy continuation. `- item` / `[^1]: def` / `%%`
+  arrives as ONE paragraph with the `%%` as a text child, so there is nothing to lift --
+  tokenizer-level, not a guard.
+- **`footnote > indented`** and **`quote > callout > footnote`** turn on a lazily-absorbed
+  definition not being a definition to Obsidian, and on the definition column of the
+  container enclosing a nested callout. Both are recorded with their rules at the code that
+  would have to change; the first touches an absorption path carrying 43 referee documents.
+- **The `comment [ ... ]` rows are the P1 cache defect and MUST NOT be fixed**, so the floor
+  here is not zero. Obsidian's offsets are short by the width of the `%%` marker, and
+  reproducing them would write a wrong offset into our own tree.
 
 ## Files
 
