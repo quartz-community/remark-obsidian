@@ -95,10 +95,20 @@ function signatureOf(
   }
   if (colDelta) parts.push("def-col");
 
+  // Empty-named references excluded from BOTH sides, which is what `referee.mts` does and
+  // what the corpus's own comparator does: `^[]` is in the cache with an empty name and
+  // Reading View renders nothing there. Two tools comparing one thing must share the
+  // convention, or the queue stops describing what the gate measures.
   const theirRefs = new Set(
-    entry.refs.map((r) => `${fold(r[0])}@${r[1]}:${r[2]}`),
+    entry.refs
+      .filter((r) => r[0] !== "")
+      .map((r) => `${fold(r[0])}@${r[1]}:${r[2]}`),
   );
-  const ourRefs = new Set(got.refs.map((r) => `${fold(r[0])}@${r[1]}:${r[2]}`));
+  const ourRefs = new Set(
+    got.refs
+      .filter((r) => r[0] !== "")
+      .map((r) => `${fold(r[0])}@${r[1]}:${r[2]}`),
+  );
   let refMiss = 0;
   let refExtra = 0;
   for (const key of theirRefs) {
@@ -149,7 +159,12 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
       continue;
     }
     const key = (rows: readonly unknown[][]) =>
-      JSON.stringify(rows.map((row) => JSON.stringify(row)).sort());
+      JSON.stringify(
+        rows
+          .filter((row) => row[0] !== "")
+          .map((row) => JSON.stringify(row))
+          .sort(),
+      );
     if (
       key(got.defs as Def[]) === key(entry.defs) &&
       key(got.refs as Ref[]) === key(entry.refs)
