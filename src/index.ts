@@ -117,6 +117,7 @@ import { quoteIndentedCodeTransform } from "./lib/quote-indented-code.js";
 import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 import { calloutTransform } from "./lib/callout.js";
 import { definitionIndentedCodeTransform } from "./lib/definition-indented-code.js";
+import { mathListExtentTransform } from "./lib/math-list-extent.js";
 import { commentHoistTransform } from "./lib/comment-hoist.js";
 import { commentTailTransform } from "./lib/comment-tail.js";
 import { commentDefinitionExtentTransform } from "./lib/comment-definition-extent.js";
@@ -654,6 +655,12 @@ export default function remarkObsidian(
       self.parse(markdown),
     );
     quoteIndentedCodeTransform(tree, String(file), (markdown) =>
+      self.parse(markdown),
+    );
+    // Before the absorption, which is what keeps it small: the unclosed `$$` is still a root
+    // SIBLING of the list here, so bounding it lets the existing pass absorb a correctly
+    // ended node. After absorption it would mean splitting a node inside a `listItem`.
+    mathListExtentTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
     containerLazyTransform(tree, String(file));

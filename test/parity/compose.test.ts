@@ -46,7 +46,12 @@ const GOLDEN = path.join(import.meta.dirname, "goldens/compose.json");
  *     definition is code, which `definitionIndentedCodeTransform` now reproduces. The gate
  *     is what forced this list to move with the fix rather than drifting behind it.
  *
- *     pairs/matrix  `bullet`/`ordered > math` is the extent bug -- both sides absorb the
+ *     The MATH EXTENT family is closed -- `mathListExtentTransform` bounds an unclosed `$$`
+ *     at its blank line when a list absorbs it, which took 12 rows across four axes. The two
+ *     `> footnote > math` rows that remain reach the list through a spacer, so the opener's
+ *     previous sibling is a `footnoteDefinition` rather than the list itself.
+ *
+ *     pairs/matrix  `linkdef > thematic` is -- both sides absorb the
  *                   opener and we run past the blank line, which is upstream in remark-math
  *                   and needs node surgery rather than a guard. `linkdef > indented` reports
  *                   a paragraph where Obsidian reports code; `linkdef > thematic` is
@@ -62,17 +67,14 @@ const GOLDEN = path.join(import.meta.dirname, "goldens/compose.json");
  *                   needs its own evidence.
  */
 const DIVERGING: Record<Axis, readonly string[]> = {
-  pairs: ["bullet > math", "linkdef > thematic", "ordered > math"],
-  matrix: ["bullet > math", "linkdef > thematic", "ordered > math"],
+  pairs: ["linkdef > thematic"],
+  matrix: ["linkdef > thematic"],
   inside: [],
   isolate: [
     "bullet > footnote > comment",
     "bullet > footnote > math",
     "bullet > html > comment",
     "bullet > html > thematic",
-    "bullet > paragraph > math",
-    "bullet > setext > math",
-    "bullet > table > math",
     "callout > footnote > comment",
     "callout > footnote > indented",
     "callout > footnote > thematic",
@@ -80,17 +82,10 @@ const DIVERGING: Record<Axis, readonly string[]> = {
     "ordered > footnote > math",
     "ordered > html > comment",
     "ordered > html > thematic",
-    "ordered > paragraph > math",
-    "ordered > setext > math",
-    "ordered > table > math",
     "quote > footnote > comment",
     "quote > footnote > indented",
   ],
-  nested: [
-    "bullet > bullet > math",
-    "bullet > quote > math",
-    "quote > callout > footnote",
-  ],
+  nested: ["quote > callout > footnote"],
   inline: ["tag + blockid"],
   "inline-block": [
     "comment [ embed ]",
