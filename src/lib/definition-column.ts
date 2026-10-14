@@ -95,6 +95,24 @@ export function definitionColumnTransform(tree: Root, source: string): void {
         ? marker
         : null;
     if (!quoted && !tabbed && !/^[ \t]+$/u.test(prefix)) return;
+    // A NO-PREFIX definition absorbed into a NESTED container is the one measured shape this
+    // early return gets wrong, and it is left alone deliberately. `compose.mts --nested` has
+    // `quote > callout > footnote` as its only remaining row, and the rule is confirmed over
+    // three depths rather than inferred:
+    //
+    //     > [!note] title     / [^1]: def    column 0   (we agree)
+    //     > > [!note] title   / [^1]: def    column 2
+    //     > > > [!note] title / [^1]: def    column 4
+    //
+    // So the column is the content column of the container ENCLOSING the callout -- the
+    // prefix without its innermost marker -- which is 2 per level of nesting above one.
+    // The definition's own line carries no prefix at all in every case, so reading the line
+    // cannot produce it; the depth has to come from the tree after absorption.
+    //
+    // Not implemented because this return guards EVERY root definition, which is correctly
+    // column 0, and the firing condition would have to distinguish "absorbed into a nested
+    // container" from "at root" without a prefix to key on. One compose row against that
+    // blast radius is the wrong trade to make without scoring it first.
 
     // A quote contributes its own content column, which is the marker plus the one space
     // it consumes -- anything further along the prefix belongs to the definition. The

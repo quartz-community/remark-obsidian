@@ -66,6 +66,28 @@ const GOLDEN = path.join(import.meta.dirname, "goldens/compose.json");
  *     inline        `#tag^blk` only: a tag has no closing delimiter, so the caret follows a
  *                   word character, which is a different mechanism from the closer rule and
  *                   needs its own evidence.
+ *
+ * WHAT THE REMAINING 19 ARE, each with its cause measured rather than guessed:
+ *
+ *     5 `> comment`      the `%%` never becomes a comment node. `- item` / `[^1]: def` /
+ *                        `%%` arrives as ONE paragraph with `%%` as a TEXT child, both lines
+ *                        absorbed as lazy continuation, so there is nothing to lift. Needs
+ *                        `%%` to interrupt lazy continuation -- tokenizer-level, not a guard.
+ *     2 `html > thematic` we absorb the `---` into the container where Obsidian keeps a root
+ *                        `thematicBreak`. The chain widening that would do it is recorded at
+ *                        3 better against 23 worse in `container-lazy.ts`.
+ *     2 `footnote > indented` and 1 `footnote > thematic`: a definition absorbed as a
+ *                        container's lazy content is NOT a definition to Obsidian, so the
+ *                        indented line after it is root `code` rather than the definition's
+ *                        continuation. `callout > footnote > thematic` is the same cause seen
+ *                        through `defs`: Obsidian reports none and we report one.
+ *     1 `quote > callout > footnote`  a definition column, confirmed over three depths; the
+ *                        rule and why it is not implemented are recorded in
+ *                        `definition-column.ts` at the early return it would have to change.
+ *     1 `tag + blockid`  a tag has no closing delimiter, so the caret follows a word
+ *                        character -- a different mechanism from the closer rule.
+ *     1 `linkdef > thematic`  upstream's setext-under-definition reading, `UPSTREAM.md` 2.
+ *     4 `comment [ ... ]` the P1 cache defect. MUST NOT be fixed.
  */
 const DIVERGING: Record<Axis, readonly string[]> = {
   pairs: ["linkdef > thematic"],
