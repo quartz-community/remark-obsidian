@@ -822,6 +822,54 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "def-end-trim-empty",
+    what: "a definition's end is pulled back off trailing EMPTY lines only",
+    // The narrowing `definition-blank-tail.ts` forces. That pass deliberately EXTENDS a
+    // definition over a trailing WHITESPACE-ONLY line (`/^[ \t]+$/`), measured against the
+    // app: `[^1]:` over six spaces is one definition covering them. A candidate trimming
+    // every line whose `.trim()` is empty would undo that, so this one trims only lines that
+    // are truly empty and the two rules cannot touch the same line.
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      return {
+        refs: ours.refs,
+        defs: ours.defs.map((d): Def => {
+          let end = d[3];
+          while (end > d[1] && (lines[end] ?? "") === "") end -= 1;
+          return end === d[3] ? d : [d[0], d[1], d[2], end];
+        }),
+      };
+    },
+  },
+  {
+    name: "def-end-trim-blank",
+    what: "a definition's end is pulled back off trailing blank lines",
+    // The single largest POSITIONAL family on the referee: grouping the 1,415 disagreeing
+    // documents by what differs rather than by their text gives 72 shapes with 82% in the top
+    // ten, and `def-end+1` alone is 107 of them, `def-end-1` 57 and `def-end+2` 32.
+    //
+    // Their comparator normalises both sides here -- `trimmedEnd` strips trailing blanks from
+    // the reader's end and `lastLine` pulls an end at column 0 of a later line back one -- so
+    // the question this answers is whether OUR end is simply late by the trailing blanks.
+    //
+    // SCORED AND SHIPPED: better 48, worse 0, agreement 5403 -> 5439. The implementation
+    // delivered exactly that -- referee +36 with ZERO documents lost -- and it was NOT a new
+    // rule. `definitionTrimTransform` already carried it and applied it once: its blank loop
+    // declines when the end line holds content, the column fallback then pulls back one line
+    // and EXPOSES blanks that loop never saw. Re-testing after the fallback is the whole fix.
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      return {
+        refs: ours.refs,
+        defs: ours.defs.map((d): Def => {
+          let end = d[3];
+          while (end > d[1] && (lines[end] ?? "").trim() === "") end -= 1;
+          return end === d[3] ? d : [d[0], d[1], d[2], end];
+        }),
+      };
+    },
+  },
+  {
     name: "nested-container-definition-column",
     what: "a column-0 definition in ANY nested container sits at 2 per level above one",
     // The rule `definition-column.ts` records at its early return, confirmed over three

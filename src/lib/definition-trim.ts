@@ -129,6 +129,23 @@ export function definitionTrimTransform(tree: Root, source: string): void {
       }
       if (!region) last = end - 1;
     }
+    // Blanks RE-TESTED, because the fallback above can expose them.
+    //
+    // The first loop sees the end line as it arrives, and where that line holds content --
+    // the next definition's own line, say -- it does nothing at all. The column fallback then
+    // pulls the end back by exactly one, which uncovers any blank lines between the real
+    // content and that line, and those the first loop never looked at:
+    //
+    //     ⟨3sp⟩[^Note]: body / ⟨4sp⟩``` / ⇥> quoted / blank / blank / ⟨2sp⟩[^1]: ...
+    //
+    //     arrives ending on line 6, the `[^1]:` line, so the loop declines
+    //     the fallback takes it to 5, which is blank
+    //     Obsidian ends it at 3, the last line holding content
+    //
+    // Re-running this very pass on the FINISHED tree corrected it, which is what showed the
+    // pass right and its single application short. One pass-through is not a fixed point when
+    // two mechanisms can each move the end.
+    while (last > start && BLANK.test(lines[last - 1] ?? "")) last--;
     if (last === end) return;
 
     // Back to the end of that line, which is where the content stops.
