@@ -78,6 +78,19 @@ export function definitionLazySplitTransform(
     // against the title-only control where Obsidian reports `1@1:0-1`. Splitting in the
     // body case produced a definition it has none of, and the `--ids` diff is what named
     // them: the net figure moved by two while three documents were lost and one gained.
+    // NOTE FOR WIDENING THIS. The test is callout-shaped, so it rejects every `list`
+    // outright -- a list's child is a `listItem`, never a `calloutTitle`. Adding `"list"` to
+    // the set above therefore measures NOTHING: the trees come back byte-identical and that
+    // reads exactly like "the list case needs no change". It was dumped rather than inferred,
+    // which is the only reason this is written down.
+    //
+    // So the list and quote halves are UNTESTED, not refuted. What IS measured is that
+    // splitting for them without flattening regresses -- `bullet` and
+    // `ordered > footnote > indented` went from agreeing to reporting a definition and a
+    // reference Obsidian has neither of. At parse time the root sibling is there under both
+    // list readings (`legacyLists` either way gives `list@0-0` then
+    // `footnoteDefinition@1-2`), so the work is in how `containerLazyTransform` and
+    // `footnoteInterruptTransform` then interact, not in finding the node.
     const body = previous as { children?: RootContent[] };
     if ((body.children ?? []).some((child) => child.type !== "calloutTitle")) {
       continue;
