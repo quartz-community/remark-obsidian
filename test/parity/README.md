@@ -3470,9 +3470,34 @@ with their numbers; `reproducers.json#881` is the shape to chase instead.
 
 **The nested-definition column is confirmed** over three depths -- `> [!note]` gives 0,
 `> > [!note]` gives 2, `> > > [!note]` gives 4, so it is the content column of the container
-ENCLOSING the callout. Not implemented: the early return it would have to change guards EVERY
-root definition, which is correctly 0, and one row against that blast radius wants scoring
-first. The rule is recorded at that return.
+ENCLOSING the callout. It has now been scored both ways, and neither says to build it:
+
+| candidate                      | better | worse | touched | verdict             |
+| ------------------------------ | -----: | ----: | ------: | ------------------- |
+| any nested container counts    |      0 |     5 |      12 | net negative        |
+| only quotes and callouts count |      0 |     0 |   **0** | **NOT ADJUDICABLE** |
+
+The general form is actively WRONG, and its own counter-examples say why: all five nest
+through a LIST -- `10.`, `*`, `1.` -- and want column 0, where every measured case nests
+through QUOTES. That is the list/quote asymmetry this file records as a class of exactly
+four, met again in a candidate rather than in a parser.
+
+Narrowed to the form the probes actually measured, it touches **nothing** in 6,818
+documents. So the referee cannot call it safe or unsafe, which is the fourth verdict earning
+its place a second time -- reporting that as "net negative" would read as evidence against a
+rule the corpus simply has no opinion about.
+
+**Which leaves one `compose.mts --nested` row as the entire evidence for it**, against twelve
+recorded probes behind the column-0 behaviour the early return protects. Declined on those
+terms, with both numbers at the return and both variants in `score.mts`.
+
+And the first scoping was a bug in the candidate, not a finding -- **the fifth time a new
+oracle's first result has been its own defect.** Its precondition was `/^[ \t>]/`, "no
+whitespace or quote prefix", which does not exclude a LIST prefix: `2)  > [!NOTE]- [^注1]:`
+has its label at column 15 and the rule overwrote it with 2, scoring 0 against 22. All three
+printed counter-examples were that mistake. Reading the examples rather than the totals is
+what separated them, and `score.mts` printing three `worse` documents exists for exactly
+this.
 
 ### Widening the invariant gate found four defects nothing had seen
 

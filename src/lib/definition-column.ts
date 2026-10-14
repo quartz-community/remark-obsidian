@@ -111,8 +111,21 @@ export function definitionColumnTransform(tree: Root, source: string): void {
     //
     // Not implemented because this return guards EVERY root definition, which is correctly
     // column 0, and the firing condition would have to distinguish "absorbed into a nested
-    // container" from "at root" without a prefix to key on. One compose row against that
-    // blast radius is the wrong trade to make without scoring it first.
+    // container" from "at root" without a prefix to key on.
+    //
+    // NOW SCORED, both ways, and neither says to build it. `score.mts` holds both:
+    //
+    //   nested-container-definition-column   better 0  worse 5  net negative
+    //   nested-quote-definition-column       better 0  worse 0  TOUCHED 0 of 6,818
+    //
+    // The general form is actively WRONG: all five of its counter-examples nest through a
+    // LIST and want column 0, which is the list/quote asymmetry met again. Narrowed to
+    // quotes and callouts -- the form the probes actually measured -- it touches NOTHING in
+    // the referee corpus, so that oracle cannot call it safe or unsafe.
+    //
+    // Which leaves one `compose.mts --nested` row as the whole evidence for it, against the
+    // twelve recorded probes behind the column-0 behaviour this return protects. Declined on
+    // those terms, which is the same trade as the quote-tab rule.
 
     // A quote contributes its own content column, which is the marker plus the one space
     // it consumes -- anything further along the prefix belongs to the definition. The

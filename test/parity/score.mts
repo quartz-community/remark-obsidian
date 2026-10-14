@@ -84,6 +84,72 @@ const COMMENT_LINE = /^[ \t>]*%%/u;
 const TAB_MARKER = /^((?:[ \t]*>)*[ \t]*(?:[-*+]|\d{1,9}[.)]))([ \t]*)/u;
 const LABEL = /^\[\^([^\]]*)\]:/u;
 
+/** Every container that nests, and the quote-only half of it. */
+const NESTING_ANY = new Set(["blockquote", "callout", "listItem"]);
+const NESTING_QUOTE = new Set(["blockquote", "callout"]);
+
+/**
+ * The nesting depth of the container holding each definition, keyed by its zero-based line.
+ *
+ * Shared by the two nested-column scopings below, which differ ONLY in which container types
+ * count as nesting -- and that difference is the whole measurement, so it has to be the only
+ * thing that varies between them.
+ */
+function depthsByLine(
+  tree: Root,
+  kinds: ReadonlySet<string>,
+): Map<number, number> {
+  const depths = new Map<number, number>();
+  const walk = (node: unknown, depth: number): void => {
+    const self = node as {
+      type: string;
+      position?: { start: { line: number } };
+      children?: unknown[];
+    };
+    if (self.type === "footnoteDefinition" || self.type === "definition") {
+      const line = (self.position?.start.line ?? 0) - 1;
+      // The OUTERMOST reading wins: `walk` descends, a definition is visited once, so
+      // whatever depth it is reached at is the nesting of the container holding it.
+      if (!depths.has(line)) depths.set(line, depth);
+    }
+    const nested = kinds.has(self.type) ? depth + 1 : depth;
+    for (const child of self.children ?? []) walk(child, nested);
+  };
+  walk(tree, 0);
+  return depths;
+}
+
+/**
+ * A column-0 definition's column from its container nesting, at 2 per level above one.
+ *
+ * The precondition is that the label begins at column 0 LITERALLY -- the bracket is the
+ * line's first character. Testing `/^[ \t>]/` instead, "no whitespace or quote prefix", was
+ * the first version and it fired on lines carrying a LIST prefix, which that does not match:
+ * `2)  > [!NOTE]- [^注1]: ...` has its label at column 15 and the rule overwrote it with 2.
+ * Scored `better 0 worse 22`, and all three printed examples were that mistake rather than
+ * the rule failing -- the fifth time a new oracle's first finding has been a bug in the
+ * oracle.
+ */
+function nestedColumn(
+  text: string,
+  ours: Facts,
+  tree: Root,
+  kinds: ReadonlySet<string>,
+): Facts {
+  const lines = text.split("\n");
+  const depthOf = depthsByLine(tree, kinds);
+  return {
+    refs: ours.refs,
+    defs: ours.defs.map((d): Def => {
+      if (!(lines[d[1]] ?? "").startsWith("[")) return d;
+      const depth = depthOf.get(d[1]) ?? 0;
+      if (depth < 2) return d;
+      const want = 2 * (depth - 1);
+      return want === d[2] ? d : [d[0], d[1], want, d[3]];
+    }),
+  };
+}
+
 const RULES: readonly Rule[] = [
   {
     name: "quote-truncate",
@@ -754,6 +820,44 @@ const RULES: readonly Rule[] = [
         }),
       };
     },
+  },
+  {
+    name: "nested-container-definition-column",
+    what: "a column-0 definition in ANY nested container sits at 2 per level above one",
+    // The rule `definition-column.ts` records at its early return, confirmed over three
+    // depths against live 1.14.4 rather than inferred:
+    //
+    //     > [!note] title     / [^1]: def    column 0   (we already agree)
+    //     > > [!note] title   / [^1]: def    column 2
+    //     > > > [!note] title / [^1]: def    column 4
+    //
+    // Scored rather than built because that early return guards EVERY root definition --
+    // correctly column 0 -- so the firing condition has to tell "absorbed into a nested
+    // container" from "at root" with no prefix on the line to key on. One compose row
+    // against that blast radius needs a number first.
+    //
+    // SCORED, NOT SHIPPED: better 0, worse 5, agreement 5389 -> 5384.
+    apply: (text, ours, tree) => nestedColumn(text, ours, tree, NESTING_ANY),
+  },
+  {
+    name: "nested-quote-definition-column",
+    what: "...the same, counting only quotes and callouts as nesting",
+    // The narrowing the first scoping's own counter-examples asked for. All five of its
+    // `worse` documents nest through a LIST -- `10.`, `*`, `1.` -- and want column 0, while
+    // every measured case nests through QUOTES. That is the list/quote asymmetry this
+    // harness records as a class of exactly four, met again.
+    //
+    // SCORED, NOT SHIPPED: better 0, worse 0, TOUCHED 0 of 6,818 -- NOT ADJUDICABLE.
+    //
+    // So the referee holds no document where a column-0 definition sits inside depth-two
+    // quote nesting, and cannot say the rule is safe OR unsafe. That is the fourth verdict
+    // doing its job: reporting this as "net negative" would read as evidence against a rule
+    // the corpus simply has no opinion about.
+    //
+    // Which leaves ONE compose row as the entire evidence for it, against an early return
+    // backed by twelve recorded probes that correctly puts every root definition at column
+    // 0. Declining on those terms is the same trade as the quote-tab rule beside it.
+    apply: (text, ours, tree) => nestedColumn(text, ours, tree, NESTING_QUOTE),
   },
 ];
 
