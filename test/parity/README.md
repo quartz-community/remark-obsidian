@@ -2783,6 +2783,67 @@ nor the bracket's; here it is a quote outranking a host we should not have found
 conclusion both times: our innermost `listItem` is not always Obsidian's host, and until a host
 test can express the difference, rules keyed on it have a ceiling that is not about the rule.
 
+### "The referee cannot see B3" was wrong, and the blast radius is how you find out
+
+Everything above concludes that this oracle cannot adjudicate B3. That is **false**, and the
+measurement that shows it is one nobody had run: not "how many documents hold the shape" but
+**how many documents does the landed rule actually change the answer for.**
+
+Dumping every definition for all 6,818 documents with the fix in and with it out:
+
+    documents compared : 6818
+    documents CHANGED  : 4
+
+Four. Not the 1,833 that hold the shape. And all four are `probes.json` entries -- **the sibling
+project's own designed B3 probes**, with Obsidian's recorded answer sitting right there:
+
+| document            | note                                  | referee `defs` |
+| ------------------- | ------------------------------------- | -------------- |
+| `probe:k-dash3-2-6` | `-⟨3sp⟩a` / `⟨2sp⟩b` / `⟨6sp⟩[^1]: x` | **`[]`**       |
+| `probe:k-dash3-1-5` | `-⟨3sp⟩a` / `⟨1sp⟩b` / `⟨5sp⟩[^1]: x` | **`[]`**       |
+| `probe:k-ord-1-6`   | `1. a` / `⟨1sp⟩b` / `⟨6sp⟩[^1]: x`    | **`[]`**       |
+| `probe:k-dash-1-5`  | `- a` / `⟨1sp⟩b` / `⟨5sp⟩[^1]: x`     | **`[]`**       |
+
+**No definition at all**, because the lowered column moves the indented-code threshold with it.
+The two halves are one rule and they agree on every case once both are applied:
+
+    - a / ⟨1sp⟩lazy / ⟨4sp⟩[^1]:    floor 1, 4 - 1 = 3 < 4   definition at column 1
+    - a / ⟨1sp⟩b    / ⟨5sp⟩[^1]:    floor 1, 5 - 1 = 4 >= 4  CODE, no definition
+
+So the landed fix is **correct and incomplete**, and the referee could say so all along. What
+hid it is that these four documents disagree before AND after, so the agreement total and even
+the `--ids` identity diff are both silent -- a document that is wrong in a new way is not a
+document that moved.
+
+**The rule for the next person: measure the blast radius, not the shape count.** "How many
+documents hold this shape" counted 1,833 and told me nothing; "how many answers does my change
+alter" counted 4 and handed me an oracle with Obsidian's own answers in it. The first is a
+property of the corpus, the second is a property of the change. Five scored premises and a
+landed fix went by before anyone asked the second question.
+
+#### The threshold half, scored twice, and the unit bug it exposed
+
+    floor re-derived in the scorer    better 28  worse 48  agreement -37
+    floor from `contentColumn`        better 20  worse 17  agreement -12
+
+The first read `1.⟨5sp⟩` as seven columns where the five-space cap makes it four -- the **sixth**
+premise about this quantity refuted by its own arithmetic rather than by the rule. That is now
+structurally prevented: `contentColumn` is exported and `score.mts` calls it, so the scorer and
+the pass cannot disagree.
+
+The second still loses 17, and they are **a unit mismatch in the shipped function**:
+
+    - a / ⟨4sp⟩- b / ⇥⇥- [^1]: def     answer column 4, the candidate drops the definition
+
+`contentColumn` returns `opener[0].length`, which is CHARACTERS, while the threshold compares an
+indent in COLUMNS with tabs expanded. For `⇥⇥- ` that is 4 against 8, so the threshold fires on
+an item whose content begins exactly where its definition does. Both halves of B3 need one
+unit, and choosing it edits the shipped column answer rather than the candidate -- so the
+threshold stays unshipped with its number attached.
+
+Note the shape: positive on DISTANCE, negative on AGREEMENT. This file has seen it once before,
+on F5, and both times it meant the rule was right and its boundary wrong.
+
 ## Tracing their SOURCE finds rules their document does not letter
 
 Their rules document was mined once and gave five gaps, all now closed. Their source is a

@@ -43,8 +43,9 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import type { Root, RootContent } from "mdast";
+import type { ListItem, Root, RootContent } from "mdast";
 
+import { contentColumn } from "../../src/lib/definition-column.js";
 import { refereeFactsWithTree, type Def, type Ref } from "./referee-facts.js";
 
 interface Answer {
@@ -1217,6 +1218,118 @@ const RULES: readonly Rule[] = [
           if (floor === undefined || floor >= d[2]) return d;
           return [d[0], d[1], floor, d[3]];
         }),
+      };
+    },
+  },
+  {
+    name: "b3-threshold-drops-definition",
+    what: "...and the SAME floor moves where indented code begins",
+    // The other half of B3, and the referee CAN adjudicate this one -- which is the correction
+    // to "this oracle cannot see B3". Measured: the shipped column fix changes the answer for
+    // exactly FOUR of 6,818 documents, and all four are the sibling project's own designed B3
+    // probes with Obsidian's answer recorded:
+    //
+    //     -⟨3sp⟩a / ⟨2sp⟩b / ⟨6sp⟩[^1]: x    defs []   probe:k-dash3-2-6
+    //     -⟨3sp⟩a / ⟨1sp⟩b / ⟨5sp⟩[^1]: x    defs []   probe:k-dash3-1-5
+    //     1. a    / ⟨1sp⟩b / ⟨6sp⟩[^1]: x    defs []   probe:k-ord-1-6
+    //     - a     / ⟨1sp⟩b / ⟨5sp⟩[^1]: x    defs []   probe:k-dash-1-5
+    //
+    // NO DEFINITION AT ALL, because the lowered column moves the code threshold with it. The
+    // two readings agree on every case once both halves are applied:
+    //
+    //     - a / ⟨1sp⟩lazy / ⟨4sp⟩[^1]:    floor 1, 4 - 1 = 3 < 4   definition at column 1
+    //     - a / ⟨1sp⟩b    / ⟨5sp⟩[^1]:    floor 1, 5 - 1 = 4 >= 4  CODE, no definition
+    //
+    // So the shipped half is correct and incomplete, which is the shape this harness refuses
+    // when it can see it -- and here it could, through four documents nobody had looked at.
+    //
+    // SCORED TWICE, NOT SHIPPED, and the pair is the point:
+    //
+    //     floor re-derived here           better 28  worse 48  agreement -37
+    //     floor from `contentColumn`       better 20  worse 17  agreement -12
+    //
+    // The first re-derived the base from `marker[0].length` and so read `1.⟨5sp⟩` as seven
+    // columns where the five-space cap makes it four -- the SIXTH premise about this quantity
+    // to be refuted by its own arithmetic. That is why `contentColumn` is exported now and why
+    // this candidate calls it: a divergence between the scorer and the pass is impossible by
+    // construction rather than by review.
+    //
+    // The second still loses 17, and they are a UNIT MISMATCH in the shipped function rather
+    // than a counter-example to the rule:
+    //
+    //     - a / ⟨4sp⟩- b / ⇥⇥- [^1]: def       answer column 4, we drop the definition
+    //     * a / ⇥* b     / ⇥⇥* [^1]: def       answer column 4, we drop the definition
+    //
+    // `contentColumn` returns `opener[0].length`, which is CHARACTERS, while the threshold
+    // compares the definition's indent in COLUMNS with tabs expanded to their four-stop. For
+    // `⇥⇥- ` that is 4 against 8, so the threshold fires on an item whose content begins
+    // exactly where the definition does. Both halves of B3 need one unit, and picking it is a
+    // change to the shipped column answer rather than to this candidate -- so it is left here
+    // with its number instead of being bought at -12.
+    //
+    // Note the shape: positive on DISTANCE and negative on AGREEMENT, which this harness has
+    // seen once before, on F5. Both times it meant the rule was right and its boundary wrong.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const PREFIX = /^(?:[ \t]*>[ \t]?)*/u;
+      const cols = (line: string): number => {
+        let column = 0;
+        for (const character of line) {
+          if (character === " ") column += 1;
+          else if (character === "\t") column += 4 - (column % 4);
+          else break;
+        }
+        return column;
+      };
+
+      // The host map is the transform's own: pre-order, so the INNERMOST item overwrites.
+      const items = new Map<unknown, ListItem>();
+      const index = (node: unknown): void => {
+        const self = node as { type?: string; children?: unknown[] };
+        if (self.type === "listItem") {
+          const mark = (inner: unknown): void => {
+            items.set(inner, self as unknown as ListItem);
+            for (const child of (inner as { children?: unknown[] }).children ??
+              []) {
+              mark(child);
+            }
+          };
+          mark(self);
+        }
+        for (const child of self.children ?? []) index(child);
+      };
+      index(tree);
+
+      const drop = new Set<number>();
+      const scan = (node: unknown): void => {
+        const self = node as {
+          type?: string;
+          position?: { start: { line: number } };
+          children?: unknown[];
+        };
+        if (
+          (self.type === "footnoteDefinition" || self.type === "definition") &&
+          self.position
+        ) {
+          const host = items.get(self);
+          // `contentColumn` ALREADY carries B3's minimum, the five-space cap, the dot
+          // adjustment and the tab stops -- which is the entire reason it is called rather
+          // than re-derived here.
+          const column = host ? contentColumn(text, host) : undefined;
+          if (column !== undefined) {
+            const at = self.position.start.line - 1;
+            const raw = lines[at] ?? "";
+            const own = PREFIX.exec(raw)?.[0].length ?? 0;
+            if (cols(raw.slice(own)) + own >= column + 4) drop.add(at);
+          }
+        }
+        for (const child of self.children ?? []) scan(child);
+      };
+      scan(tree);
+
+      return {
+        refs: ours.refs,
+        defs: ours.defs.filter((d) => !drop.has(d[1])),
       };
     },
   },

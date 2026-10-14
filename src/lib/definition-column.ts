@@ -217,8 +217,24 @@ function deIndentFloor(source: string, item: ListItem): number {
   return floor;
 }
 
-/** The column an item's own content begins at, past its marker and one space. */
-function contentColumn(source: string, item: ListItem): number | undefined {
+/**
+ * The column an item's own content begins at, past its marker and one space.
+ *
+ * EXPORTED for `test/parity/score.mts`, and that is a correctness measure rather than a
+ * convenience. Six scored premises about this quantity have now been refuted by their own
+ * arithmetic rather than by the rule they were testing -- a host keyed on line ranges, a
+ * minimum taken across overlapping items, indentation measured from column zero inside a
+ * quote, nested blocks entering the minimum, `- [ ] ` read as two columns, and `1.⟨5sp⟩` read
+ * as seven where the five-space cap makes it four. Every one of them re-derived what this
+ * function already computes, and each wrong number read exactly like evidence about B3.
+ *
+ * So a candidate rule about the content column calls THIS, and a divergence between the
+ * scorer and the pass is then impossible by construction rather than by review.
+ */
+export function contentColumn(
+  source: string,
+  item: ListItem,
+): number | undefined {
   const from = item.position?.start?.offset;
   if (from === undefined) return undefined;
   const bol = source.lastIndexOf("\n", from - 1) + 1;
