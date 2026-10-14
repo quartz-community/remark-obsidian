@@ -429,6 +429,72 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "quote-tab-no-define",
+    what: "a tab DIRECTLY after a quote marker means the label does not define -- SCORED, NOT SHIPPED",
+    apply: (text, ours) => {
+      // Unmasked by `mathListExtentTransform`: a swallowing formula had been hiding it.
+      // Measured on 1.14.4, and the space form is the control that makes it a rule about the
+      // TAB rather than about quoted definitions:
+      //
+      //     >\t[^Ω]: body text   defs=[]            tab directly after `>`: nothing
+      //     >   [^Ω]: body text  defs=[["ω",0]]     three spaces: defines
+      //
+      // Scoped to a tab IMMEDIATELY after the marker. `>   ⇥[^1]: def` is a definition at
+      // column 2 -- recorded in `definition-column.ts` -- so a tab AFTER a space is a
+      // different shape and must keep defining.
+      //
+      // NOT IMPLEMENTED, and the reason is the standing rule that a tree-derived premise is
+      // still OUR tree, so probes against the application outrank a rule fitted to referee
+      // rows. Asked directly, our SIMPLE cases are already right -- `>\t[^b]:` defines
+      // nothing here and does define in bare `remark-parse` + `remark-gfm`, `>   [^b]:`
+      // defines, and the three-line established form defines both. So the +29 is a
+      // CONTEXTUAL defect, not this rule: `reproducers.json#881` is the shape to chase,
+      // where `>\t[^名]: def` over `  \t[^2]: body text` should define only `2` and we
+      // define only `名`. Shipping a line-based drop would fit the referee while
+      // contradicting five controls.
+      const lines = text.split("\n");
+      const tabbed = /^[ \t]*>\t/u;
+      return {
+        refs: ours.refs,
+        defs: ours.defs.filter((d) => !tabbed.test(lines[d[1]] ?? "")),
+      };
+    },
+  },
+  {
+    name: "quote-tab-no-define-unless-established",
+    what: "...unless an earlier definition in the same quote already succeeded",
+    apply: (text, ours) => {
+      // The blunt rule scores 52/1, and the single counter-example needs a THREE-element
+      // shape, pinned with four controls:
+      //
+      //     >\t[^b]:                        nothing
+      //     > text / > / >\t[^b]:           nothing -- a blank quote line alone is not it
+      //     > [^a]: It / > / >\t[^b]:       BOTH -- a preceding definition that SUCCEEDED
+      //     >\t[^b]: / > / >\t[^c]:         nothing -- the first never defined, nor does the
+      //                                     second, so the exception does not chain off a
+      //                                     failed one
+      //
+      // So a tab-indented label defines once the quote already holds a definition, which is
+      // consistent with the first one establishing the quote's content column.
+      const lines = text.split("\n");
+      const tabbed = /^[ \t]*>\t/u;
+      const defines = /^[ \t]*>[ \t]+\[\^[^\]]*\]:/u;
+      return {
+        refs: ours.refs,
+        defs: ours.defs.filter((d) => {
+          if (!tabbed.test(lines[d[1]] ?? "")) return true;
+          // An earlier SPACE-separated definition line in the same quote run establishes it.
+          for (let line = d[1] - 1; line >= 0; line--) {
+            const text2 = lines[line] ?? "";
+            if (!/^[ \t]*>/u.test(text2)) break;
+            if (defines.test(text2)) return true;
+          }
+          return false;
+        }),
+      };
+    },
+  },
+  {
     name: "refs-add-bare",
     what: "every `[^name]` outside a label is a reference we may be missing",
     apply: (text, ours) => {
