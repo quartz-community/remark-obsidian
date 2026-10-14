@@ -822,6 +822,146 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "comment-burial-ends-at-blank",
+    what: "a container-opened comment buries nothing past the first blank line",
+    // The second premise for F4's open half, after the per-line prefix test scored 6 better
+    // against 28 worse. That test was too strict because a container absorbs LAZY lines, so
+    // "lacking the prefix" is not the same as "outside the container".
+    //
+    // A BLANK line is different: it ends a quote in CommonMark outright, no laziness about it.
+    // So a comment opened inside a container buries only up to the first blank line after its
+    // opener, which for `fuzz-20261003.json#1124` is lines 2-3 and matches Obsidian exactly.
+    //
+    // SCORED, NOT SHIPPED: better 7, worse 7, agreement 5452 -> 5449. An EVEN TRADE, which is
+    // the verdict that says the corpus can see the rule and does not endorse it -- the shape
+    // is right often enough to win seven documents and wrong often enough to lose seven.
+    //
+    // So BOTH premises for F4's open half are refuted, and the pair is the result: the family
+    // is real at 207 documents and 2.17x lift, and neither "lacking the container's prefix"
+    // nor "past the first blank line" expresses where Obsidian ends that comment. What is
+    // needed is the container's TRUE extent, which our own tree cannot supply because the
+    // too-wide extent IS the defect -- the circularity this harness records as "a predicate
+    // that stands in for the premise is part of what you are measuring", fifth instance.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const quoted = (line: string) => /^[ \t]*>/u.test(line);
+
+      const loose = new Set<number>();
+      const walk = (node: unknown): void => {
+        const self = node as {
+          type?: string;
+          position?: { start: { line: number }; end: { line: number } };
+          children?: unknown[];
+        };
+        if (self.type === "comment" && self.position) {
+          const opener = self.position.start.line - 1;
+          if (quoted(lines[opener] ?? "")) {
+            let blankAt = -1;
+            for (
+              let line = opener + 1;
+              line <= self.position.end.line - 1;
+              line++
+            ) {
+              if ((lines[line] ?? "").trim() === "") {
+                blankAt = line;
+                break;
+              }
+            }
+            if (blankAt !== -1) {
+              for (
+                let line = blankAt;
+                line <= self.position.end.line - 1;
+                line++
+              ) {
+                loose.add(line);
+              }
+            }
+          }
+        }
+        for (const child of self.children ?? []) walk(child);
+      };
+      walk(tree);
+
+      return {
+        defs: ours.defs,
+        refs: ours.refs.filter((r) => !loose.has(r[1])),
+      };
+    },
+  },
+  {
+    name: "comment-burial-needs-container-prefix",
+    what: "a container-opened comment buries nothing on a line lacking that container's prefix",
+    // Their F4: "A comment opened inside a quote, callout, or item ends with its container."
+    // Its first half is implemented -- a column-0 `%%` cannot close a quoted comment, see
+    // `commentQuoteExtentTransform` -- and its second half is recorded there as open: "the
+    // quote's own extent is still wrong there, which no corpus case exercises".
+    //
+    // NO CORPUS CASE, and 482 referee documents hold a container-opened `%%` of which 207
+    // disagree, against a 19.8% base rate. A 2.17x lift, the strongest since the tab family,
+    // and it survives the base-rate test that killed four earlier selectors.
+    //
+    // The worked case, `fuzz-20261003.json#1124`:
+    //
+    //     > > %%              our  blockquote@2-9 holding comment@2-9
+    //     > > [^名]: def      obs  the comment ends with its container, at line 3
+    //     ⟨blank⟩
+    //     2)     [^名]: ...   buried by us, outside the quote for Obsidian
+    //
+    // Expressed at the LINE rather than at the span, which is what makes it scoreable without
+    // re-deriving the burial: a comment whose opener carries `n` quote markers buries only
+    // lines carrying at least `n`. Lines 4 onward carry none, so nothing on them is buried and
+    // the references we read out of them are ours alone.
+    //
+    // SCORED, NOT SHIPPED: better 6, worse 28, agreement 5452 -> 5434. Too strict, and the
+    // reason is instructive: a container absorbs LAZY lines, so a line lacking the prefix can
+    // still be inside the quote. See `comment-burial-ends-at-blank` for the second premise.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const markersOf = (line: string): number => {
+        let count = 0;
+        let rest = line.replace(/^[ \t]+/u, "");
+        while (rest.startsWith(">")) {
+          count += 1;
+          rest = rest.slice(1).replace(/^[ \t]?/u, "");
+        }
+        return count;
+      };
+
+      /** Line ranges a container-opened comment covers but does NOT bury. */
+      const notBuried: Array<[number, number]> = [];
+      const walk = (node: unknown): void => {
+        const self = node as {
+          type?: string;
+          position?: { start: { line: number }; end: { line: number } };
+          children?: unknown[];
+        };
+        if (self.type === "comment" && self.position) {
+          const openerLine = self.position.start.line - 1;
+          const need = markersOf(lines[openerLine] ?? "");
+          if (need > 0) {
+            for (
+              let line = openerLine + 1;
+              line <= self.position.end.line - 1;
+              line++
+            ) {
+              if (markersOf(lines[line] ?? "") < need) {
+                notBuried.push([line, line]);
+              }
+            }
+          }
+        }
+        for (const child of self.children ?? []) walk(child);
+      };
+      walk(tree);
+
+      const loose = new Set(notBuried.map(([line]) => line));
+      return {
+        defs: ours.defs,
+        refs: ours.refs.filter((r) => !loose.has(r[1])),
+      };
+    },
+  },
+  {
     name: "def-end-trim-empty",
     what: "a definition's end is pulled back off trailing EMPTY lines only",
     // The narrowing `definition-blank-tail.ts` forces. That pass deliberately EXTENDS a
