@@ -183,8 +183,11 @@ const DIVERGING_POSITIONS: readonly string[] = [
  * and plain lazy text merged even before the fix.
  */
 const DIVERGING_SECTIONS: readonly string[] = [
-  // Both indents of the pipeless row, which is the same cause at two widths.
-  "C2 pipeless indent 2",
+  // The FOUR-space pipeless row only. `C2 pipeless indent 2` is fixed -- `table-row-style.ts`
+  // now measures the leading pipe at the table's own content column instead of after
+  // `trimStart()`, so an indented row in a pipeless table stays a row. At four spaces
+  // micromark makes the line indented CODE before any table logic runs, which is a different
+  // defect: the row has to be re-parsed out of a `code` node rather than merely kept.
   "C2 pipeless indented row",
   // Both D6 forms: a title across a blank line, and an `<...>` destination across one.
   "D6 angle dest over blank",
