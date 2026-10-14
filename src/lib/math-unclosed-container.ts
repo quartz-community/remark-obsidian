@@ -87,9 +87,28 @@ export function mathUnclosedContainerTransform(
       // already covers. The structural argument is what carries it -- a title is one
       // line by construction -- so a probe wave over title boundaries would be the
       // way to confirm it rather than another fuzz sweep.
+      // Same line read from OFFSETS, not from `.line`. This pass runs second-to-last in the
+      // chain, after `taskReparseTransform`, so by here many nodes have been spliced by
+      // offset and carry a line number nothing updated -- `normalizePointsTransform` rebuilds
+      // those from offsets afterwards. A staleness audit over a 487-case sample found 28
+      // documents where some node's `.line` disagreed with its own offset AT THIS CALL SITE,
+      // more than at any other pass measured, which is what prompted the change.
+      //
+      // Third instance of the same defect after `definition-column.ts` and
+      // `footnote-interrupt.ts`, and like both of those a stale read here fails SILENTLY:
+      // the tree stays valid and only this rule declines.
+      //
+      // INERT ON EVERY MEASURED DOCUMENT, which is the honest label: the corpus, the referee
+      // and all 1,152 composition sequences are byte-identical across this change. So the
+      // staleness at this call site never lands on the callout/math pair being compared --
+      // it is LATENT rather than live, and kept because the governing rule says a pass
+      // before `normalizePointsTransform` reads offsets, not because it fixed anything.
+      // Anyone measuring this file should not expect a number to move.
+      const calloutFrom = node.position?.start?.offset;
       const onTitleLine =
         node.type === "callout" &&
-        math.position?.start?.line === node.position?.start?.line;
+        calloutFrom !== undefined &&
+        !source.slice(calloutFrom, from).includes("\n");
       if (!onTitleLine && !CONTENT_AFTER_OPENER.test(written)) continue;
       // And the opener has to be *inside* the container, not merely under a node
       // that is. `- item` / `  [^37]: a` / `x $$` / `$$ tail` has its opener at

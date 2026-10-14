@@ -3173,6 +3173,47 @@ zero-regression lesson, where a clean delta against a corpus holding no case for
 us nothing and cost a shipped regression. A free result retires a CLAIM, not a constraint, and
 the honest follow-up is a probe that would exercise it.
 
+### The offset-over-line rule, audited as a class for the first time
+
+Same methodology as the ordering claims above, applied to a different standing rule: **offsets
+are what the passes maintain, and the rest of a point is rebuilt from them by
+`normalizePointsTransform`, which runs LAST.** So any pass before it that reads `.line` or
+`.column` for a DECISION is reading a stale field. That rule was written down twice, in
+`definition-column.ts` and then in `footnote-interrupt.ts`, each time after a defect -- and
+never checked against the other ~70 passes.
+
+**Both known instances failed SILENTLY**, which is what makes the class worth auditing rather
+than waiting for a third report. A stale read makes a rule DECLINE; the tree stays valid, every
+invariant holds, and only an unrelated-looking parity row is wrong. The
+`footnote-interrupt.ts` one had been costing four composition rows and was attributed to
+"tokenizer-level work" for weeks.
+
+Grepping for line comparisons gives five transform suspects, and the cheap decisive instrument
+is to measure STALENESS at each call site rather than reason about it: walk the tree, recompute
+each point's line from its own offset, and count the disagreements. Over a 487-case sample:
+
+| pass                             | documents with a stale line at that call site |
+| -------------------------------- | --------------------------------------------: |
+| `mathUnclosedContainerTransform` |                                        **28** |
+| `lrdFootnoteTransform`           |                                             2 |
+| `frontmatterUnclosedTransform`   |                                             2 |
+| `calloutTransform`               |                                             2 |
+| `commentHoistTransform`          |                                         **0** |
+
+The shape is exactly what the chain predicts: `commentHoist` runs first and sees micromark's
+own points, `mathUnclosedContainer` runs second-to-last and sees the accumulated damage.
+
+**And converting the worst one is INERT** -- corpus, referee and all 1,152 composition
+sequences byte-identical. So staleness being present at a call site does not mean the rule
+reads a stale node: the 28 documents have some node out of date, never the callout/math pair
+this rule compares. It is kept as latent correctness, labelled inert in place so nobody
+re-measures expecting movement, and the other three are left alone on the same evidence.
+
+Two things to carry. **A measurement that finds nothing still retires a question** -- "is the
+offset rule violated elsewhere" was open and is now answered with numbers. And **a defect class
+that fails silently cannot be found by waiting**, because nothing reports it; it has to be
+swept, the same argument that justified the ordering audit and the invariant widening.
+
 ## Reducing a referee disagreement needs an invariant, and two obvious ones fail
 
 `referee-shrink.mts` deletes lines from a disagreeing note, re-bases the recorded answer, and
