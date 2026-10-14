@@ -2340,6 +2340,73 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/def-cap/bullet-six", "- item\n\n      [^1]: x\n"],
   ["probe/def-cap/bullet-seven", "- item\n\n       [^1]: x\n"],
   ["probe/def-cap/ordered-four", "1. item\n\n    [^1]: x\n"],
+  // B3, their rules document: an item's content column is the SMALLEST indentation among its
+  // own lines, counting only the INDENTED ones. `definition-column.ts` implements it and this
+  // corpus held ZERO cases for it -- which is the whole reason the rule had to be gated by a
+  // separate golden before it could be landed at all.
+  //
+  // The question each group settles:
+  //
+  //   `lazy`     a column-0 continuation is EXCLUDED from the minimum, so the column stays at
+  //              the marker's width. This half was always right and no case covered it.
+  //   `indented` a continuation below the marker's width pulls the column DOWN to it. This is
+  //              the half that was wrong, across four marker shapes -- bullet, wide bullet,
+  //              ordered and task -- because a rule confirmed on one marker is confirmed on
+  //              that marker's accidents.
+  //   `code`     the SAME minimum moves where indented code begins, so the definition stops
+  //              existing. This half is NOT implemented: the four `-code` cases are the
+  //              referee's own `probe:k-*` documents, which it answers `defs: []` for, and
+  //              they are here so the main gate can adjudicate a fix instead of only the
+  //              referee's four.
+  //   `quote`    the minimum is taken after the container's prefix and made absolute again.
+  //              Also not implemented -- attempted and reverted at -2 referee documents.
+  ["probe/def-deindent/lazy-zero", "- a\nlazy\n\n    [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-deindent/lazy-two", "- a\n  b\n\n    [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-deindent/no-continuation", "- a\n\n    [^1]: def\n\nuse[^1]\n"],
+  [
+    "probe/def-deindent/indented-one",
+    "- a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/indented-wide-marker",
+    "-   a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/indented-ordered",
+    "1. a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/indented-task",
+    "- [ ] a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/code-lazy-deep",
+    "- a\nlazy\n\n        [^1]: def\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/code-task-six",
+    "- [ ] a\n\n      [^1]: def\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/code-bullet-one-five",
+    "- a\n b\n\n     [^1]: x\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/code-wide-one-five",
+    "-   a\n b\n\n     [^1]: x\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/code-wide-two-six",
+    "-   a\n  b\n\n      [^1]: x\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/code-ordered-one-six",
+    "1. a\n b\n\n      [^1]: x\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/quote-indented-one",
+    "> - a\n>  lazy\n>\n>     [^1]: def\n\nuse[^1]\n",
+  ],
   // The definition content-column rule, on the shapes the REFEREE surfaced and cannot
   // adjudicate -- it stores no structure, so the host item's content column has to be
   // recovered from text and that is wrong too often to tabulate. These are the same

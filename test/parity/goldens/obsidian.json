@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-12T08:11:38.498Z",
+  "recordedAt": "2026-10-14T22:43:34.476Z",
   "cases": {
     "probe/label-bracket/full-unmatched-undefined": {
       "id": "probe/label-bracket/full-unmatched-undefined",
@@ -81399,6 +81399,918 @@
           "tags": [],
           "listItems": [
             "-|parent:-1@0:0-2:11"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-deindent/lazy-zero": {
+      "id": "probe/def-deindent/lazy-zero",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\nlazy\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>a<br>\nlazy</p>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "a lazy use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\nlazy\n\n    [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@3:2-3:13"
+          ],
+          "footnoteRefs": [
+            "1@5:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-3:13",
+            "paragraph@5:0-5:7",
+            "text@6:0-6:0",
+            "element@6:0-6:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-3:13"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-deindent/lazy-two": {
+      "id": "probe/def-deindent/lazy-two",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\n  b\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>a<br>\nb</p>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "a b use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\n  b\n\n    [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@3:2-3:13"
+          ],
+          "footnoteRefs": [
+            "1@5:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-3:13",
+            "paragraph@5:0-5:7",
+            "text@6:0-6:0",
+            "element@6:0-6:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-3:13"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-deindent/no-continuation": {
+      "id": "probe/def-deindent/no-continuation",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>a</p>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "a use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\n\n    [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@2:2-2:13"
+          ],
+          "footnoteRefs": [
+            "1@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:13",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:13"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-deindent/indented-one": {
+      "id": "probe/def-deindent/indented-one",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>a<br>\nlazy</p>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "a lazy use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\n lazy\n\n    [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@3:1-3:13"
+          ],
+          "footnoteRefs": [
+            "1@5:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-3:13",
+            "paragraph@5:0-5:7",
+            "text@6:0-6:0",
+            "element@6:0-6:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-3:13"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-deindent/indented-wide-marker": {
+      "id": "probe/def-deindent/indented-wide-marker",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "-   a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>a<br>\nlazy</p>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "a lazy use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "-   a\n lazy\n\n    [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@3:1-3:13"
+          ],
+          "footnoteRefs": [
+            "1@5:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-3:13",
+            "paragraph@5:0-5:7",
+            "text@6:0-6:0",
+            "element@6:0-6:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-3:13"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-deindent/indented-ordered": {
+      "id": "probe/def-deindent/indented-ordered",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "1. a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\">\n<p>a<br>\nlazy</p>\n</li>\n</ol>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "a lazy use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1. a\n lazy\n\n    [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@3:1-3:13"
+          ],
+          "footnoteRefs": [
+            "1@5:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-3:13",
+            "paragraph@5:0-5:7",
+            "text@6:0-6:0",
+            "element@6:0-6:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-3:13"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-deindent/indented-task": {
+      "id": "probe/def-deindent/indented-task",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- [ ] a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul class=\"contains-task-list\">\n<li data-task=\"\" class=\"task-list-item\" dir=\"auto\">\n<p><input type=\"checkbox\" class=\"task-list-item-checkbox\">a<br>\nlazy</p>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "a lazy use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [
+            {
+              "char": " ",
+              "checked": false
+            }
+          ],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- [ ] a\n lazy\n\n    [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@3:1-3:13"
+          ],
+          "footnoteRefs": [
+            "1@5:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-3:13",
+            "paragraph@5:0-5:7",
+            "text@6:0-6:0",
+            "element@6:0-6:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "\" \"|parent:-1@0:0-3:13"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-deindent/code-lazy-deep": {
+      "id": "probe/def-deindent/code-lazy-deep",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\nlazy\n\n        [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>a<br>\nlazy</p>\n<pre><code>  [^1]: def\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</li>\n</ul>\n<p dir=\"auto\">use1</p>",
+        "projections": {
+          "text": "a lazy [^1]: def use1",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\nlazy\n\n        [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-3:17",
+            "paragraph@5:0-5:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-3:17"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-deindent/code-task-six": {
+      "id": "probe/def-deindent/code-task-six",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- [ ] a\n\n      [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul class=\"contains-task-list\">\n<li data-task=\"\" class=\"task-list-item\" dir=\"auto\">\n<p><input type=\"checkbox\" class=\"task-list-item-checkbox\">a</p>\n<pre><code>[^1]: def\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</li>\n</ul>\n<p dir=\"auto\">use1</p>",
+        "projections": {
+          "text": "a [^1]: def use1",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [
+            {
+              "char": " ",
+              "checked": false
+            }
+          ],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- [ ] a\n\n      [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:15",
+            "paragraph@4:0-4:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "\" \"|parent:-1@0:0-2:15"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-deindent/code-bullet-one-five": {
+      "id": "probe/def-deindent/code-bullet-one-five",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\n b\n\n     [^1]: x\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>a<br>\nb</p>\n<pre><code>[^1]: x\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</li>\n</ul>\n<p dir=\"auto\">use1</p>",
+        "projections": {
+          "text": "a b [^1]: x use1",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\n b\n\n     [^1]: x"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-3:12",
+            "paragraph@5:0-5:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-3:12"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "B3's code threshold, the half that is NOT implemented. An item's content column is the smallest indentation among its own indented lines, and that SAME minimum moves where indented code begins -- so with the floor at 1 a five-space definition is four columns past it and Obsidian reports NO definition at all, where we report one at the lowered column. The column half shipped in `definition-column.ts` (`deIndentFloor`); this is its consequence and needs a pass that demotes the definition to code. Scored at better 20 / worse 17 against the referee with the floor read from the shipped `contentColumn`, and the remaining losses are a UNIT MISMATCH in that function -- it returns `opener[0].length` in characters while the threshold compares columns, so a tab-indented marker is 4 against 8. Choosing one unit edits the shipped column answer, which is why this is recorded rather than bought at -12. These four documents are the referee's own `probe:k-*` cases, which it answers `defs: []` for, promoted here so the main gate can adjudicate a fix too."
+    },
+    "probe/def-deindent/code-wide-one-five": {
+      "id": "probe/def-deindent/code-wide-one-five",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "-   a\n b\n\n     [^1]: x\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>a<br>\nb</p>\n<pre><code>[^1]: x\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</li>\n</ul>\n<p dir=\"auto\">use1</p>",
+        "projections": {
+          "text": "a b [^1]: x use1",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "-   a\n b\n\n     [^1]: x"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-3:12",
+            "paragraph@5:0-5:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-3:12"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "B3's code threshold, the half that is NOT implemented. An item's content column is the smallest indentation among its own indented lines, and that SAME minimum moves where indented code begins -- so with the floor at 1 a five-space definition is four columns past it and Obsidian reports NO definition at all, where we report one at the lowered column. The column half shipped in `definition-column.ts` (`deIndentFloor`); this is its consequence and needs a pass that demotes the definition to code. Scored at better 20 / worse 17 against the referee with the floor read from the shipped `contentColumn`, and the remaining losses are a UNIT MISMATCH in that function -- it returns `opener[0].length` in characters while the threshold compares columns, so a tab-indented marker is 4 against 8. Choosing one unit edits the shipped column answer, which is why this is recorded rather than bought at -12. These four documents are the referee's own `probe:k-*` cases, which it answers `defs: []` for, promoted here so the main gate can adjudicate a fix too."
+    },
+    "probe/def-deindent/code-wide-two-six": {
+      "id": "probe/def-deindent/code-wide-two-six",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "-   a\n  b\n\n      [^1]: x\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>a<br>\nb</p>\n<pre><code>[^1]: x\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</li>\n</ul>\n<p dir=\"auto\">use1</p>",
+        "projections": {
+          "text": "a b [^1]: x use1",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "-   a\n  b\n\n      [^1]: x"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-3:13",
+            "paragraph@5:0-5:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-3:13"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "B3's code threshold, the half that is NOT implemented. An item's content column is the smallest indentation among its own indented lines, and that SAME minimum moves where indented code begins -- so with the floor at 1 a five-space definition is four columns past it and Obsidian reports NO definition at all, where we report one at the lowered column. The column half shipped in `definition-column.ts` (`deIndentFloor`); this is its consequence and needs a pass that demotes the definition to code. Scored at better 20 / worse 17 against the referee with the floor read from the shipped `contentColumn`, and the remaining losses are a UNIT MISMATCH in that function -- it returns `opener[0].length` in characters while the threshold compares columns, so a tab-indented marker is 4 against 8. Choosing one unit edits the shipped column answer, which is why this is recorded rather than bought at -12. These four documents are the referee's own `probe:k-*` cases, which it answers `defs: []` for, promoted here so the main gate can adjudicate a fix too."
+    },
+    "probe/def-deindent/code-ordered-one-six": {
+      "id": "probe/def-deindent/code-ordered-one-six",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "1. a\n b\n\n      [^1]: x\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\">\n<p>a<br>\nb</p>\n<pre><code> [^1]: x\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</li>\n</ol>\n<p dir=\"auto\">use1</p>",
+        "projections": {
+          "text": "a b [^1]: x use1",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1. a\n b\n\n      [^1]: x"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-3:13",
+            "paragraph@5:0-5:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-3:13"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "B3's code threshold, the half that is NOT implemented. An item's content column is the smallest indentation among its own indented lines, and that SAME minimum moves where indented code begins -- so with the floor at 1 a five-space definition is four columns past it and Obsidian reports NO definition at all, where we report one at the lowered column. The column half shipped in `definition-column.ts` (`deIndentFloor`); this is its consequence and needs a pass that demotes the definition to code. Scored at better 20 / worse 17 against the referee with the floor read from the shipped `contentColumn`, and the remaining losses are a UNIT MISMATCH in that function -- it returns `opener[0].length` in characters while the threshold compares columns, so a tab-indented marker is 4 against 8. Choosing one unit edits the shipped column answer, which is why this is recorded rather than bought at -12. These four documents are the referee's own `probe:k-*` cases, which it answers `defs: []` for, promoted here so the main gate can adjudicate a fix too."
+    },
+    "probe/def-deindent/quote-indented-one": {
+      "id": "probe/def-deindent/quote-indented-one",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> - a\n>  lazy\n>\n>     [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<ul>\n<li dir=\"auto\">\n<p>a<br>\nlazy</p>\n</li>\n</ul>\n</blockquote>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "a lazy use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> - a\n>  lazy\n>\n>     [^1]: def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@3:3-3:15"
+          ],
+          "footnoteRefs": [
+            "1@5:3"
+          ],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-3:15",
+            "paragraph@5:0-5:7",
+            "text@6:0-6:0",
+            "element@6:0-6:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:2-3:15"
           ],
           "blocks": [],
           "frontmatterLinks": []

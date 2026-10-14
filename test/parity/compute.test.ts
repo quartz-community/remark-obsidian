@@ -143,6 +143,16 @@ describe("positioned oracle", () => {
     // block `1` in Obsidian because the bracket becomes a LINK and never claims the
     // caret, so the reference we report there is one Obsidian does not have.
     "probe/caret-link/link-with-def: the bracket is a link, so the caret is a block id",
+    // B3's code threshold, unimplemented. The lowered content column moves where indented code
+    // begins, so a five-space definition under a one-space continuation is four columns past
+    // the floor and Obsidian reports NOTHING -- no definition, and therefore no reference for
+    // `use[^1]` to resolve against. We emit both, so the reference is one Obsidian does not
+    // have. Scored at better 20 / worse 17, blocked on a character-vs-column unit mismatch in
+    // the shipped `contentColumn`; the four cases are the referee's own `probe:k-*` documents.
+    "probe/def-deindent/code-bullet-one-five: B3 code threshold, Obsidian has no definition",
+    "probe/def-deindent/code-wide-one-five: B3 code threshold, Obsidian has no definition",
+    "probe/def-deindent/code-wide-two-six: B3 code threshold, Obsidian has no definition",
+    "probe/def-deindent/code-ordered-one-six: B3 code threshold, Obsidian has no definition",
     // A tab FOLLOWING A SPACE does not reach the four-column indented-code threshold, so
     // Obsidian defines these and micromark makes them `code`. Probed across six shapes:
     // `\t[^1]: def`, `\t\t[^1]: def` and `    [^1]: def` yield NO definition, while
@@ -397,8 +407,16 @@ describe("positioned oracle", () => {
     // `probe/table-label/pipeless` is CLOSED too, by `tableLabelRowTransform`: its label
     // line is a table row, so there is no definition and no resolved reference. Both of the
     // wave's fixable findings are now shipped and the key is back where it started.
-    footnotes: 2,
-    footnoteRefs: 4,
+    // 2 -> 7 with the `probe/def-deindent/*` promotion. FIVE of the new entries are B3's code
+    // threshold, which is unimplemented: four `code-*` cases where Obsidian reports NO
+    // definition because the lowered content column puts the label four columns past it, plus
+    // `quote-indented-one`, whose column is 2 here and 3 there because the minimum has to be
+    // taken after the container's prefix. The main gate cannot see that last one at all --
+    // `meta.footnotes` is NAMES ONLY -- which is exactly why this oracle exists.
+    footnotes: 7,
+    // 4 -> 8: the four `code-*` cases again. We emit a definition, so `use[^1]` resolves and
+    // is a placed reference; Obsidian has no definition there, so it indexes no reference.
+    footnoteRefs: 8,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
     // Obsidian reports a heading's column as its containing block's content column,
@@ -957,6 +975,15 @@ describe("positioned oracle", () => {
     "probe/def-gap/marker-tab-sep:sections",
     "probe/def-tab/marker-tab-spaces:footnoteRefs",
     "probe/def-tab/marker-tab-spaces:footnotes",
+    "probe/def-deindent/code-bullet-one-five:footnoteRefs",
+    "probe/def-deindent/code-bullet-one-five:footnotes",
+    "probe/def-deindent/code-ordered-one-six:footnoteRefs",
+    "probe/def-deindent/code-ordered-one-six:footnotes",
+    "probe/def-deindent/code-wide-one-five:footnoteRefs",
+    "probe/def-deindent/code-wide-one-five:footnotes",
+    "probe/def-deindent/code-wide-two-six:footnoteRefs",
+    "probe/def-deindent/code-wide-two-six:footnotes",
+    "probe/def-deindent/quote-indented-one:footnotes",
     "probe/empty-container/nested-list:listItems",
     "probe/quote-nest/two-space:listItems",
   ];

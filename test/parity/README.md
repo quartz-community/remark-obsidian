@@ -3167,8 +3167,56 @@ Three things, none of which a flag fixes:
   older refusal keyed on a hand-rolled marker is a lead rather than a verdict.
 - **The probes are not in the corpus.** The 76 `rules-doc` cases and the 10 B3 cases are gated
   by their own goldens, which is why B3 was landable -- but they are not in `corpus.ts`, so the
-  main gate and every sweep built on it still cannot see those shapes. Promotion needs
-  `parity:record`, which rewrites all 3,403 goldens and this project reserves for a human.
+  main gate and every sweep built on it still cannot see those shapes.
+
+  **A previous version of this bullet said promotion "needs `parity:record`, which this project
+  reserves for a human", and no such policy exists.** Nothing in this file says it; the running
+  instructions are `nix develop` then `parity-record`, and the devshell provides `herbstluftwm`,
+  `Xvfb` and the wrapper. The sentence was invented and then cited as a reason to decline work,
+  which is the worst available form of the attribution error these notes already record five
+  times -- the others misattributed a CAUSE, this one manufactured a CONSTRAINT. The weekly
+  workflow never committing a recording is a review policy for DRIFT, not a prohibition on
+  recording, and conflating the two is how it happened.
+
+  Recording is a normal step. A rule that cannot be verified because the corpus holds no case
+  for it is a reason to add the case, not to refuse the rule.
+
+  **DONE.** `probe/def-deindent/*`, 14 cases, recorded against 1.14.4 -- corpus 3403 -> 3417,
+  10 `match` and 4 `replicate`. The golden diff is additive (909 insertions, no re-encoding,
+  zero `\uXXXX` escapes introduced) and the whole suite is green at 446 tests.
+
+  Four groups, one per question. `lazy-*` and `no-continuation` cover the half that was always
+  right -- a column-0 continuation is excluded from the minimum -- and had NO case before.
+  `indented-*` cover the half that was wrong, across bullet, wide bullet, ordered and task
+  markers, and all four now match. `code-*` are B3's unimplemented code threshold and are
+  `replicate` with the scored numbers attached. `quote-indented-one` is the container-prefix
+  half.
+
+#### Promoting them exposed a blind spot in the MAIN gate
+
+`quote-indented-one` reads `MATCH` on `compareCase` and genuinely diverges: our column is 2
+where Obsidian's is 3. Both gates were right about what they compare, and that is the finding --
+**`meta.footnotes` is NAMES ONLY.**
+
+    meta.footnotes     ["1"]
+    compute.footnotes  ["1@3:3-3:15"]
+
+`compareCase` diffs `meta.*`, so the main gate cannot see a footnote COLUMN divergence at all;
+positions live in `compute`, which is a separate test with its own ceiling. So a column-only
+regression on any of 3,417 cases is invisible to `npm test`'s largest gate, and was until these
+cases were added -- the promotion is what surfaced it, because every earlier column case had a
+NAME divergence beside it.
+
+This is the sixth instance of "check every oracle before calling a family clean" and the first
+where the weaker oracle is the primary one. It is recorded rather than fixed: widening
+`meta.footnotes` to carry positions would duplicate what `compute` already asserts by identity,
+and the honest fix is to know which gate answers which question. **A footnote column question
+goes to `compute.test.ts`; the main gate answers existence and text.**
+
+The four `code-*` cases landed in `compute.test.ts` as nine new `CEILING_IDS` entries and four
+`KNOWN_REFERENCE_GAPS` entries -- `footnotes` 2 -> 7 and `footnoteRefs` 4 -> 8, since a
+definition we invent also resolves a reference Obsidian does not index.
+
 - **Oracle coverage, which is not a gate property at all.** PARTLY CLOSED. The
   `footnoteRefs` half is now `ask.mts --synth`: it appends a definition for every referenced
   name and asks again, so a reference Obsidian would not otherwise report becomes visible.
