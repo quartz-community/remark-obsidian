@@ -150,11 +150,25 @@ const DIVERGING_POSITIONS: readonly string[] = [
   // `referenceLinks` below.
   //
   // E5, three variants of one rule: a footnote name runs to the first `]` and may hold a `[`
-  // or a `^`, giving names `^[x`, `[x` and `x[y`. We read no reference at all. This is the
-  // known-hard family `README.md` records -- it needs a construct claiming `[^` before the
-  // wikilink extension, GFM's footnote call and CommonMark's label start see that bracket,
-  // and three attempts are refuted with their numbers. `E5 whitespace in name` AGREES, which
-  // is the half already implemented in `footnote-bare.ts`.
+  // or a `^`, giving names `^[x`, `[x` and `x[y`. We read neither a definition nor a
+  // reference. `E5 whitespace in name` AGREES, which is the half already implemented in
+  // `footnote-bare.ts`.
+  //
+  // THE BLOCKER IS THE DEFINITION TOKENIZER, measured rather than inherited. Allowing `[` in
+  // `footnote-bare.ts`'s `REFERENCE` class costs ZERO corpus regressions and trips no lint --
+  // so the "widening the label pattern costs 11 regressions and trips the ReDoS lint" note
+  // this harness carried was conflating it with the BLANK widening, which is a different
+  // character class. What the widening actually produces is half a fix and therefore worse
+  // than none:
+  //
+  //     a[^^[x]] / blank / [^^[x]: d      defs []   refs ["^[x", "^[x"]
+  //
+  // The reference appears, no definition does, and the definition LINE is then read as a
+  // second bare reference because nothing claimed it. So the work is in GFM's `[^label]:`
+  // scan, which rejects `[` in a label, and until that accepts one the reference half must
+  // stay shut. That is consistent with what `README.md` concludes from the other direction --
+  // a construct has to claim `[^` to the first `]` before the wikilink extension, GFM's
+  // footnote call and CommonMark's label start see that bracket.
   "E5 bracket in name",
   "E5 bracket name",
   "E5 trailing bracket name",
