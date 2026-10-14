@@ -117,6 +117,7 @@ import {
   legacyDefinitionTransform,
 } from "./lib/legacy-definition.js";
 import { quoteIndentedCodeTransform } from "./lib/quote-indented-code.js";
+import { itemDotThresholdTransform } from "./lib/item-dot-threshold.js";
 import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 import { calloutTransform } from "./lib/callout.js";
 import { definitionIndentedCodeTransform } from "./lib/definition-indented-code.js";
@@ -659,6 +660,12 @@ export default function remarkObsidian(
       self.parse(markdown),
     );
     quoteIndentedCodeTransform(tree, String(file), (markdown) =>
+      self.parse(markdown),
+    );
+    // Beside the pass above, which handles the same shape when the marker sits on the code's
+    // own line. A single-digit `1.` marker moves the item's CODE THRESHOLD out by one, the
+    // same adjustment `definition-column.ts` already applies to the column.
+    itemDotThresholdTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
     // Before the absorption, which is what keeps it small: the unclosed `$$` is still a root
