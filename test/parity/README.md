@@ -2621,6 +2621,41 @@ MEASUREMENTS -- the rules document, the lettered comments in its source, and the
 oracle this harness uses as a referee -- not its code. Its architecture solves a problem
 `remark-parse` 8 has and micromark does not.
 
+### ...except B3 IS a gap, and the five siblings above were the wrong five
+
+The paragraph above is kept because its conclusion about ADOPTING their parser still holds and
+its premise does not. "The behaviour it produces is already ours -- `- a` / `lazy` /
+`    [^1]: def` and four siblings all match live Obsidian" is true of those five and false of
+the rule. Every one of them has its continuation line at column ZERO, which is the half of B3
+that says Obsidian leaves unindented lines OUT of the minimum -- so they could not have
+distinguished the two readings. One space is what separates them:
+
+| note                                   |   obs | ours |
+| -------------------------------------- | ----: | ---: |
+| `- a` / `lazy` / `⟨4sp⟩[^1]:`          |     2 |    2 |
+| `- a` / `⟨2sp⟩b` / `⟨4sp⟩[^1]:`        |     2 |    2 |
+| `- a` / `⟨1sp⟩lazy` / `⟨4sp⟩[^1]:`     | **1** |    2 |
+| `-⟨3sp⟩a` / `⟨1sp⟩lazy` / `⟨4sp⟩[^1]:` | **1** |    4 |
+
+So an item's content column really is the SMALLEST indentation among its own lines, counting
+only the indented ones, and we report the marker's width instead. The probe set that cleared
+this rule was chosen from their document's own example, which is a column-0 case, and five
+variations of a column-0 case are one case.
+
+**It is the largest enriched family on this oracle.** 895 documents hold an item with a
+continuation line indented below its marker's content column, and 354 of them disagree against
+a 19.3% base rate -- a 2.05x lift, beside the container-opened `%%` class at 2.17x over 207.
+
+And it is the one open item that is genuinely a NEW RULE rather than an extension, which
+matters because every fix that has landed here recently was a widening of something already in
+the tree. It governs three things at once -- the definition's column, where indented code
+begins, and which lines continue the item -- so it belongs in `legacy-list.ts`, the vendored
+reader this package already replaces `list` with, rather than in a repair pass. That is exactly
+the file the sibling project patched, for exactly this rule.
+
+The usual caution applies before anyone starts: 354 is the documents the shape TOUCHES, not the
+gain. The tab family touched 426 and capped at ten.
+
 ## Tracing their SOURCE finds rules their document does not letter
 
 Their rules document was mined once and gave five gaps, all now closed. Their source is a
