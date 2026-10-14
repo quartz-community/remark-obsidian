@@ -924,6 +924,50 @@ describe("positioned oracle", () => {
     frontmatterPosition: 0,
   };
 
+  /**
+   * The same ceiling BY IDENTITY, which is what makes it a gate rather than a tally.
+   *
+   * `CEILING` above is per-field COUNTS, and a count holds exactly when one case stops
+   * diverging while another starts. This harness has paid for that twice already -- once as
+   * "verify a HOLD by identity, not by its total", where a referee figure read as unchanged
+   * while two documents traded, and once as the round-trip ceiling that could not tell untidy
+   * from unbounded and now asserts emptiness instead. An audit of every instrument here found
+   * this the last count-shaped assertion left, so it gets the same treatment.
+   *
+   * 18 entries over THIRTEEN cases, which is the other thing a count hides:
+   * `probe/def-gap/marker-tab-sep` diverges on three fields at once and
+   * `fuzz/embed/24` and `probe/caret-link/link-with-def` on two, so "18" was never 18
+   * independent problems. Every attribution for them is in `CEILING`'s own comments, which is
+   * why that block stays -- this list is the assertion, those comments are the reasoning.
+   */
+  const CEILING_IDS: readonly string[] = [
+    "callout/nested-task-list:listItems",
+    "fuzz/embed/24:embeds",
+    "fuzz/embed/24:links",
+    "fuzz/embed/75:embeds",
+    "hunt/aftercloser-chain-eats-referenced-definition/0:footnoteRefs",
+    "hunt/continuation-masked-under-foreign-label/2:footnoteRefs",
+    "hunt/inline-footnote-double-parse/0:blocks",
+    "hunt/inline-footnote-double-parse/1:blocks",
+    "probe/block-nest/both-ids:blocks",
+    "probe/caret-link/link-with-def:footnoteRefs",
+    "probe/caret-link/link-with-def:links",
+    "probe/def-gap/marker-tab-sep:footnotes",
+    "probe/def-gap/marker-tab-sep:listItems",
+    "probe/def-gap/marker-tab-sep:sections",
+    "probe/def-tab/marker-tab-spaces:footnoteRefs",
+    "probe/def-tab/marker-tab-spaces:footnotes",
+    "probe/empty-container/nested-list:listItems",
+    "probe/quote-nest/two-space:listItems",
+  ];
+
+  it("diverges on exactly the recorded cases, by identity", () => {
+    const found = [...diverged].flatMap(([id, keys]) =>
+      keys.map((key) => `${id}:${key}`),
+    );
+    expect(found.sort()).toEqual([...CEILING_IDS].sort());
+  });
+
   it("diverges on no more cases than the recorded ceiling", () => {
     const counts: Record<string, number> = Object.fromEntries(
       COMPUTE_KEYS.map((key) => [key, 0]),
@@ -932,6 +976,17 @@ describe("positioned oracle", () => {
       for (const key of keys) counts[key] = (counts[key] ?? 0) + 1;
     }
     expect(counts).toEqual(CEILING);
+    // Both assertions read the same `diverged` map, so this one cannot disagree with the
+    // identity list above -- it is kept because `CEILING`'s per-field comments are where every
+    // one of these is attributed, and a field count is the readable index into them.
+    const fromIds: Record<string, number> = Object.fromEntries(
+      COMPUTE_KEYS.map((key) => [key, 0]),
+    );
+    for (const entry of CEILING_IDS) {
+      const key = entry.slice(entry.lastIndexOf(":") + 1);
+      fromIds[key] = (fromIds[key] ?? 0) + 1;
+    }
+    expect(fromIds).toEqual(CEILING);
   });
 
   it("reproduces the inline footnote naming the probes established", () => {

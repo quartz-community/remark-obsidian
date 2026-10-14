@@ -3003,12 +3003,49 @@ four `inline-block/comment [ ... ]` rows that are the P1 cache defect which must
 | `rules-doc.test.ts`           |               6 | exact set, by identity   | none     |
 | invariants, points, roundtrip |               0 | absolute property        | none     |
 
-`CEILING` is the last one, and it has the hole for the reason the referee total did: it asserts
+`CEILING` was the last one, and it had the hole for the reason the referee total did: it asserted
 `{footnotes: 2, footnoteRefs: 4, sections: 1, links: 2, embeds: 2, blocks: 3, listItems: 4}` as
-**counts**, so one case ceasing to diverge while another starts holds the number exactly. 18
-units, which is small -- and this file already carries the lesson twice, once as "verify a HOLD
-by identity, not by its total" and once as the round-trip ceiling that could not tell untidy
-from unbounded, which is why that gate now asserts emptiness instead.
+**counts**, so one case ceasing to diverge while another started held the number exactly. This
+file already carried the lesson twice -- once as "verify a HOLD by identity, not by its total",
+and once as the round-trip ceiling that could not tell untidy from unbounded and now asserts
+emptiness instead.
+
+**Closed by `CEILING_IDS`**, the same 18 as an exact set of `<case>:<field>` entries, asserted
+by identity beside the counts. Break-tested the way the hole actually opens: swapping one entry
+for another **within the same field** fails the identity assertion while the count assertion
+still passes.
+
+The conversion also showed what the count had been hiding all along -- **18 entries are
+THIRTEEN cases.** `probe/def-gap/marker-tab-sep` diverges on `footnotes`, `listItems` and
+`sections` at once, and `fuzz/embed/24` and `probe/caret-link/link-with-def` on two each. "18
+divergences" was never 18 independent problems, which is a materially different backlog.
+
+`CEILING` itself stays, because its per-field comments are where all thirteen are attributed and
+a field count is the readable index into them; both assertions read the same `diverged` map, so
+they cannot disagree, and the count test now also checks itself against the identity list.
+
+### So every device is in order, and here is what each one can and cannot say
+
+| gate                          | diverging | assertion                | hole   |
+| ----------------------------- | --------: | ------------------------ | ------ |
+| `referee.mts`                 |     1,316 | total + `--blast`        | closed |
+| `delta.mts` (corpus)          |         5 | triage lists + `--blast` | closed |
+| `compose.mts`                 |         5 | binary rows + `--blast`  | closed |
+| `compute.test.ts`             |        18 | **identity** + counts    | closed |
+| `rules-doc.test.ts`           |         6 | exact set, by identity   | none   |
+| invariants, points, roundtrip |         0 | absolute property        | none   |
+
+Every count-shaped assertion in the harness is now backed by an identity one, and every
+comparative gate reports the `still wrong` bucket. The workflow for a `src` change is three
+dumps and three blasts, and the thing to read is **`still wrong` on all three** -- the totals
+only say whether it helped.
+
+One residual worth stating because it is a property of the oracles rather than of the gates:
+`--blast` can only speak for projections an oracle RECORDS. The referee records `defs` and
+`refs`, the corpus records ten projections plus `meta.*` and `html.*`, and `compose` records
+eight including `sections`. A rule that changes something none of the three records -- inline
+positions inside a table cell, say -- is still unmeasured, and the answer there is a probe wave
+rather than another flag.
 
 ## Tracing their SOURCE finds rules their document does not letter
 
