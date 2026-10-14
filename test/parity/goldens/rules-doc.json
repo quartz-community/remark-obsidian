@@ -1908,6 +1908,414 @@
           }
         ]
       }
+    },
+    {
+      "rule": "B3 column-0 lazy excluded",
+      "markdown": "- a\nlazy\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 3,
+              "col": 2,
+              "offset": 12
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 5,
+              "col": 3,
+              "offset": 28
+            }
+          }
+        ],
+        "blocks": [],
+        "referenceLinks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          },
+          {
+            "type": "paragraph",
+            "start": 5
+          },
+          {
+            "type": "text",
+            "start": 6
+          },
+          {
+            "type": "element",
+            "start": 6
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B3 one-space lazy counts",
+      "markdown": "- a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 3,
+              "col": 1,
+              "offset": 12
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 5,
+              "col": 3,
+              "offset": 29
+            }
+          }
+        ],
+        "blocks": [],
+        "referenceLinks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          },
+          {
+            "type": "paragraph",
+            "start": 5
+          },
+          {
+            "type": "text",
+            "start": 6
+          },
+          {
+            "type": "element",
+            "start": 6
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B3 two-space lazy counts",
+      "markdown": "- a\n  b\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 3,
+              "col": 2,
+              "offset": 11
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 5,
+              "col": 3,
+              "offset": 27
+            }
+          }
+        ],
+        "blocks": [],
+        "referenceLinks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          },
+          {
+            "type": "paragraph",
+            "start": 5
+          },
+          {
+            "type": "text",
+            "start": 6
+          },
+          {
+            "type": "element",
+            "start": 6
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B3 wide marker one-space lazy",
+      "markdown": "-   a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 3,
+              "col": 1,
+              "offset": 14
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 5,
+              "col": 3,
+              "offset": 31
+            }
+          }
+        ],
+        "blocks": [],
+        "referenceLinks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          },
+          {
+            "type": "paragraph",
+            "start": 5
+          },
+          {
+            "type": "text",
+            "start": 6
+          },
+          {
+            "type": "element",
+            "start": 6
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B3 column-0 lazy then deep",
+      "markdown": "- a\nlazy\n\n        [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "referenceLinks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          },
+          {
+            "type": "paragraph",
+            "start": 5
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B3 no lazy line at all",
+      "markdown": "- a\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 2,
+              "col": 2,
+              "offset": 7
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 4,
+              "col": 3,
+              "offset": 23
+            }
+          }
+        ],
+        "blocks": [],
+        "referenceLinks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          },
+          {
+            "type": "paragraph",
+            "start": 4
+          },
+          {
+            "type": "text",
+            "start": 5
+          },
+          {
+            "type": "element",
+            "start": 5
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B3 quoted item one-space lazy",
+      "markdown": "> - a\n>  lazy\n>\n>     [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 3,
+              "col": 3,
+              "offset": 19
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 5,
+              "col": 3,
+              "offset": 36
+            }
+          }
+        ],
+        "blocks": [],
+        "referenceLinks": [],
+        "sections": [
+          {
+            "type": "blockquote",
+            "start": 0
+          },
+          {
+            "type": "paragraph",
+            "start": 5
+          },
+          {
+            "type": "text",
+            "start": 6
+          },
+          {
+            "type": "element",
+            "start": 6
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B3 ordered one-space lazy",
+      "markdown": "1. a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 3,
+              "col": 1,
+              "offset": 13
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 5,
+              "col": 3,
+              "offset": 30
+            }
+          }
+        ],
+        "blocks": [],
+        "referenceLinks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          },
+          {
+            "type": "paragraph",
+            "start": 5
+          },
+          {
+            "type": "text",
+            "start": 6
+          },
+          {
+            "type": "element",
+            "start": 6
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B3 task item one-space lazy",
+      "markdown": "- [ ] a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 3,
+              "col": 1,
+              "offset": 16
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "1",
+            "start": {
+              "line": 5,
+              "col": 3,
+              "offset": 33
+            }
+          }
+        ],
+        "blocks": [],
+        "referenceLinks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          },
+          {
+            "type": "paragraph",
+            "start": 5
+          },
+          {
+            "type": "text",
+            "start": 6
+          },
+          {
+            "type": "element",
+            "start": 6
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B3 task item no lazy",
+      "markdown": "- [ ] a\n\n      [^1]: def\n\nuse[^1]\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "referenceLinks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          },
+          {
+            "type": "paragraph",
+            "start": 4
+          }
+        ]
+      }
     }
   ]
 }

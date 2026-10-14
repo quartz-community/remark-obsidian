@@ -180,6 +180,52 @@ const DIVERGING_POSITIONS: readonly string[] = [
   // It is also the ONLY case in the whole golden that differs on COLUMN alone, which is the
   // audit's answer to "do we handle column": yes, on every case that agrees on line bar this.
   "P2 column quirk",
+  // B3, five cases, and they are the rule rather than a sample of it. An item's content column
+  // is the SMALLEST indentation among its own INDENTED lines, so a continuation sitting below
+  // the marker's width pulls the column down with it. We report the marker's width.
+  //
+  // Ten probes against live 1.14.4 are in the golden and FIVE of them agree, which is what
+  // makes these five the rule and not a shape:
+  //
+  //     - a / lazy(col 0)  / ⟨4sp⟩[^1]:    col 2   agrees -- a column-0 line is EXCLUDED
+  //     - a / ⟨2sp⟩b       / ⟨4sp⟩[^1]:    col 2   agrees -- the minimum IS the marker width
+  //     - a / lazy(col 0)  / ⟨8sp⟩[^1]:    NONE    agrees -- 8 - 2 >= 4, indented code
+  //     - a /              / ⟨4sp⟩[^1]:    col 2   agrees -- no continuation to minimise over
+  //     - [ ] a /          / ⟨6sp⟩[^1]:    NONE    agrees -- so a task item's content column
+  //                                                is 2 and the CHECKBOX IS CONTENT
+  //
+  // The five below are every case where an indented continuation sits BELOW that column, and
+  // they cover the axes independently: one space against the marker's two, a wide `-⟨3sp⟩`
+  // marker, an ordered marker, a task marker, and a quoted item where the answer is 3 because
+  // the minimum is taken after the container's prefix and made absolute again.
+  //
+  // NOT IMPLEMENTED, and the blocker is adjudication rather than difficulty. FIVE premises were
+  // scored against the referee's 6,818 documents -- see `score.mts` -- and every one of them
+  // gained ZERO:
+  //
+  //     host by line range, minimum across overlaps     better 0   worse 521
+  //     host by tree containment, innermost wins        better 0   worse 117
+  //     minimum measured after the container prefix     better 0   worse 119
+  //     minimum over the item's own lines only          better 0   worse 115
+  //     ...and the checkbox folded into the marker      better 0   worse  83
+  //
+  // Each step fixed a real defect in the PREDICATE and only ever reduced the losses. 1,833 of
+  // those documents hold an item with a sub-content-column indented continuation, so the shape
+  // is there in quantity and not one of the answers is reached by this rule. The last step is
+  // the clearest evidence of why: folding the checkbox into the marker helped by making the
+  // rule DECLINE on task items, and probe 10 above shows the content column there is 2, so the
+  // premise it encoded is false and the number still improved.
+  //
+  // That is what these entries are for. The referee cannot adjudicate B3 and the 3,403-case
+  // corpus holds no instance of it, so an implementation had no gate at all -- and this
+  // harness's own standing rule is that a clean measurement against a corpus which cannot
+  // adjudicate a rule is not evidence and reads exactly like evidence. These ten cases are
+  // that gate: five pin the rule, five pin the boundaries it must not cross.
+  "B3 one-space lazy counts",
+  "B3 wide marker one-space lazy",
+  "B3 ordered one-space lazy",
+  "B3 task item one-space lazy",
+  "B3 quoted item one-space lazy",
 ];
 
 /**
@@ -209,6 +255,19 @@ const DIVERGING_SECTIONS: readonly string[] = [
   // destination running across blank lines has to be REWRITTEN rather than merely spanned,
   // and `referenceLinks` carries its value -- a field 111 corpus answers depend on.
   "D6 angle dest over blank",
+  // B3 again, attributed above. EIGHT here against five on position, and the extra three are
+  // the same cause seen from the other side: the item's content column decides its EXTENT too,
+  // so `list` ends where we think the item stops even where the definition's own column agrees.
+  // The two cases absent from this set are the two whose definition becomes indented code,
+  // which is the boundary holding.
+  "B3 column-0 lazy excluded",
+  "B3 one-space lazy counts",
+  "B3 two-space lazy counts",
+  "B3 wide marker one-space lazy",
+  "B3 no lazy line at all",
+  "B3 quoted item one-space lazy",
+  "B3 ordered one-space lazy",
+  "B3 task item one-space lazy",
 ];
 
 /**

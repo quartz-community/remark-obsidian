@@ -2658,16 +2658,30 @@ gain. The tab family touched 426 and capped at ten.
 
 #### ...and that caution was the whole story: the lift is a CORRELATE
 
-Scored before anything was built, twice, and the pair is the result:
+Scored before anything was built, five times, and the sequence is the result:
 
-| premise                                       | better | worse |
-| --------------------------------------------- | -----: | ----: |
-| host by line range, minimum across overlaps   |  **0** |   521 |
-| host by tree containment, innermost item wins |  **0** |   117 |
+| premise                                         | better | worse |
+| ----------------------------------------------- | -----: | ----: |
+| host by line range, minimum across overlaps     |  **0** |   521 |
+| host by tree containment, innermost item wins   |  **0** |   117 |
+| minimum measured after the container's prefix   |  **0** |   119 |
+| minimum over the item's own lines, to 1st blank |  **0** |   115 |
+| ...and the checkbox folded into the marker      |  **0** |    83 |
 
-The second fixed two genuine defects in the predicate -- a definition our tree places inside an
-item but past a blank line was never reached, and `definition-column.ts` records that the
-INNERMOST item owns the column -- and the gain stayed at ZERO.
+Every step fixed a genuine defect in the PREDICATE -- a definition our tree places inside an
+item but past a blank line was never reached, `definition-column.ts` records that the INNERMOST
+item owns the column, the corpus's shaped documents measure indentation after a container's `>`
+run rather than from column zero, lines belonging to nested blocks were entering the minimum,
+and `- [ ] ` is six columns of marker where the regex read two. **Each one reduced the losses
+and not one produced a gain.**
+
+That last step is the most useful of the five, because it improved the number for a false
+reason. Folding the checkbox in helped by making the rule DECLINE on task items -- and a probe
+added afterwards, `- [ ] a` / `⟨6sp⟩[^1]:`, reports NO definition, which means a task item's
+content column is 2 and the checkbox is CONTENT. So the premise the edit encoded is wrong and
+the score still moved 115 to 83. **A predicate's score can improve because it stopped firing**,
+which is the inert-probe failure mode wearing the opposite disguise: here the number moved, and
+the movement still carried no information about the rule.
 
 **Zero better over 1,833 shaped documents.** The corpus holds the shape in abundance and not one
 of its answers is reached by this rule, while the probes against live 1.14.4 show the rule
@@ -2688,6 +2702,45 @@ the one open item that is structural rather than an extension. What does not sur
 claim that it is the largest actionable family. Its size on this oracle is unmeasured, because
 this oracle cannot see it -- and the instrument that could is a probe wave against the
 application, which is where these notes already send every rule whose premise is structural.
+
+#### So: it CAN be implemented, and what blocked it was having no gate
+
+Ten probes against live 1.14.4 state the rule with nothing left ambiguous, and they are in
+`goldens/rules-doc.json` with `rules-doc.test.ts` asserting them:
+
+    - a / lazy(col 0)  / ⟨4sp⟩[^1]:    col 2   a column-0 line is EXCLUDED
+    - a / ⟨1sp⟩lazy    / ⟨4sp⟩[^1]:    col 1   an indented one is counted
+    - a / ⟨2sp⟩b       / ⟨4sp⟩[^1]:    col 2   the minimum IS the marker width here
+    -⟨3sp⟩a / ⟨1sp⟩lazy / ⟨4sp⟩[^1]:   col 1   marker width 4, answer still 1
+    1. a / ⟨1sp⟩lazy   / ⟨4sp⟩[^1]:    col 1   ordered marker, same rule
+    - [ ] a / ⟨1sp⟩lazy / ⟨4sp⟩[^1]:   col 1   task marker, same rule
+    > - a / >⟨2sp⟩lazy / >⟨5sp⟩[^1]:   col 3   after the container prefix, made absolute
+    - a /              / ⟨4sp⟩[^1]:    col 2   no continuation to minimise over
+    - a / lazy(col 0)  / ⟨8sp⟩[^1]:    NONE    8 - 2 >= 4, so indented code
+    - [ ] a /          / ⟨6sp⟩[^1]:    NONE    6 - 2 >= 4, so the checkbox is CONTENT
+
+`column = min(marker content column, indentation of the item's indented lines)`, with the code
+threshold measured from that same column. **Five of the ten already agree**, which is what makes
+the other five the rule rather than a shape -- and the two reporting NO definition are the
+boundary, so an implementation that lowers a column too eagerly fails the gate from the other
+side.
+
+Two things are NOT blockers, and saying so is the point of having checked:
+
+- **The tokenizer site.** `legacy-list.ts` fixes `containerState.size` when the marker is read,
+  and B3 needs lines that do not exist yet, so the vendored reader cannot host it as written --
+  which is what "`remark-parse` strips a whole item by a minimum and micromark does it per line"
+  means in practice. That makes it a post-pass or a buffered whole-item read, not impossible.
+- **The 83 losses.** Every one inspected is the predicate under-measuring a content column in a
+  compound container -- `- [ ]⇥laborum`, and `2)  > [!NOTE]- [^注1]:` where the real column is
+  15 and the regex computes 4. Those are fixable; fixing them is what took 521 to 83.
+
+The blocker was the third thing: **there was no instrument that would tell anyone a correct
+implementation was correct.** The referee gains zero however the minimum is measured, the
+3,403-case corpus holds no instance, and this file's own standing rule is that a clean
+measurement against a corpus which cannot adjudicate a rule is not evidence and reads exactly
+like evidence. Ten recorded cases is that instrument, and both halves of it are break-tested --
+dropping an entry and corrupting a recorded column each fail the gate.
 
 ## Tracing their SOURCE finds rules their document does not letter
 

@@ -1031,6 +1031,196 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "b3-minimum-container-relative",
+    what: "...the same minimum, measured AFTER the container's own prefix",
+    // The third premise, and the one that tests whether B3 is implementable at all rather
+    // than whether it is real. Both earlier attempts measured indentation from COLUMN ZERO,
+    // and the corpus's shaped documents are items inside quotes and callouts, where every
+    // line carries a `>` run that is the container's and not the item's. So the minimum was
+    // being taken over the wrong quantity, which is enough on its own to explain 0 better.
+    //
+    // SCORED, NOT SHIPPED: better 0, worse 119. So THREE premises now -- column-zero by line
+    // range, column-zero by containment, and container-relative -- score 0 better at 521, 117
+    // and 119 worse. The gain does not depend on how the minimum is measured, and the losing
+    // documents are the same ones each time.
+    //
+    // What they have in common is instructive: Obsidian keeps the MARKER's column where an
+    // indented line below it exists, so the minimum is not applied there at all. In the probe
+    // cases it is. Something narrower than "an indented line exists" selects between them, and
+    // this corpus cannot say what, because it never reaches the probe shape.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const PREFIX = /^(?:[ \t]*>[ \t]?)*/u;
+      const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/u;
+      const cols = (line: string): number => {
+        let column = 0;
+        for (const character of line) {
+          if (character === " ") column += 1;
+          else if (character === "\t") column += 4 - (column % 4);
+          else break;
+        }
+        return column;
+      };
+
+      const floorOf = new Map<number, number>();
+      const hosts: Array<{ item: unknown; floor: number }> = [];
+      const walk = (node: unknown): void => {
+        const self = node as {
+          type?: string;
+          position?: { start: { line: number }; end: { line: number } };
+          children?: unknown[];
+        };
+        if (self.type === "listItem" && self.position) {
+          const first = self.position.start.line - 1;
+          const head = lines[first] ?? "";
+          // The container's own prefix, measured on the item's FIRST line and reused for the
+          // rest: it is the quote's width, not the item's, so it is outside the minimum.
+          const prefix = PREFIX.exec(head)?.[0].length ?? 0;
+          const marker = MARKER.exec(head.slice(prefix));
+          if (marker) {
+            let least = marker[0].length;
+            for (let at = first + 1; at <= self.position.end.line - 1; at++) {
+              const line = lines[at] ?? "";
+              if (line.trim() === "") continue;
+              const inner = line.slice(PREFIX.exec(line)?.[0].length ?? 0);
+              const indent = cols(inner);
+              if (indent > 0 && indent < least) least = indent;
+            }
+            hosts.push({ item: self, floor: prefix + least });
+          }
+        }
+        for (const child of self.children ?? []) walk(child);
+      };
+      walk(tree);
+
+      for (const { item, floor } of hosts) {
+        const mark = (node: unknown): void => {
+          const self = node as {
+            type?: string;
+            position?: { start: { line: number } };
+            children?: unknown[];
+          };
+          if (
+            (self.type === "footnoteDefinition" ||
+              self.type === "definition") &&
+            self.position
+          ) {
+            floorOf.set(self.position.start.line - 1, floor);
+          }
+          for (const child of self.children ?? []) mark(child);
+        };
+        mark(item);
+      }
+
+      return {
+        refs: ours.refs,
+        defs: ours.defs.map((d): Def => {
+          const floor = floorOf.get(d[1]);
+          if (floor === undefined || floor >= d[2]) return d;
+          return [d[0], d[1], floor, d[3]];
+        }),
+      };
+    },
+  },
+  {
+    name: "b3-minimum-first-chunk",
+    what: "...the minimum over the item's OWN lines, stopping at its first blank",
+    // The fourth premise, and the first with a probe family behind it rather than a reading
+    // of their prose. Eight cases against live 1.14.4 fix the rule precisely:
+    //
+    //     - a / lazy(col 0) / blank / ⟨4sp⟩[^1]:    col 2   (column-0 line excluded)
+    //     - a / ⟨1sp⟩lazy   / blank / ⟨4sp⟩[^1]:    col 1
+    //     - a / ⟨2sp⟩b      / blank / ⟨4sp⟩[^1]:    col 2
+    //     -⟨3sp⟩a / ⟨1sp⟩lazy / blank / ⟨4sp⟩[^1]:  col 1   (marker width 4, still 1)
+    //     - a / lazy(col 0) / blank / ⟨8sp⟩[^1]:    NONE    (8 - 2 >= 4, indented code)
+    //     - a / blank / ⟨4sp⟩[^1]:                  col 2   (no continuation at all)
+    //     > - a / >⟨2sp⟩lazy / > / >⟨5sp⟩[^1]:      col 3   (container-relative, then absolute)
+    //     1. a / ⟨1sp⟩lazy  / blank / ⟨4sp⟩[^1]:    col 1
+    //
+    // All eight are `min(marker content column, indentation of continuation lines)` with
+    // column-zero lines left out -- which is what premise 3 computed. The difference is the
+    // SCAN RANGE. Premise 3 took every line in the item's line range, so lines belonging to
+    // nested blocks past a blank line entered the minimum, and that is what cost it 119
+    // documents: in the callout cases the answer keeps the marker's column because the
+    // indent-2 line it was being lowered to is a NESTED block's line, not the item's.
+    //
+    // B3's wording is "the smallest indentation among ITS OWN LINES", and the item's own lines
+    // are the first chunk -- the consecutive non-blank lines from the marker to the first
+    // blank, which is exactly what stock de-indents before deciding what follows is code.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const PREFIX = /^(?:[ \t]*>[ \t]?)*/u;
+      // THE CHECKBOX IS PART OF THE MARKER. `- [ ] ` is six columns, not two, and a definition
+      // on a task item's own line sits at exactly that column. Leaving it out is what cost
+      // premises 1-4 their losses: they lowered correct answers of 6 down to 2.
+      const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+(?:\[[ xX]\][ \t]+)?/u;
+      const cols = (line: string): number => {
+        let column = 0;
+        for (const character of line) {
+          if (character === " ") column += 1;
+          else if (character === "\t") column += 4 - (column % 4);
+          else break;
+        }
+        return column;
+      };
+
+      const floorOf = new Map<number, number>();
+      const walk = (node: unknown): void => {
+        const self = node as {
+          type?: string;
+          position?: { start: { line: number }; end: { line: number } };
+          children?: unknown[];
+        };
+        if (self.type === "listItem" && self.position) {
+          const first = self.position.start.line - 1;
+          const head = lines[first] ?? "";
+          const prefix = PREFIX.exec(head)?.[0].length ?? 0;
+          const marker = MARKER.exec(head.slice(prefix));
+          if (marker) {
+            let least = marker[0].length;
+            // THE ITEM'S OWN LINES: stop at the first blank. Everything past it is a separate
+            // block, and premise 3's losses were all lines reached past this point.
+            for (let at = first + 1; at <= self.position.end.line - 1; at++) {
+              const line = lines[at] ?? "";
+              const inner = line.slice(PREFIX.exec(line)?.[0].length ?? 0);
+              if (inner.trim() === "") break;
+              const indent = cols(inner);
+              if (indent > 0 && indent < least) least = indent;
+            }
+            const floor = prefix + least;
+            const mark = (node: unknown): void => {
+              const inner = node as {
+                type?: string;
+                position?: { start: { line: number } };
+                children?: unknown[];
+              };
+              if (
+                (inner.type === "footnoteDefinition" ||
+                  inner.type === "definition") &&
+                inner.position
+              ) {
+                floorOf.set(inner.position.start.line - 1, floor);
+              }
+              for (const child of inner.children ?? []) mark(child);
+            };
+            mark(self);
+          }
+        }
+        for (const child of self.children ?? []) walk(child);
+      };
+      walk(tree);
+
+      return {
+        refs: ours.refs,
+        defs: ours.defs.map((d): Def => {
+          const floor = floorOf.get(d[1]);
+          if (floor === undefined || floor >= d[2]) return d;
+          return [d[0], d[1], floor, d[3]];
+        }),
+      };
+    },
+  },
+  {
     name: "html-extent-item-block-tag",
     what: "a BLOCK TAG html in a list item swallows the following paragraph, as `<!--` already does",
     // `itemHtmlExtentTransform` carries this for the `<!--` opener only, and its own docstring
