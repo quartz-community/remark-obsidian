@@ -1,6 +1,6 @@
 {
   "source": "https://github.com/Comprehensive-Jason/obsidian-footnotes/blob/master/docs/obsidian-reading-rules.md",
-  "recordedAt": "2026-10-14T09:59:39.487Z",
+  "recordedAt": "2026-10-14T10:39:22.178Z",
   "obsidian": {
     "app": "1.14.4"
   },
@@ -1186,6 +1186,404 @@
           {
             "type": "footnoteDefinition",
             "start": 4
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B10 different bullet apart",
+      "markdown": "- apples\n[^1]: from the market\n* pears\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          },
+          {
+            "type": "list",
+            "start": 2
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B10 ordered merges",
+      "markdown": "1. apples\n[^1]: from the market\n2. pears\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B10 bullet then ordered apart",
+      "markdown": "- apples\n[^1]: from the market\n1. pears\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          },
+          {
+            "type": "list",
+            "start": 2
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B10 real definition apart",
+      "markdown": "- apples\n\n[^1]: from the market\n\n- pears\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 10
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 2
+          },
+          {
+            "type": "list",
+            "start": 4
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B10 plain lazy merges",
+      "markdown": "- apples\nlazy text\n- pears\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "B10 three items merge",
+      "markdown": "- apples\n[^1]: from the market\n- pears\n- plums\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "list",
+            "start": 0
+          }
+        ]
+      }
+    },
+    {
+      "rule": "C2 pipeless indent 2",
+      "markdown": "a | b\n--- | ---\n  | c[^2] | d\n\n[^2]: x\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "2",
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 31
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "2",
+            "start": {
+              "line": 2,
+              "col": 5,
+              "offset": 21
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "table",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 4
+          }
+        ]
+      }
+    },
+    {
+      "rule": "C2 pipeless flush row",
+      "markdown": "a | b\n--- | ---\nc[^2] | d\n\n[^2]: x\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "2",
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 27
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "2",
+            "start": {
+              "line": 2,
+              "col": 1,
+              "offset": 17
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "table",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 4
+          }
+        ]
+      }
+    },
+    {
+      "rule": "C2 pipeless no pipe",
+      "markdown": "a | b\n--- | ---\n    plain[^2] text\n\n[^2]: x\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "2",
+            "start": {
+              "line": 4,
+              "col": 0,
+              "offset": 36
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "table",
+            "start": 0
+          },
+          {
+            "type": "code",
+            "start": 2
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 4
+          }
+        ]
+      }
+    },
+    {
+      "rule": "D6 title next line",
+      "markdown": "[foo]: /url\n'tit [^1]'\n\n[^1]: x\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 3,
+              "col": 0,
+              "offset": 24
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "definition",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 3
+          }
+        ]
+      }
+    },
+    {
+      "rule": "D6 angle dest over blank",
+      "markdown": "[foo]: <a\n\nb\nc>\n\n[^1]: x\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 5,
+              "col": 0,
+              "offset": 17
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "definition",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 5
+          }
+        ]
+      }
+    },
+    {
+      "rule": "D6 simple title",
+      "markdown": "[foo]: /url \"title\"\n\n[^1]: x\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "1",
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 21
+            }
+          }
+        ],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "definition",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 2
+          }
+        ]
+      }
+    },
+    {
+      "rule": "E5 bracket name",
+      "markdown": "a[^[x]\n\n[^[x]: d\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "[x",
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 8
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "[x",
+            "start": {
+              "line": 0,
+              "col": 1,
+              "offset": 1
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 2
+          }
+        ]
+      }
+    },
+    {
+      "rule": "E5 trailing bracket name",
+      "markdown": "a[^x[y]\n\n[^x[y]: d\n",
+      "obsidian": {
+        "footnotes": [
+          {
+            "id": "x[y",
+            "start": {
+              "line": 2,
+              "col": 0,
+              "offset": 9
+            }
+          }
+        ],
+        "footnoteRefs": [
+          {
+            "id": "x[y",
+            "start": {
+              "line": 0,
+              "col": 1,
+              "offset": 1
+            }
+          }
+        ],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          },
+          {
+            "type": "footnoteDefinition",
+            "start": 2
+          }
+        ]
+      }
+    },
+    {
+      "rule": "E5 whitespace in name",
+      "markdown": "a[^x [y]\n\n[^x: d\n",
+      "obsidian": {
+        "footnotes": [],
+        "footnoteRefs": [],
+        "blocks": [],
+        "sections": [
+          {
+            "type": "paragraph",
+            "start": 0
+          },
+          {
+            "type": "paragraph",
+            "start": 2
           }
         ]
       }

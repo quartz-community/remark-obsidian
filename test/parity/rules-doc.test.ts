@@ -139,16 +139,30 @@ function oursFor(markdown: string) {
  *        three attempts at it are refuted with their numbers.
  */
 const DIVERGING_POSITIONS: readonly string[] = [
+  // C2: a PIPELESS table's rows do not start with `|`, so an indented line holding one is
+  // still a row and the reference in it is live. We read indented code and the reference
+  // dies. The PIPED half of C2 is fixed -- see `table-indented-row.ts`.
   "C2 pipeless indented row",
+  // D6: a link reference definition reads its title ACROSS a blank line, so the `[^1]` is
+  // inside the definition and dead. We start a paragraph and the reference is live. Stock
+  // micromark agrees with us, so this is Obsidian's fork reading definitions differently.
   "D6 lrd title over lines",
+  // E5, three variants of one rule: a footnote name runs to the first `]` and may hold a `[`
+  // or a `^`, giving names `^[x`, `[x` and `x[y`. We read no reference at all. This is the
+  // known-hard family `README.md` records -- it needs a construct claiming `[^` before the
+  // wikilink extension, GFM's footnote call and CommonMark's label start see that bracket,
+  // and three attempts are refuted with their numbers. `E5 whitespace in name` AGREES, which
+  // is the half already implemented in `footnote-bare.ts`.
   "E5 bracket in name",
+  "E5 bracket name",
+  "E5 trailing bracket name",
   // NOT OURS, and MUST NOT REACH ZERO. `1. > [!note] T` / `ab cd[^1]` is reported by the
   // cache at column 8 where the character really sits at 5, which their document states
   // itself under P2: "reports [^1] at column 9 instead of 6". We report 5 and are right, so
-  // this entry is here to keep the set exact rather than because anything is owed.
+  // this entry keeps the set exact rather than recording a debt.
   //
-  // It is also the ONLY case of the 44 that differs on column alone -- the audit's answer to
-  // "do we handle column", which is yes, on 40 of 41 cases that agree on line.
+  // It is also the ONLY case in the whole golden that differs on COLUMN alone, which is the
+  // audit's answer to "do we handle column": yes, on every case that agrees on line bar this.
   "P2 column quirk",
 ];
 
@@ -158,16 +172,22 @@ const DIVERGING_POSITIONS: readonly string[] = [
  * Compared as a set of start lines and deliberately type-agnostic: Obsidian names a section
  * `callout` where our tree has a `blockquote`, and a type comparison would report divergences
  * that are projection naming rather than structure. Start lines are structural, and over all
- * 44 cases they produce exactly these three with no false positives.
+ * 59 cases they produce exactly these four with no false positives.
  *
- *   B10 is here and NOT in the position set, because its whole difference is structural: the
- *   label is the first item's lazy text, so the list never ended and `- pears` is its next
- *   item. One list to Obsidian, two to us, with identical footnote facts either way -- so a
- *   footnote-only gate would have called this case clean.
+ * B10 WAS HERE and is fixed. Its whole difference was structural -- a label between two items
+ * is the first item's lazy text, so the list never ended and `- pears` is its next item, one
+ * list to Obsidian against our two, with IDENTICAL footnote facts either way. A footnote-only
+ * gate called that case clean, which is why this second assertion exists. Seven boundary cases
+ * now pin it: the same bullet and the same ordered delimiter merge, a different bullet and a
+ * bullet-against-ordered stay apart, a real definition behind blank lines keeps three blocks,
+ * and plain lazy text merged even before the fix.
  */
 const DIVERGING_SECTIONS: readonly string[] = [
-  "B10 label between items",
+  // Both indents of the pipeless row, which is the same cause at two widths.
+  "C2 pipeless indent 2",
   "C2 pipeless indented row",
+  // Both D6 forms: a title across a blank line, and an `<...>` destination across one.
+  "D6 angle dest over blank",
   "D6 lrd title over lines",
 ];
 

@@ -45,6 +45,7 @@ import {
   listEmptyItemTransform,
 } from "./lib/container-lazy.js";
 import { quoteMergeTransform } from "./lib/quote-merge.js";
+import { listMergeTransform } from "./lib/list-merge.js";
 import { indentTabTransform } from "./lib/indent-tab.js";
 import { listEmptyNestTransform } from "./lib/list-empty-nest.js";
 import { listItemExtentTransform } from "./lib/list-item-extent.js";
@@ -686,6 +687,11 @@ export default function remarkObsidian(
     // item and this only has to move the item. Legacy reading only.
     if (opts.legacyLists) listEmptyNestTransform(tree, String(file));
     quoteMergeTransform(tree, String(file));
+    // Beside the quote merge and for the same reason, but it must follow
+    // `containerLazyTransform`: that pass absorbs a column-zero definition into the list
+    // above it, and the adjacency this repairs only exists afterwards. Their B10 -- a label
+    // between two items is the first item's lazy text, so the list never ended.
+    listMergeTransform(tree, String(file));
     // After the quote passes have settled the block, since this reads its lines.
     quoteTabTransform(tree, String(file));
     listTabTransform(tree, String(file));
