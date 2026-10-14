@@ -46,6 +46,7 @@ import path from "node:path";
 import type { ListItem, Root, RootContent } from "mdast";
 
 import { contentColumn } from "../../src/lib/definition-column.js";
+import { columnsOf } from "../../src/lib/item-dot-threshold.js";
 import { refereeFactsWithTree, type Def, type Ref } from "./referee-facts.js";
 
 interface Answer {
@@ -962,15 +963,6 @@ const RULES: readonly Rule[] = [
     // than as a raw count.
     apply: (text, ours, tree) => {
       const lines = text.split("\n");
-      const cols = (line: string): number => {
-        let column = 0;
-        for (const character of line) {
-          if (character === " ") column += 1;
-          else if (character === "\t") column += 4 - (column % 4);
-          else break;
-        }
-        return column;
-      };
       const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/u;
 
       /** The innermost host item of each definition, by tree containment. */
@@ -990,7 +982,7 @@ const RULES: readonly Rule[] = [
             for (let at = first + 1; at <= self.position.end.line - 1; at++) {
               const line = lines[at] ?? "";
               if (line.trim() === "") continue;
-              const indent = cols(line);
+              const indent = columnsOf(line);
               if (indent > 0 && indent < least) least = indent;
             }
             hosts.push({ item: self, floor: least });
@@ -1053,15 +1045,6 @@ const RULES: readonly Rule[] = [
       const lines = text.split("\n");
       const PREFIX = /^(?:[ \t]*>[ \t]?)*/u;
       const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/u;
-      const cols = (line: string): number => {
-        let column = 0;
-        for (const character of line) {
-          if (character === " ") column += 1;
-          else if (character === "\t") column += 4 - (column % 4);
-          else break;
-        }
-        return column;
-      };
 
       const floorOf = new Map<number, number>();
       const hosts: Array<{ item: unknown; floor: number }> = [];
@@ -1084,7 +1067,7 @@ const RULES: readonly Rule[] = [
               const line = lines[at] ?? "";
               if (line.trim() === "") continue;
               const inner = line.slice(PREFIX.exec(line)?.[0].length ?? 0);
-              const indent = cols(inner);
+              const indent = columnsOf(inner);
               if (indent > 0 && indent < least) least = indent;
             }
             hosts.push({ item: self, floor: prefix + least });
@@ -1155,15 +1138,6 @@ const RULES: readonly Rule[] = [
       // on a task item's own line sits at exactly that column. Leaving it out is what cost
       // premises 1-4 their losses: they lowered correct answers of 6 down to 2.
       const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+(?:\[[ xX]\][ \t]+)?/u;
-      const cols = (line: string): number => {
-        let column = 0;
-        for (const character of line) {
-          if (character === " ") column += 1;
-          else if (character === "\t") column += 4 - (column % 4);
-          else break;
-        }
-        return column;
-      };
 
       const floorOf = new Map<number, number>();
       const walk = (node: unknown): void => {
@@ -1185,7 +1159,7 @@ const RULES: readonly Rule[] = [
               const line = lines[at] ?? "";
               const inner = line.slice(PREFIX.exec(line)?.[0].length ?? 0);
               if (inner.trim() === "") break;
-              const indent = cols(inner);
+              const indent = columnsOf(inner);
               if (indent > 0 && indent < least) least = indent;
             }
             const floor = prefix + least;
@@ -1272,15 +1246,6 @@ const RULES: readonly Rule[] = [
     apply: (text, ours, tree) => {
       const lines = text.split("\n");
       const PREFIX = /^(?:[ \t]*>[ \t]?)*/u;
-      const cols = (line: string): number => {
-        let column = 0;
-        for (const character of line) {
-          if (character === " ") column += 1;
-          else if (character === "\t") column += 4 - (column % 4);
-          else break;
-        }
-        return column;
-      };
 
       // The host map is the transform's own: pre-order, so the INNERMOST item overwrites.
       const items = new Map<unknown, ListItem>();
@@ -1320,7 +1285,7 @@ const RULES: readonly Rule[] = [
             const at = self.position.start.line - 1;
             const raw = lines[at] ?? "";
             const own = PREFIX.exec(raw)?.[0].length ?? 0;
-            if (cols(raw.slice(own)) + own >= column + 4) drop.add(at);
+            if (columnsOf(raw.slice(own)) + own >= column + 4) drop.add(at);
           }
         }
         for (const child of self.children ?? []) scan(child);

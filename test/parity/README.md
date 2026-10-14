@@ -3151,12 +3151,20 @@ habit.
 
 Three things, none of which a flag fixes:
 
-- **`score.mts` still re-derives what the passes compute.** Eleven hand-rolled `MARKER`,
-  `PREFIX` and column loops remain across its candidates. That is the exact class that refuted
-  six B3 premises by their own arithmetic, and only ONE candidate was converted to call the
-  shipped `contentColumn`. Every remaining candidate keyed on a content column, a marker width
-  or an indent is suspect until it calls the real function, and a refutation from one of them
-  should be re-run before it is believed.
+- **`score.mts` re-derived what the passes compute.** PARTLY CLOSED. The tab-aware column
+  measure had FOUR byte-identical copies in the scorer against one in `src`; `columnsOf` is
+  exported from `item-dot-threshold.ts` now and the copies are gone, which makes drift on that
+  quantity impossible rather than unlikely.
+  Verified behaviour-preserving by re-scoring two recorded candidates: `0/83` and `20/17`,
+  both unchanged. One number did move and it is worth reading --
+  `b3-minimum-first-chunk`'s `same` fell 37 to 33 with `untouched` up by 4, which is exactly
+  the four documents the shipped B3 fix now already handles, so the candidate no longer alters
+  them. An independent confirmation of the fix, arriving from a refactor.
+  What remains is the MARKER patterns, and they are deliberately left: the B3 candidates are
+  recorded EVIDENCE, and rewriting a refuted premise's predicate changes the number its
+  refutation rests on. So the rule for new work is the one that matters -- a candidate keyed on
+  a content column must call `contentColumn`, as `b3-threshold-drops-definition` does, and any
+  older refusal keyed on a hand-rolled marker is a lead rather than a verdict.
 - **The probes are not in the corpus.** The 76 `rules-doc` cases and the 10 B3 cases are gated
   by their own goldens, which is why B3 was landable -- but they are not in `corpus.ts`, so the
   main gate and every sweep built on it still cannot see those shapes. Promotion needs

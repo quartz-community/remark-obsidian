@@ -125,8 +125,16 @@ export function itemDotThresholdTransform(
   });
 }
 
-/** Leading whitespace in COLUMNS, a tab reaching the next four-stop. */
-function columnsOf(line: string): number {
+/**
+ * Leading whitespace in COLUMNS, a tab reaching the next four-stop.
+ *
+ * EXPORTED for `test/parity/score.mts`, which had four byte-identical copies of this loop
+ * across its candidates. That duplication is not a tidiness problem: six scored premises about
+ * list-item columns were refuted by their own arithmetic rather than by the rule they tested,
+ * and a measure the scorer owns separately is a measure that can drift from the one the passes
+ * use. `definition-column.ts` exports `contentColumn` for the same reason and says so.
+ */
+export function columnsOf(line: string): number {
   let column = 0;
   for (const character of line) {
     if (character === " ") column += 1;
