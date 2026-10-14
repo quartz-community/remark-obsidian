@@ -3395,6 +3395,87 @@ A second, smaller trap on the way: the key list started life exported from
 overview's seven checks reported as eleven. `COMPUTE_KEYS` now lives in `types.ts` beside
 `PROJECTION_KEYS`, which is where a projection key list belongs anyway.
 
+## Working the gated set down, and what each fix cost to find
+
+The first session driven by the gated composition axes rather than by picking a diverging case
+and reasoning about it. Five fixes, and the pattern in how they were found matters more than
+the count: **every one was a rule already measured somewhere, needing a second node type, a
+second host, or one level more depth.** Not one was a new repair for a newly observed shape.
+
+| fix                                                 | rows  |
+| --------------------------------------------------- | ----- |
+| an indented line after a link definition is code    | 35→33 |
+| a blank line bounds an unclosed `$$` a list absorbs | 33→21 |
+| …and its chain reaches the list across a footnote   | 21→19 |
+| an html lazy line gives up its setext underline     | 19→17 |
+
+Zero corpus regressions throughout, and the referee's agreeing set diffed by id at every step
+rather than by its total.
+
+### The gates caught four things reasoning did not
+
+**The corpus refuted my first hypothesis.** The math fix broke
+`hunt/fix-lazy-skip-not-revisited/0` on its first run, and the obvious explanation -- that
+`$$ tail`, with content after the opener, behaves differently from a bare `$$` -- was wrong:
+three further controls bound all of them identically. The real axis is the TAIL's indentation,
+because an indented line continues the list ITEM across the blank so the item never closed.
+That guard is the entire difference between the rule and a regression.
+
+**An id diff separated an unmasking from a regression.** The referee dropped one document and
+it read as a cost. Three controls showed the swallowing formula had been HIDING a separate
+defect: `>\t[^Ω]: body text` defines nothing in Obsidian while `>   [^Ω]:` defines. The fix was
+right and a second bug became visible -- which is not a reason to revert.
+
+**The compose gate went red on a FIX**, twice, forcing the expectation to move with it. That is
+the property an exact set has and a bound does not, and it is why `roundtrip` was converted
+away from a bound.
+
+**And probing caught a silent content loss no gate could see.** The first
+`definitionIndentedCodeTransform` sliced only the indented run, while `[ref]: /url` /
+`    code` / `lazy` arrives as ONE paragraph spanning both lines -- so the splice DELETED
+`lazy`. That row was already red for the node type, so no count could have moved.
+
+### Two candidates measured and declined
+
+**The quote-tab rule scores +29**, which would be the second-largest single move recorded here,
+and it is NOT shipped. Asked directly, our simple cases are already right -- `>\t[^b]:` defines
+nothing here and does define in bare `remark-parse`, `>   [^b]:` defines, and the
+three-line established form defines both. So the gain is a CONTEXTUAL defect and a line-based
+drop would fit the referee while contradicting five controls. Both variants sit in `score.mts`
+with their numbers; `reproducers.json#881` is the shape to chase instead.
+
+**The nested-definition column is confirmed** over three depths -- `> [!note]` gives 0,
+`> > [!note]` gives 2, `> > > [!note]` gives 4, so it is the content column of the container
+ENCLOSING the callout. Not implemented: the early return it would have to change guards EVERY
+root definition, which is correctly 0, and one row against that blast radius wants scoring
+first. The rule is recorded at that return.
+
+### Widening the invariant gate found four defects nothing had seen
+
+`invariants.test.ts` walked the 3,403 golden cases and nothing else -- a limit on its INPUT,
+not on the check. The 1,152 composition sequences had never been held to it, and the first one
+examined by hand held a `footnoteDefinition` with start offset 16 and END OFFSET 15. That
+file's own first assertion tests for exactly that, and it passed only because the document was
+not in the corpus.
+
+`violationsOf` now lives in `invariant-checks.ts` and `compose.test.ts` runs it over every
+sequence, which needs no Obsidian because the checks compare the tree against itself. Eleven
+sequences contradict themselves: **seven are the upstream `definition/heading` overlap and must
+not reach zero**, and four are ours, each named so a fix has somewhere to land. All four
+involve a definition or a list absorbed into a container.
+
+Two gate widenings in one day, with opposite outcomes: `headings` added ZERO divergences across
+540 sequences and was still worth running, while this one surfaced four defects. Which it would
+be was not knowable in advance, and that is the argument for running both.
+
+### What the remaining rows are
+
+Attributed in `compose.test.ts`'s own docstring rather than here, so the list cannot drift from
+the gate that holds it. The shape of it: five `> comment` rows need `%%` to interrupt lazy
+continuation, which is tokenizer-level rather than a guard; three footnote-spacer rows turn on
+a lazily-absorbed definition not being a definition; and **four are the P1 cache defect and must
+not be fixed**, so the floor is four rather than zero.
+
 ## Files
 
 | File                     | Role                                               |
@@ -3411,7 +3492,14 @@ overview's seven checks reported as eleven. `COMPUTE_KEYS` now lives in `types.t
 | `overview.ts`            | That registry, gated against drift by its own test |
 | `ask.mts`                | Asks a running Obsidian about arbitrary markdown   |
 | `score.mts`              | Scores a candidate rule over the whole referee     |
-| `compose.mts`            | Sweeps sequences of block constructs vs Obsidian   |
+| `compose.mts`            | Sweeps construct sequences vs Obsidian; `--record` |
+| `compose.ts`             | Those axes as a library, so a test can import them |
+| `compose.test.ts`        | Gates every axis, and the tree's own invariants    |
+| `goldens/compose.json`   | Obsidian's answers for all 1152 sequences          |
+| `invariant-checks.ts`    | The tree's structural invariants, shared           |
+| `ask-dom.ts`             | The DOM projections the cache does not carry       |
+| `probe-agrees.mts`       | Does the probe agree with the goldens? 663 of 663  |
+| `proxy-agrees.mts`       | Detached render vs a REAL Reading View             |
 | `delta.mts`              | What a change gained and broke, before committing  |
 | `invariants.test.ts`     | Structural invariants on the tree itself           |
 | `option-matrix.test.ts`  | Every option toggled, looking for crashes          |
@@ -3421,3 +3509,13 @@ overview's seven checks reported as eleven. `COMPUTE_KEYS` now lives in `types.t
 | `referee-shrink.mts`     | Reduces referee disagreements to minimal forms     |
 | `pass-order.mts`         | Which passes depend on their position in the chain |
 | `UPSTREAM.md`            | Defects found in upstream packages and Obsidian    |
+
+The DOM probe is a plugin, not a harness file: `test-vault/.obsidian/plugins/parity-probe`
+exposes a detached `MarkdownRenderer` and a real Reading View, because `obsidian eval` has
+`require` but no `obsidian` module -- it is injected into plugins at load time. The real view
+additionally needs CDP focus emulation, since reading mode renders off
+`requestAnimationFrame` and Chromium starves an unfocused window:
+
+```bash
+obsidian dev:cdp method=Emulation.setFocusEmulationEnabled params='{"enabled":true}'
+```
