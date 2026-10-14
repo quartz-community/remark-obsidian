@@ -19,7 +19,7 @@ import { endPoint } from "./comment-hoist.js";
  * is the gate catching a rule applied one container type too wide.
  */
 const SPLITTABLE: ReadonlyMap<string, ReadonlySet<string>> = new Map([
-  ["footnoteDefinition", new Set(["callout"])],
+  ["footnoteDefinition", new Set(["callout", "list", "blockquote"])],
   ["html", new Set(["list"])],
 ]);
 
@@ -59,10 +59,17 @@ const SPLITTABLE: ReadonlyMap<string, ReadonlySet<string>> = new Map([
  *                            was  list@0 swallowing `html@1-2`
  *
  * `SPLITTABLE` therefore maps a spacer type to the hosts it may be split after, and the two
- * entries differ: a definition is split after a CALLOUT, an html block after a LIST. Those
- * are not symmetric and the asymmetry is measured -- a quote absorbs no html at all, so its
- * `%%` already stays at root, and a definition after a list needs flattening this does not
- * do.
+ * entries are deliberately asymmetric: a definition is split after a callout, a list OR a
+ * quote, an html block only after a LIST. A quote absorbs no html at all, so its `%%`
+ * already stays at root and there is nothing to split.
+ *
+ * WHAT THE DEFINITION HALF NEEDED BESIDE THIS. Splitting leaves the head definition inside
+ * the container, and Obsidian reports `defs []` for a list and a quote -- the label is folded
+ * into the lazy paragraph as a reference. `footnoteInterruptTransform` does exactly that fold
+ * and was DECLINING, because it tested adjacency with line numbers and this pass moves nodes
+ * by offset, leaving every line at 1. Reading the gap from offsets instead is what let the
+ * list and quote halves work at all; the two fixes are useless apart and were measured
+ * together.
  *
  * Scored before it was built, and the first scoping was refuted. Truncating every
  * definition INSIDE a container costs 495 documents against 102 -- `> [!note]` /
@@ -95,18 +102,17 @@ export function definitionLazySplitTransform(
     // against the title-only control where Obsidian reports `1@1:0-1`. Splitting in the
     // body case produced a definition it has none of, and the `--ids` diff is what named
     // them: the net figure moved by two while three documents were lost and one gained.
-    // CALLOUT ONLY. This test is callout-shaped -- a list's child is a `listItem`, never a
-    // `calloutTitle` -- so running it unconditionally rejected every list outright and made
-    // widening `SPLITTABLE` measure NOTHING. The trees came back byte-identical, which reads
-    // exactly like "the list case needs no change"; dumping them rather than trusting that
-    // is the only reason it was caught.
+    // CALLOUT ONLY, because the test is callout-shaped: a list's child is a `listItem`,
+    // never a `calloutTitle`. Running it unconditionally rejected every list outright and
+    // made widening `SPLITTABLE` measure NOTHING -- the trees came back byte-identical,
+    // which reads exactly like "the list case needs no change", and dumping them rather
+    // than trusting that is the only reason it was caught.
     //
-    // A `footnoteDefinition` after a LIST is still not split, and that half is UNTESTED
-    // rather than refused: splitting it without also flattening the definition regresses
-    // `bullet` and `ordered > footnote > indented` from agreeing to reporting a definition
-    // and a reference Obsidian has neither of. The node is present at parse time under both
-    // list readings, so the work is in how `containerLazyTransform` and
-    // `footnoteInterruptTransform` interact, not in finding it.
+    // The body test is a CALLOUT rule, not a general one. Three referee documents put prose
+    // before the label and Obsidian reports no definition for any of them, against the
+    // title-only control where it reports `1@1:0-1`. A list and a quote have no such
+    // distinction because they do not keep the definition at all -- `footnoteInterrupt`
+    // folds it into their lazy paragraph, which is exactly what Obsidian's `defs []` says.
     if (previous.type === "callout") {
       const body = previous as { children?: RootContent[] };
       if (

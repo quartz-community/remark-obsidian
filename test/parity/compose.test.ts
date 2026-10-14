@@ -43,65 +43,42 @@ const GOLDEN = path.join(import.meta.dirname, "goldens/compose.json");
  * left empty -- and the gate caught it instantly, which is the gate working and the author
  * not. Re-derive from the golden with the snippet in `README.md` rather than editing by eye.
  *
- * NO COUNTS IN THIS PROSE. Four axes have reached zero (`pairs`, `matrix`, `inside`,
- * `inline`) and each did so by a count in a sentence going stale while `DIVERGING` below
- * moved correctly. The constant IS the count; read it there. What prose is good for is the
- * CAUSE of a row, which no gate can infer, so that is all this says.
+ * NO COUNTS IN THIS PROSE. Every axis that reached zero did so by a count in a sentence
+ * going stale while `DIVERGING` below moved correctly, four separate times. The constant IS
+ * the count; read it there. What prose is good for is the CAUSE of a row, which no gate can
+ * infer, so that is all this says.
  *
- * FOUR AXES CLEAN. `inside` never diverged. `inline` closed when a tag's END was found to
- * free the caret for a block identifier. `pairs` and `matrix` closed together on their last
- * shared row, `linkdef > thematic`, whose cause is worth keeping: `definitionSetextTransform`
- * already implemented the rule and declined this case on NODE TYPE alone, because `===` has
- * no second reading and arrives as paragraph text while `---` arrives as a `thematicBreak`.
- * One rule, two node types -- the same shape as `splitLazyHtml` beside `splitLazyHeading`.
+ * SIX AXES CLEAN, and the LIVE BACKLOG IS ZERO. `inside` never diverged. `inline` closed
+ * when a tag's END was found to free the caret for a block identifier. `pairs` and `matrix`
+ * closed together on `linkdef > thematic`, where `definitionSetextTransform` already
+ * implemented the rule and declined on NODE TYPE alone -- `===` has no second reading and
+ * arrives as paragraph text while `---` arrives as a `thematicBreak`. `isolate` closed last,
+ * 43 rows down to none, and all of the final eight were one family.
  *
- * EVERY REMAINING ROW, each with its cause measured rather than guessed:
+ * WHAT CLOSED IT, worth keeping because the entries had been filed as TWO families with two
+ * causes, one of them recorded as tokenizer-level work it never needed:
  *
- *     `> comment`       the CALLOUT row is CLOSED, and it was never "tokenizer-level" as
- *                       this entry used to claim. The `%%` is the lazily-absorbed
- *                       definition's own continuation, so splitting the definition produces
- *                       a real comment node -- and an UNCLOSED one then has to take the end
- *                       of the note, which the fragment re-parse cannot know. Obsidian
- *                       reports TWO sections there, the callout and a comment swallowing the
- *                       trailing paragraph.
+ *   UPSTREAM SPANS THE SPACER over its continuation line. `[^1]: def` plus an indented line
+ *   is ONE definition, and `<div>` plus a `%%` is ONE html node, so the third line of
+ *   `container / spacer / absorbable` sits INSIDE the spacer where no absorption guard can
+ *   reach it. `definitionLazySplitTransform` splits the spacer at its own line and the
+ *   existing chain then decides each tail by its own node type -- which it already did
+ *   correctly for all 80 cells of `--matrix`. The per-type guard was never wrong.
  *
- *                       `bullet` and `ordered > html > comment` are CLOSED too, by the same
- *                       split with a second spacer type: an html block runs to a blank line,
- *                       so micromark hands `<div>` and a `%%` under it over as ONE html node
- *                       exactly as it spans a definition over its continuation.
+ *   TWO THINGS THE SPLIT ALONE DID NOT GIVE. An unclosed `%%` tail needs the end of the
+ *   note, which a fragment re-parse cannot know. And the head definition has to be FOLDED
+ *   for a list or a quote, where Obsidian reports `defs []` against a callout's `1@1:0-1`;
+ *   `footnoteInterruptTransform` performs that fold and was DECLINING, because it read
+ *   adjacency from LINE numbers while this pass moves nodes by offset, leaving every line at
+ *   1. The two are useless apart and were measured together.
  *
- *                       And the pass had to ask the absorption map a question it had not:
- *                       splitting a list's html spacer regardless closed these two and broke
- *                       `bullet` and `ordered > html > math`, an even trade. A list absorbs
- *                       every member of the asymmetry class, so for a list only a `comment`
- *                       is left at root -- split only where the tail becomes a ROOT block,
- *                       or the tail loses its document extent to the fragment re-parse.
+ * EVERY REMAINING ROW, and neither is work:
  *
- *                       `bullet`, `ordered` and `quote > footnote > comment` remain for the
- *                       same reason their `indented` sibling does: a quote and a list report
- *                       `defs []`, so the definition must be FLATTENED as well as split, and
- *                       that is `containerLazyTransform` and `footnoteInterruptTransform`
- *                       interacting rather than a guard.
- *     `quote > footnote > indented`  the CALLOUT half of this is CLOSED, and the split is
- *                       worth reading before touching the rest. Upstream reads `[^1]: def`
- *                       plus an indented line as ONE definition, so the continuation sits
- *                       INSIDE the definition where no absorption guard can see it;
- *                       `definitionLazySplitTransform` splits it off and the existing guard
- *                       chain then gets the tail right by its own node type, which it
- *                       already does for all 80 matrix cells.
- *
- *                       The quote half needs MORE than that split, which live 1.14.4 states
- *                       directly: a callout reports `defs 1@1:0-1` while a quote and a list
- *                       report `defs []`. So a quote must also FLATTEN the definition, which
- *                       is what it already does -- the lazy paragraph swallows the label and
- *                       reports a reference. Splitting for a quote or a list produced a
- *                       definition node Obsidian has none of and regressed `bullet` and
- *                       `ordered > footnote > indented` from agreeing; compose went 13 to 14
- *                       before the scoping was narrowed, which is the gate catching a rule
- *                       applied one container type too wide.
- *     `quote > callout > footnote`  a definition column, confirmed over three depths; the
- *                       rule and why it is not implemented are recorded in
- *                       `definition-column.ts` at the early return it would have to change.
+ *     `quote > callout > footnote`  the nested definition column, confirmed over three
+ *                       depths and SCORED BOTH WAYS in `score.mts` -- the general form is 0
+ *                       better against 5 worse, and the measured form touches 0 of 6,818
+ *                       referee documents. Declined, with the rule recorded at the early
+ *                       return in `definition-column.ts` it would have to change.
  *     `comment [ ... ]` the P1 cache defect: Obsidian's offsets are short by the width of
  *                       the `%%` marker, so reproducing them would write a wrong offset into
  *                       our own tree. MUST NOT be fixed -- these four are the floor.
@@ -110,12 +87,7 @@ const DIVERGING: Record<Axis, readonly string[]> = {
   pairs: [],
   matrix: [],
   inside: [],
-  isolate: [
-    "bullet > footnote > comment",
-    "ordered > footnote > comment",
-    "quote > footnote > comment",
-    "quote > footnote > indented",
-  ],
+  isolate: [],
   nested: ["quote > callout > footnote"],
   inline: [],
   "inline-block": [

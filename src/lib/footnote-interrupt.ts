@@ -61,13 +61,33 @@ function fold(children: RootContent[], source: string): void {
     }
     const host = found.paragraph;
 
-    const startLine = node.position?.start?.line;
-    const endLine = previous.position?.end?.line;
-    if (
-      startLine === undefined ||
-      endLine === undefined ||
-      startLine - endLine !== 1
-    ) {
+    // Adjacency read from OFFSETS, not from line numbers, which is this repo's own standing
+    // rule applied to this pass: offsets are what the passes maintain and the rest of a point
+    // is rebuilt from them by `normalizePointsTransform`, which runs LAST. Any pass before it
+    // that reads `.line` is reading a stale field.
+    //
+    // It mattered. A pass that splices a node by offset leaves every line at 1, so this read
+    // `1 - 1 = 0` and declined -- silently, because the tree is correct either way and only
+    // the FOLD is missing. `- item` / `[^1]: def` / `%%` therefore kept a definition inside
+    // the item where Obsidian reports none, and a tree dump at this call site is what showed
+    // every node reporting `@0-0`.
+    //
+    // `definition-column.ts` carries the same correction for the same reason, which is why
+    // the fallback below is a fallback and not the primary test: `source` defaults to `""`
+    // for callers that pass no document, and there the line numbers are all there is.
+    const gapFrom = previous.position?.end?.offset;
+    const gapTo = node.position?.start?.offset;
+    const adjacent =
+      source !== "" && gapFrom !== undefined && gapTo !== undefined
+        ? // `>` is in the class because a definition INSIDE a quote carries the quote's own
+          // prefix in the gap -- `\n> ` -- and excluding it stopped those folding, which cost
+          // four corpus cases and opened five `[ footnote ]` composition rows. A blank line
+          // is still rejected, since `\n` is not in the class and so cannot repeat.
+          /^\n[ \t>]*$/u.test(source.slice(gapFrom, gapTo))
+        : (node.position?.start?.line ?? 0) -
+            (previous.position?.end?.line ?? 0) ===
+          1;
+    if (!adjacent) {
       index++;
       continue;
     }
