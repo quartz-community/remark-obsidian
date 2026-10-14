@@ -4,6 +4,8 @@ import path from "node:path";
 import { assert } from "mdast-util-assert";
 import { describe, expect, it } from "vitest";
 
+import { violationsOf } from "./invariant-checks.js";
+
 import { parseOurs, PROFILES } from "./chain.js";
 import type { GoldenCase } from "./types.js";
 
@@ -58,67 +60,6 @@ const CEILING = {
   // trailing line ending: a `math` span runs through the ending after its block, which is
   // right for a flow node and wrong for the phrasing node replacing it.
 } as const;
-
-interface Point {
-  readonly line: number;
-  readonly column: number;
-  readonly offset?: number;
-}
-
-interface Spanned {
-  readonly type?: string;
-  readonly position?: { readonly start: Point; readonly end: Point };
-  readonly children?: readonly unknown[];
-}
-
-function violationsOf(markdown: string, tree: unknown): string[] {
-  const found: string[] = [];
-  const walk = (node: unknown, parent: Spanned | null): void => {
-    const self = node as Spanned;
-    const mine = self.position;
-    const theirs = parent?.position;
-    if (mine?.start.offset !== undefined && mine.end.offset !== undefined) {
-      if (mine.start.offset > mine.end.offset) {
-        found.push(`start AFTER end: ${self.type}`);
-      }
-      if (mine.end.offset > markdown.length) {
-        found.push(`end PAST source: ${self.type}`);
-      }
-      if (
-        theirs?.start.offset !== undefined &&
-        theirs.end.offset !== undefined
-      ) {
-        if (mine.start.offset < theirs.start.offset) {
-          found.push(
-            `child STARTS BEFORE parent: ${parent?.type} > ${self.type}`,
-          );
-        }
-        if (mine.end.offset > theirs.end.offset) {
-          found.push(`child ENDS AFTER parent: ${parent?.type} > ${self.type}`);
-        }
-      }
-    }
-    const kids = (self.children ?? []) as Spanned[];
-    for (const [index, left] of kids.entries()) {
-      const right = kids[index + 1];
-      if (!right) break;
-      const leftEnd = left.position?.end?.offset;
-      const rightStart = right.position?.start?.offset;
-      if (
-        leftEnd !== undefined &&
-        rightStart !== undefined &&
-        leftEnd > rightStart
-      ) {
-        found.push(
-          `SIBLINGS OVERLAP: ${self.type} > ${left.type}/${right.type}`,
-        );
-      }
-    }
-    for (const kid of kids) walk(kid, self);
-  };
-  walk(tree, null);
-  return found;
-}
 
 const goldens = path.join(import.meta.dirname, "goldens/obsidian.json");
 const golden = JSON.parse(fs.readFileSync(goldens, "utf8")) as {

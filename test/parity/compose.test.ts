@@ -11,6 +11,8 @@ import {
   type Axis,
   type Facts,
 } from "./compose.js";
+import { applyTextTransform, parseOurs } from "./chain.js";
+import { violationsOf } from "./invariant-checks.js";
 
 /**
  * The composition axes, gated.
@@ -115,6 +117,58 @@ const DIVERGING: Record<Axis, readonly string[]> = {
   ],
 };
 
+/**
+ * The tree's own invariants, over the composition space.
+ *
+ * `invariants.test.ts` walked the 3,403 golden cases and nothing else, which is a limit on
+ * its INPUT rather than on the check: these 1,152 sequences had never been held to it. The
+ * first one examined by hand held a `footnoteDefinition` with start offset 16 and end offset
+ * 15 -- a span beginning after it finishes -- which that file's first assertion tests for and
+ * which passed only because the document was not in the corpus.
+ *
+ * Needs no Obsidian, so it gates: the checks compare the tree against ITSELF.
+ *
+ * SEVEN of the eleven are upstream's and MUST NOT reach zero. `root > definition/heading`
+ * overlapping is `UPSTREAM.md` item 2, reproducible on bare `remark-parse` + `remark-gfm`,
+ * so driving it out would mean diverging from upstream's own output. The other four are ours
+ * and are real defects, each named here so a fix has somewhere to land.
+ */
+const INVARIANT_VIOLATIONS: Record<string, readonly string[]> = {
+  // UPSTREAM, keep: a definition and a setext heading built from the same lines.
+  "pairs|linkdef > setext": ["SIBLINGS OVERLAP: root > definition/heading"],
+  "matrix|linkdef > setext": ["SIBLINGS OVERLAP: root > definition/heading"],
+  "isolate|linkdef > setext > comment": [
+    "SIBLINGS OVERLAP: root > definition/heading",
+  ],
+  "isolate|linkdef > setext > indented": [
+    "SIBLINGS OVERLAP: root > definition/heading",
+  ],
+  "isolate|linkdef > setext > math": [
+    "SIBLINGS OVERLAP: root > definition/heading",
+  ],
+  "isolate|linkdef > setext > thematic": [
+    "SIBLINGS OVERLAP: root > definition/heading",
+  ],
+  "isolate|linkdef > paragraph > thematic": [
+    "SIBLINGS OVERLAP: root > definition/heading",
+  ],
+  // OURS, four real defects. All four involve a definition or a list absorbed into a
+  // container, which is the same family the diverging-row table above attributes.
+  "isolate|callout > footnote > thematic": [
+    "start AFTER end: footnoteDefinition",
+  ],
+  "isolate|quote > footnote > thematic": [
+    "child ENDS AFTER parent: paragraph > break",
+    "start AFTER end: text",
+  ],
+  "nested|quote > bullet > footnote": [
+    "child ENDS AFTER parent: listItem > paragraph",
+  ],
+  "nested|quote > bullet > setext": [
+    "child ENDS AFTER parent: blockquote > list",
+  ],
+};
+
 const golden = fs.existsSync(GOLDEN)
   ? (JSON.parse(fs.readFileSync(GOLDEN, "utf8")) as {
       obsidian: { app: string | null };
@@ -142,6 +196,24 @@ describe.skipIf(golden === undefined)("composition axes", () => {
       }
     }
     expect(missing).toEqual([]);
+  });
+
+  it("contradicts its own spans on exactly the recorded sequences", () => {
+    const found: Record<string, string[]> = {};
+    for (const axis of AXES) {
+      for (const entry of casesFor(axis)) {
+        const source = applyTextTransform(entry.text);
+        let tree;
+        try {
+          tree = parseOurs(source, "all-features");
+        } catch {
+          continue;
+        }
+        const bad = [...new Set(violationsOf(source, tree))].sort();
+        if (bad.length > 0) found[`${axis}|${entry.name}`] = bad;
+      }
+    }
+    expect(found).toEqual(INVARIANT_VIOLATIONS);
   });
 
   for (const axis of AXES) {
