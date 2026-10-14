@@ -1211,13 +1211,32 @@ definition column.
 | `--matrix`       |        80 |      5 | **0** |
 | `--inside`       |        64 |      2 | **0** |
 | `--inline`       |       196 |      1 | **0** |
-| `--isolate`      |       140 |     43 | 8     |
+| `--isolate`      |       140 |     43 | 4     |
 | `--nested`       |       192 |     13 | 1     |
 | `--inline-block` |       224 |      4 | 4     |
 
-**Four of the seven axes are at zero**, and `--inline-block` is at its floor rather than
-open -- all four of its rows are the P1 cache defect. So the live backlog is nine rows, in
-the two axes that put a spacer or a second container between the two constructs.
+**Four of the seven axes are at zero**, and `--inline-block` is at its floor rather than open
+-- all four of its rows are the P1 cache defect and MUST NOT be fixed. Of the nine remaining,
+the `--nested` row is scored and declined, so the LIVE backlog is **four rows**, all in
+`--isolate` and all one cause: a definition a quote or a list absorbed lazily has to be
+FLATTENED as well as split.
+
+The isolate axis went 43 to 4 and the last eight of that came from a single insight, which is
+worth stating because the entries had been filed as two separate families with two separate
+causes: upstream spans the SPACER over its continuation line, so the third line of
+`container / spacer / absorbable` is inside the spacer where no absorption guard can see it.
+Splitting the spacer at its own line hands each tail to the rule that already governs it. Two
+spacer types, `footnoteDefinition` and `html`, and the per-type guard was right all along --
+`--matrix` has been clean at 0 of 80 throughout.
+
+Three refutations on the way to it, each from a different instrument and none able to find the
+others': `score.mts` killed the premise "a definition inside a container" (495 worse, because
+a PREFIXED definition is genuine container content), the compose gate killed the container
+scoping (13 to 14, because a quote and a list need the flattening too), and the referee's
+`--ids` diff killed the callout scoping (3 lost behind a total that read as unchanged, because
+a callout with a BODY reports no definition at all). A fourth came from the gate again: the
+split must fire only where the tail becomes a ROOT block, or a list's html spacer trades
+`html > comment` for `html > math` at no net gain.
 
 Every fix that landed from them extended a rule already measured to a node type or a nesting
 depth it had not been scoped for -- a callout where a quote was named, a callout where a
