@@ -233,7 +233,27 @@ const DIVERGING_POSITIONS: readonly string[] = [
   // reaches the host branch at all and the `quoted` branch answers 2, the quote's own content
   // column, where Obsidian reports 3. The minimum has to be taken after the container's prefix
   // and made absolute again, and the branch that would do it has 60 referee documents of
-  // history behind its current answer. Left for its own measurement.
+  // history behind its current answer.
+  //
+  // ATTEMPTED AND REVERTED, at 0 corpus regressions and referee 5502 -> 5500: `-2` by identity,
+  // 2 lost and 0 gained, for this one probe. Both losses name the cause, and it is not the
+  // arithmetic:
+  //
+  //     > [!note] / >⟨3sp⟩[^1]: def / >⟨5sp⟩- item        answer column 2
+  //     > [!note] / >⟨4sp⟩[^ch2*]: body / > $$ / ...      answer column 2
+  //
+  // A quoted definition takes the QUOTE's content column even when a list item exists in the
+  // same container, so `Math.max(quote, host)` is the wrong combinator -- the quote wins. The
+  // reason the probe differs is that its definition is inside the item that opens the quote's
+  // content, while in both of these the item is a SIBLING our `items` map claims anyway: a
+  // pre-order `visit` into every `listItem` maps any node the item's span covers, and after
+  // absorption that reaches further than Obsidian's host does.
+  //
+  // Which is the contaminated host identification this harness already records from the other
+  // direction, where Obsidian answered a column that was neither the host's nor the bracket's
+  // and the conclusion was the same: our innermost `listItem` is not always Obsidian's host.
+  // Separating the two needs a host test this tree cannot currently express, so the probe stays
+  // registered rather than being bought for two documents.
   "B3 quoted item one-space lazy",
 ];
 

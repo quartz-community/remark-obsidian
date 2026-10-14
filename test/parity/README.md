@@ -2742,6 +2742,47 @@ measurement against a corpus which cannot adjudicate a rule is not evidence and 
 like evidence. Ten recorded cases is that instrument, and both halves of it are break-tested --
 dropping an entry and corrupting a recorded column each fail the gate.
 
+#### Landed: four of the five, at zero cost on both oracles
+
+`deIndentFloor` in `definition-column.ts`, folded into `contentColumn` -- which already carried
+the five-space cap, the single-digit-dot arithmetic and the tab-stop handling that all five
+scored premises kept re-deriving and getting wrong.
+
+    rules-doc    4 of 5 B3 position cases now agree
+    corpus       0 regressions
+    referee      5502/6818, agreeing set BYTE-IDENTICAL by --ids
+
+The zero is the point, and it is why the probes had to come first: measured the usual way this
+reads as a change that does nothing. **A fix with no measurable effect on either standing oracle
+is exactly what a rule looks like when the oracles cannot see it** -- and one with a probe gate
+behind it is the only kind that can be told apart from a no-op.
+
+#### And the fifth was bought back at a measured price, so it was not bought
+
+The quoted host is a different code path rather than a smaller version of the same one:
+`contentColumn`'s `MARKER` is anchored at column 0, so `> - a` never reached the host branch and
+the quote branch answered 2 where Obsidian reports 3. Making the function prefix-aware and
+letting the item outrank the quote scores **0 corpus regressions and referee 5502 to 5500** --
+`-2` by identity, 2 lost and 0 gained, for one probe. Reverted.
+
+Both losses name the cause and it is not the arithmetic:
+
+    > [!note] / >⟨3sp⟩[^1]: def / >⟨5sp⟩- item        answer column 2
+    > [!note] / >⟨4sp⟩[^ch2*]: body / > $$ / ...      answer column 2
+
+A quoted definition takes the QUOTE's content column even when a list item exists in the same
+container, so `Math.max(quote, host)` is the wrong combinator -- the quote wins. The probe
+differs because its definition sits inside the item that OPENS the quote's content, where in
+both of these the item is a sibling our `items` map claims anyway: a pre-order `visit` into
+every `listItem` maps whatever that item's span covers, and after absorption that span reaches
+further than Obsidian's host does.
+
+Which is **the contaminated host identification this file already records**, met from the
+opposite direction. There the tell was Obsidian answering a column that was neither the host's
+nor the bracket's; here it is a quote outranking a host we should not have found. Same
+conclusion both times: our innermost `listItem` is not always Obsidian's host, and until a host
+test can express the difference, rules keyed on it have a ceiling that is not about the rule.
+
 ## Tracing their SOURCE finds rules their document does not letter
 
 Their rules document was mined once and gave five gaps, all now closed. Their source is a
