@@ -112,6 +112,50 @@ const bump = (kind: string) => kinds.set(kind, (kinds.get(kind) ?? 0) + 1);
 const wantIds = process.argv.includes("--ids");
 const agreed: string[] = [];
 
+/**
+ * `--dump <file>` records every answer; `--blast <file>` diffs against one.
+ *
+ * THE BUCKET BOTH OTHER VIEWS ARE BLIND TO. The summary says whether the total moved and
+ * `--ids` says which documents changed side, and a document that was wrong before and is wrong
+ * in a DIFFERENT WAY afterwards appears in neither -- it never changed side, so the identity
+ * diff is empty, and the total is unmoved.
+ *
+ * That is not a hypothetical. B3's content-column fix altered the answer for exactly four of
+ * these 6,818 documents, every one of them a designed B3 probe carrying Obsidian's recorded
+ * answer, and all four say the definition should not exist at all. The fix was correct and
+ * HALF THE RULE, and both of the cheap checks this harness reaches for first reported nothing:
+ * 0 corpus regressions and an identity-diff of `lost=0 gained=0`.
+ *
+ * So the question a change has to be asked is not "did agreement move" but "which answers did
+ * it ALTER, and does the oracle endorse each new one". `--blast` asks that:
+ *
+ *     git stash && npx tsx ... referee.mts --dump /tmp/before.json && git stash pop
+ *     npx tsx ... referee.mts --blast /tmp/before.json
+ *
+ * `still wrong` is the bucket to read. Every row in it is a document whose answer this change
+ * rewrote while the oracle disagrees with both spellings -- which is either a rule that is
+ * incomplete, or one firing where it should not, and the oracle's own column is printed beside
+ * it so the difference is readable without a second tool.
+ */
+const valueOf = (flag: string): string | undefined => {
+  const at = process.argv.indexOf(flag);
+  return at === -1 ? undefined : process.argv[at + 1];
+};
+const dumpTo = valueOf("--dump");
+const blastFrom = valueOf("--blast");
+const snapshot: Record<string, { answer: string; agreed: boolean }> = {};
+const baseline: Record<string, { answer: string; agreed: boolean }> =
+  blastFrom === undefined
+    ? {}
+    : (JSON.parse(fs.readFileSync(blastFrom, "utf8")) as typeof baseline);
+const blast: Array<{
+  key: string;
+  bucket: "gained" | "lost" | "still wrong" | "equivalent";
+  before: string;
+  after: string;
+  oracle: string;
+}> = [];
+
 for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
   const raw: unknown = JSON.parse(
     fs.readFileSync(path.join(dir, file), "utf8"),
@@ -134,6 +178,31 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
 
     const defsMatch = same(got.defs, entry.defs);
     const refsMatch = same(got.refs, entry.refs);
+    if (dumpTo !== undefined || blastFrom !== undefined) {
+      const agreeNow = defsMatch && refsMatch;
+      const answer = JSON.stringify([got.defs, got.refs]);
+      snapshot[key] = { answer, agreed: agreeNow };
+      const was = baseline[key];
+      if (was !== undefined && was.answer !== answer) {
+        blast.push({
+          key,
+          // `equivalent` is a real outcome rather than a tidy-up: `same()` normalises both
+          // ends and drops empty-named references, so two different spellings can both agree
+          // and that is slack in the COMPARISON, not a change in correctness.
+          bucket:
+            agreeNow && was.agreed
+              ? "equivalent"
+              : agreeNow
+                ? "gained"
+                : was.agreed
+                  ? "lost"
+                  : "still wrong",
+          before: was.answer,
+          after: answer,
+          oracle: JSON.stringify([entry.defs, entry.refs]),
+        });
+      }
+    }
     if (defsMatch && refsMatch) {
       agree++;
       if (wantIds) agreed.push(key);
@@ -150,6 +219,43 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
     else if (!defsMatch) bump("definition set differs");
     else bump("reference set differs");
   }
+}
+
+if (dumpTo !== undefined) {
+  fs.writeFileSync(dumpTo, JSON.stringify(snapshot));
+  console.log(`dumped ${Object.keys(snapshot).length} answers to ${dumpTo}`);
+  process.exit(0);
+}
+
+if (blastFrom !== undefined) {
+  const buckets = new Map<string, number>();
+  for (const row of blast) {
+    buckets.set(row.bucket, (buckets.get(row.bucket) ?? 0) + 1);
+  }
+  console.log(`blast radius against ${blastFrom}`);
+  console.log(`  answers ALTERED : ${blast.length} of ${total}`);
+  for (const bucket of ["gained", "lost", "still wrong", "equivalent"]) {
+    console.log(`    ${bucket.padEnd(12)} ${buckets.get(bucket) ?? 0}`);
+  }
+  const silent = blast.filter((row) => row.bucket === "still wrong");
+  if (silent.length > 0) {
+    console.log(
+      `\n  STILL WRONG -- rewritten where the oracle disagrees with both spellings.`,
+    );
+    console.log(
+      `  Neither the agreement total nor --ids can see these, which is why they are listed.`,
+    );
+    for (const row of silent.slice(0, 40)) {
+      console.log(`\n  ${row.key}`);
+      console.log(`    before = ${row.before}`);
+      console.log(`    after  = ${row.after}`);
+      console.log(`    oracle = ${row.oracle}`);
+    }
+    if (silent.length > 40) {
+      console.log(`\n  ...and ${silent.length - 40} more`);
+    }
+  }
+  process.exit(0);
 }
 
 if (wantIds) {

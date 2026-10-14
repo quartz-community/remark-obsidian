@@ -2844,6 +2844,79 @@ threshold stays unshipped with its number attached.
 Note the shape: positive on DISTANCE, negative on AGREEMENT. This file has seen it once before,
 on F5, and both times it meant the rule was right and its boundary wrong.
 
+### `--blast`: the bucket both cheap checks are blind to, made a tool
+
+B3 was found by hand. The general form is cheap enough to be the default, so it is now part of
+the gate rather than a scratch script -- `referee.mts --dump <file>` records every answer and
+`--blast <file>` diffs against one, using the gate's OWN comparison:
+
+```bash
+git stash && npx tsx --conditions=development test/parity/referee.mts --dump /tmp/before.json
+git stash pop && npx tsx --conditions=development test/parity/referee.mts --blast /tmp/before.json
+```
+
+Four buckets, and only three of them were ever visible:
+
+| bucket            | what it is                                      | seen by                |
+| ----------------- | ----------------------------------------------- | ---------------------- |
+| `gained`          | disagreed, now agrees                           | the total, and `--ids` |
+| `lost`            | agreed, now disagrees                           | the total, and `--ids` |
+| `equivalent`      | both spellings agree -- slack in the comparison | nothing, and harmless  |
+| **`still wrong`** | **rewritten where the oracle rejects BOTH**     | **nothing at all**     |
+
+A document in the last bucket never changed side, so the identity diff is empty, and the total
+is unmoved. Verified by replaying the B3 commit through it: **4 answers altered, 0 gained,
+0 lost, 4 still wrong**, with the oracle's `defs: []` printed beside each.
+
+#### Run over this whole session's `src` work, it found 23 more
+
+    answers ALTERED : 117 of 6818
+      gained       87
+      lost          3
+      still wrong  27
+      equivalent    0
+
+| what the change did | where the oracle sits       | docs |
+| ------------------- | --------------------------- | ---: |
+| moved a definition  | same count, different place |   13 |
+| moved a definition  | wants FEWER                 |    7 |
+| moved a definition  | **wants NONE**              |    5 |
+| moved a definition  | wants MORE                  |    1 |
+| added a definition  | same count, different place |    1 |
+
+The five wanting NONE are B3's threshold family and the bucket is **5, not the 4** a hand-rolled
+dump of the single commit found -- `reproducers.json#614` reads `[^note]` at column 3, we moved
+it to 2, and Obsidian has no definition there at all. With the 7 wanting FEWER that is **12
+documents saying we emit definitions Obsidian does not have**, which is one target rather than
+twelve leads.
+
+And `broad-20261004.json#70` is the clearest statement of what the bucket is for:
+
+    before = [["3",4,0,5], ["注1",9,8,10], ["12",16,4,16]]
+    after  = [["3",4,0,5], ["注1",9,8, 9], ["12",16,2,16]]
+    oracle = [["3",4,0,5], ["注1",9,8,11], ["12",16,2,16]]
+
+One session, one document: `12`'s column was fixed from 4 to 2, which the oracle wants, and
+`注1`'s END was moved from 10 to 9 where the oracle wants 11. **An improvement and a regression
+in the same document, cancelling into silence** on every instrument that reads a per-document
+verdict. The blind spot is not really about documents at all -- it is that agreement is a
+CONJUNCTION over fields, and a conjunction that is already false absorbs any number of further
+changes.
+
+#### It also found 3 documents this session lost without noticing
+
+`broad#12`, `broad#94` and `fuzz-20261003#202` agreed at the start of the session and do not
+now. One is recorded -- `item-dot-threshold` landed at `+6/-1` and said so -- and the other two
+went through steps where only the TOTAL was checked, which cannot tell a hold from a trade.
+This file already carries that lesson ("verify a HOLD by identity, not by its total") and the
+gap was that `--ids` was run on the steps where a wobble was predicted rather than on all of
+them.
+
+So the standing rule tightens, and it is cheap now: **dump before, blast after, every src
+change.** The total answers "did it help", `--ids` answers "which documents moved", and only
+`still wrong` answers "did I rewrite an answer into a different kind of wrong" -- which is the
+question a half-implemented rule needs asked.
+
 ## Tracing their SOURCE finds rules their document does not letter
 
 Their rules document was mined once and gave five gaps, all now closed. Their source is a
