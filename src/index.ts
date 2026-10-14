@@ -91,6 +91,7 @@ import { setextDefinitionTransform } from "./lib/setext-definition.js";
 import { itemHtmlExtentTransform } from "./lib/item-html-extent.js";
 import { shortCommentTransform } from "./lib/short-comment.js";
 import { definitionBlankTailTransform } from "./lib/definition-blank-tail.js";
+import { definitionBlankTitleTransform } from "./lib/definition-blank-title.js";
 import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
 import { blankLabelReferenceTransform } from "./lib/blank-label-reference.js";
 import { textareaNotRawTransform } from "./lib/textarea-not-raw.js";
@@ -878,6 +879,10 @@ export default function remarkObsidian(
     // blank, this one extends it over a trailing blank, and an earlier placement was
     // silently undone by it.
     definitionBlankTailTransform(tree, String(file));
+    // After the blank-tail pass, which settles where a definition ends, and before points are
+    // normalised from the offsets this moves. Their D6 -- a title may start after a blank
+    // line, and the reference inside it is then dead.
+    definitionBlankTitleTransform(tree, String(file));
     // After every pass that reads a newline out of a text value, and before points
     // are normalised from the offsets it sets.
     if (opts.positionedBreaks) breakPositionsTransform(tree, String(file));

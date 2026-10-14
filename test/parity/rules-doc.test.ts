@@ -62,6 +62,7 @@ interface Case {
     readonly footnotes: readonly Entry[];
     readonly footnoteRefs: readonly Entry[];
     readonly blocks: readonly string[];
+    readonly referenceLinks?: readonly string[];
     readonly sections: ReadonlyArray<{ type: string; start: number }>;
   };
 }
@@ -143,10 +144,11 @@ const DIVERGING_POSITIONS: readonly string[] = [
   // still a row and the reference in it is live. We read indented code and the reference
   // dies. The PIPED half of C2 is fixed -- see `table-indented-row.ts`.
   "C2 pipeless indented row",
-  // D6: a link reference definition reads its title ACROSS a blank line, so the `[^1]` is
-  // inside the definition and dead. We start a paragraph and the reference is live. Stock
-  // micromark agrees with us, so this is Obsidian's fork reading definitions differently.
-  "D6 lrd title over lines",
+  // D6's TITLE half is FIXED -- `definitionBlankTitleTransform` reads a title that starts
+  // after a blank line, so the reference inside it is dead as Obsidian has it, across five
+  // cases and both quote styles and parentheses. What it leaves is recorded against
+  // `referenceLinks` below.
+  //
   // E5, three variants of one rule: a footnote name runs to the first `]` and may hold a `[`
   // or a `^`, giving names `^[x`, `[x` and `x[y`. We read no reference at all. This is the
   // known-hard family `README.md` records -- it needs a construct claiming `[^` before the
@@ -189,9 +191,28 @@ const DIVERGING_SECTIONS: readonly string[] = [
   // micromark makes the line indented CODE before any table logic runs, which is a different
   // defect: the row has to be re-parsed out of a `code` node rather than merely kept.
   "C2 pipeless indented row",
-  // Both D6 forms: a title across a blank line, and an `<...>` destination across one.
+  // The `<...>` DESTINATION half of D6, which `definitionBlankTitleTransform` leaves: a
+  // destination running across blank lines has to be REWRITTEN rather than merely spanned,
+  // and `referenceLinks` carries its value -- a field 111 corpus answers depend on.
   "D6 angle dest over blank",
-  "D6 lrd title over lines",
+];
+
+/**
+ * `referenceLinks`, which is the projection D6 is really about.
+ *
+ * Both entries are the halves `definitionBlankTitleTransform` declines, each recorded with its
+ * measured answer rather than guessed:
+ *
+ *   `[foo]: <a` / blank / `b` / `c>` gives the destination `a\n\nb\nc` where we read `<a`.
+ *
+ *   `[foo]: /url` / blank / `'unclosed[^1]` reports NO reference link at all -- an unclosed
+ *   title DESTROYS the definition rather than merely failing to extend it. That is a demotion,
+ *   and getting it wrong deletes a definition the author wrote, which is also why the pass
+ *   refuses to half-reproduce it by swallowing the text.
+ */
+const DIVERGING_REFERENCE_LINKS: readonly string[] = [
+  "D6 angle dest over blank",
+  "D6 unclosed title destroys definition",
 ];
 
 const golden = fs.existsSync(GOLDEN)
@@ -247,6 +268,21 @@ describe.skipIf(golden === undefined)("their rules document", () => {
       }
     }
     expect(found.sort()).toEqual([...DIVERGING_SECTIONS].sort());
+  });
+
+  it("diverges on exactly the recorded reference links", () => {
+    const found: string[] = [];
+    for (const entry of file.cases) {
+      const source = applyTextTransform(entry.markdown);
+      const meta = computeOurs(parseOurs(source, "all-features"), source);
+      const ours = (meta.referenceLinks ?? [])
+        .map((link) => link.split("@")[0]!)
+        .sort();
+      const theirs = [...(entry.obsidian.referenceLinks ?? [])].sort();
+      if (JSON.stringify(ours) !== JSON.stringify(theirs))
+        found.push(entry.rule);
+    }
+    expect(found.sort()).toEqual([...DIVERGING_REFERENCE_LINKS].sort());
   });
 
   it("reproduces every block-identifier index", () => {
