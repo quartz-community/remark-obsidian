@@ -2792,6 +2792,59 @@ that exists to claim a label containing `[`, so the fix is a guard at the point 
 and no node is ever built. **Where a defect is "we invent a node", look for the pass that
 invents it before reaching for a pass that removes it.** The two differ by exactly the hazard.
 
+### Re-auditing their rules document: it has grown, and every claim in it holds
+
+The first audit of `docs/obsidian-reading-rules.md` ran 33 of its examples and found five gaps,
+all since closed. **The document has since roughly doubled** -- a whole new section G, plus D8,
+B10, F6, G2, P2, D4's block-id rule and extended E2, all dated 2026-10-08 -- so the audit was
+re-run against the current text, 44 examples over every rule with a checkable claim.
+
+**39 agree. Five diverge. All five are OURS, and not one claim in their document is wrong.**
+That is worth stating plainly, because the question being asked was whether their docs might be
+describing an extension or misreading the app: every example was put to live Obsidian 1.14.4
+through `ask.mts`, and Obsidian sided with their document every time.
+
+What agreed on arrival is most of the new material: the whole of G (a line written into the
+blank line under a paragraph carries it on, over a rule, a table, code and prose), D4's rule
+that a block id counts only at the very END of its block (`text.[^1] ^water1` registers
+`water1` and `text. ^water1[^1]` registers none), F6's note ending inside an open fence or
+comment, E2's label-line block starts and lead-quote label, D7's bracketed-text references, and
+A1's callout-title edge cases including `> [!note|meta]` and `>  [!note]`.
+
+| diverging shape                                          | theirs                   | ours                        |
+| -------------------------------------------------------- | ------------------------ | --------------------------- |
+| B10 `- apples` / `[^1]: x` / `- pears`                   | ONE list                 | two lists                   |
+| C2 `\| a \| b \|` / `\| --- \| --- \|` / ` \| c \| d \|` | table, then a paragraph  | table only, row absorbed    |
+| C2 `a \| b` / `--- \| ---` / `    \| c[^2] \| d`         | the row stays a row      | indented `code`, ref dead   |
+| D6 `[foo]: /url` / blank / `'tit [^1]` / `le'`           | title holds it, ref dead | our own paragraph, ref live |
+| E5 `a[^^[x]]`                                            | reference named `^[x`    | no reference                |
+
+E5 is the known-hard one and consistent with what this file already records: a footnote label
+runs to the first `]` with no counting, needs a construct claiming `[^` before anything else
+sees that bracket, and three attempts at it are refuted. The other four are new.
+
+**And the corpus cannot see four of the five**, which is why mining their document is worth the
+round trip even after a first pass: B10, the pipeless indented row, and the D6 title each have
+**zero** cases in 3,403, and the two cases matching the piped-row shape are both inside
+containers where the indentation is the container's content column instead. The 47 cases
+matching a bracket-in-name pattern are all INLINE footnote shapes, not references. So a clean
+delta against this corpus would have said nothing about any of them -- the standing rule about
+counting the cases that exercise a rule, met again from the far side.
+
+Two notes on running this audit, both the kind that invalidate a result silently:
+
+- **`footnoteRefs` lists only references whose name HAS a definition.** Comparing every
+  `footnoteReference` node in our tree against it reports a divergence for every dangling one,
+  which is three of the first four "diffs" this audit produced. The same caveat already applies
+  to probes and is recorded above; it applies to their document's examples too, several of
+  which define nothing.
+- **Obsidian's `sections` carry ZERO-LENGTH `text`/`element` entries past the end of the
+  document** for the relocated footnote list. `sourceBacked` in `compute.test.ts` drops them,
+  and a hand-rolled comparison has to do the same or every case diverges on `sections`.
+
+Also measured: Obsidian's `blocks` is a RECORD keyed by identifier, not an array like every
+sibling field.
+
 ### Re-measuring the last two gaps shrank them, and one to nothing
 
 Their rules document gives sizes in its own terms, and those are not sizes in ours. Measured
