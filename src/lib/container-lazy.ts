@@ -109,6 +109,82 @@ function splitLazyHeading(
   };
 }
 
+/**
+ * The same split for an html lazy line, which micromark hands over as one `html` node.
+ *
+ * `- item` / `para` / `---` already works: micromark builds a root `heading` and
+ * `splitLazyHeading` takes it apart. With an html line it builds an `html` node spanning BOTH
+ * lines instead -- a type-6 block runs to the next blank -- so there is no heading to split
+ * and the whole thing was absorbed, where Obsidian reports `list@0-1` and a root
+ * `thematicBreak@2-2`.
+ *
+ * Measured, and the asterisk form is the control that keeps this scoped to the setext
+ * underline rather than to thematic breaks in general:
+ *
+ *     <div> / ---                heading@0-1              a setext heading NAMED `<div>`
+ *     <div> / ***                html@0-1                 stays html
+ *     - item / <div> / ---       list@0-1, thematicBreak  the list refuses the heading
+ *     - item / para / ---        list@0-1, thematicBreak   already correct here
+ *
+ * So the root reading is `htmlSetextTransform`'s business and runs later; inside a list the
+ * underline is a thematic break, exactly as `splitLazyHeading` already encodes for prose.
+ * Third instance today of one rule needing a second node type.
+ *
+ * `DASH_UNDERLINE` only, shared with the heading split: `===` is absorbed as text rather than
+ * becoming a break, which the setext table in the parity README records.
+ */
+function splitLazyHtml(
+  node: RootContent,
+  source: string,
+): { content: RootContent; underline: ThematicBreak } | null {
+  const from = node.position?.start?.offset;
+  const to = node.position?.end?.offset;
+  const fromLine = node.position?.start?.line;
+  if (from === undefined || to === undefined || fromLine === undefined) {
+    return null;
+  }
+
+  const lines = source.slice(from, to).split("\n");
+  if (lines.length < 2) return null;
+  if (!DASH_UNDERLINE.test(lines[lines.length - 1]!)) return null;
+
+  const body = lines.slice(0, -1).join("\n");
+  if (body.trim() === "") return null;
+  const contentEnd = from + body.length;
+
+  // Captured BEFORE the node is mutated. Unlike `splitLazyHeading`, which builds a fresh
+  // `paragraph` and leaves the heading untouched, the html content IS this node -- so
+  // assigning its position overwrites the very end the underline needs, and reading it
+  // afterwards produced `thematicBreak@2-1`: an end before its own start.
+  const originalEnd = { ...node.position!.end };
+
+  const content = node as RootContent & { value?: string };
+  content.value = body;
+  content.position = {
+    start: { ...node.position!.start },
+    end: {
+      line: fromLine + lines.length - 2,
+      column: body.length - body.lastIndexOf("\n"),
+      offset: contentEnd,
+    },
+  };
+
+  return {
+    content,
+    underline: {
+      type: "thematicBreak",
+      position: {
+        start: {
+          line: fromLine + lines.length - 1,
+          column: 1,
+          offset: contentEnd + 1,
+        },
+        end: originalEnd,
+      },
+    },
+  };
+}
+
 interface ParentLike {
   readonly type: string;
   readonly children?: readonly ParentLike[];
@@ -345,6 +421,25 @@ function absorbPass(tree: Root, source: string): void {
     // cannot adjudicate the general form. Widening it is a probe wave, not a guess.
     if (next.type === "math" && !endsInOpenParagraph(target as ParentLike)) {
       continue;
+    }
+
+    // An html lazy line ending in a setext underline splits exactly as a heading does. The
+    // guard above already admits `html` after a list; without this the underline rides along
+    // inside the html node and the list swallows both lines.
+    if (next.type === "html" && container.type === "list") {
+      const split = splitLazyHtml(next, source);
+      if (split) {
+        (target.children as unknown[]).push(split.content);
+        for (const point of [
+          parent.position?.end,
+          target.position?.end,
+          ...descended.map((n) => n.position?.end),
+        ]) {
+          if (point) Object.assign(point, { ...split.content.position!.end });
+        }
+        children.splice(index + 1, 1, split.underline);
+        continue;
+      }
     }
 
     if (next.type === "heading") {

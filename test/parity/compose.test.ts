@@ -73,9 +73,10 @@ const GOLDEN = path.join(import.meta.dirname, "goldens/compose.json");
  *                        `%%` arrives as ONE paragraph with `%%` as a TEXT child, both lines
  *                        absorbed as lazy continuation, so there is nothing to lift. Needs
  *                        `%%` to interrupt lazy continuation -- tokenizer-level, not a guard.
- *     2 `html > thematic` we absorb the `---` into the container where Obsidian keeps a root
- *                        `thematicBreak`. The chain widening that would do it is recorded at
- *                        3 better against 23 worse in `container-lazy.ts`.
+ *     `html > thematic` is CLOSED: micromark hands an html lazy line and its setext
+ *                        underline over as ONE html node, so `splitLazyHeading` never saw a
+ *                        heading to take apart. `splitLazyHtml` does the same split for the
+ *                        second node type.
  *     2 `footnote > indented` and 1 `footnote > thematic`: a definition absorbed as a
  *                        container's lazy content is NOT a definition to Obsidian, so the
  *                        indented line after it is root `code` rather than the definition's
@@ -96,13 +97,11 @@ const DIVERGING: Record<Axis, readonly string[]> = {
   isolate: [
     "bullet > footnote > comment",
     "bullet > html > comment",
-    "bullet > html > thematic",
     "callout > footnote > comment",
     "callout > footnote > indented",
     "callout > footnote > thematic",
     "ordered > footnote > comment",
     "ordered > html > comment",
-    "ordered > html > thematic",
     "quote > footnote > comment",
     "quote > footnote > indented",
   ],
