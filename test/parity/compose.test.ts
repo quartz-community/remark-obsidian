@@ -143,9 +143,31 @@ const INVARIANT_VIOLATIONS: Record<string, readonly string[]> = {
   // OURS, and down to ONE. A lazy `[^1]: def` is absorbed into the item's paragraph, which
   // is stretched to cover it, but the `listItem` between the `list` and that paragraph is
   // not -- `blockquote 0->18` and `list 2->18` are both correct while `listItem 2->8` holds
-  // a `paragraph 4->18`. `container-lazy.ts` already stretches a `descended` chain for
-  // exactly this reason, so the `listItem` is missing FROM that chain rather than the idea
-  // being absent. Not yet traced to the pass that builds it.
+  // a `paragraph 4->18`.
+  //
+  // REDUCED TO 19 BYTES, `> - item` / `[^1]: def`, and the trigger needs all THREE of a
+  // blockquote, a list inside it, and a footnote definition. Each one dropped is clean:
+  //
+  //     > - item / lazy          ok   plain lazy text, so it is not lazy absorption as such
+  //     > item / [^1]: def       ok   no list in between
+  //     - item / [^1]: def       ok   no quote outside
+  //     > - - item / [^1]: def   ok   and a DEEPER list is fine too
+  //
+  // NOT UPSTREAM, measured rather than assumed -- the mistake `UPSTREAM.md` item 2 was
+  // carrying until tonight. Bare `remark-parse` gives `listItem 2->18` over `paragraph
+  // 4->18`, consistent; `+ remark-gfm` gives a separate root `footnoteDefinition 9->18`,
+  // also consistent. Our tree is a hybrid of the two, so the defect is ours alone.
+  //
+  // `absorbPass` in `container-lazy.ts` is where the chain is built, and its descent loop is
+  // `while (parent.type === "list")` -- so for a BLOCKQUOTE container it never runs, leaving
+  // `target` as the blockquote and `descended` empty. That explains why nothing between the
+  // quote and the paragraph is stretched, but NOT how the definition ends up merged into the
+  // paragraph's inline children, which `target.children.push(next)` cannot do. A later pass
+  // completes the merge and is not yet identified; the fourth `ok` row above is the clue,
+  // since a deeper list somehow escapes it.
+  //
+  // Left open deliberately. The absorption path it touches carries 43 referee documents, so
+  // this wants a pass-bisection instrument rather than a guess at the call site.
   //
   // THREE fixed, all the same shape -- a node on the path was skipped:
   //
