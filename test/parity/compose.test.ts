@@ -140,53 +140,31 @@ const INVARIANT_VIOLATIONS: Record<string, readonly string[]> = {
   "isolate|linkdef > paragraph > thematic": [
     "SIBLINGS OVERLAP: root > definition/heading",
   ],
-  // OURS, and down to ONE. A lazy `[^1]: def` is absorbed into the item's paragraph, which
-  // is stretched to cover it, but the `listItem` between the `list` and that paragraph is
-  // not -- `blockquote 0->18` and `list 2->18` are both correct while `listItem 2->8` holds
-  // a `paragraph 4->18`.
+  // OURS: NONE. Every sequence above is upstream's, which is why there is no second group.
   //
-  // REDUCED TO 19 BYTES, `> - item` / `[^1]: def`, and the trigger needs all THREE of a
-  // blockquote, a list inside it, and a footnote definition. Each one dropped is clean:
-  //
-  //     > - item / lazy          ok   plain lazy text, so it is not lazy absorption as such
-  //     > item / [^1]: def       ok   no list in between
-  //     - item / [^1]: def       ok   no quote outside
-  //     > - - item / [^1]: def   ok   and a DEEPER list is fine too
-  //
-  // NOT UPSTREAM, measured rather than assumed -- the mistake `UPSTREAM.md` item 2 was
-  // carrying until tonight. Bare `remark-parse` gives `listItem 2->18` over `paragraph
-  // 4->18`, consistent; `+ remark-gfm` gives a separate root `footnoteDefinition 9->18`,
-  // also consistent. Our tree is a hybrid of the two, so the defect is ours alone.
-  //
-  // `absorbPass` in `container-lazy.ts` is where the chain is built, and its descent loop is
-  // `while (parent.type === "list")` -- so for a BLOCKQUOTE container it never runs, leaving
-  // `target` as the blockquote and `descended` empty. That explains why nothing between the
-  // quote and the paragraph is stretched, but NOT how the definition ends up merged into the
-  // paragraph's inline children, which `target.children.push(next)` cannot do. A later pass
-  // completes the merge and is not yet identified; the fourth `ok` row above is the clue,
-  // since a deeper list somehow escapes it.
-  //
-  // Left open deliberately. The absorption path it touches carries 43 referee documents, so
-  // this wants a pass-bisection instrument rather than a guess at the call site.
-  //
-  // THREE fixed, all the same shape -- a node on the path was skipped:
+  // All FOUR were the same defect -- a transform located a node by descending, edited it,
+  // and left the nodes it had descended PAST spanning the old extent. Three passes, one
+  // mistake:
   //
   //   `start AFTER end: footnoteDefinition` 16 -> 15 and `start AFTER end: text` 8 -> 7,
-  //   both from `lazySetextTransform` setting an end to `keepTo` without asking whether the
-  //   node BEGAN at the departing line. `pruneEmptied` drops a node lying wholly past the
-  //   cut, which also closed `isolate|callout > footnote > thematic` as a divergence --
-  //   Obsidian reports no definition there, so removal was its answer, not merely a repair.
+  //   from `lazySetextTransform` setting an end to `keepTo` without asking whether the node
+  //   BEGAN at the departing line. `pruneEmptied` drops a node lying wholly past the cut,
+  //   which also closed `isolate|callout > footnote > thematic` as a divergence -- Obsidian
+  //   reports no definition there, so removal was its answer, not merely a repair.
   //
   //   `child ENDS AFTER parent: blockquote > list`, from the same pass shrinking only the
-  //   ENDPOINTS of its descent -- container and host -- while the helper finding the host
-  //   had descended THROUGH the `list`. It is now `paragraphHostPath`, returning the whole
-  //   path so every node on it shrinks.
+  //   ENDPOINTS of its descent while the helper had descended THROUGH the `list`. It is now
+  //   `paragraphHostPath` and returns the whole path.
   //
-  // So the remaining one is the mirror image of that third fix: a chain stretched OUTWARD
-  // with a node missing, rather than shrunk inward with one missing.
-  "nested|quote > bullet > footnote": [
-    "child ENDS AFTER parent: listItem > paragraph",
-  ],
+  //   `child ENDS AFTER parent: listItem > paragraph`, the mirror image: a chain stretched
+  //   OUTWARD over a folded definition with the `listItem` missing. `lastParagraphOf` in
+  //   `footnote-interrupt.ts` now returns what it descended past, same as the above.
+  //
+  // THE GATE IS STRICTER NOW, not weaker, because the set is exact: ours being empty means
+  // any new span defect in the composition space shows up as an unexpected key rather than
+  // being absorbed into a tolerated group.
+  //
+  // The upstream rows MUST NOT reach zero -- see the note above the constant.
 };
 
 const golden = fs.existsSync(GOLDEN)

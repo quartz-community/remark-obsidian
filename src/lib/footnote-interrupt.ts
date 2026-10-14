@@ -51,12 +51,15 @@ function fold(children: RootContent[], source: string): void {
 
     // A definition under a list item or a quote continues that block's own
     // trailing paragraph, not a sibling of the block.
-    const host =
-      previous.type === "paragraph" ? previous : lastParagraphOf(previous);
-    if (!host) {
+    const found =
+      previous.type === "paragraph"
+        ? { paragraph: previous, through: [] as RootContent[] }
+        : lastParagraphOf(previous);
+    if (!found) {
       index++;
       continue;
     }
+    const host = found.paragraph;
 
     const startLine = node.position?.start?.line;
     const endLine = previous.position?.end?.line;
@@ -107,7 +110,10 @@ function fold(children: RootContent[], source: string): void {
         ),
       );
     }
-    for (const container of [host, previous]) {
+    // `found.through` is what the search DESCENDED past -- the `listItem` between a list and
+    // its trailing paragraph. Stretching only the endpoints left it covering the line before
+    // the fold: `> - item` / `[^1]: def` gave `listItem 2->8` holding a `paragraph 4->18`.
+    for (const container of [host, previous, ...found.through]) {
       if (container.position && node.position?.end) {
         container.position.end = { ...node.position.end };
       }
@@ -116,16 +122,35 @@ function fold(children: RootContent[], source: string): void {
   }
 }
 
-/** The paragraph a trailing definition would continue, if the block ends in one. */
-function lastParagraphOf(node: RootContent): Paragraph | undefined {
+/**
+ * The paragraph a trailing definition would continue, and WHAT WAS DESCENDED PAST to find it.
+ *
+ * The intermediate nodes are returned because the caller has to stretch them too: a fold
+ * extends the paragraph over the definition's line, and every node between that paragraph
+ * and the block being folded into has to cover it as well. A list reaches its paragraph
+ * through a `listItem`, so that item is the path; a quote or callout holds its paragraph
+ * directly and has none.
+ *
+ * Returning only the endpoint is the same defect twice fixed elsewhere -- `paragraphHostPath`
+ * in `lazy-setext.ts` carries the other instance. A transform that locates a node by
+ * descending has to treat the descent as the unit of work, because the edit invalidates the
+ * span of every node it passed through.
+ */
+function lastParagraphOf(
+  node: RootContent,
+): { paragraph: Paragraph; through: RootContent[] } | undefined {
   if (node.type === "list") {
     const item = node.children[node.children.length - 1];
     if (!item || item.type !== "listItem") return undefined;
     const last = item.children[item.children.length - 1];
-    return last && last.type === "paragraph" ? last : undefined;
+    return last && last.type === "paragraph"
+      ? { paragraph: last, through: [item] }
+      : undefined;
   }
   if (node.type !== "blockquote" && node.type !== "callout") return undefined;
   const inner = (node as unknown as { children: RootContent[] }).children;
   const last = inner[inner.length - 1];
-  return last && last.type === "paragraph" ? last : undefined;
+  return last && last.type === "paragraph"
+    ? { paragraph: last, through: [] }
+    : undefined;
 }
