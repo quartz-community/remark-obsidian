@@ -182,6 +182,28 @@ function dropRefsAfterHtml(
   return { defs: ours.defs, refs: ours.refs.filter((r) => !dead.has(r[1])) };
 }
 
+/**
+ * A definition's end pulled back before the first line of a given shape, at column 0.
+ *
+ * COLUMN 0 ONLY, which is what keeps it out of the indentation argument: an indented heading
+ * or label is the definition's own content, and E1's enders are stated for a line that starts
+ * a block of its own. Shared by the two candidates so the only thing varying is the shape.
+ */
+function endBefore(text: string, ours: Facts, shape: RegExp): Facts {
+  const lines = text.split("\n");
+  return {
+    refs: ours.refs,
+    defs: ours.defs.map((d): Def => {
+      for (let line = d[1] + 1; line <= d[3]; line++) {
+        const at = lines[line] ?? "";
+        if (/^[ \t]/u.test(at)) continue;
+        if (shape.test(at)) return [d[0], d[1], d[2], line - 1];
+      }
+      return d;
+    }),
+  };
+}
+
 const RULES: readonly Rule[] = [
   {
     name: "quote-truncate",
@@ -852,6 +874,52 @@ const RULES: readonly Rule[] = [
         }),
       };
     },
+  },
+  {
+    name: "def-end-before-label",
+    what: "a definition ends before a column-0 label line, which E1 says ends it",
+    // `shapes.mts` put `def-end+1` at 80 documents; classifying the SURPLUS line -- the one we
+    // absorb and Obsidian does not -- over all 113 entries gives:
+    //
+    //     39  text          lazy continuation, correct to absorb per E1
+    //     38  definition    E1: "another label" ENDS a definition
+    //     30  bullet        E1: "list items" end it
+    //     10  heading       E1: "ATX headings" end it
+    //      7  comment       D5: `%%` is lazy text, correct to absorb
+    //      7  fence         E1: fences end it
+    //
+    // So 85 of 113 are enders E1 names and we take them in anyway. This candidate is the
+    // cleanest of them, a label at column 0, where E1 is unambiguous and no indentation
+    // argument applies.
+    //
+    // SCORED, NOT SHIPPED: better 5, worse 1, and the worse document was ALREADY disagreeing
+    // -- no agreeing document breaks, checked by identity rather than read off the total.
+    //
+    // It is not implementable as an end position, which is why it stayed here. In
+    // `probes.json#388`, `[^9]: orphan` / `⟨4sp⟩<!--` / `[^1]: one` / `-->`, our first
+    // definition ends on the label's own line and the indented `<!--` CHILD extends into that
+    // line too. Pulling the parent's end back therefore orphans the child, which the invariant
+    // gate reports; doing it properly means shrinking the html as well, and `fuzz#2814` needs
+    // a list split for the same reason. A guard that declines whenever a child would be
+    // orphaned makes the pass completely INERT, measured at 0 gained and 0 lost, so the
+    // position-only version was reverted rather than left in place looking like a fix.
+    //
+    // Five documents against child surgery on a definition's content is the wrong trade, and
+    // it is recorded here rather than attempted.
+    apply: (text, ours) => endBefore(text, ours, /^\[\^[^\]]*\]:/u),
+  },
+  {
+    name: "def-end-before-any-ender",
+    what: "...and before a column-0 heading, fence or list marker too",
+    // The same rule over the rest of E1's list. Each is stated there for a definition's text
+    // and each appears in the table above, so the question is only whether taking all four at
+    // once costs anything the label alone does not.
+    apply: (text, ours) =>
+      endBefore(
+        text,
+        ours,
+        /^(?:\[\^[^\]]*\]:|#{1,6}(?:[ \t]|$)|```|~~~|(?:[-*+])(?:[ \t]|$)|1[.)](?:[ \t]|$))/u,
+      ),
   },
   {
     name: "html-extent-item-block-tag",
