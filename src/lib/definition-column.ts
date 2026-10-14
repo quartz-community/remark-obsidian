@@ -188,6 +188,34 @@ function contentColumn(source: string, item: ListItem): number | undefined {
   const line = source.slice(bol, nl === -1 ? undefined : nl);
   const opener = MARKER.exec(line);
   if (!opener) return undefined;
+  // FIVE OR MORE spaces after the marker and the content column falls back to the marker plus
+  // ONE, because CommonMark makes that much indentation the item's own indented CODE rather
+  // than a wider content column.
+  //
+  //     *⟨9sp⟩item / blank / ⟨4sp⟩[^1]: def    column 2, where marker+all-spaces gives 10
+  //     -⟨5sp⟩item / blank / ⟨2sp⟩[^1]: def    column 2 either way
+  //
+  // Only visible when the definition's own indent EXCEEDS the capped column, which is why one
+  // of seven probed shapes moved and six did not -- `min(indent, contentColumn)` hides the
+  // difference whenever the indent is the smaller of the two. All twelve probes this function
+  // already carries have a run under five and are untouched.
+  // The capped column is the marker plus ONE SEPARATOR, and that separator is measured the
+  // same two ways the uncapped path already measures the whole run. Skipping either cost
+  // seven referee documents in one class:
+  //
+  //     1.⟨6sp⟩~~~ / ⟨4sp⟩[^Note]: def    column 4, not 3 -- the single-digit-dot adjustment
+  //     +⇥⟨4sp⟩Text / ⟨4sp⟩[^2]: More     column 4, not 2 -- a tab reaches its column stop
+  //     1.⇥⟨4sp⟩More / ...                column 4, and NOT 5: a tab already reaches 4, so
+  //                                       the dot adjustment must not apply on top of it
+  const split = /^([ \t]*(?:[-*+]|\d{1,9}[.)]))([ \t]*)/u.exec(line);
+  if (split && split[2]!.length >= 5) {
+    const marker = split[1]!;
+    const tabbed = split[2]![0] === "\t";
+    const base = tabbed
+      ? marker.length + (4 - (marker.length % 4))
+      : marker.length + 1;
+    return !tabbed && /^[ \t]*\d\.$/u.test(marker) ? base + 1 : base;
+  }
   // A SINGLE-DIGIT marker ending in a dot counts one column more than it occupies, which
   // is the `1.  foo` quirk already recorded for list items, reaching the definition column
   // too. Twelve probes vary the marker's width against the indent and all twelve fit
