@@ -139,6 +139,7 @@ export function lazySetextTransform(
     for (const node of [container, host, paragraph]) {
       if (node.position) node.position.end = { ...pointOf(source, keepTo) };
     }
+    pruneEmptied(container, keepTo);
 
     const inline = reparse(content).children[0];
     if (inline?.type === "paragraph") {
@@ -156,6 +157,43 @@ export function lazySetextTransform(
 
     // Replaces the quote's trailing sibling too when that is where the run sat.
     children.splice(index + 1, headingEnd === spanEnd ? 0 : 1, heading);
+  }
+}
+
+/**
+ * Drop whatever the departing line was ALL of.
+ *
+ * `keepTo` is one offset before the content line starts, so a node beginning AT that line
+ * has nothing left once the line leaves to become a heading. Setting its end to `keepTo`
+ * therefore gave it a start one PAST its end:
+ *
+ *     > [!note] title / [^1]: def / ---   footnoteDefinition 16 -> 15
+ *     > quote / [^1]: def / ---           text 8 -> 7
+ *
+ * In both the number is exact -- start is `contentFrom`, end is `contentFrom - 1` -- which is
+ * what identified this pass rather than one of the forty others in the chain. The callout
+ * case arises because the callout absorbs the definition as lazy content and
+ * `lastParagraphHost` then descends INTO it, so the node being shrunk is the one whose whole
+ * body is the departing line.
+ *
+ * A start after an end is categorically broken, not merely odd: `invariants.test.ts` tests
+ * for it before anything else, and a splice-by-offset consumer such as `obsidian-linter`
+ * cannot order an edit against a negative span.
+ *
+ * Removing rather than clamping is what Obsidian's own answer asks for. A definition absorbed
+ * as a container's lazy content is NOT a definition to it -- `defs` is empty for the callout
+ * case where we reported one -- so the node should not survive the line it was made of.
+ */
+function pruneEmptied(parent: RootContent, keepTo: number): void {
+  const node = parent as unknown as { children?: RootContent[] };
+  if (!Array.isArray(node.children)) return;
+
+  for (let index = node.children.length - 1; index >= 0; index--) {
+    const child = node.children[index]!;
+    pruneEmptied(child, keepTo);
+    const start = child.position?.start?.offset;
+    // Strictly past the cut, so a node ENDING at `keepTo` is untouched.
+    if (start !== undefined && start > keepTo) node.children.splice(index, 1);
   }
 }
 

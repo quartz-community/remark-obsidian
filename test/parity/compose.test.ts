@@ -84,7 +84,6 @@ const DIVERGING: Record<Axis, readonly string[]> = {
     "bullet > html > comment",
     "callout > footnote > comment",
     "callout > footnote > indented",
-    "callout > footnote > thematic",
     "ordered > footnote > comment",
     "ordered > html > comment",
     "quote > footnote > comment",
@@ -111,10 +110,16 @@ const DIVERGING: Record<Axis, readonly string[]> = {
  *
  * Needs no Obsidian, so it gates: the checks compare the tree against ITSELF.
  *
- * SEVEN of the eleven are upstream's and MUST NOT reach zero. `root > definition/heading`
+ * MOST of these are upstream's and MUST NOT reach zero. `root > definition/heading`
  * overlapping is `UPSTREAM.md` item 2, reproducible on bare `remark-parse` + `remark-gfm`,
- * so driving it out would mean diverging from upstream's own output. The other four are ours
- * and are real defects, each named here so a fix has somewhere to land.
+ * so driving it out would mean diverging from upstream's own output. The rest are ours and
+ * are real defects, each named here so a fix has somewhere to land -- and two already did,
+ * recorded at the boundary between the two groups below.
+ *
+ * No count in this sentence. The previous one said "SEVEN of the eleven" and went stale the
+ * moment two of ours were fixed -- the same failure the diverging table above now avoids by
+ * carrying causes and leaving counts to the constant. Read the groups below; they are the
+ * record.
  */
 const INVARIANT_VIOLATIONS: Record<string, readonly string[]> = {
   // UPSTREAM, keep: a definition and a setext heading built from the same lines.
@@ -135,15 +140,15 @@ const INVARIANT_VIOLATIONS: Record<string, readonly string[]> = {
   "isolate|linkdef > paragraph > thematic": [
     "SIBLINGS OVERLAP: root > definition/heading",
   ],
-  // OURS, four real defects. All four involve a definition or a list absorbed into a
-  // container, which is the same family the diverging-row table above attributes.
-  "isolate|callout > footnote > thematic": [
-    "start AFTER end: footnoteDefinition",
-  ],
-  "isolate|quote > footnote > thematic": [
-    "child ENDS AFTER parent: paragraph > break",
-    "start AFTER end: text",
-  ],
+  // OURS. Both involve a list absorbed into a container, the same family the diverging-row
+  // table above attributes.
+  //
+  // The two NEGATIVE-SPAN defects that used to sit here are FIXED. `lazySetextTransform` set
+  // a node's end to `keepTo` without checking whether the node began at the line that was
+  // leaving, so `footnoteDefinition` came out 16 -> 15 and `text` 8 -> 7. `pruneEmptied`
+  // drops a node lying wholly past the cut instead, which also closed
+  // `isolate|callout > footnote > thematic` as a divergence -- Obsidian reports no
+  // definition there, so removing the node was its answer and not merely a repair.
   "nested|quote > bullet > footnote": [
     "child ENDS AFTER parent: listItem > paragraph",
   ],
