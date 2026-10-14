@@ -18,7 +18,10 @@ import { endPoint } from "./comment-hoist.js";
  * and a reference Obsidian has neither of. Compose went 13 to 14 before this scoping, which
  * is the gate catching a rule applied one container type too wide.
  */
-const CONTAINERS = new Set(["callout"]);
+const SPLITTABLE: ReadonlyMap<string, ReadonlySet<string>> = new Map([
+  ["footnoteDefinition", new Set(["callout"])],
+  ["html", new Set(["list"])],
+]);
 
 /**
  * A definition a container absorbs LAZILY keeps only its own line.
@@ -47,6 +50,20 @@ const CONTAINERS = new Set(["callout"]);
  * continuation is its own content, which 42 corpus cases depend on, so this fires only
  * where a container precedes the definition with no blank line between them.
  *
+ * TWO SPACER TYPES, one rule -- the fifth instance of that shape here, after `splitLazyHtml`
+ * beside `splitLazyHeading` and the setext underline arriving as paragraph text or as a
+ * thematic break. An html block runs to a blank line, so micromark hands `<div>` and a `%%`
+ * under it over as ONE html node exactly as it spans a definition over its continuation:
+ *
+ *     - item / <div> / %%    obs  list@0, comment@2
+ *                            was  list@0 swallowing `html@1-2`
+ *
+ * `SPLITTABLE` therefore maps a spacer type to the hosts it may be split after, and the two
+ * entries differ: a definition is split after a CALLOUT, an html block after a LIST. Those
+ * are not symmetric and the asymmetry is measured -- a quote absorbs no html at all, so its
+ * `%%` already stays at root, and a definition after a list needs flattening this does not
+ * do.
+ *
  * Scored before it was built, and the first scoping was refuted. Truncating every
  * definition INSIDE a container costs 495 documents against 102 -- `> [!note]` /
  * `> [^a$]: est` / `>   more` is PREFIXED, so it is genuine container content with a real
@@ -64,10 +81,10 @@ export function definitionLazySplitTransform(
 
   const children = tree.children;
   for (let index = children.length - 1; index >= 1; index--) {
-    const definition = children[index];
+    const spacer = children[index];
     const previous = children[index - 1];
-    if (definition?.type !== "footnoteDefinition") continue;
-    if (!previous || !CONTAINERS.has(previous.type)) continue;
+    const hosts = spacer ? SPLITTABLE.get(spacer.type) : undefined;
+    if (!spacer || !hosts || !previous || !hosts.has(previous.type)) continue;
 
     // A callout holding ONLY its title. With a body line the definition does not survive at
     // all -- three referee documents say so, each a callout with prose before the label:
@@ -78,26 +95,29 @@ export function definitionLazySplitTransform(
     // against the title-only control where Obsidian reports `1@1:0-1`. Splitting in the
     // body case produced a definition it has none of, and the `--ids` diff is what named
     // them: the net figure moved by two while three documents were lost and one gained.
-    // NOTE FOR WIDENING THIS. The test is callout-shaped, so it rejects every `list`
-    // outright -- a list's child is a `listItem`, never a `calloutTitle`. Adding `"list"` to
-    // the set above therefore measures NOTHING: the trees come back byte-identical and that
-    // reads exactly like "the list case needs no change". It was dumped rather than inferred,
-    // which is the only reason this is written down.
+    // CALLOUT ONLY. This test is callout-shaped -- a list's child is a `listItem`, never a
+    // `calloutTitle` -- so running it unconditionally rejected every list outright and made
+    // widening `SPLITTABLE` measure NOTHING. The trees came back byte-identical, which reads
+    // exactly like "the list case needs no change"; dumping them rather than trusting that
+    // is the only reason it was caught.
     //
-    // So the list and quote halves are UNTESTED, not refuted. What IS measured is that
-    // splitting for them without flattening regresses -- `bullet` and
-    // `ordered > footnote > indented` went from agreeing to reporting a definition and a
-    // reference Obsidian has neither of. At parse time the root sibling is there under both
-    // list readings (`legacyLists` either way gives `list@0-0` then
-    // `footnoteDefinition@1-2`), so the work is in how `containerLazyTransform` and
-    // `footnoteInterruptTransform` then interact, not in finding the node.
-    const body = previous as { children?: RootContent[] };
-    if ((body.children ?? []).some((child) => child.type !== "calloutTitle")) {
-      continue;
+    // A `footnoteDefinition` after a LIST is still not split, and that half is UNTESTED
+    // rather than refused: splitting it without also flattening the definition regresses
+    // `bullet` and `ordered > footnote > indented` from agreeing to reporting a definition
+    // and a reference Obsidian has neither of. The node is present at parse time under both
+    // list readings, so the work is in how `containerLazyTransform` and
+    // `footnoteInterruptTransform` interact, not in finding it.
+    if (previous.type === "callout") {
+      const body = previous as { children?: RootContent[] };
+      if (
+        (body.children ?? []).some((child) => child.type !== "calloutTitle")
+      ) {
+        continue;
+      }
     }
 
-    const from = definition.position?.start?.offset;
-    const to = definition.position?.end?.offset;
+    const from = spacer.position?.start?.offset;
+    const to = spacer.position?.end?.offset;
     const previousEnd = previous.position?.end?.offset;
     if (from === undefined || to === undefined || previousEnd === undefined) {
       continue;
@@ -125,9 +145,24 @@ export function definitionLazySplitTransform(
     // spanning the departed line. Re-parsing each half gives every node a correct span by
     // construction.
     const head = reparse(source.slice(from, firstBreak)).children[0];
-    if (head?.type !== "footnoteDefinition") continue;
+    // The SAME node type back, or the split changed what the first line is. `<div>` alone is
+    // still `html` and `[^1]: def` alone is still a definition, so a different type means the
+    // fragment did not stand on its own and the spacer is left whole.
+    if (head?.type !== spacer.type) continue;
     const tail = reparse(source.slice(firstBreak + 1, to)).children;
     if (tail.length === 0) continue;
+
+    // SPLIT ONLY WHERE THE TAIL BECOMES A ROOT BLOCK. If the host absorbs that type anyway
+    // the split gains nothing and costs the tail its document-level extent, because the
+    // fragment re-parse cannot see past its own slice.
+    //
+    // A LIST absorbs every member of the measured asymmetry class -- setext, indented, math
+    // and html -- so for a list only a `comment` is left at root, a comment being absorbed by
+    // nothing. Splitting a list's html spacer regardless closed `bullet` and
+    // `ordered > html > comment` and broke `bullet` and `ordered > html > math` in the same
+    // run: an even trade at 11, which is the absorption map stating a condition this pass had
+    // not asked it for.
+    if (previous.type === "list" && tail[0]?.type !== "comment") continue;
 
     shiftOnto(head, from);
     for (const node of tail) shiftOnto(node, firstBreak + 1);

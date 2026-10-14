@@ -65,12 +65,23 @@ const GOLDEN = path.join(import.meta.dirname, "goldens/compose.json");
  *                       reports TWO sections there, the callout and a comment swallowing the
  *                       trailing paragraph.
  *
+ *                       `bullet` and `ordered > html > comment` are CLOSED too, by the same
+ *                       split with a second spacer type: an html block runs to a blank line,
+ *                       so micromark hands `<div>` and a `%%` under it over as ONE html node
+ *                       exactly as it spans a definition over its continuation.
+ *
+ *                       And the pass had to ask the absorption map a question it had not:
+ *                       splitting a list's html spacer regardless closed these two and broke
+ *                       `bullet` and `ordered > html > math`, an even trade. A list absorbs
+ *                       every member of the asymmetry class, so for a list only a `comment`
+ *                       is left at root -- split only where the tail becomes a ROOT block,
+ *                       or the tail loses its document extent to the fragment re-parse.
+ *
  *                       `bullet`, `ordered` and `quote > footnote > comment` remain for the
- *                       same reason their `indented` siblings do: a quote and a list report
- *                       `defs []`, so the definition must be FLATTENED as well as split.
- *                       `bullet` and `ordered > html > comment` are a DIFFERENT mechanism --
- *                       the spacer is an html block rather than a definition, so there is no
- *                       definition to split and the family has not been investigated.
+ *                       same reason their `indented` sibling does: a quote and a list report
+ *                       `defs []`, so the definition must be FLATTENED as well as split, and
+ *                       that is `containerLazyTransform` and `footnoteInterruptTransform`
+ *                       interacting rather than a guard.
  *     `quote > footnote > indented`  the CALLOUT half of this is CLOSED, and the split is
  *                       worth reading before touching the rest. Upstream reads `[^1]: def`
  *                       plus an indented line as ONE definition, so the continuation sits
@@ -101,9 +112,7 @@ const DIVERGING: Record<Axis, readonly string[]> = {
   inside: [],
   isolate: [
     "bullet > footnote > comment",
-    "bullet > html > comment",
     "ordered > footnote > comment",
-    "ordered > html > comment",
     "quote > footnote > comment",
     "quote > footnote > indented",
   ],
