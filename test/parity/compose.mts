@@ -243,6 +243,15 @@ if (dumpTo !== undefined || blastFrom !== undefined) {
       console.log(`    ${String(count).padStart(4)}  ${field}`);
     }
   }
+  if (rows.length === 0) {
+    console.log(
+      "\n  NO EVIDENCE. This oracle's answers are UNCHANGED by the edit, so it cannot\n" +
+        "  adjudicate it -- a clean result here is not a passing one. This harness's most\n" +
+        "  expensive mistake was a zero-regression reading from a corpus holding no case for\n" +
+        "  the rule, which read exactly like evidence and shipped a regression. Reach for a\n" +
+        "  probe wave (test/parity/ask.mts) instead of trusting this.",
+    );
+  }
   const silent = rows.filter((row) => row.bucket === "still wrong");
   if (silent.length > 0) {
     console.log(

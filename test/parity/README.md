@@ -3119,6 +3119,60 @@ So the audit's score: of seven `PARITY_*` variables, five are genuine parameters
 were deferred work are now scheduled. **Nothing in the harness is now gated on someone
 remembering to run it.**
 
+### The last lesson without a tool, and it was already measured
+
+Every doctrine in this file got an instrument this session except the most expensive one:
+
+> A zero-regression measurement proves nothing if the corpus cannot adjudicate the rule.
+> Before trusting one, **count the cases that exercise the rule** -- and if the answer is zero,
+> the measurement has told you nothing.
+
+That cost a shipped regression, and the guard against it was a one-line predicate re-written by
+hand every time. **It needs no new tool, because `--blast` already computes it from the other
+side**: `answers ALTERED` IS the count of cases a change exercises. A clean gate with zero
+altered answers is not a pass, it is an absence of evidence -- and nothing said so.
+
+All three blast tools now say it:
+
+    answers ALTERED : 0 of 3403
+      gained 0   lost 0   still wrong 0
+
+      NO EVIDENCE. This oracle's answers are UNCHANGED by the edit, so it cannot
+      adjudicate it -- a clean result here is not a passing one. [...]
+      Reach for a probe wave (test/parity/ask.mts) instead of trusting this.
+
+Checked both ways: it fires on the corpus for this session's `src` work, which really is
+unadjudicable there, and it stays silent on the referee's 4 altered answers. **The two readings
+that look identical on a summary -- "nothing broke" and "nothing was measured" -- are now
+printed differently**, which is the whole of that lesson expressed as output rather than as a
+habit.
+
+### What still does NOT suffice, stated plainly
+
+Three things, none of which a flag fixes:
+
+- **`score.mts` still re-derives what the passes compute.** Eleven hand-rolled `MARKER`,
+  `PREFIX` and column loops remain across its candidates. That is the exact class that refuted
+  six B3 premises by their own arithmetic, and only ONE candidate was converted to call the
+  shipped `contentColumn`. Every remaining candidate keyed on a content column, a marker width
+  or an indent is suspect until it calls the real function, and a refutation from one of them
+  should be re-run before it is believed.
+- **The probes are not in the corpus.** The 76 `rules-doc` cases and the 10 B3 cases are gated
+  by their own goldens, which is why B3 was landable -- but they are not in `corpus.ts`, so the
+  main gate and every sweep built on it still cannot see those shapes. Promotion needs
+  `parity:record`, which rewrites all 3,403 goldens and this project reserves for a human.
+- **Oracle coverage, which is not a gate property at all.** `footnoteRefs` lists only
+  references whose name HAS a definition, so it cannot adjudicate the reference side without
+  the synthesised-definition trick; 8 of 14 inline constructs report nothing to
+  `metadataCache`; and `P1`/`P2` are cache defects that must NOT be reproduced, so four
+  composition rows and several positional ones have a floor above zero by design. No
+  instrument can close these -- they are what the application exposes.
+
+So the measuring devices are in order and two known-weak spots remain inside them: the scorer's
+re-derivations, and the corpus's blindness to the probe shapes. Both are tractable and neither
+blocks working the referee queue, as long as a refusal from `score.mts` is treated as a lead
+rather than a verdict.
+
 ## Tracing their SOURCE finds rules their document does not letter
 
 Their rules document was mined once and gave five gaps, all now closed. Their source is a

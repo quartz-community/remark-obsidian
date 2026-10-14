@@ -237,6 +237,15 @@ if (blastFrom !== undefined) {
   for (const bucket of ["gained", "lost", "still wrong", "equivalent"]) {
     console.log(`    ${bucket.padEnd(12)} ${buckets.get(bucket) ?? 0}`);
   }
+  if (blast.length === 0) {
+    console.log(
+      "\n  NO EVIDENCE. This oracle's answers are UNCHANGED by the edit, so it cannot\n" +
+        "  adjudicate it -- a clean result here is not a passing one. This harness's most\n" +
+        "  expensive mistake was a zero-regression reading from a corpus holding no case for\n" +
+        "  the rule, which read exactly like evidence and shipped a regression. Reach for a\n" +
+        "  probe wave (test/parity/ask.mts) instead of trusting this.",
+    );
+  }
   const silent = blast.filter((row) => row.bucket === "still wrong");
   if (silent.length > 0) {
     console.log(
