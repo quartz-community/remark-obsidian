@@ -140,20 +140,30 @@ const INVARIANT_VIOLATIONS: Record<string, readonly string[]> = {
   "isolate|linkdef > paragraph > thematic": [
     "SIBLINGS OVERLAP: root > definition/heading",
   ],
-  // OURS. Both involve a list absorbed into a container, the same family the diverging-row
-  // table above attributes.
+  // OURS, and down to ONE. A lazy `[^1]: def` is absorbed into the item's paragraph, which
+  // is stretched to cover it, but the `listItem` between the `list` and that paragraph is
+  // not -- `blockquote 0->18` and `list 2->18` are both correct while `listItem 2->8` holds
+  // a `paragraph 4->18`. `container-lazy.ts` already stretches a `descended` chain for
+  // exactly this reason, so the `listItem` is missing FROM that chain rather than the idea
+  // being absent. Not yet traced to the pass that builds it.
   //
-  // The two NEGATIVE-SPAN defects that used to sit here are FIXED. `lazySetextTransform` set
-  // a node's end to `keepTo` without checking whether the node began at the line that was
-  // leaving, so `footnoteDefinition` came out 16 -> 15 and `text` 8 -> 7. `pruneEmptied`
-  // drops a node lying wholly past the cut instead, which also closed
-  // `isolate|callout > footnote > thematic` as a divergence -- Obsidian reports no
-  // definition there, so removing the node was its answer and not merely a repair.
+  // THREE fixed, all the same shape -- a node on the path was skipped:
+  //
+  //   `start AFTER end: footnoteDefinition` 16 -> 15 and `start AFTER end: text` 8 -> 7,
+  //   both from `lazySetextTransform` setting an end to `keepTo` without asking whether the
+  //   node BEGAN at the departing line. `pruneEmptied` drops a node lying wholly past the
+  //   cut, which also closed `isolate|callout > footnote > thematic` as a divergence --
+  //   Obsidian reports no definition there, so removal was its answer, not merely a repair.
+  //
+  //   `child ENDS AFTER parent: blockquote > list`, from the same pass shrinking only the
+  //   ENDPOINTS of its descent -- container and host -- while the helper finding the host
+  //   had descended THROUGH the `list`. It is now `paragraphHostPath`, returning the whole
+  //   path so every node on it shrinks.
+  //
+  // So the remaining one is the mirror image of that third fix: a chain stretched OUTWARD
+  // with a node missing, rather than shrunk inward with one missing.
   "nested|quote > bullet > footnote": [
     "child ENDS AFTER parent: listItem > paragraph",
-  ],
-  "nested|quote > bullet > setext": [
-    "child ENDS AFTER parent: blockquote > list",
   ],
 };
 

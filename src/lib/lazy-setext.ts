@@ -108,8 +108,9 @@ export function lazySetextTransform(
 
     // The quote keeps everything above the line that leaves.
     const keepTo = contentFrom - 1;
-    const host = lastParagraphHost(container);
-    if (!host) continue;
+    const path = paragraphHostPath(container);
+    if (!path) continue;
+    const host = path[path.length - 1]!;
     const paragraph = host.children[host.children.length - 1] as
       Paragraph | undefined;
     if (paragraph?.type !== "paragraph") continue;
@@ -136,7 +137,8 @@ export function lazySetextTransform(
       for (const child of rebuilt.children) shiftOnto(child, pFrom);
       paragraph.children = rebuilt.children;
     }
-    for (const node of [container, host, paragraph]) {
+    // `path[0]` IS the container, so it is shrunk here rather than named separately.
+    for (const node of [...path, paragraph]) {
       if (node.position) node.position.end = { ...pointOf(source, keepTo) };
     }
     pruneEmptied(container, keepTo);
@@ -198,7 +200,13 @@ function pruneEmptied(parent: RootContent, keepTo: number): void {
 }
 
 /**
- * The node whose children hold the quote's trailing paragraph, at any DEPTH.
+ * EVERY node from the container down to the one holding the trailing paragraph.
+ *
+ * The path, not just its endpoint, because all of it has to shrink. Returning only the host
+ * left the nodes DESCENDED THROUGH spanning the departed line: `> - item` / `title` / `===`
+ * gave `blockquote 0->8` holding `list 2->18`, a child outliving its parent, since the loop
+ * below shrank the container and the host -- the blockquote and the `listItem` -- while the
+ * `list` between them was never named.
  *
  * It used to return the container itself, which is only right at one level of nesting:
  * `> > quote` / `title` / `===` has an inner `blockquote` as the outer one's last child, so
@@ -207,19 +215,19 @@ function pruneEmptied(parent: RootContent, keepTo: number): void {
  * depths, so the depth-sensitivity was entirely ours. `compose.mts --nested` found it in four
  * of its six nestings.
  */
-function lastParagraphHost(
-  container: RootContent,
-): { children: RootContent[]; position?: Node["position"] } | null {
+function paragraphHostPath(container: RootContent): Host[] | null {
   const host = container as unknown as { children?: RootContent[] };
   if (!Array.isArray(host.children)) return null;
 
   const last = host.children[host.children.length - 1];
   if (last && last.type !== "paragraph") {
-    const deeper = lastParagraphHost(last);
-    if (deeper) return deeper;
+    const deeper = paragraphHostPath(last);
+    if (deeper) return [host as Host, ...deeper];
   }
-  return host as { children: RootContent[]; position?: Node["position"] };
+  return [host as Host];
 }
+
+type Host = { children: RootContent[]; position?: Node["position"] };
 
 /**
  * Strip a RUN of quote markers from a line, not just one.
