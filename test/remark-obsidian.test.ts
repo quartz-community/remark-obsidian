@@ -2995,9 +2995,16 @@ describe("html setext inside a container", () => {
     expect(shape("- <br>\n\n===\n")).toBe(
       "list(listItem(html)) + paragraph(text)",
     );
-    expect(shape("- <br>\nplain\n")).toBe(
-      "list(listItem(html paragraph(text)))",
-    );
+    // The html SWALLOWS the plain line, which is the point of the control: no heading forms
+    // either way, and the line below an html block inside a container is that block's content
+    // rather than a paragraph of its own.
+    //
+    // This read `list(listItem(html paragraph(text)))` and was asserting our own behaviour
+    // rather than the app's. Asked of live 1.14.4, Obsidian indexes NOTHING on that line for
+    // `<br>`, `<div>` or `<span>` alike -- their B4, "HTML blocks inside items and quotes run
+    // on through column-0 lines" -- so `itemHtmlExtentTransform` was widened to match and this
+    // expectation moved with it.
+    expect(shape("- <br>\nplain\n")).toBe("list(listItem(html))");
   });
 
   it("still handles the root form", () => {

@@ -43,7 +43,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import type { Root } from "mdast";
+import type { Root, RootContent } from "mdast";
 
 import { refereeFactsWithTree, type Def, type Ref } from "./referee-facts.js";
 
@@ -148,6 +148,38 @@ function nestedColumn(
       return want === d[2] ? d : [d[0], d[1], want, d[3]];
     }),
   };
+}
+
+/**
+ * References on a paragraph that an html sibling would have swallowed, dropped.
+ *
+ * Shared by the two html-extent candidates so the only thing that varies between them is the
+ * set of hosts, which is the whole measurement.
+ */
+function dropRefsAfterHtml(
+  text: string,
+  ours: Facts,
+  tree: Root,
+  hosts: ReadonlySet<string>,
+): Facts {
+  const dead = new Set<number>();
+  const walk = (node: unknown): void => {
+    const self = node as { type?: string; children?: RootContent[] };
+    if (self.type !== undefined && hosts.has(self.type) && self.children) {
+      for (let index = 0; index < self.children.length - 1; index++) {
+        const html = self.children[index];
+        const next = self.children[index + 1];
+        if (html?.type !== "html" || next?.type !== "paragraph") continue;
+        const from = next.position?.start.line;
+        const to = next.position?.end.line;
+        if (from === undefined || to === undefined) continue;
+        for (let line = from - 1; line <= to - 1; line++) dead.add(line);
+      }
+    }
+    for (const child of self.children ?? []) walk(child);
+  };
+  walk(tree);
+  return { defs: ours.defs, refs: ours.refs.filter((r) => !dead.has(r[1])) };
 }
 
 const RULES: readonly Rule[] = [
@@ -820,6 +852,38 @@ const RULES: readonly Rule[] = [
         }),
       };
     },
+  },
+  {
+    name: "html-extent-item-block-tag",
+    what: "a BLOCK TAG html in a list item swallows the following paragraph, as `<!--` already does",
+    // `itemHtmlExtentTransform` carries this for the `<!--` opener only, and its own docstring
+    // records why: over the referee corpus, `<!--` was unanimous at 58 of 58 while a bare
+    // block tag was 27 of 29, so the block tag was left pending its own evidence. This is that
+    // evidence, asked as a score rather than as a count.
+    apply: (text, ours, tree) =>
+      dropRefsAfterHtml(text, ours, tree, new Set(["listItem"])),
+  },
+  {
+    name: "html-extent-any-container",
+    what: "...and in a quote or callout too, not only a list item",
+    // Their B4 states it for every container: "Fences, `$$` blocks, and HTML blocks inside
+    // items and quotes run on through column-0 lines." The pass is scoped to `listItem`, and
+    // these are the shortest `ref-extra` members in the queue:
+    //
+    //     2) <div> / Text[^2]        obs indexes nothing; we index a reference at 1:4
+    //     > <div> / Text[^2]         the same in a quote
+    //     > [!info] / ⇥Prose [^3]    the same in a callout
+    //
+    // At ROOT the html already swallows the line -- `<div>` over `Text[^2]` is one
+    // `html@0-1` with no reference at all -- so this is the container case of a rule micromark
+    // already applies, which is the shape that lands here.
+    apply: (text, ours, tree) =>
+      dropRefsAfterHtml(
+        text,
+        ours,
+        tree,
+        new Set(["listItem", "blockquote", "callout"]),
+      ),
   },
   {
     name: "comment-burial-ends-at-blank",
