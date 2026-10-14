@@ -1211,29 +1211,39 @@ definition column.
 | `--matrix`       |        80 |      5 | **0** |
 | `--inside`       |        64 |      2 | **0** |
 | `--inline`       |       196 |      1 | **0** |
-| `--isolate`      |       140 |     43 | 4     |
+| `--isolate`      |       140 |     43 | **0** |
 | `--nested`       |       192 |     13 | 1     |
 | `--inline-block` |       224 |      4 | 4     |
 
-**Four of the seven axes are at zero**, and `--inline-block` is at its floor rather than open
--- all four of its rows are the P1 cache defect and MUST NOT be fixed. Of the nine remaining,
-the `--nested` row is scored and declined, so the LIVE backlog is **four rows**, all in
-`--isolate` and all one cause: a definition a quote or a list absorbed lazily has to be
-FLATTENED as well as split.
+**SIX of the seven axes are at zero, and the LIVE BACKLOG IS NONE.** `--inline-block` sits at
+its floor rather than open -- all four of its rows are the P1 cache defect and MUST NOT be
+fixed -- and the single `--nested` row is scored both ways and declined. So every composition
+row that remains is one this harness has decided not to close.
 
-The isolate axis went 43 to 4 and the last eight of that came from a single insight, which is
-worth stating because the entries had been filed as two separate families with two separate
-causes: upstream spans the SPACER over its continuation line, so the third line of
-`container / spacer / absorbable` is inside the spacer where no absorption guard can see it.
-Splitting the spacer at its own line hands each tail to the rule that already governs it. Two
-spacer types, `footnoteDefinition` and `html`, and the per-type guard was right all along --
-`--matrix` has been clean at 0 of 80 throughout.
+The isolate axis went **43 to 0**, and the last twelve of that came from one insight, worth
+stating because the entries had been filed as two separate families with two separate causes
+and one of them written off as tokenizer-level work: upstream spans the SPACER over its
+continuation line, so the third line of `container / spacer / absorbable` sits inside the
+spacer where no absorption guard can reach it. Splitting the spacer at its own line hands each
+tail to the rule that already governs it. Two spacer types, `footnoteDefinition` and `html`,
+and the per-type guard was right all along -- `--matrix` has been clean at 0 of 80 throughout.
 
-Three refutations on the way to it, each from a different instrument and none able to find the
-others': `score.mts` killed the premise "a definition inside a container" (495 worse, because
-a PREFIXED definition is genuine container content), the compose gate killed the container
-scoping (13 to 14, because a quote and a list need the flattening too), and the referee's
-`--ids` diff killed the callout scoping (3 lost behind a total that read as unchanged, because
+Splitting alone was not enough twice over, and both gaps were about a FRAGMENT RE-PARSE not
+seeing the document. An unclosed `%%` tail needs the end of the note, which a two-character
+re-parse cannot know. And the head definition has to be FOLDED for a list or a quote, where
+Obsidian reports `defs []` against a callout's `1@1:0-1` -- `footnoteInterruptTransform` does
+that fold and was declining because it read adjacency from LINE numbers while the splitting
+pass moves nodes by offset, leaving every line at 1. Those two fixes are useless apart and
+were measured together.
+
+FIVE refutations on the way to it, each from a different instrument and not one able to find
+what the others found: `score.mts` killed the premise "a definition inside a container" (495
+worse, because a PREFIXED definition is genuine container content), the compose gate killed
+the container scoping (13 to 14, because a quote and a list need the flattening too) and then
+the tail scoping (an even trade, because a list absorbs everything in the asymmetry class),
+the corpus killed the gap character class (four cases, because a definition inside a quote
+carries `\n> ` in the gap), and the referee's `--ids` diff killed the callout scoping (3 lost
+behind a total that read as unchanged, because
 a callout with a BODY reports no definition at all). A fourth came from the gate again: the
 split must fire only where the tail becomes a ROOT block, or a list's html spacer trades
 `html > comment` for `html > math` at no net gain.
