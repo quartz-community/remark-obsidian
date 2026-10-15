@@ -99,6 +99,7 @@ import { closingPreInterruptSyntax } from "./lib/syntax/closing-pre-interrupt.js
 import { labelOpenerWikilinkTransform } from "./lib/label-opener-wikilink.js";
 import { autolinkLiteralExtentTransform } from "./lib/autolink-literal-extent.js";
 import { definitionColumnTransform } from "./lib/definition-column.js";
+import { definitionDeindentCodeTransform } from "./lib/definition-deindent-code.js";
 import { definitionSetextTransform } from "./lib/definition-setext.js";
 import { listDeepContinuationTransform } from "./lib/list-deep-continuation.js";
 import { invisibleBlankLineTransform } from "./lib/invisible-blank-line.js";
@@ -851,6 +852,12 @@ export default function remarkObsidian(
       // fields, so re-running it on an already-classified tree changes nothing.
       mathDisplayTransform(tree, String(file));
       bareFootnoteRefTransform(tree, String(file));
+      // Before the column pass, because it decides whether there is a definition to give a
+      // column to at all: B3's minimum moves the indented-code threshold with the content
+      // column, so a label four past the lowered floor is code and Obsidian reports none.
+      definitionDeindentCodeTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
       // Last of the footnote passes, so it sees every definition in its final place.
       definitionColumnTransform(tree, String(file));
       // After the reference passes, because the tree is what can say whether the `]`

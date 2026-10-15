@@ -1285,7 +1285,34 @@ const RULES: readonly Rule[] = [
             const at = self.position.start.line - 1;
             const raw = lines[at] ?? "";
             const own = PREFIX.exec(raw)?.[0].length ?? 0;
-            if (columnsOf(raw.slice(own)) + own >= column + 4) drop.add(at);
+            const body = raw.slice(own);
+            // CHARACTERS, not expanded columns -- a tab counts as ONE, which is the unit
+            // `contentColumn` reports in and the unit Obsidian answers in. Measured:
+            // `- a` / `⟨4sp⟩- b` / `⇥⇥- [^1]: def` is column 4, so `⇥⇥- ` is four and not ten.
+            // The earlier version expanded tabs here and compared 8 against a content column of
+            // 4, which is what cost it 17 documents.
+            // A TAB AFTER A SPACE does not reach the code threshold, which
+            // `definition-column.ts` records from the arbiter and six probes confirm: a
+            // LEADING tab counts its four columns, one after a space counts nothing. So
+            // `- p` / `⟨5sp⟩⇥[^1]: def` is five for this purpose and keeps its definition at
+            // column 2, where counting the tab made it six and dropped it.
+            // CHARACTERS, a tab counting ONE, and a tab that follows a space ending the
+            // count. Both halves are measured:
+            //
+            //   `- a` / `⟨4sp⟩- b` / `⇥⇥- [^1]: def`   column 4, so `⇥⇥` is TWO, not eight --
+            //                                          expanding leading tabs here cost 3
+            //   `- p` / `⟨5sp⟩⇥[^1]: def`              column 2, so the tab after five spaces
+            //                                          adds NOTHING, which is the arbiter rule
+            //                                          `definition-column.ts` already carries
+            const run = body.slice(0, body.length - body.trimStart().length);
+            let indent = 0;
+            let sawSpace = false;
+            for (const character of run) {
+              if (character === "\t" && sawSpace) break;
+              if (character === " ") sawSpace = true;
+              indent += 1;
+            }
+            if (indent + own >= column + 4) drop.add(at);
           }
         }
         for (const child of self.children ?? []) scan(child);
