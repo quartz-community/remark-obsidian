@@ -57,6 +57,20 @@ const indentConstruct: Construct = {
 };
 
 /**
+ * Flow constructs whose content is LITERAL, so no line inside one can be a sibling marker.
+ *
+ * That is the whole justification for admitting a shallower line while one is open -- see
+ * `tokenizeIndent`. `mathFlow` belongs here for the same reason `codeFenced` does, and it was
+ * measured rather than assumed: `*⟨4sp⟩$$` / `⟨3sp⟩x` / `⟨3sp⟩[^2]: y` / `⟨5sp⟩$$` reports no
+ * reference in Obsidian and reported one here until it was added.
+ *
+ * `htmlFlow` is deliberately ABSENT: `*⟨4sp⟩<div>` / `⟨3sp⟩x` / `⟨3sp⟩[^2]: y` already agrees,
+ * because an html block's own continuation rules keep the line. Adding it would be a change
+ * with nothing to fix.
+ */
+const LITERAL = new Set(["codeFenced", "mathFlow"]);
+
+/**
  * Replaces the list container, for Obsidian's more permissive list rules.
  *
  * Registered under every marker character stock `list` answers to, so this
@@ -376,7 +390,7 @@ function tokenizeIndent(
     }
     let depth = 0;
     for (const [kind, token] of child?.events ?? []) {
-      if (token.type !== "codeFenced") continue;
+      if (!LITERAL.has(token.type)) continue;
       depth += kind === "enter" ? 1 : -1;
     }
     return depth > 0;
