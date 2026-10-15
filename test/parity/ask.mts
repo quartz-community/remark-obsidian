@@ -37,6 +37,8 @@ import fs from "node:fs";
 
 interface Answer {
   readonly markdown: string;
+  /** Which Obsidian answered. The goldens pin 1.14.4; anything else is a different parser. */
+  readonly obsidian: string;
   readonly compute: unknown;
   readonly synth?: {
     readonly safe: boolean;
@@ -127,6 +129,34 @@ if (alive !== "function") {
   process.exit(1);
 }
 
+/**
+ * Which Obsidian answered, stamped into the output the way the recorder stamps `apiVersion`.
+ *
+ * The goldens pin 1.14.4 and the referee's answers were recorded against one release, so a
+ * probe answered by a different one is measuring a different parser -- and until now nothing
+ * in this output said which. That is not hypothetical: a 1.15.0 alpha was started at 19:03
+ * on the day this was written, two minutes after the last probe of a session that derived
+ * three rules, and only the process start time distinguished those answers from 1.15.0's.
+ *
+ * `require('obsidian')` is not resolvable in the eval context, so the version comes from
+ * Electron's own app record, with the candidates tried in order and `null` when none answer.
+ */
+const askedVersion =
+  [
+    "window.electron?.remote?.app?.getVersion?.()",
+    "window.require?.('electron')?.remote?.app?.getVersion?.()",
+    "app.appVersion",
+  ].reduce<string | null>((found, expression) => {
+    if (found !== null) return found;
+    const raw = evaluate(`JSON.stringify(${expression} ?? null)`);
+    try {
+      const value: unknown = JSON.parse(raw);
+      return typeof value === "string" && value !== "" ? value : null;
+    } catch {
+      return null;
+    }
+  }, null) ?? "UNKNOWN";
+
 // With `--synth` every question is asked TWICE: as written, and with a definition appended for
 // each undefined name. The pair is what lets the safety check below compare the original region.
 const asked: string[] = wantSynth
@@ -168,7 +198,8 @@ const within = (list: readonly Positioned[] | undefined, limit: number) =>
   );
 
 const result: Answer[] = questions.map((markdown, index) => {
-  if (!wantSynth) return { markdown, compute: answers[index] };
+  if (!wantSynth)
+    return { markdown, obsidian: askedVersion, compute: answers[index] };
   const plain = answers[index * 2] as
     { footnotes?: Positioned[]; sections?: Positioned[] } | undefined;
   const synth = answers[index * 2 + 1] as
@@ -196,6 +227,7 @@ const result: Answer[] = questions.map((markdown, index) => {
     appended === wanted;
   return {
     markdown,
+    obsidian: askedVersion,
     compute: plain,
     synth: {
       // False means the appended definitions changed the document's OWN parse -- an unclosed
@@ -246,5 +278,21 @@ if (!wantSynth) {
       "     Re-ask with --synth before concluding anything from it.",
     );
   }
+}
+const PINNED = (
+  JSON.parse(
+    fs.readFileSync(new URL("goldens/obsidian.json", import.meta.url), "utf8"),
+  ) as { obsidian?: { app?: string } }
+).obsidian?.app;
+if (askedVersion !== PINNED) {
+  console.error(
+    `ask: ANSWERED BY OBSIDIAN ${askedVersion}, but the goldens pin ${PINNED ?? "?"}.`,
+  );
+  console.error(
+    "     These answers describe a DIFFERENT parser than the corpus and the referee.",
+  );
+  console.error(
+    "     Fine for characterising a release; do not settle a rule against the goldens with it.",
+  );
 }
 console.log(JSON.stringify(result, null, 2));
