@@ -1810,6 +1810,54 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "def-end-drops-tab-line",
+    what: "a definition does not absorb a following TAB-indented line",
+    // `def-end+1` is the largest positional family at 99 documents, and all six of its shortest
+    // members are the same shape -- we absorb a tab-indented line into the definition and
+    // Obsidian does not:
+    //
+    //     ⟨2sp⟩10.⇥[^b]: def / ⇥# heading            obs end 0, ours 1
+    //     >>[^ä]: def        / ⇥More                 obs end 0, ours 1
+    //     ⟨3sp⟩1.⟨4sp⟩[^Note]: Definition / ⟨5sp⟩⇥- item  obs end 0, ours 1
+    //     -⟨4sp⟩[^ä]: Definition / ⟨2sp⟩⇥# heading   obs end 0, ours 1
+    //     > [^x-y]: More...  / > ⇥$$                 obs end 1, ours 2
+    //
+    // THE DIRECTION IS THE POINT. An earlier candidate read this family as needing the end
+    // EXTENDED on a tabbed line and scored 17/44 -- because `shapes.mts` prints
+    // `obs -> ours` and I had it backwards. The family wants TRUNCATION, and the tab was the
+    // right signal read the wrong way round.
+    //
+    // AND IT IS STILL WRONG: better 25, worse 188. Pulling back on a tabbed line breaks 188
+    // definitions that legitimately DO absorb one. The six shortest members misdescribe the
+    // family -- fifth time selection-by-brevity has done that in two sessions -- and
+    // classifying all 151 entries by WHAT the absorbed line is gives the real shape:
+    //
+    //     85  quote        17  comment      12  list marker    9  math
+    //      8  another label  8  heading      5  fence          4  tab-indented text
+    //
+    // So `def-end+1` is 56% QUOTE LINES, which is the `quote-truncate` family this file already
+    // records as refused at 91 better against 395 worse -- and which the tree-split re-ask
+    // confirmed at an identical 19% ratio whether the definition sits at root or inside a
+    // quote. The remaining 66 entries are seven mechanisms of four to seventeen.
+    //
+    // The tab bucket this candidate was built for is FOUR entries. Nothing in this family is
+    // worth building, and that is now established from both ends: the largest slice is refused
+    // with numbers and the tail has no slice big enough to matter.
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      return {
+        refs: ours.refs,
+        defs: ours.defs.map((d): Def => {
+          if (d[3] <= d[1]) return d;
+          const last = lines[d[3]] ?? "";
+          const run = last.slice(0, last.length - last.trimStart().length);
+          if (!run.includes("\t")) return d;
+          return [d[0], d[1], d[2], d[3] - 1];
+        }),
+      };
+    },
+  },
+  {
     name: "ref-before-label-wins",
     what: "a `[^name]` stays a footnote reference even when a `[` follows it",
     // `a[^1][^2]` becomes a `linkReference#^2` with the text `^1` -- a FULL link reference --

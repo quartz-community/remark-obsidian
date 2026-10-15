@@ -1511,6 +1511,63 @@ list item, blocked on bounding the math node's extent at its opener before the d
 absorb it. The reference families (`ref-miss` 201, `ref-extra` 196) remain the biggest counts
 and remain mostly cascades from the definition side.
 
+### 5502 to 5702: what the tokenizer route returned, and the number refused along the way
+
+Thirteen fixes. The last five are one thread, and it is the thread this file had pointed at
+five separate times without being able to walk it:
+
+| landed                                              | referee |
+| --------------------------------------------------- | ------: |
+| a fence in a list item keeps shallower lines        |     +37 |
+| `$$` the same way, `htmlFlow` deliberately not      |     +16 |
+| a capped item keeps a line above its content column |     +28 |
+
+**What unlocked it was a restriction derived from the construct.** B3's minimum applied in the
+tokenizer was refuted the night before at -32 referee and four CommonMark list cases, because a
+shallower line is how a SIBLING MARKER announces itself. Inside a fence it cannot be -- fence
+content is literal -- and that is a property of fences rather than a narrowing fitted to the
+losses. The four list cases stayed green throughout.
+
+**And the container CAN see the flow**, which was the open question that made the route look
+closed. The document tokenizer's own events hold container tokens only, so scanning them for
+`codeFenced` finds nothing. The flow events live in the child tokenizer micromark attaches to
+each `chunkFlow` token, and every chunk on a line shares one: an `enter:codeFenced` with no
+matching `exit` is an open fence.
+
+#### A repair scored +7 where the tokenizer was worth +37
+
+The same rule as a repair pass -- extend the fence node, drop the buried siblings, re-parse the
+tail -- scored `better 8 / worse 1` and was recorded as too risky to build. In the tokenizer the
+identical rule is worth five times as much, because it fixes the STRUCTURE rather than filtering
+the facts a wrong structure produced. Worth remembering the next time a repair looks cheaper.
+
+#### The bigger number that was refused
+
+Admitting a shallower line for ANY item, excluding only lines that could start a marker, scores
+**referee +52 at 74 gained / 21 lost** -- nearly double the landing that replaced it. Refused,
+because "exclude markers" is exclude-what-broke rather than a property of anything, and the 21
+losses are documents where we were RIGHT and became WRONG, each with a definition moving from
+root into the item's column. The version that shipped has a derivation instead:
+
+    ⟨2sp⟩1.⟨5sp⟩Prose here / ⟨4sp⟩[^1]: Definition    obs 1@1:4 -- the line JOINS the item
+    10.⟨2sp⟩Moreend.       / ⟨2sp⟩[^ä]: Some words    obs ä at ROOT, column 0
+
+The CAP is what differs, and `otherPrefix` is reached exactly when it fires.
+
+#### `def-end+1` is closed from both ends
+
+The largest positional family at 151 entries, and classifying all of them -- rather than
+reading the six shortest, which misdescribed it for the fifth time -- gives:
+
+    85  quote        17  comment      12  list marker    9  math
+     8  another label  8  heading      5  fence          4  tab-indented text
+
+56% are quote lines, which is the `quote-truncate` family this file already refuses at 91
+better against 395 worse. The tail is seven mechanisms of four to seventeen. A candidate built
+for the tab bucket -- which is FOUR entries -- scored 25/188. Nothing in the family is worth
+building, and that now holds from both directions: the largest slice is refused with numbers
+and no slice in the tail is big enough to matter.
+
 ### The queue after the reference work, and one finding left unfitted
 
 `ref-miss` collapsed from 203 to 126 when adjacent references landed, and the remaining
