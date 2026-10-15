@@ -1926,6 +1926,94 @@ The third is worth keeping as a test rather than an example: it shows the remedy
 recommends actually answers the question, recovering both undefined names with the safety
 check green.
 
+## Characterising a release without the recorder, because the recorder cannot
+
+Asked to diff Obsidian 1.15.0 against the committed goldens. The documented route does not
+work, and finding that out took four full recordings.
+
+### `OBSIDIAN_APP_PATH` is accepted, echoed back, and never used
+
+`wdio-obsidian-service@3.3.0` resolves the app version against its own
+`obsidian-versions.json` BEFORE it consults `appPath`:
+
+    OBSIDIAN_APP_PATH=<1.15.0 asar>                 ran 1.14.4, override ignored
+    ...and OBSIDIAN_APP_VERSION=1.15.0              SevereServiceError in 15s,
+                                                     `No Obsidian app version "1.15.0" found`
+    ...and a synthesised manifest entry             resolution passes, getter reports 1.15.0,
+                                                     bundle still reports apiVersion 1.14.4
+
+An alpha is never in the manifest, which is exactly when the hatch is wanted. `wdio.conf.mts`
+now synthesises the manifest entry and passes it through the service's own `versionsUrl`
+option, gated on `OBSIDIAN_APP_PATH` so CI is untouched -- and that gets past resolution
+without getting the app loaded. **The asar's atime did not move across any of the four
+recordings.** The code honouring `appPath` sits on another route, beside the appium options.
+
+So the README's escape hatch was aspirational: it had never been exercised, because until now
+app and installer were always the same version and nobody could tell.
+
+### A 1.14.4-vs-1.14.4 diff reads exactly like "nothing changed"
+
+This is the part worth internalising. The first recording completed, wrote 3,417 goldens,
+stamped a plausible version, and produced a two-case diff -- and I nearly reported it as a
+clean 1.15.0 result. Both of those two cases were the `KNOWN_PROXY_DIVERGENCES` entries, moved
+because I snapshotted the golden before the Reading View cross-check wrote its corrections.
+
+`oracle.e2e.ts` now prints `apiVersion`, the installer and the getter SEPARATELY, because
+`apiVersion ?? getObsidianVersion()` cannot be read backwards -- a stamp of 1.14.4 means either
+"the bundle said 1.14.4" or "the bundle said nothing and this is the installer". It also reads
+the override asar's own version and refuses to write a golden when that disagrees with the
+running bundle. That guard then fired on a real failure, which is how the four-recording story
+above ends.
+
+### The version is not on any property path
+
+Obsidian's version is a minified module-local constant, renamed every build:
+
+    1.15.0 asar   var Kpe=1e3/60,__=16,Zr="1.15.0",xE="28.2.3";
+    1.14.4 asar   foe=1e3/60,voe=16,goe="1.14.4",moe="28.2.3"
+
+so every in-app route is wrong or absent, and the CLI's own subcommand is the only one that
+answers:
+
+    app.apiVersion / app.appVersion / app.version   no output
+    electron.remote.app.getVersion()                1.14.4, for a running 1.15.0
+    ipcRenderer.sendSync("version")                 1.14.4, for a running 1.15.0
+    obsidian version                                1.15.0 (installer 1.15.0)
+
+The guard in `oracle.e2e.ts` anchors on the `1e3/60` frame constant beside it. Extraction
+failing is deliberately NOT fatal -- 1.13.7 does not match the anchor -- while a successful
+extraction that disagrees is.
+
+### So: `release-diff.mts`, and 1.15.0 moves nothing
+
+The CLI channel talks to whatever is actually running, so it can answer for a build the
+recorder cannot load. `release-diff.mts` asks it every corpus document and projects the answers
+through the recorder's own formatter:
+
+    release-diff: goldens pin 1.14.4, running 1.15.0
+      asking 3417 documents in chunks of 150
+      DOCUMENTS WHOSE ANSWER MOVED: 0 of 3417
+
+**Forty seconds, against ten minutes for a recording**, and no goldens written. Across all
+3,417 documents and eleven cache projections, 1.15.0 changes nothing this harness can see --
+consistent with the change that prompted the question being a Live Preview decoration class,
+which `metadataCache` cannot see by construction.
+
+Two things make that zero trustworthy, and neither is optional:
+
+- **It found a bug in itself first.** Projecting `frontmatterLinks` with the shared `reference`
+  formatter reported both frontmatter wikilink cases as release changes when nothing had moved
+  -- that field carries the frontmatter KEY and no span. Same phantom-divergence shape as the
+  `headings` projection carrying `@line:col` on one side only, which cost 52 here once.
+- **It is break-tested.** Tampering three cases' `sections` and `footnotes` in a golden copy
+  reports exactly those three documents and exactly those two fields. A zero from an inert
+  comparator is indistinguishable from a real one, and this file has eleven instances of that.
+
+The projection is duplicated from `oracle.e2e.ts:258-303` rather than shared, because the
+recorder's copy runs inside the browser. That is a second copy of a fact and this file says a
+second copy rots, so it carries the recorder's line numbers in a comment -- the honest
+mitigation, not a fix.
+
 ## Asking Obsidian directly, in two seconds
 
 `parity:record` boots Obsidian under Xvfb, renders all 3,403 corpus cases and rewrites the
