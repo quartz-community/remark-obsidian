@@ -1874,6 +1874,71 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "setext-underline-beats-the-definition",
+    what: "a definition line under a `-` underline is a HEADING: no definition, but the REFERENCE stays",
+    // Five probes against live 1.14.4, then a CORRECTION that inverted the rule.
+    //
+    // The probes read `compute.footnoteRefs` and showed `refs=[]` under every underline, so the
+    // first version dropped the definition AND the reference. It scored 5 better / 12 worse, and
+    // restricting it to `=` underlines -- a run of `=` can only be a setext underline, where a
+    // run of `-` is also a thematic break and a list marker -- moved it to 3/5. Still negative,
+    // and the reason is that the restriction threw away the only case that was broken.
+    //
+    // `compute.footnoteRefs` LISTS ONLY NAMES THAT HAVE A DEFINITION. A setext heading leaves
+    // nothing defined, so every reference vanished from the projection and `refs=[]` meant "no
+    // DEFINED reference" rather than "no reference". `ask.mts --synth` exists for exactly this
+    // and was not used. The referee's own `refs` field settles it:
+    //
+    //     [^1]: def / === / blank / use[^1] use[^2] use[^3]
+    //       obs  defs=[]  refs=[["1",0,0],["1",3,3],["2",3,11],["3",3,19]]
+    //       ours defs=[]  refs=[["1",0,0],["1",3,3],["2",3,11],["3",3,19]]   IDENTICAL
+    //
+    // So Obsidian reports a reference at line 0 column 0 -- the `[^1]` inside the heading text
+    // -- and we already agree under `=`, `---` and `=`. The 12 and the 5 were documents the rule
+    // BROKE agreement on.
+    //
+    // What remains is one case and it is real:
+    //
+    //     [^1]: x / -      obs defs=[] + a ref     ours defs=["1"]    <- the only divergence
+    //     [^1]: x / ===    agrees already
+    //     [^1]: x / ---    agrees already
+    //     [^1]: x / y / === def + heading "y"       agrees already
+    //
+    // A single hyphen reads as a list marker to the legacy reader, which builds a definition
+    // where Obsidian builds a heading. So the rule drops the definition and PUTS THE REFERENCE
+    // BACK at the label's own position, which is what the corrected probe says is there.
+    apply: (text: string, ours: Facts): Facts => {
+      const lines = text.split("\n");
+      const dead = new Map<number, number>();
+      for (let at = 0; at + 1 < lines.length; at++) {
+        const line = lines[at] ?? "";
+        const label = /^ {0,3}\[\^[^\]]+\]:/u.exec(line);
+        if (!label) continue;
+        // `-` ONLY. The `=` and `---` spellings already agree, so claiming them is how the
+        // first two attempts lost documents that were right.
+        // NO TRAILING WHITESPACE. `-` followed by a space or tab is a BULLET MARKER, and
+        // `[^1]: Definition` / `⟨2sp⟩-⇥` keeps its definition for exactly that reason -- the
+        // one document the previous form lost. A bare `-` at end of line has no following
+        // whitespace to make it a marker and resolves to a setext underline. Construct
+        // property: a marker needs a space after it.
+        if (!/^ {0,3}-+$/u.test(lines[at + 1] ?? "")) continue;
+        dead.set(at, line.indexOf("[^"));
+      }
+      if (dead.size === 0) return ours;
+      const refs = [...ours.refs];
+      for (const d of ours.defs) {
+        const column = dead.get(d[1]);
+        if (column === undefined) continue;
+        refs.push([d[0], d[1], column]);
+      }
+      return {
+        ...ours,
+        defs: ours.defs.filter((d) => !dead.has(d[1])),
+        refs,
+      };
+    },
+  },
+  {
     name: "quote-comment-extends-past-the-quote",
     what: "an unclosed `%%` in a quote at depth 2+ swallows the lazy lines below it",
     // `comment-quote-extent.ts` handles depth 1 and bails at depth 2+, because it requires the

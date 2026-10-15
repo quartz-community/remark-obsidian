@@ -9,6 +9,8 @@ interface ParentNode extends Node {
 }
 
 const UNDERLINE = /^[ \t]*(?:>[ \t]*)?(=+|-+)[ \t]*$/;
+/** A hyphen run with NO trailing whitespace, which is what keeps it from being a marker. */
+const STRICT_UNDERLINE = /^ {0,3}-+$/u;
 const QUOTE_PREFIX = /^[ \t]*>[ \t]?/;
 
 /**
@@ -53,8 +55,30 @@ export function setextDefinitionTransform(tree: Root, source: string): void {
         const next = parent.children[index + 1];
         const nextStart = next?.position?.start?.offset;
         const nextEnd = next?.position?.end?.offset;
-        if (next?.type !== "thematicBreak") continue;
+        // A THIRD node type the underline arrives as, and the one this pass was missing.
+        // A single `-` is a bullet marker to the legacy reader, so it builds an empty `list`
+        // rather than a `thematicBreak`, and `[^1]: x` / `-` kept its definition where
+        // Obsidian reports a heading. Four probes against 1.14.4, and the discriminator is
+        // TRAILING WHITESPACE:
+        //
+        //     [^1]: Definition / -         heading@0-1                   defs=[]
+        //     [^1]: Definition / --        heading@0-1                   defs=[]
+        //     [^1]: Definition / `- `      footnoteDefinition + list@1-1 defs=["1"]
+        //     [^1]: Definition / ⟨2sp⟩-⇥   footnoteDefinition + list@1-1 defs=["1"]
+        //
+        // A marker needs whitespace after it to be a marker, so a hyphen run with nothing
+        // behind it is an underline and one with a space or tab behind it is a real list.
+        // `UNDERLINE` deliberately admits trailing whitespace for the absorbed and
+        // thematic-break spellings, both of which are measured and shipped, so the list
+        // spelling is gated on `STRICT_UNDERLINE` instead of loosening the shared one.
+        if (next?.type !== "thematicBreak" && next?.type !== "list") continue;
         if (nextStart === undefined || nextEnd === undefined) continue;
+        if (
+          next.type === "list" &&
+          !STRICT_UNDERLINE.test(source.slice(nextStart, nextEnd))
+        ) {
+          continue;
+        }
         // Exactly one newline. `trim()` accepted a blank line, so `[^1]:` / blank /
         // `---` became one heading spanning both -- where Obsidian reports the
         // definition and the thematic break as the separate blocks they are. A blank
