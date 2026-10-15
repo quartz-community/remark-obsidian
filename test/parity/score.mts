@@ -1446,6 +1446,48 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "def-name-ascii-whitespace",
+    what: "a definition whose NAME holds ASCII whitespace defines nothing",
+    // `footnote-bare.ts` already enforces this for REFERENCES -- their E5b, "a name may not
+    // hold ASCII whitespace, so `a[^x [y]` is no reference at all" -- and nothing enforces it
+    // for DEFINITIONS. GFM accepts a space in a footnote label, so we build the node:
+    //
+    //     [^a b]: x     obs defines NOTHING, we define `a b`
+    //
+    // ASCII ONLY, which this harness already records as the trap in the reference half: the
+    // referee's own answers hold six names that are `a\u00a0b` and `a\u3000b`, a no-break and
+    // an ideographic space, so a `\s` class would reject names Obsidian accepts.
+    //
+    // SCORED better 2 / worse 0, agreement UNCHANGED, and NOT implemented. The rule is right --
+    // seven probes against live 1.14.4 settle it, and the non-ASCII half with them:
+    //
+    //     [^a b]: x        defs []         [^a\u00a0b]: x   defs ["a b"]
+    //     [^a⇥b]: x        defs []         [^a\u3000b]: x   defs ["a　b"]
+    //     [^a  b]: x       defs []         [^ab]: x         defs ["ab"]
+    //     > [^a b]: x      defs []
+    //
+    // What stops it is size against risk. The shape occurs in THREE of 6,818 referee documents
+    // and the candidate reaches two of them for no agreement gain; all three corpus cases
+    // (`probe/label-shape/space-only-defined` and `hunt/invalid-name-rewritten-by-rules/0-1`)
+    // already MATCH. So the package is right everywhere a committed gate can see, and this is
+    // the referee's raw tree walk reporting a node the PROJECTION already drops -- the same
+    // class as the 247 buried definitions that turned out to be a bug in the measurement.
+    //
+    // And the discriminator is not understood, which is the real blocker: `[^a b]: x` builds a
+    // definition here while `[^my note]: x`, `[^1 ]: x` and `[^ ]: x` do not, all with one
+    // ASCII space. Something narrower than "holds a space" decides it -- probably
+    // `legacy-definition.ts`, which re-decides definitions under `remark-parse@8`'s label rules
+    // -- and dropping nodes by name before knowing why would be fitting, not fixing.
+    //
+    // Converting the node to text is also the refused `shortCommentTransform` shape: a
+    // definition rendered as literal text makes the serialiser escape its `[`, which is how one
+    // parity case bought a formatter that grows the author's file.
+    apply: (text, ours) => ({
+      refs: ours.refs,
+      defs: ours.defs.filter((d) => !/[ \t\n\r\f\v]/u.test(d[0])),
+    }),
+  },
+  {
     name: "html-extent-item-block-tag",
     what: "a BLOCK TAG html in a list item swallows the following paragraph, as `<!--` already does",
     // `itemHtmlExtentTransform` carries this for the `<!--` opener only, and its own docstring

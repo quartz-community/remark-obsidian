@@ -73,13 +73,83 @@ function regionsFor(source: string, open: string, close: string): Region[] {
  */
 const BLOCK_OPENER = /^(?:[ \t]*>)*[ \t]*%%[^%\n]*$/u;
 
+/**
+ * Four columns of indentation makes the opener indented CODE, so it opens nothing.
+ *
+ * `BLOCK_OPENER` admits any leading whitespace, which is right for one to three columns and
+ * wrong at four: there the line is a code block like any other and the `%%` is literal. We
+ * opened a region anyway and it ran to the end of the note, swallowing every definition below
+ * it. Eight probes against live 1.14.4 fix the threshold exactly, and it holds at root and
+ * after a quote alike:
+ *
+ *     > x / ⟨3sp⟩%% / [^1]: def        comment@1, NO definition
+ *     > x / ⟨6sp⟩%% / [^1]: def        code@1, definition at 2:0
+ *     > x / ⇥%%     / [^1]: def        code@1, definition at 2:0  -- a tab reaches the stop
+ *     ⟨3sp⟩%% / [^1]: def              comment@0, no definition
+ *     ⟨6sp⟩%% / [^1]: def              code@0, definition at 1:0
+ *
+ * Measured from after the quote markers, since a quote's own prefix is not indentation -- the
+ * rule `line-map.ts` and `quote-indented-code.ts` both carry, and CommonMark example 252
+ * enforces.
+ */
+const QUOTE_RUN = /^(?:[ \t]*>[ \t]?)*/u;
+const DEFINITION_LABEL = /^ {0,3}\[\^[^\]]*\]:/u;
+
+/**
+ * UNLESS IT CONTINUES A FOOTNOTE DEFINITION, whose content column is already 4.
+ *
+ * Indented code is four columns past the CONTAINING BLOCK's content column, not past zero, and
+ * a definition's content sits at four. So `[^1]: one` / `⟨4sp⟩%%` is at relative indent ZERO
+ * and really does open a comment -- Obsidian spans that definition through the closing `%%`.
+ * Measuring from column zero broke `hunt/definition-block-owns-region-opener/0` and `/2`, the
+ * only two corpus regressions this rule caused.
+ *
+ * `commentRegions` reads the SOURCE and has no tree, so the containing block is recovered the
+ * only way available: an unbroken run of non-blank lines back to a label at indent under four.
+ * A blank line ends a definition's content, which is what separates the two probe families --
+ * `x` / blank / `⟨6sp⟩%%` is code because the blank closed the paragraph, while
+ * `[^1]: one` / `⟨4sp⟩%%` continues the definition directly.
+ */
+function continuesDefinition(
+  source: string,
+  lineStart: number,
+  indent: number,
+): boolean {
+  if (indent < 4) return false;
+  let at = lineStart;
+  while (at > 0) {
+    const previousEnd = at - 1;
+    const previousStart = source.lastIndexOf("\n", previousEnd - 1) + 1;
+    const previous = source.slice(previousStart, previousEnd);
+    if (previous.trim() === "") return false;
+    if (DEFINITION_LABEL.test(previous)) return true;
+    at = previousStart;
+  }
+  return false;
+}
+
+function openerIndent(line: string): number {
+  const body = line.slice(QUOTE_RUN.exec(line)?.[0].length ?? 0);
+  let column = 0;
+  for (const character of body) {
+    if (character === " ") column += 1;
+    else if (character === "\t") column += 4 - (column % 4);
+    else break;
+  }
+  return column;
+}
+
 export function commentRegions(source: string): Region[] {
   return regionsFor(source, "%%", "%%").filter((region) => {
     const lineStart = source.lastIndexOf("\n", region.start - 1) + 1;
     const lineEnd = source.indexOf("\n", region.start);
-    return BLOCK_OPENER.test(
-      source.slice(lineStart, lineEnd === -1 ? source.length : lineEnd),
+    const line = source.slice(
+      lineStart,
+      lineEnd === -1 ? source.length : lineEnd,
     );
+    if (!BLOCK_OPENER.test(line)) return false;
+    const indent = openerIndent(line);
+    return indent < 4 || continuesDefinition(source, lineStart, indent);
   });
 }
 
