@@ -1624,6 +1624,84 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "def-absorbs-unclosed-math",
+    what: "a definition in a list item absorbs a following UNCLOSED $$ line",
+    // 32 of the 84 `def-end-1` entries, and the largest single bucket in that family once it
+    // is classified by WHAT the dropped line is rather than read shortest-first.
+    //
+    // Seven probes against live 1.14.4, three of them the controls that scope it:
+    //
+    //     - [^a]: Definition / ⟨2sp⟩$$              end 1, ours 0
+    //     - [^a]: Definition / $$                   end 1, ours 0   -- column 0 too, lazily
+    //     - [^a]: Definition / ⟨4sp⟩$$              end 1, ours 0
+    //     - [^a]: Definition / ⟨2sp⟩$$ / x / $$     end 0, ours 0   -- CLOSED, not absorbed
+    //     [^a]: Definition   / ⟨2sp⟩$$              end 0, ours 0   -- ROOT def, not absorbed
+    //     - [^a]: Definition / ⟨2sp⟩text            end 1, ours 1   -- already right
+    //     - [^a]: Definition / ⟨2sp⟩%%              end 1, ours 1   -- already right
+    //
+    // So it is specifically an UNCLOSED `$$` inside a list item: text and `%%` are absorbed
+    // already, a closed `$$` is its own block on both sides, and at root the definition keeps
+    // its own line.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const inItem = new Set<number>();
+      const walk = (node: unknown, inside: boolean): void => {
+        const self = node as {
+          type?: string;
+          position?: { start: { line: number } };
+          children?: unknown[];
+        };
+        if (inside && self.type === "footnoteDefinition" && self.position) {
+          inItem.add(self.position.start.line - 1);
+        }
+        const next = inside || self.type === "listItem";
+        for (const child of self.children ?? []) walk(child, next);
+      };
+      walk(tree, false);
+
+      const opener = /^[ \t]*\$\$[ \t]*$/u;
+      return {
+        refs: ours.refs,
+        defs: ours.defs.map((d): Def => {
+          if (!inItem.has(d[1])) return d;
+          const next = lines[d[3] + 1];
+          if (next === undefined || !opener.test(next)) return d;
+          const closed = lines
+            .slice(d[3] + 2)
+            .some((line) => /\$\$/u.test(line));
+          if (closed) return d;
+          // NOT NARROWED FURTHER, and the attempt is the reason. Requiring the opener to END
+          // the item -- the line after it blank or absent, which every probe had -- scores
+          // 22/4 against 29/10, so it cuts more wins than losses:
+          //
+          //     unclosed `$$` after the definition      better 29  worse 10  agreement +19
+          //     ...and the opener ends the item         better 22  worse  4  agreement +15
+          //
+          // Both remaining loss shapes keep the definition on its own line where this absorbs:
+          // `⟨3sp⟩$$` with `⇥⟨4sp⟩> quoted` under it, and `⟨5sp⟩$$` under a `- ` marker. Neither
+          // is explained by what the probes varied, so the wider form is the one to build and
+          // the four are recorded rather than fitted around.
+          //
+          // NOT YET IMPLEMENTED, and the obstacle is EXTENT rather than the rule. Our tree is
+          //
+          //     listItem > footnoteDefinition@1-1, math@2-3
+          //
+          // for `- [^a]: Definition` / `⟨2sp⟩$$` / blank, and Obsidian's definition ends on line
+          // 2 -- the `$$` line itself, not the blank the math node also swallowed. So extending
+          // the definition's end over a sibling leaves OVERLAPPING SPANS, which
+          // `invariants.test.ts` gates, and absorbing the math node whole ends the definition
+          // one line late. Either way the math's own extent has to be bounded at its opener
+          // first, which is `mathListExtentTransform`'s job and the order it already documents.
+          //
+          // Left as a measured lead rather than a half-landing: +19 is the largest single gain
+          // available on this oracle, and extent surgery is what these notes record costing
+          // more than it looks four separate times.
+          return [d[0], d[1], d[2], d[3] + 1];
+        }),
+      };
+    },
+  },
+  {
     name: "html-extent-item-block-tag",
     what: "a BLOCK TAG html in a list item swallows the following paragraph, as `<!--` already does",
     // `itemHtmlExtentTransform` carries this for the `<!--` opener only, and its own docstring
