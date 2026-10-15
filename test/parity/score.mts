@@ -44,6 +44,8 @@ import fs from "node:fs";
 import path from "node:path";
 
 import type { ListItem, Root, RootContent } from "mdast";
+import type { Node } from "unist";
+import { visit } from "unist-util-visit";
 
 import { contentColumn } from "../../src/lib/definition-column.js";
 import { columnsOf } from "../../src/lib/item-dot-threshold.js";
@@ -1936,6 +1938,131 @@ const RULES: readonly Rule[] = [
         defs: ours.defs.filter((d) => !dead.has(d[1])),
         refs,
       };
+    },
+  },
+  {
+    name: "item-code-below-the-character-threshold",
+    what: "a `code` node in a list item whose CHARACTER indent is under the threshold is not code",
+    // The inverse of a rule this package already ships. `definition-deindent-code.ts` counts
+    // the indent in CHARACTERS with a tab worth ONE and a tab-after-space ending the count --
+    // measured over four scoring runs, where expanded columns scored -12 and this form +4 --
+    // and uses it to decide when a definition BECOMES code. The tokenizer decides the opposite
+    // direction in COLUMNS, with a tab worth four, so the two disagree on exactly one shape:
+    //
+    //     - parent More / blank / ⇥⟨3sp⟩[^3]: It[^1]    obs DEFINES `3`   ours: code
+    //     - parent More / blank / ⇥[^3]: It[^1]         both define
+    //     - parent More / blank / ⟨4sp⟩ and ⟨5sp⟩        both define
+    //     - parent More / blank / ⟨6sp⟩[^3]: ...         both: no definition
+    //
+    // `⇥⟨3sp⟩` is SEVEN columns and FOUR characters. The host's content column is 2, so the
+    // threshold is 6: columns say code, characters say not code, and Obsidian says not code.
+    // Five of six spellings already agree, which is what makes this the rule rather than the
+    // shape.
+    //
+    // Sized from the `ref-miss` classification: 104 entries are "we made it CODE" and not one
+    // has Obsidian calling the region code, with 74 of them inside a list item.
+    //
+    // NOT ADJUDICABLE BY THIS SCORER, which is the fourth verdict and the right one here.
+    // Three narrowings, each derived and each helping, and it never approaches break-even:
+    //
+    //     any code node under the CHARACTER threshold      18 better   890 worse
+    //     ...only where a TAB reached it (spaces agree)     2 better    50 worse
+    //     ...and indented code only, never a fence          2 better    47 worse
+    //
+    // WHAT FAILS IS THE CANDIDATE, NOT THE RULE, and the losing rows say so plainly: after the
+    // first narrowing they carry defs IDENTICAL to the answer and differ only in references
+    // this candidate INVENTED. It frees a region and then scans it textually for `[^name]`,
+    // guessing a column and an end line for each -- so it is measuring a hand-rolled parser,
+    // which is exactly what `definition-deindent-code.ts` says a re-parse exists to delegate.
+    // The residual 47 are fenced openers behind a list marker (`⇥2)⟨4sp⟩```), which the fence
+    // test above cannot see without stripping the container prefix -- and these notes already
+    // measure prefix-stripping as past its sweet spot at 84/100.
+    //
+    // So the rule stands on its probes and the implementation needs the shape this scorer
+    // cannot express: free the region, RE-PARSE it, and splice the result back with real
+    // spans. That is a new pass and the exact inverse of `definition-deindent-code.ts`, which
+    // already owns the character threshold in the converting direction. Left scored-not-built
+    // with the numbers attached, and the numbers are about my synthesis rather than Obsidian.
+    apply: (text: string, ours: Facts, tree: Root): Facts => {
+      const items = new Map<Node, Node>();
+      visit(tree, "listItem", (item: Node) => {
+        visit(item, (inner: Node) => {
+          items.set(inner, item);
+        });
+      });
+      const freed: Array<[number, number]> = [];
+      visit(tree, "code", (node: Node) => {
+        const host = items.get(node);
+        if (!host) return;
+        const column = contentColumn(text, host as never);
+        if (column === undefined) return;
+        const from = node.position?.start?.offset;
+        const to = node.position?.end?.offset;
+        if (from === undefined || to === undefined) return;
+        const bol = text.lastIndexOf("\n", from - 1) + 1;
+        const head = text.slice(bol, text.indexOf("\n", bol) + 1 || undefined);
+        const run = head.slice(0, head.length - head.trimStart().length);
+        let indent = 0;
+        let sawSpace = false;
+        for (const character of run) {
+          if (character === "\t" && sawSpace) break;
+          if (character === " ") sawSpace = true;
+          indent += 1;
+        }
+        // THE DISAGREEMENT ZONE ONLY, which the probes draw exactly. Pure spaces agree on
+        // every width -- `⟨4sp⟩`, `⟨5sp⟩` define and `⟨6sp⟩` does not, on both sides -- so a
+        // run with no tab in it is not this rule and claiming one is how the first version
+        // scored 18 better against 890 worse. The divergence needs the tokenizer to have
+        // reached the threshold ONLY by expanding a tab: at or above it in COLUMNS, below it
+        // in CHARACTERS.
+        if (!run.includes("\t")) return;
+        // INDENTED CODE ONLY. A FENCE's content is literal by construction and no indent
+        // arithmetic bears on it, so freeing one and indexing the labels inside is simply
+        // wrong -- it is where the second version's fifty losses came from, every one of them
+        // adding references Obsidian does not have inside a ``` block. The `ref-miss`
+        // classification already separated the two sub-families (41 indented against 33
+        // fenced) and the candidate ignored its own split.
+        if (/^[ \t]*(?:>[ \t]*)*(?:```|~~~)/u.test(head)) return;
+        let columns = 0;
+        for (const character of run) {
+          if (character === " ") columns += 1;
+          else if (character === "\t") columns += 4 - (columns % 4);
+          else break;
+        }
+        if (columns < column + 4) return;
+        if (indent >= column + 4) return;
+        freed.push([
+          text.slice(0, from).split("\n").length - 1,
+          text.slice(0, to).split("\n").length - 1,
+        ]);
+      });
+      if (freed.length === 0) return ours;
+
+      const lines = text.split("\n");
+      const refs = [...ours.refs];
+      const defs = [...ours.defs];
+      const seen = new Set(ours.refs.map((r) => `${r[0]}@${r[1]}:${r[2]}`));
+      for (const [fromLine, toLine] of freed) {
+        for (let at = fromLine; at <= toLine && at < lines.length; at++) {
+          const line = lines[at] ?? "";
+          for (const hit of line.matchAll(/\[\^([^[\]\s]+)\]/gu)) {
+            const name = hit[1]!.toLowerCase();
+            const column = hit.index!;
+            // A label at the line's start followed by a colon is a DEFINITION, not a
+            // reference -- which is what `[^3]: It[^1]` holds one of each of.
+            if (
+              /^[ \t]*$/u.test(line.slice(0, column)) &&
+              line[column + hit[0]!.length] === ":"
+            ) {
+              defs.push([name, at, column, at]);
+              continue;
+            }
+            if (seen.has(`${name}@${at}:${column}`)) continue;
+            refs.push([name, at, column]);
+          }
+        }
+      }
+      return { ...ours, defs, refs };
     },
   },
   {
