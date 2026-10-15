@@ -56,6 +56,7 @@ import { paragraphMergeTransform } from "./lib/paragraph-merge.js";
 import { normalizePointsTransform } from "./lib/normalize-points.js";
 import { breakPositionsTransform } from "./lib/break-positions.js";
 import { commentParseTransform } from "./lib/comment-parse.js";
+import { commentDefinitionColumnTransform } from "./lib/comment-definition-column.js";
 import { commentQuoteExtentTransform } from "./lib/comment-quote-extent.js";
 import {
   ensureLineOffsets,
@@ -889,6 +890,11 @@ export default function remarkObsidian(
     // body is parsed from the span the comment finally claims.
     if (opts.keepComments && opts.parseComments) {
       commentParseTransform(tree, String(file), reparse);
+      // Directly after, because that pass is where the defect comes from: it re-parses the
+      // body through this chain, `definitionColumnTransform` clamps a whitespace-prefixed
+      // definition to a block the FRAGMENT does not contain, and the node lands at its line
+      // start. Obsidian indexes the label at its bracket.
+      commentDefinitionColumnTransform(tree, String(file));
     }
     // After every pass that can extend a definition, and before points are
     // normalised from the offsets this corrects.
