@@ -42,6 +42,28 @@ const isComment = (node: unknown): node is CommentNode =>
  * at the top level an unclosed `%%` runs to the end of the note, blank lines and
  * all, which a committed golden pins. Only a container that is itself
  * blank-line-terminated bounds the comment this way.
+ *
+ * A BLANK LINE IS NOT THE ONLY THING THAT ENDS THE HOST, and the other one is not handled
+ * here. A following DEFINITION LABEL ends a definition too, so it ends the comment inside it.
+ * Five probes, and only the last diverges:
+ *
+ *     %%         / [^1]: one / %%                 buries `1`   -- we agree
+ *     > %%       / > [^1]: one / > %%             buries `1`   -- we agree
+ *     > %%       / > [^1]: one                    buries `1`   -- we agree
+ *     > %%       / [^1]: one / > %%               buries `1`   -- we agree
+ *     > [^9]: orphan / > %% / > [^1]: one / > %%  defines BOTH  -- we define only `9`
+ *
+ * The last one is the rule: `> [^9]: orphan` makes the `%%` a CONTINUATION of that definition
+ * rather than a fresh opener, so the comment is bounded by `[^9]` -- and `> [^1]: one` starts a
+ * new definition, which ends `[^9]` and therefore ends the comment. The definition below it is
+ * live. Without the `[^9]` line the `%%` is a plain opener and does bury what follows.
+ *
+ * Found by classifying the 75 referee documents where Obsidian DEFINES a label and we emit a
+ * REFERENCE at the same place. The largest bucket is 25 "inside an unclosed `%%`", and within
+ * it 15 are regions that CLOSE later -- which is this shape, since a closed region cannot
+ * explain a live definition inside it any other way. Not implemented: extending this pass to
+ * end on a label line needs the host definition's own boundary rules, which `definitionTrim`
+ * and `definitionLazy` also touch, and the family is 15 documents.
  */
 export function commentDefinitionExtentTransform(
   tree: Root,
