@@ -1733,17 +1733,36 @@ can see code sections -- and the family remains unmeasured for a different reaso
 
 ### Where the 118 actually is, and it is the inverse of this session's work
 
-Classified whole rather than by its head:
+Classified whole rather than by its head -- and then RE-classified, because the first pass
+below was wrong in a way worth keeping as a worked example. What it recorded:
 
     49  obs code -> ours keeps the line in a LIST item
     29  obs code -> ours keeps it in a BLOCKQUOTE
-    20  fence variants of the same
+    20  fence variants of the same          <- NOT A HOST TYPE
      5  callout     3  paragraph     3  footnoteDefinition
 
-**78 of 118 are one mechanism: we keep a line inside a container where Obsidian ends the
-container and makes the line ROOT INDENTED CODE.** That is the exact inverse of the three fixes
-that took the referee from 83.2% to 83.6% this session, all of which made containers keep MORE
-lines -- and the shapes overlap, which is the useful part:
+**That breakdown MIXES TWO DIMENSIONS.** "Fence variants" is a construct description, not a
+host, so twenty list-hosted documents were counted in their own row and the list bucket read as
+49 when it was 69. Re-measured on one axis only -- the root-level node our tree puts the line
+inside -- and the bucket is also nine smaller than recorded, because this session's fixes took
+`code` agreement from 732 to 742:
+
+    69  list
+    23  blockquote
+     8  callout
+     3  math     3  paragraph     3  footnoteDefinition
+    ---
+    109 documents (the README said 118)
+
+**92 of 109 are one mechanism: we keep a line inside a container where Obsidian ends the
+container and makes the line ROOT INDENTED CODE.** That is 84% of the bucket on one axis rather than 66% on two, so the correction makes the
+claim stronger and the numbers different -- which is the reason to re-measure a classification
+rather than inherit it. It is also the fourth time a recorded breakdown here has turned out to
+describe its selector rather than its population.
+
+That mechanism is the exact inverse of the three fixes
+that took the referee from 83.2% to 83.6% in that session, all of which made containers keep
+MORE lines -- and the shapes overlap, which is the useful part:
 
     ⟨2sp⟩10.⇥[^b]: def / ⇥# heading          code [[1,1]]  -- also a `def-end+1` entry
     +⟨4sp⟩⇥[^a]: def / blank / ⇥- item       code [[2,3]]  -- also a cap-family probe
