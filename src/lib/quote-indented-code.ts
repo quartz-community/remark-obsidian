@@ -38,6 +38,34 @@ function codeIndent(inDefinition: boolean): number {
 }
 
 /**
+ * Whether a line's content begins exactly at `want` COLUMNS, counting a tab to its stop.
+ *
+ * The test this replaces was `text.slice(0, want).trim() === ""` -- four CHARACTERS -- and a
+ * tab is ONE character reaching four columns, so `> x` / `⇥y` was left as lazy continuation
+ * where `> x` / `⟨4sp⟩y` was correctly split out as code. Obsidian makes both a root code
+ * block, and the referee's `code` field says so on 40 documents: `>>[^ä]: def` / `⇥More`,
+ * `> x` / `⇥%%`, `>⟨4sp⟩%%` / `[^ä]: def` / `⇥It %% [^x-y] %%`.
+ *
+ * The "not a space at `want`" half is kept deliberately. A line indented FIVE columns is not
+ * this rule -- the surrounding pass rebuilds the quote around what it cuts, and admitting a
+ * deeper indent would change where that cut lands on evidence nothing here has measured.
+ */
+function atColumn(text: string, want: number): boolean {
+  let column = 0;
+  let index = 0;
+  while (index < text.length && column < want) {
+    const character = text[index];
+    if (character === " ") column += 1;
+    else if (character === "\t") column += 4 - (column % 4);
+    else return false;
+    index += 1;
+  }
+  if (column !== want) return false;
+  const rest = text.slice(index);
+  return rest !== "" && rest[0] !== " " && rest.trim() !== "";
+}
+
+/**
  * An indented line below a quote is code, not lazy continuation.
  *
  * CommonMark cannot start indented code inside a paragraph, so `> quote` /
@@ -243,11 +271,7 @@ export function quoteIndentedCodeTransform(
       }
 
       const want = codeIndent(inDefinition.has(quote));
-      const indented = (text: string): boolean =>
-        text.length > want &&
-        text.slice(0, want).trim() === "" &&
-        text.charAt(want) !== " " &&
-        text.slice(want).trim() !== "";
+      const indented = (text: string): boolean => atColumn(text, want);
 
       const lines = source.slice(start, end).split("\n");
       let cut = lines.length;
