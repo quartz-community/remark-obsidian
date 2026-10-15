@@ -65,6 +65,7 @@ import {
 import { definitionTabTransform } from "./lib/definition-tab.js";
 import { definitionTrimTransform } from "./lib/definition-trim.js";
 import { fenceOutlivesTransform } from "./lib/fence-outlives.js";
+import { itemFenceCloserTransform } from "./lib/item-fence-closer.js";
 import { mathOutlivesTransform } from "./lib/math-outlives.js";
 import { mathMidlineTransform } from "./lib/math-midline.js";
 import { listUnderDefinitionTransform } from "./lib/list-under-definition.js";
@@ -896,6 +897,18 @@ export default function remarkObsidian(
       // start. Obsidian indexes the label at its bracket.
       commentDefinitionColumnTransform(tree, String(file));
     }
+    // LATE, and the position is the whole of why it works. Early in the chain an item whose
+    // fence was broken by a column-zero line still holds that line as its own child -- a
+    // `blockquote`, say -- so the item's last child is not the fence's `code` and the pass
+    // declines. By here the absorption passes have folded those away and the shape is the one
+    // the probes describe: the item ending in a `code`, and a root `code` whose first line is
+    // the matching closer.
+    // `reparse`, not `self.parse`: the remainder holds bare references like `use[^1]`, and a
+    // plain parse leaves those as literal text -- GFM only builds a `footnoteReference` for a
+    // name that is defined, and `bareFootnoteRefTransform` is what converts the rest.
+    itemFenceCloserTransform(tree, String(file), (markdown) =>
+      reparse(markdown),
+    );
     // After every pass that can extend a definition, and before points are
     // normalised from the offsets this corrects.
     definitionTrimTransform(tree, String(file));
