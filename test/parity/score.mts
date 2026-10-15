@@ -1326,6 +1326,126 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "def-end-tab-continuation",
+    what: "a definition absorbs a following line whose indent holds a TAB",
+    // `def-end+1` is the largest positional family left at 80 documents, and five of its ten
+    // shortest have the same shape: the line past our end carries a TAB in its indentation and
+    // Obsidian takes it into the definition.
+    //
+    //     ⟨2sp⟩10.⇥[^b]: def / ⇥# heading          obs end 1, ours 0
+    //     >>[^ä]: def        / ⇥More               obs end 1, ours 0
+    //     ⟨3sp⟩1.⟨4sp⟩[^Note]: Definition / ⟨5sp⟩⇥- item   obs end 1, ours 0
+    //     -⟨4sp⟩[^ä]: Definition / ⟨2sp⟩⇥# heading obs end 1, ours 0
+    //
+    // What they have in common is that the absorbed line would be a BLOCK of its own at that
+    // indentation -- a heading, a list item, a `$$` -- so this is not about what the line is.
+    // It is about the tab making the line a continuation of the definition.
+    //
+    // REFUTED, both scopes:
+    //
+    //     any definition         better 17  worse 44  agreement -19
+    //     single-line only       better 12  worse 39  agreement -19
+    //
+    // Narrowing cut both sides and moved agreement not at all, which is the signature of a
+    // predicate selecting the wrong population rather than one that is merely too wide. The
+    // losses are definitions inside quotes and callouts where the tabbed line belongs to the
+    // CONTAINER, and nothing in a `[name, line, col, endLine]` tuple can tell those apart --
+    // the same structural limit this harness records for the containing-block family.
+    //
+    // Consistent with the earlier pass-level refusal of `def-end+1`, which measured label-only
+    // enders at 5/1 and all four enders at 6/4 and concluded the clean rule is not expressible
+    // as an end position. Two independent instruments now say so.
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      return {
+        refs: ours.refs,
+        defs: ours.defs.map((d): Def => {
+          const next = lines[d[3] + 1];
+          if (next === undefined || next.trim() === "") return d;
+          const run = next.slice(0, next.length - next.trimStart().length);
+          if (!run.includes("\t")) return d;
+          // SINGLE-LINE definitions only. Unrestricted this scored 17/44, and the losses were
+          // definitions already spanning lines that the rule then extended further -- the
+          // absorption is about a definition that ended on its own label line.
+          if (d[3] !== d[1]) return d;
+          return [d[0], d[1], d[2], d[3] + 1];
+        }),
+      };
+    },
+  },
+  {
+    name: "def-in-definition-host",
+    what: "a definition nested in a footnoteDefinition takes min(indent, 4)",
+    // `definition-column.ts` builds its host map from `listItem` ONLY, so a definition absorbed
+    // into another footnote definition finds no host and is clamped to column 0. Obsidian gives
+    // it the bracket:
+    //
+    //     [^ä]: def / blank / ⟨2sp⟩⇥[^ch2*]: body text     obs column 3, ours 0
+    //
+    // Both sides agree the outer definition spans all three lines, so the inner one really is
+    // its child. A footnote definition's own content column is 4 -- the standard continuation
+    // indent -- so `min(indent, hostContentColumn)` is `min(3, 4)` and the existing formula
+    // gives Obsidian's answer with no new arithmetic, only a second host type.
+    //
+    // That is the shape this harness records as the one that lands: an already-measured rule
+    // extended to a node type it was never scoped for.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      // Line -> the nested definition's own bracket column, from the TREE rather than from a
+      // scan: `[^1]: [^2]: x` holds two on one line and `indexOf("[^")` cannot tell them apart.
+      const hosted = new Map<number, number>();
+      const walk = (node: unknown, inside: boolean): void => {
+        const self = node as {
+          type?: string;
+          position?: { start: { line: number; column: number } };
+          children?: unknown[];
+        };
+        if (
+          inside &&
+          (self.type === "footnoteDefinition" || self.type === "definition") &&
+          self.position
+        ) {
+          hosted.set(
+            self.position.start.line - 1,
+            self.position.start.column - 1,
+          );
+        }
+        const next = inside || self.type === "footnoteDefinition";
+        for (const child of self.children ?? []) walk(child, next);
+      };
+      walk(tree, false);
+
+      return {
+        refs: ours.refs,
+        defs: ours.defs.map((d): Def => {
+          if (!hosted.has(d[1])) return d;
+          // ONLY where the definition starts its own line. `[^1]: [^2]: x` puts the inner one
+          // behind the outer's label and Obsidian reports its bracket at 6 with no clamp --
+          // the same precondition `definition-column.ts` enforces by requiring the line's
+          // prefix to be whitespace, a quote run or a list marker. Unrestricted this scored
+          // 5/4 and all four losses were that shape.
+          //
+          // Keyed on how many definitions share the line rather than on the node's own column,
+          // because by the time the scorer sees the tree `definitionColumnTransform` has
+          // already moved that column to 0 -- reading it back finds the clamp, not the bracket,
+          // and the candidate measured NOTHING on 6,818 documents as a result.
+          if (ours.defs.filter((other) => other[1] === d[1]).length !== 1) {
+            return d;
+          }
+          const line = lines[d[1]] ?? "";
+          // NO QUOTE between the host and the definition. `[^9]: x` / `⟨4sp⟩> [!tip]` /
+          // `⟨4sp⟩> [^1]: def` is column 6 -- the innermost container is the BLOCKQUOTE, whose
+          // content column is the indent plus its own marker, not the definition's 4. Modelling
+          // that is a second host type; excluding it costs the one document this rule had wrong
+          // and leaves 5 better against 0.
+          if (/^[ \t]*>/u.test(line)) return d;
+          const run = line.length - line.trimStart().length;
+          return [d[0], d[1], Math.min(run, 4), d[3]];
+        }),
+      };
+    },
+  },
+  {
     name: "html-extent-item-block-tag",
     what: "a BLOCK TAG html in a list item swallows the following paragraph, as `<!--` already does",
     // `itemHtmlExtentTransform` carries this for the `<!--` opener only, and its own docstring

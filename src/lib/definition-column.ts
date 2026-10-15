@@ -44,6 +44,24 @@ export function definitionColumnTransform(tree: Root, source: string): void {
     });
   });
 
+  // A FOOTNOTE DEFINITION is a host too, and this map is the whole of that rule.
+  //
+  // The list map above was the only one, so a definition absorbed into another definition found
+  // no host and was clamped to column 0. Obsidian gives it the bracket:
+  //
+  //     [^ä]: def / blank / ⟨2sp⟩⇥[^ch2*]: body text     obs column 3, ours 0
+  //
+  // Both sides agree the outer definition spans all three lines, so the inner one is its child.
+  // Its content column is 4 -- the standard continuation indent -- and the `column > bracket -
+  // gap` decline below then yields `min(indent, 4)` with no new arithmetic: indent 3 declines
+  // to the bracket, indent 6 takes the 4. Scored better 5 / worse 0 before being built.
+  const inDefinition = new Set<Node>();
+  visit(tree, "footnoteDefinition", (host: Node) => {
+    visit(host, (inner: Node) => {
+      if (inner !== host) inDefinition.add(inner);
+    });
+  });
+
   // Both definition kinds, because Obsidian applies one rule to them. A LINK reference
   // definition's column follows `min(indent, hostContentColumn)` exactly as a footnote
   // definition's does: `   [foo]: /url` at root is reported at column 0, and
@@ -152,7 +170,9 @@ export function definitionColumnTransform(tree: Root, source: string): void {
           ? quoted[1]!.length
           : host
             ? contentColumn(source, host)
-            : 0;
+            : inDefinition.has(node)
+              ? 4
+              : 0;
     if (column === undefined) return;
     // One column for every host. The gap-TWO rule this replaces was fitted to
     // `1. item` / `    [^1]:` reporting the bracket at 4 while `- item` / `    [^1]:`
