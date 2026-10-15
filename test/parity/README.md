@@ -1549,6 +1549,39 @@ implementing an observable whose mechanism is unknown is how this harness has pr
 a number instead of a rule -- and the tab family in particular is recorded as refused four ways
 with a demonstrated ceiling of ten.
 
+#### And the rest of `ref-extra` is a long tail that MINIMISES AWAY
+
+Four sub-families were taken apart. Three are small and the fourth is a family already refused:
+
+| sub-family                          | size           | state                                  |
+| ----------------------------------- | -------------- | -------------------------------------- |
+| `[^name](url)` is a link            | **4** of 6,818 | already in `KNOWN_REFERENCE_GAPS`      |
+| a reference inside `<...>` autolink | **6** of 6,818 | rule confirmed, population too small   |
+| label inside a real FENCE           | 39             | the five-space cap again -- see below  |
+| callout plus a TAB                  | 67             | observable recorded, mechanism unknown |
+
+**Two of those were picked by reading the bucket's shortest members, and both were wrong about
+its mass** -- the link shape is 4 documents and the autolink shape is 6, against a bucket of 200. That is the third and fourth time in two sessions that the head of a family misdescribed
+it, and the lesson has now been paid for enough times to state as a procedure: **classify the
+whole family and COUNT the sub-family before probing it**, not after.
+
+The fence sub-family is the instructive one. All six minimal spellings AGREE -- ` ``` ` /
+`[^1]: def` reports neither a definition nor a reference on both sides, closed or unclosed, at
+root or after a paragraph. The disagreement needs the dense document:
+
+    *⟨4sp⟩~~~ / ⟨3sp⟩Text / ⟨3sp⟩[^2]: body text / ⟨5sp⟩~~~
+
+Our tree closes that fence IMMEDIATELY -- `code@1-1` with an empty value -- and its intended
+content becomes a paragraph, so the `[^2]` inside it is a live reference where Obsidian has it
+buried. The opener sits at column 5 behind a `*⟨4sp⟩` marker, which is the five-space cap
+family: already refused three ways at 11/97, 0/3 and 31/351, and reached here from a fourth
+direction. `fenceOutlivesTransform` cannot help because it handles UNTERMINATED fences and this
+one closes.
+
+So the honest statement about `ref-extra` is that it is not one family at 204. It is a dozen
+mechanisms of two to forty documents each, and **the two largest need something this harness
+does not have**: a mechanism for the callout tab, and the five-space cap in the tokenizer.
+
 ## Asking Obsidian directly, in two seconds
 
 `parity:record` boots Obsidian under Xvfb, renders all 3,403 corpus cases and rewrites the
