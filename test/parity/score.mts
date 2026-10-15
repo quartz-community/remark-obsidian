@@ -1874,6 +1874,122 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "orphan-line-is-root-code",
+    what: "a line indented 4+ but below the item's content column is ROOT CODE",
+    // THE FIRST GEOMETRY CANDIDATE, and the reason the `code` dimension was built. 78 of the
+    // 118 "we report no root code block" entries are one mechanism: we keep a line inside a
+    // container where Obsidian ends the container and makes the line root indented code.
+    //
+    // Six probes against live 1.14.4 derive the boundary, and the two that AGREE are what make
+    // it a rule rather than a fit:
+    //
+    //     10.⟨4sp⟩More x / ⟨6sp⟩- item      list@0-0 + code@1-1   ours list@0-1
+    //     10.⟨4sp⟩More x / ⟨5sp⟩- item      list@0-0 + code@1-1   ours list@0-1
+    //     10.⟨4sp⟩More x / ⟨3sp⟩- item      list@0-0 + list@1-1   agrees -- below 4 is a
+    //                                                             SIBLING marker
+    //     - a / ⟨4sp⟩- d                    list@0-1, 2 items     agrees -- 4 >= the content
+    //                                                             column, so a continuation
+    //     ⟨1sp⟩- a / ⟨2sp⟩- b / ⟨3sp⟩- c / ⟨4sp⟩- d   4 flat items  agrees -- the staircase
+    //
+    // So the gap is `4 <= indent < contentColumn`: too deep to be a shallow sibling, too
+    // shallow to be the item's own content, and Obsidian resolves it as root code where
+    // CommonMark continues the list.
+    //
+    // UPSTREAM, measured: bare `remark-parse` + `remark-gfm` reports `list@0-1` for every
+    // failing shape, so no pass here introduces it and this is an inherited divergence of
+    // exactly the kind this package exists to reproduce.
+    //
+    // SCORED TWICE, NOT SHIPPED, and the pair is the finding:
+    //
+    //     content column from `marker[0].length`   better 49  worse 252   touched  578
+    //     content column from `contentColumn`      better  1  worse   3   touched   11
+    //
+    // The first re-derived the column from the raw prefix, which ignores the five-space cap and
+    // the dot adjustment -- the SEVENTH candidate about this quantity refuted by its own
+    // arithmetic, and the reason that function is exported. The second is honest and says the
+    // rule is TINY: the shipped column is capped, so the gap `4 <= indent < column` is empty
+    // for most shapes and only 11 documents of 6,818 fall in it.
+    //
+    // So the boundary is right -- six probes derive it and two of them AGREE, which is what
+    // separates a rule from a fit -- and it is not what the 78-document bucket is made of. The
+    // probes came from the bucket's shortest members, which is the sixth time in this effort
+    // that the head of a family has misdescribed it. The bucket's own classification already
+    // said so and I read past it:
+    //
+    //     49  ours keeps the line in a LIST item     29  ours keeps it in a BLOCKQUOTE
+    //     20  fence variants                         11  callout, paragraph, footnoteDefinition
+    //
+    // Those are four mechanisms sharing a symptom, and the blockquote half -- 29 documents --
+    // has nothing to do with a list item's content column at all. The next step is one probe
+    // wave per bucket, not one rule for the symptom.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/u;
+      const columnsOfRun = (line: string): number => {
+        let column = 0;
+        for (const character of line) {
+          if (character === " ") column += 1;
+          else if (character === "\t") column += 4 - (column % 4);
+          else break;
+        }
+        return column;
+      };
+
+      const orphans = new Set<number>();
+      const walk = (node: unknown): void => {
+        const self = node as {
+          type?: string;
+          position?: { start: { line: number }; end: { line: number } };
+          children?: unknown[];
+        };
+        if (self.type === "listItem" && self.position) {
+          const first = self.position.start.line - 1;
+          const marker = MARKER.exec(lines[first] ?? "");
+          // THE SHIPPED COLUMN, not `marker[0].length`. The raw prefix ignores the five-space
+          // cap and the single-digit-dot adjustment, and using it scored 49/252 -- the seventh
+          // time a candidate about this quantity has been refuted by its own arithmetic, which
+          // is the reason `contentColumn` is exported at all.
+          const column = contentColumn(text, self as unknown as ListItem);
+          if (marker && column !== undefined) {
+            for (let at = first + 1; at <= self.position.end.line - 1; at++) {
+              const line = lines[at] ?? "";
+              if (line.trim() === "") continue;
+              const indent = columnsOfRun(line);
+              if (indent >= 4 && indent < column) orphans.add(at);
+            }
+          }
+        }
+        for (const child of self.children ?? []) walk(child);
+      };
+      walk(tree);
+      if (orphans.size === 0) return ours;
+
+      // Consecutive orphan lines are ONE code block, which is how an indented run works.
+      const sorted = [...orphans].sort((a, b) => a - b);
+      const ranges: CodeRange[] = [];
+      let from = sorted[0]!;
+      let last = from;
+      for (const at of sorted.slice(1)) {
+        if (at === last + 1) {
+          last = at;
+          continue;
+        }
+        ranges.push([from, last]);
+        from = at;
+        last = at;
+      }
+      ranges.push([from, last]);
+      const kept = (ours.code ?? []).filter(
+        (c) => !orphans.has(c[0]) && !orphans.has(c[1]),
+      );
+      return {
+        defs: ours.defs.filter((d) => !orphans.has(d[1])),
+        refs: ours.refs.filter((r) => !orphans.has(r[1])),
+        code: [...kept, ...ranges],
+      };
+    },
+  },
+  {
     name: "control-drop-all-code",
     what: "CONTROL: report no root code block at all",
     // Not a rule. It exists to prove the `code` dimension is wired in: a candidate that empties
