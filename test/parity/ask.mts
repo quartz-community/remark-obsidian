@@ -141,21 +141,22 @@ if (alive !== "function") {
  * `require('obsidian')` is not resolvable in the eval context, so the version comes from
  * Electron's own app record, with the candidates tried in order and `null` when none answer.
  */
-const askedVersion =
-  [
-    "window.electron?.remote?.app?.getVersion?.()",
-    "window.require?.('electron')?.remote?.app?.getVersion?.()",
-    "app.appVersion",
-  ].reduce<string | null>((found, expression) => {
-    if (found !== null) return found;
-    const raw = evaluate(`JSON.stringify(${expression} ?? null)`);
-    try {
-      const value: unknown = JSON.parse(raw);
-      return typeof value === "string" && value !== "" ? value : null;
-    } catch {
-      return null;
-    }
-  }, null) ?? "UNKNOWN";
+const askedVersion = (() => {
+  // The CLI's own `version` subcommand, which is the only source that answers correctly.
+  // Everything reachable from `eval` is wrong or absent: Obsidian's version is a minified
+  // module-local constant (`Zr="1.15.0"` in one build, `goe="1.14.4"` in another) exposed on
+  // no property path, so `app.apiVersion`, `app.appVersion` and `app.version` all return
+  // nothing, while `electron.remote.app.getVersion()` and `ipcRenderer.sendSync("version")`
+  // returned 1.14.4 for a running 1.15.0 -- the first version of this stamp used the former
+  // and reported 1.15.0 once and 1.14.4 later for the same app.
+  const raw = execFileSync("obsidian", ["version"], {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
+    timeout: 120_000,
+  });
+  // `1.15.0 (installer 1.15.0)`
+  return /^\s*(\S+)\s*\(installer\s+(\S+)\)/u.exec(raw)?.[1] ?? "UNKNOWN";
+})();
 
 // With `--synth` every question is asked TWICE: as written, and with a definition appended for
 // each undefined name. The pair is what lets the safety check below compare the original region.
