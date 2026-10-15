@@ -1639,6 +1639,51 @@ So the honest statement about `ref-extra` is that it is not one family at 204. I
 mechanisms of two to forty documents each, and **the two largest need something this harness
 does not have**: a mechanism for the callout tab, and the five-space cap in the tokenizer.
 
+## A THIRD dormant field, and it is the largest: Obsidian's own code-block ranges
+
+Asked to find the next large actionable step with the queue mined out, and the answer was not in
+the queue. The referee's records have five keys and `referee.mts` read three:
+
+    id   text   defs   refs   code
+                              ^^^^ read by nothing, on every document, since the corpus was made
+
+`code` is `[[start, end], ...]` -- Obsidian's own code-block line ranges, zero-based and
+inclusive -- and **883 of the 6,818 documents hold a non-empty one**. That makes it the third
+dormant field this harness has found and by far the biggest: `referenceLinks` was 111 answers
+and the `math[].tex` capability was the other. It is an oracle for precisely the family the
+definition and reference work keeps running into -- where a fence or an indented block begins
+and ends -- and it has been sitting in the corpus unread the whole time.
+
+**It is ROOT LEVEL ONLY, which had to be measured rather than assumed.** Comparing every `code`
+node in the tree agrees on **52.4%**; comparing only the tree's own children agrees on
+**82.9%**, and every extra block in the first reading was one inside a container:
+
+    > [^a]: d / > / ⇥continued / blank / >⟨5sp⟩```     records [[2,2]] -- the ROOT indented
+                                                       code, and not the quoted fence
+
+So the first reading's 420 disagreements were 269 instances of the harness asking the wrong
+question. `referee.mts` now reports the dimension beside the footnote one rather than folded
+into it -- different question, different population, and mixing them would make neither figure
+readable:
+
+    code blocks (root level), a dimension nothing read until now:
+      732/883 agree (82.9%)
+        118  we report NO root code block
+         12  block count differs (1 vs 2)
+         10  block count differs (2 vs 1)
+          8  a block STARTS elsewhere
+          1  a block ENDS elsewhere
+
+**151 disagreements, 78% of them in one bucket.** That is a better-shaped target than anything
+left in the footnote queue, where the largest remaining slice is refused with numbers and the
+tail is mechanisms of four to seventeen documents.
+
+One probe wave has already been spent on the head of that bucket and five of its six shapes
+AGREE -- a root `⇥- item` is indented code on both sides, as are `⟨4sp⟩- item`, `⇥1. item` and
+`⇥⟨2sp⟩text`. So the 118 is not the obvious rule, and the next step is to classify all of it
+rather than read its shortest members, which is the procedure this file has now paid for five
+times.
+
 ## Asking Obsidian directly, in two seconds
 
 `parity:record` boots Obsidian under Xvfb, renders all 3,403 corpus cases and rewrites the

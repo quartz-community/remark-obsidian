@@ -131,11 +131,16 @@ export const ORACLES: readonly Oracle[] = [
     name: "referee (sibling corpus)",
     command: "PARITY_REFEREE_DIR=... tsx test/parity/referee.mts",
     gate: "measurement",
-    compares: ["footnote definitions", "footnote references"],
+    compares: [
+      "footnote definitions",
+      "footnote references",
+      "ROOT-LEVEL CODE BLOCK ranges -- recorded on 883 of the 6818 documents and read by nothing until now",
+    ],
     blind: [
       "section geometry: scored 0 of 6818 documents on the container-comment rule, so it cannot adjudicate that family at all",
       "positionless nodes -- it excludes them, which is why driving that count down moves agreement either way",
-      "anything that is not a definition or a reference",
+      "code blocks INSIDE a container: the field records root level only, which is why comparing every `code` node agrees on 52.4% and comparing the tree's own children agrees on 82.9%",
+      "anything that is not a definition, a reference or a root code block",
       "a net total hides a one-for-one trade; use --ids and diff the member set",
     ],
     ungated:

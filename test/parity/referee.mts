@@ -23,7 +23,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { refereeFacts } from "./referee-facts.js";
+import { refereeFactsWithTree } from "./referee-facts.js";
 
 interface Point {
   readonly line: number;
@@ -36,6 +36,22 @@ interface Entry {
   readonly text: string;
   readonly defs: ReadonlyArray<readonly [string, number, number, number]>;
   readonly refs: ReadonlyArray<readonly [string, number, number]>;
+  /**
+   * Obsidian's own ROOT-LEVEL code-block line ranges, `[[start, end], ...]`, zero-based and
+   * inclusive.
+   *
+   * Recorded on every one of these documents since the corpus was made and read by NOTHING
+   * until now -- 883 of 6,818 hold a non-empty one. That is the third dormant field this
+   * harness has found (`referenceLinks` was the first, at 111 answers) and by far the largest,
+   * and it is an oracle for exactly the construct family the definition and reference work
+   * keeps running into: where a fence or an indented block begins and ends.
+   *
+   * ROOT LEVEL ONLY, measured rather than assumed. Comparing every `code` node in the tree
+   * agrees on 52.4%; comparing only the tree's own children agrees on 82.9%, and every extra
+   * block in the first reading was one inside a container -- `> [^a]: d` / `>` / `⇥continued` /
+   * blank / `>⟨5sp⟩``` ` records `[[2,2]]`, the root indented code, and not the quoted fence.
+   */
+  readonly code?: ReadonlyArray<readonly [number, number]>;
 }
 
 const dir =
@@ -94,6 +110,9 @@ const names = (rows: ReadonlyArray<readonly unknown[]>) =>
 let total = 0;
 let agree = 0;
 let unplaced = 0;
+let withCode = 0;
+let codeAgree = 0;
+const codeKinds = new Map<string, number>();
 const kinds = new Map<string, number>();
 const bump = (kind: string) => kinds.set(kind, (kinds.get(kind) ?? 0) + 1);
 
@@ -169,12 +188,44 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
     const key = `${file}#${at}`;
     let got;
     try {
-      got = refereeFacts(entry.text);
+      got = refereeFactsWithTree(entry.text);
     } catch {
       bump("our parse threw");
       continue;
     }
     unplaced += got.unplaced;
+
+    // The `code` dimension, reported beside the footnote one rather than folded into it: it is
+    // a different question, it has its own population, and mixing them would make neither
+    // figure readable.
+    const wantCode = entry.code ?? [];
+    if (wantCode.length > 0) {
+      withCode++;
+      const ourCode: Array<[number, number]> = [];
+      for (const child of got.tree.children) {
+        if (child.type === "code" && child.position) {
+          ourCode.push([
+            child.position.start.line - 1,
+            child.position.end.line - 1,
+          ]);
+        }
+      }
+      const a = JSON.stringify([...wantCode].sort());
+      const b = JSON.stringify(ourCode.sort());
+      if (a === b) codeAgree++;
+      else {
+        const kind =
+          ourCode.length === 0
+            ? "we report NO root code block"
+            : wantCode.length !== ourCode.length
+              ? `block count differs (${wantCode.length} vs ${ourCode.length})`
+              : JSON.stringify(wantCode.map((x) => x[0]).sort()) !==
+                  JSON.stringify(ourCode.map((x) => x[0]).sort())
+                ? "a block STARTS elsewhere"
+                : "a block ENDS elsewhere";
+        codeKinds.set(kind, (codeKinds.get(kind) ?? 0) + 1);
+      }
+    }
 
     const defsMatch = same(got.defs, entry.defs);
     const refsMatch = same(got.refs, entry.refs);
@@ -279,6 +330,13 @@ console.log(
   "  empty-named references excluded from both sides, as the corpus's own comparator does",
 );
 console.log(`  nodes spliced without a position: ${unplaced}`);
+console.log(
+  `\ncode blocks (root level), a dimension nothing read until now:` +
+    `\n  ${codeAgree}/${withCode} agree (${((100 * codeAgree) / withCode).toFixed(1)}%)`,
+);
+for (const [kind, count] of [...codeKinds].sort((a, b) => b[1] - a[1])) {
+  console.log(`  ${String(count).padStart(5)}  ${kind}`);
+}
 console.log("\ndisagreement kinds:");
 for (const [kind, count] of [...kinds].sort((a, b) => b[1] - a[1])) {
   console.log(`  ${String(count).padStart(5)}  ${kind}`);
