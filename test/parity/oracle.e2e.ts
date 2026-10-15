@@ -605,6 +605,43 @@ describe("Obsidian parity oracle", () => {
       (await browser.executeObsidian(DETECT_MATH_TEX as never)) as string,
     ) as { mathTex: boolean; apiVersion: string | null };
     const { mathTex } = probe;
+    // Print BOTH, because `apiVersion ?? getter` cannot be read backwards. A stamp of
+    // "1.14.4" means either "the bundle says 1.14.4" or "the bundle said nothing and this
+    // is the INSTALLER version" -- and under `OBSIDIAN_APP_PATH` those are opposite
+    // conclusions about which app was recorded. One run of this distinguishes them.
+    console.log(
+      `  apiVersion=${JSON.stringify(probe.apiVersion)} installer=${installerVersion} getter=${String(await browser.getObsidianVersion())}`,
+    );
+    // An override that is SILENTLY IGNORED is the failure this guards, measured rather than
+    // imagined: `OBSIDIAN_APP_PATH` pointed at a 1.15.0 asar for two full recordings and
+    // `wdio-obsidian-service@3.3.0` never opened the file -- the asar's atime stayed at the
+    // moment it was last hashed by hand, the download cache held only 1.13.7 and 1.14.4, and
+    // the bundle reported `apiVersion` 1.14.4 throughout. A 1.14.4-vs-1.14.4 diff reads
+    // exactly like "the new release changes nothing", which is the wrong conclusion drawn
+    // from a correct-looking run.
+    //
+    // So the asar is asked what it is and the answer has to match the bundle. Obsidian's
+    // version is a minified module-local constant -- `Zr="1.15.0"` in one build and
+    // `goe="1.14.4"` in another -- so it is anchored on the `1e3/60` frame constant that sits
+    // beside it in both. Extraction failing is NOT fatal, because the anchor is a minifier
+    // artefact and may move; a successful extraction that DISAGREES is.
+    const overridePath = process.env.OBSIDIAN_APP_PATH;
+    if (overridePath !== undefined && overridePath !== "") {
+      const asar = await fs.readFile(overridePath, "latin1").catch(() => "");
+      const claimed = /1e3\/60,[^;]{0,60}?="(\d+\.\d+\.\d+)"/u.exec(asar)?.[1];
+      if (claimed === undefined) {
+        console.log(
+          `  WARNING: could not read a version out of ${overridePath}; the stamp below is unverified`,
+        );
+      } else if (claimed !== probe.apiVersion) {
+        throw new Error(
+          `OBSIDIAN_APP_PATH points at an asar claiming ${claimed} but the running bundle ` +
+            `reports ${JSON.stringify(probe.apiVersion)}. The override did not take effect, ` +
+            `so this recording is NOT of the requested app. Refusing to write a golden that ` +
+            `would be diffed as if it were.`,
+        );
+      }
+    }
     const appVersion =
       probe.apiVersion ?? String(await browser.getObsidianVersion());
     console.log(`  app ${appVersion}, math latex available: ${mathTex}`);
