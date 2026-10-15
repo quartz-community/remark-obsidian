@@ -1702,6 +1702,114 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "fence-swallows-shallower-lines",
+    what: "an item's fence keeps lines indented less than its content column",
+    // The five-space-cap family reached from a FIFTH direction, and this time with a
+    // restriction that answers last night's refutation.
+    //
+    //     *⟨4sp⟩~~~ / ⟨3sp⟩Text / ⟨3sp⟩[^2]: body text / ⟨5sp⟩~~~
+    //
+    // The item's content column is 5, the content lines are at 3, so they fall outside the item
+    // and our fence closes EMPTY -- `code@1-1` with no value -- leaving the `[^2]` live in a
+    // paragraph where Obsidian has it buried. Obsidian's content column there is 3, which is
+    // B3's minimum over the item's own lines.
+    //
+    // B3's minimum as the rule deciding item OWNERSHIP was refuted last night in the tokenizer
+    // at -32 referee and four CommonMark list cases, because a shallower line is how a SIBLING
+    // MARKER announces itself. INSIDE A FENCE it cannot be: fence content is literal, so no
+    // line in it starts a list item. That is the restriction the refuted version lacked, and it
+    // is a property of fences rather than a narrowing fitted to the losses.
+    //
+    // SCORED better 8 / worse 1, agreement +7, and READY TO BUILD rather than built:
+    //
+    //     no contentColumn gate            better 10  worse 23  agreement -11
+    //     gated on the shipped column      better  8  worse  1  agreement  +7
+    //
+    // The gate is the second half of the rule and not a narrowing. `1.⟨6sp⟩```` has a CAPPED
+    // content column -- five or more separator spaces put it at the marker plus one -- so its
+    // ``` sits four or more past that and is indented CODE, not a fence. A `[^name]` inside
+    // indented code IS indexed, which this file already records, and only a fence buries one.
+    // Every one of the 23 losses was that shape.
+    //
+    // WHAT IT COSTS TO BUILD, and why it is recorded instead. The fence node is EMPTY in our
+    // tree -- `code@1-1` -- and the lines that should be its content are a sibling paragraph
+    // that also straddles the closer, so the repair has to extend the fence, drop the buried
+    // siblings, and re-parse the tail INSIDE a list item. These notes record a repair that
+    // re-parsed an item's content costing 27 referee documents because the node it produced
+    // competed with every enclosing block, and +7 does not buy that risk without the tail
+    // handled more carefully than one sitting allows.
+    //
+    // The cleaner home is the TOKENIZER, where this restriction makes B3's minimum safe: while
+    // a fence is open inside an item, a shallower line cannot be a sibling marker, so
+    // `tokenizeIndent` could admit it and lower `containerState.size` exactly as the refuted
+    // version did -- without the four CommonMark list cases that refuted it. Whether
+    // `containerState` can see an open fence is the open question, and it is the fifth
+    // independent direction pointing at `legacy-list.ts`.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const buried: Array<[number, number]> = [];
+      const walk = (node: unknown): void => {
+        const self = node as { type?: string; children?: unknown[] };
+        if (self.type === "listItem") {
+          const kids = (self.children ?? []) as Array<{
+            type?: string;
+            position?: { start: { line: number }; end: { line: number } };
+          }>;
+          for (const [at, kid] of kids.entries()) {
+            if (kid.type !== "code" || !kid.position) continue;
+            // The opener's line carries the LIST MARKER when the fence opens on it --
+            // `*⟨4sp⟩~~~` -- so an `^[ \t]*` fence pattern never matches and the candidate
+            // measured nothing across 6,818 documents. The marker comes off first.
+            const open = (lines[kid.position.start.line - 1] ?? "").replace(
+              /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]*/u,
+              "",
+            );
+            const fence = /^([ \t]*)(`{3,}|~{3,})/u.exec(open);
+            if (!fence) continue;
+            // A REAL fence, not indented code. `1.⟨6sp⟩```` has a CAPPED content column -- five
+            // or more separator spaces put it at the marker plus one -- so its ``` sits four or
+            // more past it and is indented CODE, where a `[^name]` IS indexed. Only a fence
+            // buries one. Without this the rule scored 10/23 and every loss was that shape.
+            const column = contentColumn(text, self as unknown as ListItem);
+            if (column === undefined) continue;
+            const openerLine = lines[kid.position.start.line - 1] ?? "";
+            const openerAt = openerLine.indexOf(fence[2]![0]);
+            if (openerAt === -1 || openerAt - column >= 4) continue;
+            // An EMPTY fence whose content fell outside the item: the opener and the closer are
+            // the same line only when the tokenizer gave it nothing.
+            if (kid.position.end.line !== kid.position.start.line) continue;
+            const next = kids[at + 1];
+            if (!next?.position) continue;
+            // The matching closer, somewhere in the sibling that took the content.
+            for (
+              let line = next.position.start.line - 1;
+              line <= next.position.end.line - 1;
+              line++
+            ) {
+              const closer = /^([ \t]*)(`{3,}|~{3,})[ \t]*$/u.exec(
+                lines[line] ?? "",
+              );
+              if (!closer) continue;
+              if (closer[2]![0] !== fence[2]![0]) continue;
+              if (closer[2]!.length < fence[2]!.length) continue;
+              buried.push([kid.position.start.line - 1, line]);
+              break;
+            }
+          }
+        }
+        for (const child of self.children ?? []) walk(child);
+      };
+      walk(tree);
+
+      const inside = (line: number): boolean =>
+        buried.some(([from, to]) => line > from && line < to);
+      return {
+        defs: ours.defs.filter((d) => !inside(d[1])),
+        refs: ours.refs.filter((r) => !inside(r[1])),
+      };
+    },
+  },
+  {
     name: "ref-before-label-wins",
     what: "a `[^name]` stays a footnote reference even when a `[` follows it",
     // `a[^1][^2]` becomes a `linkReference#^2` with the text `^1` -- a FULL link reference --
