@@ -49,15 +49,31 @@ import { contentColumn } from "../../src/lib/definition-column.js";
 import { columnsOf } from "../../src/lib/item-dot-threshold.js";
 import { refereeFactsWithTree, type Def, type Ref } from "./referee-facts.js";
 
+/** A code block's line range, zero-based and inclusive, as Obsidian records it. */
+export type CodeRange = readonly [number, number];
+
 interface Answer {
   readonly text: string;
   readonly defs: readonly Def[];
   readonly refs: readonly Ref[];
+  /**
+   * Obsidian's ROOT-LEVEL code sections, on 883 of the 6,818 documents.
+   *
+   * Read by nothing until it was wired into `referee.mts`, and it is `sections` filtered to
+   * `code` -- verified against live 1.14.4 -- so it is a slice of the section oracle rather
+   * than a separate recording. Scoring it is what makes a GEOMETRY rule measurable here at
+   * all: every candidate before this one could only move definitions and references, which is
+   * why the container-comment family was refused as "section geometry only, which this oracle
+   * cannot see".
+   */
+  readonly code?: readonly CodeRange[];
 }
 
 interface Facts {
   readonly defs: readonly Def[];
   readonly refs: readonly Ref[];
+  /** Root-level code ranges. A candidate that leaves this alone is scored on the originals. */
+  readonly code?: readonly CodeRange[];
 }
 
 /**
@@ -1858,6 +1874,15 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "control-drop-all-code",
+    what: "CONTROL: report no root code block at all",
+    // Not a rule. It exists to prove the `code` dimension is wired in: a candidate that empties
+    // it must score catastrophically, and one that ignores it must score exactly as it did
+    // before the dimension existed. Both were checked when the dimension landed, which is how
+    // this harness verifies a new gate -- by breaking what it watches.
+    apply: (_text, ours) => ({ defs: ours.defs, refs: ours.refs, code: [] }),
+  },
+  {
     name: "ref-before-label-wins",
     what: "a `[^name]` stays a footnote reference even when a `[` follows it",
     // `a[^1][^2]` becomes a `linkReference#^2` with the text `^1` -- a FULL link reference --
@@ -2297,13 +2322,21 @@ const key = (rows: readonly (readonly unknown[])[]) =>
 
 /** How far a set of facts is from the recorded answer: entries missing plus entries extra. */
 function distance(ours: Facts, answer: Answer): number {
+  // The code dimension counts only where the answer HAS one. 5,935 documents record no code
+  // section, and treating their absence as an assertion would make every candidate that builds
+  // a code block look catastrophic on documents the oracle says nothing about.
+  const scoreCode = (answer.code ?? []).length > 0;
   const want = new Set([
     ...answer.defs.map((d) => `d${JSON.stringify(d)}`),
     ...answer.refs.map((r) => `r${JSON.stringify(r)}`),
+    ...(scoreCode
+      ? (answer.code ?? []).map((c) => `c${JSON.stringify(c)}`)
+      : []),
   ]);
   const have = new Set([
     ...ours.defs.map((d) => `d${JSON.stringify(d)}`),
     ...ours.refs.map((r) => `r${JSON.stringify(r)}`),
+    ...(scoreCode ? (ours.code ?? []).map((c) => `c${JSON.stringify(c)}`) : []),
   ]);
   let apart = 0;
   for (const entry of want) if (!have.has(entry)) apart += 1;
@@ -2333,10 +2366,25 @@ for (const rule of RULES) {
     } catch {
       continue;
     }
-    const after = rule.apply(answer.text, ours, ours.tree);
+    // Our own root code ranges, so a candidate can move them and a candidate that does not is
+    // still compared on them.
+    const ourCode: CodeRange[] = [];
+    for (const child of ours.tree.children) {
+      if (child.type === "code" && child.position) {
+        ourCode.push([
+          child.position.start.line - 1,
+          child.position.end.line - 1,
+        ]);
+      }
+    }
+    const base: Facts & { tree: Root } = { ...ours, code: ourCode };
+    const raw = rule.apply(answer.text, base, ours.tree);
+    const after: Facts = { ...raw, code: raw.code ?? ourCode };
     const unchanged =
-      key(ours.defs) === key(after.defs) && key(ours.refs) === key(after.refs);
-    const before = distance(ours, answer);
+      key(base.defs) === key(after.defs) &&
+      key(base.refs) === key(after.refs) &&
+      key(base.code ?? []) === key(after.code ?? []);
+    const before = distance(base, answer);
     const now = distance(after, answer);
     if (before === 0) agreedBefore += 1;
     if (now === 0) agreedAfter += 1;

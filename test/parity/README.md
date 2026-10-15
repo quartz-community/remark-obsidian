@@ -1709,9 +1709,50 @@ sections.
 
 What that opens is the family the blindness was invoked to decline. The container-opened `%%`
 work was refused as "section geometry only, which the referee's oracle cannot see by
-construction" -- and for any of its documents that hold a code section, it can. Making that
-measurable wants a `code` dimension in `score.mts`, whose candidates currently return
-`{defs, refs}` and would need to return ranges; that is the next instrument, not the next rule.
+construction" -- and for any of its documents that hold a code section, it can.
+
+### The dimension is now in `score.mts`, and it did NOT rescue that family
+
+Built as the instrument before the rule: `Answer` carries `code`, `Facts` carries it, a
+candidate may return ranges, and `distance` counts them. Two checks, because a new dimension
+that silently does nothing is this file's most-repeated failure:
+
+- a CONTROL that empties every range scores `better 20 / worse 742`, so the dimension is live
+- a candidate that returns only `{defs, refs}` gets `after.code = ours` and contributes zero to
+  both distances, so every existing verdict is untouched
+
+It counts only where the answer HAS a code section. 5,935 documents record none, and treating
+that absence as an assertion would make any candidate that builds a code block look
+catastrophic on documents the oracle says nothing about.
+
+**And the container-comment family is unchanged at 0/17 and 0/0.** The reason is worth stating
+because it is not the one I expected: those candidates drop DEFINITIONS AND REFERENCES, so they
+never touch geometry, and a dimension cannot adjudicate a rule that does not move it. Scoring
+geometry needs candidates WRITTEN for geometry. The blind-spot correction stands -- the oracle
+can see code sections -- and the family remains unmeasured for a different reason than before.
+
+### Where the 118 actually is, and it is the inverse of this session's work
+
+Classified whole rather than by its head:
+
+    49  obs code -> ours keeps the line in a LIST item
+    29  obs code -> ours keeps it in a BLOCKQUOTE
+    20  fence variants of the same
+     5  callout     3  paragraph     3  footnoteDefinition
+
+**78 of 118 are one mechanism: we keep a line inside a container where Obsidian ends the
+container and makes the line ROOT INDENTED CODE.** That is the exact inverse of the three fixes
+that took the referee from 83.2% to 83.6% this session, all of which made containers keep MORE
+lines -- and the shapes overlap, which is the useful part:
+
+    ⟨2sp⟩10.⇥[^b]: def / ⇥# heading          code [[1,1]]  -- also a `def-end+1` entry
+    +⟨4sp⟩⇥[^a]: def / blank / ⇥- item       code [[2,3]]  -- also a cap-family probe
+    10.⟨4sp⟩More $[^ä]$ [^Ω] / ⟨6sp⟩- item   code [[1,1]]
+
+So the same underlying question -- which lines a container owns -- is now measurable DIRECTLY as
+block geometry on 78 documents, instead of inferred from where a definition happens to end. That
+is a far better instrument for it than the footnote fields, and it is the first target of this
+effort that arrived with its own oracle rather than needing one built.
 
 ## Asking Obsidian directly, in two seconds
 
