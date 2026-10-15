@@ -1922,6 +1922,33 @@ const RULES: readonly Rule[] = [
     // Those are four mechanisms sharing a symptom, and the blockquote half -- 29 documents --
     // has nothing to do with a list item's content column at all. The next step is one probe
     // wave per bucket, not one rule for the symptom.
+    //
+    // THE BLOCKQUOTE BUCKET WENT THAT WAY AND LANDED: a tab-indented line below a quote is
+    // code, which was a units bug in `quote-indented-code.ts`, worth +5 footnotes and +10 code.
+    //
+    // THE LIST BUCKET HAS NOW RESISTED FIVE FORMULATIONS and the last one is the most
+    // informative, because the RULE is settled and the corpus still cannot adjudicate it.
+    // Seven probes against live 1.14.4 agree on `4 <= indent < outermost content column`:
+    //
+    //     10.⟨4sp⟩Some words / ⇥- item    col 7, indent 4    code       ours: one list
+    //     10.⟨3sp⟩a          / ⇥- item    col 6, indent 4    code       ours: one list
+    //     10.⟨2sp⟩a          / ⇥- item    col 5, indent 4    code       ours: one list
+    //     10. a              / ⇥- item    col 4, indent 4    2 items    agrees
+    //     - a                / ⇥- item    col 2, indent 4    2 items    agrees
+    //     ⟨1sp⟩- a / ⟨2sp⟩- b / ⟨3sp⟩- c / ⟨4sp⟩- d          4 items    agrees
+    //
+    // The staircase is what fixes the direction: `⟨4sp⟩- d` is admitted because 4 >= the
+    // OUTERMOST column of 3, where the innermost item's column of 5 would have called it code.
+    // Using the innermost touched 11 documents; using the outermost touches 6. Both are
+    // nothing against a bucket of 69.
+    //
+    // So the predicate is right about the shapes it was derived from and does not reach the
+    // corpus's. Those 69 entries are dense documents whose lines sit inside NESTED items, or
+    // inside containers our tree shapes differently before this would see them -- the same
+    // structural limit that refused the five-space cap three times and B3's ownership rule in
+    // the tokenizer. Recorded as probe-correct and corpus-rare, which is the third finding of
+    // that shape in two days alongside `[^name](url)` at 4 documents and the `<...>` autolink
+    // at 6.
     apply: (text, ours, tree) => {
       const lines = text.split("\n");
       const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/u;
@@ -1936,13 +1963,18 @@ const RULES: readonly Rule[] = [
       };
 
       const orphans = new Set<number>();
-      const walk = (node: unknown): void => {
+      // THE OUTERMOST item's content column, not the innermost. Walking into nested items made
+      // the candidate compare against a deeper column and it touched 11 documents of 6,818; the
+      // staircase probe is what fixes the direction -- `⟨1sp⟩- a` / `⟨2sp⟩- b` / `⟨3sp⟩- c` /
+      // `⟨4sp⟩- d` is four flat items, and `⟨4sp⟩- d` is admitted because 4 >= the OUTERMOST
+      // column of 3, while the inner item's column of 5 would have called it code.
+      const walk = (node: unknown, depth: number): void => {
         const self = node as {
           type?: string;
           position?: { start: { line: number }; end: { line: number } };
           children?: unknown[];
         };
-        if (self.type === "listItem" && self.position) {
+        if (self.type === "listItem" && self.position && depth === 1) {
           const first = self.position.start.line - 1;
           const marker = MARKER.exec(lines[first] ?? "");
           // THE SHIPPED COLUMN, not `marker[0].length`. The raw prefix ignores the five-space
@@ -1959,9 +1991,11 @@ const RULES: readonly Rule[] = [
             }
           }
         }
-        for (const child of self.children ?? []) walk(child);
+        for (const child of self.children ?? []) {
+          walk(child, self.type === "list" ? depth + 1 : depth);
+        }
       };
-      walk(tree);
+      walk(tree, 0);
       if (orphans.size === 0) return ours;
 
       // Consecutive orphan lines are ONE code block, which is how an indented run works.
