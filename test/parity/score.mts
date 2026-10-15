@@ -1958,7 +1958,29 @@ const RULES: readonly Rule[] = [
     // it because the quote bounds the comment and a blank ends the quote, which is the same
     // doctrine `comment-definition-extent.ts` states for definitions.
     //
-    // REFUSED THREE TIMES, and the trend is the useful part:
+    // AND THE FOURTH SCOPING IS THE ONE THAT MATTERED, found from the other side. Live
+    // preview's extent, with ONLY definitions suppressed, explained 11 of 18 disagreeing
+    // documents in this family and over-suppressed none -- so the boundary was never the
+    // whole problem. Dropping references was:
+    //
+    //     to the first blank line, defs AND refs      5 better   11 worse
+    //     ...the same, DEFINITIONS ONLY               6 better    1 worse
+    //
+    // A `%%` comment defines nothing and its references are STILL INDEXED, worth 710
+    // documents and already implemented in `parseComments`. The refusal note below records
+    // that the losing rows "carry defs IDENTICAL to the answer and differ only in refs",
+    // which is this bug stated without being recognised -- for three scopings.
+    //
+    // STILL NOT IMPLEMENTED, and the number says why rather than the shape. Full agreement
+    // goes 5646 -> 5645: the six improvements are PARTIAL, inside documents that still
+    // disagree on something else, while the single loss is total. So the rule is now pointed
+    // the right way and buys nothing yet. The residual loss is the same far-end over-reach as
+    // every earlier scoping -- `[^x-y]` at line 26 and `[^टिप्पणी]` at 27, dropped because no
+    // blank line separates them from an opener far above -- and it is one of the seven
+    // documents `lp-comment.mts` also cannot explain. Whatever ends a container-opened comment
+    // short of a blank line is still unknown, and it is the last piece.
+    //
+    // REFUSED THREE TIMES BEFORE THAT, and the trend is the useful part:
     //
     //     any quote depth, region to the first blank line      18 better   65 worse
     //     + the derived `opener at 4+ columns is code` guard    18 better   65 worse   INERT
@@ -2039,10 +2061,17 @@ const RULES: readonly Rule[] = [
       if (dead.length === 0) return ours;
       const buried = (line: number): boolean =>
         dead.some(([from, to]) => line > from && line < to);
+      // DEFINITIONS ONLY. A `%%` comment defines nothing and its REFERENCES ARE STILL INDEXED
+      // -- this repo's own measured asymmetry, worth 710 documents, and the reason
+      // `parseComments` keeps a buried label as a reference. Dropping both is what made every
+      // earlier scoping of this rule lose: the refusal note above records that the `worse`
+      // rows "carry defs IDENTICAL to the answer and differ only in refs", which is this bug
+      // described without being recognised. Live preview pointed at it from the other side --
+      // taking its extent and suppressing only definitions explained 11 of 18 documents in
+      // this family and over-suppressed none.
       return {
         ...ours,
         defs: ours.defs.filter((d) => !buried(d[1])),
-        refs: ours.refs.filter((r) => !buried(r[1])),
       };
     },
   },
