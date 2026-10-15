@@ -2076,6 +2076,57 @@ What the agreement buys is that live preview's boundary is worth PROBING where `
 blind, which is inside containers and at delimiter granularity. The `code` field was adopted
 the same way: verified as `sections.filter(type === "code")` before anything was scored on it.
 
+### ...and the validation set had a hole exactly where the two parsers part company
+
+Every case above is BLANK-LINE-FREE, so ten agreements said nothing about a blank line. Adding
+one is the first thing that should have been done, and it splits:
+
+| where                        | live preview | the cache         |
+| ---------------------------- | ------------ | ----------------- |
+| root, `%%` / blank / `tail`  | to EOF       | to EOF -- AGREE   |
+| in a quote, `> > %%` / blank | to EOF       | the content LIVES |
+
+At root they agree, which the committed golden already pins. **Inside a container they do not**:
+`> > %%` / blank / `[^note]: Definition` is `comment@16-27` of 27 characters to live preview,
+so buried, while the cache reports the footnote as DEFINED. And the `--extent` axis cannot
+express that case at all, because the cache reports no `comment` SECTION for a `%%` opened
+inside a quote -- which is the exact blindness live preview was wanted for.
+
+So live preview's extent is **right at root and too long inside a container**, and it cannot
+supply that boundary unqualified. Recorded as a case rather than a note so it cannot be
+forgotten.
+
+### Which still bought something, measured on the refused family
+
+`lp-comment.mts` takes live preview's extent as the boundary on the 68 referee documents
+holding a depth-2+ quoted `%%`, suppresses the definitions inside it, and compares against the
+recorded answer:
+
+    already agree (nothing to explain) : 48
+    EXPLAINED by live preview's extent : 11
+    still unexplained                  :  7
+    no comment node at all             :  2
+
+**Eleven of eighteen, and it over-suppresses none** -- against the heuristic that was refused
+three times today at 5 better and 11 worse. The 11 are documents with no blank line between
+opener and definition, where to-EOF and the real boundary coincide. The 7 are OTHER FAMILIES
+that merely co-occur with a depth-2 `%%`: a tab-indented definition in a quote, a document
+where we MISS definitions rather than invent them, an invalid footnote name.
+
+Two measurement corrections on the way, both the usual shape. Scoring the full `[name, line,
+col, endLine]` tuple counted `def-end` divergences as failures of a comment rule and understated
+it at 10 of 27 -- the metric has to be EXISTENCE, because an end line is a different family and
+no comment boundary can fix one. And the node filter caught HTML comments too, suppressing a
+definition on a line carrying `<!-- [^b] -->` that Obsidian defines; live preview names both
+syntaxes `comment` and they are told apart by their markers:
+
+    x %%c%%             comment-start / comment / comment-end
+    x <!-- c -->        comment                       <- no markers at all
+    <!-- / b / -->      hmd-html-begin ... hmd-html-end
+
+so a `%%` region must be ANCHORED on a `comment-start`, which excludes an inline HTML comment
+by construction rather than by naming `hmd-html` explicitly.
+
 ### Five comparator bugs before the first real answer
 
 The headline number was wrong four times, and every time the bug was mine rather than the

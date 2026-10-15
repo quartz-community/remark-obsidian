@@ -128,6 +128,24 @@ const CASES: readonly {
     cacheType: "comment",
     lpNode: "comment",
   },
+  // A BLANK LINE, which the first version of this set had no case for at all -- every other
+  // probe here is blank-line-free, so the agreements said nothing about one. AT ROOT the two
+  // agree and both run to the end of the document, which is what the committed golden already
+  // pins for a top-level unclosed `%%`.
+  //
+  // THE DIVERGENCE IS CONTAINER-OPENED, and this axis cannot express it: the cache reports no
+  // `comment` SECTION for a `%%` opened inside a quote, which is precisely why `sections` is
+  // blind there and why live preview was wanted. Measured through the footnote projection
+  // instead -- `> > %%` / blank / `[^note]: Definition` is `comment@16-27` of 27 characters to
+  // live preview, so buried, while the cache reports the footnote as DEFINED. So live
+  // preview's extent is right at root and too long inside a container, and it cannot supply
+  // that boundary unqualified.
+  {
+    what: "unclosed, past a blank",
+    md: "%%\n\ntail",
+    cacheType: "comment",
+    lpNode: "comment",
+  },
   {
     what: "comment after text",
     md: "x\n\n%%c%%",
