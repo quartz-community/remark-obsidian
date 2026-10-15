@@ -1875,7 +1875,7 @@ const RULES: readonly Rule[] = [
   },
   {
     name: "quote-comment-extends-past-the-quote",
-    what: "an unclosed `%%` in a quote of ANY depth swallows the lazy lines below it",
+    what: "an unclosed `%%` in a quote at depth 2+ swallows the lazy lines below it",
     // `comment-quote-extent.ts` handles depth 1 and bails at depth 2+, because it requires the
     // comment NOT to be the quote's last child. At depth 1 remark's lazy continuation pulls the
     // root-level line into the quote, so the comment has a sibling and the pass fires; at depth 2
@@ -1893,7 +1893,24 @@ const RULES: readonly Rule[] = [
     // it because the quote bounds the comment and a blank ends the quote, which is the same
     // doctrine `comment-definition-extent.ts` states for definitions.
     //
-    // REFUSED AT 18 BETTER / 65 WORSE, and the shape of the damage is the useful part. The
+    // REFUSED THREE TIMES, and the trend is the useful part:
+    //
+    //     any quote depth, region to the first blank line      18 better   65 worse
+    //     + the derived `opener at 4+ columns is code` guard    18 better   65 worse   INERT
+    //     + depth 2 or more only                                5 better   11 worse
+    //
+    // Each restriction is derived rather than fitted, and the last one is the boundary of what
+    // the shipped depth-1 pass cannot reach. It still does not pay, and the `worse` rows now
+    // name the flaw exactly: one drops `[^x-y]` at line 26 and `[^टिप्पणी]` at line 27, two
+    // definitions Obsidian KEEPS, because a `> > %%` far above them has a contiguous run that
+    // reaches that far. THE OPENER SIDE IS SETTLED AND THE CLOSING BOUNDARY IS NOT.
+    //
+    // Stopping at three rather than fitting the fourth to the 11. The next restriction that
+    // would help is a cap on how far the run may reach, and no probe supports one -- it would
+    // be exclude-what-broke, which cost +52 at 74 gained and 21 lost the last time it looked
+    // reasonable.
+    //
+    // The shape of the damage is the rest of the story. The
     // `worse` rows carry defs IDENTICAL to the answer and differ only in refs, so the rule is
     // not dropping the wrong definitions -- it is dropping references over too many lines.
     // `to = the first blank line` is a TEXTUAL approximation of the quote's extent, and in a
@@ -1919,6 +1936,11 @@ const RULES: readonly Rule[] = [
         const line = lines[at] ?? "";
         const quoted = /^[ \t]*(?:>[ \t]*)+/u.exec(line);
         if (!quoted || !line.slice(quoted[0].length).startsWith("%%")) continue;
+        // DEPTH 2 OR MORE ONLY. `comment-quote-extent.ts` already owns depth 1, measured and
+        // shipped, so a candidate that re-handles it double-applies and its damage says nothing
+        // about this rule. This is not a fit to the losses -- it is the boundary of what the
+        // shipped pass cannot reach, which is exactly the 30 documents classified here.
+        if ((quoted[0].match(/>/gu) ?? []).length < 2) continue;
         // An opener at four or more columns INSIDE the quote is indented code and opens
         // nothing -- the rule `comment-region.ts` already ships, measured at +7. Counting a
         // tab after a space as reaching nothing, per the audit.

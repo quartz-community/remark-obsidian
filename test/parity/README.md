@@ -1754,6 +1754,78 @@ block geometry on 78 documents, instead of inferred from where a definition happ
 is a far better instrument for it than the footnote fields, and it is the first target of this
 effort that arrived with its own oracle rather than needing one built.
 
+## The queue's number two bucket, classified three ways and refused three times
+
+`def-extra+ref-miss` is 124 documents and was never classified. Doing it properly produced one
+real mechanism, twelve probes, three refusals and an attribution correction -- and no shipped
+code, which is the honest outcome.
+
+### Three dimensions, each derived
+
+    SAME name as the lost ref   130      we invent a def for X and lose the ref to X
+    different name               20
+
+    of the SAME-name 130, by the NEXT line:
+    blank                        75
+    %% (any quote depth)         34
+    SETEXT underline              5      <- the hypothesis the shortest cases suggested
+
+    of the blank-next 75, by what PRECEDES:
+    UNCLOSED %% before           30      <- one coherent mechanism
+    other                        41
+
+**Setext was refuted as the mass at 5 of 135.** Two of the four shortest SAME-name cases are
+`[^1]: def` / `===`, which reads as a clean CommonMark story about a definition line becoming a
+heading. It explains five documents. Seventh time selection-by-brevity has misdescribed a
+family, and the first where the wrong hypothesis was _elegant_ rather than merely short.
+
+### The 30 are real, and twelve probes bound them
+
+    > > %%  / [^note]: Definition        suppressed   ours: DEFINITION  <- the bug
+    >   %%  / [^note]: Definition        suppressed   ours: suppressed
+        %%  / [^note]: Definition        suppressed   ours: suppressed
+    > > %%  / > > %%  / [^note]: Defn    SURVIVES     ours: survives
+    > > %%  / blank   / [^note]: Defn    SURVIVES     ours: survives
+
+`comment-quote-extent.ts` requires the comment NOT to be the quote's last child. At depth 1
+remark's lazy continuation pulls the root-level line into the quote, so the comment has a
+sibling and the pass fires; at depth 2 the line stays at root, the comment IS last, and the
+guard returns.
+
+A second wave settled the geometry, and it is pure CommonMark lazy continuation:
+
+    > > %% / [^note]: Definition     blockquote@0-1    a DEFINITION line continues it
+    > > %% / plain [^note]          blockquote@0-1    a paragraph line continues it
+    > > %% / - item [^note]         blockquote@0-0 + list@1-1       a marker ends it
+    > > %% / # head [^note]         blockquote@0-0 + heading@1-1    ATX ends it
+    > > %% / ```                    blockquote@0-0 + code@1-3       a fence ends it
+
+**And `refs` is empty in all five.** The comment suppresses past the quote's structural end, so
+its reach is not the quote's extent -- a list or heading below it is a separate root section and
+its references still die.
+
+### Refused three times, and the trend is the finding
+
+    any quote depth, region to the first blank line      18 better   65 worse
+    + the derived `opener at 4+ columns is code` guard   18 better   65 worse   INERT
+    + depth 2 or more only                                5 better   11 worse
+
+Every restriction is derived rather than fitted -- the last is the boundary of what the shipped
+depth-1 pass cannot reach -- and it still does not pay. The `worse` rows name the flaw exactly:
+one drops two definitions at lines 26 and 27 that Obsidian keeps, because a `> > %%` far above
+has a contiguous run reaching that far. **The opener side is settled and the closing boundary is
+not.** Stopping at three rather than fitting a fourth to the 11, because the only restriction
+left that would help is a cap on the run's reach and no probe supports one.
+
+### And F4 was mis-attributed
+
+The earlier note called F4 unscorable because candidates that drop definitions never move
+geometry. Right about geometry, wrong about the blocker: the obstacle is not the oracle's
+blindness but the container extent itself, and the referee adjudicates it fine from the
+defs/refs side -- 18/65 and 5/11 are real numbers about a rule previously called unmeasurable.
+Eighth attribution correction of this effort, and the second this week where a measurement's
+silence had been generalised into a property of the oracle.
+
 ## Auditing every tab expansion, and the only multi-column character there is
 
 Prompted by a sharp question after the second tab bug in two days: does one to three spaces then
