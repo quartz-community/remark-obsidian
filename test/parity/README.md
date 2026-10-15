@@ -1511,6 +1511,44 @@ list item, blocked on bounding the math node's extent at its opener before the d
 absorb it. The reference families (`ref-miss` 201, `ref-extra` 196) remain the biggest counts
 and remain mostly cascades from the definition side.
 
+### The queue after the reference work, and one finding left unfitted
+
+`ref-miss` collapsed from 203 to 126 when adjacent references landed, and the remaining
+reference mass is `ref-extra` at 204. Classified over documents whose DEFINITIONS already agree
+-- so not the cascades this file attributes the family to -- it splits:
+
+    200  plain text line        86  the label line itself     67  quote line
+     28  after %% on the line   21  indented 4+ line          13  inside $...$
+
+Two of those were examined and are recorded here rather than built.
+
+**`[^name](url)` is a link, not a reference.** Obsidian reports no reference and registers the
+`^1` as a BLOCK id instead: `see [^1](u)` / `[^1]: d` gives `refs []` and `blocks ["1"]`, and we
+report a reference. The rule is already in `KNOWN_REFERENCE_GAPS`, and the reason to leave it
+there is size: **4 of 6,818** referee documents hold `[^name](`. The 200-entry bucket is not
+this shape -- it is dominated by references inside autolinks (`<a://b[^1]>`) and inside fences.
+
+**A callout plus a TAB makes its line literal, and a plain quote does not.** Six probes:
+
+    > [!info]   / >⇥Prose here [^3]     obs []        we index it
+    > [!note]   / >⇥code[^2]            obs []        we index it
+    > [!note] T / >⇥code[^2]            obs []        we index it
+    > plain     / >⇥code[^2]            obs 2@1:6     we agree
+    > [!note]   / >⟨4sp⟩code[^2]        obs 2@1:9     we agree
+    > [!note]   / > code[^2]            obs 2@1:6     we agree
+
+The `sections` confirm it independently: the three empty cases carry no relocated-footnote
+`text`/`element` entries, so nothing was rendered to reference.
+
+A mechanism suggests itself -- `obsidian-flavored-markdown` forces a newline after a callout
+title, so the tab line starts a FRESH block and becomes indented code, where in a plain quote it
+continues the paragraph lazily. **It does not survive the fourth row**: four spaces after the
+title behave like the quote, not like the tab, and no indent arithmetic this file has makes a
+tab and four spaces differ there. So the observable is recorded and the rule is not, because
+implementing an observable whose mechanism is unknown is how this harness has previously fitted
+a number instead of a rule -- and the tab family in particular is recorded as refused four ways
+with a demonstrated ceiling of ten.
+
 ## Asking Obsidian directly, in two seconds
 
 `parity:record` boots Obsidian under Xvfb, renders all 3,403 corpus cases and rewrites the
