@@ -1488,6 +1488,127 @@ const RULES: readonly Rule[] = [
     }),
   },
   {
+    name: "def-wide-separator-item-content",
+    what: "a wide marker separator caps the item's content column, so a 4-indent label defines",
+    // The largest non-tab bucket of `def-miss`: 67 entries where a list marker has a separator
+    // of FIVE OR MORE and the definition below it sits at indent 4. We make that root-level
+    // indented code and report no definition; Obsidian puts it inside the item.
+    //
+    // Seven probes against live 1.14.4, and the separator width is the whole discriminator:
+    //
+    //     1.⟨5sp⟩Prose here / ⟨4sp⟩[^1]: Definition     1@1:4
+    //     ⟨2sp⟩1.⟨5sp⟩Prose / ⟨4sp⟩[^1]: Definition     1@1:4
+    //     ⟨3sp⟩-⟨5sp⟩More   / ⟨4sp⟩[^1]: body text      1@1:4
+    //     1.⟨5sp⟩p / blank  / ⟨4sp⟩[^1]: def            1@2:4
+    //     1000. p  / blank  / ⟨5sp⟩[^1]: def            1@2:5
+    //     1.⟨2sp⟩Prose here / ⟨4sp⟩[^1]: Definition     NONE
+    //     -⟨2sp⟩p           / ⟨4sp⟩[^1]: def            NONE
+    //
+    // `definition-column.ts` already carries the cap for the COLUMN -- five or more spaces and
+    // the content column falls back to the marker plus one -- and the tokenizer does not, so
+    // micromark keeps the item's content at the separator's full width and a 4-indent line
+    // falls outside it. The two narrow cases are correct as they are: there the paragraph's own
+    // column IS 4, so the label is lazy continuation and defines nothing.
+    //
+    // THREE SCOPINGS, ALL NEGATIVE, and together they locate the work rather than refuse it:
+    //
+    //     line scan, previous line has a wide separator    better 11  worse  97
+    //     ROOT indented code only                          better  0  worse   3
+    //     any indented code + the B3 floor, fences out     better 31  worse 351
+    //
+    // The middle one is the diagnostic: restricted to root `code` the rule touches almost
+    // nothing, because the shape arrives BOTH ways -- `⟨2sp⟩1.⟨5sp⟩Prose` / `⟨4sp⟩[^1]:` leaves
+    // the label in a `code` INSIDE the item and `1000. p` / blank / `⟨5sp⟩[^1]:` leaves it in a
+    // root one. Widening to both finds 31, and then invents 351 because a label our tree buried
+    // was buried for a REASON -- a comment region, an unclosed fence, a swallowed container --
+    // and nothing in a tree walk after the fact distinguishes "the item should have owned this
+    // line" from "something else already claimed it".
+    //
+    // Which is the same conclusion from a third direction: B3's minimum governs the definition
+    // column (shipped), the code threshold (shipped) and WHICH LINES CONTINUE THE ITEM, and
+    // only the last one is the tokenizer's. `legacy-list.ts` is the vendored reader that would
+    // carry it, and the incremental form is available -- a floor can only fall as lines arrive,
+    // so admitting a line below `containerState.size` and lowering the size to its indent is
+    // exactly the whole-item minimum computed in a stream.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/u;
+      const LABEL = /^([ \t]*)\[\^([^\]\s]+)\]:/u;
+      const have = new Set(ours.defs.map((d) => `${d[0]}@${d[1]}`));
+      const extra: Def[] = [];
+
+      // Every label line our tree left inside a `code` node, at any depth. The earlier
+      // root-only version touched almost nothing (0/3) because the shape arrives BOTH ways:
+      // `⟨2sp⟩1.⟨5sp⟩Prose` / `⟨4sp⟩[^1]:` puts the label in a `code` INSIDE the item, while
+      // `1000. p` / blank / `⟨5sp⟩[^1]:` puts it in a root one.
+      const buried = new Set<number>();
+      const collect = (node: unknown): void => {
+        const self = node as {
+          type?: string;
+          lang?: string | null;
+          position?: { start: { line: number }; end: { line: number } };
+          children?: unknown[];
+        };
+        if (self.type === "code" && self.lang === null && self.position) {
+          // INDENTED code only. A bare ``` arrives as `code` with a null `lang` exactly as
+          // indented code does, so the node type cannot tell them apart and the source line
+          // has to -- the trap `container-lazy.ts` records for the same reason. Without this
+          // the candidate resurrected every label inside a fence and scored 31/358.
+          const first = lines[self.position.start.line - 1] ?? "";
+          if (
+            !/^[ \t]*(?:```|~~~)/u.test(
+              first.trimStart() === "" ? first : first,
+            )
+          ) {
+            for (
+              let at = self.position.start.line - 1;
+              at <= self.position.end.line - 1;
+              at++
+            ) {
+              buried.add(at);
+            }
+          }
+        }
+        for (const child of self.children ?? []) collect(child);
+      };
+      collect(tree);
+
+      // B3's minimum, over the item's own lines up to and INCLUDING the label's. This is the
+      // third thing that minimum governs -- after the definition's column and the code
+      // threshold, which both shipped -- and it is the one the tokenizer decides: whether the
+      // line continues the item at all.
+      for (const at of [...buried].sort((a, b) => a - b)) {
+        const label = LABEL.exec(lines[at] ?? "");
+        if (!label) continue;
+        let start = -1;
+        for (let back = at - 1; back >= 0; back--) {
+          const line = lines[back] ?? "";
+          if (line.trim() === "") continue;
+          if (MARKER.test(line)) {
+            start = back;
+            break;
+          }
+          if (!/^[ \t]/u.test(line)) break;
+        }
+        if (start === -1) continue;
+        const marker = MARKER.exec(lines[start] ?? "")!;
+        let floor = marker[0].length;
+        for (let scan = start + 1; scan <= at; scan++) {
+          const line = lines[scan] ?? "";
+          if (line.trim() === "") continue;
+          const indent = line.length - line.trimStart().length;
+          if (indent > 0 && indent < floor) floor = indent;
+        }
+        const indent = label[1]!.length;
+        if (indent < floor) continue;
+        const name = label[2]!.toLowerCase();
+        if (have.has(`${name}@${at}`)) continue;
+        extra.push([name, at, Math.min(indent, floor), at]);
+      }
+      return { refs: ours.refs, defs: [...ours.defs, ...extra] };
+    },
+  },
+  {
     name: "html-extent-item-block-tag",
     what: "a BLOCK TAG html in a list item swallows the following paragraph, as `<!--` already does",
     // `itemHtmlExtentTransform` carries this for the `<!--` opener only, and its own docstring
