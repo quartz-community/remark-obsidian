@@ -53,11 +53,25 @@ function codeIndent(inDefinition: boolean): number {
 function atColumn(text: string, want: number): boolean {
   let column = 0;
   let index = 0;
+  let sawSpace = false;
   while (index < text.length && column < want) {
     const character = text[index];
-    if (character === " ") column += 1;
-    else if (character === "\t") column += 4 - (column % 4);
-    else return false;
+    if (character === " ") {
+      column += 1;
+      sawSpace = true;
+    } else if (character === "\t") {
+      // A TAB AFTER A SPACE REACHES NOTHING. Expanding it to the next stop looks right and is
+      // wrong: `[ref]: /url` / `⟨2sp⟩⇥code` is a PARAGRAPH to Obsidian where `[ref]: /url` /
+      // `⇥code` is code, and `> x` / `⟨2sp⟩⇥%%` opens a comment where `> x` / `⇥%%` is code.
+      // Expanding it here cost three documents and was caught by asking whether one to three
+      // spaces then a tab is really four columns -- it is not, for this threshold.
+      //
+      // The same asymmetry is already measured in `definition-deindent-code.ts` and encoded in
+      // `definition-indented-code.ts`'s `/^(?: {4}|\t)/`, which admits a LEADING tab and no
+      // other. This is the third place it belongs and the first where it was derived twice.
+      if (sawSpace) return false;
+      column += 4 - (column % 4);
+    } else return false;
     index += 1;
   }
   if (column !== want) return false;

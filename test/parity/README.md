@@ -1754,6 +1754,57 @@ block geometry on 78 documents, instead of inferred from where a definition happ
 is a far better instrument for it than the footnote fields, and it is the first target of this
 effort that arrived with its own oracle rather than needing one built.
 
+## Auditing every tab expansion, and the only multi-column character there is
+
+Prompted by a sharp question after the second tab bug in two days: does one to three spaces then
+a tab really add four columns, and are there other multi-column characters? Both halves are
+worth the answer.
+
+### A tab after a space reaches NOTHING at an indent threshold
+
+This is measured, it is Obsidian's own inconsistency, and the package encodes it in three places
+that did not know about each other:
+
+    [ref]: /url / ⇥code            code@1-1     a LEADING tab is four columns
+    [ref]: /url / ⟨2sp⟩⇥code       paragraph    two spaces then a tab is NOT
+    > x / ⇥y                       code@1-1
+    > x / ⟨2sp⟩⇥y                  no code
+    ⇥%% / [^1]: def                definition   the `%%` is code, so no comment buries it
+    ⟨2sp⟩⇥%% / [^1]: def           NO definition -- the `%%` opens a comment
+
+So `definition-indented-code.ts`'s `/^(?: {4}|\t)/` -- which looks like it is missing the
+`⟨1-3sp⟩⇥` case -- is RIGHT, and `definition-deindent-code.ts` measured the same asymmetry
+independently at +4 against -2. **The bug was in the expanders, not the patterns.**
+
+`quote-indented-code.ts`'s tab fix, landed an hour earlier, expanded every tab to its stop and
+so turned `> x` / `⟨2sp⟩⇥y` into code. It cost three documents and the identity diff reported
+them; the fix takes them back:
+
+    before the audit   8 gained   3 lost
+    after              7 gained   0 lost      referee 5709/6818, code 742/883
+
+Audited every other expansion in the package. `definition-column.ts`'s `deIndentFloor` and
+`item-dot-threshold.ts`'s `columnsOf` AGREE with Obsidian on all three tab-after-space probes,
+so they are left alone -- the asymmetry applies to the indented-code threshold, not to an
+item's content column, and the difference is measured rather than assumed. A matching change to
+`comment-region.ts`'s `openerIndent` is INERT on all 6,818 documents and was reverted rather
+than shipped as unmeasurable.
+
+### And TAB is the only multi-column character, because both sides are JavaScript
+
+The second half of the question. Obsidian's columns are **UTF-16 code units**, which four probes
+settle and which is exactly what JS `.length` and string offsets give:
+
+    中文[^1]       col 2    not display width, which would be 4
+    👩‍💻[^1]       col 5    not graphemes, which would be 1 -- a ZWJ sequence is 5 units
+    áb[^1]        col 3    a combining mark counts on its own
+    ab[^1]        col 2
+
+We match all four. So the passes that compute a column as `body.length - body.lastIndexOf("\n")`
+are correct by construction rather than by luck, and the only character that advances more than
+one column is the tab. There is no second bug class here -- which is worth having checked, since
+the corpus deliberately carries CJK, ZWJ emoji, combining marks and U+00A0.
+
 ## Asking Obsidian directly, in two seconds
 
 `parity:record` boots Obsidian under Xvfb, renders all 3,403 corpus cases and rewrites the
