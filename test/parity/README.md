@@ -2207,6 +2207,61 @@ oracle's. Worth listing, because adopting an oracle has this failure mode every 
 So the control is permanent and asserted rather than eyeballed: two ends that cannot match,
 and the run prints `NO EVIDENCE` if they ever do.
 
+## `ref-miss`, classified by OUR mechanism rather than the line's shape
+
+The largest never-classified bucket. Grouping it by what the source line looks like would have
+repeated the mistake the audit above just found twice, so it is grouped by **which of our own
+nodes covers the position Obsidian indexes a reference at** -- which names the mechanism
+instead of the symptom:
+
+    104  we made it CODE
+    101  we read it as a DEFINITION label
+     60  ref exists but at a DIFFERENT position
+     35  no ref at all
+     14  ref exists but at a DIFFERENT position (quoted line)
+     12  we made it MATH
+      7  no ref at all (quoted line)
+      3  we buried it in a COMMENT
+      1  we made it INLINE CODE
+
+337 entries, and the two heads are 61% of it. The second overlaps the `def-extra+ref-miss`
+family classified above -- we build a definition where Obsidian reads a reference -- so the new
+ground is the first.
+
+### All 104 of "we made it CODE" have Obsidian NOT calling it code
+
+Split one axis at a time, with the host from our tree:
+
+    41  indented in a LIST item      33  FENCED in a LIST item
+    18  indented at ROOT              7  indented in a QUOTE
+     4  FENCED at ROOT                1  FENCED in a QUOTE
+
+**74 of 104 are inside a list item**, and not one of the six buckets has Obsidian agreeing the
+region is code -- so this is a single claim: we over-produce code inside list items, and every
+reference inside becomes literal.
+
+The shortest members are all WIDE SEPARATORS -- `10.` with six spaces, `1.` with seven,
+`*⟨4sp⟩`, `⇥⟨3sp⟩` -- which is the five-space cap family, already refused four ways at 11/97,
+0/3, 31/351 and once more from the `ref-extra` fence sub-family. **This is the fifth direction
+it has been reached from, and the first that sizes it properly: 104 entries.**
+
+### And the minimal spelling agrees on every width
+
+Probed `10.` with one through eight spaces before `y [^2]`, with `[^2]` defined below:
+
+    1-4 spaces    list + footnoteDefinition, refs ["2"]      ours identical
+    5-8 spaces    list + footnoteDefinition, refs []         ours identical
+
+Eight for eight. The cap itself is reproduced exactly, so nothing in this family is visible
+without the dense document -- the same finding the `ref-extra` fence sub-family reached ("all
+six minimal spellings AGREE... the disagreement needs the dense document"), now confirmed on a
+second sub-family and a different axis.
+
+So the honest statement about `ref-miss` is that its largest mechanism is real, is 104 entries,
+is 71% list-hosted, and is invisible to every minimal probe. It wants the five-space cap in
+`legacy-list.ts`, which is the piece these notes have identified three times and which no
+repair pass has been able to stand in for.
+
 ## Asking Obsidian directly, in two seconds
 
 `parity:record` boots Obsidian under Xvfb, renders all 3,403 corpus cases and rewrites the
