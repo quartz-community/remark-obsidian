@@ -68,8 +68,11 @@ export function definitionMathAbsorbTransform(
       // UNCLOSED: no further `$$` anywhere below the opener. A closed region is its own block
       // on both sides, which the fourth probe fixes.
       if (source.slice(bound).includes("$$")) continue;
-      // Only an opener that reaches past its own line; one already bounded there needs nothing.
-      if (to <= bound) continue;
+      // An opener ALREADY bounded at its own line still has to be absorbed -- only the clamp is
+      // conditional, not the absorption. Skipping those was what left the column-ZERO case
+      // open: `- [^a]: Definition` / `$$` arrives as `math@2-2`, inside the item and already
+      // one line long, where the indented spellings arrive spanning the blank below too.
+      const reach = to > bound ? bound : to;
       // NOT narrowed to openers that END the item, though every probe had that shape.
       // Measured on the implementation rather than inherited from the scorer, and it agrees:
       //
@@ -83,8 +86,8 @@ export function definitionMathAbsorbTransform(
 
       const end: Point = {
         line: math.position!.start.line,
-        column: bound - (source.lastIndexOf("\n", bound - 1) + 1) + 1,
-        offset: bound,
+        column: reach - (source.lastIndexOf("\n", reach - 1) + 1) + 1,
+        offset: reach,
       };
 
       math.position!.end = { ...end };
@@ -94,7 +97,7 @@ export function definitionMathAbsorbTransform(
 
       // Every ancestor on the path, or the item keeps an end its contents no longer reach.
       if (item.position && item.position.end.offset !== undefined) {
-        if (item.position.end.offset > bound) item.position.end = { ...end };
+        if (item.position.end.offset > reach) item.position.end = { ...end };
       }
       visit(tree, "list", (host: Node) => {
         const list = host as unknown as {
@@ -102,7 +105,7 @@ export function definitionMathAbsorbTransform(
           position?: { start: Point; end: Point };
         };
         if (!list.children.includes(item as unknown as RootContent)) return;
-        if (list.position && (list.position.end.offset ?? 0) > bound) {
+        if (list.position && (list.position.end.offset ?? 0) > reach) {
           list.position.end = { ...end };
         }
       });
