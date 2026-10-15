@@ -1684,6 +1684,35 @@ AGREE -- a root `⇥- item` is indented code on both sides, as are `⟨4sp⟩- i
 rather than read its shortest members, which is the procedure this file has now paid for five
 times.
 
+### `code` IS a slice of `sections`, which corrects a recorded blind spot
+
+Worth asking why the field is root-only rather than taking it as a quirk, and the answer is that
+it is not a separate recording at all. Checked against live 1.14.4 on five documents, and
+`code` equals `sections.filter(type === "code")` every time:
+
+    <div> / Prose here / </div> / - parent Text[^Ω] / blank / ⟨4sp⟩2)⟨8sp⟩Prose here
+      referee code         [[5, 6]]
+      sections[type=code]  [[5, 6]]
+      all sections         html@0-3  code@5-6
+
+`sections` is Obsidian's own block-level parse and this file calls it the primary oracle --
+root-level by construction, which is exactly the restriction. And `root` is nothing to
+implement: it is standard mdast, `tree.children` are the top-level blocks, and the word in that
+sentence describes Obsidian's section model rather than a node type this package is missing.
+
+**So a recorded blind spot was wrong.** `overview.ts` listed the referee as blind to "section
+geometry", on the evidence that the container-comment rule scored 0 of 6,818 documents -- and
+that evidence was about DEFINITIONS, from a scorer that only ever compared definitions and
+references. The referee holds a slice of the section oracle for 883 documents and always did.
+Corrected in place; the honest claim is that it is blind to section geometry EXCEPT code
+sections.
+
+What that opens is the family the blindness was invoked to decline. The container-opened `%%`
+work was refused as "section geometry only, which the referee's oracle cannot see by
+construction" -- and for any of its documents that hold a code section, it can. Making that
+measurable wants a `code` dimension in `score.mts`, whose candidates currently return
+`{defs, refs}` and would need to return ranges; that is the next instrument, not the next rule.
+
 ## Asking Obsidian directly, in two seconds
 
 `parity:record` boots Obsidian under Xvfb, renders all 3,403 corpus cases and rewrites the

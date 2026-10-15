@@ -137,7 +137,7 @@ export const ORACLES: readonly Oracle[] = [
       "ROOT-LEVEL CODE BLOCK ranges -- recorded on 883 of the 6818 documents and read by nothing until now",
     ],
     blind: [
-      "section geometry: scored 0 of 6818 documents on the container-comment rule, so it cannot adjudicate that family at all",
+      "section geometry EXCEPT code sections: the container-comment rule scored 0 of 6818 on definitions, and that was read as the oracle being blind to geometry entirely -- which the `code` field disproves for 883 documents",
       "positionless nodes -- it excludes them, which is why driving that count down moves agreement either way",
       "code blocks INSIDE a container: the field records root level only, which is why comparing every `code` node agrees on 52.4% and comparing the tree's own children agrees on 82.9%",
       "anything that is not a definition, a reference or a root code block",
