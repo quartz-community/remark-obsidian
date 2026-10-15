@@ -2127,6 +2127,48 @@ syntaxes `comment` and they are told apart by their markers:
 so a `%%` region must be ANCHORED on a `comment-start`, which excludes an inline HTML comment
 by construction rather than by naming `hmd-html` explicitly.
 
+### And then the family closed, on a rule that was never about the boundary
+
+Following the eleven back into `score.mts` took the candidate refused three times to **6 better
+/ 0 worse** in two steps, neither of which touched the boundary logic that had absorbed all the
+attention:
+
+    to the first blank line, defs AND refs      5 better   11 worse
+    ...DEFINITIONS ONLY                         6 better    1 worse
+    ...and bounded by LAZY CONTINUATION         6 better    0 worse
+
+**Dropping references was the whole of the first eleven losses.** A `%%` comment defines nothing
+and its references are still indexed -- 710 documents depend on that asymmetry and
+`parseComments` already implements it. The refusal note written that morning says the losing
+rows "carry defs IDENTICAL to the answer and differ only in refs", which is the bug stated
+plainly and not recognised, three scopings running.
+
+**The last loss was one document and an ATX heading:**
+
+    24  > > %%          the opener
+    25  ## Footnotes    an ATX heading at column 0 -- the quote ENDS here
+    26  [^x-y]: ...     survives, and the region was burying it
+    27  [^टिप्पणी]: ...  survives
+    28  (blank)         where the scan used to stop
+
+A `%%` opened inside a quote is bounded by the quote, and a quote ends wherever a paragraph can
+no longer be lazily continued -- a marker, an ATX heading, a fence. That is CommonMark and the
+second probe wave had already measured it; what it had NOT established is the claim built on
+top of it, that "the comment suppresses past the quote's structural end". **That was the
+`footnoteRefs` trap for the third time in one day**: those probes defined nothing, so an empty
+`refs` meant "no DEFINED reference" and was read as "the reference was suppressed".
+
+So all three restrictions are derived from constructs rather than fitted to losses, and the
+family is understood rather than refused. **It is still not built, and on SIZE rather than
+correctness** -- full agreement is 5646 before and after, because all six improvements are
+partial, inside documents that still disagree on a reference column or an end line. Six touched
+documents is below the bar this file sets: read `better + worse + same` first, and a total of
+six does not justify a pass however the sign comes out.
+
+That distinction is worth keeping separate from the eight refusals above it. Those were rules
+that were WRONG. This is a rule that is RIGHT and too small, which is a different note to leave
+for whoever reads the queue next.
+
 ### Five comparator bugs before the first real answer
 
 The headline number was wrong four times, and every time the bug was mine rather than the

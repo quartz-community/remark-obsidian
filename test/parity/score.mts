@@ -1971,14 +1971,25 @@ const RULES: readonly Rule[] = [
     // that the losing rows "carry defs IDENTICAL to the answer and differ only in refs",
     // which is this bug stated without being recognised -- for three scopings.
     //
-    // STILL NOT IMPLEMENTED, and the number says why rather than the shape. Full agreement
-    // goes 5646 -> 5645: the six improvements are PARTIAL, inside documents that still
-    // disagree on something else, while the single loss is total. So the rule is now pointed
-    // the right way and buys nothing yet. The residual loss is the same far-end over-reach as
-    // every earlier scoping -- `[^x-y]` at line 26 and `[^टिप्पणी]` at 27, dropped because no
-    // blank line separates them from an opener far above -- and it is one of the seven
-    // documents `lp-comment.mts` also cannot explain. Whatever ends a container-opened comment
-    // short of a blank line is still unknown, and it is the last piece.
+    // AND THE THIRD RESTRICTION CLOSES IT. Bounding the region at the container's end rather
+    // than at the next blank line takes the last loss out:
+    //
+    //     to the first blank line, defs AND refs      5 better   11 worse
+    //     ...DEFINITIONS ONLY                         6 better    1 worse
+    //     ...and bounded by LAZY CONTINUATION         6 better    0 worse
+    //
+    // Three restrictions, each derived from a construct rather than fitted to a loss: a
+    // comment defines nothing but its references are indexed, depth 1 is already owned by a
+    // shipped pass, and a quote ends where a paragraph can no longer be lazily continued. The
+    // family is now understood rather than merely refused.
+    //
+    // STILL NOT BUILT, and on SIZE rather than correctness, which is the distinction these
+    // notes exist to keep. Full agreement is 5646 both before and after: all six improvements
+    // are PARTIAL, inside documents that still disagree on a reference column or an end line,
+    // so the referee's headline number does not move. Six touched documents is below the bar
+    // this file sets -- read `better + worse + same` first, and a total of six is not worth a
+    // pass however the sign comes out. Recorded with its numbers and left, which is what a
+    // correct rule with no measurable payoff gets.
     //
     // REFUSED THREE TIMES BEFORE THAT, and the trend is the useful part:
     //
@@ -2047,6 +2058,32 @@ const RULES: readonly Rule[] = [
         let end = lines.length;
         for (let scan = at + 1; scan < lines.length; scan++) {
           const next = lines[scan] ?? "";
+          // THE CONTAINER'S END, not merely the next blank line. A `%%` opened inside a quote
+          // is bounded by the quote, and a quote ends at any line that cannot LAZILY CONTINUE
+          // a paragraph -- CommonMark, and measured directly by the second probe wave:
+          // `> > %%` over `- item`, `# head` or a fence reports `blockquote@0-0` plus a
+          // separate root section, while `plain` and `[^note]: def` keep it open.
+          //
+          // This is the residual loss of every earlier scoping, and it is one document:
+          //
+          //     24  > > %%          the opener
+          //     25  ## Footnotes    an ATX heading at column 0 -- the quote ENDS here
+          //     26  [^x-y]: ...     survives, and we were burying it
+          //     27  [^टिप्पणी]: ...  survives
+          //     28  (blank)         where `end` used to land
+          //
+          // The earlier read of that probe wave -- "the comment suppresses PAST the quote's
+          // structural end" -- was the `footnoteRefs` trap: those probes defined nothing, so
+          // an empty `refs` meant "no DEFINED reference" rather than "suppressed". Third
+          // conclusion that one field has cost today.
+          if (
+            /^ {0,3}(?:#{1,6}(?:[ \t]|$)|```|~~~|[-*+][ \t]|\d{1,9}[.)][ \t])/u.test(
+              next,
+            )
+          ) {
+            end = scan;
+            break;
+          }
           if (next.trim() === "") {
             end = scan;
             break;
