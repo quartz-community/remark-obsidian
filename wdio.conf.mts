@@ -1,3 +1,4 @@
+import * as fs from "node:fs";
 import * as path from "node:path";
 import { env } from "node:process";
 import { browser } from "@wdio/globals";
@@ -18,6 +19,60 @@ const installerVersion = env.OBSIDIAN_INSTALLER_VERSION ?? "latest";
  */
 const appPath = env.OBSIDIAN_APP_PATH;
 
+/**
+ * `appPath` alone is not enough, which cost two full recordings to establish.
+ *
+ * The service resolves the app version against its `obsidian-versions.json` BEFORE it
+ * consults `appPath`, so an unlisted version dies with `No Obsidian app version "1.15.0"
+ * found` and a listed one downloads that version and ignores the override entirely --
+ * leaving a recording of the wrong app that looks completely normal. An alpha is never in
+ * the manifest, which is exactly when this hatch is wanted.
+ *
+ * So when an override is in play the manifest is rewritten locally with an entry for the
+ * requested version, cloned from the newest real one and marked beta, and handed to the
+ * service as a file URL -- its own documented `versionsUrl` option. `appPath` then supplies
+ * the asar and the synthetic entry's download URLs are never fetched.
+ *
+ * Gated on `OBSIDIAN_APP_PATH` being set, so CI -- which never sets it -- resolves versions
+ * exactly as before.
+ */
+function localVersionsUrl(): string | undefined {
+  if (appPath === undefined || appPath === "") return undefined;
+  if (env.OBSIDIAN_APP_VERSION === undefined) return undefined;
+  const cached = path.resolve(".obsidian-cache", "obsidian-versions.json");
+  if (!fs.existsSync(cached)) return undefined;
+  const manifest = JSON.parse(fs.readFileSync(cached, "utf8")) as {
+    versions: {
+      version: string;
+      isBeta?: boolean;
+      maxInstallerVersion?: string;
+    }[];
+  };
+  const wanted = env.OBSIDIAN_APP_VERSION;
+  if (manifest.versions.some((entry) => entry.version === wanted))
+    return undefined;
+  const newest = manifest.versions[manifest.versions.length - 1];
+  if (newest === undefined) return undefined;
+  manifest.versions.push({
+    ...newest,
+    version: wanted,
+    isBeta: true,
+    maxInstallerVersion:
+      installerVersion === "latest" ? newest.version : installerVersion,
+  });
+  const written = path.resolve(
+    ".obsidian-cache",
+    "obsidian-versions.local.json",
+  );
+  fs.writeFileSync(written, JSON.stringify(manifest));
+  console.log(
+    `wdio.conf: ${wanted} is not in the service manifest; synthesised an entry and will load the app from ${appPath}`,
+  );
+  return `file://${written}`;
+}
+
+const versionsUrl = localVersionsUrl();
+
 export const config: WebdriverIO.Config = {
   runner: "local",
   framework: "mocha",
@@ -37,7 +92,7 @@ export const config: WebdriverIO.Config = {
     },
   ],
 
-  services: ["obsidian"],
+  services: [["obsidian", { ...(versionsUrl ? { versionsUrl } : {}) }]],
   reporters: ["obsidian"],
   cacheDir: path.resolve(".obsidian-cache"),
 
