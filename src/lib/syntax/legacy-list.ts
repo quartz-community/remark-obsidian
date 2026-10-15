@@ -207,6 +207,14 @@ function tokenizeListStart(
 
   function otherPrefix(code: Code): State | undefined {
     if (markdownSpace(code)) {
+      // THE FIVE-SPACE CAP FIRED. `listItemPrefixWhitespaceConstruct` declines once the
+      // separator reaches five columns, so reaching here with a space means the item's content
+      // is its own indented CODE and the content column falls back to the marker plus one.
+      // Recorded on the container because B3's minimum applies to exactly these items -- see
+      // `tokenizeIndent`.
+      (
+        self.containerState as unknown as { _legacyCapped?: boolean }
+      )._legacyCapped = true;
       effects.enter(types.listItemPrefixWhitespace);
       effects.consume(code);
       effects.exit(types.listItemPrefixWhitespace);
@@ -354,12 +362,33 @@ function tokenizeIndent(
       got > 0 &&
       got < (self.containerState.size as number) &&
       !seenBlank &&
-      inFence()
+      (inFence() || capped())
     ) {
       self.containerState.size = got;
       return ok(code);
     }
     return nok(code);
+  }
+
+  /**
+   * Whether the five-space cap fired when this item opened.
+   *
+   * B3's minimum applies to exactly these items, which the probes separate cleanly:
+   *
+   *     ⟨2sp⟩1.⟨5sp⟩Prose here / ⟨4sp⟩[^1]: Definition    obs 1@1:4 -- the line JOINS the item
+   *     10.⟨2sp⟩Moreend.       / ⟨2sp⟩[^ä]: Some words    obs ä at ROOT, column 0
+   *
+   * Both put a shallower line under a wide-ish marker and Obsidian treats them oppositely. What
+   * separates them is the CAP: with five or more separator columns the item's content is its own
+   * indented code, and a line above that floor is still the item's. Without the cap the item
+   * ends. Admitting a shallower line for every item costs 21 documents of exactly the second
+   * shape, with the definition moving from root to the item's column.
+   */
+  function capped(): boolean {
+    return (
+      (self.containerState as unknown as { _legacyCapped?: boolean })
+        ._legacyCapped === true
+    );
   }
 
   /**
