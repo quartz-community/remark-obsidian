@@ -56,6 +56,19 @@ function readFence(line: string): Fence | undefined {
  * So the closer has to be INDENTED to count, which is what separates this from the case we
  * already get right, and a column-zero quote line inside the fence does not break it.
  *
+ * SIX FURTHER SHAPES were probed to find the rule's edges, and five of them already worked
+ * before this pass existed -- backticks instead of tildes, a QUOTE as the host, a closer with a
+ * longer run, an ordered marker, and a nested item. The sixth is the one restriction this pass
+ * had to drop:
+ *
+ *     - a / ⟨2sp⟩~~~ / > q / ⟨2sp⟩~~~ info / blank / use[^1]   ref 1@5:3
+ *
+ * CommonMark forbids an info string on a closing fence, and Obsidian closes on it anyway -- the
+ * rest of the document is free either way, which is the only thing observable here. So `info`
+ * is read but not required to be empty. A genuine indented opener cannot be mistaken for a
+ * closer regardless, because the item's last child still has to be a `code` whose own first
+ * line opens a matching fence.
+ *
  * The repair is deliberately the smallest one that is true: the closer's line is given back to
  * the item's own `code` node, and only the REMAINDER is re-parsed. That remainder is a
  * root-level region with no enclosing container, which is the safe kind -- these notes record a
@@ -93,7 +106,7 @@ export function itemFenceCloserTransform(
     const lineEnd = source.indexOf("\n", from);
     const bound = lineEnd === -1 ? source.length : lineEnd;
     const closer = readFence(source.slice(bol, bound));
-    if (!closer || closer.indent === 0 || closer.info !== "") continue;
+    if (!closer || closer.indent === 0) continue;
 
     // The previous sibling must be a list whose last item ends in an UNCLOSED fence opened with
     // the same character and no longer a run.
