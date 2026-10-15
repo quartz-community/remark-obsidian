@@ -40,6 +40,31 @@ import { contentColumn } from "./definition-column.js";
  * column stripped, so what remains is four or more past zero and the tokenizer makes it code,
  * deciding the interior blank line and the lazy split itself. Hand-rolling that is what
  * `definition-indented-code.ts` records as the thing a re-parse exists to delegate.
+ *
+ * THE CHARACTER COUNT IS NOT THE WHOLE RULE, and the INVERSE pass built on it is reverted.
+ * This one is conservative -- it only ever ADDS code -- so a character count that understates
+ * the indent costs nothing here. Read as a complete account of the threshold it is wrong, and
+ * a pass that frees code wherever the characters fall short measured referee -15 (14 gained,
+ * 27 lost) in one chain position and -21 in another, breaking `commonmark/tabs/5` in both.
+ *
+ * That case is what explains it. `- foo` / blank / `⇥⇥bar` is two characters and eight
+ * columns, and it IS code; `- parent` / blank / `⇥⟨3sp⟩[^3]: It` is four characters and seven
+ * columns, and it is NOT. Characters are LOWER for the case that is code, so they cannot be
+ * the discriminator. Seven probes give the rule that fits every one:
+ *
+ *     ⟨4sp⟩  4 columns   defines        ⇥        4 columns   defines
+ *     ⟨5sp⟩  5 columns   defines        ⇥⟨3sp⟩   7 columns   defines
+ *     ⟨6sp⟩  6 columns   CODE           ⇥⟨4sp⟩   8 columns   CODE
+ *                                       ⇥⇥       8 columns   CODE
+ *
+ * The threshold is SIX for a space-only run and EIGHT once a tab leads -- and eight is the
+ * tab stop plus four. So **a leading tab resets the content column to its own tab stop**,
+ * where a space run leaves the item's content column of 2 in place. Both thresholds are then
+ * the same rule, `contentColumn + 4`, over two different content columns.
+ *
+ * Not implemented: that belongs with `deIndentFloor` in `definition-column.ts`, which already
+ * owns an item's content column, rather than in a pass that rewrites the tokenizer's output
+ * afterwards -- which is what the two reverted attempts were.
  */
 export function definitionDeindentCodeTransform(
   tree: Root,
