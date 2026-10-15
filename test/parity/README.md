@@ -1446,6 +1446,71 @@ to be justified on the 426, and the ceiling says it should not be.
 
 That is the most expensive mistake this harness has prevented, and it cost six scoring runs.
 
+## A night on the queue: 5502 to 5520, and what the shapes actually hold
+
+Worked with the instruments finished the day before, so every change has a blast radius and a
+`still wrong` bucket rather than a total. Four landings, four refutations, one measured lead.
+
+| landed                                            | referee |  corpus |
+| ------------------------------------------------- | ------: | ------: |
+| de-indented item's CODE THRESHOLD (B3's half two) |      +5 | 4 fixed |
+| a footnote definition is a HOST for one inside it |      +6 |       0 |
+| a `%%` indented four columns is CODE              |      +7 |       0 |
+| a TITLE-LESS callout interrupts for `2.`          |       0 |       0 |
+
+And refused, each with numbers in `score.mts`: `def-end+1`'s tab continuation (17/44 then
+12/39), the ASCII-whitespace definition name (right by probe, 3 documents, unexplained
+discriminator), the wide-separator item content (11/97, 0/3, 31/351), and B3's minimum as the
+rule deciding which lines continue an item -- which failed in the TOKENIZER at -32 referee and
+four CommonMark list cases.
+
+### Three lessons, and the first cost two hours
+
+**`shapes.mts` prints `obsidian -> ours`, not `ours -> obsidian`.** I read it backwards for the
+first three candidates of the night, which inverted every case in two families before the raw
+corpus bytes settled it. The arrow is now stated here because the tool's own output does not
+say which side is which.
+
+**Brevity pointed at the wrong cause TWICE in one night, both times at the same family.** The
+ten shortest `def-extra` documents are all unclosed-construct shapes, and classifying all 304
+puts "no unclosed construct" at 194 of them. The ten shortest `def-miss` documents are all the
+tab-in-marker-separator family -- refused four ways with a ceiling of ten -- and a stride over
+all 260 puts `column 0` and `indent 4+` at 50 each against 111 tab cases. **Both of the night's
+biggest wins came from the buckets the shortest members hid**, and this file already records
+selection-by-brevity dying four times. Classify the family; do not read its head.
+
+**A `still wrong` row is not damage.** The threshold fix reported 5 gained, 0 lost and 10 still
+wrong, and reading those ten showed the definition now CORRECT in every one -- the oracle agrees
+the label should not define -- with only the reference side still differing. So the bucket mixes
+"improved inside a still-failing conjunction" with "broke differently", and the scorer's
+better/worse is what separates them. Read both, not one.
+
+### The B3 arc, closed in three parts and one retraction
+
+B3 is their rules document's de-indentation minimum, and these notes have claimed three times
+that it governs three things. Two of them shipped:
+
+- **the definition's column** -- `deIndentFloor` in `definition-column.ts`
+- **where indented code begins** -- `definition-deindent-code.ts`, after FOUR scoring runs
+  settled the unit: characters, a tab counting one, and a tab after a space counting nothing
+  (expanded columns scored -12, characters +1, leading tabs expanded -2, the final form +4)
+
+The third is **refuted**. A floor can only fall as lines arrive, so the minimum really is
+computable in a stream -- `tokenizeIndent` admitting a shallower line and lowering
+`containerState.size` -- and built that way it costs 32 referee documents and four CommonMark
+list cases, because a shallower line is how a SIBLING MARKER announces itself. So
+`remark-parse@8` decides an item's lines some other way and applies the minimum only to the
+DEDENT of lines it already owns. "Strips an item by the smallest indentation among its lines"
+is about stripping, and this file had been reading it as being about ownership.
+
+### What the queue looks like now
+
+1311 disagreeing documents in 70 shapes at the start, 1298 in 68 at the end. The largest
+measured lead is **+19**, scored and not built: an unclosed `$$` after a definition inside a
+list item, blocked on bounding the math node's extent at its opener before the definition can
+absorb it. The reference families (`ref-miss` 201, `ref-extra` 196) remain the biggest counts
+and remain mostly cascades from the definition side.
+
 ## Asking Obsidian directly, in two seconds
 
 `parity:record` boots Obsidian under Xvfb, renders all 3,403 corpus cases and rewrites the
