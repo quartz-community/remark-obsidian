@@ -70,22 +70,29 @@ function signatureOf(
     const mine = ours.get(key);
     if (!mine) {
       miss += 1;
-      detail.push(`def MISSING ${JSON.stringify(d)}`);
+      detail.push(`def MISSING (obs has it) ${JSON.stringify(d)}`);
       continue;
     }
     if (mine[3] !== d[3]) {
       endDelta.add(mine[3] - d[3]);
-      detail.push(`def end ${d[3]} -> ${mine[3]} for ${JSON.stringify(d)}`);
+      // LABELLED, because `a -> b` does not say which side is which and I read it backwards
+      // for three candidates in one session -- which inverted every case in two families until
+      // the raw corpus bytes settled it. `d` is the ORACLE's tuple, `mine` is ours.
+      detail.push(
+        `def end obs=${d[3]} ours=${mine[3]} for ${JSON.stringify(d)}`,
+      );
     }
     if (mine[2] !== d[2]) {
       colDelta = true;
-      detail.push(`def col ${d[2]} -> ${mine[2]} for ${JSON.stringify(d)}`);
+      detail.push(
+        `def col obs=${d[2]} ours=${mine[2]} for ${JSON.stringify(d)}`,
+      );
     }
   }
   for (const [key, d] of ours) {
     if (!theirs.has(key)) {
       extra += 1;
-      detail.push(`def INVENTED ${JSON.stringify(d)}`);
+      detail.push(`def INVENTED (ours only) ${JSON.stringify(d)}`);
     }
   }
   if (miss > 0) parts.push("def-miss");
