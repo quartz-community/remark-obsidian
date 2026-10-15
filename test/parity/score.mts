@@ -1702,6 +1702,90 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "ref-before-label-wins",
+    what: "a `[^name]` stays a footnote reference even when a `[` follows it",
+    // `a[^1][^2]` becomes a `linkReference#^2` with the text `^1` -- a FULL link reference --
+    // so BOTH footnote references vanish. Obsidian reads two:
+    //
+    //     a[^1][^2]        obs 1@0:1, 2@0:5      ours []
+    //     a[^1][^2][^3]    obs 1, 2, 3           ours only 3@0:9
+    //     a[^1][x]         obs 1@0:1             ours []
+    //     a[text][^1]      obs []                ours []   <- already right, and must stay
+    //     a[^1]]           obs 1@0:1             ours 1@0:1
+    //
+    // The fourth row is the discriminator and the reason this is not the `][^` gap these notes
+    // already record: there the first pair is a LINK TEXT and the `[` after it really does open
+    // a label, which we get right. Here the first pair is itself a footnote reference, and a
+    // footnote reference is not a link text.
+    //
+    // DEFINED names already work -- `[^1]: d` / `[^2]: d` / blank / `x[^1][^2]` reports both --
+    // so this is `bareFootnoteRefTransform`'s half: by the time it runs there is no plain text
+    // left to scan, only a `linkReference` that swallowed the pair.
+    //
+    // 374 of 6,818 referee documents hold `][^`.
+    apply: (text, ours, tree) => {
+      const added: Ref[] = [];
+      const lineStarts = [0];
+      for (let at = 0; at < text.length; at++) {
+        if (text[at] === "\n") lineStarts.push(at + 1);
+      }
+      const lineAt = (offset: number): number => {
+        let line = 0;
+        for (let at = 0; at < lineStarts.length; at++) {
+          if (lineStarts[at]! <= offset) line = at;
+          else break;
+        }
+        return line;
+      };
+      const walk = (node: unknown): void => {
+        const self = node as {
+          type?: string;
+          children?: unknown[];
+          position?: { start: { offset?: number }; end: { offset?: number } };
+        };
+        if (self.type === "linkReference" && self.position) {
+          const from = self.position.start.offset;
+          const to = self.position.end.offset;
+          if (from !== undefined && to !== undefined) {
+            const span = text.slice(from, to);
+            // The span must START with `[^`, which is the fourth probe's discriminator:
+            // `a[text][^1]` also CONTAINS a `[^1]` pair and is correctly a link reference,
+            // because there the first pair is a link TEXT. Without this the rule invents a
+            // reference for every such document.
+            if (!span.startsWith("[^")) {
+              for (const child of self.children ?? []) walk(child);
+              return;
+            }
+            // Every `[^name]` pair inside the swallowed span, in order.
+            let at = 0;
+            while (at < span.length) {
+              if (span[at] === "[" && span[at + 1] === "^") {
+                const close = span.indexOf("]", at + 2);
+                if (close === -1) break;
+                const name = span.slice(at + 2, close);
+                if (name !== "" && !/[ \t]/u.test(name)) {
+                  const offset = from + at;
+                  const line = lineAt(offset);
+                  added.push([
+                    name.toLowerCase(),
+                    line,
+                    offset - lineStarts[line]!,
+                  ]);
+                }
+                at = close + 1;
+                continue;
+              }
+              at += 1;
+            }
+          }
+        }
+        for (const child of self.children ?? []) walk(child);
+      };
+      walk(tree);
+      return { refs: [...ours.refs, ...added], defs: ours.defs };
+    },
+  },
+  {
     name: "html-extent-item-block-tag",
     what: "a BLOCK TAG html in a list item swallows the following paragraph, as `<!--` already does",
     // `itemHtmlExtentTransform` carries this for the `<!--` opener only, and its own docstring

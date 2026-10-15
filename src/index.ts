@@ -37,6 +37,7 @@ import { mathDisplayTransform } from "./lib/math-display.js";
 import { mathFenceTransform } from "./lib/math-fence.js";
 import { taskReparseTransform } from "./lib/task-reparse.js";
 import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
+import { refBeforeLabelTransform } from "./lib/ref-before-label.js";
 import { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
 import { inlineFootnoteInertTransform } from "./lib/inline-footnote-inert.js";
 import { inlineRefoldTransform } from "./lib/inline-refold.js";
@@ -854,6 +855,10 @@ export default function remarkObsidian(
       // repeat -- it keys on the real source at the node's span and only ever sets
       // fields, so re-running it on an already-classified tree changes nothing.
       mathDisplayTransform(tree, String(file));
+      // Before it, because it undoes the node that hides the text that pass scans: a
+      // `[^1][^2]` arrives as ONE `linkReference` swallowing both pairs, so there is no plain
+      // text left for the bare-reference pass to find.
+      refBeforeLabelTransform(tree, String(file));
       bareFootnoteRefTransform(tree, String(file));
       // Before the column pass, because it decides whether there is a definition to give a
       // column to at all: B3's minimum moves the indented-code threshold with the content
