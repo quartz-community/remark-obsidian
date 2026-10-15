@@ -1874,6 +1874,92 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "quote-comment-extends-past-the-quote",
+    what: "an unclosed `%%` in a quote of ANY depth swallows the lazy lines below it",
+    // `comment-quote-extent.ts` handles depth 1 and bails at depth 2+, because it requires the
+    // comment NOT to be the quote's last child. At depth 1 remark's lazy continuation pulls the
+    // root-level line into the quote, so the comment has a sibling and the pass fires; at depth 2
+    // the line stays at root, the comment IS last, and the guard returns. Six probes against
+    // live 1.14.4 isolate it to exactly that:
+    //
+    //     > > %%  / [^note]: Definition          suppressed   ours: DEFINITION  <-- the bug
+    //     >   %%  / [^note]: Definition          suppressed   ours: suppressed
+    //         %%  / [^note]: Definition          suppressed   ours: suppressed
+    //     > > %%  / > > %%  / [^note]: Defn      SURVIVES     ours: survives
+    //     > > %%  / blank   / [^note]: Defn      SURVIVES     ours: survives
+    //
+    // The last two matter most: the extent logic is already RIGHT -- a closer inside the quote
+    // stops it and a blank line stops it -- so only opener reach is wrong. The blank line bounds
+    // it because the quote bounds the comment and a blank ends the quote, which is the same
+    // doctrine `comment-definition-extent.ts` states for definitions.
+    //
+    // REFUSED AT 18 BETTER / 65 WORSE, and the shape of the damage is the useful part. The
+    // `worse` rows carry defs IDENTICAL to the answer and differ only in refs, so the rule is
+    // not dropping the wrong definitions -- it is dropping references over too many lines.
+    // `to = the first blank line` is a TEXTUAL approximation of the quote's extent, and in a
+    // dense document the quote ends earlier than that: a list item, a fence or an outer
+    // container closes it while the text still looks like a continuation. Obsidian's region
+    // stops where the CONTAINER stops, which a line scan cannot see.
+    //
+    // Adding the derived `opener at 4+ columns is code` guard changed NOTHING -- 18/65/6 and
+    // 6,729 untouched, byte for byte -- so that construct property is absent from this
+    // population and the guard is inert here. Worth having tried: it is a property of the
+    // construct and not a fit to the losses, which is the only kind of restriction allowed.
+    //
+    // So this is F4 CONFIRMED FROM THE DEFS/REFS SIDE, with a number attached. The earlier
+    // note said F4 was unscorable because candidates that drop definitions never move geometry;
+    // that was right about geometry and wrong about the blocker, which is not the oracle's
+    // blindness but the container extent itself. An implementation has the real tree and can
+    // ask the quote where it ends, so the fix belongs in `comment-quote-extent.ts` and not in a
+    // line scan. Refusing the line scan rather than fitting it to the 65.
+    apply: (text: string, ours: Facts): Facts => {
+      const lines = text.split("\n");
+      const dead: Array<[number, number]> = [];
+      for (let at = 0; at < lines.length; at++) {
+        const line = lines[at] ?? "";
+        const quoted = /^[ \t]*(?:>[ \t]*)+/u.exec(line);
+        if (!quoted || !line.slice(quoted[0].length).startsWith("%%")) continue;
+        // An opener at four or more columns INSIDE the quote is indented code and opens
+        // nothing -- the rule `comment-region.ts` already ships, measured at +7. Counting a
+        // tab after a space as reaching nothing, per the audit.
+        let column = 0;
+        for (const character of line.slice(quoted[0].length)) {
+          if (character === " ") column += 1;
+          else if (character === "\t") {
+            if (column % 4 !== 0) break;
+            column += 4;
+          } else break;
+        }
+        if (column >= 4) continue;
+        // Closed inside the quote's own lines: a SECOND `%%` after the opener, counting only
+        // lines that still carry a quote marker. A `%%` at column 0 belongs to what follows the
+        // quote and cannot close it -- the F4 rule the depth-1 pass already encodes.
+        let closed = line.slice(quoted[0].length + 2).includes("%%");
+        let end = lines.length;
+        for (let scan = at + 1; scan < lines.length; scan++) {
+          const next = lines[scan] ?? "";
+          if (next.trim() === "") {
+            end = scan;
+            break;
+          }
+          if (/^[ \t]*(?:>[ \t]*)+/u.test(next) && next.includes("%%"))
+            closed = true;
+        }
+        if (closed) continue;
+        dead.push([at, end]);
+        at = end;
+      }
+      if (dead.length === 0) return ours;
+      const buried = (line: number): boolean =>
+        dead.some(([from, to]) => line > from && line < to);
+      return {
+        ...ours,
+        defs: ours.defs.filter((d) => !buried(d[1])),
+        refs: ours.refs.filter((r) => !buried(r[1])),
+      };
+    },
+  },
+  {
     name: "orphan-line-is-root-code",
     what: "a line indented 4+ but below the item's content column is ROOT CODE",
     // THE FIRST GEOMETRY CANDIDATE, and the reason the `code` dimension was built. 78 of the
