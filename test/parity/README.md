@@ -2981,6 +2981,32 @@ looked like a clean partition —
 | indent 4+                                |   19 |
 | indent has a TAB                         |   15 |
 
+**That axis has no bucket for a quote-prefixed line WITHOUT a tab, and 43 entries are exactly
+that.** Re-measured, the family is 309 entries rather than 394 -- the referee has moved a long
+way since -- and splits:
+
+| prefix                | rows |
+| --------------------- | ---: |
+| column 0              |  106 |
+| quote run then a TAB  |   68 |
+| **quote run, no tab** |   43 |
+| list marker hosts it  |   35 |
+| indent 1–3            |   24 |
+| indent holds a TAB    |   19 |
+| indent 4+             |   14 |
+
+So `> [^1]: def` had nowhere to go and landed in whichever indent bucket its prefix width
+matched. The headline below survives -- column 0 is still the largest and the quote-then-tab
+family still second -- but the margins of this table cannot be trusted, and it is the same
+container-prefix blind spot that made `> %%` read as "opener has TEXT before it" in the comment
+family. A `>` run is not whitespace and it is not indentation; it needs its own axis every
+time.
+
+The sibling `def-end+1` table was re-measured the same way and HELD: 146 entries against a
+recorded 151, with `quote line` at 85 exactly and every other bucket within two. Classifying by
+one axis is what makes the difference -- that table has always had a `quote line` bucket of its
+own.
+
 and suggested an obvious rule for 136 of them: four columns of indent is indented CODE, so
 no definition. The `probe/def-cap/*` wave had already measured Obsidian agreeing with that
 at indent 6 against a content column of 2.
