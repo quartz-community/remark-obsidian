@@ -124,6 +124,7 @@ import { calloutTransform } from "./lib/callout.js";
 import { definitionIndentedCodeTransform } from "./lib/definition-indented-code.js";
 import { definitionLazySplitTransform } from "./lib/definition-lazy-split.js";
 import { mathListExtentTransform } from "./lib/math-list-extent.js";
+import { definitionMathAbsorbTransform } from "./lib/definition-math-absorb.js";
 import { commentHoistTransform } from "./lib/comment-hoist.js";
 import { commentTailTransform } from "./lib/comment-tail.js";
 import { commentDefinitionExtentTransform } from "./lib/comment-definition-extent.js";
@@ -855,6 +856,9 @@ export default function remarkObsidian(
       // Before the column pass, because it decides whether there is a definition to give a
       // column to at all: B3's minimum moves the indented-code threshold with the content
       // column, so a label four past the lowered floor is code and Obsidian reports none.
+      // Before the threshold pass and the column pass: it changes which lines the definition
+      // owns, and both of those read the definition's own extent.
+      definitionMathAbsorbTransform(tree, String(file));
       definitionDeindentCodeTransform(tree, String(file), (markdown) =>
         self.parse(markdown),
       );
