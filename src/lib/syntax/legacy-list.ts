@@ -231,6 +231,10 @@ function tokenizeListContinuation(
       self.containerState.furtherBlankLines ||
       self.containerState.initialBlankLine;
 
+    (
+      self.containerState as unknown as { _legacyBlank?: boolean }
+    )._legacyBlank = true;
+
     // We have a blank line.
     // Still, try to consume at most the items size.
     return factorySpace(
@@ -310,11 +314,72 @@ function tokenizeIndent(
   function afterPrefix(code: Code): State | undefined {
     assert(self.containerState, "expected state");
     const tail = self.events[self.events.length - 1];
-    return tail &&
-      tail[1].type === types.listItemIndent &&
-      tail[2].sliceSerialize(tail[1], true).length === self.containerState.size
-      ? ok(code)
-      : nok(code);
+    if (!tail || tail[1].type !== types.listItemIndent) return nok(code);
+    const got = tail[2].sliceSerialize(tail[1], true).length;
+    if (got === self.containerState.size) return ok(code);
+    // B3's minimum, SAFE because a fence is open.
+    //
+    // An item's content column is the smallest indentation among its own lines, and a floor can
+    // only FALL as lines arrive -- so admitting a shallower line and lowering the size is that
+    // minimum computed in a stream. Applied unconditionally it costs 32 referee documents and
+    // four CommonMark list cases, because a shallower line is how a SIBLING MARKER announces
+    // itself. Inside a fenced block it cannot be: fence content is literal, so no line in it
+    // starts a list item.
+    // AND NO BLANK LINE HAS INTERVENED. Every one of the 16 documents this cost without the
+    // check has a blank between the fence's content and the shallower line, and Obsidian ends
+    // the item there rather than letting the fence reach across it:
+    //
+    //     10.⟨4sp⟩```` / ⟨7sp⟩It / blank / ⟨2sp⟩[^a]: body text   the definition SURVIVES
+    //
+    // `furtherBlankLines` does not cover this -- it is only set when the item's FIRST line was
+    // blank -- so the flag is kept here.
+    const seenBlank = (
+      self.containerState as unknown as { _legacyBlank?: boolean }
+    )._legacyBlank;
+    if (
+      got > 0 &&
+      got < (self.containerState.size as number) &&
+      !seenBlank &&
+      inFence()
+    ) {
+      self.containerState.size = got;
+      return ok(code);
+    }
+    return nok(code);
+  }
+
+  /**
+   * Whether a fenced code block is open on this line.
+   *
+   * The DOCUMENT tokenizer's own events hold container tokens only -- `listUnordered`,
+   * `listItemPrefix`, `chunkFlow` -- so scanning them for `codeFenced` finds nothing and the
+   * first version of this returned false everywhere. The flow events live in the child
+   * tokenizer micromark attaches to each `chunkFlow` token, and every chunk on a line shares
+   * one, so the last chunk's tokenizer is the whole picture:
+   *
+   *     enter:codeFenced enter:codeFencedFence ... exit:codeFencedFence enter:lineEnding ...
+   *
+   * An `enter` with no matching `exit` is an open fence. Reading a `_tokenizer` is reaching into
+   * micromark's internals, which is the price of this file being a vendored copy -- and it is
+   * the only way the container can learn what the flow is in the middle of.
+   */
+  function inFence(): boolean {
+    let child: { events?: Array<[string, { type: string }]> } | undefined;
+    for (const [, token] of self.events) {
+      if (token.type !== "chunkFlow") continue;
+      const owned = (
+        token as unknown as {
+          _tokenizer?: { events?: Array<[string, { type: string }]> };
+        }
+      )._tokenizer;
+      if (owned) child = owned;
+    }
+    let depth = 0;
+    for (const [kind, token] of child?.events ?? []) {
+      if (token.type !== "codeFenced") continue;
+      depth += kind === "enter" ? 1 : -1;
+    }
+    return depth > 0;
   }
 }
 
