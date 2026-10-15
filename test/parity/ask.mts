@@ -207,4 +207,44 @@ const result: Answer[] = questions.map((markdown, index) => {
     },
   } as Answer;
 });
+/**
+ * Warn when `footnoteRefs` cannot answer the question being asked.
+ *
+ * The field lists only references whose name HAS a definition, so a probe reading it for an
+ * UNDEFINED name gets `[]` and reads it as "Obsidian indexes no reference here". That is the
+ * trap `--synth` exists for, and knowing about it is not enough: the setext rule was scored
+ * twice and refused twice off `refs=[]` readings before the referee's own `refs` field showed
+ * Obsidian reporting the reference all along.
+ *
+ * On stderr, because stdout is the JSON every probe pipeline parses.
+ */
+if (!wantSynth) {
+  const starved = result.filter((answer) => {
+    const compute = answer.compute as
+      { footnoteRefs?: readonly { id?: string }[] } | undefined;
+    // An ABSENT `footnoteRefs` is the STRONGEST form of the trap, not a reason to skip.
+    // Obsidian omits the key entirely when it indexes no reference -- `use[^1] and [^2]`
+    // comes back with `compute` holding `["sections"]` and nothing else -- so the first
+    // version of this guard declined exactly the case it exists to catch, and the break
+    // test is what said so. Only a missing `compute` means the answer itself failed.
+    if (compute === undefined) return false;
+    const indexed = new Set(
+      (compute.footnoteRefs ?? []).map((ref) => ref.id?.toLowerCase()),
+    );
+    return [...answer.markdown.matchAll(REFERENCE)].some(
+      (hit) => !indexed.has(hit[1]!.toLowerCase()),
+    );
+  });
+  if (starved.length > 0) {
+    console.error(
+      `ask: ${starved.length} of ${result.length} answers hold a [^name] that footnoteRefs does NOT list.`,
+    );
+    console.error(
+      "     That field is definition-gated, so [] means 'no DEFINED reference', not 'no reference'.",
+    );
+    console.error(
+      "     Re-ask with --synth before concluding anything from it.",
+    );
+  }
+}
 console.log(JSON.stringify(result, null, 2));

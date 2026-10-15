@@ -1877,6 +1877,55 @@ are correct by construction rather than by luck, and the only character that adv
 one column is the tab. There is no second bug class here -- which is worth having checked, since
 the corpus deliberately carries CJK, ZWJ emoji, combining marks and U+00A0.
 
+## `footnoteRefs` omits the KEY, and that read as agreement twice in a row
+
+The trap this file already names -- `footnoteRefs` lists only references whose name HAS a
+definition -- is worse than recorded, and knowing about it was not enough to avoid it.
+
+**Obsidian omits the key entirely rather than returning an empty array.** Asked
+`use[^1] and [^2]`, `compute` comes back holding `["sections"]` and nothing else. So the
+idiomatic probe reader
+
+    (c.get("footnoteRefs") or [])
+
+turns an ABSENT field into `[]`, and `[]` reads as "Obsidian indexes no reference here". It
+means "the key is not there", which is a different claim and the one that cost two scoring
+rounds:
+
+| attempt                                                      | better | worse |
+| ------------------------------------------------------------ | -----: | ----: |
+| setext: drop the definition AND the reference, any underline |      5 |    12 |
+| ...restricted to `=` underlines                              |      3 |     5 |
+
+Both were built on `refs=[]` readings. The referee's own `refs` field settles it in one line --
+obs reports `["1",0,0]`, the `[^1]` inside the heading text -- so we already agreed under `=`
+and `---`, and both refusals were documents the rule BROKE. The `=` restriction had thrown
+away the only genuinely broken spelling, which was `-`. Corrected, the rule is **+2 with 0
+lost** and ships.
+
+This is the same failure mode as the `obsidian.projections.text` path read as `text`: **a field
+that does not exist reads as agreement with whatever you expected.** Second instance, and the
+first where the absent field was absent by design rather than by a wrong path.
+
+### So the trap is now the tool's problem, not the reader's
+
+`ask.mts` warns on **stderr** -- stdout is the JSON every probe pipeline parses -- whenever a
+document holds a `[^name]` that `footnoteRefs` does not list, naming `--synth` as the remedy.
+Nothing is gated on remembering it any more.
+
+**And the break test caught the guard itself being inert**, which is why it is mandatory. The
+first version skipped when `footnoteRefs` was `undefined`, reasoning that an absent field meant
+an uncaptured one -- so it declined precisely the case it exists to catch, and looked exactly
+like a working guard. Three directions now verify it:
+
+    use[^1] and [^2]              warns, 3 lines, stdout still valid JSON
+    use[^1] / blank / [^1]: def   SILENT, footnoteRefs=["1"]
+    --synth use[^1] and [^2]      SILENT, safe=true, refs=["1","2"]
+
+The third is worth keeping as a test rather than an example: it shows the remedy the guard
+recommends actually answers the question, recovering both undefined names with the safety
+check green.
+
 ## Asking Obsidian directly, in two seconds
 
 `parity:record` boots Obsidian under Xvfb, renders all 3,403 corpus cases and rewrites the
