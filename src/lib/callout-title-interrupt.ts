@@ -49,9 +49,13 @@ function shift(node: unknown, offset: number, line: number): void {
  * onto further lines is not probed, and re-parsing a multi-line paragraph would decide how
  * much the item swallows on no measurement at all.
  *
- * This is A2c, the last of the five gaps the sibling project's rules document exposed, and
- * the only one with no instance in the referee corpus -- so the corpus is the sole oracle
- * for it.
+ * This is A2c, the last of the five gaps the sibling project's rules document exposed.
+ *
+ * It was recorded here as "the only one with no instance in the referee corpus", and that is
+ * WRONG: classifying the quote-prefixed half of `def-miss` turns up 46 entries, four of them
+ * this exact shape in its title-less spelling. The claim came from counting the TITLED form,
+ * which the probes used, and the referee's instances are all title-less -- so the oracle that
+ * was said to be silent was the one holding the counter-examples.
  */
 export function calloutTitleInterruptTransform(
   tree: Root,
@@ -61,12 +65,24 @@ export function calloutTitleInterruptTransform(
   if (source === "") return;
 
   visit(tree, "callout", (node: Node) => {
-    const callout = node as unknown as { children: RootContent[] };
-    const title = callout.children[0];
-    const next = callout.children[1];
-    if (title?.type !== "calloutTitle" || next?.type !== "paragraph") return;
+    const callout = node as unknown as {
+      children: RootContent[];
+      position?: { start: { line: number } };
+    };
+    // A TITLE-LESS callout has no `calloutTitle` child at all, so the interrupting block is
+    // `children[0]` rather than `children[1]`. That was the whole of why `> [!note]` /
+    // `> 2. [^1]: def` stayed a paragraph while `> [!note] title` / `> 2. [^1]: def` became a
+    // list -- the marker line still closes its own block either way, which is the rule, and
+    // the probes behind it all happened to carry a title. Obsidian reports one list item for
+    // all four spellings (`>[!note]`, `> [!note]`, `> [!NOTE]`, `> [!note]+`).
+    const titled = callout.children[0]?.type === "calloutTitle";
+    const index = titled ? 1 : 0;
+    const next = callout.children[index];
+    if (next?.type !== "paragraph") return;
 
-    const titleLine = title.position?.start?.line;
+    const titleLine = titled
+      ? callout.children[0]?.position?.start?.line
+      : callout.position?.start?.line;
     const from = next.position?.start?.offset;
     const startLine = next.position?.start?.line;
     const endLine = next.position?.end?.line;
