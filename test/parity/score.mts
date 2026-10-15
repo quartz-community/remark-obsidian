@@ -1525,11 +1525,26 @@ const RULES: readonly Rule[] = [
     // line" from "something else already claimed it".
     //
     // Which is the same conclusion from a third direction: B3's minimum governs the definition
-    // column (shipped), the code threshold (shipped) and WHICH LINES CONTINUE THE ITEM, and
-    // only the last one is the tokenizer's. `legacy-list.ts` is the vendored reader that would
-    // carry it, and the incremental form is available -- a floor can only fall as lines arrive,
-    // so admitting a line below `containerState.size` and lowering the size to its indent is
-    // exactly the whole-item minimum computed in a stream.
+    // column (shipped) and the code threshold (shipped). The third thing it was supposed to
+    // govern -- WHICH LINES CONTINUE THE ITEM -- is REFUTED, and in the tokenizer where it was
+    // said to belong.
+    //
+    // The incremental form really is available: a floor can only FALL as lines arrive, so
+    // `tokenizeIndent`'s `afterPrefix` can admit a line indented LESS than
+    // `containerState.size` and lower the size to what it got, with no lookahead. Built that
+    // way it costs:
+    //
+    //     referee 5520 -> 5488 (-32)
+    //     corpus  commonmark/lists/310, 311, 312, 313 and hunt/fold-mapping-inline-rewrite/1
+    //
+    // Four CommonMark list cases is a refusal, not a trade. A shallower line is how a SIBLING
+    // MARKER announces itself -- ` - a` / `⟨2sp⟩- b` -- so admitting it as content is exactly
+    // what `notInCurrentItem` exists to prevent, and the nesting rules depend on that.
+    //
+    // So `remark-parse@8` does NOT decide an item's lines by the minimum. It decides them some
+    // other way and applies the minimum only to the DEDENT of the lines it already owns, which
+    // is a different claim from the one these notes carried and the reason the port looked
+    // tractable. Reverted; the file is byte-identical to its backup.
     apply: (text, ours, tree) => {
       const lines = text.split("\n");
       const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/u;
