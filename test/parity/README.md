@@ -2014,6 +2014,87 @@ recorder's copy runs inside the browser. That is a second copy of a fact and thi
 second copy rots, so it carries the recorder's line numbers in a comment -- the honest
 mitigation, not a fix.
 
+## A third oracle, for the one thing the other two cannot see
+
+Every open extent question here is the same shape: where a construct CLOSES. `sections` is
+block-granular and the reading-view DOM has no delimiters in it at all, so a closing boundary
+is a value NEITHER oracle records -- the category these notes say to expect nothing from the
+tree for. It is why the tab `endLine` family was refused three ways, why the quote-depth `%%`
+candidates all died computing a boundary heuristically, and why F4 is blocked verbatim on
+"needs the container's true extent".
+
+Live preview records it. 1.15.0 gives every closing token a `cm-formatting-*-end` class, and
+the question was whether that is reachable and whether it can be trusted.
+
+### Reachable through STATE, not the DOM
+
+`__parityLivePreview` in `parity-probe` opens a real leaf with `{ mode: "source", source:
+false }`. The DOM route is nearly dead, exactly as `__parityReadingView` beside it is:
+
+    hasFocus=false   formatting spans in the DOM:  2
+                     Lezer nodes from state:      10
+
+Live preview hides formatting marks on inactive lines, and Chromium starves
+`requestAnimationFrame` for an unfocused window. **But CodeMirror holds the document and the
+syntax tree in STATE**, which needs no frame -- so `syntaxTree(cm.state)` answers fully where
+the DOM answers barely. That is the whole reason this channel works where the reading-view one
+does not, and it is worth knowing before anyone tries the DOM again:
+
+    formatting_formatting-strong_strong@0-2
+    strong@2-8
+    formatting_formatting-strong_formatting-strong-end_strong@8-10     <- 1.15.0's new class
+    comment_comment-start_formatting@26-28
+    comment@28-29
+    comment_comment-end_formatting@29-31
+
+One leaf serves a whole batch, rewriting the file between documents and waiting until
+`cm.state.doc.toString()` equals the source -- comparing against the source rather than
+sleeping is what makes a batch safe, because a stale tree is indistinguishable from an answer.
+
+### And it AGREES with the cache wherever both can see a boundary
+
+    comment, multi-line  "%%\nbody\n%%"         cacheEnd=10  lpEnd=10  AGREE
+    unclosed comment     "%%\ntail"             cacheEnd=7   lpEnd=7   AGREE
+    display math         "$$\nx\n$$"            cacheEnd=7   lpEnd=7   AGREE
+    fence                "```\ncode\n```"       cacheEnd=12  lpEnd=12  AGREE
+    fence, unclosed      "```\ncode"            cacheEnd=8   lpEnd=8   AGREE
+    fence with info      "```js\ncode\n```"     cacheEnd=14  lpEnd=14  AGREE
+    indented code        "    code"             cacheEnd=8   lpEnd=8   AGREE
+    quote                "> q"                  cacheEnd=3   lpEnd=3   AGREE
+    comment in a quote   "> %%\n> body"         cacheEnd=11  lpEnd=11  AGREE
+
+    COMPARABLE: 9 of 13   AGREE: 9 of 9
+    CONTROL (two ends that cannot match): DIFFER, as required
+
+Nine of nine, and the last row is the one worth having: a comment nested in a quote, which is
+the F4 shape. The four non-comparable cases are inline constructs the cache reports no section
+for, so there is genuinely no overlap to check there.
+
+**This does not make live preview an oracle.** It cannot adjudicate a reading-mode rule --
+Obsidian has two parsers, they disagree, and every discriminating case sides with reading view.
+What the agreement buys is that live preview's boundary is worth PROBING where `sections` is
+blind, which is inside containers and at delimiter granularity. The `code` field was adopted
+the same way: verified as `sections.filter(type === "code")` before anything was scored on it.
+
+### Five comparator bugs before the first real answer
+
+The headline number was wrong four times, and every time the bug was mine rather than the
+oracle's. Worth listing, because adopting an oracle has this failure mode every single time:
+
+- one `node` field filtering BOTH oracles, which hid every fence -- the cache calls them
+  `code` and live preview calls them `HyperMD-codeblock`
+- comparing full SPANS, when live preview marks tokens and the cache marks blocks, so
+  `⟨4sp⟩code` is `4-8` to one and `0-8` to the other -- two answers to two questions
+- a node filter that matched nothing, reported as "no overlap"
+- trailing newlines, which the cache includes in a block and live preview does not; removing
+  them from the probes beats normalising around them
+- and the first CONTROL was never inserted at all, because a scripted replace missed
+  prettier's reformatting and printed success anyway -- the silent-miss this file already
+  records, now at eight instances
+
+So the control is permanent and asserted rather than eyeballed: two ends that cannot match,
+and the run prints `NO EVIDENCE` if they ever do.
+
 ## Asking Obsidian directly, in two seconds
 
 `parity:record` boots Obsidian under Xvfb, renders all 3,403 corpus cases and rewrites the

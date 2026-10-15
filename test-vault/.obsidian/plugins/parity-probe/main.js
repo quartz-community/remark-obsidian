@@ -135,9 +135,97 @@ module.exports = class ParityProbe extends obsidian.Plugin {
       }
     };
 
+    /**
+     * Live Preview's own formatting tokens, with their document offsets.
+     *
+     * WHY, given live preview is the WRONG parser. Everything this harness cannot settle is a
+     * construct's CLOSING boundary -- where an unclosed `%%` stops inside a container, where a
+     * definition's end line falls, where a fence closes in a list item. `metadataCache` is
+     * block-granular and the reading-view DOM has no delimiters in it at all, so that boundary
+     * is a value NEITHER existing oracle records, which is exactly the category this repo's
+     * notes say to expect nothing from the tree for. Live preview records it: 1.15.0 gives
+     * every closing token a `cm-formatting-*-end` class, matching the `-link-end` and
+     * `-highlight-end` that already existed.
+     *
+     * It cannot ADJUDICATE a reading-mode rule and is not used for that. It is a candidate
+     * boundary to probe against reading mode, and the first thing built on it must be the
+     * overlap check -- where `sections` already exposes a boundary, does live preview agree?
+     * The `code` field was adopted exactly that way.
+     *
+     * THIS IS A TERRAIN MAP, not the tool. `__parityReadingView` beside it is dead through
+     * `obsidian eval` on a desktop session, because reading mode renders off
+     * `requestAnimationFrame` and Chromium starves an unfocused window. CodeMirror may well
+     * have the same problem for its DOM -- but unlike reading mode it holds the document and
+     * the syntax tree in STATE, which needs no frame. So this reports what is reachable by
+     * both routes and lets one call decide which to build on, rather than assuming.
+     */
+    window.__parityLivePreview = async function parityLivePreview(markdowns) {
+      const language = require("@codemirror/language");
+      const probePath = "__parity_lp_probe__.md";
+      let file = app.vault.getAbstractFileByPath(probePath);
+      if (file) await app.vault.modify(file, markdowns[0] ?? "");
+      else file = await app.vault.create(probePath, markdowns[0] ?? "");
+
+      const leaf = app.workspace.getLeaf(true);
+      const answers = [];
+      try {
+        // `mode: "source"` with `source: false` is Live Preview; `source: true` would be the
+        // raw editor, which has no decorations to read.
+        await leaf.openFile(file, {
+          state: { mode: "source", source: false },
+        });
+        let cm = null;
+        for (let wait = 0; wait < 120; wait++) {
+          cm = leaf.view?.editor?.cm ?? null;
+          if (cm && cm.state) break;
+          await new Promise((resolve) => setTimeout(resolve, 25));
+        }
+        if (cm === null) return [{ error: "no CodeMirror view on the leaf" }];
+
+        // ONE leaf for the whole batch, rewriting the file between documents. Opening a leaf
+        // per document costs about six seconds; this costs one tick.
+        for (const markdown of markdowns) {
+          if (cm.state.doc.toString() !== markdown) {
+            await app.vault.modify(file, markdown);
+            // The editor follows the file asynchronously, so the document itself is the
+            // readiness signal. Comparing against the SOURCE rather than waiting a fixed
+            // time is what makes a batch safe: a stale tree is indistinguishable from a
+            // real answer otherwise.
+            let synced = false;
+            for (let wait = 0; wait < 200; wait++) {
+              if (cm.state.doc.toString() === markdown) {
+                synced = true;
+                break;
+              }
+              await new Promise((resolve) => setTimeout(resolve, 10));
+            }
+            if (!synced) {
+              answers.push({ error: "editor never caught up with the file" });
+              continue;
+            }
+          }
+          const nodes = [];
+          language.syntaxTree(cm.state).iterate({
+            from: 0,
+            to: cm.state.doc.length,
+            enter: (node) => {
+              nodes.push([node.name, node.from, node.to]);
+            },
+          });
+          answers.push({ docLength: cm.state.doc.length, nodes });
+        }
+        return answers;
+      } finally {
+        leaf.detach();
+        const stale = app.vault.getAbstractFileByPath(probePath);
+        if (stale) await app.vault.delete(stale, true);
+      }
+    };
+
     plugin.register(() => {
       delete window.__parityProbe;
       delete window.__parityReadingView;
+      delete window.__parityLivePreview;
     });
   }
 };
