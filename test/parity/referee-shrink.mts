@@ -44,8 +44,310 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { refereeFacts } from "./referee-facts.js";
+import { ask } from "./probe-channel.js";
 
-import type { Def, Ref } from "./referee-facts.js";
+import type { Answer } from "./probe-channel.js";
+import type { Def, Facts, Ref } from "./referee-facts.js";
+
+/**
+ * What the disagreement is, in a form that SURVIVES DELETING A LINE.
+ *
+ * The offline shrink re-bases the recorded answer, which its own docstring calls an
+ * approximation producing a lead rather than an answer. Asking Obsidian about the reduced
+ * document instead removes the approximation -- and replaces one problem with another, because
+ * a live answer's LINE NUMBERS move when a line is dropped, so the exact missing/extra sets the
+ * offline signature compares cannot be compared across a reduction.
+ *
+ * The way through is that deleting a WHOLE LINE preserves columns. So this records, per name:
+ * which names are missing, which are invented, whose COLUMN differs, and whose definition SPAN
+ * (`end - start`, not `end`) differs. Every one of those is stable under dropping a line
+ * elsewhere, and together they cover the three divergence kinds the direction screen measured
+ * -- counts in either direction, and the 114 documents whose counts already match and whose
+ * positions do not.
+ *
+ * A name-only signature would have been simpler and WRONG: those 114 documents reduce to "no
+ * disagreement", so the shrink would delete their whole content and report a minimal form that
+ * agrees. That is the degenerate attractor the offline tool already hit once from the other
+ * direction.
+ */
+function liveSignature(text: string, obs: Answer): string {
+  let mine: Facts;
+  try {
+    mine = refereeFacts(text);
+  } catch {
+    return "threw";
+  }
+  const key = (name: string) => name.toLowerCase();
+  const mineDefs = new Map(mine.defs.map((d) => [key(d[0]), d]));
+  const obsDefs = new Map(obs.defs.map((d) => [key(d[0]), d]));
+  const mineRefs = new Map(mine.refs.map((r) => [key(r[0]), r]));
+  const obsRefs = new Map(obs.refs.map((r) => [key(r[0]), r]));
+
+  const only = (a: Map<string, unknown>, b: Map<string, unknown>) =>
+    [...a.keys()].filter((name) => !b.has(name)).sort();
+
+  const colDiff: string[] = [];
+  const spanDiff: string[] = [];
+  for (const [name, def] of mineDefs) {
+    const theirs = obsDefs.get(name);
+    if (!theirs) continue;
+    if (def[2] !== theirs[2]) colDiff.push(`d${name}`);
+    if (def[3] - def[1] !== theirs[3] - theirs[1]) spanDiff.push(`d${name}`);
+  }
+  for (const [name, ref] of mineRefs) {
+    const theirs = obsRefs.get(name);
+    if (theirs && ref[2] !== theirs[2]) colDiff.push(`r${name}`);
+  }
+
+  return JSON.stringify({
+    defsMissing: only(obsDefs, mineDefs),
+    defsExtra: only(mineDefs, obsDefs),
+    refsMissing: only(obsRefs, mineRefs),
+    refsExtra: only(mineRefs, obsRefs),
+    colDiff: colDiff.sort(),
+    spanDiff: spanDiff.sort(),
+  });
+}
+
+const AGREES = JSON.stringify({
+  defsMissing: [],
+  defsExtra: [],
+  refsMissing: [],
+  refsExtra: [],
+  colDiff: [],
+  spanDiff: [],
+});
+
+/**
+ * Minimise against the LIVE application, one batch per round rather than one call per line.
+ *
+ * A greedy shrink needs one answer per candidate deletion, which is why doing this through
+ * `obsidian eval` was never attempted: a 30-line document is 30 sequential round trips. The
+ * file channel has no batch ceiling, so every single-line deletion for a round goes in ONE
+ * request, and the only sequential part is the combination check -- `n` answers for the price
+ * of one trip, then `O(log n)` trips to find a subset that can be dropped together.
+ *
+ * The combination check is what makes it a reduction rather than a survey. Lines that are
+ * individually droppable are frequently not JOINTLY droppable: drop the quote marker and the
+ * continuation line separately and either alone preserves the bug, together they delete it. So
+ * the round proposes all of them, and on refusal splits the proposal in half and recurses,
+ * which is `ddmin` with the per-unit tests batched.
+ */
+async function live(entries: readonly Entry[]): Promise<void> {
+  const limitAt = process.argv.indexOf("--limit");
+  const cap = limitAt === -1 ? 400 : Number(process.argv[limitAt + 1] ?? "400");
+  const idsAt = process.argv.indexOf("--ids");
+  const wanted =
+    idsAt === -1
+      ? undefined
+      : new Set(
+          fs
+            .readFileSync(process.argv[idsAt + 1] ?? "", "utf8")
+            .split("\n")
+            .map((line) => line.trim())
+            .filter((line) => line !== ""),
+        );
+
+  const pool = entries
+    .map((entry, at) => ({ entry, key: entry.id ?? String(at) }))
+    .filter(({ key }) => wanted === undefined || wanted.has(key))
+    .filter(({ entry }) => entry.text.trim() !== "")
+    .slice(0, cap);
+
+  console.log(`referee-shrink --live: ${pool.length} documents`);
+  let trips = 0;
+  const askBatch = async (texts: readonly string[]): Promise<Answer[]> => {
+    trips += 1;
+    return ask(texts);
+  };
+
+  const forms = new Map<string, { count: number; from: string[] }>();
+  let reduced = 0;
+  let agreeing = 0;
+  let untrusted = 0;
+
+  for (const { entry, key } of pool) {
+    const [first] = await askBatch([entry.text]);
+    if (!first) continue;
+    if (!first.refsTrustworthy) untrusted += 1;
+    const want = liveSignature(entry.text, first);
+    // A document live Obsidian AGREES with is not a reduction target. The referee's recorded
+    // answer can differ from the running app -- that is what `release-diff.mts` exists to
+    // measure -- and shrinking toward a disagreement the application does not have would
+    // manufacture a probe for a rule that is not there.
+    if (want === AGREES || want === "threw") {
+      agreeing += 1;
+      continue;
+    }
+
+    let lines = entry.text.split("\n");
+    for (let round = 0; round < 12; round++) {
+      if (lines.length <= 1) break;
+      const candidates = lines.map((_, at) => at);
+
+      const without = (drop: ReadonlySet<number>) =>
+        lines.filter((_, at) => !drop.has(at)).join("\n");
+      const probes = candidates.map((at) => without(new Set([at])));
+      const answers = await askBatch(probes);
+      const droppable = candidates.filter(
+        (at, index) =>
+          answers[index] !== undefined &&
+          liveSignature(probes[index]!, answers[index]!) === want,
+      );
+      if (droppable.length === 0) break;
+
+      const keep = await jointly(droppable, want, without, askBatch);
+      if (keep.length === 0) break;
+      const drop = new Set(keep);
+      lines = lines.filter((_, at) => !drop.has(at));
+    }
+
+    lines = await trimTails(lines, want, askBatch);
+
+    const text = lines.join("\n");
+    if (text.length < entry.text.length) reduced += 1;
+    const seen = forms.get(text);
+    if (seen) {
+      seen.count += 1;
+      if (seen.from.length < 6) seen.from.push(key);
+    } else forms.set(text, { count: 1, from: [key] });
+  }
+
+  const sorted = [...forms.entries()].sort(
+    (a, b) => b[1].count - a[1].count || a[0].length - b[0].length,
+  );
+  console.log(
+    `  reduced ${reduced}; ${sorted.length} distinct minimal forms; ` +
+      `${agreeing} already agree with LIVE Obsidian; ${untrusted} have untrustworthy refs`,
+  );
+
+  // EVERY form re-asked, because the whole point of this mode is that a reported form is an
+  // answer rather than a lead -- and the offline tool's documented failure was reporting 109
+  // "minimal forms" whose top four this package already got right. A form that agrees is a
+  // reduction that walked off the bug, and it must be loud rather than printed in a table.
+  const verdicts = await askBatch(sorted.map(([text]) => text));
+  const degenerate = sorted.filter(
+    ([text], at) =>
+      verdicts[at] === undefined ||
+      liveSignature(text, verdicts[at]!) === AGREES,
+  );
+  console.log(
+    degenerate.length === 0
+      ? `  VERIFIED: all ${sorted.length} forms still disagree with live Obsidian`
+      : `  BROKEN: ${degenerate.length} of ${sorted.length} forms AGREE -- the reduction walked off the bug`,
+  );
+  for (const [text] of degenerate.slice(0, 5)) {
+    console.log(`    degenerate: ${JSON.stringify(text)}`);
+  }
+  console.log(`  ${trips} channel round trips`);
+  console.log("  forms, commonest first:\n");
+  for (const [text, { count, from }] of sorted.slice(0, 40)) {
+    console.log(
+      `  ${String(count).padStart(3)}x  ${JSON.stringify(text)}  [${from.slice(0, 3).join(" ")}]`,
+    );
+  }
+  fs.writeFileSync(
+    "/tmp/live-shrink.json",
+    JSON.stringify(
+      sorted.map(([text, { count, from }]) => ({ text, count, from })),
+      null,
+      2,
+    ),
+  );
+  console.log("\n  full list: /tmp/live-shrink.json");
+}
+
+/**
+ * Shrink each line by dropping words from its END, which is the only within-line cut this
+ * signature can take.
+ *
+ * Line-granular reduction leaves a fuzz document's real bulk untouched: one form came out of
+ * the line phase carrying a single 500-character line, which is unreadable as a probe and
+ * clusters with nothing. Cutting WITHIN a line normally invalidates the comparison, because
+ * `liveSignature` tracks which names sit at a differing COLUMN and an interior cut moves every
+ * column after it. A TRAILING cut does not: everything that remains keeps the column it had.
+ *
+ * Halving rather than one word at a time, and one batch per round across ALL lines, so an
+ * eighty-word line costs about seven round trips instead of eighty. Each round proposes
+ * truncating every line to half its remaining words, keeps the proposals that hold, and
+ * repeats; the single-word pass at the end recovers the boundary the halving overshoots.
+ */
+async function trimTails(
+  start: readonly string[],
+  want: string,
+  askBatch: (texts: readonly string[]) => Promise<Answer[]>,
+): Promise<string[]> {
+  let lines = [...start];
+  const words = (line: string) => line.split(/(?<=\s)/u);
+
+  for (const share of [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.9, 0.9, 0.9]) {
+    const proposals: { at: number; text: string; line: string }[] = [];
+    for (let at = 0; at < lines.length; at++) {
+      const parts = words(lines[at]!);
+      if (parts.length < 2) continue;
+      const keepCount = Math.max(1, Math.floor(parts.length * share));
+      if (keepCount >= parts.length) continue;
+      const shorter = parts.slice(0, keepCount).join("").replace(/\s+$/u, "");
+      if (shorter === lines[at]) continue;
+      const candidate = [...lines];
+      candidate[at] = shorter;
+      proposals.push({ at, text: candidate.join("\n"), line: shorter });
+    }
+    if (proposals.length === 0) continue;
+    const answers = await askBatch(proposals.map((p) => p.text));
+    // Applied ONE AT A TIME rather than all at once: two independent truncations can each hold
+    // and together delete the construct, the same trap the line phase handles by halving. A
+    // round is cheap enough that taking the first winner per line and re-proposing is simpler
+    // than a joint check here.
+    let changed = false;
+    for (let index = 0; index < proposals.length; index++) {
+      const answer = answers[index];
+      const proposal = proposals[index]!;
+      if (!answer || liveSignature(proposal.text, answer) !== want) continue;
+      const trial = [...lines];
+      trial[proposal.at] = proposal.line;
+      const [check] = await askBatch([trial.join("\n")]);
+      if (!check || liveSignature(trial.join("\n"), check) !== want) continue;
+      lines = trial;
+      changed = true;
+    }
+    if (!changed && share === 0.9) break;
+  }
+  return lines;
+}
+
+/**
+ * The largest subset of `droppable` that can be removed TOGETHER, by halving.
+ *
+ * Returns the lines to drop, which is empty when even a single one cannot go -- the caller
+ * stops there. Each level costs one round trip for the whole proposal, then two for its halves,
+ * so a round converges in `O(log n)` trips rather than `n`.
+ */
+async function jointly(
+  droppable: readonly number[],
+  want: string,
+  without: (drop: ReadonlySet<number>) => string,
+  askBatch: (texts: readonly string[]) => Promise<Answer[]>,
+): Promise<number[]> {
+  if (droppable.length === 0) return [];
+  const text = without(new Set(droppable));
+  const [answer] = await askBatch([text]);
+  if (answer && liveSignature(text, answer) === want) return [...droppable];
+  if (droppable.length === 1) return [];
+  const middle = Math.floor(droppable.length / 2);
+  const left = await jointly(
+    droppable.slice(0, middle),
+    want,
+    without,
+    askBatch,
+  );
+  const right = await jointly(droppable.slice(middle), want, without, askBatch);
+  const both = [...left, ...right];
+  if (both.length === 0 || left.length === 0 || right.length === 0) return both;
+  const together = without(new Set(both));
+  const [check] = await askBatch([together]);
+  return check && liveSignature(together, check) === want ? both : left;
+}
 
 interface Entry {
   readonly id?: string;
@@ -138,6 +440,11 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
     ? raw
     : Object.values(raw as Record<string, unknown>);
   for (const value of list as Entry[]) entries.push(value);
+}
+
+if (process.argv.includes("--live")) {
+  await live(entries);
+  process.exit(0);
 }
 
 const failing = entries
