@@ -2458,13 +2458,22 @@ Every one. On the documents that identify a set, its members' effects are ADDITI
 multi-owner set means "several units each own part of this answer" rather than "attribution
 here cannot be trusted". The single-unit map is reliable for all 426.
 
-    diverging referee documents : 1141
-      single owner, trustworthy      :  271
-      multi-owner, verified additive :  426
-      tokenizer-only, no pass owns   :  101
+    diverging referee documents : 1073
+      single owner, trustworthy      :  240
+      multi-owner, verified additive :  406
+      tokenizer-only, no pass owns   :   94
       ----                              ---
-      attributed with confidence     :  798  (70%)
-      coupled tail, not yet swept    :  343  (274 sets, same method)
+      attributed with confidence     :  740  (69%)
+      coupled tail, not yet swept    :  333  (274 sets, same method, ~45 min)
+
+**Those figures were wrong by 68 documents until the agreement test stopped being a
+reimplementation.** The hasher compared sorted rows including `code` and reported 5,745
+agreeing as 5,677, inflating every diverging count derived from it. `referee.mts` excludes an
+EMPTY-NAMED reference from both sides, compares ORDER-SENSITIVELY, and treats `code` as a
+separate dimension rather than part of the footnote figure. This file's own notes name the
+mistake -- "a reimplemented agreement test reads as independent confirmation while measuring
+something slightly different" -- and it was made again here, in an instrument built to stop
+exactly this. The hasher now matches the referee's figure exactly.
 
 A set of size TWO is fully resolved by one combined removal -- 37 sets covering 261 documents.
 A larger set is only NARROWED, because the full subset lattice is exponential. That the forty

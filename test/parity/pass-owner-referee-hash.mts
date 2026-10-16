@@ -39,8 +39,31 @@ const shapes: Record<string, string> = {};
 const agrees: Record<string, boolean> = {};
 let threw = 0;
 
+/** Order-insensitive, for HASHING a shape: a pass that reorders rows has not changed an answer. */
 const key = (rows: readonly unknown[]): string =>
   JSON.stringify(rows.map((row) => JSON.stringify(row)).sort());
+
+/**
+ * `referee.mts`'s OWN agreement test, not a reimplementation of it.
+ *
+ * Mine was stricter in three ways and reported 5,677 agreeing where the referee reports 5,745 --
+ * a 68-document gap that silently inflated every "diverging" figure derived from it. The
+ * differences, each of which the referee documents:
+ *
+ *   - an EMPTY-NAMED reference is excluded from BOTH sides, because `^[]` is in Obsidian's
+ *     cache and the corpus's producer does not compare the field
+ *   - the comparison is ORDER-SENSITIVE, with no sort
+ *   - `code` is a SEPARATE dimension and is not part of the footnote agreement figure
+ *
+ * This file's own notes name the mistake: "a reimplemented agreement test reads as independent
+ * confirmation while measuring something slightly different". It is still a copy rather than an
+ * import, because `referee.mts` runs its comparison at module scope -- so it carries the same
+ * warning the duplicated `blocksOf` does.
+ */
+const named = (rows: readonly unknown[]): readonly unknown[] =>
+  rows.filter((row) => (row as readonly unknown[])[0] !== "");
+const same = (a: readonly unknown[], b: readonly unknown[]): boolean =>
+  JSON.stringify(named(a)) === JSON.stringify(named(b));
 
 for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
   const raw: unknown = JSON.parse(
@@ -73,14 +96,12 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
       shapes[`${id}\u0000defs`] = digest(key(ours.defs));
       shapes[`${id}\u0000refs`] = digest(key(ours.refs));
       shapes[`${id}\u0000code`] = digest(key(ourCode));
+      // The FOOTNOTE agreement figure, which is what `referee.mts` reports as its headline.
+      // `code` is hashed above for ownership but deliberately NOT folded in here: it is a
+      // separate dimension with its own 883-document population, and including it is what made
+      // this disagree with the referee by 68 documents.
       agrees[id] =
-        key(ours.defs) === key(entry.defs ?? []) &&
-        key(ours.refs) === key(entry.refs ?? []) &&
-        // Counted only where the oracle HAS a code range. 5,935 documents record none, and
-        // treating that absence as an assertion would mark every one of them diverging --
-        // the same guard `score.mts` applies to this dimension.
-        ((entry.code ?? []).length === 0 ||
-          key(ourCode) === key(entry.code ?? []));
+        same(ours.defs, entry.defs ?? []) && same(ours.refs, entry.refs ?? []);
     } catch {
       shapes[`${id}\u0000defs`] = "THREW";
       shapes[`${id}\u0000refs`] = "THREW";
