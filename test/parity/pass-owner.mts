@@ -215,6 +215,36 @@ function shapes(label: string, keepAgrees = false): Shapes {
   }
 }
 
+/**
+ * `--sets <file>` removes whole OWNER SETS together, prioritised by documents covered.
+ *
+ * A coupled document -- one several units change -- cannot be attributed by single removals:
+ * "removing X moves it" may mean X decides it or that X's removal changes what a later unit
+ * sees. Resolving that needs the units removed TOGETHER, and the obvious framing of a
+ * 94-squared pairwise sweep is the wrong bound by two orders of magnitude:
+ *
+ *     naive 94 squared                  8464 runs
+ *     pairs that CO-OWN a document       423
+ *     ...and co-own a DIVERGING one      325   <- the only ones that matter
+ *     DISTINCT owner sets                314   <- one experiment each
+ *
+ * Only 50 of 92 units appear in any diverging pair and 29 own nothing at all, so most of the
+ * square is pairs that never meet. Ordering sets by documents covered then makes the tail
+ * optional -- the top set is 78 documents, the top ten are 264 of 769, the top forty are 55%.
+ *
+ * A set of size TWO is fully resolved by one combined removal: 37 sets covering 261 documents.
+ * A larger set is only NARROWED, because the full subset lattice is exponential -- that is a
+ * limit of the method, not of this flag.
+ */
+const setsAt = process.argv.indexOf("--sets");
+const setList: { owners: string[]; documents: number }[] =
+  setsAt === -1
+    ? []
+    : (JSON.parse(fs.readFileSync(process.argv[setsAt + 1] ?? "", "utf8")) as {
+        owners: string[];
+        documents: number;
+      }[]);
+
 const pristine = fs.readFileSync(index, "utf8");
 const lines = pristine.split("\n");
 const blocks = blocksOf(lines);
@@ -253,10 +283,14 @@ const units = deep
 
 const limitAt = process.argv.indexOf("--limit");
 const limit =
-  limitAt === -1 ? units.length : Number(process.argv[limitAt + 1] ?? "0");
+  limitAt === -1
+    ? setList.length > 0
+      ? setList.length
+      : units.length
+    : Number(process.argv[limitAt + 1] ?? "0");
 
 console.log(
-  `pass-owner: ${units.length} units (${blocks.length} top-level, ${inner.units.length} inside guards), removing ${limit}`,
+  `pass-owner: ${setList.length > 0 ? `${setList.length} owner sets` : `${units.length} units`} (${blocks.length} top-level, ${inner.units.length} inside guards), removing ${limit}`,
 );
 
 const base = shapes("base", true);
@@ -266,23 +300,43 @@ console.log(`  baseline: ${Object.keys(base).length} case/profile shapes\n`);
 /** Case keys each pass changes when removed. */
 const owned = new Map<string, string[]>();
 try {
-  for (const block of units.slice(0, limit)) {
-    fs.writeFileSync(
-      index,
-      [...lines.slice(0, block.start), ...lines.slice(block.end + 1)].join(
-        "\n",
-      ),
-    );
+  // One job per unit normally, or one per OWNER SET under `--sets`.
+  const work =
+    setList.length > 0
+      ? setList.slice(0, limit).map((entry) => ({
+          name: `SET[${entry.documents}] ${entry.owners.map((o) => o.split(" [")[0]).join(" + ")}`,
+          wanted: entry.owners.length,
+          members: entry.owners
+            .map((owner) => units.find((unit) => unit.name === owner))
+            .filter((unit): unit is Block => unit !== undefined),
+        }))
+      : units
+          .slice(0, limit)
+          .map((block) => ({ name: block.name, wanted: 1, members: [block] }));
+
+  for (const job of work) {
+    if (job.members.length !== job.wanted) {
+      console.log(`  ${job.name.padEnd(60)}  SKIPPED: a member is not a unit`);
+      continue;
+    }
+    // DEEPEST FIRST, so each slice is taken against line numbers the earlier cuts have not
+    // yet shifted. Removing a set in source order silently deletes the wrong lines once the
+    // first member is gone.
+    let next = [...lines];
+    for (const member of [...job.members].sort((a, b) => b.start - a.start)) {
+      next = [...next.slice(0, member.start), ...next.slice(member.end + 1)];
+    }
+    fs.writeFileSync(index, next.join("\n"));
     const without = shapes("without");
     if (Object.keys(without).length === 0) {
-      owned.set(block.name, ["<REMOVAL DOES NOT COMPILE>"]);
-      console.log(`  ${block.name.padEnd(42)}  does not compile without it`);
+      owned.set(job.name, ["<REMOVAL DOES NOT COMPILE>"]);
+      console.log(`  ${job.name.padEnd(60)}  does not compile without it`);
       continue;
     }
     const moved = Object.keys(base).filter((key) => base[key] !== without[key]);
-    owned.set(block.name, moved);
+    owned.set(job.name, moved);
     console.log(
-      `  ${block.name.padEnd(42)}  ${String(moved.length).padStart(5)} case/profiles`,
+      `  ${job.name.padEnd(60)}  ${String(moved.length).padStart(5)} case/profiles`,
     );
   }
 } finally {
