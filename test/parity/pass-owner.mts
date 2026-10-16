@@ -184,6 +184,49 @@ function innerOf(lines: readonly string[]): {
   return { units: found, guards };
 }
 
+/**
+ * The CONSTRUCT layer, which `blocksOf` could not see at all.
+ *
+ * Syntax extensions are registered in a different function and at a different indent --
+ * `  if (opts.x) {` with `    data.micromarkExtensions.push(...)` inside -- so a scan anchored
+ * on `^ {4}if \(opts\.` skipped every one of them. That omission is exactly the shape of the
+ * 94 diverging documents reported as "owned by no pass": they are owned by a CONSTRUCT, and
+ * constructs were never in the unit set.
+ *
+ * The whole guard is the unit, not the single `push`. A guard registers a triple -- the
+ * micromark syntax, the mdast extension and the serializer handler -- and removing one while
+ * keeping the others leaves an extension listening for tokens that can no longer appear.
+ * Removing the guard is "this construct is off", which is a state the option matrix already
+ * tests and therefore a state the package is known to survive.
+ */
+function constructsOf(lines: readonly string[]): Block[] {
+  const found: Block[] = [];
+  for (let at = 0; at < lines.length; at++) {
+    const guard = /^ {2}if \(opts\.([A-Za-z][A-Za-z0-9]*)\) \{/u.exec(
+      lines[at] ?? "",
+    );
+    if (!guard) continue;
+    let depth = count(lines[at]!, "{") - count(lines[at]!, "}");
+    let end = at;
+    let syntax = false;
+    while (depth > 0 && end + 1 < lines.length) {
+      end += 1;
+      depth += count(lines[end]!, "{") - count(lines[end]!, "}");
+      if ((lines[end] ?? "").includes("micromarkExtensions.push"))
+        syntax = true;
+    }
+    if (syntax) {
+      let start = at;
+      while (start > 0 && /^ {2}(?:\/\/|\/\*|\*)/u.test(lines[start - 1]!)) {
+        start -= 1;
+      }
+      found.push({ name: `construct:${guard[1]!}`, start, end });
+    }
+    at = end;
+  }
+  return found;
+}
+
 type Shapes = Record<string, string>;
 /** Agreement per document, referee mode only, so a removal's effect can be SIGNED. */
 let agreesBase: Record<string, boolean> = {};
@@ -283,6 +326,7 @@ for (const [a, b] of blocks.map((x, i) => [x, blocks[i + 1]] as const)) {
 }
 
 const inner = innerOf(lines);
+const constructs = constructsOf(lines);
 /**
  * `--deep` REPLACES a multi-pass guard with its inner calls rather than adding to them.
  *
@@ -292,6 +336,7 @@ const inner = innerOf(lines);
  * histogram exists to give.
  */
 const deep = process.argv.includes("--deep");
+const withConstructs = process.argv.includes("--constructs");
 const units = deep
   ? [
       // BY POSITION, not by name. `opts.comments` guards TWO separate blocks in the chain, so
@@ -308,8 +353,11 @@ const units = deep
           ),
       ),
       ...inner.units,
+      ...(withConstructs ? constructs : []),
     ]
-  : blocks;
+  : withConstructs
+    ? [...blocks, ...constructs]
+    : blocks;
 
 const limitAt = process.argv.indexOf("--limit");
 const limit =
@@ -320,7 +368,7 @@ const limit =
     : Number(process.argv[limitAt + 1] ?? "0");
 
 console.log(
-  `pass-owner: ${setList.length > 0 ? `${setList.length} owner sets` : `${units.length} units`} (${blocks.length} top-level, ${inner.units.length} inside guards), removing ${limit}`,
+  `pass-owner: ${setList.length > 0 ? `${setList.length} owner sets` : `${units.length} units`} (${blocks.length} top-level, ${inner.units.length} inside guards, ${withConstructs ? constructs.length : 0} constructs), removing ${limit}`,
 );
 
 const base = shapes("base", true);

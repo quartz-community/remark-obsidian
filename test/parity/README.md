@@ -5491,3 +5491,50 @@ additionally needs CDP focus emulation, since reading mode renders off
 ```bash
 obsidian dev:cdp method=Emulation.setFocusEmulationEnabled params='{"enabled":true}'
 ```
+
+## "Owns" was the wrong word -- participation is not culpability
+
+The construct sweep was run to decompose the 94 diverging documents that no pass owned. It
+attributed **12** of them -- `construct:math` 10, `construct:legacyLists` 3 -- and left **82**
+owned by nothing this package ships. The prediction written one turn earlier, that the
+construct layer "explains the 94", was wrong by a factor of eight. The 82 are stock micromark,
+CommonMark and GFM: upstream code, a different and much harder project than a vendored
+construct.
+
+The sweep also produced large per-construct figures -- `math` 216 diverging documents,
+`comments` 150, `inlineFootnotes` 131 -- and those are NOT attribution. A control asked whether
+removing a unit also perturbs documents that already AGREE:
+
+    unit                          diverging   AGREEING
+    construct:math                      216        833
+    construct:inlineFootnotes           131        710
+    construct:legacyLists                40        101
+    construct:comments                  150        118
+
+Removing a construct does not revert a repair, it DESTROYS the syntax. So `math` appears to own
+216 diverging documents mostly because 216 diverging documents contain math. The figure measures
+presence, not cause.
+
+Run on passes, the same control refutes the vocabulary used throughout this section:
+
+    bareFootnoteRefTransform            864       4432
+    quoteTabTransform                    54        197
+
+A pass whose removal changes 4,432 correct answers is not a narrow repair; it is load-bearing
+core behaviour. So the relation this whole instrument measures is PARTICIPATION -- unit U is on
+the path that produced document D's answer -- and never CULPABILITY. "Owner" overstated it in
+every table above.
+
+What survives the correction, and what does not:
+
+- SINGLE-OWNER (240) survives, and is the strongest claim in the audit: exactly one unit
+  participates, so if anything must change for that document, it is that unit. The word for
+  it is "sole participant".
+- ADDITIVE (732) survives unchanged. It was always a statement about independence of effects,
+  which the scoped verdicts measured directly.
+- PER-CONSTRUCT COUNTS do not survive and must not be used to rank work.
+
+The methodological point generalises beyond this harness: removal attributes correctly only
+when removal returns the system to a meaningful baseline. For a repair pass it does. For a
+syntax construct there is no baseline to return to -- the feature either exists or the document
+cannot be parsed as intended at all.
