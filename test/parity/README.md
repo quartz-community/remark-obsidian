@@ -2319,6 +2319,88 @@ So the next real gain is a container-tokenizer change, which is the route this f
 worth five times a repair: the fence and capped-item rules landed +37, +16 and +28 there after
 the same rule scored +7 as a repair.
 
+## Attribution: which component owns each answer, and what that cost to get right
+
+Every classification before this one grouped divergences by SYMPTOM (which field differs) or by
+INPUT SHAPE (what the line looks like). Four such selectors died here and an audit found two
+recorded breakdowns describing their selector rather than their population. The axis never
+classified was the actionable one -- which component decides the answer -- and not knowing it is
+what made the tab-threshold family cost three implementations, each measured only after being
+written.
+
+`pass-owner.mts` derives it instead of guessing: remove a pass, see which answers move. The
+machinery is `pass-order.mts`'s -- rewrite `src/index.ts`, hash every case, restore in a
+`finally` -- with REMOVAL in place of its MOVE.
+
+### What it answers
+
+    94 units (72 top-level, 29 inside option guards), ~20 minutes, no Obsidian
+
+    diverging referee documents : 1090
+      exactly ONE owner          :  255   <- workable alone
+      two or more owners         :  739   <- coupled, narrowed to 2-5 candidates
+      NO owner at all            :   96   <- stock micromark; no repair pass can fix these
+
+    PASSES BY WHICH GATE PROTECTS THEM
+      owns neither corpus nor referee   4   (3 of them protected by NO gate at all)
+      owns referee but not corpus       7   (38 referee documents `npm test` cannot see)
+      owns corpus but not referee      21
+
+The 96 are the number worth having: a document in that set cannot be fixed by any repair pass,
+which is the fact three implementations of one rule were spent discovering. And the seven
+corpus-unprotected passes are a finite list -- removing `itemFenceCloserTransform` costs 7
+referee documents while 446 tests and the corpus delta both stay green.
+
+### Attribution has to descend INTO option guards
+
+The first version treated `if (opts.x)` as one unit, which is right for MOVING a pass and wrong
+for attributing one. Seven guards hold 29 passes and `if(bareFootnoteRefs)` holds THIRTEEN, so
+923 of 979 owned-and-diverging documents "belonged to" that guard and 387 to nothing else --
+naming an OPTION rather than a pass, on the path of nearly every footnote document.
+
+Splitting them takes those 387 to **ZERO** and names the real owners:
+
+    bareFootnoteRefTransform     [in bareFootnoteRefs]  881   (188 solely)
+    commentParseTransform        [in keepComments]      241
+    footnoteInterruptTransform   [in bareFootnoteRefs]  227
+    definitionColumnTransform    [in bareFootnoteRefs]  153
+    inlineFootnoteInertTransform [in bareFootnoteRefs]  130
+
+Removing an inner call while LEAVING its guard is safe in the way removing a guarded pass alone
+is not: the guard still decides whether the block runs.
+
+### Six defects in the instrument, found while building it
+
+Worth listing in full, because they are all one shape -- a count quietly wrong rather than an
+error, which is the failure mode this file has spent a week finding in other instruments:
+
+- `^ {6}` for inner calls found 28 of 29; `inlineFootnoteInertTransform` sits at EIGHT inside a
+  nested `if`. `pass-order.mts`'s own docstring warns about exactly this.
+- `--deep` ADDED inner calls to their guard instead of replacing it, so both removals
+  attributed the same case and "2 owners" became the mode at 4,184 of 13,636.
+- the guard filter matched by NAME, and `opts.comments` guards TWO separate blocks, so a
+  single-pass block lost its attribution with the multi-pass one.
+- then by start LINE, which `blocksOf` walks back over preceding comments, filtering five of
+  seven. Containment is the right test and `94 = 72 - 7 + 29` checks.
+- the referee reporting read the GOLDEN's ids while referee mode keys by document, calling all
+  3,439 corpus cases untouched against 6,818 referee keys.
+- and FIELD-ANSWERS were reported as DOCUMENTS, which is how the unowned-and-diverging line read
+  0, then 609, then 96 for one corpus within an hour. A document is unowned only when BOTH its
+  fields are.
+
+### What it does NOT answer
+
+- **The projection layer.** `normalize.ts` is not a pass, so removal cannot reach it, and some
+  divergences live only in the projection -- AST represents source, projection represents
+  rendering. The referee's oracle reads the TREE, so the bound is that only the corpus's
+  `text`/`html` rows can be projection-owned, and the corpus is 99.7% matching.
+- **Coupling direction.** 739 diverging documents have two or more owners, and "removing X
+  changes Y" cannot distinguish X deciding Y from X's removal changing what a later pass sees.
+  `pass-order.mts` reports 42 of 62 passes position-sensitive, so this is expected; the set
+  size is the usable signal and a pairwise sweep would be 94 squared.
+- **What Obsidian does.** This says where OUR answer comes from, never what the right answer is.
+  That still needs probes.
+
 ## Asking Obsidian directly, in two seconds
 
 `parity:record` boots Obsidian under Xvfb, renders all 3,403 corpus cases and rewrites the
