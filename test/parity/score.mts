@@ -924,8 +924,25 @@ const RULES: readonly Rule[] = [
     // orphaned makes the pass completely INERT, measured at 0 gained and 0 lost, so the
     // position-only version was reverted rather than left in place looking like a fix.
     //
-    // Five documents against child surgery on a definition's content is the wrong trade, and
-    // it is recorded here rather than attempted.
+    // ATTEMPTED ANYWAY, with the child surgery the refusal above said it would take, and the
+    // result is that THE CANDIDATE AND THE IMPLEMENTATION DISAGREE:
+    //
+    //     this candidate                  better 5   worse 1   (worse was already disagreeing)
+    //     the pass, clamping descendants   better 2   worse 1   (worse was AGREEING)
+    //
+    // Clamping every descendant to the new end satisfies `invariants.test.ts` -- the orphan
+    // problem is real and solvable, and declining on it is what made the earlier attempt
+    // inert. What does not survive is the trade. The pass reaches fewer documents than the
+    // candidate because it runs after passes that have already moved those definitions, and
+    // its single loss is `broad-20261004.json#330`, where `["3",9,0,11]` matched the oracle
+    // exactly and becomes `["3",9,0,10]`. Breaking an agreeing document for two gains is the
+    // wrong direction whatever the net says.
+    //
+    // So the refusal stands, for a better-measured reason than it had: not "child surgery is
+    // too invasive" but "the surgery works and the rule still is not worth it". A candidate's
+    // better/worse is a PREDICTION about an implementation, and this is the second time
+    // tonight the two differed by enough to change the decision -- the tab-quote rule went
+    // 47/0 to 40/7 in the other direction.
     apply: (text, ours) => endBefore(text, ours, /^\[\^[^\]]*\]:/u),
   },
   {
