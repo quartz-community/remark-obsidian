@@ -42,7 +42,10 @@ export function quoteTabTransform(tree: Root, source: string): void {
 
     const lines = source.slice(from, to).split("\n");
     const indented = lines.map((line) => QUOTE_TAB.exec(line));
-    if (indented.some((match) => match === null)) return;
+    if (indented.some((match) => match === null)) {
+      mixedQuote(quote, source);
+      return;
+    }
 
     const value = indented.map((match) => match![1]!).join("\n");
     const code: Code = {
@@ -54,4 +57,89 @@ export function quoteTabTransform(tree: Root, source: string): void {
     };
     quote.children = [code];
   });
+}
+
+/**
+ * A quote line carrying a SPACE-separated definition, which establishes the content column.
+ *
+ * SPACES, not `[ \t]`. A tab-separated label is the very thing that fails to define, so
+ * admitting one here lets the exception chain off a failed definition -- `>⇥[^b]: body` / `>` /
+ * `>⇥[^c]: more` then reports `c`, where Obsidian reports nothing. That is control four, and
+ * it is the whole reason the clause says "space-separated" rather than "earlier".
+ */
+const ESTABLISHES = /^[ \t]{0,3}> +\[\^[^\]]*\]:/u;
+
+/**
+ * The same rule where the quote is a MIXTURE, which is the split this pass used to decline.
+ *
+ * The all-tab branch above rewrites a quote whose every line is `>⇥`. A mixture was left alone
+ * because regrouping the whole quote into alternating code and prose meant guessing. It does
+ * not have to be guessed: only the DEFINITION's own line needs to change, and five controls
+ * against live 1.14.4 say exactly when:
+ *
+ *     >⇥[^b]: body                        defs []           we agreed already
+ *     >⟨3sp⟩[^b]: body                     defs ["b"]        we agreed already
+ *     > text / > / >⇥[^b]: body           defs []           WE DEFINED `b`
+ *     >⇥[^b]: body / > / >⇥[^c]: more     defs []           WE DEFINED BOTH
+ *     > [^a]: It / > / >⇥[^b]: body       defs ["a","b"]    we agreed already
+ *
+ * So a tab-indented label defines once the quote ALREADY HOLDS a space-separated definition,
+ * and not otherwise -- consistent with that first definition establishing the quote's content
+ * column. The fourth control is what makes it "space-separated" rather than merely "earlier":
+ * the exception does not chain off a definition that itself never defined.
+ *
+ * Scored at 47 better / 0 worse before being built, and the two controls we were failing are
+ * the two the score is made of. A blunter form that drops EVERY tab-marked definition scores
+ * 53/1 and contradicts the fifth control, which is why the establishing clause is in the rule
+ * rather than fitted around its losses.
+ */
+function mixedQuote(quote: Blockquote, source: string): void {
+  for (let index = 0; index < quote.children.length; index++) {
+    const child = quote.children[index];
+    if (child?.type !== "footnoteDefinition") continue;
+
+    const from = child.position?.start?.offset;
+    const to = child.position?.end?.offset;
+    if (from === undefined || to === undefined) continue;
+
+    const bol = source.lastIndexOf("\n", from - 1) + 1;
+    const nl = source.indexOf("\n", bol);
+    const own = source.slice(bol, nl === -1 ? undefined : nl);
+    const marked = QUOTE_TAB.exec(own);
+    if (!marked) continue;
+
+    // Established by an earlier SPACE-separated definition in the same quote run. Walking
+    // LINE STARTS backwards, which is `continuesDefinition`'s idiom in `comment-region.ts`:
+    // stepping by the line's end instead stalls on a one-character `>` line, because
+    // `lastIndexOf("\n", end - 1)` then returns the very newline just stepped over and the
+    // slice comes back empty. That cost control five -- `> [^a]: It` / `>` / `>⇥[^b]: body`
+    // reported only `a` while the scan never reached the establishing line.
+    let established = false;
+    let lineStart = bol;
+    while (lineStart > 0) {
+      const previousEnd = lineStart - 1;
+      const previousStart = source.lastIndexOf("\n", previousEnd - 1) + 1;
+      const line = source.slice(previousStart, previousEnd);
+      if (!/^[ \t]{0,3}>/u.test(line)) break;
+      if (ESTABLISHES.test(line)) {
+        established = true;
+        break;
+      }
+      lineStart = previousStart;
+    }
+    if (established) continue;
+
+    const code: Code = {
+      type: "code",
+      lang: null,
+      meta: null,
+      value: source
+        .slice(bol, to)
+        .split("\n")
+        .map((line) => QUOTE_TAB.exec(line)?.[1] ?? line)
+        .join("\n"),
+      ...(child.position ? { position: child.position } : {}),
+    };
+    quote.children[index] = code;
+  }
 }
