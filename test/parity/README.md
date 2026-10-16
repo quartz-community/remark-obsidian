@@ -2449,22 +2449,28 @@ deviation LARGER than the number of documents that identified them -- one covers
 and masks 357 -- because removing two units together perturbs answers everywhere, not only
 where they co-own. Scoped to the documents in question:
 
-    SCOPED verdicts over the top 40 sets:
-      INDEPENDENT   40 sets, 426 documents
-      MASKING        0
-      SYNERGISTIC    0
+    SCOPED verdicts over ALL 307 owner sets (~63 minutes):
+      INDEPENDENT   301 sets, 732 documents
+      MASKING         6 sets,   7 documents
+      SYNERGISTIC     0
 
-Every one. On the documents that identify a set, its members' effects are ADDITIVE, so a
-multi-owner set means "several units each own part of this answer" rather than "attribution
-here cannot be trusted". The single-unit map is reliable for all 426.
+On the documents that identify a set, its members' effects are ADDITIVE in 301 of 307 cases, so
+a multi-owner set means "several units each own part of this answer" rather than "attribution
+here cannot be trusted". The six exceptions mask exactly ONE document each, and five of the six
+involve `containerLazyTransform` -- a coupling that is real, named, and seven documents wide.
 
     diverging referee documents : 1073
       single owner, trustworthy      :  240
-      multi-owner, verified additive :  406
+      multi-owner, verified additive :  732
+      multi-owner, MASKED            :    7
       tokenizer-only, no pass owns   :   94
       ----                              ---
-      attributed with confidence     :  740  (69%)
-      coupled tail, not yet swept    :  333  (274 sets, same method, ~45 min)
+      attributed with confidence     : 1066  (99.3%)
+      untrustworthy                  :    7
+
+The partition is exact -- 240 + 739 + 94 = 1073 -- and asserted rather than eyeballed, because
+a classification that does not add up is the failure this file has spent a week finding in
+other instruments.
 
 **Those figures were wrong by 68 documents until the agreement test stopped being a
 reimplementation.** The hasher compared sorted rows including `code` and reported 5,745
