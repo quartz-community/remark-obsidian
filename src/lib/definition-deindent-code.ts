@@ -82,10 +82,27 @@ import { contentColumn } from "./definition-column.js";
  * 21-against-10 that `definition-math-absorb.ts` shipped on, and the code dimension loses seven
  * with no compensating gain.
  *
- * Reverted on that arithmetic rather than on principle. What it establishes is that the route
- * is reachable and the rule is right: a narrowing that moves the CODE THRESHOLD without moving
- * OWNERSHIP would collect the +9 without the cascade, and in a container tokenizer those are
- * currently the same decision.
+ * Reverted on that arithmetic rather than on principle.
+ *
+ * THEN THE OTHER HALF OF THAT SENTENCE WAS BUILT TOO -- a repair pass, which moves the
+ * threshold without moving ownership -- and the pair is the result. Both make all seven probes
+ * match; neither pays:
+ *
+ *     container tokenizer   footnotes 32 gained / 23 lost   code -7    cascade
+ *     repair pass           footnotes 12 gained / 11 lost   code  0    no cascade
+ *
+ * So the ownership cascade is real and avoidable, and removing it costs most of the gain: the
+ * tokenizer's +9 becomes +1. The repair's eleven losses are a different failure from the
+ * tokenizer's -- it INVENTS definitions, `[]` becoming `[["ω",6,1,6]]` -- because freeing a
+ * code node whose floor this rule mis-reads creates a definition where Obsidian has none, and
+ * a wrong offset is worse than a missing one here.
+ *
+ * What both establish, and no earlier attempt did: the RULE is right on all seven probes by
+ * either route, and the family's difficulty is not the threshold. It is that an item's content
+ * column is load-bearing for ownership in one direction and for the code floor in the other,
+ * and this corpus's documents are dense enough that touching either moves the other. The next
+ * thing worth trying is neither of these: a floor that is correct for DEEPER NESTING, since
+ * both routes' losses are nested items where `contentColumn` is not the column Obsidian used.
  *
  * The placement note below was the first answer written here and it was WRONG.
  * `deIndentFloor` cannot own this: it computes a DEFINITION's column, and by the time it runs
