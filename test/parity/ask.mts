@@ -251,16 +251,37 @@ const result: Answer[] = questions.map((markdown, index) => {
  *
  * On stderr, because stdout is the JSON every probe pipeline parses.
  */
+/**
+ * A NULL answer is the oracle declining, not an answer, and it must be loud.
+ *
+ * `computeMetadataAsync` returns `null` for some inputs rather than an empty cache. Read as
+ * data that is the omission trap one level deeper: `(compute.footnoteRefs ?? [])` on a null
+ * throws, and `compute?.footnoteRefs ?? []` would silently report "Obsidian indexes nothing
+ * here" for a document it never parsed. The guard below tested `=== undefined` only, which
+ * JSON `null` does not satisfy -- so the field guard built to catch exactly this class of
+ * silence crashed on it instead.
+ */
+const refused = result.filter((answer) => answer.compute === null);
+if (refused.length > 0) {
+  console.error(
+    `ask: ${refused.length} of ${result.length} answers are NULL -- Obsidian returned no cache.`,
+  );
+  console.error(
+    "     That is the oracle DECLINING, not an empty answer. Do not read it as 'indexes nothing'.",
+  );
+  for (const answer of refused) console.error(`     null: ${answer.markdown}`);
+}
 if (!wantSynth) {
   const starved = result.filter((answer) => {
     const compute = answer.compute as
-      { footnoteRefs?: readonly { id?: string }[] } | undefined;
+      { footnoteRefs?: readonly { id?: string }[] } | null | undefined;
     // An ABSENT `footnoteRefs` is the STRONGEST form of the trap, not a reason to skip.
     // Obsidian omits the key entirely when it indexes no reference -- `use[^1] and [^2]`
     // comes back with `compute` holding `["sections"]` and nothing else -- so the first
     // version of this guard declined exactly the case it exists to catch, and the break
-    // test is what said so. Only a missing `compute` means the answer itself failed.
-    if (compute === undefined) return false;
+    // test is what said so. Only a missing `compute` means the answer itself failed, and
+    // `null` is one of its two spellings -- reported above rather than skipped silently.
+    if (compute === undefined || compute === null) return false;
     const indexed = new Set(
       (compute.footnoteRefs ?? []).map((ref) => ref.id?.toLowerCase()),
     );
