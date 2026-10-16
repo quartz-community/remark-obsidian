@@ -2427,6 +2427,49 @@ Five of seven axes are at zero, four of the five remaining divergences are the P
 that must NOT be reproduced, and the last is scored both ways and declined. Attributing that
 would be a twenty-minute sweep for one document.
 
+### The pairwise sweep is 40 runs, and coupling turns out not to be a problem
+
+Resolving a coupled document -- one several units change -- needs the units removed TOGETHER,
+and the obvious framing of a 94-squared sweep is the wrong bound by two orders of magnitude,
+because only pairs that ACTUALLY CO-OWN a document say anything:
+
+    naive 94 squared                  8464 runs
+    pairs that CO-OWN a document       423
+    ...and co-own a DIVERGING one      325   <- the only ones that matter
+    DISTINCT owner sets                314   <- one experiment each
+
+Only 50 of 92 units appear in any diverging pair and 29 own nothing, so most of the square is
+pairs that never meet. The real slimming is then ORDERING rather than deduplication, because
+sets sorted by documents covered have sharp diminishing returns -- the top set is 78 documents,
+the top ten are 264 of 769, the top forty are 426 of 769 at 55%.
+
+**And the verdict has to be SCOPED TO THE SET'S OWN DOCUMENTS**, which is the difference
+between an unusable answer and a usable one. Compared globally, 23 of the top 40 sets report a
+deviation LARGER than the number of documents that identified them -- one covers five documents
+and masks 357 -- because removing two units together perturbs answers everywhere, not only
+where they co-own. Scoped to the documents in question:
+
+    SCOPED verdicts over the top 40 sets:
+      INDEPENDENT   40 sets, 426 documents
+      MASKING        0
+      SYNERGISTIC    0
+
+Every one. On the documents that identify a set, its members' effects are ADDITIVE, so a
+multi-owner set means "several units each own part of this answer" rather than "attribution
+here cannot be trusted". The single-unit map is reliable for all 426.
+
+    diverging referee documents : 1141
+      single owner, trustworthy      :  271
+      multi-owner, verified additive :  426
+      tokenizer-only, no pass owns   :  101
+      ----                              ---
+      attributed with confidence     :  798  (70%)
+      coupled tail, not yet swept    :  343  (274 sets, same method)
+
+A set of size TWO is fully resolved by one combined removal -- 37 sets covering 261 documents.
+A larger set is only NARROWED, because the full subset lattice is exponential. That the forty
+largest all came back additive is evidence the lattice does not need exploring here, not proof.
+
 ### What it does NOT answer
 
 - **The projection layer.** `normalize.ts` is not a pass, so removal cannot reach it, and some

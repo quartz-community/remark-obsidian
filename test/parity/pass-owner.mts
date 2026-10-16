@@ -236,13 +236,43 @@ function shapes(label: string, keepAgrees = false): Shapes {
  * A larger set is only NARROWED, because the full subset lattice is exponential -- that is a
  * limit of the method, not of this flag.
  */
+/**
+ * `--against <map.json>` turns a set's combined removal into a VERDICT.
+ *
+ * On its own, "removing this set moved 6,507 answers" is unreadable: `bareFootnoteRefTransform`
+ * alone moves about five thousand, so every set containing it moves at least that. The signal
+ * is the comparison against what the members move INDIVIDUALLY, which a prior single-unit map
+ * already encodes -- unit U moved key K exactly when U appears in `perCase[K]`.
+ *
+ *     combined == union   INDEPENDENT -- each member's effect is additive, and the single-unit
+ *                         attribution for those documents can be trusted as ownership
+ *     combined  > union   SYNERGISTIC -- removing both changes answers neither changed alone,
+ *                         so something downstream was absorbing one of them
+ *     combined  < union   MASKING -- removing both changes FEWER answers, so one member was
+ *                         compensating for the other and neither owns those documents alone
+ *
+ * Only the first verdict licenses treating a single-unit owner as the owner. That is the
+ * question the whole pairwise exercise exists to answer, and it is why the raw counts were
+ * never the deliverable.
+ */
+const againstAt = process.argv.indexOf("--against");
+const against: Record<string, string[]> =
+  againstAt === -1
+    ? {}
+    : (
+        JSON.parse(
+          fs.readFileSync(process.argv[againstAt + 1] ?? "", "utf8"),
+        ) as { perCase: Record<string, string[]> }
+      ).perCase;
+
 const setsAt = process.argv.indexOf("--sets");
-const setList: { owners: string[]; documents: number }[] =
+const setList: { owners: string[]; documents: number; docs?: string[] }[] =
   setsAt === -1
     ? []
     : (JSON.parse(fs.readFileSync(process.argv[setsAt + 1] ?? "", "utf8")) as {
         owners: string[];
         documents: number;
+        docs?: string[];
       }[]);
 
 const pristine = fs.readFileSync(index, "utf8");
@@ -306,13 +336,17 @@ try {
       ? setList.slice(0, limit).map((entry) => ({
           name: `SET[${entry.documents}] ${entry.owners.map((o) => o.split(" [")[0]).join(" + ")}`,
           wanted: entry.owners.length,
+          docs: new Set(entry.docs ?? []),
           members: entry.owners
             .map((owner) => units.find((unit) => unit.name === owner))
             .filter((unit): unit is Block => unit !== undefined),
         }))
-      : units
-          .slice(0, limit)
-          .map((block) => ({ name: block.name, wanted: 1, members: [block] }));
+      : units.slice(0, limit).map((block) => ({
+          name: block.name,
+          wanted: 1,
+          docs: new Set<string>(),
+          members: [block],
+        }));
 
   for (const job of work) {
     if (job.members.length !== job.wanted) {
@@ -335,8 +369,37 @@ try {
     }
     const moved = Object.keys(base).filter((key) => base[key] !== without[key]);
     owned.set(job.name, moved);
+    let verdict = "";
+    if (setList.length > 0 && Object.keys(against).length > 0) {
+      const members = new Set(job.members.map((member) => member.name));
+      // SCOPED TO THE SET'S OWN DOCUMENTS. Compared globally, 23 of the top 40 sets report a
+      // deviation LARGER than the number of documents that identified them -- one covers five
+      // documents and masks 357 -- because removing two units together perturbs answers
+      // everywhere, not only where they co-own. A global number cannot certify the specific
+      // documents, which is the only thing the verdict is wanted for.
+      const scope = (key: string): boolean =>
+        job.docs.size === 0 || job.docs.has(key.split("\u0000")[0]!);
+      const union = new Set(
+        Object.keys(against).filter(
+          (key) =>
+            scope(key) &&
+            (against[key] ?? []).some((owner) => members.has(owner)),
+        ),
+      );
+      const combined = new Set(moved.filter(scope));
+      const extra = [...combined].filter((key) => !union.has(key)).length;
+      const missing = [...union].filter((key) => !combined.has(key)).length;
+      verdict =
+        extra === 0 && missing === 0
+          ? "  INDEPENDENT"
+          : extra > 0 && missing === 0
+            ? `  SYNERGISTIC +${String(extra)}`
+            : missing > 0 && extra === 0
+              ? `  MASKING -${String(missing)}`
+              : `  BOTH +${String(extra)}/-${String(missing)}`;
+    }
     console.log(
-      `  ${job.name.padEnd(60)}  ${String(moved.length).padStart(5)} case/profiles`,
+      `  ${job.name.padEnd(58)} ${String(moved.length).padStart(5)}${verdict}`,
     );
   }
 } finally {
