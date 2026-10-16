@@ -5604,3 +5604,35 @@ on every table written before the blast radius and the direction split were meas
 
 The method generalises: before attempting a batch, measure its SIZE, its BLAST RADIUS, and
 whether its errors share a DIRECTION. Only the third tells you whether a rule can exist.
+
+## The direction screen: what the remaining gap actually costs
+
+Attribution says WHERE a divergence lives. It does not say whether a rule can exist there. The
+screen that does is DIRECTION: within a pocket, do we index MORE than Obsidian, or FEWER? A
+derived restriction can only tighten, so a pocket containing both cannot be moved by one rule
+no matter how well derived.
+
+Run over every pocket rather than just the largest:
+
+    one-directional (a single rule CAN exist)   206 pockets   345 documents
+    positions only, counts match                103 pockets   114 documents
+    BIDIRECTIONAL (no single rule)              135 pockets   532 documents
+    upstream, nothing we ship                         -         82 documents
+
+    rule-addressable today: 459 of 1073 (42.8%)
+
+So the gap is three different KINDS of work, not one queue:
+
+- The 459 take derived restrictions and `score.mts` -- the loop that has produced every
+  shipped rule in this harness. The 114 position-only cases are the most tractable of all,
+  since counts already match and this repo has found eight separate character-versus-column
+  unit bugs.
+- The 532 CANNOT be restricted. They need Obsidian's actual mechanism learned from the live
+  oracle and reimplemented, which is what the tokenizer route does. Its signature is visible
+  in the measurements: the tab-threshold tokenizer scored 32 gained and 23 LOST, because a
+  bidirectional pocket moves in both directions until the mechanism is right.
+- The 82 need a construct vendored that does not exist yet.
+
+A forecast recorded here last turn -- "expect +1s and +2s now" -- was made while believing the
+live oracle was dead, and is withdrawn. Probing is exactly what the 532 need, and the 532 are
+half the remaining gap.
