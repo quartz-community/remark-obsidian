@@ -5700,3 +5700,94 @@ full answer comes back.
 The lesson is not about Obsidian. **A diagnostic that probes argument shapes against a stateful
 API can destroy the thing it is measuring**, and this one did it silently, to the only method
 that mattered, for an hour.
+
+## Minimising 532 documents against the live app: the direction hypothesis held, the clustering did not
+
+The bidirectional half of the backlog -- 532 documents whose pockets contain errors in BOTH
+directions, so no tightening rule can move them -- run through `referee-shrink --live`:
+
+    532 documents, 48 minutes, 8,541 channel round trips
+      reduced                          : 502
+      already agree with LIVE Obsidian :  30
+      refs untrustworthy               :  50
+      distinct minimal forms           : 449
+      VERIFIED still disagreeing       : 449 of 449
+
+The forms are probes rather than leads. Median 31 characters and 3 lines, against fuzz documents
+of hundreds; the five shortest are
+
+    "%%\n[^2]:"            ">~~~\n[^Ä]:"         "-\n\n  [^1]:"
+    "%%\n[^3]:"            ">\tIt\n[^3]:"
+
+### The hypothesis was right about DIRECTION
+
+The claim being tested was that bidirectionality is an artifact of POCKET GRANULARITY -- a
+pocket is "documents whose participant set is X", which lumps unrelated mechanisms together --
+rather than a property of any mechanism. Measured on the minimal forms:
+
+    ONE-DIRECTIONAL : 309 shapes, 339 documents
+    BIDIRECTIONAL   : 126 shapes, 163 documents
+
+**339 of 502 moved from "no single rule can fix this" to "a rule can exist"**, which takes the
+backlog from 459 of 1073 rule-addressable to **798 of 1073 (42.8% -> 74.4%)** without a line of
+parser code. The granularity really was the artifact for two thirds of it.
+
+The per-form direction table also confirms the signature's positional terms are load-bearing:
+
+    defs=MORE  refs=FEWER   84      defs=same  refs=FEWER   43
+    defs=FEWER refs=same    76      defs=same  refs=unknown 22
+    defs=same  refs=same    58      defs=FEWER refs=FEWER   19
+    defs=same  refs=MORE    53      defs=MORE  refs=unknown 17
+    defs=FEWER refs=MORE    49      defs=MORE  refs=same    16
+
+The 58 forms reading `same/same` still disagree -- verified individually -- because their
+divergence is a COLUMN or a SPAN rather than a count. A name-only signature would have reduced
+every one of them to "agrees" and deleted their content.
+
+### And wrong about CLUSTERING, which is the sixth grouping selector to die here
+
+    449 distinct forms -> 435 shapes
+
+Normalising footnote names, lorem filler, digits and non-ASCII runs merges **fourteen** forms.
+The largest shape in the whole sweep is **5 documents**:
+
+      5 docs  MORE        ">\n>\tw[^N]"
+      4 docs  FEWER       "-\n\t  * [^N]:\nw[^N]"
+      4 docs  FEWER+MORE  "0.\t| a | b\n| --- | ---\n    [^N]:\nw[^N] w[^N]"
+      3 docs  FEWER+MORE  "> x\n      %%\n[^N]:\nw[^N]"
+
+So this half of the backlog is genuinely a LONG TAIL OF DISTINCT MECHANISMS, not a few
+mechanisms wearing many disguises. That is the opposite of what the `def-end+1` and `ref-miss`
+classifications found, where one mechanism covered 56% and 92% of a bucket -- and it is the
+sixth selector over the INPUT to fail here, after probes-per-case, co-occurrence, construct
+frequency, line-local prefix and exact-string dedup.
+
+The useful consequence is not negative. Each of these 449 forms is three lines long, verified
+against the running application, and names its own mechanism on sight -- a tab after a quote
+marker, a definition under a bare `-`, a fence inside a list item, a `%%` at six columns. They
+are worth promoting into `corpus.ts` as probe families, which is the one thing a 500-character
+fuzz document can never be.
+
+### 30 documents where live Obsidian agrees with us and the referee does not
+
+Recorded here previously, from an 18-document sample: "Zero. The referee is not stale on any
+sampled document." On 532 documents that figure is **30**, or 5.6%. The shrink skips them by
+construction -- minimising toward a disagreement the application does not have would manufacture
+a probe for a rule that is not there -- so they cost nothing, but the earlier claim was measured
+on a sample a tenth the size and should not be quoted as a property of the corpus.
+
+### The two instrument defects worth keeping
+
+**`pkill -f <pattern>` matches the shell running `pkill`.** Killing the first sweep that way
+killed the monitoring shell instead, which produced no output, hit a 20-minute tool timeout, and
+left the edit it was supposed to make unapplied. Then `pgrep -f <pattern>` reported the dead
+sweep as RUNNING for the same reason -- the pattern was in its own command line -- so a process
+that had been dead for 20 minutes read as healthy. Match on a numeric PID, or on something the
+checking command does not itself contain.
+
+**An unattended run with no checkpoint is not a run.** The first launch had neither progress
+output nor partial results: no way to tell document 10 from document 400, and a crash at hour
+four would have lost everything. `--live` now appends every document to `/tmp/live-shrink.jsonl`
+as it finishes and skips what is already there, so relaunching continues. Break-tested by
+re-running the completed sweep: `resuming: 532 documents`, identical 449 forms, identical
+verdict, and **1 channel round trip instead of 8,541**.

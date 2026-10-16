@@ -166,7 +166,61 @@ async function live(entries: readonly Entry[]): Promise<void> {
   let agreeing = 0;
   let untrusted = 0;
 
+  /**
+   * Resumable, because an unattended run that loses everything is not a run.
+   *
+   * This sweep is hours long and every answer in it costs a round trip to another process. A
+   * crash at hour four with no partial output is a total loss, and the failure modes here are
+   * measured rather than theoretical: the metadata worker wedges silently, and the app being
+   * asked is someone else's running application.
+   *
+   * So each document is APPENDED as it finishes, and already-finished ids are skipped on
+   * start. Relaunching the same command continues where it stopped; deleting the ledger starts
+   * over.
+   */
+  const LEDGER = "/tmp/live-shrink.jsonl";
+  const done = new Map<string, string>();
+  if (fs.existsSync(LEDGER)) {
+    for (const line of fs.readFileSync(LEDGER, "utf8").split("\n")) {
+      if (line.trim() === "") continue;
+      try {
+        const row = JSON.parse(line) as { key: string; text: string };
+        done.set(row.key, row.text);
+      } catch {
+        /* a half-written final line after an interrupted run */
+      }
+    }
+    console.log(`  resuming: ${done.size} documents already in ${LEDGER}`);
+  }
+
+  const remember = (text: string, key: string): void => {
+    const seen = forms.get(text);
+    if (seen) {
+      seen.count += 1;
+      if (seen.from.length < 6) seen.from.push(key);
+    } else forms.set(text, { count: 1, from: [key] });
+  };
+  const record = (key: string, text: string, kind: string): void => {
+    fs.appendFileSync(LEDGER, `${JSON.stringify({ key, text, kind })}\n`);
+  };
+
+  let seenCount = 0;
+  const started = Date.now();
   for (const { entry, key } of pool) {
+    seenCount += 1;
+    const already = done.get(key);
+    if (already !== undefined) {
+      if (already === "") agreeing += 1;
+      else remember(already, key);
+      continue;
+    }
+    if (seenCount % 10 === 0 || seenCount === pool.length) {
+      const mins = (Date.now() - started) / 60_000;
+      console.log(
+        `  ${seenCount}/${pool.length}  forms=${forms.size}  agree=${agreeing}  ` +
+          `trips=${trips}  ${mins.toFixed(1)}m`,
+      );
+    }
     const [first] = await askBatch([entry.text]);
     if (!first) continue;
     if (!first.refsTrustworthy) untrusted += 1;
@@ -177,6 +231,7 @@ async function live(entries: readonly Entry[]): Promise<void> {
     // manufacture a probe for a rule that is not there.
     if (want === AGREES || want === "threw") {
       agreeing += 1;
+      record(key, "", want === "threw" ? "threw" : "agrees");
       continue;
     }
 
@@ -206,11 +261,8 @@ async function live(entries: readonly Entry[]): Promise<void> {
 
     const text = lines.join("\n");
     if (text.length < entry.text.length) reduced += 1;
-    const seen = forms.get(text);
-    if (seen) {
-      seen.count += 1;
-      if (seen.from.length < 6) seen.from.push(key);
-    } else forms.set(text, { count: 1, from: [key] });
+    remember(text, key);
+    record(key, text, "reduced");
   }
 
   const sorted = [...forms.entries()].sort(
