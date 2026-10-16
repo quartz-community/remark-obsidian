@@ -2388,6 +2388,45 @@ error, which is the failure mode this file has spent a week finding in other ins
   0, then 609, then 96 for one corpus within an hour. A document is unowned only when BOTH its
   fields are.
 
+### Complete, across both oracles and all three dimensions
+
+The first `--deep` run attributed the REFEREE and left the corpus on the shallow 72-unit pass,
+so the corpus still carried the composite-guard problem it had just been fixed for. Both run
+deep now, and the referee hashes all THREE of its dimensions rather than two -- `code` is a
+recorded answer on 883 documents with 141 disagreeing, and attributing only `defs` and `refs`
+left every one of those unowned by construction.
+
+    REFEREE, three dimensions, 94 units
+      diverging documents : 1141 of 6818
+        exactly ONE owner :  271
+        two or more       :  769
+        NO owner at all   :  101
+        still solely the composite guard: 0
+
+    CORPUS, 94 units
+      passes owning nothing : 14
+      cases no pass touches : 370  (2 of them not triaged `match`)
+
+**And the `code` dimension is 98% tokenizer territory**, which falls out of the per-dimension
+counts rather than being asserted:
+
+    unowned field-answers by dimension: defs 4078   refs 1120   code 6656 of 6818
+
+Almost no pass affects a root code range, so the 141 diverging `code` answers cannot be fixed
+by a repair pass -- which is the same conclusion the tab-threshold family reached the expensive
+way, now derived for the whole dimension at once.
+
+### Nothing left to attribute on `compose`
+
+Checked rather than assumed, because a 94-unit sweep per axis is not free:
+
+    pairs 0/256   matrix 0/80   inside 0/64   isolate 0/140
+    nested 1/192  inline 0/196  inline-block 4/224
+
+Five of seven axes are at zero, four of the five remaining divergences are the P1 cache defect
+that must NOT be reproduced, and the last is scored both ways and declined. Attributing that
+would be a twenty-minute sweep for one document.
+
 ### What it does NOT answer
 
 - **The projection layer.** `normalize.ts` is not a pass, so removal cannot reach it, and some

@@ -370,13 +370,13 @@ const unowned = ids.filter((id) =>
 const fieldOf = (key: string): string => key.split("\u0000")[0]!;
 const unownedDocs = refereeMode
   ? [...new Set(unowned.map(fieldOf))].filter((doc) =>
-      ["defs", "refs"].every((field) =>
+      ["defs", "refs", "code"].every((field) =>
         unowned.includes(`${doc}\u0000${field}`),
       ),
     )
   : unowned;
 console.log(
-  `\n  UNOWNED: ${unowned.length} field-answers, ${unownedDocs.length} documents with BOTH fields unowned` +
+  `\n  UNOWNED: ${unowned.length} field-answers, ${unownedDocs.length} documents with ALL fields unowned` +
     `, of ${refereeMode ? new Set(ids.map(fieldOf)).size : ids.length}  (stock micromark plus the vendored constructs)`,
 );
 // THE FIELD SUFFIX HAS TO COME OFF. `agreesBase` is keyed by DOCUMENT and the shapes are now

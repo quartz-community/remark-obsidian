@@ -16,7 +16,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
-import { refereeFacts } from "./referee-facts.js";
+import { refereeFactsWithTree } from "./referee-facts.js";
 
 const out = process.argv[2];
 const dir = process.env.PARITY_REFEREE_DIR;
@@ -31,6 +31,7 @@ interface Entry {
   readonly text: string;
   readonly defs?: unknown[];
   readonly refs?: unknown[];
+  readonly code?: [number, number][];
 }
 
 const shapes: Record<string, string> = {};
@@ -51,7 +52,17 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
   for (const [index, entry] of list.entries()) {
     const id = `${file}#${index}`;
     try {
-      const ours = refereeFacts(entry.text);
+      const ours = refereeFactsWithTree(entry.text);
+      // THE THIRD DIMENSION. The referee reports `code` -- Obsidian's own root-level code
+      // ranges -- on 883 documents, 141 of which disagree, and attributing only `defs` and
+      // `refs` left every one of those unowned. Root children only, which is how the referee
+      // itself compares them: a `code` node inside a container is not a root section.
+      const ourCode = ours.tree.children
+        .filter((child) => child.type === "code" && child.position)
+        .map((child) => [
+          child.position!.start.line - 1,
+          child.position!.end.line - 1,
+        ]);
       // PER FIELD, not one hash for the pair. A document diverging only on its references
       // told us nothing about which pass owns the references, because the combined hash moved
       // whichever field changed. The referee's oracle has two fields and they are owned
@@ -61,12 +72,19 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
         crypto.createHash("sha256").update(value).digest("hex").slice(0, 16);
       shapes[`${id}\u0000defs`] = digest(key(ours.defs));
       shapes[`${id}\u0000refs`] = digest(key(ours.refs));
+      shapes[`${id}\u0000code`] = digest(key(ourCode));
       agrees[id] =
         key(ours.defs) === key(entry.defs ?? []) &&
-        key(ours.refs) === key(entry.refs ?? []);
+        key(ours.refs) === key(entry.refs ?? []) &&
+        // Counted only where the oracle HAS a code range. 5,935 documents record none, and
+        // treating that absence as an assertion would mark every one of them diverging --
+        // the same guard `score.mts` applies to this dimension.
+        ((entry.code ?? []).length === 0 ||
+          key(ourCode) === key(entry.code ?? []));
     } catch {
       shapes[`${id}\u0000defs`] = "THREW";
       shapes[`${id}\u0000refs`] = "THREW";
+      shapes[`${id}\u0000code`] = "THREW";
       agrees[id] = false;
       threw += 1;
     }
