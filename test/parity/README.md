@@ -5636,3 +5636,67 @@ So the gap is three different KINDS of work, not one queue:
 A forecast recorded here last turn -- "expect +1s and +2s now" -- was made while believing the
 live oracle was dead, and is withdrawn. Probing is exactly what the 532 need, and the 532 are
 half the remaining gap.
+
+## The plugin is the channel, and `obsidian eval` never should have been
+
+Asked why `computeMetadataAsync` goes through the CLI at all when this harness already ships a
+plugin running inside the app. It should not, and measuring the two side by side on ONE document
+settles it:
+
+    use[^1] / blank / [^1]: def
+
+    file channel (plugin)   ["footnoteRefs", "footnotes", "sections"]   complete, 3 of 3 runs
+    ask.mts (obsidian eval) ["sections"]                                3 of 3 runs
+
+**The CLI channel loses the footnote fields.** Every earlier reading of "Obsidian returned only
+`sections` for a document with two definitions" was the channel and not the parser -- including
+the one that started this investigation. A field that is not there reads as agreement with
+whatever you expected, and this is the third instance in these notes, the first where the
+missing field was dropped in TRANSIT.
+
+Every constraint the CLI channel documents is a property of the CLI: the 5-15 ms result window
+that forces an awaited value onto a global and a second synchronous read, base64 because the
+markdown crosses a shell argument and then a JS string literal, the 40-poll loop, and a batch
+ceiling that comes from stuffing every question into one `code=` argument. A plugin has Node, so
+it reads a file and writes a file:
+
+    /tmp/parity-probe/request.json    [{ "id": ..., "markdown": ... }, ...]
+    /tmp/parity-probe/response.json   [{ "id": ..., "cache": {...}|null }, ...]
+
+**One second per batch, no ceiling, no encoding, no polling through eval.** The request is
+deleted BEFORE answering so a question that crashes the app cannot re-run on every tick, and the
+response is written to a `.part` and renamed so a reader never sees half a file.
+
+### How the harness wedged Obsidian's metadata worker, and the one-line recovery
+
+While probing argument shapes the oracle died: `computeMetadataAsync` returned `undefined` for
+every input -- plain text, a bare reference, all four argument shapes -- having answered 3,439
+documents forty minutes earlier. The app stayed responsive and only that one method was dead,
+which is the worst possible failure shape because it reads as "Obsidian indexes nothing here".
+
+De-minifying its callee explains all of it:
+
+    work(e){ if(this.workerResolve) throw new Error("Work queue must be sequential!");
+             return new Promise(i=>{ this.workerResolve=i,
+                                     this.worker.postMessage({metadataCache:e},[e]) }) }
+
+The buffer goes to a Web Worker in a TRANSFER LIST, and `workerResolve` is assigned BEFORE the
+post. So:
+
+- **A transferred ArrayBuffer is DETACHED on return.** One buffer serves exactly one call;
+  encoding once and asking twice posts a zero-length buffer the second time.
+- **Anything non-Transferable makes `postMessage` throw AFTER the flag is set**, which wedges the
+  cache permanently. Every later call throws "must be sequential", `computeMetadataAsync` swallows
+  that in its own `catch`, and the method returns `undefined` forever. Passing a `Uint8Array` and
+  a `string` to see which shape it wanted did exactly that.
+
+  app.metadataCache.workerResolve = null
+
+recovers it with no restart. `askCache` in the probe clears it on ENTRY rather than in a catch,
+because the wedge outlives the call that caused it, and the probe serves one document at a time
+so a flag found set is never a live call. Break-tested by wedging deliberately and confirming a
+full answer comes back.
+
+The lesson is not about Obsidian. **A diagnostic that probes argument shapes against a stateful
+API can destroy the thing it is measuring**, and this one did it silently, to the only method
+that mattered, for an hour.

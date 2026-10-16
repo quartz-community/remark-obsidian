@@ -222,6 +222,127 @@ module.exports = class ParityProbe extends obsidian.Plugin {
       }
     };
 
+    /**
+     * A FILE-DRIVEN batch channel, which is what `obsidian eval` should never have been.
+     *
+     * Every constraint the CLI channel documents is a property of the CLI and not of Obsidian:
+     * the 5-15 ms result window that forces an awaited value onto a global and a second
+     * synchronous read, the base64 encoding because markdown crosses a shell argument and then
+     * a JS string literal, the 40-poll loop, and the batch ceiling that comes from stuffing
+     * every question into one `code=` argument. A plugin runs INSIDE the app with Node
+     * available, so it can be handed a file and write a file, and none of those exist.
+     *
+     * Protocol, deliberately the dumbest thing that works:
+     *
+     *     /tmp/parity-probe/request.json    [{ "id": "...", "markdown": "..." }, ...]
+     *     /tmp/parity-probe/response.json   [{ "id": "...", "cache": {...}|null }, ...]
+     *
+     * The request is DELETED before answering, so a crash mid-batch cannot re-run forever, and
+     * the response is written to a temp name and renamed -- a reader polling for the file must
+     * never see a partial one. Both live outside the vault: this vault is git-tracked, and the
+     * reading-view probe above already records a stray probe file showing up as a working-tree
+     * change in an unrelated commit.
+     *
+     * `null` is written when `computeMetadataAsync` returns nothing, and it is written
+     * EXPLICITLY rather than omitted. A missing key reads as "Obsidian indexes nothing here",
+     * which is the trap `ask.mts` carries two guards for -- the definition-gated `footnoteRefs`
+     * and, newly, a null cache. The reader's job is to throw on it; the probe's job is to not
+     * hide it.
+     */
+    const BATCH_DIR = "/tmp/parity-probe";
+    const REQUEST = BATCH_DIR + "/request.json";
+    const RESPONSE = BATCH_DIR + "/response.json";
+    const fs = require("fs");
+
+    /**
+     * Ask the cache for one document, with the two hazards its own source dictates.
+     *
+     * `MetadataCache.work` is, de-minified:
+     *
+     *     work(e){ if(this.workerResolve) throw new Error("Work queue must be sequential!");
+     *              return new Promise(i=>{ this.workerResolve=i,
+     *                                      this.worker.postMessage({metadataCache:e},[e]) }) }
+     *
+     * So the buffer is handed to a Web Worker in a TRANSFER LIST, and `workerResolve` is
+     * assigned BEFORE the post. Two consequences, both of which bit this harness:
+     *
+     * A transferred ArrayBuffer is DETACHED on return, so one buffer serves exactly one call.
+     * Encoding once and asking twice posts a zero-length buffer the second time.
+     *
+     * And anything non-Transferable makes `postMessage` throw AFTER the flag is set, which
+     * wedges the cache PERMANENTLY: every later call throws "must be sequential", that throw is
+     * swallowed by `computeMetadataAsync`'s own `catch`, and the method then returns `undefined`
+     * for every input forever. A shape-probing loop that passed a `Uint8Array` and a `string`
+     * did exactly that and cost an hour -- the app stays responsive, `app.vault.getName()`
+     * answers, and only this one method is dead, which reads as "Obsidian indexes nothing here"
+     * rather than as a broken oracle.
+     *
+     * Clearing the flag recovers it with no restart. Done on ENTRY rather than in a catch,
+     * because the wedge survives the call that caused it: a stale flag is the normal state to
+     * find when something earlier went wrong, and this serves one document at a time so a set
+     * flag here is never a live call.
+     */
+    async function askCache(markdown) {
+      if (app.metadataCache.workerResolve) app.metadataCache.workerResolve = null;
+      const bytes = new TextEncoder().encode(markdown);
+      const exact =
+        bytes.byteOffset === 0 && bytes.byteLength === bytes.buffer.byteLength
+          ? bytes.buffer
+          : bytes.slice().buffer;
+      return app.metadataCache.computeMetadataAsync(exact);
+    }
+
+    let answering = false;
+    async function serveBatch() {
+      if (answering) return;
+      if (!fs.existsSync(REQUEST)) return;
+      answering = true;
+      try {
+        const asked = JSON.parse(fs.readFileSync(REQUEST, "utf8"));
+        // Before answering, so a question that crashes the app cannot be asked again on
+        // every tick of the interval.
+        fs.unlinkSync(REQUEST);
+        const answers = [];
+        for (const question of asked) {
+          let cache = null;
+          try {
+            const computed = await askCache(question.markdown ?? "");
+            cache = computed === undefined ? null : computed;
+          } catch (error) {
+            cache = null;
+            answers.push({
+              id: question.id,
+              cache: null,
+              threw: String(error && error.message ? error.message : error),
+            });
+            continue;
+          }
+          answers.push({ id: question.id, cache });
+        }
+        fs.writeFileSync(RESPONSE + ".part", JSON.stringify(answers));
+        fs.renameSync(RESPONSE + ".part", RESPONSE);
+      } catch (error) {
+        try {
+          fs.writeFileSync(
+            RESPONSE + ".part",
+            JSON.stringify({ error: String(error) }),
+          );
+          fs.renameSync(RESPONSE + ".part", RESPONSE);
+        } catch {
+          /* nothing further this side can do */
+        }
+      } finally {
+        answering = false;
+      }
+    }
+
+    try {
+      fs.mkdirSync(BATCH_DIR, { recursive: true });
+    } catch {
+      /* the reader creates it too */
+    }
+    plugin.registerInterval(window.setInterval(serveBatch, 400));
+
     plugin.register(() => {
       delete window.__parityProbe;
       delete window.__parityReadingView;
