@@ -227,6 +227,72 @@ function constructsOf(lines: readonly string[]): Block[] {
   return found;
 }
 
+/**
+ * Order the backlog by REWARD AGAINST BLAST RADIUS.
+ *
+ * Counting diverging documents per unit ranks the work wrongly, because the unit holding the
+ * most of them is also the one holding the most CORRECT answers. `bareFootnoteRefTransform` is
+ * the sole participant in 114 diverging documents and its removal perturbs 4,432 agreeing ones:
+ * thirty-nine correct answers at stake for every document that could be gained. The safest
+ * ratios in the table belong to units holding one to three documents.
+ *
+ * So this is not a queue of easy wins to sweep. It is a map of where a narrow, derived
+ * restriction has to be found before anything is edited -- which is the loop `score.mts`
+ * already enforces, applied to the places this table says are expensive.
+ */
+function workOrder(
+  map: { perCase: Record<string, readonly string[]> },
+  agrees: Record<string, boolean>,
+): void {
+  const diverging = new Set(
+    Object.entries(agrees)
+      .filter(([, ok]) => ok === false)
+      .map(([id]) => id),
+  );
+  const participants = new Map<string, Set<string>>();
+  const perDoc = new Map<string, Set<string>>();
+  for (const [key, units] of Object.entries(map.perCase)) {
+    const doc = key.split("\0")[0]!;
+    for (const unit of units) {
+      let seen = participants.get(unit);
+      if (!seen) participants.set(unit, (seen = new Set()));
+      seen.add(doc);
+    }
+    if (diverging.has(doc)) {
+      let own = perDoc.get(doc);
+      if (!own) perDoc.set(doc, (own = new Set()));
+      for (const unit of units) own.add(unit);
+    }
+  }
+  const sole = new Map<string, number>();
+  for (const units of perDoc.values()) {
+    if (units.size !== 1) continue;
+    const only = [...units][0]!;
+    sole.set(only, (sole.get(only) ?? 0) + 1);
+  }
+  const rows = [...sole].map(([unit, reward]) => {
+    const touched = participants.get(unit) ?? new Set<string>();
+    let risk = 0;
+    for (const doc of touched) if (agrees[doc] === true) risk += 1;
+    return { unit, reward, risk, ratio: reward / Math.max(risk, 1) };
+  });
+  rows.sort((a, b) => b.ratio - a.ratio);
+  console.log(
+    "  reward = diverging docs where this unit is the SOLE participant",
+  );
+  console.log("  risk   = AGREEING docs whose answer its removal perturbs");
+  for (const r of rows) {
+    console.log(
+      `    ${r.unit.slice(0, 44).padEnd(44)} ${String(r.reward).padStart(6)} ` +
+        `${String(r.risk).padStart(6)} ${r.ratio.toFixed(3).padStart(7)}`,
+    );
+  }
+  const total = rows.reduce((n, r) => n + r.reward, 0);
+  console.log(
+    `  ${rows.length} units hold ${total} sole-participant documents`,
+  );
+}
+
 type Shapes = Record<string, string>;
 /** Agreement per document, referee mode only, so a removal's effect can be SIGNED. */
 let agreesBase: Record<string, boolean> = {};
@@ -307,6 +373,27 @@ const against: Record<string, string[]> =
           fs.readFileSync(process.argv[againstAt + 1] ?? "", "utf8"),
         ) as { perCase: Record<string, string[]> }
       ).perCase;
+
+/**
+ * `--work-order <map.json> <agrees.json>` reports the table WITHOUT re-running the sweep.
+ *
+ * Re-running costs twenty-three minutes to recompute inputs that are already on disk, and the
+ * table is a pure function of them. It exits before any removal happens, so it cannot disturb
+ * `src/index.ts`.
+ */
+const workOrderAt = process.argv.indexOf("--work-order");
+if (workOrderAt !== -1) {
+  const mapAt = process.argv[workOrderAt + 1] ?? "";
+  const agreesAt = process.argv[workOrderAt + 2] ?? "";
+  const loaded = JSON.parse(fs.readFileSync(mapAt, "utf8")) as {
+    perCase: Record<string, readonly string[]>;
+  };
+  const judged = JSON.parse(fs.readFileSync(agreesAt, "utf8")) as {
+    agrees?: Record<string, boolean>;
+  };
+  workOrder(loaded, judged.agrees ?? (judged as Record<string, boolean>));
+  process.exit(0);
+}
 
 const setsAt = process.argv.indexOf("--sets");
 const setList: { owners: string[]; documents: number; docs?: string[] }[] =

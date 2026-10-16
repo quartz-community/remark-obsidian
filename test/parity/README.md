@@ -5538,3 +5538,40 @@ The methodological point generalises beyond this harness: removal attributes cor
 when removal returns the system to a meaningful baseline. For a repair pass it does. For a
 syntax construct there is no baseline to return to -- the feature either exists or the document
 cannot be parsed as intended at all.
+
+## Ordering the backlog: reward against blast radius
+
+Counting diverging documents per unit ranks the work BACKWARDS, because the unit holding the
+most divergences also holds the most correct answers.
+
+    unit                                     reward   risk     r/r
+    lrdFootnoteTransform                          1      0   1.000
+    listUnderDefinitionTransform                  3     17   0.176
+    quoteTabTransform                             8    197   0.041
+    definitionColumnTransform                    13    505   0.026
+    bareFootnoteRefTransform                    114   4432   0.026
+    construct:math                                9    833   0.011
+    commentParseTransform                         5    948   0.005
+
+    16 units hold 166 sole-participant documents
+
+`reward` is diverging documents where the unit is the SOLE participant; `risk` is AGREEING
+documents whose answer its removal perturbs. The largest batch in the backlog carries
+**thirty-nine correct answers at stake for every document it could gain**. The healthy ratios
+all belong to units holding one to three documents.
+
+So the sole-participant set is not a queue of easy wins. It is a map of where a narrow, DERIVED
+restriction must be found before anything is edited -- the loop `score.mts` already enforces,
+pointed at the places this table prices as expensive. A sweep through 114 documents by editing
+their one participant would be the most destructive change available in this repository.
+
+Adding the fourteen constructs also MOVED the partition, because a unit added can only split a
+sole participant into a pair:
+
+    sole participant : 240 -> 166   (constructs co-participate in 74)
+    multi            : 739 -> 825
+    nothing we ship  :  94 ->  82
+
+The 301-of-307 additive verdict was measured against the 94-unit map and its set MEMBERSHIP is
+now stale; the finding itself is a statement about independence of effects and is expected to
+hold, but it has not been re-measured at 108 units and must not be quoted as though it has.
