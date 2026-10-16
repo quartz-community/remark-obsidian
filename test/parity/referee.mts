@@ -297,6 +297,26 @@ if (blastFrom !== undefined) {
         "  probe wave (test/parity/ask.mts) instead of trusting this.",
     );
   }
+  // LOST FIRST, because it is the bucket that decides whether a rule ships. Only `still
+  // wrong` was printed here, so a change with `lost 7` gave no way to see WHICH seven or HOW
+  // they moved -- and the obvious workaround, re-running a scored candidate, measures the
+  // candidate rather than the implementation. The two disagreed by 7 documents on the change
+  // that exposed this.
+  const regressed = blast.filter((row) => row.bucket === "lost");
+  if (regressed.length > 0) {
+    console.log(
+      `\n  LOST -- the oracle endorsed the old answer and does not endorse the new one.`,
+    );
+    for (const row of regressed.slice(0, 40)) {
+      console.log(`\n  ${row.key}`);
+      console.log(`    before = ${row.before}`);
+      console.log(`    after  = ${row.after}`);
+      console.log(`    oracle = ${row.oracle}`);
+    }
+    if (regressed.length > 40) {
+      console.log(`\n  ...and ${regressed.length - 40} more`);
+    }
+  }
   const silent = blast.filter((row) => row.bucket === "still wrong");
   if (silent.length > 0) {
     console.log(
