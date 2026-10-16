@@ -59,6 +59,7 @@ import { breakPositionsTransform } from "./lib/break-positions.js";
 import { commentParseTransform } from "./lib/comment-parse.js";
 import { commentDefinitionColumnTransform } from "./lib/comment-definition-column.js";
 import { commentQuoteExtentTransform } from "./lib/comment-quote-extent.js";
+import { quoteCommentLazyTransform } from "./lib/quote-comment-lazy.js";
 import {
   ensureLineOffsets,
   lineOffsetsFromMarkdown,
@@ -714,6 +715,9 @@ export default function remarkObsidian(
     // quote's own extent, and before the footnote passes that would bind a
     // definition it swallows.
     if (opts.comments) commentQuoteExtentTransform(tree, String(file));
+    // Beside the pass above, which cannot reach a comment that is the quote's LAST child --
+    // which is exactly what a depth-2 opener produces, because the lazy line stays at root.
+    if (opts.comments) quoteCommentLazyTransform(tree, String(file));
     // Before the footnote passes, so a definition this recovers is one they see.
     indentTabTransform(tree, String(file), (markdown) => reparse(markdown));
     // Unconditional, unlike the continuation pass above it: a definition whose
