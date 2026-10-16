@@ -116,6 +116,74 @@ function blocksOf(lines: readonly string[]): Block[] {
   return found;
 }
 
+/**
+ * Each pass INSIDE a multi-pass guard, as its own removable unit.
+ *
+ * The guard-as-one-unit rule is right for MOVING a pass and wrong for attributing one. Seven
+ * guards hold 29 passes between them and `if(opts.bareFootnoteRefs)` holds THIRTEEN, so the
+ * audit's dominant owner was a bag: 923 of 979 diverging referee documents "belonged to"
+ * that guard and 387 of them to nothing else, which names the option rather than the pass.
+ *
+ * Removing an inner call while LEAVING the guard is safe in a way that removing a guarded pass
+ * alone is not -- the guard still decides whether the block runs, and only one call goes. So
+ * these are a second phase rather than a replacement, and they deliberately overlap the guard
+ * blocks of the first.
+ */
+function innerOf(lines: readonly string[]): {
+  readonly units: Block[];
+  /** START lines of the guards that were split, so the right blocks are replaced. */
+  readonly guards: Set<number>;
+} {
+  const found: Block[] = [];
+  const guards = new Set<number>();
+  let at = 0;
+  while (at < lines.length) {
+    const guard = /^ {4}if \(opts\.([A-Za-z][A-Za-z0-9]*)/u.exec(
+      lines[at] ?? "",
+    );
+    if (!guard || !(lines[at] ?? "").includes("{")) {
+      at += 1;
+      continue;
+    }
+    let depth = count(lines[at]!, "{") - count(lines[at]!, "}");
+    const inner: Block[] = [];
+    let end = at;
+    while (depth > 0 && end + 1 < lines.length) {
+      end += 1;
+      depth += count(lines[end]!, "{") - count(lines[end]!, "}");
+      // `{6,}` rather than exactly six: `inlineFootnoteInertTransform` sits at EIGHT inside a
+      // nested `if` within `if(opts.bareFootnoteRefs)`, so a fixed indent found 28 of 29 and
+      // reported it confidently. Removing a doubly-nested call is still safe -- both guards
+      // remain, and only the one call goes.
+      const call = /^ {6,}([a-z][A-Za-z0-9]*Transform)\(/u.exec(
+        lines[end] ?? "",
+      );
+      if (!call) continue;
+      let tail = end;
+      let open = count(lines[end]!, "(") - count(lines[end]!, ")");
+      while (open > 0 && tail + 1 < lines.length) {
+        tail += 1;
+        open += count(lines[tail]!, "(") - count(lines[tail]!, ")");
+      }
+      let start = end;
+      while (
+        start > at + 1 &&
+        /^ {6,}(?:\/\/|\/\*|\*)/u.test(lines[start - 1]!)
+      ) {
+        start -= 1;
+      }
+      inner.push({ name: `${call[1]!} [in ${guard[1]!}]`, start, end: tail });
+      end = tail;
+    }
+    if (inner.length > 1) {
+      found.push(...inner);
+      guards.add(at);
+    }
+    at = end + 1;
+  }
+  return { units: found, guards };
+}
+
 type Shapes = Record<string, string>;
 /** Agreement per document, referee mode only, so a removal's effect can be SIGNED. */
 let agreesBase: Record<string, boolean> = {};
@@ -154,11 +222,42 @@ for (const [a, b] of blocks.map((x, i) => [x, blocks[i + 1]] as const)) {
   if (b && a.end >= b.start) throw new Error(`overlapping blocks at ${a.name}`);
 }
 
+const inner = innerOf(lines);
+/**
+ * `--deep` REPLACES a multi-pass guard with its inner calls rather than adding to them.
+ *
+ * Keeping both double-counts every case: the guard's removal and the inner call's removal both
+ * change it, so a cleanly-owned case reports two owners. The first `--deep` run made "2 owners"
+ * the mode at 4,184 of 13,636 purely from that, which inverts the one number the owner-set
+ * histogram exists to give.
+ */
+const deep = process.argv.includes("--deep");
+const units = deep
+  ? [
+      // BY POSITION, not by name. `opts.comments` guards TWO separate blocks in the chain, so
+      // filtering on the name dropped a single-pass block's attribution along with the
+      // multi-pass one -- 92 units where 94 was right, which is a silent loss of coverage
+      // rather than a loud error.
+      // CONTAINMENT, not equality: `blocksOf` walks a block's `start` back over the comment
+      // lines above it, so it never equals the `if` line `innerOf` records. Comparing them
+      // directly filtered five of the seven split guards and left two counted twice.
+      ...blocks.filter(
+        (block) =>
+          ![...inner.guards].some(
+            (line) => line >= block.start && line <= block.end,
+          ),
+      ),
+      ...inner.units,
+    ]
+  : blocks;
+
 const limitAt = process.argv.indexOf("--limit");
 const limit =
-  limitAt === -1 ? blocks.length : Number(process.argv[limitAt + 1] ?? "0");
+  limitAt === -1 ? units.length : Number(process.argv[limitAt + 1] ?? "0");
 
-console.log(`pass-owner: ${blocks.length} passes, removing ${limit}`);
+console.log(
+  `pass-owner: ${units.length} units (${blocks.length} top-level, ${inner.units.length} inside guards), removing ${limit}`,
+);
 
 const base = shapes("base", true);
 if (Object.keys(base).length === 0) throw new Error("baseline failed to hash");
@@ -167,7 +266,7 @@ console.log(`  baseline: ${Object.keys(base).length} case/profile shapes\n`);
 /** Case keys each pass changes when removed. */
 const owned = new Map<string, string[]>();
 try {
-  for (const block of blocks.slice(0, limit)) {
+  for (const block of units.slice(0, limit)) {
     fs.writeFileSync(
       index,
       [...lines.slice(0, block.start), ...lines.slice(block.end + 1)].join(
@@ -264,8 +363,21 @@ const unowned = ids.filter((id) =>
     : !byCase.has(`${id}\u0000quartz-default`) &&
       !byCase.has(`${id}\u0000all-features`),
 );
+// FIELD-ANSWERS AND DOCUMENTS ARE DIFFERENT UNITS, and reporting one as the other is how this
+// line said "0 diverging and unowned" and then "609" for the same corpus within an hour. A
+// document is only unowned when BOTH of its fields are, and that is the number meaning "no
+// repair pass can fix this".
+const fieldOf = (key: string): string => key.split("\u0000")[0]!;
+const unownedDocs = refereeMode
+  ? [...new Set(unowned.map(fieldOf))].filter((doc) =>
+      ["defs", "refs"].every((field) =>
+        unowned.includes(`${doc}\u0000${field}`),
+      ),
+    )
+  : unowned;
 console.log(
-  `\n  CASES NO PASS TOUCHES: ${unowned.length} of ${ids.length}  (stock micromark plus the vendored constructs)`,
+  `\n  UNOWNED: ${unowned.length} field-answers, ${unownedDocs.length} documents with BOTH fields unowned` +
+    `, of ${refereeMode ? new Set(ids.map(fieldOf)).size : ids.length}  (stock micromark plus the vendored constructs)`,
 );
 // THE FIELD SUFFIX HAS TO COME OFF. `agreesBase` is keyed by DOCUMENT and the shapes are now
 // keyed by `document\0field`, so looking one up with the other returned `undefined` for every
@@ -274,10 +386,8 @@ console.log(
 // splitting the hash per field -- a reporting line that reads a key it no longer receives
 // fails silently and looks like good news.
 const document = (key: string): string => key.split("\u0000")[0]!;
-const unownedDiverging = unowned.filter((id) =>
-  refereeMode
-    ? agreesBase[document(id)] === false
-    : triage![id]!.triage !== "match",
+const unownedDiverging = unownedDocs.filter((id) =>
+  refereeMode ? agreesBase[id] === false : triage![id]!.triage !== "match",
 );
 console.log(
   `    of those, NOT triaged \`match\`: ${unownedDiverging.length}  <- no repair pass can fix these`,
