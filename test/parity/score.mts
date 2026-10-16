@@ -790,6 +790,27 @@ const RULES: readonly Rule[] = [
   {
     name: "drop-defs-after-list-code",
     what: "a definition after a list+code run with no blank line is swallowed by the list",
+    // THREE DERIVED RESTRICTIONS, and it still does not pay. The sequence is the finding:
+    //
+    //     the crude walk-back                       27 better  19 worse   agreement -16
+    //     + no LABEL anywhere in the run (E1)       24 better   8 worse   agreement  -6
+    //     + no `⟨4sp⟩%%`, which ends the list (F5)  21 better   7 worse   agreement  -6
+    //     + no table row: lazy needs an OPEN para   20 better   4 worse   agreement  -3
+    //
+    // Every restriction comes from a rule this file already holds -- E1 says another label
+    // ends a definition, F5 distinguishes a four-space `%%` from a tab-indented one, and the
+    // sibling candidate states the open-paragraph precondition for lazy continuation -- and
+    // together they cut the losses from 19 to 4 at a cost of 7 gains.
+    //
+    // REFUSED ON FULL AGREEMENT, not on better/worse. 20 against 4 reads positive and the
+    // agreement count goes 5676 -> 5673, because the gains are PARTIAL -- inside documents
+    // that still disagree on something else -- while the three losses are TOTAL. That is the
+    // same trade `def-end-before-label` was refused for an hour earlier, at 2 against 1, and
+    // refusing one while shipping the other would be choosing by size rather than by kind.
+    //
+    // The remaining four each want their own exclusion -- a closed inline `%%` pair, a closed
+    // `$$` block -- which is where derived turns into fitted. Recorded at the fourth scoping
+    // rather than carried to a fifth.",
     apply: (text, ours) => {
       const lines = text.split("\n");
       // The NARROW version, and the broad one was wrong. `- a` / `lazy` / `[^1]: def`
@@ -809,9 +830,36 @@ const RULES: readonly Rule[] = [
         if (!/^\[\^[^\]]*\]:/u.test(line) || index < 2) continue;
         const above = lines[index - 1] ?? "";
         if (above.trim() === "" || !/^[ \t]/u.test(above)) continue;
-        // Walk back over indented lines to a list marker, stopping at any blank.
+        // Walk back over indented lines to a list marker, stopping at any blank. NO LABEL
+        // ANYWHERE IN THE RUN, including on the marker line itself: E1 says another label
+        // ENDS a definition, so once the item's content IS a definition the column-0 label
+        // below starts a new one rather than continuing it lazily. Both shapes appear in the
+        // losses --
+        //
+        //     +⟨5sp⟩Text / ⟨4sp⟩[^ä]: Prose here / [^3]: def   oracle KEEPS `3`
+        //     10. [^note]: def / ⇥⇥- item / [^名]: Prose here   oracle KEEPS `名`
+        //
+        // -- and in both the run carries a definition the crude walk ignored.
         let at = index - 1;
-        while (at > 0 && /^[ \t]/u.test(lines[at] ?? "")) at -= 1;
+        let labelled = false;
+        let ends = false;
+        while (at > 0 && /^[ \t]/u.test(lines[at] ?? "")) {
+          const run = lines[at] ?? "";
+          if (/^[ \t]*\[\^?[^\]]*\]:/u.test(run)) labelled = true;
+          // F5: a `%%` at EXACTLY four spaces ends the list, so the label below it is a real
+          // definition. A TAB-indented one does not -- it becomes a root `code` node, breaks
+          // the absorption chain, and is the gap this rule exists for. The candidate's own
+          // note records both halves and the crude walk honoured neither.
+          if (/^ {4}%%/u.test(run)) ends = true;
+          // LAZY CONTINUATION NEEDS AN OPEN PARAGRAPH, which the sibling candidate states as
+          // its own precondition. A table row closes one -- `- | a | b |` / `⟨2sp⟩| --- |` /
+          // `[^2]: two` keeps `2` in the oracle -- so a run carrying one cannot swallow the
+          // label below it.
+          if (run.includes("|")) ends = true;
+          at -= 1;
+        }
+        if (labelled || ends) continue;
+        if (/\[\^?[^\]]*\]:/u.test(lines[at] ?? "")) continue;
         if (/^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]/u.test(lines[at] ?? "")) {
           swallowed.add(index);
         }
