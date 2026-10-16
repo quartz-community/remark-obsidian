@@ -2262,6 +2262,63 @@ is 71% list-hosted, and is invisible to every minimal probe. It wants the five-s
 `legacy-list.ts`, which is the piece these notes have identified three times and which no
 repair pass has been able to stand in for.
 
+## The two largest buckets are ONE mechanism, and it is 22% of the queue
+
+Classified `def-miss` by OUR mechanism rather than the line's shape -- the axis that worked for
+`ref-miss` and the one the audit showed line-shape axes failing at:
+
+    136  we made it CODE
+     46  plain PARAGRAPH text
+     13  we buried it in a COMMENT
+     13  we made it MATH
+      7  plain PARAGRAPH text (quoted)
+      7  inside ANOTHER definition
+
+229 entries, and 59% are one thing. The three shortest are `+⇥⟨3sp⟩[^Ω]: def` and
+`⟨2sp⟩10.⇥⟨3sp⟩[^名]: body text` -- a tab followed by spaces in the MARKER SEPARATOR, which is
+the same arithmetic as the leading-tab threshold recorded on `definition-deindent-code.ts`.
+
+`ref-miss`'s largest bucket is also "we made it CODE", at 104. So the question is whether those
+are the same documents, and counting both sides at once answers it:
+
+    documents where OUR code node covers something Obsidian indexes : 233
+      a DEFINITION only                                             : 115
+      a REFERENCE only                                              :  97
+      BOTH in the same document                                     :  21
+
+**233 documents against 1,073 still disagreeing -- 22% of the whole remaining queue, one
+mechanism.** That is by far the largest target this harness has ever had attributed to a single
+cause, and it is the mechanism tonight's seven probes pinned:
+
+    ⟨4sp⟩  4 columns  defines      ⇥       4 columns  defines
+    ⟨5sp⟩  5 columns  defines      ⇥⟨3sp⟩  7 columns  defines
+    ⟨6sp⟩  6 columns  CODE         ⇥⟨4sp⟩  8 columns  CODE
+                                   ⇥⇥      8 columns  CODE
+
+A leading tab resets the content column to its own tab stop, so the threshold is
+`contentColumn + 4` over two different content columns -- six for a space run and eight once a
+tab leads. Both halves are now corpus cases in `probe/item-tab-threshold/*`, with `tab-three`
+marked `replicate`.
+
+### Which also explains why the scored candidates are exhausted
+
+With the agreement delta as the verdict, the whole candidate set reads:
+
+    positive agreement delta :  2    (both +1, both with recorded refusals)
+    flat                     : 18
+    negative                 : 29
+
+Three candidates shipped tonight now read `NOT ADJUDICABLE -- touches nothing` or `FLAT`, which
+is the harvest working as intended. What is left in that file cannot move this oracle, and the
+22% above is not in it: every attempt at it has been a REPAIR PASS over the tokenizer's output
+-- two of them measured -15 and -21 referee documents and broke `commonmark/tabs/5` -- while
+the decision itself is made in `legacy-list.ts`'s `tokenizeIndent`, where `factorySpace` is
+given a limit of `containerState.size + 1` before the line is seen.
+
+So the next real gain is a container-tokenizer change, which is the route this file records as
+worth five times a repair: the fence and capped-item rules landed +37, +16 and +28 there after
+the same rule scored +7 as a repair.
+
 ## Asking Obsidian directly, in two seconds
 
 `parity:record` boots Obsidian under Xvfb, renders all 3,403 corpus cases and rewrites the
