@@ -103,6 +103,7 @@ import { closingPreInterruptSyntax } from "./lib/syntax/closing-pre-interrupt.js
 import { labelOpenerWikilinkTransform } from "./lib/label-opener-wikilink.js";
 import { autolinkLiteralExtentTransform } from "./lib/autolink-literal-extent.js";
 import { definitionColumnTransform } from "./lib/definition-column.js";
+import { definitionEndBeforeLabelTransform } from "./lib/definition-end-before-label.js";
 import { definitionDeindentCodeTransform } from "./lib/definition-deindent-code.js";
 import { definitionSetextTransform } from "./lib/definition-setext.js";
 import { listDeepContinuationTransform } from "./lib/list-deep-continuation.js";
@@ -875,6 +876,10 @@ export default function remarkObsidian(
       );
       // Last of the footnote passes, so it sees every definition in its final place.
       definitionColumnTransform(tree, String(file));
+      // After the column pass, which reads a definition's own extent. This only pulls an END
+      // back, so running it earlier would hand every later pass a shorter definition than the
+      // one it was measured against.
+      definitionEndBeforeLabelTransform(tree, String(file));
       // After the reference passes, because the tree is what can say whether the `]`
       // before a tag closed a construct or was ordinary text.
       tagAfterCloserTransform(tree);
