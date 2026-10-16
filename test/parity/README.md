@@ -5575,3 +5575,32 @@ sole participant into a pair:
 The 301-of-307 additive verdict was measured against the 94-unit map and its set MEMBERSHIP is
 now stale; the finding itself is a statement about independence of effects and is expected to
 hold, but it has not been re-measured at 108 units and must not be quoted as though it has.
+
+## Why the largest batch is the largest: the predicate is wrong in BOTH directions
+
+The 114 documents whose sole participant is `bareFootnoteRefTransform` are the biggest single
+target left. Broken down by which referee field diverges:
+
+    defs only        49
+    refs only        40
+    defs + refs      25
+
+and inside the refs-only group:
+
+    we index MORE than Obsidian     28
+    we index FEWER                  10
+    same count, names/positions      2
+
+So it is not one mechanism. It is at least three, and the refs group alone contains errors in
+OPPOSING directions. That is the decisive fact for planning: a restriction can only tighten a
+predicate, which would help the 28 and hurt the 10. No single derived rule can move this batch,
+which is precisely why it is still the biggest -- the cheap one-directional wins next to it have
+already been taken.
+
+Combined with its price (4,432 correct answers perturbed by its removal, thirty-nine per
+document it could gain), the honest reading is that the 114 are the LAST work to attempt here,
+not the first, despite being the largest number in the partition. Size ranked this batch first
+on every table written before the blast radius and the direction split were measured.
+
+The method generalises: before attempting a batch, measure its SIZE, its BLAST RADIUS, and
+whether its errors share a DIRECTION. Only the third tells you whether a rule can exist.
