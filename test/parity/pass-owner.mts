@@ -229,6 +229,35 @@ const triage = refereeMode
         cases: Record<string, { triage: string }>;
       }
     ).cases;
+// HOW MANY PASSES OWN EACH CASE, which separates a clean owner from coupling. `pass-order.mts`
+// reports 42 of 62 passes position-sensitive, so "removing X changes Y" can mean X decides Y
+// or it can mean X's removal changes what a later pass sees. The two are not distinguishable
+// per pair without a pairwise sweep -- 69 squared -- but the SET SIZE is, and it is the number
+// that matters for working systematically: a case with exactly one owner can be worked on
+// alone, and a case with six cannot.
+const sizes = new Map<number, number>();
+for (const [, owners] of byCase) {
+  const n = new Set(owners).size;
+  sizes.set(n, (sizes.get(n) ?? 0) + 1);
+}
+console.log(`\n  OWNERS PER CASE  (1 = workable alone, many = coupled)`);
+for (const [n, count] of [...sizes].sort((a, b) => a[0] - b[0]).slice(0, 8)) {
+  console.log(`    ${String(n).padStart(2)} owner(s): ${count}`);
+}
+const soleOwner = new Map<string, number>();
+for (const [, owners] of byCase) {
+  const uniq = [...new Set(owners)];
+  if (uniq.length === 1) {
+    soleOwner.set(uniq[0]!, (soleOwner.get(uniq[0]!) ?? 0) + 1);
+  }
+}
+console.log(`\n  SOLE OWNERSHIP -- cases no other pass touches:`);
+for (const [name, n] of [...soleOwner]
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 10)) {
+  console.log(`    ${name.padEnd(42)} ${String(n).padStart(5)}`);
+}
+
 const unowned = ids.filter((id) =>
   refereeMode
     ? !byCase.has(id)
@@ -238,8 +267,17 @@ const unowned = ids.filter((id) =>
 console.log(
   `\n  CASES NO PASS TOUCHES: ${unowned.length} of ${ids.length}  (stock micromark plus the vendored constructs)`,
 );
+// THE FIELD SUFFIX HAS TO COME OFF. `agreesBase` is keyed by DOCUMENT and the shapes are now
+// keyed by `document\0field`, so looking one up with the other returned `undefined` for every
+// entry and reported zero diverging-and-unowned where there are 111. That is the same
+// key-shape mismatch fixed an hour earlier between corpus ids and referee ids, reintroduced by
+// splitting the hash per field -- a reporting line that reads a key it no longer receives
+// fails silently and looks like good news.
+const document = (key: string): string => key.split("\u0000")[0]!;
 const unownedDiverging = unowned.filter((id) =>
-  refereeMode ? agreesBase[id] === false : triage![id]!.triage !== "match",
+  refereeMode
+    ? agreesBase[document(id)] === false
+    : triage![id]!.triage !== "match",
 );
 console.log(
   `    of those, NOT triaged \`match\`: ${unownedDiverging.length}  <- no repair pass can fix these`,

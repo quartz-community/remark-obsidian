@@ -52,16 +52,21 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
     const id = `${file}#${index}`;
     try {
       const ours = refereeFacts(entry.text);
-      shapes[id] = crypto
-        .createHash("sha256")
-        .update(`${key(ours.defs)}\u0000${key(ours.refs)}`)
-        .digest("hex")
-        .slice(0, 16);
+      // PER FIELD, not one hash for the pair. A document diverging only on its references
+      // told us nothing about which pass owns the references, because the combined hash moved
+      // whichever field changed. The referee's oracle has two fields and they are owned
+      // separately -- the tab-quote rule owned definitions while leaving references alone,
+      // and that distinction is the whole reason it shipped.
+      const digest = (value: string): string =>
+        crypto.createHash("sha256").update(value).digest("hex").slice(0, 16);
+      shapes[`${id}\u0000defs`] = digest(key(ours.defs));
+      shapes[`${id}\u0000refs`] = digest(key(ours.refs));
       agrees[id] =
         key(ours.defs) === key(entry.defs ?? []) &&
         key(ours.refs) === key(entry.refs ?? []);
     } catch {
-      shapes[id] = "THREW";
+      shapes[`${id}\u0000defs`] = "THREW";
+      shapes[`${id}\u0000refs`] = "THREW";
       agrees[id] = false;
       threw += 1;
     }
