@@ -62,7 +62,32 @@ import { contentColumn } from "./definition-column.js";
  * where a space run leaves the item's content column of 2 in place. Both thresholds are then
  * the same rule, `contentColumn + 4`, over two different content columns.
  *
- * Not implemented, and the placement matters because the first answer written here was WRONG.
+ * THE TOKENIZER ROUTE WAS BUILT AND REVERTED, and it is the most informative of the three
+ * attempts because it WORKED on the rule and failed on the cascade.
+ *
+ * `tokenizeIndent` returns a state, so the first code of the line is available and the
+ * `factorySpace` limit can be chosen per line -- `max(size, 4) + 1` when a tab leads, `size + 1`
+ * otherwise -- with `afterPrefix` accepting `got === 4` for a tab-led run. That is the rule
+ * exactly, and it makes ALL SEVEN `probe/item-tab-threshold/*` cases match, including
+ * `tab-three`, which no repair pass ever did.
+ *
+ *     referee footnotes  5745 -> 5754   32 gained, 23 lost
+ *     referee code        742 ->  735   -7
+ *     corpus 0 regressions, compose 0 of 256
+ *
+ * So the rule is confirmed and the IMPLEMENTATION cascades. An item's content column decides
+ * what the item OWNS, not only where its code begins, so moving it moves definition end lines
+ * and invents definitions elsewhere -- `["टिप्पणी",11,4,13]` becomes `...,12`, and one document
+ * gains `[["b",3,1,3]]` where the oracle has nothing. 32 against 23 is a worse ratio than the
+ * 21-against-10 that `definition-math-absorb.ts` shipped on, and the code dimension loses seven
+ * with no compensating gain.
+ *
+ * Reverted on that arithmetic rather than on principle. What it establishes is that the route
+ * is reachable and the rule is right: a narrowing that moves the CODE THRESHOLD without moving
+ * OWNERSHIP would collect the +9 without the cascade, and in a container tokenizer those are
+ * currently the same decision.
+ *
+ * The placement note below was the first answer written here and it was WRONG.
  * `deIndentFloor` cannot own this: it computes a DEFINITION's column, and by the time it runs
  * the tokenizer has already decided the line is code. `contentColumn` beside it does handle a
  * tab -- `+⇥⟨4sp⟩Text` gives column 4 -- but only in the MARKER's separator, never a tab
