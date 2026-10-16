@@ -143,6 +143,12 @@ describe("positioned oracle", () => {
     // block `1` in Obsidian because the bracket becomes a LINK and never claims the
     // caret, so the reference we report there is one Obsidian does not have.
     "probe/caret-link/link-with-def: the bracket is a link, so the caret is a block id",
+    // A LEADING TAB resets an item's content column to its own tab stop, so `⇥⟨3sp⟩` at seven
+    // columns is below the threshold and Obsidian defines the label where we read code. The
+    // family's other six cases match and are the controls -- `⇥⇥` is FEWER characters and MORE
+    // columns, so no character count discriminates, which refuted two implementations at -15
+    // and -21 referee documents and broke `commonmark/tabs/5` in both.
+    "probe/item-tab-threshold/tab-three: a leading tab resets the item's content column",
     // A tab FOLLOWING A SPACE does not reach the four-column indented-code threshold, so
     // Obsidian defines these and micromark makes them `code`. Probed across six shapes:
     // `\t[^1]: def`, `\t\t[^1]: def` and `    [^1]: def` yield NO definition, while
@@ -402,8 +408,21 @@ describe("positioned oracle", () => {
     // left is `quote-indented-one`, whose column is 2 here and 3 there because the minimum has
     // to be taken after the container's prefix. The main gate cannot see it at all --
     // `meta.footnotes` is NAMES ONLY -- which is exactly why this oracle exists.
-    footnotes: 3,
-    footnoteRefs: 4,
+    // 3 -> 5 and 4 -> 5. The four promoted probe families added two `footnotes` divergences
+    // and one `footnoteRefs`, and both are rules this oracle exists to hold:
+    //
+    //   `probe/item-tab-threshold/tab-three` -- a LEADING TAB resets an item's content column
+    //   to its own tab stop, so `⇥⟨3sp⟩` at seven columns is not code and Obsidian defines
+    //   `3` where we define nothing. Its six siblings match and are the controls; `tab-tab` is
+    //   fewer characters and more columns than this one, which is what refuted two
+    //   implementations built on a character count at -15 and -21 referee documents.
+    //
+    //   `probe/quote-tab-def/established:footnotes` -- the one position divergence in the
+    //   tab-quote family, which the MAIN GATE CANNOT SEE because `meta.footnotes` is names
+    //   only. The names and the rule are right -- that family took the referee from 5717 to
+    //   5744 -- and a column or end line is out by the quote's own prefix.
+    footnotes: 5,
+    footnoteRefs: 5,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
     // Obsidian reports a heading's column as its containing block's content column,
@@ -964,7 +983,10 @@ describe("positioned oracle", () => {
     "probe/def-tab/marker-tab-spaces:footnotes",
     "probe/def-deindent/quote-indented-one:footnotes",
     "probe/empty-container/nested-list:listItems",
+    "probe/item-tab-threshold/tab-three:footnoteRefs",
+    "probe/item-tab-threshold/tab-three:footnotes",
     "probe/quote-nest/two-space:listItems",
+    "probe/quote-tab-def/established:footnotes",
   ];
 
   it("diverges on exactly the recorded cases, by identity", () => {

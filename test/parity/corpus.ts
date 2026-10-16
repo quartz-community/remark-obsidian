@@ -2002,6 +2002,116 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   // one quote deep; a second `>` changes which container the lazy line belongs to,
   // which is exactly the axis `probe/quote-html/*` just found mattered.
   ["probe/nested-comment/two-deep-then-lazy", "> > %%\nem*\n"],
+
+  // A TAB AFTER A QUOTE MARKER, in a quote that is NOT entirely tab-marked.
+  //
+  // `quote-tab.ts` already read `>⇥anything` as indented code but only rewrote a quote whose
+  // EVERY line was marked that way, because a mixture "would need the lines regrouped into
+  // alternating code and prose". These five controls supply the split instead of guessing it,
+  // and they are what the mixed branch ships on:
+  //
+  //   `alone`       / `spaced`      the two that already agreed, kept as controls
+  //   `after-text`  / `after-tab`   the two that were WRONG: a tab-marked definition defined
+  //   `established` the exception -- an earlier SPACE-separated definition in the same quote
+  //                 fixes its content column, and only then does a tab-marked label define.
+  //                 `after-tab` is why the clause says space-separated: the exception must not
+  //                 chain off a definition that itself never defined.
+  ["probe/quote-tab-def/alone", ">\t[^b]: body\n\nuse[^b]\n"],
+  ["probe/quote-tab-def/spaced", ">   [^b]: body\n\nuse[^b]\n"],
+  ["probe/quote-tab-def/after-text", "> text\n>\n>\t[^b]: body\n\nuse[^b]\n"],
+  [
+    "probe/quote-tab-def/after-tab",
+    ">\t[^b]: body\n>\n>\t[^c]: more\n\nuse[^b] use[^c]\n",
+  ],
+  [
+    "probe/quote-tab-def/established",
+    "> [^a]: It\n>\n>\t[^b]: body\n\nuse[^a] use[^b]\n",
+  ],
+
+  // AN UNCLOSED `%%` OPENED TWO QUOTES DEEP.
+  //
+  // `comment-quote-extent.ts` owns depth one and cannot reach depth two: it requires the
+  // comment not to be the quote's last child, which holds at depth one only because lazy
+  // continuation pulls the root-level line into the quote. These six pin the shipped rule and
+  // its three boundaries.
+  //
+  //   `deep`     the divergence: the definition below is swallowed
+  //   `shallow` / `root`   the two spellings that already worked, as controls
+  //   `closed`   a second `%%` inside the quote, so nothing is swallowed
+  //   `blank`    a blank line ends the quote and the definition survives
+  //   `heading`  an ATX heading at column 0 ends it too, which is the lazy-continuation bound
+  [
+    "probe/quote-comment-deep/deep",
+    "> > %%\n[^note]: Definition\n\nuse[^note]\n",
+  ],
+  [
+    "probe/quote-comment-deep/shallow",
+    "> %%\n[^note]: Definition\n\nuse[^note]\n",
+  ],
+  ["probe/quote-comment-deep/root", "%%\n[^note]: Definition\n\nuse[^note]\n"],
+  [
+    "probe/quote-comment-deep/closed",
+    "> > %%\n> > %%\n[^note]: Definition\n\nuse[^note]\n",
+  ],
+  [
+    "probe/quote-comment-deep/blank",
+    "> > %%\n\n[^note]: Definition\n\nuse[^note]\n",
+  ],
+  [
+    "probe/quote-comment-deep/heading",
+    "> > %%\n## Footnotes\n[^x]: a\n\nuse[^x]\n",
+  ],
+
+  // A SETEXT UNDERLINE UNDER A DEFINITION, where the underline arrives as a LIST.
+  //
+  // `setext-definition.ts` accepted the underline as an absorbed line or a `thematicBreak`,
+  // and a bare `-` is neither: it is a bullet marker to the legacy reader, so remark builds an
+  // empty `list` and the pass declined the shape it exists for. The discriminator is TRAILING
+  // WHITESPACE -- a marker needs a space after it to be a marker.
+  ["probe/def-setext-dash/bare", "[^1]: Definition\n-\n\nuse[^1]\n"],
+  ["probe/def-setext-dash/double", "[^1]: Definition\n--\n\nuse[^1]\n"],
+  ["probe/def-setext-dash/trailing-space", "[^1]: Definition\n- \n\nuse[^1]\n"],
+  [
+    "probe/def-setext-dash/trailing-tab",
+    "[^1]: Definition\n  -\t\n\nuse[^1]\n",
+  ],
+
+  // WHERE INDENTED CODE BEGINS INSIDE A LIST ITEM, which is NOT IMPLEMENTED.
+  //
+  // Seven probes, and the threshold is SIX columns for a space-only run and EIGHT once a tab
+  // leads -- eight being the tab stop plus four. So a leading tab resets the item's content
+  // column to its own tab stop, where a space run leaves the marker's width in place; both
+  // thresholds are then `contentColumn + 4` over two different content columns.
+  //
+  // `tab-three` is the divergence and `tab-tab` is the control that refuted the simpler
+  // readings: it is FEWER characters than `tab-three` and more columns, so a character count
+  // cannot discriminate, and it is `commonmark/tabs/5`'s shape. Two implementations built on
+  // the character count measured -15 and -21 referee documents and broke that case.
+  [
+    "probe/item-tab-threshold/sp-four",
+    "- parent More\n\n    [^3]: It\n\nuse[^3]\n",
+  ],
+  [
+    "probe/item-tab-threshold/sp-five",
+    "- parent More\n\n     [^3]: It\n\nuse[^3]\n",
+  ],
+  [
+    "probe/item-tab-threshold/sp-six",
+    "- parent More\n\n      [^3]: It\n\nuse[^3]\n",
+  ],
+  ["probe/item-tab-threshold/tab", "- parent More\n\n\t[^3]: It\n\nuse[^3]\n"],
+  [
+    "probe/item-tab-threshold/tab-three",
+    "- parent More\n\n\t   [^3]: It\n\nuse[^3]\n",
+  ],
+  [
+    "probe/item-tab-threshold/tab-four",
+    "- parent More\n\n\t    [^3]: It\n\nuse[^3]\n",
+  ],
+  [
+    "probe/item-tab-threshold/tab-tab",
+    "- parent More\n\n\t\t[^3]: It\n\nuse[^3]\n",
+  ],
   ["probe/nested-comment/two-deep-closed", "> > %%a%%\n"],
   ["probe/nested-comment/two-deep-then-quoted", "> > %%\n> > a%%\n"],
   ["probe/nested-comment/one-deep-then-lazy", "> %%\nem*\n"],

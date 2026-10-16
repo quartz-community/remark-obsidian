@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-14T22:43:34.476Z",
+  "recordedAt": "2026-10-16T03:06:52.376Z",
   "cases": {
     "probe/label-bracket/full-unmatched-undefined": {
       "id": "probe/label-bracket/full-unmatched-undefined",
@@ -70316,6 +70316,1412 @@
           "embeds": [],
           "tags": [],
           "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-tab-def/alone": {
+      "id": "probe/quote-tab-def/alone",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": ">\t[^b]: body\n\nuse[^b]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<pre><code>[^b]: body\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</blockquote>\n<p dir=\"auto\">useb</p>",
+        "projections": {
+          "text": "[^b]: body useb",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": ">\t[^b]: body"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^b]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:12",
+            "paragraph@2:0-2:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-tab-def/spaced": {
+      "id": "probe/quote-tab-def/spaced",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": ">   [^b]: body\n\nuse[^b]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n</blockquote>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"b\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>body<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": ">   [^b]: body"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^b]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "b"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "b@0:2-0:14"
+          ],
+          "footnoteRefs": [
+            "b@2:3"
+          ],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:14",
+            "paragraph@2:0-2:7",
+            "text@3:0-3:0",
+            "element@3:0-3:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-tab-def/after-text": {
+      "id": "probe/quote-tab-def/after-text",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> text\n>\n>\t[^b]: body\n\nuse[^b]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>text</p>\n<pre><code>[^b]: body\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</blockquote>\n<p dir=\"auto\">useb</p>",
+        "projections": {
+          "text": "text [^b]: body useb",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> text\n>\n>\t[^b]: body"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^b]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-2:12",
+            "paragraph@4:0-4:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-tab-def/after-tab": {
+      "id": "probe/quote-tab-def/after-tab",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": ">\t[^b]: body\n>\n>\t[^c]: more\n\nuse[^b] use[^c]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<pre><code>[^b]: body\n\n[^c]: more\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</blockquote>\n<p dir=\"auto\">useb usec</p>",
+        "projections": {
+          "text": "[^b]: body [^c]: more useb usec",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": ">\t[^b]: body\n>\n>\t[^c]: more"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^b] use[^c]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-2:12",
+            "paragraph@4:0-4:15"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-tab-def/established": {
+      "id": "probe/quote-tab-def/established",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> [^a]: It\n>\n>\t[^b]: body\n\nuse[^a] use[^b]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n</blockquote>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"a\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> use<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"b\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>It</p><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p>body<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "use⟨fn⟩ use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> [^a]: It\n>\n>\t[^b]: body"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^a] use[^b]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "a",
+            "b"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "a@0:2-2:12",
+            "b@2:2-2:12"
+          ],
+          "footnoteRefs": [
+            "a@4:3",
+            "b@4:11"
+          ],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-2:12",
+            "paragraph@4:0-4:15",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-comment-deep/deep": {
+      "id": "probe/quote-comment-deep/deep",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> > %%\n[^note]: Definition\n\nuse[^note]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n</blockquote>\n</blockquote>\n<p dir=\"auto\">usenote</p>",
+        "projections": {
+          "text": "usenote",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> > %%\n[^note]: Definition"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^note]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:19",
+            "paragraph@3:0-3:10"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "An unclosed `%%` opened inside a QUOTE is bounded by that quote in Obsidian and runs to the end of the note here, so the `use[^note]` line below the blank is swallowed and our `text` projection is empty against Obsidian's. The footnote facts are right -- this family is why `quote-comment-lazy.ts` exists and the referee gained six documents -- and the EXTENT for the text projection is a separate gap: `root` and `closed` in this same family match, so it is specific to a quote-opened opener. Live preview reads the same `%%` to the end of the document, so the bound is reading-mode-specific and `lp-extent.mts` records the divergence."
+    },
+    "probe/quote-comment-deep/shallow": {
+      "id": "probe/quote-comment-deep/shallow",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> %%\n[^note]: Definition\n\nuse[^note]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n</blockquote>\n<p dir=\"auto\">usenote</p>",
+        "projections": {
+          "text": "usenote",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> %%\n[^note]: Definition"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^note]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:19",
+            "paragraph@3:0-3:10"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "An unclosed `%%` opened inside a QUOTE is bounded by that quote in Obsidian and runs to the end of the note here, so the `use[^note]` line below the blank is swallowed and our `text` projection is empty against Obsidian's. The footnote facts are right -- this family is why `quote-comment-lazy.ts` exists and the referee gained six documents -- and the EXTENT for the text projection is a separate gap: `root` and `closed` in this same family match, so it is specific to a quote-opened opener. Live preview reads the same `%%` to the end of the document, so the bound is reading-mode-specific and `lp-extent.mts` records the divergence."
+    },
+    "probe/quote-comment-deep/root": {
+      "id": "probe/quote-comment-deep/root",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "%%\n[^note]: Definition\n\nuse[^note]\n",
+      "obsidian": {
+        "html": "",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "comment",
+              "text": "%%\n[^note]: Definition\n\nuse[^note]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "comment@0:0-4:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-comment-deep/closed": {
+      "id": "probe/quote-comment-deep/closed",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> > %%\n> > %%\n[^note]: Definition\n\nuse[^note]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n</blockquote>\n</blockquote>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"note\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>Definition<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> > %%\n> > %%\n[^note]: Definition"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^note]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "note"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "note@2:0-2:19"
+          ],
+          "footnoteRefs": [
+            "note@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-2:19",
+            "paragraph@4:0-4:10",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-comment-deep/blank": {
+      "id": "probe/quote-comment-deep/blank",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> > %%\n\n[^note]: Definition\n\nuse[^note]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n</blockquote>\n</blockquote>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"note\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>Definition<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> > %%"
+            },
+            {
+              "type": "footnoteDefinition",
+              "text": "[^note]: Definition"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^note]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "note"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "note@2:0-2:19"
+          ],
+          "footnoteRefs": [
+            "note@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-0:6",
+            "footnoteDefinition@2:0-2:19",
+            "paragraph@4:0-4:10",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "An unclosed `%%` opened inside a QUOTE is bounded by that quote in Obsidian and runs to the end of the note here, so the `use[^note]` line below the blank is swallowed and our `text` projection is empty against Obsidian's. The footnote facts are right -- this family is why `quote-comment-lazy.ts` exists and the referee gained six documents -- and the EXTENT for the text projection is a separate gap: `root` and `closed` in this same family match, so it is specific to a quote-opened opener. Live preview reads the same `%%` to the end of the document, so the bound is reading-mode-specific and `lp-extent.mts` records the divergence."
+    },
+    "probe/quote-comment-deep/heading": {
+      "id": "probe/quote-comment-deep/heading",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> > %%\n## Footnotes\n[^x]: a\n\nuse[^x]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n</blockquote>\n</blockquote>\n<h2 data-heading=\"Footnotes\" dir=\"auto\">Footnotes</h2>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"x\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>a<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "Footnotes use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "2:Footnotes"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> > %%"
+            },
+            {
+              "type": "heading",
+              "text": "## Footnotes"
+            },
+            {
+              "type": "footnoteDefinition",
+              "text": "[^x]: a"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^x]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "2:Footnotes"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "x"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "x@2:0-2:7"
+          ],
+          "footnoteRefs": [
+            "x@4:3"
+          ],
+          "headings": [
+            "2:Footnotes@1:0"
+          ],
+          "sections": [
+            "blockquote@0:0-0:6",
+            "heading@1:0-1:12",
+            "footnoteDefinition@2:0-2:7",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "An unclosed `%%` opened inside a QUOTE is bounded by that quote in Obsidian and runs to the end of the note here, so the `use[^note]` line below the blank is swallowed and our `text` projection is empty against Obsidian's. The footnote facts are right -- this family is why `quote-comment-lazy.ts` exists and the referee gained six documents -- and the EXTENT for the text projection is a separate gap: `root` and `closed` in this same family match, so it is specific to a quote-opened opener. Live preview reads the same `%%` to the end of the document, so the bound is reading-mode-specific and `lp-extent.mts` records the divergence."
+    },
+    "probe/def-setext-dash/bare": {
+      "id": "probe/def-setext-dash/bare",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^1]: Definition\n-\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<h2 data-heading=\"[^1]: Definition\" dir=\"auto\">1: Definition</h2>\n<p dir=\"auto\">use1</p>",
+        "projections": {
+          "text": "1: Definition use1",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "2:[^1]: Definition"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "[^1]: Definition\n-"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "2:[^1]: Definition"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "2:[^1]: Definition@0:0"
+          ],
+          "sections": [
+            "heading@0:0-1:1",
+            "paragraph@3:0-3:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-setext-dash/double": {
+      "id": "probe/def-setext-dash/double",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^1]: Definition\n--\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<h2 data-heading=\"[^1]: Definition\" dir=\"auto\">1: Definition</h2>\n<p dir=\"auto\">use1</p>",
+        "projections": {
+          "text": "1: Definition use1",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "2:[^1]: Definition"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "heading",
+              "text": "[^1]: Definition\n--"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "2:[^1]: Definition"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "2:[^1]: Definition@0:0"
+          ],
+          "sections": [
+            "heading@0:0-1:2",
+            "paragraph@3:0-3:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-setext-dash/trailing-space": {
+      "id": "probe/def-setext-dash/trailing-space",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^1]: Definition\n- \n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\"></li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>Definition<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]: Definition"
+            },
+            {
+              "type": "list",
+              "text": "- "
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@0:0-0:16"
+          ],
+          "footnoteRefs": [
+            "1@3:3"
+          ],
+          "headings": [],
+          "sections": [
+            "footnoteDefinition@0:0-0:16",
+            "list@1:0-1:2",
+            "paragraph@3:0-3:7",
+            "text@4:0-4:0",
+            "element@4:0-4:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@1:0-1:2"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/def-setext-dash/trailing-tab": {
+      "id": "probe/def-setext-dash/trailing-tab",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[^1]: Definition\n  -\t\n\nuse[^1]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\"></li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>Definition<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "footnoteDefinition",
+              "text": "[^1]: Definition"
+            },
+            {
+              "type": "list",
+              "text": "  -\t"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^1]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "1"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "1@0:0-0:16"
+          ],
+          "footnoteRefs": [
+            "1@3:3"
+          ],
+          "headings": [],
+          "sections": [
+            "footnoteDefinition@0:0-0:16",
+            "list@1:0-1:4",
+            "paragraph@3:0-3:7",
+            "text@4:0-4:0",
+            "element@4:0-4:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@1:0-1:4"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/item-tab-threshold/sp-four": {
+      "id": "probe/item-tab-threshold/sp-four",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- parent More\n\n    [^3]: It\n\nuse[^3]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>parent More</p>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"3\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>It<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "parent More use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- parent More\n\n    [^3]: It"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^3]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "3"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "3@2:2-2:12"
+          ],
+          "footnoteRefs": [
+            "3@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:12",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:12"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/item-tab-threshold/sp-five": {
+      "id": "probe/item-tab-threshold/sp-five",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- parent More\n\n     [^3]: It\n\nuse[^3]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>parent More</p>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"3\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>It<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "parent More use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- parent More\n\n     [^3]: It"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^3]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "3"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "3@2:2-2:13"
+          ],
+          "footnoteRefs": [
+            "3@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:13",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:13"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/item-tab-threshold/sp-six": {
+      "id": "probe/item-tab-threshold/sp-six",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- parent More\n\n      [^3]: It\n\nuse[^3]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>parent More</p>\n<pre><code>[^3]: It\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</li>\n</ul>\n<p dir=\"auto\">use3</p>",
+        "projections": {
+          "text": "parent More [^3]: It use3",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- parent More\n\n      [^3]: It"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^3]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:14",
+            "paragraph@4:0-4:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:14"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/item-tab-threshold/tab": {
+      "id": "probe/item-tab-threshold/tab",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- parent More\n\n\t[^3]: It\n\nuse[^3]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>parent More</p>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"3\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>It<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "parent More use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- parent More\n\n\t[^3]: It"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^3]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "3"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "3@2:1-2:9"
+          ],
+          "footnoteRefs": [
+            "3@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:9",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:9"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/item-tab-threshold/tab-three": {
+      "id": "probe/item-tab-threshold/tab-three",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- parent More\n\n\t   [^3]: It\n\nuse[^3]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>parent More</p>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"3\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>It<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "parent More use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- parent More\n\n\t   [^3]: It"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^3]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "3"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "3@2:1-2:12"
+          ],
+          "footnoteRefs": [
+            "3@4:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:12",
+            "paragraph@4:0-4:7",
+            "text@5:0-5:0",
+            "element@5:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:12"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "A leading tab resets an item's content column to its own TAB STOP, where a space run leaves the marker's width in place. The threshold is `contentColumn + 4` over two different content columns: six for `⟨6sp⟩` and eight for `⇥⟨4sp⟩`, which is the tab stop plus four. So `⇥⟨3sp⟩` at seven columns is NOT code and Obsidian defines `3`, while we read it as code and define nothing. The other six cases in this family already match and are the controls -- `tab-tab` in particular is FEWER characters and MORE columns than this one, so a character count cannot discriminate, which is what refuted two implementations at -15 and -21 referee documents. The decision lives in `legacy-list.ts`'s `tokenizeIndent`, where `factorySpace` is given a limit of `containerState.size + 1` before the line is seen."
+    },
+    "probe/item-tab-threshold/tab-four": {
+      "id": "probe/item-tab-threshold/tab-four",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- parent More\n\n\t    [^3]: It\n\nuse[^3]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>parent More</p>\n<pre><code>[^3]: It\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</li>\n</ul>\n<p dir=\"auto\">use3</p>",
+        "projections": {
+          "text": "parent More [^3]: It use3",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- parent More\n\n\t    [^3]: It"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^3]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:13",
+            "paragraph@4:0-4:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:13"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/item-tab-threshold/tab-tab": {
+      "id": "probe/item-tab-threshold/tab-tab",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- parent More\n\n\t\t[^3]: It\n\nuse[^3]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>parent More</p>\n<pre><code>[^3]: It\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</li>\n</ul>\n<p dir=\"auto\">use3</p>",
+        "projections": {
+          "text": "parent More [^3]: It use3",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- parent More\n\n\t\t[^3]: It"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^3]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:10",
+            "paragraph@4:0-4:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-2:10"
+          ],
           "blocks": [],
           "frontmatterLinks": []
         }

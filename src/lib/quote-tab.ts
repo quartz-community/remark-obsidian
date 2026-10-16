@@ -133,13 +133,46 @@ function mixedQuote(quote: Blockquote, source: string): void {
       type: "code",
       lang: null,
       meta: null,
+      // EVERY line loses its quote prefix, not only the `>⇥` ones. A blank quote line is `>`
+      // alone, which `QUOTE_TAB` does not match, so falling through to the raw line left a
+      // stray marker in the rendered text -- `[^b]: body > [^c]: more` against Obsidian's
+      // `[^b]: body [^c]: more`.
       value: source
         .slice(bol, to)
         .split("\n")
-        .map((line) => QUOTE_TAB.exec(line)?.[1] ?? line)
+        .map(
+          (line) =>
+            QUOTE_TAB.exec(line)?.[1] ??
+            line.replace(/^[ \t]{0,3}>[ \t]?/u, ""),
+        )
         .join("\n"),
       ...(child.position ? { position: child.position } : {}),
     };
     quote.children[index] = code;
+
+    // MERGE WITH AN ADJACENT CODE SIBLING. Converting each definition on its own gives two
+    // code blocks where Obsidian reports one -- `html.codeLang` was `["",""]` against its
+    // `[""]` -- because the quote's own blank line sits between them and belongs to neither.
+    const previous = quote.children[index - 1];
+    if (previous?.type === "code") {
+      const from = previous.position?.start?.offset;
+      const gap = previous.position?.end?.offset;
+      if (from !== undefined && gap !== undefined) {
+        previous.value = source
+          .slice(from, to)
+          .split("\n")
+          .map(
+            (line) =>
+              QUOTE_TAB.exec(line)?.[1] ??
+              line.replace(/^[ \t]{0,3}>[ \t]?/u, ""),
+          )
+          .join("\n");
+        if (previous.position && child.position) {
+          previous.position.end = { ...child.position.end };
+        }
+        quote.children.splice(index, 1);
+        index -= 1;
+      }
+    }
   }
 }
