@@ -2988,14 +2988,26 @@ for (const rule of RULES) {
   // positive nor negative, and labelling it "net negative" reads as evidence against a rule
   // the corpus simply cannot adjudicate -- which is exactly the state
   // `container-comment-swallows-defs` is in at zero documents touched.
+  // THE VERDICT IS THE AGREEMENT DELTA, not better/worse. Those two disagree far more often
+  // than they agree: of nine candidates with `better > worse`, only TWO move full agreement
+  // up. The reason is structural -- a "better" document has merely moved CLOSER and may still
+  // disagree on a reference column, while a "worse" one usually loses agreement outright. So
+  // better/worse is a distance measure and agreement is the referee's own headline, and
+  // labelling the agreement line from the distance read `5676 -> 5673   NET POSITIVE` on a
+  // rule that cost three agreeing documents. That reading refused one rule and nearly shipped
+  // another in one night.
+  //
+  // `better`/`worse` are still printed, and still worth reading: they say whether a rule is
+  // pointed the right way, which is what narrowing a predicate works on.
+  const moved = agreedAfter - agreedBefore;
   const verdict =
-    better > worse
-      ? "NET POSITIVE"
-      : better < worse
-        ? "net negative"
+    moved > 0
+      ? `NET POSITIVE (+${moved} agreeing)`
+      : moved < 0
+        ? `net negative (${moved} agreeing)`
         : better + worse === 0
           ? "NOT ADJUDICABLE -- touches nothing"
-          : "even trade";
+          : "FLAT -- moves distance, not agreement";
   console.log(`  ${rule.name}  --  ${rule.what}`);
   console.log(
     `    documents it changes : better ${better}  worse ${worse}  same ${same}` +
