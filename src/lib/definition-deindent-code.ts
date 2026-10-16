@@ -62,9 +62,24 @@ import { contentColumn } from "./definition-column.js";
  * where a space run leaves the item's content column of 2 in place. Both thresholds are then
  * the same rule, `contentColumn + 4`, over two different content columns.
  *
- * Not implemented: that belongs with `deIndentFloor` in `definition-column.ts`, which already
- * owns an item's content column, rather than in a pass that rewrites the tokenizer's output
- * afterwards -- which is what the two reverted attempts were.
+ * Not implemented, and the placement matters because the first answer written here was WRONG.
+ * `deIndentFloor` cannot own this: it computes a DEFINITION's column, and by the time it runs
+ * the tokenizer has already decided the line is code. `contentColumn` beside it does handle a
+ * tab -- `+⇥⟨4sp⟩Text` gives column 4 -- but only in the MARKER's separator, never a tab
+ * leading a continuation line.
+ *
+ * The decision is in `legacy-list.ts`'s `tokenizeIndent`, which calls `factorySpace` with a
+ * limit of `containerState.size + 1` and then accepts only `got === size`, where `got` is
+ * `sliceSerialize(token, true)` -- expanded, so COLUMNS. For `- parent` with size 2 and a
+ * `⇥⟨3sp⟩` line, the container takes 2 of 7 columns and the 5 left over are code; the rule
+ * wants it to take 4, leaving 3. The same change gives `⇥⇥` 8 - 4 = 4 and keeps it code, which
+ * is what `commonmark/tabs/5` asserts.
+ *
+ * So a fix raises that limit to `max(size, 4) + 1` for a tab-led run and widens the `got`
+ * test to match. Stated rather than attempted, with its risk: the limit is chosen BEFORE the
+ * line is seen, so the widening cannot be conditioned on the leading character and would reach
+ * every item whose size is under 4 -- which is most of them. That is the shape of the work and
+ * the reason it is not a small change.
  */
 export function definitionDeindentCodeTransform(
   tree: Root,
