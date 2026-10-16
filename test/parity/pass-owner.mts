@@ -45,7 +45,20 @@ import path from "node:path";
 
 const root = path.resolve(import.meta.dirname, "../..");
 const index = path.join(root, "src/index.ts");
-const hasher = path.join(root, "test/parity/pass-owner-hash.mts");
+/**
+ * `--referee` attributes the BACKLOG instead of the corpus, which is the mode worth running.
+ *
+ * The corpus is 99.7% matching, so its "unowned and diverging" set is two documents. The
+ * referee holds 1,073 disagreements, and a divergence that arrives with its component already
+ * named is the whole point of attributing anything.
+ */
+const refereeMode = process.argv.includes("--referee");
+const hasher = path.join(
+  root,
+  refereeMode
+    ? "test/parity/pass-owner-referee-hash.mts"
+    : "test/parity/pass-owner-hash.mts",
+);
 const goldens = path.join(root, "test/parity/goldens/obsidian.json");
 
 interface Block {
@@ -104,8 +117,10 @@ function blocksOf(lines: readonly string[]): Block[] {
 }
 
 type Shapes = Record<string, string>;
+/** Agreement per document, referee mode only, so a removal's effect can be SIGNED. */
+let agreesBase: Record<string, boolean> = {};
 
-function shapes(label: string): Shapes {
+function shapes(label: string, keepAgrees = false): Shapes {
   const out = path.join(os.tmpdir(), `pass-owner-${label}.json`);
   try {
     execFileSync("npx", ["tsx", "--conditions=development", hasher, out], {
@@ -113,7 +128,18 @@ function shapes(label: string): Shapes {
       encoding: "utf8",
       timeout: 900_000,
     });
-    return JSON.parse(fs.readFileSync(out, "utf8")) as Shapes;
+    // The referee hasher emits `{shapes, agrees}` and the corpus one a bare map. Narrowed on
+    // the VALUE's type rather than on key presence, because a bare `Shapes` could legally
+    // hold a "shapes" key and `in` cannot tell those apart.
+    const read: unknown = JSON.parse(fs.readFileSync(out, "utf8"));
+    const wrapped = read as { shapes?: unknown; agrees?: unknown };
+    if (typeof wrapped.shapes === "object" && wrapped.shapes !== null) {
+      if (keepAgrees && typeof wrapped.agrees === "object") {
+        agreesBase = wrapped.agrees as Record<string, boolean>;
+      }
+      return wrapped.shapes as Shapes;
+    }
+    return read as Shapes;
   } catch {
     return {};
   } finally {
@@ -134,7 +160,7 @@ const limit =
 
 console.log(`pass-owner: ${blocks.length} passes, removing ${limit}`);
 
-const base = shapes("base");
+const base = shapes("base", true);
 if (Object.keys(base).length === 0) throw new Error("baseline failed to hash");
 console.log(`  baseline: ${Object.keys(base).length} case/profile shapes\n`);
 
@@ -182,20 +208,38 @@ for (const [name, keys] of owned) {
     byCase.set(key, [...(byCase.get(key) ?? []), name]);
   }
 }
-const golden = JSON.parse(fs.readFileSync(goldens, "utf8")) as {
-  cases: Record<string, { triage: string }>;
-};
-const ids = Object.keys(golden.cases);
-const unowned = ids.filter(
-  (id) =>
-    !byCase.has(`${id}\u0000quartz-default`) &&
-    !byCase.has(`${id}\u0000all-features`),
+// THE TWO MODES KEY THEIR CASES DIFFERENTLY, and conflating them is silently wrong rather
+// than loud: the corpus hasher emits `id\0profile` and the referee hasher a bare document id,
+// so reading the golden's ids in referee mode reported every one of 3,439 as untouched while
+// the shapes held 6,818 referee keys. Divergence comes from the golden's triage for the corpus
+// and from the referee's own agreement for the referee.
+const ids = refereeMode
+  ? Object.keys(base)
+  : Object.keys(
+      (
+        JSON.parse(fs.readFileSync(goldens, "utf8")) as {
+          cases: Record<string, { triage: string }>;
+        }
+      ).cases,
+    );
+const triage = refereeMode
+  ? undefined
+  : (
+      JSON.parse(fs.readFileSync(goldens, "utf8")) as {
+        cases: Record<string, { triage: string }>;
+      }
+    ).cases;
+const unowned = ids.filter((id) =>
+  refereeMode
+    ? !byCase.has(id)
+    : !byCase.has(`${id}\u0000quartz-default`) &&
+      !byCase.has(`${id}\u0000all-features`),
 );
 console.log(
   `\n  CASES NO PASS TOUCHES: ${unowned.length} of ${ids.length}  (stock micromark plus the vendored constructs)`,
 );
-const unownedDiverging = unowned.filter(
-  (id) => golden.cases[id]!.triage !== "match",
+const unownedDiverging = unowned.filter((id) =>
+  refereeMode ? agreesBase[id] === false : triage![id]!.triage !== "match",
 );
 console.log(
   `    of those, NOT triaged \`match\`: ${unownedDiverging.length}  <- no repair pass can fix these`,
