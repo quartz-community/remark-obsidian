@@ -102,6 +102,21 @@ const QUOTE_PREFIX = /^[ \t]*>/u;
 const COMMENT_LINE = /^[ \t>]*%%/u;
 /** A marker whose separator run holds a tab, then a label. Split to keep the lint happy. */
 const TAB_MARKER = /^((?:[ \t]*>)*[ \t]*(?:[-*+]|\d{1,9}[.)]))([ \t]*)/u;
+/** A list marker whose content IS a `%%` opener: `1.⇥%%`, `+⟨2sp⟩%%`, `⟨3sp⟩+ %%`. */
+const ITEM_COMMENT = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+%%/u;
+/** A line that cannot lazily continue the item's paragraph, so it ends the host. */
+/**
+ * The same opener, with the separator CAPPED at four so the `%%` is still the item's content.
+ *
+ * Five spaces past the marker puts the `%%` four columns in, where it is indented code and
+ * opens nothing -- the rule this package already ships for a root `%%`.
+ */
+const ITEM_COMMENT_CAPPED = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]{1,4}%%/u;
+/** The capped opener, with a quote-marker run allowed before the list marker. */
+const QUOTED_ITEM_COMMENT =
+  /^(?:[ \t]*>)*[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]{1,4}%%/u;
+const ENDS_ITEM =
+  /^ {0,3}(?:#{1,6}(?:[ \t]|$)|```|~~~|[-*+][ \t]|\d{1,9}[.)][ \t])/u;
 const LABEL = /^\[\^([^\]]*)\]:/u;
 
 /** Every container that nests, and the quote-only half of it. */
@@ -566,6 +581,140 @@ const RULES: readonly Rule[] = [
       }
       if (cut === Number.POSITIVE_INFINITY) return ours;
       return { defs: ours.defs.filter((d) => d[1] < cut), refs: ours.refs };
+    },
+  },
+  {
+    name: "item-comment-swallows-defs",
+    what: "an unclosed `%%` inside a LIST ITEM buries the definitions below it, refs still indexed",
+    apply: (text, ours) => {
+      // `quote-comment-lazy.ts` ships this rule for a blockquote at depth 2+ and is worth +6.
+      // The minimised backlog says the SAME decision is pending for a list item: 67 documents
+      // whose shortest members are `1.⇥%%` / `⟨2sp⟩[^3]:` and `+⟨2sp⟩%%` / `[^note]:`, where
+      // Obsidian reports NO definition and indexes the label as a REFERENCE instead. Extending
+      // a measured rule to a new host type is the shape that lands here; a new repair for a new
+      // shape is the shape that gets refused.
+      const lines = text.split("\n");
+      let cut = Number.POSITIVE_INFINITY;
+      for (let at = 0; at < lines.length; at++) {
+        const opener = ITEM_COMMENT.exec(lines[at] ?? "");
+        if (!opener) continue;
+        // Unclosed from the opener onward. The `%%` is the item's own content, so a closer is a
+        // SECOND `%%` below it rather than on the same line.
+        const rest = lines.slice(at).join("\n").slice(opener[0].length);
+        if (rest.includes("%%")) continue;
+        cut = Math.min(cut, at);
+      }
+      if (cut === Number.POSITIVE_INFINITY) return ours;
+      return { defs: ours.defs.filter((d) => d[1] <= cut), refs: ours.refs };
+    },
+  },
+  {
+    name: "item-comment-swallows-defs-lazy",
+    what: "...bounded by LAZY CONTINUATION, which is the restriction the quote version needed",
+    apply: (text, ours) => {
+      // The quote rule went 6 better / 1 worse unbounded and 6/0 once bounded this way, and the
+      // single loss was an ATX heading at column 0 ending the container. The bound is CommonMark
+      // rather than a fit to the loss, so it is asked for here before any implementation.
+      const lines = text.split("\n");
+      let cut = Number.POSITIVE_INFINITY;
+      let reach = lines.length;
+      for (let at = 0; at < lines.length; at++) {
+        const opener = ITEM_COMMENT.exec(lines[at] ?? "");
+        if (!opener) continue;
+        const rest = lines.slice(at).join("\n").slice(opener[0].length);
+        if (rest.includes("%%")) continue;
+        let to = at + 1;
+        while (to < lines.length) {
+          const line = lines[to] ?? "";
+          if (line.trim() === "" || ENDS_ITEM.test(line)) break;
+          to += 1;
+        }
+        if (at < cut) {
+          cut = at;
+          reach = to;
+        }
+      }
+      if (cut === Number.POSITIVE_INFINITY) return ours;
+      return {
+        defs: ours.defs.filter((d) => d[1] <= cut || d[1] >= reach),
+        refs: ours.refs,
+      };
+    },
+  },
+  {
+    name: "item-comment-swallows-defs-capped",
+    what: "...and the `%%` must be AT the item's content column, because at 4+ it is code",
+    apply: (text, ours) => {
+      // The lazy-bounded version's remaining losses name this, and the restriction is already
+      // measured rather than fitted: `*⟨5sp⟩%%` / `[^Ω]: body text` has Obsidian DEFINING the
+      // label, because five spaces past the marker puts the `%%` four columns into the item's
+      // content -- where it is INDENTED CODE and opens no comment at all. This package already
+      // ships that rule for a root `%%` at +7 referee documents ("a `%%` indented four columns
+      // is CODE"), so capping the separator here is the same fact applied to a list item, not a
+      // new exception carved out of the failures.
+      const lines = text.split("\n");
+      let cut = Number.POSITIVE_INFINITY;
+      let reach = lines.length;
+      for (let at = 0; at < lines.length; at++) {
+        const opener = ITEM_COMMENT_CAPPED.exec(lines[at] ?? "");
+        if (!opener) continue;
+        const rest = lines.slice(at).join("\n").slice(opener[0].length);
+        if (rest.includes("%%")) continue;
+        let to = at + 1;
+        while (to < lines.length) {
+          const line = lines[to] ?? "";
+          if (line.trim() === "" || ENDS_ITEM.test(line)) break;
+          to += 1;
+        }
+        if (at < cut) {
+          cut = at;
+          reach = to;
+        }
+      }
+      if (cut === Number.POSITIVE_INFINITY) return ours;
+      return {
+        defs: ours.defs.filter((d) => d[1] <= cut || d[1] >= reach),
+        refs: ours.refs,
+      };
+    },
+  },
+  {
+    name: "item-comment-swallows-defs-quoted",
+    what: "...and the item may sit inside a quote, since the rule is about the ITEM",
+    apply: (text, ours) => {
+      // The capped version fires on 9 documents of a 67-document minimised family, and the
+      // opener pattern is why: it anchors the marker at `^[ \t]*`, so an item inside a
+      // blockquote is not matched at all. An item is an item whatever holds it -- the same
+      // widening that took `containerLazyTransform` from naming `blockquote` to covering a
+      // callout, and `quote-tab.ts` from one node type to two.
+      const lines = text.split("\n");
+      let cut = Number.POSITIVE_INFINITY;
+      let reach = lines.length;
+      for (let at = 0; at < lines.length; at++) {
+        const opener = QUOTED_ITEM_COMMENT.exec(lines[at] ?? "");
+        if (!opener) continue;
+        const rest = lines.slice(at).join("\n").slice(opener[0].length);
+        if (rest.includes("%%")) continue;
+        let to = at + 1;
+        while (to < lines.length) {
+          const line = lines[to] ?? "";
+          if (
+            line.replace(/^[ \t>]+/u, "").trim() === "" ||
+            ENDS_ITEM.test(line)
+          )
+            break;
+          to += 1;
+        }
+        if (at < cut) {
+          cut = at;
+          reach = to;
+        }
+      }
+      if (cut === Number.POSITIVE_INFINITY) return ours;
+      return {
+        defs: ours.defs.filter((d) => d[1] <= cut || d[1] >= reach),
+        refs: ours.refs,
+      };
     },
   },
   {
@@ -2901,6 +3050,24 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
 const key = (rows: readonly (readonly unknown[])[]) =>
   JSON.stringify(rows.map((row) => JSON.stringify(row)).sort());
 
+/**
+ * Agreement the way `referee.mts` computes it, which this file had been approximating.
+ *
+ * Three differences, each measured: an EMPTY-NAMED reference is excluded from both sides, the
+ * comparison is ORDER-SENSITIVE rather than sorted, and `code` is a separate dimension rather
+ * than part of the footnote figure. Reimplementing an oracle's agreement test is the mistake
+ * this repository has now made twice -- once in the attribution hasher, where it inflated every
+ * diverging count by 68 documents, and once here.
+ */
+const refereeNamed = (rows: readonly (readonly unknown[])[]) =>
+  JSON.stringify(rows.filter((row) => row[0] !== ""));
+function footnoteAgrees(ours: Facts, answer: Answer): boolean {
+  return (
+    refereeNamed(ours.defs) === refereeNamed(answer.defs) &&
+    refereeNamed(ours.refs) === refereeNamed(answer.refs)
+  );
+}
+
 /** How far a set of facts is from the recorded answer: entries missing plus entries extra. */
 function distance(ours: Facts, answer: Answer): number {
   // The code dimension counts only where the answer HAS one. 5,935 documents record no code
@@ -2936,6 +3103,21 @@ for (const rule of RULES) {
   let untouched = 0;
   let agreedBefore = 0;
   let agreedAfter = 0;
+  // ...and the same count the REFEREE reports, which is a different question.
+  //
+  // `distance` folds the `code` dimension into agreement, so a document whose definitions and
+  // references become perfect while its root code ranges still differ never reaches zero here.
+  // `referee.mts` treats `code` as a SEPARATE dimension (742/883) and excludes an EMPTY-NAMED
+  // reference from both sides, which is why its figure is 5745 where this file's baseline is
+  // 5677 -- 68 documents.
+  //
+  // That gap is not cosmetic: it decides verdicts. A rule can be `better 9 / worse 0` and read
+  // FLAT here while moving nine documents on the oracle the project actually reports. Both are
+  // printed rather than one replacing the other, because the stricter figure is the right one
+  // for a candidate that touches code and the referee's is the right one for a candidate that
+  // does not.
+  let footnoteBefore = 0;
+  let footnoteAfter = 0;
   // A few documents the rule makes WORSE, which is what says whether the rule is wrong or
   // its approximation is. Three is enough to tell those apart and short enough to read.
   const examples: string[] = [];
@@ -2969,6 +3151,8 @@ for (const rule of RULES) {
     const now = distance(after, answer);
     if (before === 0) agreedBefore += 1;
     if (now === 0) agreedAfter += 1;
+    if (footnoteAgrees(base, answer)) footnoteBefore += 1;
+    if (footnoteAgrees(after, answer)) footnoteAfter += 1;
     if (unchanged) {
       untouched += 1;
       continue;
@@ -3015,6 +3199,15 @@ for (const rule of RULES) {
   );
   console.log(
     `    documents in full agreement : ${agreedBefore} -> ${agreedAfter}   ${verdict}`,
+  );
+  const refereeMoved = footnoteAfter - footnoteBefore;
+  console.log(
+    `    referee footnote agreement  : ${footnoteBefore} -> ${footnoteAfter}   ` +
+      (refereeMoved > 0
+        ? `REFEREE GAIN +${refereeMoved}`
+        : refereeMoved < 0
+          ? `referee loss ${refereeMoved}`
+          : "referee flat"),
   );
   for (const example of examples) console.log(`      worse: ${example}`);
   console.log("");

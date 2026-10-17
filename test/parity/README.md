@@ -5791,3 +5791,78 @@ four would have lost everything. `--live` now appends every document to `/tmp/li
 as it finishes and skips what is already there, so relaunching continues. Break-tested by
 re-running the completed sweep: `resuming: 532 documents`, identical 449 forms, identical
 verdict, and **1 channel round trip instead of 8,541**.
+
+## Clustering the minimal forms by OUR MECHANISM, and what the rule it found actually paid
+
+The shape clustering above failed -- 449 forms to 435 shapes -- and it failed because it grouped
+by TEXT, which is the axis six selectors have died on. Re-grouped by the axis that keeps working
+-- which of OUR nodes covers the position Obsidian indexes -- the same 449 forms concentrate:
+
+    def-extra @ footnoteDefinition   130 forms   145 docs
+    ref-extra @ footnoteReference     81 forms    97 docs
+    def-miss  @ code                  76 forms    87 docs
+    def-span  @ ours-longer           66 forms    68 docs
+    ref-miss  @ footnoteDefinition    64 forms    69 docs
+    def-miss  @ text                  57 forms    59 docs
+    def-miss  @ footnoteReference     37 forms    55 docs
+    ref-miss  @ code                  36 forms    40 docs
+
+Nine families of 35-145 documents instead of 435 singletons, from the same data. The axis was
+the whole difference.
+
+### "Bidirectional" was largely a METRIC artifact: it is one decision, not two errors
+
+93 forms and 107 documents have a `*-miss` AND a `*-extra` at once, and on the same construct.
+Reading the shortest members explains it:
+
+    ">⇥It\n[^3]:"        ours 0 defs / 1 ref    obs 1 def / 0 refs
+    "1.⇥%%\n⟨2sp⟩[^3]:"  ours 1 def  / 0 refs   obs 0 defs / 1 ref
+
+The SAME LABEL is a definition to one side and a reference to the other. Counting definitions
+and references as separate dimensions makes one swap look like two opposite errors -- so a
+document that is bidirectional by the direction screen can be ONE decision: did this
+definition survive its host? When it fails to define, Obsidian indexes its label as a
+reference, which is the asymmetry this file already records at 710 documents.
+
+Two named sub-families fall out:
+
+    we DEFINE it, Obsidian REFS it   67 docs   `1.⇥%%` / `⟨2sp⟩[^3]:`   an item-hosted `%%`
+    we REF it, Obsidian DEFINES it   40 docs   `>⇥It` / `[^3]:`          a quote-tab line
+
+### The rule that followed is RIGHT and pays NOTHING, and the reason matters
+
+The 67-document family is `quote-comment-lazy.ts`'s shipped rule applied to a list item, which
+is the "extend a measured rule to a new host type" shape that has landed every time here. Scored
+in three steps, each restriction derived rather than fitted:
+
+    an unclosed `%%` in a LIST ITEM buries the defs below it     better 9  worse 26   -25
+    ...bounded by LAZY CONTINUATION                              better 9  worse  8    -8
+    ...and the `%%` AT the item's content column, not 4+ in      better 9  worse  0   FLAT
+    ...and the item may sit inside a quote                       better 9  worse  0   FLAT
+
+The cap is the measured rule "a `%%` indented four columns is CODE", worth +7 here already: the
+loss that named it is `*⟨5sp⟩%%` / `[^Ω]: body text`, where five spaces past the marker put the
+opener four columns into the item's content and Obsidian DEFINES the label. So the final form has
+zero losses and is almost certainly correct -- and moves agreement by **zero on both metrics**.
+
+**A minimal form's family size does not predict a rule's reach, and this is the trap in the
+74.4% figure.** 67 documents minimise into this family; the rule fires on 9. Minimisation strips
+the OTHER divergences that dominate the original dense document, so a family counts the documents
+where a mechanism is PRESENT, not the documents a rule would FIX. The 339 one-directional
+documents are "a rule can exist here", never "a rule will close these". Refused on size, with the
+numbers, as this file's standing rule for a correct-and-too-small rule requires.
+
+### And `score.mts` was approximating the referee, which decides verdicts
+
+The baseline printed here was 5677 where `referee.mts` reports **5745** -- 68 documents -- because
+`distance` folds the `code` dimension into agreement while the referee keeps it separate, and an
+empty-named reference is not excluded. That is not cosmetic: a candidate can be `better 9 /
+worse 0` and read FLAT on the strict figure while moving the oracle the project actually reports.
+
+Both are printed now, and the new counter reproduces **5745 exactly**. Second instance of
+reimplementing this oracle's agreement test -- the first inflated every diverging count in the
+attribution sweep by the same 68 documents -- and in both cases the reimplementation read as
+independent confirmation while measuring something slightly different.
+
+The candidate above is flat on BOTH, which is what makes the refusal safe rather than an artifact
+of the wrong metric. It would not have been knowable before this fix.
