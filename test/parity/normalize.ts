@@ -504,6 +504,23 @@ export function mdastText(
     // *blockquote* rather than beside the comment. A container whose last descendant
     // is an unclosed comment is itself unclosed for this purpose.
     if (candidate.type !== "comment") {
+      // ...but the hiding does NOT escape a LIST, which is measured rather than assumed.
+      //
+      // `1.⇥%%` / `⟨2sp⟩[^3]: It` / blank / `use[^3]` renders `use3` in Obsidian: the trailing
+      // paragraph survives, with the label shown literally because nothing defines it any
+      // more. A nested quote is the opposite -- `> > %%` over `em*` hides what follows -- which
+      // is the case this recursion was built for, and generalising it to every container type
+      // was only invisible while no pass put a definition INSIDE an item-hosted comment.
+      // `itemCommentLazyTransform` does, which made the item's last child the comment and hid
+      // the rest of the note: the three `probe/item-comment/*` cases went from `use⟨fn⟩` to the
+      // empty string, with `meta.footnotes` already correct.
+      //
+      // So a quote propagates and a list does not. The asymmetry is the same one recorded four
+      // times over for absorption -- `setext`, `indented`, `math` and `html` are taken by a
+      // list and kept at root by a quote -- and it is read off the node type for the same
+      // reason.
+      if (candidate.type === "list" || candidate.type === "listItem")
+        return false;
       const kids = (candidate as { children?: Node[] }).children;
       const last = kids?.[kids.length - 1];
       return last !== undefined && unclosedComment(last);

@@ -59,6 +59,7 @@ import { breakPositionsTransform } from "./lib/break-positions.js";
 import { commentParseTransform } from "./lib/comment-parse.js";
 import { commentDefinitionColumnTransform } from "./lib/comment-definition-column.js";
 import { commentQuoteExtentTransform } from "./lib/comment-quote-extent.js";
+import { itemCommentLazyTransform } from "./lib/item-comment-lazy.js";
 import { quoteCommentLazyTransform } from "./lib/quote-comment-lazy.js";
 import {
   ensureLineOffsets,
@@ -719,6 +720,10 @@ export default function remarkObsidian(
     // Beside the pass above, which cannot reach a comment that is the quote's LAST child --
     // which is exactly what a depth-2 opener produces, because the lazy line stays at root.
     if (opts.comments) quoteCommentLazyTransform(tree, String(file));
+    // Beside the quote half, after it: the two cannot both claim one opener -- that pass
+    // needs the comment to be its container's LAST child and this one needs a sibling after
+    // it -- so the order is for reading rather than for correctness.
+    if (opts.comments) itemCommentLazyTransform(tree, String(file));
     // Before the footnote passes, so a definition this recovers is one they see.
     indentTabTransform(tree, String(file), (markdown) => reparse(markdown));
     // Unconditional, unlike the continuation pass above it: a definition whose

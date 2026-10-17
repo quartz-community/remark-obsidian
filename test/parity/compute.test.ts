@@ -165,22 +165,13 @@ describe("positioned oracle", () => {
     // the MARKER'S SEPARATOR rather than indentation after a space, so `+\t   [^1]: def`
     // turns on micromark's list-item tab straddle instead of the code threshold.
     "probe/def-tab/marker-tab-spaces: the tab is the marker's own separator",
-    // AN UNCLOSED `%%` HOSTED BY A LIST ITEM buries the definition below it, and Obsidian
-    // indexes the buried label as a REFERENCE at its own position -- the asymmetry
-    // `parseComments` implements and 710 documents depend on. We define instead, so we are
-    // short exactly that reference. These five are the minimised forms of 67 referee
-    // documents, reduced against the running app, and `item-comment/five-space` is the
-    // control that MATCHES: five spaces past the marker put the `%%` four columns into the
-    // item's content, where it is indented code and opens nothing.
-    //
-    // The rule is derived and scored -- `better 9 / worse 0` with the cap and a
-    // lazy-continuation bound -- and refused on SIZE, because full agreement moves by zero on
-    // both the strict and the referee metric. So it is a gap we intend to close, not an
-    // impossibility.
-    "probe/item-comment/tab: an item-hosted unclosed `%%` buries the definition",
-    "probe/item-comment/two-space: as item-comment/tab, space separator",
-    "probe/item-comment/four-space: as item-comment/tab, still at the content column",
-    "probe/item-comment/quoted: as item-comment/tab, item inside a blockquote",
+    // AN UNCLOSED `%%` HOSTED BY A LIST ITEM is CLOSED by `itemCommentLazyTransform`, and four
+    // of the six cases promoted for it now MATCH. What remains here is the CLOSED-region
+    // sibling, which is a different mechanism: `commentRegionTransform` owns a `%%...%%` region
+    // and this pass deliberately declines one, because claiming a closed opener is what broke
+    // the container lift before -- that pass finds a region's host by strict containment, so
+    // moving the opener out from under it leaves the region unrebuilt and a buried definition
+    // live.
     "probe/item-comment/closed: a CLOSED `%%` region hosted by an item buries it too",
     // A TAB AFTER A QUOTE MARKER ends the quote, so the following column-0 line is a ROOT
     // definition. We index the label as a reference instead. `quote-tab-root-def/space` and
@@ -444,8 +435,8 @@ describe("positioned oracle", () => {
     //   tab-quote family, which the MAIN GATE CANNOT SEE because `meta.footnotes` is names
     //   only. The names and the rule are right -- that family took the referee from 5717 to
     //   5744 -- and a column or end line is out by the quote's own prefix.
-    footnotes: 11,
-    footnoteRefs: 11,
+    footnotes: 7,
+    footnoteRefs: 7,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
     // Obsidian reports a heading's column as its containing block's content column,
@@ -955,7 +946,7 @@ describe("positioned oracle", () => {
     // now accepts a quote-prefixed line after a LIST, which is the same shape as the `html`
     // and `heading` entries it already restricted to a list, with the same evidence -- one
     // recorded probe per container.
-    listItems: 6,
+    listItems: 5,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
@@ -1004,15 +995,6 @@ describe("positioned oracle", () => {
     "probe/item-comment/closed:footnotes",
     "probe/item-comment/closed:listItems",
     "probe/item-comment/closed:sections",
-    "probe/item-comment/four-space:footnoteRefs",
-    "probe/item-comment/four-space:footnotes",
-    "probe/item-comment/quoted:footnoteRefs",
-    "probe/item-comment/quoted:footnotes",
-    "probe/item-comment/quoted:listItems",
-    "probe/item-comment/tab:footnoteRefs",
-    "probe/item-comment/tab:footnotes",
-    "probe/item-comment/two-space:footnoteRefs",
-    "probe/item-comment/two-space:footnotes",
     "probe/quote-tab-root-def/tab:footnoteRefs",
     "probe/quote-tab-root-def/tab:footnotes",
     "probe/def-gap/marker-tab-sep:listItems",

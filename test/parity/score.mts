@@ -718,6 +718,62 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "item-comment-swallows-defs-and-refs",
+    what: "...AND indexes each buried label as a reference, which is the half that was missing",
+    apply: (text, ours) => {
+      // The capped version scored `better 9 / worse 0` and FLAT, and the mechanism map says
+      // exactly why: the commonest two-mechanism pair in the whole backlog is
+      //
+      //     56  def-extra @ footnoteDefinition  +  ref-miss @ footnoteDefinition
+      //
+      // which is this family. Dropping the definition fixes `def-extra` and LEAVES
+      // `ref-miss`, so the document moves closer and never reaches agreement -- a rule that
+      // implements half of a swap can only ever score better-but-flat.
+      //
+      // The other half is already measured and already implemented elsewhere: a definition
+      // that fails to define has its LABEL indexed as a reference at its own position, the
+      // asymmetry `parseComments` carries and 710 documents depend on. Probed live for this
+      // exact shape: `1.⇥%%` / `⟨2sp⟩[^3]: It` reports `defs []` and
+      // `refs [["3",1,2],["3",3,3]]` -- the label's own line and column, then the use below.
+      const lines = text.split("\n");
+      let cut = Number.POSITIVE_INFINITY;
+      let reach = lines.length;
+      for (let at = 0; at < lines.length; at++) {
+        const opener = QUOTED_ITEM_COMMENT.exec(lines[at] ?? "");
+        if (!opener) continue;
+        const rest = lines.slice(at).join("\n").slice(opener[0].length);
+        if (rest.includes("%%")) continue;
+        let to = at + 1;
+        while (to < lines.length) {
+          const line = lines[to] ?? "";
+          if (
+            line.replace(/^[ \t>]+/u, "").trim() === "" ||
+            ENDS_ITEM.test(line)
+          )
+            break;
+          to += 1;
+        }
+        if (at < cut) {
+          cut = at;
+          reach = to;
+        }
+      }
+      if (cut === Number.POSITIVE_INFINITY) return ours;
+
+      const buried = ours.defs.filter((d) => d[1] > cut && d[1] < reach);
+      // Inserted in DOCUMENT ORDER, because the referee compares references order-sensitively
+      // and a correct set in the wrong order reads as total disagreement.
+      const refs = [
+        ...ours.refs,
+        ...buried.map((d): Ref => [d[0], d[1], d[2]]),
+      ].sort((a, b) => a[1] - b[1] || a[2] - b[2]);
+      return {
+        defs: ours.defs.filter((d) => d[1] <= cut || d[1] >= reach),
+        refs,
+      };
+    },
+  },
+  {
     name: "quote-tab-no-define",
     what: "a tab DIRECTLY after a quote marker means the label does not define -- SCORED, NOT SHIPPED",
     apply: (text, ours) => {
