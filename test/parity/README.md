@@ -5866,3 +5866,64 @@ independent confirmation while measuring something slightly different.
 
 The candidate above is flat on BOTH, which is what makes the refusal safe rather than an artifact
 of the wrong metric. It would not have been knowable before this fix.
+
+## Mechanisms per document: 759 of 1056 are ONE rule from agreeing
+
+`mechanism.mts` labels every diverging document by WHICH OF OUR NODES covers the position the
+recorded answer indexes, then counts how many distinct mechanisms each document carries. That
+second number is the one that decides whether a rule can pay:
+
+    1 mechanism  : 759 documents   <- a single rule can flip these
+    2 mechanisms : 240
+    3 mechanisms :  50
+    4 or more    :   7
+
+**This refuted the premise it was built to test.** A rule had just scored `better 9 / worse 0`
+and FLAT, and the conclusion drawn from it -- that the backlog is mostly multi-divergence
+documents, so single-mechanism rules are all futile -- was wrong. Three quarters are one
+mechanism away. The FLAT score had a specific cause, not a general one.
+
+### The pair table found that cause immediately
+
+    56  def-extra @ footnoteDefinition  +  ref-miss @ footnoteDefinition
+
+That is ONE SWAP, not two errors: the same label is a definition to us and a reference to
+Obsidian. The candidate dropped the definition and never indexed its label, so it implemented
+half a swap -- which can only ever score better-but-flat, because every one of its documents
+still carried the other half. Scoring both halves took it to `better 8 / worse 0` and +6, and
+building it as a pass was worth +17.
+
+### And the labeller had a duplicate-name blind spot
+
+49 documents came back `unclassified`, which read as "a mechanism nothing has named". It was not:
+keying the comparison by NAME collapses duplicates, while the referee compares ORDER-SENSITIVE
+ARRAYS, so `[^2]` referenced on two lines looked identical in the map and differed in the array.
+
+    duplicate REFERENCE names  : 42
+    duplicate DEFINITION names :  7
+    order-only                 :  0
+
+Keyed by `name@line` instead -- a label occurs at most once per line, which is what makes that a
+key rather than a guess -- and the table REORDERS: `ref-extra @ footnoteReference` goes from 114
+one-away to **150**, the largest single target, and `ref-miss @ code` from 55 to 74. An
+`order-only` label now exists as a named outcome so the next blind spot cannot hide in a silent
+bucket.
+
+Tenth instrument defect of this effort, and the same shape as the rest: a count quietly wrong
+rather than an error.
+
+### What the largest family looks like, and why it is not yet a rule
+
+`ref-extra @ footnoteReference` at 150 one-away, classified both ways:
+
+    by OUR host                        by the LINE the extra reference sits on
+    151  paragraph>footnoteReference   126  plain text
+     34  footnoteDefinition>paragraph   91  the label line itself
+     33  list>listItem>paragraph        70  quote line
+     30  callout>paragraph              23  inside an autolink
+     28  blockquote>paragraph           15  indented 4+
+
+Neither axis concentrates. The host is "a paragraph" for the plurality, which is no container
+story at all, and the largest line shape is the residual bucket. Recorded as characterised and
+NOT attacked, because this file's own history says what happens next otherwise: six selectors
+have died by picking the biggest number in a table that does not concentrate.

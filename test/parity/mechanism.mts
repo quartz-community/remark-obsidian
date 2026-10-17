@@ -125,11 +125,24 @@ for (const [index, entry] of entries.entries()) {
   diverging += 1;
 
   const lines = entry.text.split("\n");
-  const key = (name: string) => name.toLowerCase();
-  const ourDefs = new Map(ours.defs.map((d) => [key(d[0]), d]));
-  const ourRefs = new Map(ours.refs.map((r) => [key(r[0]), r]));
-  const wantDefMap = new Map(wantDefs.map((d) => [key(d[0]), d]));
-  const wantRefMap = new Map(wantRefs.map((r) => [key(r[0]), r]));
+  /**
+   * Keyed by name AND LINE, not by name alone.
+   *
+   * A name-keyed map collapses duplicates, and the referee compares ORDER-SENSITIVE ARRAYS, so
+   * `[^2]` referenced on two lines looked identical in the map while the arrays differed. Every
+   * one of the 49 documents this labeller reported as `unclassified` had a duplicate name --
+   * 42 on references, 7 on definitions, and ZERO that were order-only -- so the bucket was not
+   * an unknown mechanism, it was this blind spot.
+   *
+   * Line is enough to separate them and keeps the col and span comparisons below pairable: a
+   * label occurs at most once per line, which is what makes `name@line` a key rather than a
+   * guess.
+   */
+  const key = (name: string, line: number) => `${name.toLowerCase()}@${line}`;
+  const ourDefs = new Map(ours.defs.map((d) => [key(d[0], d[1]), d]));
+  const ourRefs = new Map(ours.refs.map((r) => [key(r[0], r[1]), r]));
+  const wantDefMap = new Map(wantDefs.map((d) => [key(d[0], d[1]), d]));
+  const wantRefMap = new Map(wantRefs.map((r) => [key(r[0], r[1]), r]));
 
   const found = new Set<string>();
   for (const [name, def] of wantDefMap) {
@@ -180,7 +193,11 @@ for (const [index, entry] of entries.entries()) {
     const theirs = wantRefMap.get(name);
     if (theirs && ref[2] !== theirs[2]) found.add("ref-col");
   }
-  if (found.size === 0) found.add("unclassified");
+  // A document that diverges with nothing named is now ORDER ONLY -- the same multiset in a
+  // different sequence -- which the referee counts as disagreement and nothing above can see.
+  // Measured at zero on this corpus, and kept as a named outcome rather than a silent bucket
+  // so it cannot absorb the next blind spot.
+  if (found.size === 0) found.add("order-only");
   perDocument.set(id, found);
 }
 
