@@ -75,7 +75,7 @@ export function refereeFacts(text: string): Facts {
  * Scanning both cost 12 documents against 19 gained; scanning only the indented form is what
  * makes the trade one-sided.
  */
-function isIndented(
+export function isIndented(
   source: string,
   at: { start: Point; end: Point } | undefined,
 ): boolean {

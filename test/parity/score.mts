@@ -49,7 +49,13 @@ import { visit } from "unist-util-visit";
 
 import { contentColumn } from "../../src/lib/definition-column.js";
 import { columnsOf } from "../../src/lib/item-dot-threshold.js";
-import { refereeFactsWithTree, type Def, type Ref } from "./referee-facts.js";
+import {
+  isIndented,
+  refereeFactsWithTree,
+  type Def,
+  type Point,
+  type Ref,
+} from "./referee-facts.js";
 
 /** A code block's line range, zero-based and inclusive, as Obsidian records it. */
 export type CodeRange = readonly [number, number];
@@ -115,6 +121,8 @@ const ITEM_COMMENT_CAPPED = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]{1,4}%%/u;
 /** The capped opener, with a quote-marker run allowed before the list marker. */
 const QUOTED_ITEM_COMMENT =
   /^(?:[ \t]*>)*[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]{1,4}%%/u;
+/** A definition line led by a TAB and at most three further spaces -- below the tab+4 cap. */
+const LEADING_TAB_DEF = /^\t {0,3}\[\^([^\]]+)\]:/u;
 const ENDS_ITEM =
   /^ {0,3}(?:#{1,6}(?:[ \t]|$)|```|~~~|[-*+][ \t]|\d{1,9}[.)][ \t])/u;
 const LABEL = /^\[\^([^\]]*)\]:/u;
@@ -770,6 +778,84 @@ const RULES: readonly Rule[] = [
       return {
         defs: ours.defs.filter((d) => d[1] <= cut || d[1] >= reach),
         refs,
+      };
+    },
+  },
+  {
+    name: "leading-tab-defines-in-indented-code",
+    what: "...restricted to a label our own tree put inside INDENTED code, never a fence",
+    apply: (text, ours, tree) => {
+      // Sixty probes against the live app, five marker shapes crossed with twelve indents, and
+      // the tab rows are IDENTICAL in all five:
+      //
+      //     marker / tab     obs def col 1    ours CODE
+      //     marker / tab+1   obs def col 1    ours CODE
+      //     marker / tab+2   obs def col 1    ours CODE
+      //     marker / tab+3   obs def col 1    ours CODE
+      //     marker / tab+4   obs CODE         ours CODE   <- agree
+      //
+      // So a LEADING tab makes the marker irrelevant: the column is 1 whether the item is `-`,
+      // `- `, `10.` or `10. `, and the threshold is the tab stop plus four. The threshold half
+      // is already recorded on `definition-deindent-code.ts`; the COLUMN being uniformly 1 is
+      // not, and it is what four previous implementations of this family had to guess at --
+      // each one derived the column from the host's content column, which these probes say is
+      // not what Obsidian uses once a tab leads.
+      const lines = text.split("\n");
+      const added: Def[] = [];
+      // Only where OUR OWN NODE is indented code, which is the mechanism this targets and two
+      // restrictions in one. The naive form scored `better 20 / worse 223` because it fired on
+      // any tab-led label line whatever contained it: one loss is a document opening `%%%`,
+      // where an unclosed comment buries everything and Obsidian defines NOTHING at all. Asking
+      // the tree instead of the line means a comment, an html block or frontmatter declines by
+      // construction rather than by a predicate that has to anticipate each one.
+      //
+      // And a FENCE is excluded, which is measured rather than tidy: `referee-facts.ts` records
+      // that Obsidian indexes a label inside indented code and NOT one inside a fence, and that
+      // scanning both cost 12 documents against 19 gained while scanning only the indented form
+      // is one-sided. The node type cannot tell them apart -- a bare ``` arrives as `code` with
+      // a null lang exactly as indented code does -- so the distinction comes from the source
+      // line, through that file's own helper rather than a second copy of the predicate.
+      const indentedCode: { from: number; to: number }[] = [];
+      visit(tree, "code", (node: Node) => {
+        const at = node.position;
+        if (!at?.start?.offset || !at?.end?.offset) return;
+        if (!isIndented(text, at as { start: Point; end: Point })) return;
+        indentedCode.push({ from: at.start.offset, to: at.end.offset });
+      });
+      if (indentedCode.length === 0) return ours;
+      let offset = 0;
+      const startOf: number[] = [];
+      for (const line of lines) {
+        startOf.push(offset);
+        offset += line.length + 1;
+      }
+      for (let at = 0; at < lines.length; at++) {
+        const hit = LEADING_TAB_DEF.exec(lines[at] ?? "");
+        if (!hit) continue;
+        const where = startOf[at]!;
+        if (
+          !indentedCode.some((span) => where >= span.from && where < span.to)
+        ) {
+          continue;
+        }
+        const name = hit[1]!.toLowerCase();
+        if (ours.defs.some((d) => d[0].toLowerCase() === name)) continue;
+        // The definition's extent, by the same lazy rule the rest of this family uses: a blank
+        // line or a line that cannot continue it ends it.
+        let end = at;
+        while (end + 1 < lines.length) {
+          const next = lines[end + 1] ?? "";
+          if (next.trim() === "" || /^\S/u.test(next)) break;
+          end += 1;
+        }
+        added.push([name, at, 1, end]);
+      }
+      if (added.length === 0) return ours;
+      return {
+        defs: [...ours.defs, ...added].sort(
+          (a, b) => a[1] - b[1] || a[2] - b[2],
+        ),
+        refs: ours.refs,
       };
     },
   },

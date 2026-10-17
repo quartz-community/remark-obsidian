@@ -5927,3 +5927,64 @@ Neither axis concentrates. The host is "a paragraph" for the plurality, which is
 story at all, and the largest line shape is the residual bucket. Recorded as characterised and
 NOT attacked, because this file's own history says what happens next otherwise: six selectors
 have died by picking the biggest number in a table that does not concentrate.
+
+## The leading-tab column, measured at last -- and the fifth refutation of a repair for it
+
+`def-miss @ code` is 111 one-away documents and the largest non-refused family. Sixty probes
+against the live app -- five marker shapes crossed with twelve indents -- and the tab rows are
+IDENTICAL in all five:
+
+    marker / tab     obs def col 1    ours CODE
+    marker / tab+1   obs def col 1    ours CODE
+    marker / tab+2   obs def col 1    ours CODE
+    marker / tab+3   obs def col 1    ours CODE
+    marker / tab+4   obs CODE         ours CODE   <- agree
+
+**A LEADING TAB MAKES THE MARKER IRRELEVANT.** The column is 1 whether the item is `-`, `- `,
+`10.` or `10. `, and the threshold is the tab stop plus four. The threshold half was already
+recorded on `definition-deindent-code.ts`; the COLUMN being uniformly 1 was not, and it is
+exactly what four previous implementations of this family had to guess at -- each derived the
+column from the host's content column, which these probes say is not what Obsidian uses once a
+tab leads.
+
+The space rows give a second rule for free: **a BARE marker's content column is its marker
+WIDTH**, not width plus one.
+
+    bare -    1sp-4sp -> col 1      5sp -> CODE      content column 1
+    dash+sp   2sp-5sp -> col 2      6sp -> CODE      content column 2
+    bare 10.  3sp-6sp -> col 3                       content column 3
+    ten+sp    4sp-6sp -> col 4                       content column 4
+
+Every threshold is `contentColumn + 4`, which is the rule this file already carries, now
+confirmed across four marker widths rather than one.
+
+### And a repair for it is refused twice more, which makes five
+
+    any tab-led label line defines at column 1          better 20  worse 223   -166
+    ...only where OUR node is INDENTED code, no fence   better  8  worse  73    -50
+
+The first fires on any tab-led label whatever contains it. One loss is a document opening `%%%`,
+where an unclosed comment buries everything and Obsidian defines NOTHING at all -- so the rule
+was adding definitions to documents with no definitions in them.
+
+The second asks the TREE instead of the line, which declines a comment, an html block or
+frontmatter by construction. It is still -50, and the remaining losses are one shape:
+
+    * ````  / ⟨2sp⟩Prose [^x-y] / ⇥[^Ä]: Prose here       answer []
+    ⟨3sp⟩1.  ```` / ⟨7sp⟩`[^1]` / ⇥[^b]: Definition       answer []
+
+**A FENCE OPENED BEHIND A LIST MARKER.** `isIndented` strips only spaces, tabs and `>`, so
+`* ````  ` does not match its fence pattern and reads as indented code. Widening that prefix
+class is not available: this file already measures taking the list marker too, and it moves
+32/32 to **84 better against 100 worse**.
+
+So the isolated rule is correct on sixty probes and no repair over the tokenizer's output can
+carry it -- fifth refutation of this family, after two repair passes at -15 and -21, a container
+tokenizer at 32 gained and 23 lost, and a columns-with-a-tab-stop-floor repair at 12 and 11. The
+route remains `legacy-list.ts`'s own indent accounting, where the tab is measured once and
+nothing downstream is re-parsed, and where the fence and capped-item rules landed +37, +16 and
++28 after the same rules scored +7 as repairs.
+
+What is new and worth having is the measurement: the column is 1, the marker is irrelevant, and
+a bare marker's content column is its width. Three facts a tokenizer change needs and none of
+the five attempts had.
