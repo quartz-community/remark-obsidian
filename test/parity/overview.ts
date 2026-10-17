@@ -241,6 +241,21 @@ export const ORACLES: readonly Oracle[] = [
     test: "chain.test.ts",
   },
   {
+    name: "probe ledger",
+    command:
+      "tsx test/parity/probe-ledger.mts --record <file.json> to add probes; --status to see drift",
+    gate: "regression",
+    test: "probes.test.ts",
+    compares: [
+      "footnote definitions and references for a probe, against OUR OWN answer at record time",
+    ],
+    blind: [
+      "whether we AGREE with Obsidian -- it asserts stability, because a probe usually records a divergence and a gate demanding agreement would be red from its first entry",
+      "anything the referee's projection drops: no columns beyond the definition start, no code ranges, no sections",
+      "a probe nobody recorded -- the ledger is only as wide as the sweeps someone chose to keep",
+    ],
+  },
+  {
     name: "their rules document",
     command:
       "tsx test/parity/ask.mts to re-measure an example; the golden is goldens/rules-doc.json",

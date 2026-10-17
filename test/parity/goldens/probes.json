@@ -1,0 +1,1820 @@
+[
+  {
+    "markdown": "*\n\t    [^1]: x\n",
+    "note": "leading tab with NO BLANK line: marker bare*, indent tab+4. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:52.187Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\n\t   [^1]: x\n",
+    "note": "leading tab with NO BLANK line: marker bare*, indent tab+3. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:52.185Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\n\t[^1]: x\n",
+    "note": "leading tab with NO BLANK line: marker bare*, indent tab. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:52.184Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\n\n\t    [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare*, indent tab+4. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.427Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\n\n\t   [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare*, indent tab+3. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.426Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\n\n\t  [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare*, indent tab+2. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.426Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\n\n\t [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare*, indent tab+1. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.425Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\n\n\t[^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare*, indent tab. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.425Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\n\n      [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare*, indent 6sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.424Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\n\n     [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare*, indent 5sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.423Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\n\n    [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare*, indent 4sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.422Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\n\n   [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare*, indent 3sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.421Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\n\n  [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare*, indent 2sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.419Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\n\n [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare*, indent 1sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.417Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\n\n[^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare*, indent none. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.416Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\t    [^1]: x\n",
+    "note": "leading tab with NO BLANK line: marker bare-, indent tab+4. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:52.175Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\t   [^1]: x\n",
+    "note": "leading tab with NO BLANK line: marker bare-, indent tab+3. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:52.174Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\t[^1]: x\n",
+    "note": "leading tab with NO BLANK line: marker bare-, indent tab. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:52.172Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n\t    [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare-, indent tab+4. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.402Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n\t   [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare-, indent tab+3. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.402Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n\t  [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare-, indent tab+2. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.401Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n\t [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare-, indent tab+1. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.399Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n\t[^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare-, indent tab. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.397Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n      [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare-, indent 6sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.396Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n     [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare-, indent 5sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.394Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n    [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare-, indent 4sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.390Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n   [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare-, indent 3sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.388Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n  [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare-, indent 2sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.385Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare-, indent 1sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.382Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n[^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare-, indent none. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.379Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- \n\t    [^1]: x\n",
+    "note": "leading tab with NO BLANK line: marker dash+sp, indent tab+4. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:52.182Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- \n\t   [^1]: x\n",
+    "note": "leading tab with NO BLANK line: marker dash+sp, indent tab+3. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:52.180Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- \n\t[^1]: x\n",
+    "note": "leading tab with NO BLANK line: marker dash+sp, indent tab. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:52.178Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- \n\n\t    [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker dash+sp, indent tab+4. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.415Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- \n\n\t   [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker dash+sp, indent tab+3. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.414Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- \n\n\t  [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker dash+sp, indent tab+2. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.413Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- \n\n\t [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker dash+sp, indent tab+1. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.413Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- \n\n\t[^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker dash+sp, indent tab. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.412Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- \n\n      [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker dash+sp, indent 6sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.411Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- \n\n     [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker dash+sp, indent 5sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.410Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- \n\n    [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker dash+sp, indent 4sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.408Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- \n\n   [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker dash+sp, indent 3sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.407Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- \n\n  [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker dash+sp, indent 2sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.406Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- \n\n [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker dash+sp, indent 1sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.404Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- \n\n[^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker dash+sp, indent none. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.403Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\n\t    [^1]: x\n",
+    "note": "leading tab with NO BLANK line: marker bare10., indent tab+4. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:52.191Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\n\t   [^1]: x\n",
+    "note": "leading tab with NO BLANK line: marker bare10., indent tab+3. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:52.190Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\n\t[^1]: x\n",
+    "note": "leading tab with NO BLANK line: marker bare10., indent tab. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:52.189Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\n\n\t    [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare10., indent tab+4. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.438Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\n\n\t   [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare10., indent tab+3. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.437Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\n\n\t  [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare10., indent tab+2. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.437Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\n\n\t [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare10., indent tab+1. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.436Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\n\n\t[^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare10., indent tab. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.436Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\n\n      [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare10., indent 6sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          3,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.434Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\n\n     [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare10., indent 5sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          3,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.432Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\n\n    [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare10., indent 4sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          3,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.431Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\n\n   [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare10., indent 3sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          3,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.430Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\n\n  [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare10., indent 2sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.429Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\n\n [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare10., indent 1sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.428Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\n\n[^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker bare10., indent none. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.428Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \n\t    [^1]: x\n",
+    "note": "leading tab with NO BLANK line: marker ten+sp, indent tab+4. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:52.195Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \n\t   [^1]: x\n",
+    "note": "leading tab with NO BLANK line: marker ten+sp, indent tab+3. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:52.194Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \n\t[^1]: x\n",
+    "note": "leading tab with NO BLANK line: marker ten+sp, indent tab. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          1,
+          1,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:52.193Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \n\n\t    [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker ten+sp, indent tab+4. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.448Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \n\n\t   [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker ten+sp, indent tab+3. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.448Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \n\n\t  [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker ten+sp, indent tab+2. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.447Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \n\n\t [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker ten+sp, indent tab+1. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.447Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \n\n\t[^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker ten+sp, indent tab. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.447Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \n\n      [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker ten+sp, indent 6sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.446Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \n\n     [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker ten+sp, indent 5sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.445Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \n\n    [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker ten+sp, indent 4sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.444Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \n\n   [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker ten+sp, indent 3sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.443Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \n\n  [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker ten+sp, indent 2sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.442Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \n\n [^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker ten+sp, indent 1sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.441Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \n\n[^1]: x\n",
+    "note": "leading-tab/content-column sweep: marker ten+sp, indent none. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T15:03:51.439Z",
+    "obsidianVersion": "1.14.4"
+  }
+]

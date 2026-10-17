@@ -6021,3 +6021,71 @@ it is upstream of every repair tried here, and it is where the next attempt belo
 Reverted rather than shipped: a change on the most dangerous file in the package that measures a
 wash in one scoping and -10 in the other is dead code with risk attached. Baseline restored
 exactly -- referee 5762, code 742.
+
+## Two instruments for the gap between a measured rule and a working change
+
+The classification stack had stopped being the bottleneck. It found the target, named the
+one-away set, and explained a FLAT score as a half-implemented swap. What failed twice in a row
+was the step after that -- an implementation whose behaviour contradicted the probes that
+justified it, discovered by hand-writing a throwaway tree printer.
+
+### The probe ledger: `corpus.ts`'s contract at a probe's price
+
+`corpus.ts` already asserts a document against Obsidian and is the right instrument, but
+promoting a case costs a ten-minute `parity-record` run -- so a sixty-probe exploratory sweep
+never gets promoted and nothing guards it. `probe-ledger.mts` records one in about a second:
+Obsidian's answer, OUR answer at the time, and a note saying why it was taken.
+`probes.test.ts` asserts the second half on every change, needing no Obsidian.
+
+**It asserts DRIFT, not agreement**, which is the whole design. An exploratory probe usually
+records a divergence -- that is what makes it worth taking -- so a gate demanding agreement
+would be red from the first entry and promptly ignored, which this file already says about
+perfection gates. A probe that starts matching fails exactly as loudly as one that stops, and
+the message says which direction it moved, because the two need opposite responses.
+
+Seeded with the 75 probes nothing was guarding -- the 60-case marker-by-indent sweep plus 15
+no-blank variants. 38 agree with Obsidian, 37 diverge. Break-tested by tampering a recorded
+answer, which fails the drift assertion by name.
+
+**It immediately answered a question that had cost two throwaway scripts.** The no-blank shapes
+ALREADY AGREE on all five markers -- `ours` and `obsidian` are both `[["1",1,1,1]]` -- so the
+leading-tab tokenizer change was redundant where it could fire and inert where the divergence
+actually lives. That is the whole explanation of its +1/-1 wash, from one command.
+
+### Watching the watchers: `instruments.mts`
+
+`compose.mts` was dead and nothing noticed. Each instrument is now run and its headline figure
+compared to a recorded one:
+
+    ok    referee footnotes      5762        ok    compose inside         0
+    ok    referee code           742         ok    compose inline         0
+    ok    mechanism diverging    1056        ok    compose isolate        0
+    ok    compose pairs          0           ok    compose nested         1
+    ok    compose matrix         0           ok    compose inline-block   4
+
+A DELIBERATE check rather than a per-commit gate -- the compose axes each ask Obsidian -- and an
+instrument whose prerequisite is missing is SKIPPED rather than failed, because a red line for
+"the referee corpus is not cloned" trains the reader to ignore the whole report. Break-tested
+two ways: tampering the baseline reports `DRIFT referee footnotes 9999 -> 5762`, and replacing an
+instrument with a `throw` reports `THREW mechanism diverging`.
+
+### CORRECTION: `compose.mts` was not killed by an argument limit
+
+The commit that revived it (`test: revive compose.mts -- it had been dead on the CLI's argument
+limit`) names the wrong cause, and the break test above is what found that out. Restoring the
+pre-fix version from git to watch the watchdog catch it produced **`0 of 256 diverge`** -- the
+CLI version works.
+
+The 6KB argument was inferred as the cause because it appears in the error text, which is simply
+how `execFileSync` reports any failed command; and the `--inline` failure in the same stretch was
+a 200-BYTE eval that also recovered on retry. So `obsidian eval` fails INTERMITTENTLY,
+independent of payload size.
+
+That is a worse defect than a size ceiling, not a milder one: a transport that fails sometimes
+produces figures nobody can trust and failures that read as "Obsidian found nothing". The file
+channel is still the right fix because it removes the round trip rather than shrinking it -- but
+for a different reason than the one first recorded.
+
+**A break test that fails to break is evidence about the thing you were sure of.** Eleventh
+instrument correction of this effort, and the first found by trying to validate a tool rather
+than by using one.
