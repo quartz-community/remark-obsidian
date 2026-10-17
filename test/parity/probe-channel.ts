@@ -65,7 +65,7 @@ interface Positioned {
   readonly id?: string;
   readonly position?: { readonly start: Point; readonly end: Point };
 }
-interface Cache {
+export interface Cache {
   readonly footnotes?: readonly Positioned[];
   readonly footnoteRefs?: readonly Positioned[];
 }
@@ -127,6 +127,57 @@ async function exchange(
       throw new Error(`probe-channel: plugin reported ${JSON.stringify(read)}`);
     }
     return read as Reply[];
+  }
+  throw new Error(
+    `probe-channel: no response in ${timeoutMs}ms. Is Obsidian running with parity-probe enabled?`,
+  );
+}
+
+/**
+ * The RAW caches, synchronously, for callers whose shape predates this channel.
+ *
+ * `compose.mts` projects the cache itself through `theirs()` rather than reading footnote facts,
+ * and its `askBatch` is synchronous three call-frames down. It also DIED on the CLI channel: 256
+ * sequences in one `code=` argument is about 6KB and `execFileSync` fails outright, which is the
+ * batch ceiling this transport exists to remove -- so a sweep that once caught a same-day
+ * regression was simply unrunnable.
+ *
+ * The sleep is `Atomics.wait` on a SharedArrayBuffer, which is the only true blocking sleep in
+ * Node. Spinning on `Date.now()` would peg a core for the whole exchange, and making the chain
+ * async would rewrite three functions to change a transport.
+ */
+export function askRawSync(
+  markdowns: readonly string[],
+  timeoutMs = 300_000,
+): (Cache | null)[] {
+  if (markdowns.length === 0) return [];
+  fs.mkdirSync(DIR, { recursive: true });
+  fs.rmSync(RESPONSE, { force: true });
+  fs.rmSync(`${RESPONSE}.part`, { force: true });
+  fs.writeFileSync(
+    REQUEST,
+    JSON.stringify(
+      markdowns.map((markdown, at) => ({ id: String(at), markdown })),
+    ),
+  );
+
+  const gate = new Int32Array(new SharedArrayBuffer(4));
+  const until = Date.now() + timeoutMs;
+  while (Date.now() < until) {
+    Atomics.wait(gate, 0, 0, 120);
+    if (!fs.existsSync(RESPONSE)) continue;
+    const read: unknown = JSON.parse(fs.readFileSync(RESPONSE, "utf8"));
+    if (!Array.isArray(read)) {
+      throw new Error(`probe-channel: plugin reported ${JSON.stringify(read)}`);
+    }
+    const replies = read as Reply[];
+    if (replies.length !== markdowns.length) {
+      throw new Error(
+        `probe-channel: asked ${markdowns.length} and got ${replies.length}`,
+      );
+    }
+    const byId = new Map(replies.map((reply) => [reply.id, reply]));
+    return markdowns.map((_, at) => byId.get(String(at))?.cache ?? null);
   }
   throw new Error(
     `probe-channel: no response in ${timeoutMs}ms. Is Obsidian running with parity-probe enabled?`,

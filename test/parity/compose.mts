@@ -16,6 +16,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { askDom } from "./ask-dom.js";
+import { askRawSync } from "./probe-channel.js";
 import {
   agrees,
   AXES,
@@ -43,22 +44,29 @@ function evaluate(code: string): string {
     .trim();
 }
 
+/**
+ * Through the PLUGIN's file channel, not `obsidian eval`.
+ *
+ * This sweep was dead: 256 sequences base64-encoded into one `code=` argument is about 6KB and
+ * `execFileSync` fails on it outright, so every axis threw before asking anything. The CLI's
+ * batch ceiling is not a tuning problem -- it is an argument-length limit -- and it also
+ * silently LOSES THE FOOTNOTE FIELDS, measured three runs out of three on one document.
+ *
+ * `askRawSync` hands the whole batch to the probe plugin through a request file and reads a
+ * response file, which has no ceiling, no encoding and no result window. A NULL cache throws
+ * rather than reading as an empty answer, for the reason this file already knows: an absent
+ * field reads as agreement with whatever you expected.
+ */
 function askBatch(documents: readonly string[]): unknown[] {
-  const encoded = JSON.stringify(
-    documents.map((text) => Buffer.from(text, "utf8").toString("base64")),
-  );
-  evaluate(
-    `window.__cmp='pending';(async()=>{const qs=${encoded};const out=[];` +
-      `for(const q of qs){const b=Uint8Array.from(atob(q),c=>c.charCodeAt(0)).buffer;` +
-      `out.push(await app.metadataCache.computeMetadataAsync(b))}` +
-      `window.__cmp=JSON.stringify(out)})()`,
-  );
-  let raw = "pending";
-  for (let attempt = 0; attempt < 80 && raw === "pending"; attempt++) {
-    raw = evaluate("window.__cmp");
+  const caches = askRawSync(documents);
+  const missing = caches.filter((cache) => cache === null).length;
+  if (missing > 0) {
+    throw new Error(
+      `compose: Obsidian declined ${missing} of ${documents.length} documents. ` +
+        "Clear app.metadataCache.workerResolve and retry.",
+    );
   }
-  if (raw === "pending") throw new Error("Obsidian did not finish");
-  return JSON.parse(raw) as unknown[];
+  return caches as unknown[];
 }
 
 const BATCH = 60;
