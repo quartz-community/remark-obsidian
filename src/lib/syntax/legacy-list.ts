@@ -269,7 +269,24 @@ function tokenizeListContinuation(
 
   function notBlank(code: Code): State | undefined {
     assert(self.containerState, "expected state");
-    if (self.containerState.furtherBlankLines || !markdownSpace(code)) {
+    // AN EMPTY ITEM IS NOT CLOSED BY A FURTHER BLANK LINE, which is `remark-parse@8` and not
+    // CommonMark -- the spec says an item "can begin with at most one blank line", and
+    // `furtherBlankLines` is set only when `initialBlankLine` was, so this condition fires
+    // exactly for an item that began empty and then met another blank.
+    //
+    // Twenty-two probes against live Obsidian settle it, and the discriminator is the item's
+    // CONTENT rather than the gap:
+    //
+    //     "- item" / blank / ⇥[^1]: x    col 1 BOTH sides -- a non-empty item already survives
+    //     "-"      / blank / ⇥[^1]: x    col 1 obs, CODE ours
+    //     "-" / blank / blank / ⇥...     col 1 obs -- further blanks do not break it either
+    //     "-" / blank / "Para" / ...     CODE both -- a paragraph DOES end the list
+    //     "-" / blank / "# Head" / ...   CODE both, and the same for a fence and a quote
+    //     "-" / blank / "---" / ...      col 1 obs -- a thematic break does NOT end it
+    //     "-" / blank / "- " / ...       col 1 obs -- nor does a second marker
+    //
+    // So nine of the wave's nine divergences have one cause, and this is it.
+    if (!markdownSpace(code)) {
       self.containerState.furtherBlankLines = undefined;
       self.containerState.initialBlankLine = undefined;
       return notInCurrentItem(code);
@@ -365,6 +382,40 @@ function tokenizeIndent(
       (inFence() || capped())
     ) {
       self.containerState.size = got;
+      return ok(code);
+    }
+    // A LEADING TAB makes the marker irrelevant, and the content column is 1.
+    //
+    // Sixty probes, five marker shapes crossed with twelve indents, and the tab rows are
+    // identical in all five: `tab` through `tab+3` define at COLUMN 1 whether the item is `-`,
+    // `- `, `10.` or `10. `, and `tab+4` is code. The threshold is the tab stop plus four, which
+    // this file already carries; the column being uniformly 1 is what four earlier attempts had
+    // to guess at.
+    //
+    // USELESS WITHOUT THE `notBlank` CHANGE ABOVE, and measured alone it is worth +1 referee
+    // document. `-` / blank / `⇥[^1]: x` closes the item in `notBlank` before this is ever
+    // consulted, so the line is evaluated at root and becomes indented code. The two halves are
+    // one fix, which is the shape that took the isolate axis from 43 to 0.
+    // ...and the tab must REACH the item's content column, which the sibling project's own
+    // indent probes supply and the first version of this branch ignored:
+    //
+    //     "-"      / blank / ⇥[^1]: def    content col 2, tab reaches 4   -> def col 1
+    //     "- item" / blank / ⇥[^1]: def    content col 2                  -> def col 1
+    //     "-    p" / blank / ⇥[^1]: def    content col 5                  -> ROOT code [[2,2]]
+    //     "100. a" / blank / ⇥[^1]: def    content col 5                  -> ROOT code [[2,2]]
+    //     "1000. p"/ blank / ⇥[^1]: def    content col 6                  -> ROOT code [[2,2]]
+    //
+    // Claiming the line unconditionally cost eight documents on the `code` dimension, all of
+    // that shape: a wide marker or a wide separator puts the content column past the tab stop,
+    // and a line that cannot reach it was never the item's. `got === size` is already handled
+    // above, so this is the strictly-deeper case.
+    const raw = tail[2].sliceSerialize(tail[1]);
+    if (
+      raw.startsWith("\t") &&
+      got > (self.containerState.size as number) &&
+      got < constants.tabSize * 2
+    ) {
+      self.containerState.size = 1;
       return ok(code);
     }
     return nok(code);

@@ -1,5 +1,49 @@
 [
   {
+    "markdown": "\t[^1]: x\n",
+    "note": "blank-line/empty-item wave (ctrl/no-marker): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.701Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "  -\n\n\t[^1]: x\n",
+    "note": "blank-line/empty-item wave (marker/indented): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.705Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
     "markdown": "*\n\t    [^1]: x\n",
     "note": "leading tab with NO BLANK line: marker bare*, indent tab+4. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
     "obsidian": {
@@ -11,7 +55,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:52.187Z",
+    "recordedAt": "2026-10-17T16:25:28.686Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -33,7 +77,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:52.185Z",
+    "recordedAt": "2026-10-17T16:25:28.686Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -62,7 +106,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:52.184Z",
+    "recordedAt": "2026-10-17T16:25:28.685Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -77,7 +121,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.427Z",
+    "recordedAt": "2026-10-17T16:25:28.659Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -99,7 +143,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.426Z",
+    "recordedAt": "2026-10-17T16:25:28.658Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -121,7 +165,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.426Z",
+    "recordedAt": "2026-10-17T16:25:28.657Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -139,11 +183,18 @@
       "refs": []
     },
     "ours": {
-      "defs": [],
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.425Z",
+    "recordedAt": "2026-10-17T16:25:28.655Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -161,11 +212,18 @@
       "refs": []
     },
     "ours": {
-      "defs": [],
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.425Z",
+    "recordedAt": "2026-10-17T16:25:28.653Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -180,7 +238,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.424Z",
+    "recordedAt": "2026-10-17T16:25:28.652Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -195,14 +253,14 @@
         [
           "1",
           2,
-          2,
+          5,
           2
         ]
       ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.423Z",
+    "recordedAt": "2026-10-17T16:25:28.651Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -224,14 +282,14 @@
         [
           "1",
           2,
-          2,
+          4,
           2
         ]
       ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.422Z",
+    "recordedAt": "2026-10-17T16:25:28.650Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -253,14 +311,14 @@
         [
           "1",
           2,
-          2,
+          3,
           2
         ]
       ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.421Z",
+    "recordedAt": "2026-10-17T16:25:28.648Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -289,7 +347,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.419Z",
+    "recordedAt": "2026-10-17T16:25:28.647Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -318,7 +376,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.417Z",
+    "recordedAt": "2026-10-17T16:25:28.645Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -347,7 +405,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.416Z",
+    "recordedAt": "2026-10-17T16:25:28.644Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -362,7 +420,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:52.175Z",
+    "recordedAt": "2026-10-17T16:25:28.683Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -384,12 +442,12 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:52.174Z",
+    "recordedAt": "2026-10-17T16:25:28.682Z",
     "obsidianVersion": "1.14.4"
   },
   {
     "markdown": "-\n\t[^1]: x\n",
-    "note": "leading tab with NO BLANK line: marker bare-, indent tab. The blank-line variant closes the empty item so the line lands at ROOT; without it the line is still the item's, which is the axis the tokenizer branch actually reaches.",
+    "note": "blank-line/empty-item wave (gap/none): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
     "obsidian": {
       "defs": [
         [
@@ -413,12 +471,27 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:52.172Z",
+    "recordedAt": "2026-10-17T16:25:28.690Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n\t\t[^1]: x\n",
+    "note": "blank-line/empty-item wave (cap/tab-tab): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.707Z",
     "obsidianVersion": "1.14.4"
   },
   {
     "markdown": "-\n\n\t    [^1]: x\n",
-    "note": "leading-tab/content-column sweep: marker bare-, indent tab+4. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "note": "blank-line/empty-item wave (cap/tab-4sp): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
     "obsidian": {
       "defs": [],
       "refs": []
@@ -428,7 +501,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.402Z",
+    "recordedAt": "2026-10-17T16:25:28.708Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -450,7 +523,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.402Z",
+    "recordedAt": "2026-10-17T16:25:28.630Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -472,7 +545,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.401Z",
+    "recordedAt": "2026-10-17T16:25:28.629Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -490,16 +563,23 @@
       "refs": []
     },
     "ours": {
-      "defs": [],
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.399Z",
+    "recordedAt": "2026-10-17T16:25:28.628Z",
     "obsidianVersion": "1.14.4"
   },
   {
     "markdown": "-\n\n\t[^1]: x\n",
-    "note": "leading-tab/content-column sweep: marker bare-, indent tab. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "note": "blank-line/empty-item wave (gap/1-blank): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
     "obsidian": {
       "defs": [
         [
@@ -512,11 +592,76 @@
       "refs": []
     },
     "ours": {
-      "defs": [],
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.397Z",
+    "recordedAt": "2026-10-17T16:25:28.691Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n\n\t[^1]: x\n",
+    "note": "blank-line/empty-item wave (gap/2-blank): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          3,
+          1,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          3,
+          1,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.692Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n\n\n\t[^1]: x\n",
+    "note": "blank-line/empty-item wave (gap/3-blank): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          4,
+          1,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          4,
+          1,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.693Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -531,7 +676,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.396Z",
+    "recordedAt": "2026-10-17T16:25:28.625Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -546,14 +691,14 @@
         [
           "1",
           2,
-          2,
+          5,
           2
         ]
       ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.394Z",
+    "recordedAt": "2026-10-17T16:25:28.624Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -575,14 +720,14 @@
         [
           "1",
           2,
-          2,
+          4,
           2
         ]
       ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.390Z",
+    "recordedAt": "2026-10-17T16:25:28.622Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -604,19 +749,19 @@
         [
           "1",
           2,
-          2,
+          3,
           2
         ]
       ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.388Z",
+    "recordedAt": "2026-10-17T16:25:28.620Z",
     "obsidianVersion": "1.14.4"
   },
   {
     "markdown": "-\n\n  [^1]: x\n",
-    "note": "leading-tab/content-column sweep: marker bare-, indent 2sp. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "note": "blank-line/empty-item wave (sp/1-blank): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
     "obsidian": {
       "defs": [
         [
@@ -640,7 +785,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.385Z",
+    "recordedAt": "2026-10-17T16:25:28.709Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -669,7 +814,147 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.382Z",
+    "recordedAt": "2026-10-17T16:25:28.616Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n# Head\n\n\t[^1]: x\n",
+    "note": "blank-line/empty-item wave (gap/atx): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.695Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n- \n\n\t[^1]: x\n",
+    "note": "blank-line/empty-item wave (gap/second-item): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          4,
+          1,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          4,
+          1,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.700Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n---\n\n\t[^1]: x\n",
+    "note": "blank-line/empty-item wave (gap/thematic): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          4,
+          1,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.698Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n> quote\n\n\t[^1]: x\n",
+    "note": "blank-line/empty-item wave (gap/quote): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.700Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\nPara\n\n\t[^1]: x\n",
+    "note": "blank-line/empty-item wave (gap/paragraph): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.694Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\nPara\n\n    [^1]: x\n",
+    "note": "blank-line/empty-item wave (sp/4-after-para): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.711Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\nPara\n\n  [^1]: x\n",
+    "note": "blank-line/empty-item wave (sp/paragraph): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.710Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -698,7 +983,22 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.379Z",
+    "recordedAt": "2026-10-17T16:25:28.613Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\n\n```\n```\n\n\t[^1]: x\n",
+    "note": "blank-line/empty-item wave (gap/fence): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.697Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -713,7 +1013,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:52.182Z",
+    "recordedAt": "2026-10-17T16:25:28.685Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -735,7 +1035,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:52.180Z",
+    "recordedAt": "2026-10-17T16:25:28.684Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -764,7 +1064,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:52.178Z",
+    "recordedAt": "2026-10-17T16:25:28.683Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -779,7 +1079,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.415Z",
+    "recordedAt": "2026-10-17T16:25:28.643Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -801,7 +1101,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.414Z",
+    "recordedAt": "2026-10-17T16:25:28.642Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -823,7 +1123,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.413Z",
+    "recordedAt": "2026-10-17T16:25:28.641Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -841,11 +1141,18 @@
       "refs": []
     },
     "ours": {
-      "defs": [],
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.413Z",
+    "recordedAt": "2026-10-17T16:25:28.640Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -863,11 +1170,18 @@
       "refs": []
     },
     "ours": {
-      "defs": [],
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.412Z",
+    "recordedAt": "2026-10-17T16:25:28.640Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -882,7 +1196,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.411Z",
+    "recordedAt": "2026-10-17T16:25:28.639Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -911,7 +1225,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.410Z",
+    "recordedAt": "2026-10-17T16:25:28.638Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -940,7 +1254,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.408Z",
+    "recordedAt": "2026-10-17T16:25:28.637Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -969,7 +1283,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.407Z",
+    "recordedAt": "2026-10-17T16:25:28.636Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -998,7 +1312,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.406Z",
+    "recordedAt": "2026-10-17T16:25:28.635Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1027,7 +1341,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.404Z",
+    "recordedAt": "2026-10-17T16:25:28.634Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1056,7 +1370,36 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.403Z",
+    "recordedAt": "2026-10-17T16:25:28.633Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- item\n\n\t[^1]: x\n",
+    "note": "blank-line/empty-item wave (marker/with-content): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.704Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1071,7 +1414,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:52.191Z",
+    "recordedAt": "2026-10-17T16:25:28.688Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1100,7 +1443,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:52.190Z",
+    "recordedAt": "2026-10-17T16:25:28.687Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1129,7 +1472,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:52.189Z",
+    "recordedAt": "2026-10-17T16:25:28.687Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1144,7 +1487,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.438Z",
+    "recordedAt": "2026-10-17T16:25:28.669Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1162,11 +1505,18 @@
       "refs": []
     },
     "ours": {
-      "defs": [],
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.437Z",
+    "recordedAt": "2026-10-17T16:25:28.668Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1184,11 +1534,18 @@
       "refs": []
     },
     "ours": {
-      "defs": [],
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.437Z",
+    "recordedAt": "2026-10-17T16:25:28.667Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1206,16 +1563,23 @@
       "refs": []
     },
     "ours": {
-      "defs": [],
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.436Z",
+    "recordedAt": "2026-10-17T16:25:28.667Z",
     "obsidianVersion": "1.14.4"
   },
   {
     "markdown": "10.\n\n\t[^1]: x\n",
-    "note": "leading-tab/content-column sweep: marker bare10., indent tab. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "note": "blank-line/empty-item wave (marker/ordered): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
     "obsidian": {
       "defs": [
         [
@@ -1228,11 +1592,18 @@
       "refs": []
     },
     "ours": {
-      "defs": [],
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.436Z",
+    "recordedAt": "2026-10-17T16:25:28.706Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1254,14 +1625,14 @@
         [
           "1",
           2,
-          4,
+          6,
           2
         ]
       ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.434Z",
+    "recordedAt": "2026-10-17T16:25:28.665Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1283,14 +1654,14 @@
         [
           "1",
           2,
-          4,
+          5,
           2
         ]
       ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.432Z",
+    "recordedAt": "2026-10-17T16:25:28.664Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1319,7 +1690,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.431Z",
+    "recordedAt": "2026-10-17T16:25:28.664Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1348,7 +1719,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.430Z",
+    "recordedAt": "2026-10-17T16:25:28.663Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1377,7 +1748,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.429Z",
+    "recordedAt": "2026-10-17T16:25:28.662Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1406,7 +1777,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.428Z",
+    "recordedAt": "2026-10-17T16:25:28.661Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1435,7 +1806,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.428Z",
+    "recordedAt": "2026-10-17T16:25:28.660Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1450,7 +1821,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:52.195Z",
+    "recordedAt": "2026-10-17T16:25:28.690Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1479,7 +1850,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:52.194Z",
+    "recordedAt": "2026-10-17T16:25:28.689Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1508,7 +1879,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:52.193Z",
+    "recordedAt": "2026-10-17T16:25:28.689Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1523,7 +1894,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.448Z",
+    "recordedAt": "2026-10-17T16:25:28.680Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1541,11 +1912,18 @@
       "refs": []
     },
     "ours": {
-      "defs": [],
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.448Z",
+    "recordedAt": "2026-10-17T16:25:28.679Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1563,11 +1941,18 @@
       "refs": []
     },
     "ours": {
-      "defs": [],
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.447Z",
+    "recordedAt": "2026-10-17T16:25:28.677Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1585,16 +1970,23 @@
       "refs": []
     },
     "ours": {
-      "defs": [],
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.447Z",
+    "recordedAt": "2026-10-17T16:25:28.676Z",
     "obsidianVersion": "1.14.4"
   },
   {
     "markdown": "10. \n\n\t[^1]: x\n",
-    "note": "leading-tab/content-column sweep: marker ten+sp, indent tab. A leading tab puts the definition at column 1 and the marker is irrelevant; a bare marker's content column is its WIDTH; every threshold is contentColumn+4.",
+    "note": "blank-line/empty-item wave (marker/ordered-sp): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
     "obsidian": {
       "defs": [
         [
@@ -1607,11 +1999,18 @@
       "refs": []
     },
     "ours": {
-      "defs": [],
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.447Z",
+    "recordedAt": "2026-10-17T16:25:28.707Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1640,7 +2039,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.446Z",
+    "recordedAt": "2026-10-17T16:25:28.674Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1669,7 +2068,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.445Z",
+    "recordedAt": "2026-10-17T16:25:28.673Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1698,7 +2097,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.444Z",
+    "recordedAt": "2026-10-17T16:25:28.672Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1727,7 +2126,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.443Z",
+    "recordedAt": "2026-10-17T16:25:28.672Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1756,7 +2155,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.442Z",
+    "recordedAt": "2026-10-17T16:25:28.671Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1785,7 +2184,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.441Z",
+    "recordedAt": "2026-10-17T16:25:28.670Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1814,7 +2213,37 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-17T15:03:51.439Z",
+    "recordedAt": "2026-10-17T16:25:28.670Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> quote\n\n\t[^1]: x\n",
+    "note": "blank-line/empty-item wave (ctrl/quote-only): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.702Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "Para\n\n\t[^1]: x\n",
+    "note": "blank-line/empty-item wave (ctrl/para-only): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-17T16:25:28.701Z",
     "obsidianVersion": "1.14.4"
   }
 ]
