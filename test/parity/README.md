@@ -5988,3 +5988,36 @@ nothing downstream is re-parsed, and where the fence and capped-item rules lande
 What is new and worth having is the measurement: the column is 1, the marker is irrelevant, and
 a bare marker's content column is its width. Three facts a tokenizer change needs and none of
 the five attempts had.
+
+### ...and the TOKENIZER attempt refuted the framing, not just the rule
+
+Five repairs had been refused and this file kept saying the route was `legacy-list.ts`'s own
+indent accounting. Built there, gated on the indent being a LEADING tab read from the raw slice:
+
+    with `!seenBlank` carried over from the branch above   referee 5762 -> 5763   code 742 -> 741
+    without it                                            referee 5762 -> 5760   code 742 -> 734
+
+A wash, then negative. And in BOTH versions the probe shapes still came back as code, which is
+the tell that mattered more than either number -- a change that cannot reproduce the sixty
+measurements it was built from is not a scoping problem.
+
+**The tree says why, and it invalidates how this family has been framed all along:**
+
+    "-" / blank / "⇥[^1]: x"    list@1:1-1:2  then  code@3:1-3:9 AT ROOT
+    "-" / "⇥[^1]: x"            list@1:1-2:9  with  footnoteDefinition INSIDE the item
+
+A blank line ends an EMPTY list item, so the tab-led line is evaluated at root and
+`tokenizeIndent` is never consulted for it. Every one of the sixty probes has that blank. So the
+family is not an item-continuation question in those documents, and five attempts plus these two
+scopings were all editing a code path the failing cases do not reach.
+
+**What it is instead, stated as the lead rather than the answer.** A bare `⇥[^1]: def` at root
+is NO definition on both sides -- already probed and recorded above. Put a bare `-` and a blank
+line in front of it and Obsidian reports a definition at column 1. The only thing that can
+explain both is that Obsidian's empty list item SURVIVES the blank line and still owns the tab
+line, where ours closes at the marker. That is a different divergence from the indent threshold,
+it is upstream of every repair tried here, and it is where the next attempt belongs.
+
+Reverted rather than shipped: a change on the most dangerous file in the package that measures a
+wash in one scoping and -10 in the other is dead code with risk attached. Baseline restored
+exactly -- referee 5762, code 742.
