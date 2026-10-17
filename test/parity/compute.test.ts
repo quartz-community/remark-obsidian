@@ -165,6 +165,29 @@ describe("positioned oracle", () => {
     // the MARKER'S SEPARATOR rather than indentation after a space, so `+\t   [^1]: def`
     // turns on micromark's list-item tab straddle instead of the code threshold.
     "probe/def-tab/marker-tab-spaces: the tab is the marker's own separator",
+    // AN UNCLOSED `%%` HOSTED BY A LIST ITEM buries the definition below it, and Obsidian
+    // indexes the buried label as a REFERENCE at its own position -- the asymmetry
+    // `parseComments` implements and 710 documents depend on. We define instead, so we are
+    // short exactly that reference. These five are the minimised forms of 67 referee
+    // documents, reduced against the running app, and `item-comment/five-space` is the
+    // control that MATCHES: five spaces past the marker put the `%%` four columns into the
+    // item's content, where it is indented code and opens nothing.
+    //
+    // The rule is derived and scored -- `better 9 / worse 0` with the cap and a
+    // lazy-continuation bound -- and refused on SIZE, because full agreement moves by zero on
+    // both the strict and the referee metric. So it is a gap we intend to close, not an
+    // impossibility.
+    "probe/item-comment/tab: an item-hosted unclosed `%%` buries the definition",
+    "probe/item-comment/two-space: as item-comment/tab, space separator",
+    "probe/item-comment/four-space: as item-comment/tab, still at the content column",
+    "probe/item-comment/quoted: as item-comment/tab, item inside a blockquote",
+    "probe/item-comment/closed: a CLOSED `%%` region hosted by an item buries it too",
+    // A TAB AFTER A QUOTE MARKER ends the quote, so the following column-0 line is a ROOT
+    // definition. We index the label as a reference instead. `quote-tab-root-def/space` and
+    // `/two-space` are the controls and both MATCH -- with a space the line lazily continues
+    // the quote's paragraph and defines nothing on either side, which is what makes this a
+    // rule about the TAB rather than about quoted definitions.
+    "probe/quote-tab-root-def/tab: a tab ends the quote, so the next line defines",
   ];
 
   it("places every footnote reference, except the classified cases", () => {
@@ -421,8 +444,8 @@ describe("positioned oracle", () => {
     //   tab-quote family, which the MAIN GATE CANNOT SEE because `meta.footnotes` is names
     //   only. The names and the rule are right -- that family took the referee from 5717 to
     //   5744 -- and a column or end line is out by the quote's own prefix.
-    footnotes: 5,
-    footnoteRefs: 5,
+    footnotes: 11,
+    footnoteRefs: 11,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
     // Obsidian reports a heading's column as its containing block's content column,
@@ -567,7 +590,7 @@ describe("positioned oracle", () => {
     // Note the other eleven new probes diverge on `sections` ONLY by two zero-width
     // `text`/`element` entries past the document, which `sourceBacked` filters -- the
     // renderer's relocated footnote section, already classified must-not-fix for `blocks`.
-    sections: 1,
+    sections: 2,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
     // invented, which is the shape of a missing collector rather than a parse bug.
@@ -932,7 +955,7 @@ describe("positioned oracle", () => {
     // now accepts a quote-prefixed line after a LIST, which is the same shape as the `html`
     // and `heading` entries it already restricted to a list, with the same evidence -- one
     // recorded probe per container.
-    listItems: 4,
+    listItems: 6,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
@@ -977,6 +1000,21 @@ describe("positioned oracle", () => {
     "probe/caret-link/link-with-def:footnoteRefs",
     "probe/caret-link/link-with-def:links",
     "probe/def-gap/marker-tab-sep:footnotes",
+    "probe/item-comment/closed:footnoteRefs",
+    "probe/item-comment/closed:footnotes",
+    "probe/item-comment/closed:listItems",
+    "probe/item-comment/closed:sections",
+    "probe/item-comment/four-space:footnoteRefs",
+    "probe/item-comment/four-space:footnotes",
+    "probe/item-comment/quoted:footnoteRefs",
+    "probe/item-comment/quoted:footnotes",
+    "probe/item-comment/quoted:listItems",
+    "probe/item-comment/tab:footnoteRefs",
+    "probe/item-comment/tab:footnotes",
+    "probe/item-comment/two-space:footnoteRefs",
+    "probe/item-comment/two-space:footnotes",
+    "probe/quote-tab-root-def/tab:footnoteRefs",
+    "probe/quote-tab-root-def/tab:footnotes",
     "probe/def-gap/marker-tab-sep:listItems",
     "probe/def-gap/marker-tab-sep:sections",
     "probe/def-tab/marker-tab-spaces:footnoteRefs",

@@ -2116,6 +2116,54 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/nested-comment/two-deep-then-quoted", "> > %%\n> > a%%\n"],
   ["probe/nested-comment/one-deep-then-lazy", "> %%\nem*\n"],
 
+  // AN UNCLOSED `%%` WHOSE OPENER IS A LIST ITEM'S OWN CONTENT, with the five-space cap.
+  //
+  // `quote-comment-lazy.ts` ships this rule for a blockquote at depth 2+. The same decision is
+  // open for a list item, and these cases are the minimised forms of 67 referee documents --
+  // reduced against the running app by `referee-shrink --live`, so each one is ground truth
+  // rather than a re-based lead.
+  //
+  // Obsidian reports NO definition and indexes the buried label AS A REFERENCE at its own
+  // position, which is the asymmetry `parseComments` already implements and 710 documents
+  // depend on: `1.⇥%%` / `⟨2sp⟩[^3]: It` gives `defs []` and `refs [["3",1,2],["3",3,3]]`.
+  //
+  // `four-space` and `five-space` are the DISCRIMINATING PAIR and the reason this family is
+  // here rather than implemented from the shorter cases alone. Four spaces past the marker
+  // still leaves the `%%` at the item's content column, where it opens a comment; five puts it
+  // four columns in, where it is INDENTED CODE and opens nothing -- so `five-space` is the one
+  // case in the family Obsidian DEFINES. That is the measured rule "a `%%` indented four
+  // columns is CODE", worth +7 referee documents, reaching a list item.
+  //
+  // SCORED AND NOT IMPLEMENTED. With the cap and a lazy-continuation bound the rule is
+  // `better 9 / worse 0` and moves full agreement by ZERO -- all nine documents still disagree
+  // on something else -- so it is refused on size, not on correctness. The probes carry the
+  // characterisation so the next reader does not re-derive it, which is what this layer is for.
+  ["probe/item-comment/tab", "1.\t%%\n  [^3]: It\n\nuse[^3]\n"],
+  ["probe/item-comment/two-space", "+  %%\n[^note]: It\n\nuse[^note]\n"],
+  ["probe/item-comment/four-space", "+    %%\n[^note]: It\n\nuse[^note]\n"],
+  ["probe/item-comment/five-space", "*     %%\n[^note]: It\n\nuse[^note]\n"],
+  ["probe/item-comment/closed", "+  %%\n[^note]: It\n%%\n\nuse[^note]\n"],
+  ["probe/item-comment/quoted", "> +  %%\n> [^note]: It\n\nuse[^note]\n"],
+
+  // A TAB AFTER A QUOTE MARKER ENDS THE QUOTE, so the next line is a ROOT definition.
+  //
+  // The minimised form of 40 referee documents, and the shortest is eight characters past the
+  // marker. Obsidian DEFINES the root label after a tabbed quote line and we index it as a
+  // reference instead:
+  //
+  //     >⇥It / [^3]: Def        obs defs [["3",1,0]]   ours: a REFERENCE at 1:0
+  //     > It / [^3]: Def        obs defs []            we agree -- lazy continuation
+  //     >⟨2sp⟩It / [^3]: Def    obs defs []            we agree
+  //
+  // The space forms are the controls that make this a rule about the TAB rather than about
+  // quoted definitions: with a space the root line lazily continues the quote's paragraph and
+  // defines nothing, on both sides. `quote-tab.ts` already handles a tab-marked definition
+  // INSIDE a mixed quote, worth +27; this is the other half, where the tab is on the quote's
+  // own content and the definition is at root.
+  ["probe/quote-tab-root-def/tab", ">\tIt\n[^3]: Def\n\nuse[^3]\n"],
+  ["probe/quote-tab-root-def/space", "> It\n[^3]: Def\n\nuse[^3]\n"],
+  ["probe/quote-tab-root-def/two-space", ">  It\n[^3]: Def\n\nuse[^3]\n"],
+
   // A footnote label that looks like something else.
   //
   // `[^ ]`, `[^blk](u)` and `][^[^1]](` all reduced out of the sweep. The label rules

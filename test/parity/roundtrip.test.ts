@@ -30,6 +30,23 @@ const UNSTABLE: readonly string[] = [
   "fuzz/inline-footnote/11",
   "hunt/fix-lazy-setext-chain-not-idempotent/1",
   "probe/bracket-nest/label-autolink-closer",
+  // 20 with the `probe/item-comment/*` promotion. One of the six new cases is unstable and it
+  // CONVERGES, which is the distinction this list exists to make -- measured pass by pass
+  // rather than inferred from the convergence gate passing:
+  //
+  //     src    "+  %%\n[^note]: It\n%%\n\nuse[^note]\n"
+  //     pass1  "* %%\n  %%\n  [^note]: It\n      %%\n\nuse[^note]\n"
+  //     pass2  "* %%\n  %%\n  [^note]: It\n\n      %%%%\n\nuse[^note]\n"
+  //     pass3  "* %%\n  %%\n\n  [^note]: It\n\n      %%%%\n\nuse[^note]\n"
+  //     pass4  identical to pass3 -- CONVERGED
+  //
+  // The item's `%%` is re-emitted as its own line and the CLOSING marker is written at six
+  // columns as `%%%%`, where it is indented code rather than a closer. That is the same
+  // missing-handler debt as the math group below: a comment region hosted by a list item has
+  // no `toMarkdown` handler that writes its closer back at the item's content column. It
+  // reaches a fixed point on the fourth pass and holds, so repeated formatting settles -- not
+  // the backslash-growing shape refused outright for corrupting a file on every pass.
+  "probe/item-comment/closed",
   "probe/label-shape/space-only-defined",
   "probe/math-indent/one-space-empty-body",
   "probe/math-retry/five-double-closer",

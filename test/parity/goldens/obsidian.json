@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-16T03:06:52.376Z",
+  "recordedAt": "2026-10-17T07:46:21.989Z",
   "cases": {
     "probe/label-bracket/full-unmatched-undefined": {
       "id": "probe/label-bracket/full-unmatched-undefined",
@@ -71861,6 +71861,533 @@
           "headings": [],
           "sections": [
             "blockquote@0:0-1:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/item-comment/tab": {
+      "id": "probe/item-comment/tab",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "1.\t%%\n  [^3]: It\n\nuse[^3]\n",
+      "obsidian": {
+        "html": "<ol>\n<li dir=\"auto\"></li>\n</ol>\n<p dir=\"auto\">use3</p>",
+        "projections": {
+          "text": "use3",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "1.\t%%\n  [^3]: It"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^3]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:10",
+            "paragraph@3:0-3:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:10"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "an unclosed `%%` whose opener is a list item's own content buries the definition below it and Obsidian indexes the label as a reference; rule derived and scored 9 better / 0 worse, refused on size (agreement flat)"
+    },
+    "probe/item-comment/two-space": {
+      "id": "probe/item-comment/two-space",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "+  %%\n[^note]: It\n\nuse[^note]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\"></li>\n</ul>\n<p dir=\"auto\">usenote</p>",
+        "projections": {
+          "text": "usenote",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "+  %%\n[^note]: It"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^note]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:11",
+            "paragraph@3:0-3:10"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:11"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "as item-comment/tab, with a space separator"
+    },
+    "probe/item-comment/four-space": {
+      "id": "probe/item-comment/four-space",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "+    %%\n[^note]: It\n\nuse[^note]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\"></li>\n</ul>\n<p dir=\"auto\">usenote</p>",
+        "projections": {
+          "text": "usenote",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "+    %%\n[^note]: It"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^note]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:11",
+            "paragraph@3:0-3:10"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:11"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "as item-comment/tab; four spaces still leaves the `%%` at the item's content column, so it still opens a comment -- five-space is the control that defines"
+    },
+    "probe/item-comment/five-space": {
+      "id": "probe/item-comment/five-space",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "*     %%\n[^note]: It\n\nuse[^note]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<pre><code>%%\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</li>\n</ul>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"note\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>It<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "%% use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "*     %%\n[^note]: It"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^note]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "note"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "note@1:0-1:11"
+          ],
+          "footnoteRefs": [
+            "note@3:3"
+          ],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:11",
+            "paragraph@3:0-3:10",
+            "text@4:0-4:0",
+            "element@4:0-4:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:11"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/item-comment/closed": {
+      "id": "probe/item-comment/closed",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "+  %%\n[^note]: It\n%%\n\nuse[^note]\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\"></li>\n</ul>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "+  %%\n[^note]: It"
+            },
+            {
+              "type": "comment",
+              "text": "%%\n\nuse[^note]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-1:11",
+            "comment@2:0-5:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:11"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "a CLOSED `%%` region hosted by a list item also buries the definition; different mechanism from the unclosed cases, owned by commentRegionTransform"
+    },
+    "probe/item-comment/quoted": {
+      "id": "probe/item-comment/quoted",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> +  %%\n> [^note]: It\n\nuse[^note]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<ul>\n<li dir=\"auto\"></li>\n</ul>\n</blockquote>\n<p dir=\"auto\">usenote</p>",
+        "projections": {
+          "text": "usenote",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> +  %%\n> [^note]: It"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^note]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:13",
+            "paragraph@3:0-3:10"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:2-1:13"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "as item-comment/tab, with the item inside a blockquote; the rule is about the item, not its host"
+    },
+    "probe/quote-tab-root-def/tab": {
+      "id": "probe/quote-tab-root-def/tab",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": ">\tIt\n[^3]: Def\n\nuse[^3]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<pre><code>It\n</code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</blockquote>\n<p dir=\"auto\">use<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"3\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>Def<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+        "projections": {
+          "text": "It use⟨fn⟩",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": ">\tIt\n[^3]: Def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^3]"
+            },
+            {
+              "type": "text",
+              "text": ""
+            },
+            {
+              "type": "element",
+              "text": ""
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": [
+            "3"
+          ]
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [
+            "3@1:0-1:9"
+          ],
+          "footnoteRefs": [
+            "3@3:3"
+          ],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:9",
+            "paragraph@3:0-3:7",
+            "text@4:0-4:0",
+            "element@4:0-4:0"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "a tab after a quote marker ends the quote, so the following column-0 line is a ROOT definition; we index the label as a reference instead. The space controls agree on both sides"
+    },
+    "probe/quote-tab-root-def/space": {
+      "id": "probe/quote-tab-root-def/space",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "> It\n[^3]: Def\n\nuse[^3]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p>It<br>\n3: Def</p>\n</blockquote>\n<p dir=\"auto\">use3</p>",
+        "projections": {
+          "text": "It 3: Def use3",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": "> It\n[^3]: Def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^3]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:9",
+            "paragraph@3:0-3:7"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match"
+    },
+    "probe/quote-tab-root-def/two-space": {
+      "id": "probe/quote-tab-root-def/two-space",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": ">  It\n[^3]: Def\n\nuse[^3]\n",
+      "obsidian": {
+        "html": "<blockquote dir=\"auto\">\n<p> It<br>\n3: Def</p>\n</blockquote>\n<p dir=\"auto\">use3</p>",
+        "projections": {
+          "text": "It 3: Def use3",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "blockquote",
+              "text": ">  It\n[^3]: Def"
+            },
+            {
+              "type": "paragraph",
+              "text": "use[^3]"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "blockquote@0:0-1:9",
+            "paragraph@3:0-3:7"
           ],
           "links": [],
           "embeds": [],
