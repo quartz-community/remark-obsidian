@@ -6366,3 +6366,24 @@ the mechanism map predicts for a family after its coherent clusters are taken.
 So the shrink is mined out: two rules shipped from it (+20 referee between them), one cluster
 refused with numbers, one below the bar, and the list-marker cluster held by the pass-ordering
 question recorded above. That is a complete accounting of 69 forms rather than a stopping point.
+
+### The pass-ordering question, answered: same code, early inert, late +4
+
+The item-hosted tab rule scored `better 21 / worse 7` for +4 and was completely inert when
+built beside its quote-hosted sibling, early in the chain next to the comment and fence
+absorptions. Moved to the late section that settles a definition's extent -- after
+`definitionTrimTransform`, `definitionBlankTailTransform` and `definitionBlankTitleTransform`,
+which the chain already comments as "after every pass that can extend a definition" -- the
+same code is worth exactly its score:
+
+    early placement   referee 5823 -> 5823   inert
+    late placement    referee 5823 -> 5827   +4, code held, 0 corpus regressions
+
+So a positive score locates a RULE and not a position, and the two have to be measured
+separately. The scorer runs against the final tree, where the definitions this removes exist;
+a pass runs where it is registered, and early in the chain those definitions have not been
+created yet. Nothing in the score could have said so.
+
+That is now a procedure rather than an anecdote: **when a scored rule builds inert, move it
+before abandoning it.** The chain's own comments mark the phases, and a rule about a
+definition's extent belongs with the other passes that settle one.
