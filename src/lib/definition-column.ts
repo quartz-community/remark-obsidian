@@ -3,6 +3,8 @@ import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 
 const MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]+/u;
+/** The same marker with NOTHING after it: an empty item, whose content column is its width. */
+const BARE_MARKER = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]*$/u;
 
 /**
  * A footnote definition starts at its containing block's content column.
@@ -261,7 +263,27 @@ export function contentColumn(
   const nl = source.indexOf("\n", from);
   const line = source.slice(bol, nl === -1 ? undefined : nl);
   const opener = MARKER.exec(line);
-  if (!opener) return undefined;
+  if (!opener) {
+    // A BARE MARKER -- nothing after it on its line -- has a content column of its own WIDTH.
+    //
+    // `MARKER` needs `[ \t]+`, so an empty item never matched and this returned `undefined`,
+    // leaving the definition's column to a fallback. Probed across four marker widths, with
+    // the code threshold confirming each at `contentColumn + 4`:
+    //
+    //     "-"    / blank / "⟨1sp⟩[^1]: x"   col 1    "⟨5sp⟩" -> CODE
+    //     "10."  / blank / "⟨3sp⟩[^1]: x"   col 3
+    //
+    // CommonMark would give `W + 1` here. Obsidian gives `W`, and the `+1` belongs to a
+    // separator that is actually present -- `- ` really is 2 and `10. ` really is 4.
+    //
+    // Fixed HERE rather than in the tokenizer, which is measured: `containerState.size` is both
+    // the ownership threshold and the `factorySpace` consumption limit, so lowering it there
+    // caps a tab at two columns and collapses ten probe rows to code, while widening the limit
+    // to compensate costs 366 referee documents.
+    const bare = BARE_MARKER.exec(line);
+    if (!bare) return undefined;
+    return Math.min(bare[0].trimEnd().length, deIndentFloor(source, item));
+  }
   // Applied to BOTH paths below, because the marker's width is only ever an upper bound: a
   // continuation line indented below it pulls the content column down with it, and the
   // five-space cap is the same quantity measured a different way.
