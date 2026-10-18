@@ -51,6 +51,7 @@ const QUOTES = new Set(["blockquote", "callout"]);
 export function quoteLazyIndentedCodeTransform(
   tree: Root,
   source: string,
+  reparse: (markdown: string) => Root,
 ): void {
   if (source === "") return;
 
@@ -100,6 +101,7 @@ export function quoteLazyIndentedCodeTransform(
       const run = lazyRun(position.start.line - 1, position.end.line - 1);
       if (!run) continue;
       const [first, last] = run;
+      const quoteEnd = position.end.line - 1;
 
       const code: Code = {
         type: "code",
@@ -132,7 +134,26 @@ export function quoteLazyIndentedCodeTransform(
         column: (lines[first - 1]?.length ?? 0) + 1,
         offset: (starts[first - 1] ?? 0) + (lines[first - 1]?.length ?? 0),
       });
-      children.splice(index + 1, 0, code as RootContent);
+
+      // WHATEVER THE QUOTE HELD AFTER THE RUN IS RE-PARSED, NOT DROPPED. `> q` / `> - i` /
+      // `⟨4sp⟩lazy` / `> after` is `blockquote, code, blockquote` to Obsidian -- the marked
+      // line resumes a SECOND quote -- and the clamp above has just deleted it along with
+      // everything else past the cut. Restricting the rule to a run that reaches the quote's
+      // last line avoids the deletion and costs referee 5860 -> 5858 and code 775 -> 758, so
+      // the tail has to be rebuilt rather than avoided.
+      const tail: RootContent[] = [];
+      if (last < quoteEnd) {
+        const from = starts[last + 1]!;
+        // To the QUOTE's end, not the document's: the quote's siblings were never touched,
+        // and re-parsing past it would insert a second copy of the rest of the note.
+        const to = starts[quoteEnd]! + (lines[quoteEnd]?.length ?? 0);
+        const parsed = reparse(source.slice(from, to));
+        for (const child of parsed.children) {
+          shiftBy(child, from);
+          tail.push(child);
+        }
+      }
+      children.splice(index + 1, 0, code as RootContent, ...tail);
     }
   };
   walk(tree as unknown as { children?: RootContent[] });
@@ -142,6 +163,26 @@ interface Point {
   line: number;
   column: number;
   offset: number;
+}
+
+/**
+ * Move a re-parsed subtree onto its real place in the document, by OFFSET only.
+ *
+ * `normalizePointsTransform` rebuilds every line and column from the offsets later, so
+ * shifting those here would be work the chain undoes -- and these notes record offsets as the
+ * thing that must be right before that pass runs.
+ */
+function shiftBy(node: unknown, offset: number): void {
+  const self = node as {
+    position?: { start: { offset?: number }; end: { offset?: number } };
+    children?: unknown[];
+  };
+  if (self.position) {
+    for (const point of [self.position.start, self.position.end]) {
+      point.offset = offset + (point.offset ?? 0);
+    }
+  }
+  for (const child of self.children ?? []) shiftBy(child, offset);
 }
 
 /**

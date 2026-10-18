@@ -6713,3 +6713,59 @@ that STARTS before the cut and ENDS after it -- the lazily continued paragraph, 
 entire defect -- survives the drop with its end intact. 15 `SIBLINGS OVERLAP` violations in
 `compose.test.ts`, from a gate that walks the composition space rather than the corpus. The
 fix clamps the subtree to the cut, value included, rather than shrinking it onto a child.
+
+### Widening the axis found a content-DELETING defect in the rule it had just shipped
+
+Seven widenings were screened before any were built, which is now the standing procedure
+here. Each was asked of the live app at six indents, with our own answer beside it:
+
+    shape            obs varies   we diverge
+    tail (current)      2/6       ......
+    mid                 2/6       ..XXXX      <- the only live one
+    run x2              2/6       ......
+    bare `>` marker     2/6       ......
+    split block         2/6       ......
+    depth 2             2/6       ......
+    list host           1/6       ......
+
+**One of seven.** A second lazy line, a bare marker head, a split multi-line block, two levels
+of quote and a list host all agree at every indent, so six candidate widenings were refuted
+for the price of one sweep.
+
+And `mid` -- a lazy line with a MARKED line after it -- was diverging because
+`quoteLazyIndentedCodeTransform`, shipped an hour earlier, was **deleting the marked line**:
+
+    "> quote" / "> - item" / "⟨4sp⟩lazy[^1]" / "> after"
+      obs   blockquote@0-1  code@2-2  blockquote@3-3  paragraph@5-5
+      ours  blockquote@0    code@2                    paragraph@5
+
+The clamp cuts the quote at the first lazy indented line and everything past the cut goes with
+it, including content that is not part of the code run at all. Obsidian resumes a SECOND
+blockquote on the marked line.
+
+**Restricting the rule to a run that reaches the quote's last line avoids the deletion and
+costs referee 5860 -> 5858 and code 775 -> 758**, so avoidance was refused and the tail is
+re-parsed in place instead -- bounded to the quote's own end, because slicing to the end of
+the document inserts a second copy of the note. That took the rule from +9 to **+17**:
+
+    referee  5851 -> 5860 (no tail) -> 5868 (tail re-parsed)
+    code      742 -> 775 -> 775
+
+So the axis caught a defect in the rule it had itself produced, one commit later, in a shape
+the corpus and the referee had both passed. That is the argument for sweeping a space rather
+than shrinking documents out of it.
+
+### ...and exposed a 32-cell family that was there all along
+
+    "> [!note] title" / "> # heading" / "lazy[^1]" / "> after"
+      obs   callout@0                paragraph@5
+      ours  callout@0  blockquote@3  paragraph@5
+
+A block that ENDS a container -- heading, setext, fence, comment, thematic, table, math, html,
+which is `--matrix`'s "absorbed by nothing" set -- does not stop the container reclaiming a
+later MARKED line. Obsidian keeps `> after` in the original section and we start a second
+blockquote. 8 blocks x 4 containers x the 4 sub-threshold indents, and the new pass is not
+involved in any of them: every one is below the four-column threshold, so it never fires.
+
+Recorded in `DIVERGING` as the axis's BACKLOG rather than an accepted floor, since it has not
+been scored. The axis now stands at 32 of 960.

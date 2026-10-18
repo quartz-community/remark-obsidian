@@ -90,11 +90,56 @@ const DIVERGING: Record<Axis, readonly string[]> = {
   isolate: [],
   nested: ["quote > callout > footnote"],
   inline: [],
-  // Opened at 16 and CLOSED by `quoteLazyIndentedCodeTransform` in the same session. All
-  // sixteen were one rule -- a lazy line four columns under a root quote is root indented
-  // code -- and the axis exists because no other one can generate a partially prefixed
-  // container body: `--inside` prefixes every line of its inner block.
-  lazy: [],
+  // Opened at 16, CLOSED by `quoteLazyIndentedCodeTransform`, then WIDENED with the `mid`
+  // shape -- a lazy line with a marked line after it -- which exposed these 32.
+  //
+  // They are PRE-EXISTING and not that pass: it never fires here, because every one is an
+  // indent below the four-column threshold. The mechanism is uniform across all 32:
+  //
+  //     "> [!note] title" / "> # heading" / "lazy[^1]" / "> after"
+  //       obs   callout@0                paragraph@5
+  //       ours  callout@0  blockquote@3  paragraph@5
+  //
+  // A block that ENDS a container -- heading, setext, fence, comment, thematic, table, math,
+  // html, which is `--matrix`'s "absorbed by nothing" set -- does not stop the container
+  // reclaiming a later MARKED line. Obsidian keeps `> after` in the original section; we
+  // start a second blockquote. 8 such blocks x 4 containers x the 4 sub-threshold indents.
+  //
+  // Not scored yet, so not triaged: it is the axis's backlog rather than an accepted floor.
+  lazy: [
+    "callout [ comment ] 1sp mid",
+    "callout [ comment ] 2sp mid",
+    "callout [ comment ] 3sp mid",
+    "callout [ comment ] bare mid",
+    "callout [ fence ] 1sp mid",
+    "callout [ fence ] 2sp mid",
+    "callout [ fence ] 3sp mid",
+    "callout [ fence ] bare mid",
+    "callout [ heading ] 1sp mid",
+    "callout [ heading ] 2sp mid",
+    "callout [ heading ] 3sp mid",
+    "callout [ heading ] bare mid",
+    "callout [ html ] 1sp mid",
+    "callout [ html ] 2sp mid",
+    "callout [ html ] 3sp mid",
+    "callout [ html ] bare mid",
+    "callout [ math ] 1sp mid",
+    "callout [ math ] 2sp mid",
+    "callout [ math ] 3sp mid",
+    "callout [ math ] bare mid",
+    "callout [ setext ] 1sp mid",
+    "callout [ setext ] 2sp mid",
+    "callout [ setext ] 3sp mid",
+    "callout [ setext ] bare mid",
+    "callout [ table ] 1sp mid",
+    "callout [ table ] 2sp mid",
+    "callout [ table ] 3sp mid",
+    "callout [ table ] bare mid",
+    "callout [ thematic ] 1sp mid",
+    "callout [ thematic ] 2sp mid",
+    "callout [ thematic ] 3sp mid",
+    "callout [ thematic ] bare mid",
+  ],
   "inline-block": [
     "comment [ embed ]",
     "comment [ inlinefn ]",

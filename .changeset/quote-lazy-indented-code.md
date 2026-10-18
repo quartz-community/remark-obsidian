@@ -19,6 +19,10 @@ It applies to a quote starting at column 0 only. A quote nested in a list item o
 produces no root code at any indent from zero to twelve, because its lazy line belongs to the
 container above it.
 
+Content after the code block is re-parsed rather than dropped. `> quote` / `> - item` /
+four spaces `lazy` / `> after` is a blockquote, a code block and a second blockquote in
+Obsidian — the marked line resumes a quote — so the lines the rule cuts away are rebuilt in
+place instead of being deleted with the rest.
+
 Found by a new composition axis that generates partially prefixed container bodies, which is a
 shape no existing sweep could express — the others prefix every line of the nested block.
-Sixteen of its 512 cells diverged, all of them this rule, and the axis is at zero now.

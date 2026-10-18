@@ -348,6 +348,13 @@ const INNER: ReadonlyArray<readonly [string, string]> = [
  *
  * `marked` is appended as the control -- the follower carrying the container's own prefix,
  * which is `--inside`'s shape and therefore the cell whose answer is already swept.
+ *
+ * EACH INDENT IS SWEPT TWICE, with the lazy line LAST and with a marked line after it. Seven
+ * widenings were screened once the axis had closed at its first shape, and only that one is
+ * live -- a second lazy line, a bare `>` marker as the head, a split multi-line block, two
+ * levels of quote and a list host all AGREE at every indent. The `mid` shape is where
+ * `quoteLazyIndentedCodeTransform` was dropping the marked line entirely, so it is swept to
+ * keep that fixed rather than because the grid looked incomplete.
  */
 const LAZY_INDENTS: ReadonlyArray<readonly [string, string]> = [
   ["bare", ""],
@@ -543,6 +550,10 @@ export function casesFor(axis: Axis): Case[] {
           cases.push({
             name: `${container} [ ${innerName} ] ${indentName}`,
             text: `${head}\n${body}\n${indent}lazy[^1]\n\nuse[^1]\n`,
+          });
+          cases.push({
+            name: `${container} [ ${innerName} ] ${indentName} mid`,
+            text: `${head}\n${body}\n${indent}lazy[^1]\n${prefix}after\n\nuse[^1]\n`,
           });
         }
         cases.push({

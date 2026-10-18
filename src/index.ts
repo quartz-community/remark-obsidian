@@ -733,7 +733,9 @@ export default function remarkObsidian(
     definitionTabAfterQuoteTransform(tree, String(file));
     // Beside the two above, and before every footnote pass: the lines this turns into code
     // must stop looking like definitions and references BEFORE anything indexes them.
-    quoteLazyIndentedCodeTransform(tree, String(file));
+    quoteLazyIndentedCodeTransform(tree, String(file), (markdown) =>
+      reparse(markdown),
+    );
     // Before the footnote passes, so a definition this recovers is one they see.
     indentTabTransform(tree, String(file), (markdown) => reparse(markdown));
     // Unconditional, unlike the continuation pass above it: a definition whose
