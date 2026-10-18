@@ -6806,3 +6806,44 @@ time.
 
 The honest next step is `pass-owner.mts`'s removal sweep pointed at this shape, which is the
 instrument built for exactly this question and has not been run on it.
+
+### ...and the removal sweep named the pass in one run, against two wrong guesses
+
+The correction above left the question "which pass merges the blockquote?" open, and recorded
+that reading the likely-looking one would be a guess. It would have been the WRONG guess
+twice over -- `absorbPass` was the obvious candidate and is not the pass, and the option
+bisect says why nobody could have narrowed it by reading:
+
+    flipping all 20 boolean options, one at a time : NOT ONE changes the result
+
+So it is an unguarded pass, and 61 of those run on every document. Removing each in turn and
+re-parsing the one document names them both:
+
+    REMOVING containerLazyTransform   blockquote@1-2  paragraph@3  blockquote@4
+    REMOVING quoteMergeTransform      blockquote@1-3               blockquote@4
+
+Two passes in sequence: `containerLazyTransform` absorbs the lazy line, then
+`quoteMergeTransform` joins the two quotes. **The second is 27 lines long and the fix is one
+token** -- its pair test names `blockquote` on both sides, so a callout on the left is
+declined. Third instance of "same rule, two node types" in this package.
+
+All four combinations were probed before the edit rather than after, and the merged container
+always takes the FIRST one's type:
+
+    quote   + quote     blockquote@0-3    already merged
+    callout + quote     callout@0-3       the 32 cells, now fixed
+    quote   + callout   blockquote@0-3    left alone
+    callout + callout   callout@0-3       left alone
+
+**The two with a callout on the RIGHT are refused on a derived reason, not forgotten.** The
+merge pushes the second container's children into the first, and a second callout brings a
+`calloutTitle` with it -- so a symmetric fix produces a callout claiming two titles where
+Obsidian renders one whose `[!tip] x` line is ordinary body text. Demoting that title is a
+separate question and neither shape is in the axis.
+
+    compose --lazy   32 -> 0 of 960
+    referee          5868 -> 5869,  code 775 held
+    corpus           0 regressions, 450 tests, 4 gates green
+
+So the axis has now opened and closed twice in one session, and the second cycle cost one
+token in a pass nobody had read, found by the instrument built for exactly that question.
