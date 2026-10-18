@@ -7034,3 +7034,53 @@ That is the experiment to run next, and it is a one-line change to a limit rathe
 machinery. It is deliberately not attempted here: this file records B3's minimum applied in
 the same function costing 32 referee documents and four CommonMark list cases, so a limit
 change wants its own measured cycle rather than the tail of a long one.
+
+### The tokenizer attempt: the discriminator WORKS and the plumbing does not
+
+Built, proven correct, measured inert, reverted. Worth recording in full because the hard half
+is done and the remaining unknown is now one sentence.
+
+**First, a correction to the section above.** It called this "a one-line change to a limit",
+and that is wrong. `factorySpace(max)` consumes `max - 1`, so the item's own indent of 5 eats
+all four columns and stock's `tabSize` of 4 eats three and leaves one -- and a fence under
+four columns is still a FENCE. Producing indented code needs the indent UNTOUCHED, which means
+`max` of 1, which breaks every sibling marker. No limit value works; the decision has to be
+made on the line's CONTENT.
+
+**So the construct boundaries were pinned first, seventeen probes, and every one is the
+construct's own validity rule rather than a fitted list:**
+
+    ENDS the item    ``` ~~~  # (1-6, with a space)  - + 1. 2) (a DIFFERENT marker)  %%
+    ABSORBED         plain  >  ---  <div>  $$  |  [^1]:  ===
+                     `*` under `*`     -- same marker, the absorption map's own row
+                     `#tag`, `####### h` -- not ATX: no space, and seven hashes
+                     `--`, two backticks, a single `%` -- not a marker, fence or comment
+
+`---` is absent from the trigger set for the reason `atMarker` already records from the other
+side: only a marker with a second reading loses, and a thematic break reads as a setext
+underline.
+
+**`endsItemConstruct` implements that and FIRES EXACTLY AS MEASURED.** Instrumented, on three
+controls:
+
+    "*⟨4sp⟩Text" / "⟨4sp⟩```"     [endsItem] FIRED       correct
+    "*⟨4sp⟩Text" / "⟨4sp⟩plain"   did not fire           correct
+    "*⟨4sp⟩Text" / "⟨4sp⟩* i"     did not fire           correct -- same marker
+
+So the rule, the column window and the marker-identity test are all right in the tokenizer.
+
+**And the tree does not change.** `list@1-2` before and after, with no `code` node: returning
+`nok` from the list continuation does not hand the line back to flow with its indent intact.
+Two plumbing attempts, neither moving anything:
+
+    check -> nok                              list@1-2, unchanged
+    check -> set `_closeFlow`, clear `interrupt`, then nok    list@1-2, unchanged
+
+That is two substantive failures, which is this file's stop condition, so it is reverted rather
+than left in as dead code -- the standing rule for a provably inert `src` change.
+
+**The remaining unknown, stated precisely:** when a container's continuation declines, what
+makes micromark re-evaluate the line from column 0 with its whitespace unconsumed? Everything
+else about this family is now measured. The next attempt should answer that question against
+micromark's own document tokenizer before touching `legacy-list.ts` again -- the construct is
+written and proven, and reinstating it is a paste once the release path is understood.
