@@ -71,6 +71,19 @@ import type { Def, Facts, Ref } from "./referee-facts.js";
  * direction.
  */
 function liveSignature(text: string, obs: Answer): string {
+  // REFS ARE DROPPED when the augmentation did not take, which is not a detail.
+  //
+  // `footnoteRefs` is definition-gated, so references are read from a copy carrying one
+  // synthesised definition per name -- and a document that SWALLOWS its tail eats them. An
+  // unclosed fence, an unclosed `%%` and an unclosed `$$` all do. The channel already detects
+  // it and this function ignored the flag, so a ref-only divergence that is really "the probe
+  // never fired" read as a real one and the shrink minimised toward it.
+  //
+  // Measured on the `ref-extra` run: 28 of 115 reported minimal forms are this artifact, and
+  // the shortest is `hidden[^2]` over an unclosed fence -- where the appended definition lands
+  // INSIDE the fence. Comparing definitions only is the honest fallback: a document whose refs
+  // cannot be adjudicated is skipped rather than reduced toward a phantom.
+  const refs = obs.refsTrustworthy ? obs.refs : [];
   let mine: Facts;
   try {
     mine = refereeFacts(text);
@@ -81,7 +94,7 @@ function liveSignature(text: string, obs: Answer): string {
   const mineDefs = new Map(mine.defs.map((d) => [key(d[0]), d]));
   const obsDefs = new Map(obs.defs.map((d) => [key(d[0]), d]));
   const mineRefs = new Map(mine.refs.map((r) => [key(r[0]), r]));
-  const obsRefs = new Map(obs.refs.map((r) => [key(r[0]), r]));
+  const obsRefs = new Map(refs.map((r) => [key(r[0]), r]));
 
   const only = (a: Map<string, unknown>, b: Map<string, unknown>) =>
     [...a.keys()].filter((name) => !b.has(name)).sort();
@@ -102,8 +115,8 @@ function liveSignature(text: string, obs: Answer): string {
   return JSON.stringify({
     defsMissing: only(obsDefs, mineDefs),
     defsExtra: only(mineDefs, obsDefs),
-    refsMissing: only(obsRefs, mineRefs),
-    refsExtra: only(mineRefs, obsRefs),
+    refsMissing: obs.refsTrustworthy ? only(obsRefs, mineRefs) : [],
+    refsExtra: obs.refsTrustworthy ? only(mineRefs, obsRefs) : [],
     colDiff: colDiff.sort(),
     spanDiff: spanDiff.sort(),
   });

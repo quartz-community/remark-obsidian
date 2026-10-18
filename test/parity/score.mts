@@ -954,6 +954,47 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "quoted-fence-swallows-unquoted-line",
+    what: "an UNQUOTED line below a quoted fence opener is inside the fence, so its refs are not indexed",
+    apply: (text, ours) => {
+      // The largest clean cluster in the `ref-extra` shrink -- 24 of 93 minimal forms -- and
+      // every short one is a quoted fence. 25 probes, five openers by five tails:
+      //
+      //                   unquoted-ref  quoted-ref  unq-then-close  blank-then-ref
+      //     > ```         0/1*          0/0         0/1*            1/1
+      //     >   ~~~       0/1*          0/0         0/1*            1/1
+      //     > [!note]/> ``` 0/1*        0/0         0/1*            1/1
+      //
+      // `quoted-ref` already agrees and `blank-then-ref` agrees because a blank line ends the
+      // quote -- those two are the controls that make this a rule about LAZY CONTINUATION into
+      // a quoted fence rather than about fences generally.
+      const lines = text.split("\n");
+      const dead = new Set<number>();
+      let open = false;
+      for (let at = 0; at < lines.length; at++) {
+        const line = lines[at] ?? "";
+        const quoted = /^[ \t]*>/u.test(line);
+        const inner = line.replace(/^[ \t]*>[ \t]?/u, "");
+        if (quoted && /^ {0,3}(?:```|~~~)/u.test(inner)) {
+          open = !open;
+          continue;
+        }
+        if (!open) continue;
+        // A blank line ends the quote, and with it the lazy continuation.
+        if (line.trim() === "") {
+          open = false;
+          continue;
+        }
+        if (!quoted) dead.add(at);
+      }
+      if (dead.size === 0) return ours;
+      return {
+        defs: ours.defs,
+        refs: ours.refs.filter((r) => !dead.has(r[1])),
+      };
+    },
+  },
+  {
     name: "quote-tab-no-define",
     what: "a tab DIRECTLY after a quote marker means the label does not define -- SCORED, NOT SHIPPED",
     apply: (text, ours) => {

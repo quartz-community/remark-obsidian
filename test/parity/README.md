@@ -6247,3 +6247,42 @@ shape.
 So the mechanism is the finding and the rule is not worth building, which are different
 outcomes and worth separating. A standing "mechanism unknown" note is now closed, the
 discriminator is stated, and the next person does not re-derive it from the callout.
+
+## Pointing the shrinker at a one-away family, and the artifact it exposed in the shrinker
+
+`referee-shrink --live` had only ever run on the bidirectional 532. Pointed at the 150 one-away
+`ref-extra` documents it reduced 123 to 115 verified forms -- and 28 OF THOSE WERE PHANTOMS.
+
+`footnoteRefs` is definition-gated, so references are read from a copy carrying a synthesised
+definition per name, and a document that SWALLOWS ITS TAIL eats them: an unclosed fence, `%%` or
+`$$` all do. `probe-channel` detects that and sets `refsTrustworthy`; `liveSignature` ignored
+the flag, so "the probe never fired" read as a real ref-only divergence and the shrink minimised
+toward it. The shortest phantom is `hidden[^2]` above an unclosed fence, where the appended
+definition lands inside the fence.
+
+Comparing definitions only when the flag is false is the honest fallback -- a document whose
+refs cannot be adjudicated is SKIPPED rather than reduced toward nothing. Re-run: 101 reduced,
+93 forms, and 22 documents moved out of the diverging set.
+
+**Twelfth instrument defect of this effort, and the second where a guard existed and the caller
+did not consult it.**
+
+### What the clean 93 say
+
+    fence 24   other 15   math 14   quote+tab 9   comment 8   quote-no-tab 8   wikilink 6
+
+Every short form in the fence cluster is a QUOTED fence, and 25 probes give the rule:
+
+                     unquoted-ref  quoted-ref  unq-then-close  blank-then-ref
+    > ```            0/1*          0/0         0/1*            1/1
+    >   ~~~          0/1*          0/0         0/1*            1/1
+    > [!note]/> ```  0/1*          0/0         0/1*            1/1
+
+An UNQUOTED line below a quoted fence opener is inside the fence and its references are not
+indexed. `quoted-ref` already agrees and `blank-then-ref` agrees because a blank ends the
+quote, so the controls make this lazy continuation into a quoted fence rather than a fact about
+fences.
+
+Implementation refused: `better 8 / worse 7`, FLAT on both metrics. The mechanism is right and
+the documents carrying it need more than their references corrected -- the same shape as the
+item-comment rule before its second half was found.

@@ -4147,6 +4147,181 @@
     "obsidianVersion": "1.14.4"
   },
   {
+    "markdown": ">   ~~~\n\nlive[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener ind-tilde, tail blank-then-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.857Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">   ~~~\n> ```\nlive[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener ind-tilde, tail quoted-close-then-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.855Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">   ~~~\n> live[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener ind-tilde, tail quoted-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.852Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">   ~~~\nlive[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener ind-tilde, tail unquoted-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          1,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.852Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">   ~~~\nlive[^7]\n> ```\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener ind-tilde, tail unquoted-then-close. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          1,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.854Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
     "markdown": "> [!note]\n>\tcode[^2]\n\n[^2]: def\n",
     "note": "quote-tab literal wave: first line callout, second tab. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
     "obsidian": {
@@ -4366,6 +4541,187 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T03:32:45.063Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n> ```\n\nlive[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener callout-fence, tail blank-then-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          5,
+          0,
+          5
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          3,
+          4
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          5,
+          0,
+          5
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          3,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.876Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n> ```\n> ```\nlive[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener callout-fence, tail quoted-close-then-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          5,
+          0,
+          5
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          3,
+          4
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          5,
+          0,
+          5
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          3,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.873Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n> ```\n> live[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener callout-fence, tail quoted-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.869Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n> ```\nlive[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener callout-fence, tail unquoted-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.867Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n> ```\nlive[^7]\n> ```\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener callout-fence, tail unquoted-then-close. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          5,
+          0,
+          5
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          5,
+          0,
+          5
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.871Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5868,6 +6224,187 @@
     "obsidianVersion": "1.14.4"
   },
   {
+    "markdown": "> ```\n\nlive[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener sp-fence, tail blank-then-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.840Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> ```\n> ```\nlive[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener sp-fence, tail quoted-close-then-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.838Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> ```\n> live[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener sp-fence, tail quoted-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.832Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> ```\nlive[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener sp-fence, tail unquoted-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          1,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.829Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> ```\nlive[^7]\n> ```\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener sp-fence, tail unquoted-then-close. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          1,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.834Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
     "markdown": "> plain\n>\tcode[^2]\n\n[^2]: def\n",
     "note": "quote-tab literal wave: first line plain, second tab. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
     "obsidian": {
@@ -6430,6 +6967,362 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T02:12:56.430Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> ~~~\n\nlive[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener tilde, tail blank-then-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.864Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> ~~~\n> ```\nlive[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener tilde, tail quoted-close-then-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.863Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> ~~~\n> live[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener tilde, tail quoted-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.860Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> ~~~\nlive[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener tilde, tail unquoted-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          1,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.859Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> ~~~\nlive[^7]\n> ```\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener tilde, tail unquoted-then-close. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          1,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.862Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">```\n\nlive[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener nosp-fence, tail blank-then-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.850Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">```\n> ```\nlive[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener nosp-fence, tail quoted-close-then-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          2,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.849Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">```\n> live[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener nosp-fence, tail quoted-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.843Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">```\nlive[^7]\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener nosp-fence, tail unquoted-ref. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          1,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.842Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">```\nlive[^7]\n> ```\n\n[^7]: def\n",
+    "note": "quoted-fence swallow wave: opener nosp-fence, tail unquoted-then-close. The fence cluster is 24 of 93 clean ref-extra minimal forms and every short one is a QUOTED fence.",
+    "obsidian": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "7",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "7",
+          1,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T04:18:53.846Z",
     "obsidianVersion": "1.14.4"
   },
   {
