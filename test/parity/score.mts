@@ -1000,6 +1000,42 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "tab-after-container-prefix-is-code",
+    what: "a TAB directly after a container prefix is indented code, so the label does not define",
+    apply: (text, ours, tree) => {
+      // Two live-shrink clusters converge: `> ⇥[^1]:` is 9 `def-extra` documents and
+      // `- p` / `⟨2sp⟩⇥[^1]:` is 20 more. 40 probes, five hosts by eight indents:
+      //
+      //                    tab    sp-tab  2sp-tab  3sp-tab  4sp   2sp
+      //     quote-inline   -/2*   2/2     2/2      2/-*     -/-   2/2
+      //     item-blank     -/2*   2/2     2/2      2/2      -/-   2/2
+      //     item-wide      -/3*   3/3     3/3      3/3      -/-   3/3
+      //
+      // A BARE TAB after the container prefix means no definition, in all three container
+      // contexts, while one, two or three spaces then a tab all define. That is the
+      // leading-tab-versus-tab-after-space asymmetry this file already records, measured
+      // relative to the CONTAINER's content column rather than the line start -- and the five
+      // agreeing indent columns are the controls that make it that rule rather than a fact
+      // about tabs.
+      const lines = text.split("\n");
+      const hosted = new Set<number>();
+      visit(tree, "footnoteDefinition", (node: Node) => {
+        const line = node.position?.start?.line;
+        if (line === undefined) return;
+        const raw = lines[line - 1] ?? "";
+        // Past the container prefix: a quote-marker run, each taking one space, then any
+        // list-marker indent already consumed. What remains is the line's own indent.
+        const rest = raw.replace(/^[ \t]*(?:>[ \t]?)*/u, "");
+        if (rest.startsWith("\t")) hosted.add(line - 1);
+      });
+      if (hosted.size === 0) return ours;
+      return {
+        defs: ours.defs.filter((d) => !hosted.has(d[1])),
+        refs: ours.refs,
+      };
+    },
+  },
+  {
     name: "quote-tab-no-define",
     what: "a tab DIRECTLY after a quote marker means the label does not define -- SCORED, NOT SHIPPED",
     apply: (text, ours) => {
