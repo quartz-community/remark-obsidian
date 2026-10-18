@@ -54,6 +54,21 @@ export interface Answer {
    * than by pattern-matching the source for constructs that might swallow a tail.
    */
   readonly refsTrustworthy: boolean;
+  /**
+   * Obsidian's ROOT code-block line ranges, zero-based and inclusive.
+   *
+   * The same quantity the referee records as `code`, and it is a SLICE OF `sections` rather
+   * than a separate recording -- verified against live 1.14.4 on five documents when that
+   * field was adopted, where `code` equalled `sections.filter(type === "code")` every time.
+   * `sections` is root-level by construction, which is the restriction.
+   *
+   * Added because this channel could not see the dimension at all, so `referee-shrink --live`
+   * was blind to every document that diverges only on block geometry -- 108 of them, the
+   * largest bucket being 43 where we read prose and Obsidian reads code. A shrinker whose
+   * signature cannot see the divergence reduces the document to something that no longer
+   * exhibits it, which is indistinguishable from the family having no minimal form.
+   */
+  readonly code: readonly (readonly [number, number])[];
 }
 
 interface Point {
@@ -68,6 +83,10 @@ interface Positioned {
 export interface Cache {
   readonly footnotes?: readonly Positioned[];
   readonly footnoteRefs?: readonly Positioned[];
+  readonly sections?: readonly {
+    readonly type: string;
+    readonly position: { readonly start: Point; readonly end: Point };
+  }[];
 }
 interface Reply {
   readonly id: string;
@@ -257,6 +276,12 @@ export async function ask(
           : [[entry.id, entry.position.start.line, entry.position.start.col]],
       ),
       refsTrustworthy: wanted.every((name) => defined.has(name.toLowerCase())),
+      code: (plain!.cache!.sections ?? []).flatMap(
+        (entry): (readonly [number, number])[] =>
+          entry.type === "code"
+            ? [[entry.position.start.line, entry.position.end.line] as const]
+            : [],
+      ),
     });
   }
   return out;

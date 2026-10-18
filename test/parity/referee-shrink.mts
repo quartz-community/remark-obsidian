@@ -43,7 +43,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { refereeFacts } from "./referee-facts.js";
+import { refereeFacts, refereeFactsWithTree } from "./referee-facts.js";
 import { ask } from "./probe-channel.js";
 
 import type { Answer } from "./probe-channel.js";
@@ -85,8 +85,13 @@ function liveSignature(text: string, obs: Answer): string {
   // cannot be adjudicated is skipped rather than reduced toward a phantom.
   const refs = obs.refsTrustworthy ? obs.refs : [];
   let mine: Facts;
+  let mineCode: number;
   try {
-    mine = refereeFacts(text);
+    const got = refereeFactsWithTree(text);
+    mine = got;
+    mineCode = got.tree.children.filter(
+      (child) => child.type === "code",
+    ).length;
   } catch {
     return "threw";
   }
@@ -119,6 +124,15 @@ function liveSignature(text: string, obs: Answer): string {
     refsExtra: obs.refsTrustworthy ? only(mineRefs, obsRefs) : [],
     colDiff: colDiff.sort(),
     spanDiff: spanDiff.sort(),
+    // THE DELTA, not the ranges. A code range is an absolute line number, so carrying the
+    // ranges themselves would break the position-independence the rest of this signature is
+    // built on -- dropping any line above a code block shifts it and the shrink would read
+    // a preserved divergence as a changed one.
+    //
+    // The delta survives that, and it survives the shrink deleting a code block BOTH sides
+    // agree on, which a raw count does not. It is what the 43-document bucket needs: they
+    // report a root code block where we report none.
+    codeDelta: mineCode - obs.code.length,
   });
 }
 
@@ -129,6 +143,7 @@ const AGREES = JSON.stringify({
   refsExtra: [],
   colDiff: [],
   spanDiff: [],
+  codeDelta: 0,
 });
 
 /**

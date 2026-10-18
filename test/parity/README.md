@@ -6904,3 +6904,69 @@ this candidate would have been refused before it was written.
 What the 43 do NOT support is a source-shape predicate. The next instrument for them is
 `referee-shrink --live` on the bucket, because a minimal form keeps only the lines that matter
 and the shape's commonness is exactly what shrinking removes.
+
+## The live shrinker was BLIND to the code dimension, which is why that family had no forms
+
+`referee-shrink --live` minimises a document while preserving its divergence, and its
+signature was built from definitions and references only. `probe-channel.ts` had no `code`
+field at all -- the word appears once, in a comment about CLI arguments.
+
+So every document that diverges only on block geometry was unshrinkable **and looked exactly
+like a family with no minimal form**: the shrinker would reduce it until the defs and refs
+still matched, which is most of the way to nothing, and report that. 108 documents, the
+largest bucket being the 43 where we read prose and Obsidian reads code.
+
+Two additions close it, and both are the quantity the referee already records:
+
+- `Answer.code` on the probe channel, as `sections.filter(type === "code")` -- a SLICE of
+  `sections`, verified equal to the referee's own `code` on five documents when that field
+  was adopted, rather than a second derivation of it.
+- `codeDelta` in `liveSignature`, as `ours.length - theirs.length`. **The delta, not the
+  ranges**: a range is an absolute line number, so carrying ranges would break the
+  position-independence the rest of the signature rests on -- dropping any line above a code
+  block shifts it, and a preserved divergence would read as a changed one. The delta also
+  survives the shrink deleting a block both sides agree on, which a raw count does not.
+
+Break-tested before use, because an inert signature component looks exactly like a working
+one -- twelve instances here. Four documents where we produce fewer root code blocks than
+recorded all report `delta = -1`, and the live application agrees with the recorded answer on
+every one.
+
+### What the 43 reduce to
+
+36 distinct minimal forms, **92% carrying two or more constructs**, clustered by set:
+
+      6 docs   tab + marker                 3 docs   marker + indent4
+      4 docs   quote + tab + marker         3 docs   fence + marker + indent4
+      4 docs   indent4 ALONE                3 docs   quote + indent4
+
+The `tab + marker` and `marker + indent4` clusters are the wide-separator cap again, refused
+five ways and now reached from a sixth. The tractable one is `indent4` alone -- a
+single-construct minimal form can only be wrong about one thing -- and it is two shapes:
+
+    "[^1]:" / "===" / "⟨4sp⟩chunk [^2]"        2 documents
+    "More" / "[^ä]:" / blank / "⟨4sp⟩[^ä]:"    1 document
+
+### The first isolates to ONE cell, and `---` already works
+
+Eight probes around it, seven agreeing:
+
+    bare indented             obs [0,0]   ours [0,0]
+    text / === / indented     obs [2,2]   ours [2,2]
+    def  / --- / indented     obs [2,2]   ours [2,2]
+    def  / === / indented     obs [2,2]   ours NONE     <- the only divergence
+    def  / blank / indented   obs none    ours none
+    def  / indented           obs none    ours none
+
+`definitionSetextTransform` is the owner and the asymmetry is in its tail handling. For `---`
+the underline arrives as a `thematicBreak`, which carries no children, so there is no tail and
+micromark had already made the indented line code. For `===` it arrives as PARAGRAPH TEXT
+holding `===
+⟨4sp⟩chunk` -- indented code cannot interrupt a paragraph -- and the pass keeps
+the remainder as a paragraph built from the original inline children, where Obsidian reads
+code once the heading has ended the block. The tail wants re-parsing, not re-wrapping.
+
+**Refused on SIZE, not correctness.** The shape is 1 document by a source scan over all 6,818
+and 3 by the shrink's own count, against a bar this file has already applied to a six-document
+rule. Recorded with the mechanism so it can be picked up if the population ever grows, which
+is the same disposition as the quoted-`%%` rule that is right and too small.
