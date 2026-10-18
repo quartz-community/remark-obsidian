@@ -3966,6 +3966,47 @@
     "obsidianVersion": "1.14.4"
   },
   {
+    "markdown": "> [^1]: def\n>\t$$\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `math-tab` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T02:20:32.965Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
     "markdown": "> [^1]: def\n>\tmore\n\nuse[^1]\n",
     "note": "quoted definition EXTENT: what does a `quoted-tab` line below `> [^1]: def` do to the definition's last line? def-span-shorter is 38/90 quote lines and def-span-longer is 125 -- the same construct in both directions.",
     "obsidian": {
@@ -4090,7 +4131,7 @@
   },
   {
     "markdown": "> [^1]: def\n>     code\n\nuse[^1]\n",
-    "note": "quoted definition EXTENT: what does a `quoted-4sp` line below `> [^1]: def` do to the definition's last line? def-span-shorter is 38/90 quote lines and def-span-longer is 125 -- the same construct in both directions.",
+    "note": "quoted definition CONTINUATION wave 2: does a `indented-code` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
     "obsidian": {
       "defs": [
         [
@@ -4126,7 +4167,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T02:12:56.507Z",
+    "recordedAt": "2026-10-18T02:20:32.982Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4171,8 +4212,49 @@
     "obsidianVersion": "1.14.4"
   },
   {
+    "markdown": "> [^1]: def\n> #tag\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `tag` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T02:20:32.989Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
     "markdown": "> [^1]: def\n> $$\n\nuse[^1]\n",
-    "note": "quoted definition EXTENT: what does a `quoted-math` line below `> [^1]: def` do to the definition's last line? def-span-shorter is 38/90 quote lines and def-span-longer is 125 -- the same construct in both directions.",
+    "note": "quoted definition CONTINUATION wave 2: does a `math-open` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
     "obsidian": {
       "defs": [
         [
@@ -4208,12 +4290,12 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T02:12:56.514Z",
+    "recordedAt": "2026-10-18T02:20:32.962Z",
     "obsidianVersion": "1.14.4"
   },
   {
-    "markdown": "> [^1]: def\n> %%\n\nuse[^1]\n",
-    "note": "quoted definition EXTENT: what does a `quoted-comment` line below `> [^1]: def` do to the definition's last line? def-span-shorter is 38/90 quote lines and def-span-longer is 125 -- the same construct in both directions.",
+    "markdown": "> [^1]: def\n> $$x$$\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `math-closed` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
     "obsidian": {
       "defs": [
         [
@@ -4249,7 +4331,130 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T02:12:56.516Z",
+    "recordedAt": "2026-10-18T02:20:32.968Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [^1]: def\n> %%\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `comment-open` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T02:20:32.991Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [^1]: def\n> * item\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `star-marker` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T02:20:32.998Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [^1]: def\n> + item\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `plus-marker` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T02:20:32.997Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4291,6 +4496,246 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T02:12:56.512Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [^1]: def\n> ---\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `thematic` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          0,
+          2
+        ],
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T02:20:32.970Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [^1]: def\n> 1) item\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `ordered` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T02:20:32.994Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [^1]: def\n> <div>\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `html` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T02:20:32.976Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [^1]: def\n> ===\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `setext-eq` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          0,
+          2
+        ],
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          0,
+          2
+        ],
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T02:20:32.972Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [^1]: def\n> > deep\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `nested-quote` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T02:20:32.980Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [^1]: def\n> []: x\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `empty-label` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T02:20:33.002Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4344,6 +4789,88 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T02:12:56.513Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [^1]: def\n> [ref]: /url\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `link-def` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T02:20:33.001Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [^1]: def\n> ^abc\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `blockid` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T02:20:32.986Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4426,6 +4953,88 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T02:12:56.504Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [^1]: def\n> | a | b |\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `table` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T02:20:32.974Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [^1]: def\n> ~~~\n\nuse[^1]\n",
+    "note": "quoted definition CONTINUATION wave 2: does a `tilde-fence` line below `> [^1]: def` continue the definition or end it? def-span-shorter is 38/90 quote lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T02:20:32.984Z",
     "obsidianVersion": "1.14.4"
   },
   {

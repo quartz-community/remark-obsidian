@@ -6,9 +6,20 @@ import { visit } from "unist-util-visit";
 const LABEL = /^\[\^?[^\]]*\]:/u;
 /** A run of quote markers, each consuming at most one following space. */
 const QUOTE_PREFIX = /^[ \t]*(?:>[ \t]?)+/u;
-/** A quoted line whose content opens a new block: a list marker or a footnote label. */
+/**
+ * A quoted line whose content opens a new block: a list marker, a footnote label, or a `>`.
+ *
+ * Scored `better 5 / worse 0` on top of the marker-and-label rule and worth +7 referee
+ * documents, so the same rule reaching one more opener rather than a new one.
+ *
+ * NOTE that this does NOT catch a nested quote, and making it do so was measured and refused.
+ * The prefix strip above consumes the whole marker run, so `> > deep` becomes `deep` and opens
+ * nothing -- the probe that suggested the `>` never fires. Comparing at the definition's own
+ * quote DEPTH instead, so a deeper line ends it, gains that one probe and costs 62 referee
+ * documents and a corpus case. The `>` earns its place on other shapes entirely.
+ */
 const QUOTED_BLOCK_OPENER =
-  /^ {0,3}(?:(?:[-*+]|\d{1,9}[.)])[ \t]|\[\^[^\]]*\]:)/u;
+  /^ {0,3}(?:(?:[-*+]|\d{1,9}[.)])[ \t]|\[\^[^\]]*\]:|>)/u;
 
 interface Point {
   line: number;

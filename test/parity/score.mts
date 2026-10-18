@@ -125,7 +125,7 @@ const QUOTED_ITEM_COMMENT =
 const LEADING_TAB_DEF = /^\t {0,3}\[\^([^\]]+)\]:/u;
 /** A quoted line whose content opens a new block: a list marker or a footnote label. */
 const QUOTED_BLOCK_OPENER =
-  /^ {0,3}(?:(?:[-*+]|\d{1,9}[.)])[ \t]|\[\^[^\]]*\]:)/u;
+  /^ {0,3}(?:(?:[-*+]|\d{1,9}[.)])[ \t]|\[\^[^\]]*\]:|>)/u;
 const ENDS_ITEM =
   /^ {0,3}(?:#{1,6}(?:[ \t]|$)|```|~~~|[-*+][ \t]|\d{1,9}[.)][ \t])/u;
 const LABEL = /^\[\^([^\]]*)\]:/u;
