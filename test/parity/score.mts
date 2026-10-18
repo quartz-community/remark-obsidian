@@ -988,8 +988,13 @@ const RULES: readonly Rule[] = [
         if (!quoted) dead.add(at);
       }
       if (dead.size === 0) return ours;
+      // BOTH halves: a line inside a fence parses as nothing, so a DEFINITION on it does not
+      // define either. Filtering only the references scored `better 8 / worse 7` and FLAT,
+      // which is the signature the item-comment rule had before its second half was found: a
+      // rule that corrects one side of a line's meaning cannot finish a document whose other
+      // side is still wrong.
       return {
-        defs: ours.defs,
+        defs: ours.defs.filter((d) => !dead.has(d[1])),
         refs: ours.refs.filter((r) => !dead.has(r[1])),
       };
     },

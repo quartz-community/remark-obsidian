@@ -6286,3 +6286,22 @@ fences.
 Implementation refused: `better 8 / worse 7`, FLAT on both metrics. The mechanism is right and
 the documents carrying it need more than their references corrected -- the same shape as the
 item-comment rule before its second half was found.
+
+### ...and BOTH HALVES scores +9 while no implementation of it does
+
+Suppressing only the references on a swallowed line scores `better 8 / worse 7` and FLAT.
+Suppressing the DEFINITIONS too -- a line inside a fence parses as nothing, so neither side of
+its meaning survives -- scores `better 19 / worse 8` for **+9**. Second measured instance of a
+half-rule scoring flat, after `item-comment`, which makes it a reliable reading rather than an
+anecdote.
+
+**Two implementations of that +9 both measure -3.** Removing the root nodes those lines produced
+costs referee 5803 -> 5800 and code 742 -> 738; extending the quoted fence's own `code` node
+over them first, with every ancestor on the path, changes neither figure. So the answer-filter's
++9 does not survive contact with the tree here, which is the reverse of the usual direction --
+`item-comment` scored +6 and built +17, `quoted-def-ends` scored +22 and built +29.
+
+Recorded rather than retried at a third shape. The mechanism is measured, the probes are in the
+ledger asserting it, and the gap is between a filter over answers and a structure that produces
+them -- which is worth knowing precisely because this file has four instances of that gap
+running the other way.
