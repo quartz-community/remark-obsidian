@@ -4,8 +4,24 @@ import { visit } from "unist-util-visit";
 
 /** A footnote or link label starting a line, which is what E1 calls "another label". */
 const LABEL = /^\[\^?[^\]]*\]:/u;
-/** A run of quote markers, each consuming at most one following space. */
-const QUOTE_PREFIX = /^[ \t]*(?:>[ \t]?)+/u;
+/**
+ * A run of quote markers, each consuming at most one following SPACE -- never a tab.
+ *
+ * A tab after the marker puts the line's content four columns in, where it is indented code,
+ * so whatever follows is not a block opener. 30 probes, six separators by five openers:
+ *
+ *     sep      marker     label      deeper     heading    fence
+ *     `⟨1sp⟩`  0..0|0..0  0..0|0..0  0..0|0..0  0..0|0..0  0..0|0..0
+ *     `⇥`      0..1|0..0  0..1|0..0  0..1|0..0  0..1|0..1  0..1|0..1
+ *     `⟨2sp⟩`  0..0|0..0  ... every space separator agrees ...
+ *
+ * Obsidian EXTENDS the definition over a tab-separated marker or label where this pass ended
+ * it, and the heading and fence columns agreeing are the controls. Consuming `[ \t]?` here
+ * made `>⇥- item` strip to `- item`, which the opener test then matched -- so the shipped rule
+ * was ending a definition that Obsidian carries on. Found as the largest cluster of the
+ * `def-span-shorter` shrink, 34 forms over 36 documents.
+ */
+const QUOTE_PREFIX = /^[ \t]*(?:> ?)+/u;
 
 /** How many quote markers a line opens with, each consuming at most one following space. */
 function quoteDepth(line: string): number {
