@@ -6769,3 +6769,40 @@ involved in any of them: every one is below the four-column threshold, so it nev
 
 Recorded in `DIVERGING` as the axis's BACKLOG rather than an accepted floor, since it has not
 been scored. The axis now stands at 32 of 960.
+
+### Correction: the 32 are a CALLOUT, and the section above got that wrong
+
+The note above says "8 blocks x 4 containers x the 4 sub-threshold indents". Counting the
+committed list says otherwise:
+
+    by CONTAINER  {callout: 32}
+    by BLOCK      comment, fence, heading, html, math, setext, table, thematic -- 4 each
+    by INDENT     bare, 1sp, 2sp, 3sp -- 8 each
+
+8 blocks x **callout alone** x 4 indents. The container is the whole finding rather than an
+incidental, and writing it as a product over four containers describes a family that does not
+exist. Ninth attribution correction here, and the first where the wrong number was mine from
+an hour earlier -- written from the sweep's own output without counting it.
+
+**What it actually is**, measured four ways on the same two inputs that differ only in
+`[!note]`:
+
+    bare remark-parse + gfm, BOTH   blockquote@1-2   paragraph@3   blockquote@4
+    ours, plain quote               blockquote@1-4                              MERGED
+    ours, callout                   callout@1-3      blockquote@4               not merged
+    Obsidian, both                  one container spanning all four lines
+
+So upstream splits the two identically -- a heading ends the quote, the lazy line is a root
+paragraph, the marked line opens a second quote -- Obsidian merges all four lines, we
+reproduce that merge for a `blockquote` and miss it for a `callout`. That is the "same rule,
+two node types" shape `container-lazy.ts` already carries twice.
+
+**And the pass performing the blockquote merge is NOT identified.** `absorbPass`'s guard
+admits a quote-ish follower only after a `list`, so the merge that produces `blockquote@1-4`
+happens somewhere else, and adding a callout arm to that guard would be fitting a patch to a
+mechanism nobody has located. Recorded as the axis's backlog rather than attempted: this file
+has four instances of a rule scoped to the accidents of whichever pass was being read at the
+time.
+
+The honest next step is `pass-owner.mts`'s removal sweep pointed at this shape, which is the
+instrument built for exactly this question and has not been run on it.

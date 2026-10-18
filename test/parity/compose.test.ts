@@ -97,15 +97,26 @@ const DIVERGING: Record<Axis, readonly string[]> = {
   // indent below the four-column threshold. The mechanism is uniform across all 32:
   //
   //     "> [!note] title" / "> # heading" / "lazy[^1]" / "> after"
-  //       obs   callout@0                paragraph@5
-  //       ours  callout@0  blockquote@3  paragraph@5
+  //       obs   callout@0-3              paragraph@5
+  //       ours  callout@0-3  blockquote@4  paragraph@6
   //
-  // A block that ENDS a container -- heading, setext, fence, comment, thematic, table, math,
-  // html, which is `--matrix`'s "absorbed by nothing" set -- does not stop the container
-  // reclaiming a later MARKED line. Obsidian keeps `> after` in the original section; we
-  // start a second blockquote. 8 such blocks x 4 containers x the 4 sub-threshold indents.
+  // ALL 32 ARE A CALLOUT. An earlier note here said "8 blocks x 4 containers" and that was
+  // wrong -- it is 8 blocks x CALLOUT ALONE x the 4 sub-threshold indents, and the container
+  // is the whole point rather than an incidental. A plain quote merges and a callout does
+  // not:
   //
-  // Not scored yet, so not triaged: it is the axis's backlog rather than an accepted floor.
+  //     bare remark, BOTH inputs   blockquote@1-2  paragraph@3  blockquote@4
+  //     ours, plain quote          blockquote@1-4                              merged
+  //     ours, callout              callout@1-3     blockquote@4                NOT merged
+  //     Obsidian, both             one container spanning all four lines
+  //
+  // So upstream splits them identically, we re-merge for a blockquote, and the callout misses
+  // out. That is the "same rule, two node types" shape `container-lazy.ts` already records
+  // twice -- and the pass that performs the blockquote merge has NOT been identified yet:
+  // `absorbPass`'s own guard admits a quote-ish follower only after a LIST, so the merge
+  // comes from somewhere else and adding a callout arm there would be a guess.
+  //
+  // Not scored, not attributed, so not triaged: the axis's backlog rather than a floor.
   lazy: [
     "callout [ comment ] 1sp mid",
     "callout [ comment ] 2sp mid",
