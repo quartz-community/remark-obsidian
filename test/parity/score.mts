@@ -123,6 +123,9 @@ const QUOTED_ITEM_COMMENT =
   /^(?:[ \t]*>)*[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]{1,4}%%/u;
 /** A definition line led by a TAB and at most three further spaces -- below the tab+4 cap. */
 const LEADING_TAB_DEF = /^\t {0,3}\[\^([^\]]+)\]:/u;
+/** A quoted line whose content opens a new block: a list marker or a footnote label. */
+const QUOTED_BLOCK_OPENER =
+  /^ {0,3}(?:(?:[-*+]|\d{1,9}[.)])[ \t]|\[\^[^\]]*\]:)/u;
 const ENDS_ITEM =
   /^ {0,3}(?:#{1,6}(?:[ \t]|$)|```|~~~|[-*+][ \t]|\d{1,9}[.)][ \t])/u;
 const LABEL = /^\[\^([^\]]*)\]:/u;
@@ -855,6 +858,54 @@ const RULES: readonly Rule[] = [
         defs: [...ours.defs, ...added].sort(
           (a, b) => a[1] - b[1] || a[2] - b[2],
         ),
+        refs: ours.refs,
+      };
+    },
+  },
+  {
+    name: "quoted-def-ends-at-block-opener",
+    what: "a quoted LIST MARKER or LABEL ends a quoted definition, as a quoted heading already does",
+    apply: (text, ours) => {
+      // Fourteen probes on quoted-definition extent, 11 agreeing and 3 not:
+      //
+      //     "> [^1]: def" / "> # head"      obs 0..0   ours 0..0   already right
+      //     "> [^1]: def" / "> ```"         obs 0..0   ours 0..0   already right
+      //     "> [^1]: def" / "> - item"      obs 0..0   ours 0..1   we over-claim
+      //     "> [^1]: def" / "> [^2]: two"   obs 0..0   ours 0..1   we over-claim
+      //
+      // So we already end a quoted definition at a quoted heading and a quoted fence, and the
+      // gap is the other two block openers. One rule, derived from the probes that agree
+      // rather than from the ones that do not.
+      const lines = text.split("\n");
+      const stops = new Set<number>();
+      // UNRESTRICTED, and the obvious restriction was measured and refused. Two of the three
+      // sampled losses are `> [!note]` callouts where a quoted label does NOT end the previous
+      // definition, and excluding callouts is a derived narrowing -- a callout is a distinct
+      // node type here with its own extent rules. It still loses:
+      //
+      //     unrestricted            better 34  worse 10   +22
+      //     ...excluding callouts   better 21  worse  5   +15
+      //
+      // The exclusion halves the losses and costs thirteen gains, so the callout cases are net
+      // POSITIVE and belong in the rule. A narrowing that is principled can still be wrong,
+      // which is the third time that has been measured here.
+      for (let at = 0; at < lines.length; at++) {
+        const inner = (lines[at] ?? "").replace(/^[ \t]*(?:>[ \t]?)+/u, "");
+        if (inner === lines[at]) continue;
+        if (QUOTED_BLOCK_OPENER.test(inner)) stops.add(at);
+      }
+      if (stops.size === 0) return ours;
+      return {
+        defs: ours.defs.map((d) => {
+          let end = d[3];
+          for (let at = d[1] + 1; at <= d[3]; at++) {
+            if (stops.has(at)) {
+              end = at - 1;
+              break;
+            }
+          }
+          return [d[0], d[1], d[2], end] as Def;
+        }),
         refs: ours.refs,
       };
     },
