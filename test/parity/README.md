@@ -6181,3 +6181,30 @@ disagreement needs the dense document. That is the third family to end this way,
 a prediction rather than a surprise: **a family whose deltas run both directions is several
 rules, and probing its axis will keep returning agreement.** The direction screen already says
 which families those are, and it should be consulted before the probes rather than after.
+
+## Four families probed, one yielded: the minimal-shape screen is now a procedure
+
+Probing a family's own axis is cheap and its outcome is binary, so it is worth doing before any
+implementation. Four waves, 120 probes, all now in the ledger:
+
+| family                      | one-away | probes | diverging | outcome                       |
+| --------------------------- | -------: | -----: | --------: | ----------------------------- |
+| `def-span-shorter` (quoted) |       60 |     32 |         6 | **+36 referee shipped**       |
+| `def-col` (narrow sep)      |       50 |     64 |         3 | all three the refused B3 min  |
+| `def-span-longer` (root)    |      102 |     20 |     **0** | nothing to find               |
+| `ref-extra @ ref`           |      150 |     18 |         1 | the known 6-document autolink |
+
+**The root definition's extent is correct in all twenty shapes** -- blank, text, 2/4/5-space
+indents, tab, heading, fence, marker, label, math, thematic, quote, table, html, comment, block
+id, tag, link definition and setext. And a reference is indexed or not exactly as we index it in
+seventeen of eighteen contexts, the exception being `<a://b[^1]>`, already recorded at six
+documents.
+
+So the procedure: **probe the axis first; if the minimal shapes agree, the family needs the
+dense document and a probe wave will not find it.** One of four yielded, and the one that did
+had minimal shapes that diverged on contact.
+
+That also says which instrument the other three need. `referee-shrink --live` reduces a REAL
+diverging document until it is small and still wrong, which is precisely the evidence a
+synthetic probe cannot manufacture -- it was built for the bidirectional 532 and has not been
+pointed at the one-away families at all.

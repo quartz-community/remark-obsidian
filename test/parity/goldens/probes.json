@@ -5107,5 +5107,1453 @@
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T02:12:56.429Z",
     "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\tcode\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `tab` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.835Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `blank` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.826Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n    use[^1]\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside indented? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          7
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          7
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.590Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n# use[^1]\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside heading? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          5
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          5
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.615Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n#tag[^1]\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside tag-ish? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          4
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.620Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n$$\nuse[^1]\n$$\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside display-math? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.598Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n$use[^1]$\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside inline-math? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.596Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n%% use[^1] %%\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside comment? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          6
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          6
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.594Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n<a://b[^1]>\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside autolink? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          6
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.603Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n<div>\nuse[^1]\n</div>\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside html-block? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.612Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n> use[^1]\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside quote? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          5
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          5
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.614Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n[[use[^1]]]\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside wikilink? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.616Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n[^2]: use[^1]\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside in-def-body? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ],
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          9
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ],
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          9
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.617Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n[t](u[^1])\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside link-dest? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.606Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n[use[^1]](u)\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside link-label? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          4
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.609Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n\\[^1]\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside escaped? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.618Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n```\nuse[^1]\n```\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside fence? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.587Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n`use[^1]`\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside inline-code? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.601Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\nuse[^1]\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside plain? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.584Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n\n| use[^1] | b |\n| --- | --- |\n",
+    "note": "ref-extra wave: does Obsidian index `[^1]` inside table? 150 one-away documents are references we index and Obsidian does not, and neither the host nor the line-shape axis concentrates.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          5
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          5
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:07:36.611Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n     code\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `indent-5` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.837Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n    code\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `indent-4` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.834Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n  more\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `indent-2` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.832Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n# head\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `atx` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.839Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n#tag\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `tag` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.861Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n$$\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `math` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.849Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n%%\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `comment` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.858Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n- item\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `marker` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.845Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n---\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `thematic` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          0,
+          0
+        ],
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          0,
+          0
+        ],
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.851Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n<div>\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `html` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.856Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n===\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `setext` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          0,
+          0
+        ],
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          0,
+          0
+        ],
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.867Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n> quote\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `quote` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.853Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n[^2]: two\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `label` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ],
+        [
+          "2",
+          1,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ],
+        [
+          "2",
+          1,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.848Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n[ref]: /url\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `linkdef` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.864Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n^abc\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `blockid` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.859Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n```\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `fence` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.841Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\nmore\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `text` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.829Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "[^1]: def\n| a | b |\n\nuse[^1]\n",
+    "note": "ROOT definition extent: does a `table` line below `[^1]: def` continue it or end it? def-span-longer is 102 one-away and its non-quote half is indented and blank lines.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:04:19.854Z",
+    "obsidianVersion": "1.14.4"
   }
 ]
