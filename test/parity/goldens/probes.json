@@ -5445,6 +5445,176 @@
     "obsidianVersion": "1.14.4"
   },
   {
+    "markdown": ">   $$\n\n[^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener ind-math, tail blank-then-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.257Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">   $$\n  [^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener ind-math, tail indented-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          1,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.256Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">   $$\n> $$\n[^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener ind-math, tail closed-then-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.258Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">   $$\n> [^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener ind-math, tail quoted-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.255Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">   $$\n[^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener ind-math, tail unquoted-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.254Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
     "markdown": ">   [^1]: def\n\nuse[^1]\n",
     "note": "space-then-tab wave: host quote-inline, indent 2sp. Two live-shrink clusters converge here -- `> <TAB>[^1]:` at 9 documents and `- p / <2sp><TAB>[^1]:` at 20 -- and this file records a tab after a space reaching NOTHING, so these contexts must differ.",
     "obsidian": {
@@ -5658,6 +5828,346 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T06:16:14.372Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> $$\n\n[^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener sp-math, tail blank-then-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.241Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> $$\n  [^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener sp-math, tail indented-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          1,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.238Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> $$\n> $$\n[^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener sp-math, tail closed-then-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.244Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> $$\n> [^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener sp-math, tail quoted-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.235Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> $$\n[^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener sp-math, tail unquoted-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.230Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> > $$\n\n[^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener nested-math, tail blank-then-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.265Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> > $$\n  [^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener nested-math, tail indented-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          1,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.263Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> > $$\n> $$\n[^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener nested-math, tail closed-then-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.266Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> > $$\n> [^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener nested-math, tail quoted-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          1,
+          2,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.261Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> > $$\n[^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener nested-math, tail unquoted-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          1,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.259Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5880,6 +6390,176 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T06:16:14.334Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n> $$\n\n[^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener callout-math, tail blank-then-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          5,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          5,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.274Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n> $$\n  [^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener callout-math, tail indented-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.272Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n> $$\n> $$\n[^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener callout-math, tail closed-then-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          5,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          5,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.276Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n> $$\n> [^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener callout-math, tail quoted-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.270Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n> $$\n[^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener callout-math, tail unquoted-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.269Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8481,6 +9161,176 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T06:16:14.376Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">$$\n\n[^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener nosp-math, tail blank-then-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.251Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">$$\n  [^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener nosp-math, tail indented-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          1,
+          0,
+          1
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.249Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">$$\n> $$\n[^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener nosp-math, tail closed-then-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          4,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.253Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">$$\n> [^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener nosp-math, tail quoted-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.247Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">$$\n[^2]: def\n\nuse[^2]\n",
+    "note": "quoted-$$ swallow wave: opener nosp-math, tail unquoted-def. The math cluster of the def-extra shrink is 9 forms / 11 docs and every short one is a quoted $$ over an unquoted definition -- the same shape as the quoted-fence rule already shipped.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "2",
+          3,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T07:06:16.246Z",
     "obsidianVersion": "1.14.4"
   },
   {

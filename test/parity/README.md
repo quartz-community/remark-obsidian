@@ -6331,3 +6331,38 @@ rule: the +4 is real and the position is wrong.
 
 The candidate is kept in `score.mts` with its numbers so the next attempt starts from the
 measurement rather than from the probes again.
+
+## Mining the `def-extra` shrink to exhaustion
+
+Thirteen of its 69 forms were already fixed by the two rules shipped from it, which is worth
+re-checking before mining a shrink that predates a landing. The 56 still open:
+
+    list marker 17   fence 14   math 9   quote 7   comment 5   other 3   indented 1
+
+**math -- probed, refused at two scopings.** Every short form is a quoted `$$` over an unquoted
+definition, visibly the shape the fence rule already ships for. 25 probes, five openers by five
+tails:
+
+                   unquoted-def  quoted-def  indented-def  blank-then  closed-then
+    > $$           -/-           -/-         -/0*          0/0         0/0
+    > > $$         -/0*          -/2*        -/0*          0/0         -/-
+
+The INDENTED row diverges on all five openers and a nested `$$` is unhandled -- but a column-0
+unquoted definition below a single-level `$$` ALREADY agrees on four of five, so part of this is
+handled and a rule must not reclaim it.
+
+    `$$` treated exactly like a fence     better 11  worse 10   referee FLAT
+    ...restricted to INDENTED lines       better  9  worse  7   referee FLAT
+
+Both flat on the figure this project reports. The restriction is derived from the probe table
+rather than fitted to the losses and still does not pay, so it is recorded at two scopings
+rather than retried at a third. Kept in `score.mts` with its numbers.
+
+**comment -- below the bar without probing.** Five forms, five documents, and each carries two
+or three constructs at once: `+⇥>` / `⟨2sp⟩> $$` / `%%%` / `[^src:2]:` and
+`It^[inline [^名]]%%` / `*⟨2sp⟩⇥[^Ω]:`. There is no shape to probe -- these are the long tail
+the mechanism map predicts for a family after its coherent clusters are taken.
+
+So the shrink is mined out: two rules shipped from it (+20 referee between them), one cluster
+refused with numbers, one below the bar, and the list-marker cluster held by the pass-ordering
+question recorded above. That is a complete accounting of 69 forms rather than a stopping point.

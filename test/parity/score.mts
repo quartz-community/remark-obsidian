@@ -1081,6 +1081,53 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "quoted-math-swallows-indented-line",
+    what: "...the same for a quoted `$$` opener -- REFUSED, flat on the referee in two scopings",
+    apply: (text, ours) => {
+      // The math cluster of the `def-extra` shrink is 9 forms and 11 documents, and every
+      // short one is a quoted `$$` over an unquoted definition -- visibly the shape the fence
+      // rule already ships for. 25 probes, five openers by five tails:
+      //
+      //                    unquoted-def  quoted-def  indented-def  blank-then  closed-then
+      //     > $$           -/-           -/-         -/0*          0/0         0/0
+      //     > > $$         -/0*          -/2*        -/0*          0/0         -/-
+      //
+      // The INDENTED row diverges on all five openers and a nested `$$` is unhandled, while a
+      // column-0 unquoted definition below a single-level `$$` ALREADY agrees on four of five
+      // -- so our pipeline handles part of this already and the rule must not reclaim it.
+      //
+      //     `$$` treated exactly like a fence     better 11  worse 10   referee FLAT
+      //     ...restricted to INDENTED lines       better  9  worse  7   referee FLAT
+      //
+      // Both flat on the figure this project reports. The restriction is derived from the
+      // probe table rather than fitted to the losses and still does not pay, so this is
+      // recorded at two scopings rather than retried at a third.
+      const lines = text.split("\n");
+      const dead = new Set<number>();
+      let open = false;
+      for (let at = 0; at < lines.length; at++) {
+        const line = lines[at] ?? "";
+        const quoted = /^[ \t]*>/u.test(line);
+        const inner = line.replace(/^[ \t]*>[ \t]?/u, "");
+        if (quoted && /^ {0,3}\$\$/u.test(inner)) {
+          open = !open;
+          continue;
+        }
+        if (!open) continue;
+        if (line.trim() === "") {
+          open = false;
+          continue;
+        }
+        if (!quoted && /^[ \t]/u.test(line)) dead.add(at);
+      }
+      if (dead.size === 0) return ours;
+      return {
+        defs: ours.defs.filter((d) => !dead.has(d[1])),
+        refs: ours.refs.filter((r) => !dead.has(r[1])),
+      };
+    },
+  },
+  {
     name: "quote-tab-no-define",
     what: "a tab DIRECTLY after a quote marker means the label does not define -- SCORED, NOT SHIPPED",
     apply: (text, ours) => {
