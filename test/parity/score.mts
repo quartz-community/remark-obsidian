@@ -1036,6 +1036,51 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "tab-past-item-content-column-is-code",
+    what: "...the same rule for a LIST ITEM host, with the content column taken from the tree",
+    apply: (text, ours, tree) => {
+      // The quote half shipped at +11. Its sibling in the same shrink is `- p` /
+      // `⟨2sp⟩⇥[^1]:` at twenty documents, and the probes put them on one rule:
+      //
+      //     item-blank   tab -/2   sp-tab 2/2   2sp-tab 2/2   3sp-tab 2/2   4sp -/-
+      //     item-wide    tab -/3   sp-tab 3/3   2sp-tab 3/3   3sp-tab 3/3   4sp -/-
+      //
+      // A bare tab PAST the item's content column defines nothing. The quote version could
+      // strip its prefix with a regex; an item's content column cannot be, which is why this
+      // takes it from `contentColumn` -- the function the pass itself uses. Six scored
+      // premises about this quantity have been refuted by re-deriving it, and this file's
+      // standing rule is that a candidate about the content column calls the same code the
+      // pass does.
+      const lines = text.split("\n");
+      const dead = new Set<number>();
+      visit(tree, "listItem", (item: Node) => {
+        const column = contentColumn(text, item as never);
+        if (column === undefined) return;
+        visit(item, "footnoteDefinition", (node: Node) => {
+          const line = node.position?.start?.line;
+          if (line === undefined) return;
+          const raw = lines[line - 1] ?? "";
+          // Consume exactly the content column in COLUMNS, then look at what follows.
+          let at = 0;
+          let seen = 0;
+          while (at < raw.length && seen < column) {
+            const ch = raw[at];
+            if (ch === " ") seen += 1;
+            else if (ch === "\t") seen += 4 - (seen % 4);
+            else break;
+            at += 1;
+          }
+          if (raw[at] === "\t") dead.add(line - 1);
+        });
+      });
+      if (dead.size === 0) return ours;
+      return {
+        defs: ours.defs.filter((d) => !dead.has(d[1])),
+        refs: ours.refs,
+      };
+    },
+  },
+  {
     name: "quote-tab-no-define",
     what: "a tab DIRECTLY after a quote marker means the label does not define -- SCORED, NOT SHIPPED",
     apply: (text, ours) => {

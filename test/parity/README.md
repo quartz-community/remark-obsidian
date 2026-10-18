@@ -6305,3 +6305,29 @@ Recorded rather than retried at a third shape. The mechanism is measured, the pr
 ledger asserting it, and the gap is between a filter over answers and a structure that produces
 them -- which is worth knowing precisely because this file has four instances of that gap
 running the other way.
+
+## A candidate can score on the FINAL tree and be inert where a pass runs
+
+`tab-past-item-content-column-is-code` is the list-item sibling of the quote rule that shipped
+at +11. Same probes, same asymmetry:
+
+    item-blank   tab -/2   sp-tab 2/2   2sp-tab 2/2   3sp-tab 2/2   4sp -/-
+    item-wide    tab -/3   sp-tab 3/3   2sp-tab 3/3   3sp-tab 3/3   4sp -/-
+
+It scores `better 21 / worse 7` for **+4**, taking the content column from `contentColumn`
+rather than re-deriving it, which is this file's standing rule for that quantity.
+
+**Built into the pass it is completely INERT.** The minimal form explains why: `- p` / blank /
+`⟨2sp⟩⇥[^1]: def` already produces NO definition and no `footnoteDefinition` node at all by the
+time the pipeline ends -- the line is code to us already. The scorer runs against the FINAL
+tree, where those nodes are gone; the pass runs mid-pipeline, where on the referee's dense
+documents the definitions it would remove have not been created yet or are still elsewhere.
+
+So a positive score does not locate a fix. `score.mts` answers "would this answer be better",
+and a pass has to answer "is this true at the point I run" -- two questions that coincide often
+enough to be mistaken for one. Reverted rather than shipped inert, which is this repo's rule
+for a provably inert `src` change, and recorded as a PASS-ORDERING question rather than a dead
+rule: the +4 is real and the position is wrong.
+
+The candidate is kept in `score.mts` with its numbers so the next attempt starts from the
+measurement rather than from the probes again.
