@@ -6424,3 +6424,39 @@ document a quoted tab-led label very often does define, and adding a reference t
 
 Recorded with both numbers rather than narrowed a third time. A probe table proves what Obsidian
 does to a SHAPE; it cannot prove how often that shape is what a real document contains.
+
+## Re-shrinking a family after shipping from it, three times
+
+Two of three recent gains came from re-examining a shipped rule rather than from a new family,
+so it is worth doing deliberately. Three attempts, three different outcomes.
+
+**`def-miss @ code`: the rule reached one separator width of four.** Re-shrunk after shipping,
+its list-marker cluster was still 38 forms. The code node a re-parse consumes keeps whatever
+indent EXCEEDED the stripped four columns, so
+
+    `-⇥⟨2sp⟩[^1]: def`     value `"[^1]: def"`     matched
+    `+⇥⟨3sp⟩[^1]: def`     value `" [^1]: def"`    skipped
+    `⟨3sp⟩-⇥⟨2sp⟩[^1]: def` value `" [^1]: def"`   skipped
+
+Trimming that indent is +7, and `probe/def-tab/marker-tab-spaces` -- open since the tab family
+was first explored, with two implementations refused at -15 and -21 -- now matches.
+
+**`def-span-shorter`: the rule was WRONG on a case it claimed.** Its largest cluster is
+`>[^名]:` over `>⇥- item`, which Obsidian carries on and the quoted-opener rule ended, because
+the prefix strip consumed `[ \t]?` and turned `>⇥- item` into `- item`. Restricting the prefix
+to a SPACE is +3.
+
+**`ref-extra`: the missing half is refused.** Its fence cluster is unchanged at 24 forms,
+because the quoted-fence rule removes DEFINITIONS on a swallowed line and not REFERENCES --
+the candidate that scored +9 filtered both. Adding the reference half:
+
+    beside the definition half (early)   INERT -- the node does not exist yet
+    late, after `bareFootnoteRefTransform`   referee UNCHANGED, corpus -2
+
+So the +9 was the definition half entirely, and the reference half costs two corpus cases for
+nothing. Reverted. That also settles why the cluster persists: those documents need something
+other than the reference dropped.
+
+The procedure is worth keeping: **after shipping a rule, re-shrink the family it came from.**
+One of three found the rule too narrow, one found it wrong, and one found a half that must not
+be added -- none of which the original measurement could have said.
