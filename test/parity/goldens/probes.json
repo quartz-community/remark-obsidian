@@ -23,7 +23,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.712Z",
+    "recordedAt": "2026-10-18T10:37:09.172Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -38,7 +38,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.432Z",
+    "recordedAt": "2026-10-18T10:37:08.886Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -79,7 +79,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.713Z",
+    "recordedAt": "2026-10-18T10:37:09.173Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -120,7 +120,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.714Z",
+    "recordedAt": "2026-10-18T10:37:09.175Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -161,7 +161,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.715Z",
+    "recordedAt": "2026-10-18T10:37:09.176Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -195,7 +195,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.716Z",
+    "recordedAt": "2026-10-18T10:37:09.177Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -222,7 +222,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.717Z",
+    "recordedAt": "2026-10-18T10:37:09.178Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -249,7 +249,293 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.717Z",
+    "recordedAt": "2026-10-18T10:37:09.178Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "   -\t    [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-dash, separator tab4, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.256Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "   -\t   [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-dash, separator tab3, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          5,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.254Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "   -\t  [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-dash, separator tab2, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          5,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.253Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "   -\t [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-dash, separator tab1, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          5,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          5,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.251Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "   -\t[^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-dash, separator tab, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          5,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          5,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.250Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "   - \t[^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-dash, separator sp-tab, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.257Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "   -  [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-dash, separator 2sp, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          6,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          6,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.260Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "   - [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-dash, separator 1sp, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          5,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          5,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.259Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -278,7 +564,300 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.436Z",
+    "recordedAt": "2026-10-18T10:37:08.891Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "  10.\t    [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-ord, separator tab4, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.265Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "  10.\t   [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-ord, separator tab3, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          6,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.265Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "  10.\t  [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-ord, separator tab2, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          6,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          6,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.264Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "  10.\t [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-ord, separator tab1, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          6,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          6,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.263Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "  10.\t[^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-ord, separator tab, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          6,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          6,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.262Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "  10. \t[^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-ord, separator sp-tab, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.266Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "  10.  [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-ord, separator 2sp, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          7,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          7,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.268Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "  10. [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ind-ord, separator 1sp, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          6,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          6,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.267Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -319,7 +898,191 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.718Z",
+    "recordedAt": "2026-10-18T10:37:09.179Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\t    [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker star, separator tab4, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.234Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\t   [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker star, separator tab3, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.234Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\t  [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker star, separator tab2, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.233Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\t [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker star, separator tab1, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.232Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*\t[^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker star, separator tab, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.231Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -334,7 +1097,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.412Z",
+    "recordedAt": "2026-10-18T10:37:08.863Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -356,7 +1119,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.411Z",
+    "recordedAt": "2026-10-18T10:37:08.863Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -385,7 +1148,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.410Z",
+    "recordedAt": "2026-10-18T10:37:08.862Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -400,7 +1163,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.384Z",
+    "recordedAt": "2026-10-18T10:37:08.831Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -422,7 +1185,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.383Z",
+    "recordedAt": "2026-10-18T10:37:08.831Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -444,7 +1207,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.382Z",
+    "recordedAt": "2026-10-18T10:37:08.830Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -473,7 +1236,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.381Z",
+    "recordedAt": "2026-10-18T10:37:08.829Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -502,7 +1265,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.380Z",
+    "recordedAt": "2026-10-18T10:37:08.828Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -517,7 +1280,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.380Z",
+    "recordedAt": "2026-10-18T10:37:08.828Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -532,7 +1295,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.379Z",
+    "recordedAt": "2026-10-18T10:37:08.827Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -561,7 +1324,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.377Z",
+    "recordedAt": "2026-10-18T10:37:08.826Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -590,7 +1353,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.376Z",
+    "recordedAt": "2026-10-18T10:37:08.825Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -619,7 +1382,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.374Z",
+    "recordedAt": "2026-10-18T10:37:08.824Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -648,7 +1411,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.372Z",
+    "recordedAt": "2026-10-18T10:37:08.824Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -677,7 +1440,593 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.371Z",
+    "recordedAt": "2026-10-18T10:37:08.823Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "* \t[^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker star, separator sp-tab, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.235Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "*  [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker star, separator 2sp, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          3,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          3,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.240Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "* [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker star, separator 1sp, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.237Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "+\t    [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker plus, separator tab4, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.227Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "+\t   [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker plus, separator tab3, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.226Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "+\t  [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker plus, separator tab2, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.225Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "+\t [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker plus, separator tab1, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.224Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "+\t[^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker plus, separator tab, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.223Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "+ \t[^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker plus, separator sp-tab, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.228Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "+  [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker plus, separator 2sp, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          3,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          3,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.230Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "+ [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker plus, separator 1sp, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.229Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\t    [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker dash, separator tab4, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.219Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\t   [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker dash, separator tab3, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.219Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\t  [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker dash, separator tab2, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.218Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\t [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker dash, separator tab1, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.216Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-\t[^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker dash, separator tab, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.215Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -692,7 +2041,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.407Z",
+    "recordedAt": "2026-10-18T10:37:08.859Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -714,7 +2063,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.406Z",
+    "recordedAt": "2026-10-18T10:37:08.858Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -743,7 +2092,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.420Z",
+    "recordedAt": "2026-10-18T10:37:08.872Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -758,7 +2107,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.437Z",
+    "recordedAt": "2026-10-18T10:37:08.895Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -773,7 +2122,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.438Z",
+    "recordedAt": "2026-10-18T10:37:08.896Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -795,7 +2144,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.355Z",
+    "recordedAt": "2026-10-18T10:37:08.802Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -817,7 +2166,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.354Z",
+    "recordedAt": "2026-10-18T10:37:08.801Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -846,7 +2195,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.353Z",
+    "recordedAt": "2026-10-18T10:37:08.800Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -875,7 +2224,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.422Z",
+    "recordedAt": "2026-10-18T10:37:08.874Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -904,7 +2253,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.423Z",
+    "recordedAt": "2026-10-18T10:37:08.876Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -933,7 +2282,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.423Z",
+    "recordedAt": "2026-10-18T10:37:08.877Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -948,7 +2297,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.349Z",
+    "recordedAt": "2026-10-18T10:37:08.797Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -963,7 +2312,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.347Z",
+    "recordedAt": "2026-10-18T10:37:08.796Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -992,7 +2341,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.346Z",
+    "recordedAt": "2026-10-18T10:37:08.795Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1021,7 +2370,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.344Z",
+    "recordedAt": "2026-10-18T10:37:08.793Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1050,7 +2399,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.439Z",
+    "recordedAt": "2026-10-18T10:37:08.897Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1079,7 +2428,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.341Z",
+    "recordedAt": "2026-10-18T10:37:08.787Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1094,7 +2443,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.426Z",
+    "recordedAt": "2026-10-18T10:37:08.880Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1123,7 +2472,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.431Z",
+    "recordedAt": "2026-10-18T10:37:08.886Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1145,7 +2494,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.428Z",
+    "recordedAt": "2026-10-18T10:37:08.883Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1160,7 +2509,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.429Z",
+    "recordedAt": "2026-10-18T10:37:08.884Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1175,7 +2524,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.424Z",
+    "recordedAt": "2026-10-18T10:37:08.878Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1190,7 +2539,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.441Z",
+    "recordedAt": "2026-10-18T10:37:08.900Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1219,7 +2568,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.440Z",
+    "recordedAt": "2026-10-18T10:37:08.899Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1248,7 +2597,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.337Z",
+    "recordedAt": "2026-10-18T10:37:08.783Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1263,12 +2612,12 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.427Z",
+    "recordedAt": "2026-10-18T10:37:08.881Z",
     "obsidianVersion": "1.14.4"
   },
   {
     "markdown": "- \t[^1]: def\n\nuse[^1]\n",
-    "note": "space-then-tab wave: host item-inline, indent tab. Two live-shrink clusters converge here -- `> <TAB>[^1]:` at 9 documents and `- p / <2sp><TAB>[^1]:` at 20 -- and this file records a tab after a space reaching NOTHING, so these contexts must differ.",
+    "note": "marker-separator tab wave: marker dash, separator sp-tab, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
     "obsidian": {
       "defs": [],
       "refs": [
@@ -1290,7 +2639,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.719Z",
+    "recordedAt": "2026-10-18T10:37:09.221Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1305,7 +2654,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.409Z",
+    "recordedAt": "2026-10-18T10:37:08.861Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1327,7 +2676,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.408Z",
+    "recordedAt": "2026-10-18T10:37:08.861Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1356,7 +2705,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.408Z",
+    "recordedAt": "2026-10-18T10:37:08.860Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1371,7 +2720,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.369Z",
+    "recordedAt": "2026-10-18T10:37:08.822Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1393,7 +2742,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.368Z",
+    "recordedAt": "2026-10-18T10:37:08.820Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1415,7 +2764,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.367Z",
+    "recordedAt": "2026-10-18T10:37:08.819Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1444,7 +2793,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.366Z",
+    "recordedAt": "2026-10-18T10:37:08.818Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1473,7 +2822,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.364Z",
+    "recordedAt": "2026-10-18T10:37:08.817Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1488,7 +2837,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.362Z",
+    "recordedAt": "2026-10-18T10:37:08.815Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1517,7 +2866,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.361Z",
+    "recordedAt": "2026-10-18T10:37:08.814Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1546,7 +2895,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.360Z",
+    "recordedAt": "2026-10-18T10:37:08.812Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1575,7 +2924,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.359Z",
+    "recordedAt": "2026-10-18T10:37:08.811Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1604,7 +2953,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.358Z",
+    "recordedAt": "2026-10-18T10:37:08.809Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1633,7 +2982,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.357Z",
+    "recordedAt": "2026-10-18T10:37:08.807Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1662,7 +3011,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.356Z",
+    "recordedAt": "2026-10-18T10:37:08.806Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1696,7 +3045,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.720Z",
+    "recordedAt": "2026-10-18T10:37:09.181Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1723,7 +3072,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.721Z",
+    "recordedAt": "2026-10-18T10:37:09.182Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1750,7 +3099,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.721Z",
+    "recordedAt": "2026-10-18T10:37:09.183Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1777,7 +3126,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.722Z",
+    "recordedAt": "2026-10-18T10:37:09.184Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1804,7 +3153,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.726Z",
+    "recordedAt": "2026-10-18T10:37:09.185Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1831,7 +3180,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.724Z",
+    "recordedAt": "2026-10-18T10:37:09.184Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1846,7 +3195,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.480Z",
+    "recordedAt": "2026-10-18T10:37:08.932Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1875,7 +3224,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.479Z",
+    "recordedAt": "2026-10-18T10:37:08.931Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1904,7 +3253,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.478Z",
+    "recordedAt": "2026-10-18T10:37:08.930Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1933,7 +3282,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.477Z",
+    "recordedAt": "2026-10-18T10:37:08.929Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1948,7 +3297,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.476Z",
+    "recordedAt": "2026-10-18T10:37:08.928Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -1977,7 +3326,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.475Z",
+    "recordedAt": "2026-10-18T10:37:08.927Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2006,7 +3355,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.473Z",
+    "recordedAt": "2026-10-18T10:37:08.926Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2035,7 +3384,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.472Z",
+    "recordedAt": "2026-10-18T10:37:08.925Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2076,7 +3425,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.728Z",
+    "recordedAt": "2026-10-18T10:37:09.186Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2105,7 +3454,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.471Z",
+    "recordedAt": "2026-10-18T10:37:08.924Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2134,7 +3483,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.469Z",
+    "recordedAt": "2026-10-18T10:37:08.923Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2163,7 +3512,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.468Z",
+    "recordedAt": "2026-10-18T10:37:08.923Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2192,7 +3541,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.466Z",
+    "recordedAt": "2026-10-18T10:37:08.922Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2221,7 +3570,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.465Z",
+    "recordedAt": "2026-10-18T10:37:08.921Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2250,7 +3599,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.464Z",
+    "recordedAt": "2026-10-18T10:37:08.919Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2279,7 +3628,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.463Z",
+    "recordedAt": "2026-10-18T10:37:08.918Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2308,7 +3657,48 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.461Z",
+    "recordedAt": "2026-10-18T10:37:08.917Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-  [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker dash, separator 2sp, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          3,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          3,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.222Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2337,7 +3727,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.460Z",
+    "recordedAt": "2026-10-18T10:37:08.916Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2364,7 +3754,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.702Z",
+    "recordedAt": "2026-10-18T10:37:09.156Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2405,7 +3795,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.704Z",
+    "recordedAt": "2026-10-18T10:37:09.159Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2446,7 +3836,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.705Z",
+    "recordedAt": "2026-10-18T10:37:09.161Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2487,7 +3877,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.707Z",
+    "recordedAt": "2026-10-18T10:37:09.163Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2514,7 +3904,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.708Z",
+    "recordedAt": "2026-10-18T10:37:09.165Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2541,7 +3931,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.710Z",
+    "recordedAt": "2026-10-18T10:37:09.169Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2568,7 +3958,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.710Z",
+    "recordedAt": "2026-10-18T10:37:09.167Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2583,7 +3973,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.459Z",
+    "recordedAt": "2026-10-18T10:37:08.916Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2612,7 +4002,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.458Z",
+    "recordedAt": "2026-10-18T10:37:08.915Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2653,7 +4043,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.712Z",
+    "recordedAt": "2026-10-18T10:37:09.171Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2682,7 +4072,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.455Z",
+    "recordedAt": "2026-10-18T10:37:08.914Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2711,7 +4101,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.454Z",
+    "recordedAt": "2026-10-18T10:37:08.913Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2740,7 +4130,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.452Z",
+    "recordedAt": "2026-10-18T10:37:08.912Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2769,7 +4159,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.451Z",
+    "recordedAt": "2026-10-18T10:37:08.911Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2798,7 +4188,48 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.449Z",
+    "recordedAt": "2026-10-18T10:37:08.910Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker dash, separator 1sp, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.221Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2827,7 +4258,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.435Z",
+    "recordedAt": "2026-10-18T10:37:08.889Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2856,7 +4287,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.447Z",
+    "recordedAt": "2026-10-18T10:37:08.909Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2883,7 +4314,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.693Z",
+    "recordedAt": "2026-10-18T10:37:09.142Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2924,7 +4355,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.694Z",
+    "recordedAt": "2026-10-18T10:37:09.143Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2965,7 +4396,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.696Z",
+    "recordedAt": "2026-10-18T10:37:09.145Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3006,7 +4437,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.697Z",
+    "recordedAt": "2026-10-18T10:37:09.147Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3033,7 +4464,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.699Z",
+    "recordedAt": "2026-10-18T10:37:09.150Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3060,7 +4491,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.700Z",
+    "recordedAt": "2026-10-18T10:37:09.153Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3075,7 +4506,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.447Z",
+    "recordedAt": "2026-10-18T10:37:08.908Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3102,7 +4533,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.700Z",
+    "recordedAt": "2026-10-18T10:37:09.151Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3117,7 +4548,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.446Z",
+    "recordedAt": "2026-10-18T10:37:08.907Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3146,7 +4577,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.445Z",
+    "recordedAt": "2026-10-18T10:37:08.906Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3187,7 +4618,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.701Z",
+    "recordedAt": "2026-10-18T10:37:09.154Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3216,7 +4647,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.444Z",
+    "recordedAt": "2026-10-18T10:37:08.905Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3245,7 +4676,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.444Z",
+    "recordedAt": "2026-10-18T10:37:08.904Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3274,7 +4705,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.443Z",
+    "recordedAt": "2026-10-18T10:37:08.903Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3303,7 +4734,198 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.442Z",
+    "recordedAt": "2026-10-18T10:37:08.901Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\t    [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ord, separator tab4, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.246Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\t   [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ord, separator tab3, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          4,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          4,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.245Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\t  [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ord, separator tab2, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          4,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          4,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.244Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\t [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ord, separator tab1, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          4,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          4,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.242Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.\t[^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ord, separator tab, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          4,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          4,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.241Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3318,7 +4940,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.415Z",
+    "recordedAt": "2026-10-18T10:37:08.865Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3347,7 +4969,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.414Z",
+    "recordedAt": "2026-10-18T10:37:08.865Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3376,7 +4998,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.413Z",
+    "recordedAt": "2026-10-18T10:37:08.864Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3391,7 +5013,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.395Z",
+    "recordedAt": "2026-10-18T10:37:08.842Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3420,7 +5042,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.394Z",
+    "recordedAt": "2026-10-18T10:37:08.841Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3449,7 +5071,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.394Z",
+    "recordedAt": "2026-10-18T10:37:08.840Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3478,7 +5100,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.393Z",
+    "recordedAt": "2026-10-18T10:37:08.839Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3507,7 +5129,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.436Z",
+    "recordedAt": "2026-10-18T10:37:08.892Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3536,7 +5158,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.392Z",
+    "recordedAt": "2026-10-18T10:37:08.837Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3565,7 +5187,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.391Z",
+    "recordedAt": "2026-10-18T10:37:08.836Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3594,7 +5216,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.390Z",
+    "recordedAt": "2026-10-18T10:37:08.835Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3623,7 +5245,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.389Z",
+    "recordedAt": "2026-10-18T10:37:08.835Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3652,7 +5274,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.388Z",
+    "recordedAt": "2026-10-18T10:37:08.834Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3681,7 +5303,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.387Z",
+    "recordedAt": "2026-10-18T10:37:08.833Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3710,7 +5332,34 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.386Z",
+    "recordedAt": "2026-10-18T10:37:08.832Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. \t[^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ord, separator sp-tab, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.247Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3725,7 +5374,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.419Z",
+    "recordedAt": "2026-10-18T10:37:08.870Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3754,7 +5403,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.417Z",
+    "recordedAt": "2026-10-18T10:37:08.868Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3783,7 +5432,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.416Z",
+    "recordedAt": "2026-10-18T10:37:08.866Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3798,7 +5447,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.405Z",
+    "recordedAt": "2026-10-18T10:37:08.857Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3827,7 +5476,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.405Z",
+    "recordedAt": "2026-10-18T10:37:08.855Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3856,7 +5505,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.404Z",
+    "recordedAt": "2026-10-18T10:37:08.853Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3885,7 +5534,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.403Z",
+    "recordedAt": "2026-10-18T10:37:08.852Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3914,7 +5563,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.437Z",
+    "recordedAt": "2026-10-18T10:37:08.893Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3943,7 +5592,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.401Z",
+    "recordedAt": "2026-10-18T10:37:08.848Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -3972,7 +5621,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.400Z",
+    "recordedAt": "2026-10-18T10:37:08.847Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4001,7 +5650,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.399Z",
+    "recordedAt": "2026-10-18T10:37:08.846Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4030,7 +5679,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.398Z",
+    "recordedAt": "2026-10-18T10:37:08.845Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4059,7 +5708,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.397Z",
+    "recordedAt": "2026-10-18T10:37:08.844Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4088,7 +5737,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.396Z",
+    "recordedAt": "2026-10-18T10:37:08.843Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4117,7 +5766,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.396Z",
+    "recordedAt": "2026-10-18T10:37:08.842Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4132,7 +5781,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.512Z",
+    "recordedAt": "2026-10-18T10:37:08.964Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4161,7 +5810,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.511Z",
+    "recordedAt": "2026-10-18T10:37:08.962Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4183,7 +5832,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.510Z",
+    "recordedAt": "2026-10-18T10:37:08.961Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4205,7 +5854,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.510Z",
+    "recordedAt": "2026-10-18T10:37:08.959Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4220,7 +5869,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.509Z",
+    "recordedAt": "2026-10-18T10:37:08.959Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4249,7 +5898,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.508Z",
+    "recordedAt": "2026-10-18T10:37:08.958Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4278,7 +5927,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.507Z",
+    "recordedAt": "2026-10-18T10:37:08.957Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4307,7 +5956,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.506Z",
+    "recordedAt": "2026-10-18T10:37:08.956Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4322,7 +5971,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.504Z",
+    "recordedAt": "2026-10-18T10:37:08.956Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4351,7 +6000,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.504Z",
+    "recordedAt": "2026-10-18T10:37:08.955Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4380,7 +6029,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.503Z",
+    "recordedAt": "2026-10-18T10:37:08.954Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4402,7 +6051,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.501Z",
+    "recordedAt": "2026-10-18T10:37:08.953Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4417,7 +6066,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.500Z",
+    "recordedAt": "2026-10-18T10:37:08.951Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4446,7 +6095,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.498Z",
+    "recordedAt": "2026-10-18T10:37:08.950Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4475,7 +6124,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.497Z",
+    "recordedAt": "2026-10-18T10:37:08.949Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4504,7 +6153,48 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.495Z",
+    "recordedAt": "2026-10-18T10:37:08.948Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.  [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ord, separator 2sp, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          5,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          5,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.249Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4519,7 +6209,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.494Z",
+    "recordedAt": "2026-10-18T10:37:08.947Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4548,7 +6238,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.493Z",
+    "recordedAt": "2026-10-18T10:37:08.946Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4577,7 +6267,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.492Z",
+    "recordedAt": "2026-10-18T10:37:08.945Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4606,7 +6296,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.491Z",
+    "recordedAt": "2026-10-18T10:37:08.944Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4621,7 +6311,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.490Z",
+    "recordedAt": "2026-10-18T10:37:08.942Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4650,7 +6340,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.489Z",
+    "recordedAt": "2026-10-18T10:37:08.941Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4679,7 +6369,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.488Z",
+    "recordedAt": "2026-10-18T10:37:08.940Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4708,7 +6398,48 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.487Z",
+    "recordedAt": "2026-10-18T10:37:08.939Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. [^1]: def\n\nuse[^1]\n",
+    "note": "marker-separator tab wave: marker ord, separator 1sp, label on the SAME line. The def-miss@code shrink's largest cluster is 34 forms / 50 documents and every short one is this shape; earlier waves only covered a label on a LATER line.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          4,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          4,
+          0
+        ]
+      ],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T10:37:09.248Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4737,7 +6468,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.486Z",
+    "recordedAt": "2026-10-18T10:37:08.938Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4766,7 +6497,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.485Z",
+    "recordedAt": "2026-10-18T10:37:08.937Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4795,7 +6526,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.484Z",
+    "recordedAt": "2026-10-18T10:37:08.936Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4824,7 +6555,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.484Z",
+    "recordedAt": "2026-10-18T10:37:08.935Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4853,7 +6584,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.483Z",
+    "recordedAt": "2026-10-18T10:37:08.935Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4882,7 +6613,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.482Z",
+    "recordedAt": "2026-10-18T10:37:08.934Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4911,7 +6642,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.481Z",
+    "recordedAt": "2026-10-18T10:37:08.933Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4940,7 +6671,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.480Z",
+    "recordedAt": "2026-10-18T10:37:08.932Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -4975,7 +6706,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.609Z",
+    "recordedAt": "2026-10-18T10:37:09.066Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5010,7 +6741,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.615Z",
+    "recordedAt": "2026-10-18T10:37:09.070Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5039,7 +6770,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.615Z",
+    "recordedAt": "2026-10-18T10:37:09.070Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5080,7 +6811,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.614Z",
+    "recordedAt": "2026-10-18T10:37:09.069Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5121,7 +6852,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.613Z",
+    "recordedAt": "2026-10-18T10:37:09.068Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5162,7 +6893,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.611Z",
+    "recordedAt": "2026-10-18T10:37:09.067Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5203,7 +6934,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.610Z",
+    "recordedAt": "2026-10-18T10:37:09.067Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5230,7 +6961,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.684Z",
+    "recordedAt": "2026-10-18T10:37:09.135Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5271,7 +7002,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.685Z",
+    "recordedAt": "2026-10-18T10:37:09.135Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5312,7 +7043,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.686Z",
+    "recordedAt": "2026-10-18T10:37:09.137Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5346,7 +7077,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.688Z",
+    "recordedAt": "2026-10-18T10:37:09.137Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5373,7 +7104,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.689Z",
+    "recordedAt": "2026-10-18T10:37:09.138Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5400,7 +7131,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.690Z",
+    "recordedAt": "2026-10-18T10:37:09.139Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5427,7 +7158,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.690Z",
+    "recordedAt": "2026-10-18T10:37:09.139Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5468,7 +7199,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.742Z",
+    "recordedAt": "2026-10-18T10:37:09.201Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5502,7 +7233,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.741Z",
+    "recordedAt": "2026-10-18T10:37:09.199Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5543,7 +7274,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.743Z",
+    "recordedAt": "2026-10-18T10:37:09.202Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5570,7 +7301,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.740Z",
+    "recordedAt": "2026-10-18T10:37:09.199Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5597,7 +7328,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.740Z",
+    "recordedAt": "2026-10-18T10:37:09.198Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5638,7 +7369,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.691Z",
+    "recordedAt": "2026-10-18T10:37:09.140Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5679,7 +7410,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.670Z",
+    "recordedAt": "2026-10-18T10:37:09.124Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5714,7 +7445,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.670Z",
+    "recordedAt": "2026-10-18T10:37:09.123Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5743,7 +7474,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.668Z",
+    "recordedAt": "2026-10-18T10:37:09.120Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5778,7 +7509,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.667Z",
+    "recordedAt": "2026-10-18T10:37:09.119Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5813,7 +7544,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.669Z",
+    "recordedAt": "2026-10-18T10:37:09.122Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5854,7 +7585,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.733Z",
+    "recordedAt": "2026-10-18T10:37:09.190Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5888,7 +7619,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.732Z",
+    "recordedAt": "2026-10-18T10:37:09.189Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5929,7 +7660,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.734Z",
+    "recordedAt": "2026-10-18T10:37:09.191Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5956,7 +7687,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.730Z",
+    "recordedAt": "2026-10-18T10:37:09.188Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -5983,7 +7714,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.729Z",
+    "recordedAt": "2026-10-18T10:37:09.187Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6024,7 +7755,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.748Z",
+    "recordedAt": "2026-10-18T10:37:09.208Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6058,7 +7789,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.746Z",
+    "recordedAt": "2026-10-18T10:37:09.206Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6085,7 +7816,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.750Z",
+    "recordedAt": "2026-10-18T10:37:09.209Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6119,7 +7850,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.745Z",
+    "recordedAt": "2026-10-18T10:37:09.205Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6153,7 +7884,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.744Z",
+    "recordedAt": "2026-10-18T10:37:09.204Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6188,7 +7919,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.623Z",
+    "recordedAt": "2026-10-18T10:37:09.080Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6223,7 +7954,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.631Z",
+    "recordedAt": "2026-10-18T10:37:09.089Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6252,7 +7983,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.630Z",
+    "recordedAt": "2026-10-18T10:37:09.088Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6293,7 +8024,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.628Z",
+    "recordedAt": "2026-10-18T10:37:09.086Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6334,7 +8065,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.627Z",
+    "recordedAt": "2026-10-18T10:37:09.084Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6375,7 +8106,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.626Z",
+    "recordedAt": "2026-10-18T10:37:09.083Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6416,7 +8147,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.756Z",
+    "recordedAt": "2026-10-18T10:37:09.213Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6450,7 +8181,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.755Z",
+    "recordedAt": "2026-10-18T10:37:09.212Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6491,7 +8222,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.757Z",
+    "recordedAt": "2026-10-18T10:37:09.214Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6518,7 +8249,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.753Z",
+    "recordedAt": "2026-10-18T10:37:09.211Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6545,7 +8276,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.752Z",
+    "recordedAt": "2026-10-18T10:37:09.211Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6586,7 +8317,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.683Z",
+    "recordedAt": "2026-10-18T10:37:09.134Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6627,7 +8358,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.681Z",
+    "recordedAt": "2026-10-18T10:37:09.133Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6656,7 +8387,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.678Z",
+    "recordedAt": "2026-10-18T10:37:09.131Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6691,7 +8422,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.677Z",
+    "recordedAt": "2026-10-18T10:37:09.130Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6726,7 +8457,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.679Z",
+    "recordedAt": "2026-10-18T10:37:09.132Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6767,7 +8498,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.625Z",
+    "recordedAt": "2026-10-18T10:37:09.082Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6802,7 +8533,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.633Z",
+    "recordedAt": "2026-10-18T10:37:09.091Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6837,7 +8568,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.645Z",
+    "recordedAt": "2026-10-18T10:37:09.098Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6866,7 +8597,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.643Z",
+    "recordedAt": "2026-10-18T10:37:09.097Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6907,7 +8638,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.640Z",
+    "recordedAt": "2026-10-18T10:37:09.096Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6948,7 +8679,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.638Z",
+    "recordedAt": "2026-10-18T10:37:09.094Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -6989,7 +8720,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.637Z",
+    "recordedAt": "2026-10-18T10:37:09.093Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7030,7 +8761,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.635Z",
+    "recordedAt": "2026-10-18T10:37:09.092Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7071,7 +8802,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.529Z",
+    "recordedAt": "2026-10-18T10:37:08.990Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7112,7 +8843,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.529Z",
+    "recordedAt": "2026-10-18T10:37:08.991Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7153,7 +8884,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.533Z",
+    "recordedAt": "2026-10-18T10:37:08.995Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7194,7 +8925,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.516Z",
+    "recordedAt": "2026-10-18T10:37:08.971Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7235,7 +8966,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.514Z",
+    "recordedAt": "2026-10-18T10:37:08.967Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7276,7 +9007,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.530Z",
+    "recordedAt": "2026-10-18T10:37:08.992Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7317,7 +9048,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.541Z",
+    "recordedAt": "2026-10-18T10:37:09.005Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7358,7 +9089,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.518Z",
+    "recordedAt": "2026-10-18T10:37:08.975Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7399,7 +9130,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.549Z",
+    "recordedAt": "2026-10-18T10:37:09.009Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7440,7 +9171,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.532Z",
+    "recordedAt": "2026-10-18T10:37:08.994Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7481,7 +9212,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.534Z",
+    "recordedAt": "2026-10-18T10:37:08.997Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7522,7 +9253,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.552Z",
+    "recordedAt": "2026-10-18T10:37:09.010Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7563,7 +9294,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.556Z",
+    "recordedAt": "2026-10-18T10:37:09.014Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7604,7 +9335,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.554Z",
+    "recordedAt": "2026-10-18T10:37:09.013Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7645,7 +9376,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.521Z",
+    "recordedAt": "2026-10-18T10:37:08.980Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7684,7 +9415,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.535Z",
+    "recordedAt": "2026-10-18T10:37:08.999Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7725,7 +9456,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.553Z",
+    "recordedAt": "2026-10-18T10:37:09.012Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7766,7 +9497,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.539Z",
+    "recordedAt": "2026-10-18T10:37:09.003Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7803,7 +9534,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.536Z",
+    "recordedAt": "2026-10-18T10:37:09.001Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7844,7 +9575,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.540Z",
+    "recordedAt": "2026-10-18T10:37:09.004Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7885,7 +9616,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.559Z",
+    "recordedAt": "2026-10-18T10:37:09.018Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7938,7 +9669,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.523Z",
+    "recordedAt": "2026-10-18T10:37:08.982Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7979,7 +9710,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.558Z",
+    "recordedAt": "2026-10-18T10:37:09.017Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8020,7 +9751,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.546Z",
+    "recordedAt": "2026-10-18T10:37:09.007Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8061,7 +9792,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.520Z",
+    "recordedAt": "2026-10-18T10:37:08.978Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8102,7 +9833,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.515Z",
+    "recordedAt": "2026-10-18T10:37:08.969Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8143,7 +9874,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.537Z",
+    "recordedAt": "2026-10-18T10:37:09.002Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8184,7 +9915,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.545Z",
+    "recordedAt": "2026-10-18T10:37:09.006Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8225,7 +9956,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.528Z",
+    "recordedAt": "2026-10-18T10:37:08.988Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8266,7 +9997,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.662Z",
+    "recordedAt": "2026-10-18T10:37:09.111Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8307,7 +10038,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.661Z",
+    "recordedAt": "2026-10-18T10:37:09.110Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8336,7 +10067,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.659Z",
+    "recordedAt": "2026-10-18T10:37:09.108Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8371,7 +10102,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.657Z",
+    "recordedAt": "2026-10-18T10:37:09.107Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8406,7 +10137,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.660Z",
+    "recordedAt": "2026-10-18T10:37:09.109Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8447,7 +10178,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.616Z",
+    "recordedAt": "2026-10-18T10:37:09.071Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8482,7 +10213,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.647Z",
+    "recordedAt": "2026-10-18T10:37:09.099Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8517,7 +10248,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.655Z",
+    "recordedAt": "2026-10-18T10:37:09.106Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8546,7 +10277,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.654Z",
+    "recordedAt": "2026-10-18T10:37:09.105Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8587,7 +10318,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.651Z",
+    "recordedAt": "2026-10-18T10:37:09.104Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8628,7 +10359,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.650Z",
+    "recordedAt": "2026-10-18T10:37:09.103Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8669,7 +10400,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.648Z",
+    "recordedAt": "2026-10-18T10:37:09.102Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8710,7 +10441,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.648Z",
+    "recordedAt": "2026-10-18T10:37:09.101Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8751,7 +10482,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.621Z",
+    "recordedAt": "2026-10-18T10:37:09.078Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8792,7 +10523,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.621Z",
+    "recordedAt": "2026-10-18T10:37:09.076Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8833,7 +10564,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.620Z",
+    "recordedAt": "2026-10-18T10:37:09.075Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8874,7 +10605,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.619Z",
+    "recordedAt": "2026-10-18T10:37:09.074Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8915,7 +10646,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.618Z",
+    "recordedAt": "2026-10-18T10:37:09.073Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8956,7 +10687,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.617Z",
+    "recordedAt": "2026-10-18T10:37:09.072Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8971,7 +10702,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.433Z",
+    "recordedAt": "2026-10-18T10:37:08.888Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9012,7 +10743,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.676Z",
+    "recordedAt": "2026-10-18T10:37:09.129Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9047,7 +10778,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.675Z",
+    "recordedAt": "2026-10-18T10:37:09.128Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9076,7 +10807,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.673Z",
+    "recordedAt": "2026-10-18T10:37:09.126Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9111,7 +10842,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.672Z",
+    "recordedAt": "2026-10-18T10:37:09.125Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9146,7 +10877,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.674Z",
+    "recordedAt": "2026-10-18T10:37:09.127Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9187,7 +10918,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.738Z",
+    "recordedAt": "2026-10-18T10:37:09.196Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9221,7 +10952,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.737Z",
+    "recordedAt": "2026-10-18T10:37:09.195Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9262,7 +10993,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.739Z",
+    "recordedAt": "2026-10-18T10:37:09.197Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9289,7 +11020,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.736Z",
+    "recordedAt": "2026-10-18T10:37:09.194Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9316,7 +11047,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.735Z",
+    "recordedAt": "2026-10-18T10:37:09.192Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9357,7 +11088,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.666Z",
+    "recordedAt": "2026-10-18T10:37:09.117Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9398,7 +11129,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.665Z",
+    "recordedAt": "2026-10-18T10:37:09.116Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9427,7 +11158,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.664Z",
+    "recordedAt": "2026-10-18T10:37:09.112Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9462,7 +11193,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.663Z",
+    "recordedAt": "2026-10-18T10:37:09.111Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9497,7 +11228,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.664Z",
+    "recordedAt": "2026-10-18T10:37:09.114Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9512,7 +11243,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.432Z",
+    "recordedAt": "2026-10-18T10:37:08.887Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9553,7 +11284,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.566Z",
+    "recordedAt": "2026-10-18T10:37:09.023Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9594,7 +11325,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.560Z",
+    "recordedAt": "2026-10-18T10:37:09.019Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9635,7 +11366,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.588Z",
+    "recordedAt": "2026-10-18T10:37:09.047Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9676,7 +11407,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.605Z",
+    "recordedAt": "2026-10-18T10:37:09.061Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9717,7 +11448,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.608Z",
+    "recordedAt": "2026-10-18T10:37:09.065Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9746,7 +11477,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.594Z",
+    "recordedAt": "2026-10-18T10:37:09.051Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9775,7 +11506,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.592Z",
+    "recordedAt": "2026-10-18T10:37:09.050Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9816,7 +11547,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.591Z",
+    "recordedAt": "2026-10-18T10:37:09.049Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9851,7 +11582,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.597Z",
+    "recordedAt": "2026-10-18T10:37:09.054Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9880,7 +11611,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.603Z",
+    "recordedAt": "2026-10-18T10:37:09.059Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9921,7 +11652,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.604Z",
+    "recordedAt": "2026-10-18T10:37:09.060Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -9950,7 +11681,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.606Z",
+    "recordedAt": "2026-10-18T10:37:09.062Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10003,7 +11734,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.607Z",
+    "recordedAt": "2026-10-18T10:37:09.063Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10032,7 +11763,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.599Z",
+    "recordedAt": "2026-10-18T10:37:09.055Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10073,7 +11804,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.601Z",
+    "recordedAt": "2026-10-18T10:37:09.056Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10102,7 +11833,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.608Z",
+    "recordedAt": "2026-10-18T10:37:09.064Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10131,7 +11862,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.586Z",
+    "recordedAt": "2026-10-18T10:37:09.046Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10160,7 +11891,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.595Z",
+    "recordedAt": "2026-10-18T10:37:09.053Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10201,7 +11932,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.585Z",
+    "recordedAt": "2026-10-18T10:37:09.046Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10242,7 +11973,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.603Z",
+    "recordedAt": "2026-10-18T10:37:09.058Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10283,7 +12014,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.568Z",
+    "recordedAt": "2026-10-18T10:37:09.024Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10324,7 +12055,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.564Z",
+    "recordedAt": "2026-10-18T10:37:09.022Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10365,7 +12096,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.562Z",
+    "recordedAt": "2026-10-18T10:37:09.021Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10406,7 +12137,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.570Z",
+    "recordedAt": "2026-10-18T10:37:09.026Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10447,7 +12178,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.582Z",
+    "recordedAt": "2026-10-18T10:37:09.042Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10476,7 +12207,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.575Z",
+    "recordedAt": "2026-10-18T10:37:09.033Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10517,7 +12248,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.580Z",
+    "recordedAt": "2026-10-18T10:37:09.039Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10558,7 +12289,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.573Z",
+    "recordedAt": "2026-10-18T10:37:09.029Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10595,7 +12326,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.576Z",
+    "recordedAt": "2026-10-18T10:37:09.034Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10636,7 +12367,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.578Z",
+    "recordedAt": "2026-10-18T10:37:09.037Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10673,7 +12404,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.585Z",
+    "recordedAt": "2026-10-18T10:37:09.045Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10714,7 +12445,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.576Z",
+    "recordedAt": "2026-10-18T10:37:09.035Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10767,7 +12498,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.574Z",
+    "recordedAt": "2026-10-18T10:37:09.031Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10808,7 +12539,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.584Z",
+    "recordedAt": "2026-10-18T10:37:09.044Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10849,7 +12580,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.581Z",
+    "recordedAt": "2026-10-18T10:37:09.041Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10878,7 +12609,7 @@
       "refs": []
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.571Z",
+    "recordedAt": "2026-10-18T10:37:09.027Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10919,7 +12650,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.561Z",
+    "recordedAt": "2026-10-18T10:37:09.020Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -10960,7 +12691,7 @@
       ]
     },
     "refsTrustworthy": true,
-    "recordedAt": "2026-10-18T08:53:00.577Z",
+    "recordedAt": "2026-10-18T10:37:09.036Z",
     "obsidianVersion": "1.14.4"
   }
 ]

@@ -62,6 +62,7 @@ import { commentQuoteExtentTransform } from "./lib/comment-quote-extent.js";
 import { itemCommentLazyTransform } from "./lib/item-comment-lazy.js";
 import { definitionTabAfterQuoteTransform } from "./lib/definition-tab-after-quote.js";
 import { definitionTabPastItemTransform } from "./lib/definition-tab-past-item.js";
+import { markerTabDefinitionTransform } from "./lib/marker-tab-definition.js";
 import { quotedFenceLazyTransform } from "./lib/quoted-fence-lazy.js";
 import { quoteCommentLazyTransform } from "./lib/quote-comment-lazy.js";
 import {
@@ -948,6 +949,11 @@ export default function remarkObsidian(
     // sibling -- early, next to the comment and fence absorptions -- this is completely inert:
     // the definitions it removes have not been created yet there. Measured both ways.
     definitionTabPastItemTransform(tree, String(file));
+    // Beside it, and late for the same reason: it CREATES a definition out of a code node, so
+    // every pass that could still move or extend one has run.
+    markerTabDefinitionTransform(tree, String(file), (markdown) =>
+      reparse(markdown),
+    );
     // After every pass that reads a newline out of a text value, and before points
     // are normalised from the offsets it sets.
     if (opts.positionedBreaks) breakPositionsTransform(tree, String(file));

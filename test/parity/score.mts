@@ -126,6 +126,9 @@ const LEADING_TAB_DEF = /^\t {0,3}\[\^([^\]]+)\]:/u;
 /** A quoted line whose content opens a new block: a list marker or a footnote label. */
 const QUOTED_BLOCK_OPENER =
   /^ {0,3}(?:(?:[-*+]|\d{1,9}[.)])[ \t]|\[\^[^\]]*\]:|>)/u;
+/** A marker, a TAB, at most three further spaces, then a label -- the separator shape. */
+const MARKER_TAB_LABEL =
+  /^([ \t]*)((?:[-*+]|\d{1,9}[.)]))\t {0,3}\[\^([^\]]+)\]:/u;
 const ENDS_ITEM =
   /^ {0,3}(?:#{1,6}(?:[ \t]|$)|```|~~~|[-*+][ \t]|\d{1,9}[.)][ \t])/u;
 const LABEL = /^\[\^([^\]]*)\]:/u;
@@ -1124,6 +1127,59 @@ const RULES: readonly Rule[] = [
       return {
         defs: ours.defs.filter((d) => !dead.has(d[1])),
         refs: ours.refs.filter((r) => !dead.has(r[1])),
+      };
+    },
+  },
+  {
+    name: "marker-tab-separator-defines",
+    what: "marker + TAB + up to three spaces defines at markerWidth+1, ROOT items only",
+    apply: (text, ours, tree) => {
+      // The largest cluster of the `def-miss @ code` shrink -- 34 forms, 50 documents -- and
+      // every short one is a tab in the marker's own SEPARATOR with the label on the same
+      // line. Earlier waves only ever put the label on a LATER line, so this axis was unprobed.
+      // 48 probes, six markers by eight separators:
+      //
+      //               tab     tab1    tab2    tab3    tab4    1sp     2sp
+      //     dash      2/2     2/2     2/-*    2/-*    -/-     2/2     3/3
+      //     ord       4/4     4/4     4/4     4/4     -/-     4/4     5/5
+      //     ind-dash  5/5     5/-*    5/-*    5/-*    -/-     5/5     6/6
+      //     ind-ord   6/6     6/6     6/-*    6/-*    -/-     6/6     7/7
+      //
+      // A tab plus up to three spaces DEFINES, at the leading indent plus the marker's width
+      // plus one, and tab plus four is code on both sides. We stop defining two columns early.
+      // The `ord` row agreeing throughout and the `tab4` column agreeing throughout are the
+      // controls: this is a separator rule, not a fact about tabs or about wide markers.
+      const lines = text.split("\n");
+      // ROOT-LEVEL items only, taken from the tree. The unrestricted form scores -8 and its
+      // losses are nested markers: `- amet...` / `⟨2sp⟩2)⇥[^Note]:` has Obsidian defining
+      // NOTHING, where an equally indented marker at root -- `⟨3sp⟩-⇥⟨2sp⟩[^1]:` in the probe
+      // table -- defines at column 5. The probes only ever placed the marker at root, so the
+      // nested case was never measured and the rule must not claim it.
+      const rootLines = new Set<number>();
+      for (const node of tree.children) {
+        if (node.type !== "list") continue;
+        for (const item of (node as unknown as { children: Node[] }).children) {
+          const line = item.position?.start?.line;
+          if (line !== undefined) rootLines.add(line - 1);
+        }
+      }
+      const added: Def[] = [];
+      for (let at = 0; at < lines.length; at++) {
+        if (!rootLines.has(at)) continue;
+        const hit = MARKER_TAB_LABEL.exec(lines[at] ?? "");
+        if (!hit) continue;
+        const name = hit[3]!.toLowerCase();
+        if (ours.defs.some((d) => d[0].toLowerCase() === name && d[1] === at)) {
+          continue;
+        }
+        added.push([name, at, hit[1]!.length + hit[2]!.length + 1, at]);
+      }
+      if (added.length === 0) return ours;
+      return {
+        defs: [...ours.defs, ...added].sort(
+          (a, b) => a[1] - b[1] || a[2] - b[2],
+        ),
+        refs: ours.refs,
       };
     },
   },
