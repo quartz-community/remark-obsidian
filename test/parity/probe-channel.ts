@@ -100,6 +100,28 @@ export function augment(markdown: string): string {
   return `${markdown.endsWith("\n") ? markdown : `${markdown}\n`}\n${tail}\n`;
 }
 
+/**
+ * Written to a temp name and RENAMED, because the plugin polls every 400ms.
+ *
+ * `writeFileSync` is not atomic, so a batch can be read while half-written: the plugin's
+ * `JSON.parse` throws, it answers with an error object, and the caller sees an exchange that
+ * produced nothing. Seen twice, on 64- and 18-probe batches, both succeeding on retry -- the
+ * signature of a race rather than a size limit. The RESPONSE already used rename for exactly
+ * this; the request did not.
+ *
+ * Five consecutive exchanges pass either way, so this is not proven by reproduction. It is the
+ * same discipline the response side already has, on the same reasoning, and costs one rename.
+ */
+function writeRequest(markdowns: readonly string[]): void {
+  fs.writeFileSync(
+    `${REQUEST}.part`,
+    JSON.stringify(
+      markdowns.map((markdown, at) => ({ id: String(at), markdown })),
+    ),
+  );
+  fs.renameSync(`${REQUEST}.part`, REQUEST);
+}
+
 const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -111,12 +133,7 @@ async function exchange(
   fs.mkdirSync(DIR, { recursive: true });
   fs.rmSync(RESPONSE, { force: true });
   fs.rmSync(`${RESPONSE}.part`, { force: true });
-  fs.writeFileSync(
-    REQUEST,
-    JSON.stringify(
-      markdowns.map((markdown, at) => ({ id: String(at), markdown })),
-    ),
-  );
+  writeRequest(markdowns);
 
   const until = Date.now() + timeoutMs;
   while (Date.now() < until) {
@@ -154,12 +171,7 @@ export function askRawSync(
   fs.mkdirSync(DIR, { recursive: true });
   fs.rmSync(RESPONSE, { force: true });
   fs.rmSync(`${RESPONSE}.part`, { force: true });
-  fs.writeFileSync(
-    REQUEST,
-    JSON.stringify(
-      markdowns.map((markdown, at) => ({ id: String(at), markdown })),
-    ),
-  );
+  writeRequest(markdowns);
 
   const gate = new Int32Array(new SharedArrayBuffer(4));
   const until = Date.now() + timeoutMs;
