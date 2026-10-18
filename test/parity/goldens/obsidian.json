@@ -86313,8 +86313,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A TAB FOLLOWING A SPACE does not reach the four-column indented-code threshold. Probed across six shapes: `\\t[^1]: def`, `\\t\\t[^1]: def` and `    [^1]: def` yield NO definition, while `  \\t[^1]: def` defines at column 0, `>   \\t[^1]: def` at column 2 and `+\\t   [^1]: def` at column 2. So a leading tab counts four columns and a tab after a space does not -- the same asymmetry the arbiter shows for ` \\t[^1]: def`. micromark follows CommonMark and advances to the next tab stop either way, so it makes these lines indented CODE and no definition exists to place; verified unchanged at HEAD~3, so this is micromark's own tab handling rather than any pass here. Closing it needs a repair that re-parses such a code node, and the referee holds 127 definitions on tab-prefixed lines that we miss."
+      "triage": "match"
     },
     "probe/def-tab/four-spaces": {
       "id": "probe/def-tab/four-spaces",

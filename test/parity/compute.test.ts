@@ -149,22 +149,6 @@ describe("positioned oracle", () => {
     // columns, so no character count discriminates, which refuted two implementations at -15
     // and -21 referee documents and broke `commonmark/tabs/5` in both.
     "probe/item-tab-threshold/tab-three: a leading tab resets the item's content column",
-    // A tab FOLLOWING A SPACE does not reach the four-column indented-code threshold, so
-    // Obsidian defines these and micromark makes them `code`. Probed across six shapes:
-    // `\t[^1]: def`, `\t\t[^1]: def` and `    [^1]: def` yield NO definition, while
-    // `  \t[^1]: def` is column 0, `>   \t[^1]: def` is column 2 and `+\t   [^1]: def` is
-    // column 2 -- so a LEADING tab counts four columns and one after a space does not.
-    //
-    // micromark follows CommonMark and advances to the next tab stop either way, and the
-    // tree is unchanged at HEAD~3, so this is its own tab handling rather than a pass
-    // here. The reference is unplaceable because the definition it belongs to never
-    // exists. The referee holds 127 definitions on tab-prefixed lines that we miss.
-    // `probe/def-tab/quote-spaces-tab` was here and is CLOSED: the container-aware repair
-    // strips the quote's own prefix before measuring, so `>   \t[^1]: def` is a definition
-    // at column 2. The list sibling remains, and its cause is different -- there the tab is
-    // the MARKER'S SEPARATOR rather than indentation after a space, so `+\t   [^1]: def`
-    // turns on micromark's list-item tab straddle instead of the code threshold.
-    "probe/def-tab/marker-tab-spaces: the tab is the marker's own separator",
     // AN UNCLOSED `%%` HOSTED BY A LIST ITEM is CLOSED by `itemCommentLazyTransform`, and four
     // of the six cases promoted for it now MATCH. What remains here is the CLOSED-region
     // sibling, which is a different mechanism: `commentRegionTransform` owns a `%%...%%` region
@@ -435,8 +419,8 @@ describe("positioned oracle", () => {
     //   tab-quote family, which the MAIN GATE CANNOT SEE because `meta.footnotes` is names
     //   only. The names and the rule are right -- that family took the referee from 5717 to
     //   5744 -- and a column or end line is out by the quote's own prefix.
-    footnotes: 7,
-    footnoteRefs: 7,
+    footnotes: 6,
+    footnoteRefs: 6,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
     // Obsidian reports a heading's column as its containing block's content column,
@@ -999,8 +983,6 @@ describe("positioned oracle", () => {
     "probe/quote-tab-root-def/tab:footnotes",
     "probe/def-gap/marker-tab-sep:listItems",
     "probe/def-gap/marker-tab-sep:sections",
-    "probe/def-tab/marker-tab-spaces:footnoteRefs",
-    "probe/def-tab/marker-tab-spaces:footnotes",
     "probe/def-deindent/quote-indented-one:footnotes",
     "probe/empty-container/nested-list:listItems",
     "probe/item-tab-threshold/tab-three:footnoteRefs",

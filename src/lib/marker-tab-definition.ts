@@ -74,7 +74,13 @@ export function markerTabDefinitionTransform(
       const line = first.position?.start?.line;
       if (line === undefined) continue;
 
-      const value = (first as unknown as { value?: string }).value ?? "";
+      // The code node's value keeps whatever indent exceeded the stripped four columns, so
+      // `+⇥⟨3sp⟩[^1]: def` arrives as `" [^1]: def"` with a leading space while `-⇥⟨2sp⟩`
+      // arrives clean. Guarding on `startsWith("[^")` therefore caught only the narrowest
+      // separator and silently skipped the rest of the family -- tab+3 and every
+      // leading-indented marker.
+      const raw = (first as unknown as { value?: string }).value ?? "";
+      const value = raw.replace(/^ +/u, "");
       if (!value.startsWith("[^")) continue;
 
       // Where the label actually begins, which is NOT the code node's start: the node starts
