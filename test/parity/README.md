@@ -6847,3 +6847,60 @@ separate question and neither shape is in the axis.
 
 So the axis has now opened and closed twice in one session, and the second cycle cost one
 token in a pass nobody had read, found by the instrument built for exactly that question.
+
+## The `code` dimension's remaining 91, and the sixth death of a shape selector
+
+With the quote family closed, `code` sits at 775/883. Classifying the 108 that still disagree
+by OUR innermost node covering the line Obsidian calls code:
+
+    43  paragraph              we read prose, Obsidian reads code
+    27  code                   we have code, nested where Obsidian has it at root
+    10  footnoteDefinition      5  math      5  listItem      1  root
+
+The 43 are the largest coherent bucket, so they were classified whole rather than by their
+head -- the procedure this file has now paid for six times:
+
+    by the ORPHAN LINE's indent        by the LINE ABOVE it
+      19  4 spaces                       23  list marker
+      15  leading tab                    10  BLANK
+       4  5 spaces                        5  plain text
+       4  6 spaces                        4  indented too
+       1  other                           1  quoted
+
+So 23 of 43 are an indented line DIRECTLY BELOW A MARKER, and the rule suggests itself: the
+line is indented four or more but shallower than the item's own content column, so it cannot
+be item content, and at root four columns is indented code.
+
+### The existing candidate was unreachable, not wrong
+
+`orphan-line-is-root-code` already encodes that rule and scores FLAT on 6 documents. The
+reason is the premise rather than the rule: it walks `listItem` nodes and asks which lines
+fall inside their span, and in this family **our tree does not put the line in the item at
+all** -- it is a root paragraph, so the item's span never covers it and the scan finds
+nothing. Same rule, unreachable premise, which is a third variety of the "re-ask it with the
+tree" lesson: the tree can also be the thing that hides the case.
+
+### So it was re-asked from the SOURCE, and the base rate killed it
+
+    orphan-below-marker-is-root-code   better 21  worse 123  same 197
+                                       agreement 5806 -> 5711, referee -80
+
+**And the scorer states the reason without another run.** The shape is touched in 341
+documents and helps in 21 -- fifteen times more common than the divergence it was selected
+from. The 23 were classified on the FAILING side only, and nothing counted how often the same
+source shape appears where Obsidian reports no code at all.
+
+That is the sixth counting selector to die here, after probes-per-open-case, co-occurrence,
+construct frequency, line-local prefix and brevity. It is also the second time the SAME trap
+has been walked into after being written up -- the first was the commented-definition rule --
+and both times the write-up was correct and the discipline was not applied to the next
+candidate.
+
+The standing rule needs sharpening, so: **classify a family on the failing side to find the
+shape, then count that shape on BOTH sides before scoring it.** The scorer's `touched` total
+is that count and it is free -- had it been read as a base rate rather than as a blast radius,
+this candidate would have been refused before it was written.
+
+What the 43 do NOT support is a source-shape predicate. The next instrument for them is
+`referee-shrink --live` on the bucket, because a minimal form keeps only the lines that matter
+and the shape's commonness is exactly what shrinking removes.

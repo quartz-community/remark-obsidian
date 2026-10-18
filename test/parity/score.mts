@@ -3239,6 +3239,96 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "orphan-below-marker-is-root-code",
+    what: "a 4+ indented line DIRECTLY below a marker whose content column is deeper is ROOT code",
+    // The sibling candidate `orphan-line-is-root-code` is FLAT and touches 6 documents,
+    // because it walks `listItem` nodes and asks which lines fall inside their span. In this
+    // family our tree does not put the line in the item at all -- it is a root PARAGRAPH, so
+    // the item's span never covers it and the scan finds nothing. Same rule, unreachable
+    // premise.
+    //
+    // Classified over the whole bucket rather than its head: of the 43 documents where
+    // Obsidian has a root code line we produce none for and our innermost node is a
+    // paragraph, the line ABOVE is a list marker in 23, blank in 10, plain text in 5.
+    // This targets the 23.
+    //
+    // `contentColumn` is CALLED, not re-derived -- it carries the five-space cap and the
+    // bare-marker width branch, and this file records a candidate being refuted by its own
+    // re-derivation of exactly this quantity.
+    //
+    // REFUSED: better 21 / worse 123 / same 197, agreement 5806 -> 5711, referee -80.
+    //
+    // And the scorer states the reason without a second run. The shape is TOUCHED in 341
+    // documents and helps in 21, so it is fifteen times more common than the divergence it
+    // was selected from -- the base-rate trap this file records five times, walked into again
+    // because the 23 were classified on the FAILING side only and nothing counted how often
+    // the same source shape appears where Obsidian reports no code at all.
+    //
+    // Kept rather than deleted: a refused candidate with its numbers is what stops the next
+    // reader re-deriving it, and the classification above is still correct about where the
+    // 43 are. What it does NOT support is a source-shape predicate, which is the thing the
+    // base rate kills.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const INDENTED = /^(?: {4}|\t)/u;
+      const MARKER_LINE = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]/u;
+
+      const starts: number[] = [];
+      let at = 0;
+      for (const line of lines) {
+        starts.push(at);
+        at += line.length + 1;
+      }
+
+      const ourCode = new Set<number>();
+      for (const child of tree.children) {
+        if (child.type === "code" && child.position) {
+          for (
+            let i = child.position.start.line - 1;
+            i <= child.position.end.line - 1;
+            i++
+          ) {
+            ourCode.add(i);
+          }
+        }
+      }
+
+      const orphans = new Set<number>();
+      for (let line = 1; line < lines.length; line++) {
+        const self = lines[line] ?? "";
+        if (self.trim() === "" || ourCode.has(line)) continue;
+        if (!INDENTED.test(self)) continue;
+        if (!MARKER_LINE.test(lines[line - 1] ?? "")) continue;
+        const column = contentColumn(text, {
+          position: { start: { offset: starts[line - 1]! } },
+        } as unknown as ListItem);
+        if (column === undefined) continue;
+        if (columnsOf(/^[ \t]*/u.exec(self)![0]) < column) orphans.add(line);
+      }
+      if (orphans.size === 0) return ours;
+
+      const sorted = [...orphans].sort((a, b) => a - b);
+      const ranges: CodeRange[] = [];
+      let from = sorted[0]!;
+      let last = from;
+      for (const line of sorted.slice(1)) {
+        if (line === last + 1) {
+          last = line;
+          continue;
+        }
+        ranges.push([from, last]);
+        from = line;
+        last = line;
+      }
+      ranges.push([from, last]);
+      return {
+        defs: ours.defs.filter((d) => !orphans.has(d[1])),
+        refs: ours.refs.filter((r) => !orphans.has(r[1])),
+        code: [...(ours.code ?? []), ...ranges],
+      };
+    },
+  },
+  {
     name: "control-drop-all-code",
     what: "CONTROL: report no root code block at all",
     // Not a rule. It exists to prove the `code` dimension is wired in: a candidate that empties
