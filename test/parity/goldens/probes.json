@@ -1360,6 +1360,660 @@
     "obsidianVersion": "1.14.4"
   },
   {
+    "markdown": "-    p\n\n\t[^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 4sp, definition indent tab. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.626Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-    p\n\n       [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 4sp, definition indent 7sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          5,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          5,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.626Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-    p\n\n      [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 4sp, definition indent 6sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          5,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          5,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.625Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-    p\n\n     [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 4sp, definition indent 5sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          5,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          5,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.624Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-    p\n\n    [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 4sp, definition indent 4sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.623Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-    p\n\n   [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 4sp, definition indent 3sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.622Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-    p\n\n  [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 4sp, definition indent 2sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.621Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-    p\n\n [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 4sp, definition indent 1sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.620Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-   p\n\n\t[^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 3sp, definition indent tab. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.619Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-   p\n\n       [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 3sp, definition indent 7sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.618Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-   p\n\n      [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 3sp, definition indent 6sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.617Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-   p\n\n     [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 3sp, definition indent 5sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.617Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-   p\n\n    [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 3sp, definition indent 4sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.616Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-   p\n\n   [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 3sp, definition indent 3sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.615Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-   p\n\n  [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 3sp, definition indent 2sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.614Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-   p\n\n [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 3sp, definition indent 1sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.613Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-  p\n\n\t[^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 2sp, definition indent tab. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.611Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-  p\n\n       [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 2sp, definition indent 7sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.609Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-  p\n\n      [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 2sp, definition indent 6sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          3,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          3,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.608Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-  p\n\n     [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 2sp, definition indent 5sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          3,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          3,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.606Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-  p\n\n    [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 2sp, definition indent 4sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          3,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          3,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.605Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-  p\n\n   [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 2sp, definition indent 3sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          3,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          3,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.604Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-  p\n\n  [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 2sp, definition indent 2sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.602Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "-  p\n\n [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 2sp, definition indent 1sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.601Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
     "markdown": "- item\n\n\t[^1]: x\n",
     "note": "blank-line/empty-item wave (marker/with-content): does a bare marker still own a tab-led definition across a gap, and what breaks it? Discriminates 'the empty item survives' from 'a preceding list lowers the root code threshold'.",
     "obsidian": {
@@ -1386,6 +2040,210 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T00:23:50.368Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- p\n\n\t[^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 1sp, definition indent tab. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.599Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- p\n\n       [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 1sp, definition indent 7sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.597Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- p\n\n      [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 1sp, definition indent 6sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.596Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- p\n\n     [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 1sp, definition indent 5sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.595Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- p\n\n    [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 1sp, definition indent 4sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.593Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- p\n\n   [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 1sp, definition indent 3sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.590Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- p\n\n  [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 1sp, definition indent 2sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          2,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.589Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "- p\n\n [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker dash, separator 1sp, definition indent 1sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.584Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -2200,6 +3058,829 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T00:23:50.334Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.    p\n\n\t[^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 4sp, definition indent tab. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.663Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.    p\n\n       [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 4sp, definition indent 7sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          7,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          7,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.663Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.    p\n\n      [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 4sp, definition indent 6sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          6,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.662Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.    p\n\n     [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 4sp, definition indent 5sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          5,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.661Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.    p\n\n    [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 4sp, definition indent 4sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.660Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.    p\n\n   [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 4sp, definition indent 3sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.660Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.    p\n\n  [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 4sp, definition indent 2sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.659Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.    p\n\n [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 4sp, definition indent 1sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.658Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.   p\n\n\t[^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 3sp, definition indent tab. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.657Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.   p\n\n       [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 3sp, definition indent 7sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          6,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          6,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.656Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.   p\n\n      [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 3sp, definition indent 6sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          6,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          6,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.655Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.   p\n\n     [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 3sp, definition indent 5sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          5,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.652Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.   p\n\n    [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 3sp, definition indent 4sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.651Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.   p\n\n   [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 3sp, definition indent 3sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.648Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.   p\n\n  [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 3sp, definition indent 2sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.647Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.   p\n\n [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 3sp, definition indent 1sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.646Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.  p\n\n\t[^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 2sp, definition indent tab. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.646Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.  p\n\n       [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 2sp, definition indent 7sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          5,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          5,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.645Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.  p\n\n      [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 2sp, definition indent 6sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          5,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          5,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.644Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.  p\n\n     [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 2sp, definition indent 5sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          5,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          5,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.643Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.  p\n\n    [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 2sp, definition indent 4sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.642Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.  p\n\n   [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 2sp, definition indent 3sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.642Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.  p\n\n  [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 2sp, definition indent 2sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.641Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10.  p\n\n [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 2sp, definition indent 1sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.639Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. p\n\n\t[^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 1sp, definition indent tab. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          1,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.636Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. p\n\n       [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 1sp, definition indent 7sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.635Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. p\n\n      [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 1sp, definition indent 6sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.634Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. p\n\n     [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 1sp, definition indent 5sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.633Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. p\n\n    [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 1sp, definition indent 4sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          4,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.631Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. p\n\n   [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 1sp, definition indent 3sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.629Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. p\n\n  [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 1sp, definition indent 2sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.628Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "10. p\n\n [^1]: x\n",
+    "note": "content-column sweep, NARROW separator: marker ord, separator 1sp, definition indent 1sp. 36 of 50 one-away def-col documents have only narrow separators, so this is not the refused five-space cap family.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          2,
+          0,
+          2
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T00:46:18.627Z",
     "obsidianVersion": "1.14.4"
   },
   {

@@ -6144,3 +6144,40 @@ So after the column fix the family stands at 78 of 91 probes agreeing, and the t
 remain all need the threshold rather than the column: three where a space-indented line under a
 bare marker should be the item's content, and ten where a tab plus spaces should be. Every
 attempt at that threshold has now cost more than it gained, across three scopings and two files.
+
+## `def-col` is not a minimal-shape family either, and 64 probes say so
+
+50 one-away documents, concentrated hard on one host -- 46 of 51 entries are
+`list>listItem>footnoteDefinition` -- but with deltas running both directions, which is the
+signature of several rules rather than one.
+
+First the cheap check, because this quantity has a refused family attached: only **13 of 50**
+hold a five-plus-column separator, so this is NOT the five-space cap refused four ways. 36 hold
+only narrow separators, which is new ground.
+
+Probed exhaustively -- two marker widths, separators one to four, eight definition indents:
+
+    indents:        1sp      2sp      3sp      4sp      5sp      6sp      7sp      tab
+    -    sep=1   0        2        2        2        2        CODE     CODE     1
+    -    sep=2   0        0        3        3        3        3        CODE     1
+    -    sep=3   0        0        0        4        4        4        4        1
+    -    sep=4   0        0        0        CODE     5        5        5        CODE
+    10.  sep=1   0        0        0        4        4        4        4        1
+    10.  sep=2   0        0        0        CODE     5        5        5        CODE
+    10.  sep=3   0        0        0        CODE     5(CODE)  6        6        CODE
+    10.  sep=4   0        0        0        CODE     5(CODE)  6(CODE)  7        CODE
+
+**61 of 64 AGREE.** The content column is the marker width plus its separator; an indent below
+it puts the definition at root; four columns past it is code; and a leading tab is column 1,
+which is the rule already shipped.
+
+The three that differ are all a wide marker with an indent BELOW the content column, where
+Obsidian lowers the column to the line's own indent -- B3's de-indentation minimum, which this
+file refuses in the tokenizer at -32 referee documents and four CommonMark list cases.
+
+So `def-col`'s 36 narrow-separator documents are not explained by any minimal shape, and the
+disagreement needs the dense document. That is the third family to end this way, after the
+`ref-extra` fence sub-family and the `ref-miss` list bucket, and the pattern is worth stating as
+a prediction rather than a surprise: **a family whose deltas run both directions is several
+rules, and probing its axis will keep returning agreement.** The direction screen already says
+which families those are, and it should be consulted before the probes rather than after.
