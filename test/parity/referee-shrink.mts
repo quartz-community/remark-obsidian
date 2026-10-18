@@ -283,7 +283,13 @@ async function live(entries: readonly Entry[]): Promise<void> {
   );
   console.log(
     `  reduced ${reduced}; ${sorted.length} distinct minimal forms; ` +
-      `${agreeing} already agree with LIVE Obsidian; ${untrusted} have untrustworthy refs`,
+      // "SKIPPED", not "agree". This counter incremented for any document the loop declined,
+      // which includes those whose refs cannot be adjudicated because the augmentation was
+      // swallowed -- so it read 34% on `ref-extra` and 0% on `def-miss @ code` and was taken
+      // twice as evidence that the referee corpus had gone stale. Asking the live application
+      // about all 967 diverging documents put the real staleness at FOURTEEN.
+      `${agreeing} SKIPPED (agree with live, or refs not adjudicable); ` +
+      `${untrusted} of those have untrustworthy refs`,
   );
 
   // EVERY form re-asked, because the whole point of this mode is that a reported form is an

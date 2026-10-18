@@ -6460,3 +6460,61 @@ other than the reference dropped.
 The procedure is worth keeping: **after shipping a rule, re-shrink the family it came from.**
 One of three found the rule too narrow, one found it wrong, and one found a half that must not
 be added -- none of which the original measurement could have said.
+
+## Where the remaining 15% actually is: DENSITY, not a missing construct
+
+Asked whether ~15% is too much to be individual cases and small subsets -- whether something
+systematic is being missed. Three hypotheses, all measured.
+
+**Referee staleness: 14 documents.** Every diverging document asked of the live application:
+
+    967 diverging
+      live AGREES with us      :  14  (1.4%)  -- and all 14 differ from the recorded answer
+      live DIFFERS from us     : 848  (87.7%)
+      refs not adjudicable     : 105  (10.9%)
+
+So the corpus is not stale and the earlier 18-document sample holds at 967. **And the shrink
+logs that suggested otherwise were my own reporting bug**: `referee-shrink --live` counted
+"already agree with LIVE Obsidian" for any document it SKIPPED, including the ones whose refs
+cannot be adjudicated. That is why the figure read 34% on `ref-extra` and 0% on
+`def-miss @ code` -- it was measuring augmentation failure, not agreement. Relabelled.
+
+**No construct concentrates it.** Base rate 14.2%:
+
+    pattern                              present diverge  P(div|x)  lift
+    five-plus separator (the cap)            801     182    22.7%   1.60
+    a TAB anywhere                          3071     643    20.9%   1.48
+    quote-hosted definition                 1643     333    20.3%   1.43
+    unclosed fence / %% / $$                3451     662    19.2%   1.35
+    bare marker + indented (ownership)       342      40    11.7%   0.82
+
+The strongest is 1.60. And the bare-marker ownership family -- refused three times at a cost of
+up to 366 documents -- is at **0.82, BELOW the base rate**. It was never a family at all, which
+no amount of probing its shape would have revealed.
+
+**DENSITY is twice as predictive as any construct:**
+
+    lines      docs  P(div)  lift        constructs  docs  P(div)  lift
+    1-2         189    5.8%  0.41        0-2         2823    7.5%  0.53
+    3-5        1488   11.2%  0.79        3           1534   13.8%  0.97
+    6-10       2478    9.6%  0.67        4           1295   17.6%  1.24
+    11-20      2434   18.6%  1.31        5            794   22.7%  1.60
+    21-40       229   43.7%  3.08        7-10         100   46.0%  3.24
+
+A document carrying seven or more distinct constructs diverges **46%** of the time; one carrying
+two or fewer, 7.5%. That is lift 3.24 against 1.60 for the best construct, and it is the answer
+to the question: what remains is INTERACTIONS, not a construct nobody has implemented.
+
+### What follows from that
+
+It explains every shape this session kept hitting. Four families whose minimal shapes AGREE --
+the interaction is what diverges, and minimising destroys it. A probe table that proves what
+Obsidian does to a shape but not how often that shape is what a document contains. Rules that
+score and then build inert, or build wrong, because the tree in a dense document is not the
+tree in a probe.
+
+It also says which instrument is pointed the wrong way. `compose.mts` was built for exactly
+this and sits at 0 on six of seven axes -- but it tests PAIRS and triples of sixteen block
+constructs, and the documents that actually diverge carry seven or more. The gap between
+"compose is clean" and "46% of dense documents diverge" is the unexplored surface, and it is
+arity, not coverage.
