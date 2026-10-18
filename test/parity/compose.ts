@@ -324,6 +324,42 @@ const INNER: ReadonlyArray<readonly [string, string]> = [
 ];
 
 /**
+ * The follower indents `--lazy` sweeps, which is the axis's actual variable.
+ *
+ * `--inside` prefixes EVERY line of the inner block, so the whole grid is WELL-FORMED
+ * nesting. The forms the corpus actually diverges on are PARTIALLY prefixed -- 31 of the 50
+ * quote-bearing minimal forms from a live shrink, against 19 fully prefixed -- where the
+ * container's body stops being marked and the next line continues it lazily. No cell of any
+ * existing axis spells that, which is why `quoted-fence-lazy.ts` was found by shrinking the
+ * corpus and never by a sweep.
+ *
+ * **The first version of this axis varied the wrong thing and measured zero.** It generated
+ * the follower bare against the follower PREFIXED, on the reasoning that carrying the
+ * container's marker is what separates lazy content from ordinary content. Obsidian's answer
+ * is IDENTICAL in all 64 cells: after an open container a bare line is absorbed exactly as a
+ * marked one is, so the pair tests nothing. That is a fifth family probed on an axis that
+ * returns agreement, and it is recorded here rather than deleted because the zero it produced
+ * is indistinguishable from a working sweep finding nothing.
+ *
+ * What the diverging forms actually vary is the follower's INDENT -- `⇥It %% [^x-y]` under a
+ * quote, `⇥[^ch2*]:` under a list. Screened before building: across 32 container-block cells
+ * at seven indents, Obsidian's own answer varies in **16**, so the threshold between lazy
+ * continuation and indented code is a real boundary this grid can reach.
+ *
+ * `marked` is appended as the control -- the follower carrying the container's own prefix,
+ * which is `--inside`'s shape and therefore the cell whose answer is already swept.
+ */
+const LAZY_INDENTS: ReadonlyArray<readonly [string, string]> = [
+  ["bare", ""],
+  ["1sp", " "],
+  ["2sp", "  "],
+  ["3sp", "   "],
+  ["4sp", "    "],
+  ["tab", "\t"],
+  ["tab2sp", "\t  "],
+];
+
+/**
  * `--inside` maps the OTHER axis: what each block does INSIDE each container.
  *
  * `--matrix` maps adjacency -- a container, then a block at column 0 -- and that axis is now
@@ -387,6 +423,7 @@ export const AXES = [
   "nested",
   "inline",
   "inline-block",
+  "lazy",
 ] as const;
 export type Axis = (typeof AXES)[number];
 
@@ -491,6 +528,27 @@ export function casesFor(axis: Axis): Case[] {
               `${syntaxOf.get(absorbable)!}\n\nuse[^1]\n`,
           });
         }
+      }
+    }
+  }
+  if (axis === "lazy") {
+    for (const [container, prefix] of INNER) {
+      const head = syntaxOf.get(container)!;
+      for (const [innerName, innerSyntax] of BLOCKS) {
+        const body = innerSyntax
+          .split("\n")
+          .map((line) => `${prefix}${line}`)
+          .join("\n");
+        for (const [indentName, indent] of LAZY_INDENTS) {
+          cases.push({
+            name: `${container} [ ${innerName} ] ${indentName}`,
+            text: `${head}\n${body}\n${indent}lazy[^1]\n\nuse[^1]\n`,
+          });
+        }
+        cases.push({
+          name: `${container} [ ${innerName} ] marked`,
+          text: `${head}\n${body}\n${prefix}lazy[^1]\n\nuse[^1]\n`,
+        });
       }
     }
   }

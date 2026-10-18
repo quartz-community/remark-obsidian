@@ -104,12 +104,33 @@ function theirsFor(axis: Axis): Map<string, Facts> {
 
 const GOLDEN = path.join(import.meta.dirname, "goldens/compose.json");
 
+const FLAGS: ReadonlyArray<readonly [string, Axis]> = [
+  ["--matrix", "matrix"],
+  ["--inside", "inside"],
+  ["--isolate", "isolate"],
+  ["--nested", "nested"],
+  ["--inline-block", "inline-block"],
+  ["--inline", "inline"],
+  ["--lazy", "lazy"],
+];
+
 if (process.argv.includes("--record")) {
   const stamp = evaluate(
     "JSON.stringify({app: app.vault.getName(), version: app.appVersion ?? null})",
   );
-  const recorded: Record<string, Record<string, Facts>> = {};
-  for (const axis of AXES) {
+  // Re-recording every axis to ADD one would put the two DOM axes back through the CLI
+  // channel, which these notes record as failing intermittently and independently of payload
+  // size. Naming an axis alongside `--record` keeps the rest of the golden byte-identical, so
+  // adding an axis cannot silently rewrite answers nobody re-examined.
+  const only = FLAGS.filter(([flag]) => process.argv.includes(flag)).map(
+    ([, name]) => name,
+  );
+  const recorded: Record<string, Record<string, Facts>> = only.length
+    ? ((
+        JSON.parse(fs.readFileSync(GOLDEN, "utf8")) as { axes: typeof recorded }
+      ).axes ?? {})
+    : {};
+  for (const axis of only.length > 0 ? only : AXES) {
     const answers = theirsFor(axis);
     recorded[axis] = Object.fromEntries(answers);
     console.log(`  ${axis.padEnd(14)}${answers.size} sequences`);
@@ -274,14 +295,6 @@ if (dumpTo !== undefined || blastFrom !== undefined) {
   process.exit(0);
 }
 
-const FLAGS: ReadonlyArray<readonly [string, Axis]> = [
-  ["--matrix", "matrix"],
-  ["--inside", "inside"],
-  ["--isolate", "isolate"],
-  ["--nested", "nested"],
-  ["--inline-block", "inline-block"],
-  ["--inline", "inline"],
-];
 const axis: Axis =
   FLAGS.find(([flag]) => process.argv.includes(flag))?.[1] ?? "pairs";
 

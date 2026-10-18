@@ -3,7 +3,7 @@
     "app": "test-vault",
     "version": null
   },
-  "recordedAt": "2026-10-13T22:48:50.584Z",
+  "recordedAt": "2026-10-18T16:39:21.003Z",
   "axes": {
     "pairs": {
       "bullet > bullet": {
@@ -20299,6 +20299,6797 @@
           ],
           "mathDisplay": []
         }
+      }
+    },
+    "lazy": {
+      "bullet [ bullet ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ bullet ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ bullet ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ bullet ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ bullet ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ bullet ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ bullet ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ bullet ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ ordered ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ ordered ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ ordered ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ ordered ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ ordered ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ ordered ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ ordered ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ ordered ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ quote ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ quote ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ quote ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ quote ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ quote ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ quote ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ quote ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ quote ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ callout ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ callout ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ callout ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ callout ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ callout ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ callout ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ callout ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ callout ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ heading ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ heading ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ heading ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ heading ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ heading ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ heading ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ heading ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ heading ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ setext ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ setext ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ setext ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ setext ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ setext ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ setext ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ setext ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ setext ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ indented ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ indented ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ indented ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ indented ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ indented ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ indented ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ indented ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ indented ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ fence ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ fence ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ fence ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ fence ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ fence ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ fence ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ fence ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ fence ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ comment ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ comment ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ comment ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ comment ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ comment ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ comment ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ comment ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ comment ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ thematic ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ thematic ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ thematic ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ thematic ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ thematic ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ thematic ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ thematic ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ thematic ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ table ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ table ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ table ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ table ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ table ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ table ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ table ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ table ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ math ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ math ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ math ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ math ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ math ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ math ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ math ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ math ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ footnote ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ footnote ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ footnote ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ footnote ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ footnote ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ footnote ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ footnote ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ footnote ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ linkdef ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ linkdef ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ linkdef ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ linkdef ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ linkdef ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ linkdef ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ linkdef ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ linkdef ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ html ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ html ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ html ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ html ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ html ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ html ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ html ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ html ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ paragraph ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ paragraph ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ paragraph ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ paragraph ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ paragraph ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ paragraph ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ paragraph ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "bullet [ paragraph ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ bullet ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ bullet ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ bullet ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ bullet ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ bullet ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ bullet ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ bullet ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ bullet ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ ordered ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ ordered ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ ordered ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ ordered ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ ordered ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ ordered ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ ordered ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ ordered ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ quote ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ quote ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ quote ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ quote ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ quote ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ quote ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ quote ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ quote ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ callout ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ callout ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ callout ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ callout ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ callout ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ callout ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ callout ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ callout ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ heading ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ heading ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ heading ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ heading ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ heading ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ heading ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ heading ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ heading ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ setext ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ setext ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ setext ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ setext ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ setext ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ setext ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ setext ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ setext ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ indented ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ indented ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ indented ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ indented ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ indented ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ indented ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ indented ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ indented ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ fence ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ fence ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ fence ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ fence ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ fence ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ fence ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ fence ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ fence ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ comment ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ comment ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ comment ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ comment ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ comment ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ comment ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ comment ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ comment ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ thematic ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ thematic ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ thematic ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ thematic ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ thematic ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ thematic ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ thematic ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ thematic ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ table ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ table ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ table ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ table ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ table ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ table ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ table ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ table ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ math ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ math ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ math ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ math ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ math ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ math ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ math ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ math ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ footnote ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ footnote ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ footnote ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ footnote ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ footnote ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ footnote ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ footnote ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ footnote ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ linkdef ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ linkdef ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ linkdef ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ linkdef ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ linkdef ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ linkdef ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ linkdef ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ linkdef ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ html ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ html ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ html ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ html ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ html ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ html ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ html ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ html ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ paragraph ] bare": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ paragraph ] 1sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ paragraph ] 2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ paragraph ] 3sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ paragraph ] 4sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ paragraph ] tab": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ paragraph ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "ordered [ paragraph ] marked": {
+        "defs": [],
+        "sections": [
+          "list@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ bullet ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ bullet ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ bullet ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ bullet ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ bullet ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ bullet ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ bullet ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ bullet ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ ordered ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ ordered ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ ordered ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ ordered ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ ordered ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ ordered ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ ordered ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ ordered ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ quote ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ quote ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ quote ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ quote ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ quote ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ quote ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ quote ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ quote ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ callout ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ callout ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ callout ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ callout ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ callout ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ callout ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ callout ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ callout ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ heading ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ heading ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ heading ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ heading ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ heading ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ heading ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ heading ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ heading ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ setext ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ setext ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ setext ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ setext ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ setext ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@3",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ setext ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@3",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ setext ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@3",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ setext ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ indented ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ indented ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ indented ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ indented ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ indented ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ indented ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ indented ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ indented ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ fence ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ fence ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ fence ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ fence ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ fence ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ fence ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ fence ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ fence ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ comment ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ comment ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ comment ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ comment ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ comment ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ comment ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ comment ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ comment ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ thematic ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ thematic ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ thematic ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ thematic ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ thematic ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ thematic ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ thematic ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ thematic ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ table ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ table ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ table ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ table ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ table ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@3",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ table ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@3",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ table ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@3",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ table ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ math ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ math ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ math ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ math ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ math ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ math ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ math ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ math ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ footnote ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ footnote ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ footnote ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ footnote ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ footnote ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ footnote ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ footnote ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ footnote ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ linkdef ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ linkdef ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ linkdef ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ linkdef ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ linkdef ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ linkdef ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ linkdef ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ linkdef ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ html ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ html ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ html ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ html ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ html ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ html ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ html ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ html ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ paragraph ] bare": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ paragraph ] 1sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ paragraph ] 2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ paragraph ] 3sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ paragraph ] 4sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ paragraph ] tab": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ paragraph ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "quote [ paragraph ] marked": {
+        "defs": [],
+        "sections": [
+          "blockquote@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ bullet ] bare": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ bullet ] 1sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ bullet ] 2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ bullet ] 3sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ bullet ] 4sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ bullet ] tab": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ bullet ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ bullet ] marked": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ ordered ] bare": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ ordered ] 1sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ ordered ] 2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ ordered ] 3sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ ordered ] 4sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ ordered ] tab": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ ordered ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ ordered ] marked": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ quote ] bare": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ quote ] 1sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ quote ] 2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ quote ] 3sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ quote ] 4sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ quote ] tab": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ quote ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ quote ] marked": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ callout ] bare": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ callout ] 1sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ callout ] 2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ callout ] 3sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ callout ] 4sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ callout ] tab": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ callout ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ callout ] marked": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ heading ] bare": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ heading ] 1sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ heading ] 2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ heading ] 3sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ heading ] 4sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ heading ] tab": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ heading ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ heading ] marked": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ setext ] bare": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ setext ] 1sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ setext ] 2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ setext ] 3sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ setext ] 4sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@3",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ setext ] tab": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@3",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ setext ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@3",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ setext ] marked": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ indented ] bare": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ indented ] 1sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ indented ] 2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ indented ] 3sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ indented ] 4sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ indented ] tab": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ indented ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ indented ] marked": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ fence ] bare": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ fence ] 1sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ fence ] 2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ fence ] 3sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ fence ] 4sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ fence ] tab": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ fence ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ fence ] marked": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ comment ] bare": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ comment ] 1sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ comment ] 2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ comment ] 3sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ comment ] 4sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ comment ] tab": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ comment ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ comment ] marked": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ thematic ] bare": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ thematic ] 1sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ thematic ] 2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ thematic ] 3sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ thematic ] 4sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ thematic ] tab": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ thematic ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ thematic ] marked": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ table ] bare": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ table ] 1sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ table ] 2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ table ] 3sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ table ] 4sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@3",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ table ] tab": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@3",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ table ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@3",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ table ] marked": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@5"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ math ] bare": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ math ] 1sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ math ] 2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ math ] 3sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ math ] 4sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ math ] tab": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ math ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ math ] marked": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ footnote ] bare": {
+        "defs": [
+          "1@1:2-2"
+        ],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [
+          "1@2:4",
+          "1@4:3"
+        ],
+        "blocks": []
+      },
+      "callout [ footnote ] 1sp": {
+        "defs": [
+          "1@1:2-2"
+        ],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [
+          "1@2:5",
+          "1@4:3"
+        ],
+        "blocks": []
+      },
+      "callout [ footnote ] 2sp": {
+        "defs": [
+          "1@1:2-2"
+        ],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [
+          "1@2:6",
+          "1@4:3"
+        ],
+        "blocks": []
+      },
+      "callout [ footnote ] 3sp": {
+        "defs": [
+          "1@1:2-2"
+        ],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [
+          "1@2:7",
+          "1@4:3"
+        ],
+        "blocks": []
+      },
+      "callout [ footnote ] 4sp": {
+        "defs": [
+          "1@1:2-1"
+        ],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [
+          "1@4:3"
+        ],
+        "blocks": []
+      },
+      "callout [ footnote ] tab": {
+        "defs": [
+          "1@1:2-1"
+        ],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [
+          "1@4:3"
+        ],
+        "blocks": []
+      },
+      "callout [ footnote ] tab2sp": {
+        "defs": [
+          "1@1:2-1"
+        ],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [
+          "1@4:3"
+        ],
+        "blocks": []
+      },
+      "callout [ footnote ] marked": {
+        "defs": [
+          "1@1:2-2"
+        ],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [
+          "1@2:6",
+          "1@4:3"
+        ],
+        "blocks": []
+      },
+      "callout [ linkdef ] bare": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ linkdef ] 1sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ linkdef ] 2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ linkdef ] 3sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ linkdef ] 4sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ linkdef ] tab": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ linkdef ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ linkdef ] marked": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ html ] bare": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ html ] 1sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ html ] 2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ html ] 3sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ html ] 4sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ html ] tab": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ html ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ html ] marked": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ paragraph ] bare": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ paragraph ] 1sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ paragraph ] 2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ paragraph ] 3sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ paragraph ] 4sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ paragraph ] tab": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ paragraph ] tab2sp": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "code@2",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
+      },
+      "callout [ paragraph ] marked": {
+        "defs": [],
+        "sections": [
+          "callout@0",
+          "paragraph@4"
+        ],
+        "headings": [],
+        "links": [],
+        "embeds": [],
+        "tags": [],
+        "refs": [],
+        "blocks": []
       }
     }
   }

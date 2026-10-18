@@ -6588,3 +6588,70 @@ eighth in a file whose seven took weeks to work to zero, and this file's own rec
 instrument built before its question is sharp produces a number nobody can act on -- four
 families probed on an axis that returned agreement, five counting selectors dead. The
 measurement says where to point it; pointing it is a decision, not a consequence.
+
+## The eighth axis: `--lazy`, and the first version of it measured zero
+
+Built because the density finding named exactly one missing capability -- a generator for
+PARTIALLY prefixed container bodies, where `--inside` only ever emits well-formed nesting.
+
+**The first design varied the wrong thing.** It generated the follower BARE against the
+follower PREFIXED, reasoning that carrying the container's marker is what separates lazy
+content from ordinary content. 128 sequences, **0 diverging** -- and the zero was not a clean
+sweep, it was an inert one. Checking Obsidian's own answers for the two halves:
+
+    64 cells; OBSIDIAN'S ANSWER DIFFERS between lazy and marked in 0
+
+After an open container a bare line is absorbed exactly as a marked one is, so the pair tests
+nothing. That is the fifth family probed on an axis that returns agreement, and the first
+where the axis was MINE. It is recorded rather than deleted because an inert sweep and a clean
+one print the same number -- this file's most-repeated failure, now at twelve instances.
+
+**Screening the next candidate BEFORE building it is what this file says to do, and it paid.**
+The diverging forms vary the follower's INDENT -- `⇥It %% [^x-y]` under a quote, `⇥[^ch2*]:`
+under a list -- so 32 container-block cells were asked at seven indents:
+
+    OBSIDIAN'S ANSWER VARIES WITH INDENT in 16 of 32
+
+Live variable, so the axis was rebuilt on it: 4 containers x 16 blocks x 7 indents, plus a
+`marked` control carrying the container's own prefix. 512 sequences.
+
+### What it found on its first live run
+
+**16 of 512, and they are ONE rule:**
+
+    quote   [ bullet, ordered, quote, callout, indented, footnote, linkdef, paragraph ] tab2sp
+    callout [ the same eight ]                                                          tab2sp
+
+        > quote / > - item / ⇥⟨2sp⟩lazy[^1]
+          obs   blockquote@0  code@2  paragraph@4
+          ours  blockquote@0          paragraph@4
+
+After a quote or callout that is still OPEN, a follower indented by a TAB AND TWO SPACES is
+ROOT INDENTED CODE to Obsidian, and we continue the container instead. **A bare tab does not
+diverge**, which is the arithmetic rather than a quirk: inside a quote whose content column is
+2, a tab reaches column 4 and is two columns past it, while `⇥⟨2sp⟩` reaches 6 and is four --
+the threshold. The same arithmetic `definition-tab-after-quote.ts` and
+`definition-tab-past-item.ts` measured for DEFINITIONS this week, now visible as BLOCK
+GEOMETRY, on a surface that has its own oracle in `sections`.
+
+And the eight blocks are exactly the ones a container holds OPEN. The absent eight -- heading,
+setext, fence, comment, thematic, table, math, html -- END it, so there is no open container to
+measure the follower against. That is the `--matrix` absorption map's "absorbed by nothing" set
+arrived at from a third direction, which is the kind of agreement that says the axis is
+measuring the thing it claims to.
+
+### Two notes on landing it
+
+**Recording one axis must not re-record the others.** `--record` swept all seven every time,
+which would have put the two DOM axes back through the CLI channel this file records as failing
+intermittently. `--record --lazy` now records just that axis and leaves the rest byte-identical
+-- verified by diffing all seven after the write, since "adding an axis" silently rewriting
+answers nobody re-examined is the same failure as a stale golden.
+
+**And the gate is break-tested, not assumed.** Tampering one recorded answer makes it fail on
+exactly that cell and nothing else:
+
+    + "quote [ fence ] bare"      Tests  1 failed | 10 passed
+
+Without that, a gate asserting a 16-row expectation against a golden it also recorded is a
+tautology, and this file has eleven instances of one.
