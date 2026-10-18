@@ -3329,6 +3329,102 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "orphan-below-marker-ends-item",
+    what: "a sub-content-column line that ENDS the item is root code; one it absorbs is not",
+    // The discriminator the refused `orphan-below-marker-is-root-code` lacked, and it is not
+    // fitted -- it is the `--matrix` absorption map applied to a follower BELOW the item's
+    // content column. Thirteen follower types probed under `*⟨4sp⟩Text` (content column 5)
+    // with the follower at 4, and Obsidian's own sections split them cleanly:
+    //
+    //     ``` ~~~ # - %%      list@0-0  code@1-1   the item ENDS, the line is root code
+    //     plain > --- <div>   list@0-1             the item ABSORBS the line
+    //     $$ | [^1]: ===      list@0-1
+    //
+    // Three of the five are `--matrix`'s "absorbed by nothing" set -- heading, fence, comment
+    // -- and the fourth is a DIFFERENT marker, which that map records as starting a new list.
+    // `---` is absent from the trigger set because it has a second reading as a setext
+    // underline, which is the "only a marker with a second reading loses" rule
+    // `legacy-list.ts` already carries from the other side.
+    //
+    // So the shape predicate is unchanged and the follower test is what was missing: plain
+    // text is lazy continuation, and plain text is why the shape alone fired on 341 documents
+    // and helped in 21.
+    //
+    // REFUSED AS A REPAIR: better 11 / worse 8 / same 32, agreement 5806 -> 5804, referee -1.
+    //
+    // The discriminator did its job -- 341 touched became 51 and 123 losses became 8 -- so the
+    // mechanism is right and the REPAIR is what fails. The losses are definition EXTENTS: our
+    // `[^2]` already ends at line 4 where the answer says 2, and adding a code range to a
+    // document whose definition geometry is still wrong moves distance without reaching
+    // agreement.
+    //
+    // That is the shape this file records three times for this family: a repair filters the
+    // facts a wrong structure produced, while the tokenizer fixes the structure and the facts
+    // follow. The same rule was worth +7 as a repair and +37 in `legacy-list.ts`.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const INDENTED = /^(?: {4}|\t)/u;
+      const MARKER_LINE = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]/u;
+      // The measured trigger set, de-indented. A fence, an ATX heading, a `%%` or a marker.
+      const ENDS_ITEM =
+        /^(?:```|~~~|#{1,6}(?:[ \t]|$)|%%|(?:[-*+]|\d{1,9}[.)])(?:[ \t]|$))/u;
+
+      const starts: number[] = [];
+      let at = 0;
+      for (const line of lines) {
+        starts.push(at);
+        at += line.length + 1;
+      }
+      const ourCode = new Set<number>();
+      for (const child of tree.children) {
+        if (child.type === "code" && child.position) {
+          for (
+            let i = child.position.start.line - 1;
+            i <= child.position.end.line - 1;
+            i++
+          ) {
+            ourCode.add(i);
+          }
+        }
+      }
+
+      const orphans = new Set<number>();
+      for (let line = 1; line < lines.length; line++) {
+        const self = lines[line] ?? "";
+        if (self.trim() === "" || ourCode.has(line)) continue;
+        if (!INDENTED.test(self)) continue;
+        if (!MARKER_LINE.test(lines[line - 1] ?? "")) continue;
+        if (!ENDS_ITEM.test(self.replace(/^[ \t]+/u, ""))) continue;
+        const column = contentColumn(text, {
+          position: { start: { offset: starts[line - 1]! } },
+        } as unknown as ListItem);
+        if (column === undefined) continue;
+        if (columnsOf(/^[ \t]*/u.exec(self)![0]) < column) orphans.add(line);
+      }
+      if (orphans.size === 0) return ours;
+
+      const sorted = [...orphans].sort((a, b) => a - b);
+      const ranges: CodeRange[] = [];
+      let from = sorted[0]!;
+      let last = from;
+      for (const line of sorted.slice(1)) {
+        if (line === last + 1) {
+          last = line;
+          continue;
+        }
+        ranges.push([from, last]);
+        from = line;
+        last = line;
+      }
+      ranges.push([from, last]);
+      return {
+        defs: ours.defs.filter((d) => !orphans.has(d[1])),
+        refs: ours.refs.filter((r) => !orphans.has(r[1])),
+        code: [...(ours.code ?? []), ...ranges],
+      };
+    },
+  },
+  {
     name: "control-drop-all-code",
     what: "CONTROL: report no root code block at all",
     // Not a rule. It exists to prove the `code` dimension is wired in: a candidate that empties

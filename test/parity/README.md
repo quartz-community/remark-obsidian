@@ -6970,3 +6970,67 @@ code once the heading has ended the block. The tail wants re-parsing, not re-wra
 and 3 by the shrink's own count, against a bar this file has already applied to a six-document
 rule. Recorded with the mechanism so it can be picked up if the population ever grows, which
 is the same disposition as the quoted-`%%` rule that is right and too small.
+
+## The wide-separator family's MECHANISM, measured at last
+
+Refused six times as a repair and identified three times as wanting a tokenizer change,
+always without a stated rule. The rule is now measured, and the instrument was Obsidian's own
+`sections` rather than the footnote fields.
+
+**The shape alone is not the rule, which is why six attempts failed.** Under `*⟨4sp⟩Text` --
+content column 5 -- with the follower at 4 columns, thirteen follower types split cleanly:
+
+    ``` ~~~ # - %%          list@0-0  code@1-1     the item ENDS, the line is ROOT CODE
+    plain > --- <div>       list@0-1               the item ABSORBS the line
+    $$ | [^1]: ===          list@0-1
+
+So a sub-content-column line is root indented code when it ENDS the item and lazy
+continuation when the item absorbs it. The shape predicate was always right and the follower
+test was always missing -- plain text is the common case, which is exactly why the shape alone
+fired on 341 documents and helped in 21.
+
+**And the trigger set is not fitted; it is already in this file.** Three of the five --
+heading, fence, comment -- are `--matrix`'s "absorbed by nothing" set, the constructs that end
+any container. The fourth is a DIFFERENT marker, which the same map records as starting a new
+list. `---` is absent because it has a second reading as a setext underline, which
+`legacy-list.ts` already carries from the other side: "only a marker with a second reading
+loses."
+
+Four controls pin the column arithmetic, all agreeing:
+
+    "* [^a]: Text"      / "⟨4sp⟩```"    content col 2, follower 4 > 2   absorbed, no code
+    "*⟨5sp⟩[^a]: Text"  / "⟨4sp⟩```"    CAPPED to col 2                 absorbed, no code
+    "*⟨4sp⟩[^a]: Text"  / "⟨5sp⟩```"    follower 5 = col 5              absorbed, no code
+    "*⟨4sp⟩[^a]: Text"  / "⟨4sp⟩```"    follower 4 < col 5              ENDS, root code
+
+### The repair scores -2, and that is the third time this family has said the same thing
+
+    orphan-below-marker-is-root-code   better 21  worse 123   -95   shape only
+    orphan-below-marker-ends-item      better 11  worse   8    -2   with the discriminator
+
+The discriminator took 341 touched documents to 51 and 123 losses to 8, so the mechanism is
+right and the REPAIR is what fails. The losses are definition EXTENTS -- our `[^2]` already
+ends at line 4 where the answer says 2, and adding a code range to a document whose definition
+geometry is still wrong moves distance without reaching agreement.
+
+That is the distinction this file states for the fence and capped-item rules, which were worth
+`+7` as a repair and `+37`, `+16` and `+28` in the tokenizer: **a repair filters the facts a
+wrong structure produced; the tokenizer fixes the structure and the facts follow.**
+
+### Where it goes, named precisely
+
+`legacy-list.ts`'s `tokenizeIndent.afterPrefix` already returns `nok` for this case -- a
+shallower line that is neither in a fence nor under a capped item is correctly not the item's.
+What follows it is the problem: `notInCurrentItem` runs
+
+    factorySpace(effects, effects.attempt(legacyList, ok, nok), linePrefix,
+                 Math.max(itemIndent, constants.tabSize))
+
+with `itemIndent` 5, so the four-space indent is consumed as `linePrefix` before the flow sees
+the line -- and a fence at column 0 is a FENCE, where four spaces would have been CODE. The
+indent the rule depends on is spent by the pass that declines to own it.
+
+That is the experiment to run next, and it is a one-line change to a limit rather than new
+machinery. It is deliberately not attempted here: this file records B3's minimum applied in
+the same function costing 32 referee documents and four CommonMark list cases, so a limit
+change wants its own measured cycle rather than the tail of a long one.
