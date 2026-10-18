@@ -64,6 +64,7 @@ import { definitionTabAfterQuoteTransform } from "./lib/definition-tab-after-quo
 import { definitionTabPastItemTransform } from "./lib/definition-tab-past-item.js";
 import { markerTabDefinitionTransform } from "./lib/marker-tab-definition.js";
 import { quotedFenceLazyTransform } from "./lib/quoted-fence-lazy.js";
+import { quoteLazyIndentedCodeTransform } from "./lib/quote-lazy-indented-code.js";
 import { quoteCommentLazyTransform } from "./lib/quote-comment-lazy.js";
 import {
   ensureLineOffsets,
@@ -730,6 +731,9 @@ export default function remarkObsidian(
     if (opts.comments) itemCommentLazyTransform(tree, String(file));
     quotedFenceLazyTransform(tree, String(file));
     definitionTabAfterQuoteTransform(tree, String(file));
+    // Beside the two above, and before every footnote pass: the lines this turns into code
+    // must stop looking like definitions and references BEFORE anything indexes them.
+    quoteLazyIndentedCodeTransform(tree, String(file));
     // Before the footnote passes, so a definition this recovers is one they see.
     indentTabTransform(tree, String(file), (markdown) => reparse(markdown));
     // Unconditional, unlike the continuation pass above it: a definition whose

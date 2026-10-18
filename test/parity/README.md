@@ -6655,3 +6655,61 @@ exactly that cell and nothing else:
 
 Without that, a gate asserting a 16-row expectation against a golden it also recorded is a
 tautology, and this file has eleven instances of one.
+
+### The axis closed its own finding: 5851 -> 5860, and `code` 742 -> 775
+
+`--lazy` opened at 16 and is at **0 of 512** in the same session. All sixteen were one rule,
+and the implementation is `quoteLazyIndentedCodeTransform`.
+
+**Scored before it was built**, as this file requires:
+
+    quote-lazy-indented-code   better 35  worse 7  same 17   +8 agreeing, referee +1
+
+**Then the restriction was DERIVED, and it raised both counters.** The losses pointed at a
+quote nested inside a definition, so the live app was asked at thirteen indents per host:
+
+    quote at column 0                   indent 0..12   ....CCCCCCCCC
+    quote at column 2, in a list item                  .............
+    quote at column 4, in a definition                 .............
+
+A nested quote produces NO root code at any indent -- its lazy line belongs to the container
+above it, so there is no root block to become. Adding that:
+
+    ...root quotes only        better 34  worse 5  same 5    +9 agreeing, referee +2
+
+One gain traded for two losses removed, and BOTH counters up. That is the shape a correct
+restriction has, against the callout exclusion this file refused earlier for halving losses
+while costing thirteen gains.
+
+**And the next restriction was refuted before it cost anything.** The remaining losses looked
+like a definition continuing instead of becoming code, so eight shapes were probed -- and all
+eight are code. A definition, a link definition, a fence and a comment under the quote make no
+difference at all, so there was no exception to carve and the five losses are a different
+family.
+
+That probe round also walked into the oldest trap here for the third time: `ask()` does not
+populate `code`, so reading `a.code` returned `null` and printed as "no code" for all eight
+rows -- the opposite of the truth. `askRawSync`'s `sections` is what answers this question.
+**A field that does not exist reads as agreement with whatever you expected**, now at three
+instances, and the tell was that the first row contradicted a probe wave from ten minutes
+earlier.
+
+### What it measured, and the one thing the gate caught
+
+    referee footnotes   5851 -> 5860   (+9, exactly the scored prediction)
+    referee code        742  -> 775    (+33)
+    probe ledger        436  -> 439 agreeing
+    compose --lazy      16   -> 0 of 512
+    corpus              0 regressions, 450 tests
+
+**The `code` dimension moved five times more than the footnote one**, which is the first rule
+here written FOR geometry rather than for facts. This file recorded that gap when the
+dimension landed -- "scoring geometry needs candidates WRITTEN for geometry" -- and +33 against
++9 is what that looks like.
+
+**And the span gate caught the obvious implementation being wrong.** Pulling the quote back
+onto its last surviving child leaves it still covering the new code node, because the child
+that STARTS before the cut and ENDS after it -- the lazily continued paragraph, which is the
+entire defect -- survives the drop with its end intact. 15 `SIBLINGS OVERLAP` violations in
+`compose.test.ts`, from a gate that walks the composition space rather than the corpus. The
+fix clamps the subtree to the cut, value included, rather than shrinking it onto a child.

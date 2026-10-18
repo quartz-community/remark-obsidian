@@ -90,36 +90,11 @@ const DIVERGING: Record<Axis, readonly string[]> = {
   isolate: [],
   nested: ["quote > callout > footnote"],
   inline: [],
-  // ONE rule, found by this axis on its first live run: after a quote or callout that is
-  // still open, a follower indented by a TAB AND TWO SPACES is ROOT INDENTED CODE to
-  // Obsidian, and we continue the container instead. A bare tab does NOT diverge -- within a
-  // quote whose content column is 2, a tab reaches column 4 and is two columns past it,
-  // while `\t  ` reaches 6 and is four, which is the threshold. That is the same arithmetic
-  // `definition-tab-after-quote.ts` and `definition-tab-past-item.ts` measured for
-  // definitions this week, now visible as BLOCK GEOMETRY on a surface with its own oracle.
-  //
-  // The eight blocks are exactly the ones a container holds OPEN. The absent eight --
-  // heading, setext, fence, comment, thematic, table, math, html -- END it, so there is no
-  // open container for the follower to be measured against, which is the `--matrix`
-  // absorption map's "absorbed by nothing" set reached from a third direction.
-  lazy: [
-    "callout [ bullet ] tab2sp",
-    "callout [ callout ] tab2sp",
-    "callout [ footnote ] tab2sp",
-    "callout [ indented ] tab2sp",
-    "callout [ linkdef ] tab2sp",
-    "callout [ ordered ] tab2sp",
-    "callout [ paragraph ] tab2sp",
-    "callout [ quote ] tab2sp",
-    "quote [ bullet ] tab2sp",
-    "quote [ callout ] tab2sp",
-    "quote [ footnote ] tab2sp",
-    "quote [ indented ] tab2sp",
-    "quote [ linkdef ] tab2sp",
-    "quote [ ordered ] tab2sp",
-    "quote [ paragraph ] tab2sp",
-    "quote [ quote ] tab2sp",
-  ],
+  // Opened at 16 and CLOSED by `quoteLazyIndentedCodeTransform` in the same session. All
+  // sixteen were one rule -- a lazy line four columns under a root quote is root indented
+  // code -- and the axis exists because no other one can generate a partially prefixed
+  // container body: `--inside` prefixes every line of its inner block.
+  lazy: [],
   "inline-block": [
     "comment [ embed ]",
     "comment [ inlinefn ]",

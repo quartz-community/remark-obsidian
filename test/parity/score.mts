@@ -3152,6 +3152,93 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "quote-lazy-indented-code",
+    what: "a LAZY line at 4+ columns under an open quote is ROOT indented code",
+    // Found by `compose.mts --lazy`, the axis built for partially-prefixed container bodies.
+    //
+    // THE PREDICATE IS `/^(?: {4}|\t)/`, AND IT IS NOT A GUESS. Eighteen follower indents were
+    // asked of the live app under a quote, a callout, a bullet and an ordered item:
+    //
+    //   0-3sp  not code      4sp..8sp  CODE      tab..tab+4sp  CODE      tabtab  CODE
+    //   1sp+tab / 2sp+tab / 3sp+tab    NOT code  -- a tab AFTER a space reaches nothing,
+    //                                 which `definition-indented-code.ts` measured separately
+    //
+    // Four spaces OR a leading tab reproduces all eighteen rows, which is the same predicate
+    // that pass already carries -- derived twice, independently, from different oracles.
+    //
+    // QUOTE AND CALLOUT ONLY. Under a bullet or an ordered item NOTHING is code at any of the
+    // eighteen indents and we already agree on every one, so admitting a list here would be
+    // fitting the shape rather than the rule.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const INDENTED = /^(?: {4}|\t)/u;
+      const QUOTED = /^[ \t]*>/u;
+
+      const orphans = new Set<number>();
+      const walk = (node: unknown): void => {
+        const self = node as {
+          type?: string;
+          position?: { start: { line: number }; end: { line: number } };
+          children?: unknown[];
+        };
+        // A QUOTE STARTING AT COLUMN 0, which is a restriction derived from the construct
+        // rather than fitted to the losses. Asked of the live app at thirteen indents each:
+        //
+        //   quote at col 0            indent 0..12  ....CCCCCCCCC
+        //   quote at col 2, in a list item          .............
+        //   quote at col 4, in a definition         .............
+        //
+        // A nested quote produces NO root code at any indent, because its lazy line belongs
+        // to the container above it and there is no root block for the line to become.
+        if (
+          self.type &&
+          NESTING_QUOTE.has(self.type) &&
+          self.position &&
+          (self.position.start as { column?: number }).column === 1
+        ) {
+          for (
+            let at = self.position.start.line;
+            at <= self.position.end.line - 1;
+            at++
+          ) {
+            const line = lines[at] ?? "";
+            if (line.trim() === "") continue;
+            // A line carrying the marker is ordinary container content, not a lazy line, and
+            // its indent is measured from the quote's content column rather than from zero.
+            if (QUOTED.test(line)) continue;
+            if (INDENTED.test(line)) orphans.add(at);
+          }
+        }
+        for (const child of self.children ?? []) walk(child);
+      };
+      walk(tree);
+      if (orphans.size === 0) return ours;
+
+      const sorted = [...orphans].sort((a, b) => a - b);
+      const ranges: CodeRange[] = [];
+      let from = sorted[0]!;
+      let last = from;
+      for (const at of sorted.slice(1)) {
+        if (at === last + 1) {
+          last = at;
+          continue;
+        }
+        ranges.push([from, last]);
+        from = at;
+        last = at;
+      }
+      ranges.push([from, last]);
+      const kept = (ours.code ?? []).filter(
+        (c) => !orphans.has(c[0]) && !orphans.has(c[1]),
+      );
+      return {
+        defs: ours.defs.filter((d) => !orphans.has(d[1])),
+        refs: ours.refs.filter((r) => !orphans.has(r[1])),
+        code: [...kept, ...ranges],
+      };
+    },
+  },
+  {
     name: "control-drop-all-code",
     what: "CONTROL: report no root code block at all",
     // Not a rule. It exists to prove the `code` dimension is wired in: a candidate that empties
