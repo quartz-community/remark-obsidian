@@ -1184,6 +1184,49 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "quoted-def-ends-at-deeper-quote",
+    what: "ADDITIVE: a line DEEPER than the definition's own quote ends it, leaving all else alone",
+    apply: (text, ours) => {
+      // The `def-span-longer` shrink's largest cluster is 43 forms over 44 documents, and its
+      // shortest members are depth transitions: `> [^b]:` over `> > quoted`, `> > [^Ä]:` over
+      // `> -`. The shipped rule's prefix strip consumes the WHOLE marker run, so `> > quoted`
+      // becomes `quoted` and opens nothing.
+      //
+      // An earlier fix REPLACED that logic with a depth comparison -- deeper ends it, shallower
+      // continues, equal tests the opener -- and cost 62 referee documents and a corpus case.
+      // This is the additive half only: a deeper line ends the definition, and every other
+      // line keeps exactly the behaviour that is already shipped. If the -62 came from the
+      // shallower or equal branches, this separates it.
+      const lines = text.split("\n");
+      const depthOf = (line: string): number => {
+        let rest = line.replace(/^[ \t]+/u, "");
+        let depth = 0;
+        while (rest.startsWith(">")) {
+          depth += 1;
+          rest = rest.slice(1);
+          if (rest.startsWith(" ") || rest.startsWith("\t"))
+            rest = rest.slice(1);
+        }
+        return depth;
+      };
+      return {
+        defs: ours.defs.map((d) => {
+          const own = depthOf(lines[d[1]] ?? "");
+          if (own === 0) return d;
+          let end = d[3];
+          for (let at = d[1] + 1; at <= d[3]; at++) {
+            if (depthOf(lines[at] ?? "") > own) {
+              end = at - 1;
+              break;
+            }
+          }
+          return [d[0], d[1], d[2], end] as Def;
+        }),
+        refs: ours.refs,
+      };
+    },
+  },
+  {
     name: "quote-tab-no-define",
     what: "a tab DIRECTLY after a quote marker means the label does not define -- SCORED, NOT SHIPPED",
     apply: (text, ours) => {

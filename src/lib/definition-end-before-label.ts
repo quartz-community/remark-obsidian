@@ -6,6 +6,18 @@ import { visit } from "unist-util-visit";
 const LABEL = /^\[\^?[^\]]*\]:/u;
 /** A run of quote markers, each consuming at most one following space. */
 const QUOTE_PREFIX = /^[ \t]*(?:>[ \t]?)+/u;
+
+/** How many quote markers a line opens with, each consuming at most one following space. */
+function quoteDepth(line: string): number {
+  let rest = line.replace(/^[ \t]+/u, "");
+  let depth = 0;
+  while (rest.startsWith(">")) {
+    depth += 1;
+    rest = rest.slice(1);
+    if (rest.startsWith(" ") || rest.startsWith("\t")) rest = rest.slice(1);
+  }
+  return depth;
+}
 /**
  * A quoted line whose content opens a new block: a list marker, a footnote label, or a `>`.
  *
@@ -73,6 +85,7 @@ export function definitionEndBeforeLabelTransform(
     const end = node.position?.end;
     if (!start || !end) return;
 
+    const ownDepth = quoteDepth(lines[start.line - 1] ?? "");
     for (let line = start.line; line < end.line; line++) {
       const text = lines[line] ?? "";
       // A QUOTED line ends it too, and on a WIDER set of openers.
@@ -93,7 +106,22 @@ export function definitionEndBeforeLabelTransform(
       // costs thirteen gains, so the callout cases belong in the rule.
       const inner = text.replace(QUOTE_PREFIX, "");
       if (inner !== text) {
-        if (!QUOTED_BLOCK_OPENER.test(inner)) continue;
+        // A line DEEPER than the definition's own quote ends it, ADDITIVELY -- every other
+        // line keeps the behaviour below unchanged.
+        //
+        // The prefix strip consumes the whole marker run, so `> > quoted` becomes `quoted` and
+        // opens nothing: the biggest cluster of the `def-span-longer` shrink, 43 forms over 44
+        // documents, is exactly these depth transitions. REPLACING the strip with a depth
+        // comparison -- deeper ends, shallower continues, equal tests the opener -- costs 62
+        // referee documents and a corpus case. Adding only the deeper branch scores
+        // `better 20 / worse 1` for +12, which isolates the damage to the other two branches.
+        // `ownDepth > 0` is load-bearing and was omitted once. A ROOT definition has depth 0,
+        // so without it every quoted line below one counts as "deeper" and ends it -- which is
+        // not the rule and costs the same 62 documents the replacement version did. The
+        // candidate carried the guard; the first transcription of it into this pass did not,
+        // and the two measured identically wrong.
+        const deeper = ownDepth > 0 && quoteDepth(text) > ownDepth;
+        if (!deeper && !QUOTED_BLOCK_OPENER.test(inner)) continue;
       } else {
         // An INDENTED label is content, not an ender.
         if (/^[ \t]/u.test(text)) continue;
