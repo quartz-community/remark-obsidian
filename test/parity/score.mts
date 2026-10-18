@@ -129,6 +129,8 @@ const QUOTED_BLOCK_OPENER =
 /** A marker, a TAB, at most three further spaces, then a label -- the separator shape. */
 const MARKER_TAB_LABEL =
   /^([ \t]*)((?:[-*+]|\d{1,9}[.)]))\t {0,3}\[\^([^\]]+)\]:/u;
+/** A quote prefix whose content begins with a TAB, then a label. */
+const QUOTED_TAB_LABEL = /^((?:[ \t]*>\t)+)\[\^([^\]]+)\]:/u;
 const ENDS_ITEM =
   /^ {0,3}(?:#{1,6}(?:[ \t]|$)|```|~~~|[-*+][ \t]|\d{1,9}[.)][ \t])/u;
 const LABEL = /^\[\^([^\]]*)\]:/u;
@@ -1223,6 +1225,43 @@ const RULES: readonly Rule[] = [
           return [d[0], d[1], d[2], end] as Def;
         }),
         refs: ours.refs,
+      };
+    },
+  },
+  {
+    name: "quoted-tab-label-is-a-reference",
+    what: "a quoted TAB label is a REFERENCE -- REFUSED, -143 on the corpus against 32 agreeing probes",
+    apply: (text, ours) => {
+      // From the `ref-miss @ code` shrink: `>` / `It` / `>⇥[^x-y]:` has Obsidian reporting
+      // `refs [["x-y",2,2]]` and us reporting nothing at all. 32 probes, four heads by eight
+      // label shapes, `d` defining and `r` the label indexed as a reference:
+      //
+      //                q-tab   q-sp-tab  qq-tab   q-2sp-tab  sp-tab  q-4sp
+      //     empty-q    r/-     r/-       r/-      r/r        r/r     r/r
+      //     plain-q    r/-     r/-       r/-      r/r        r/r     r/r
+      //     none       -/-     -/-       -/-      d/d        d/d     d/d
+      //
+      // A quoted label line whose content starts with a TAB is a failed definition whose label
+      // Obsidian still indexes. Two further spaces, or four, already agree -- those are the
+      // controls, and the unquoted rows are what make it a rule about the QUOTE prefix.
+      //
+      // The column is the prefix's own length: `>⇥` gives 2 and `>⇥>⇥` gives 4, each marker
+      // taking one following whitespace character.
+      const lines = text.split("\n");
+      const added: Ref[] = [];
+      for (let at = 0; at < lines.length; at++) {
+        const hit = QUOTED_TAB_LABEL.exec(lines[at] ?? "");
+        if (!hit) continue;
+        if (ours.defs.some((d) => d[1] === at)) continue;
+        if (ours.refs.some((r) => r[1] === at)) continue;
+        added.push([hit[2]!.toLowerCase(), at, hit[1]!.length]);
+      }
+      if (added.length === 0) return ours;
+      return {
+        defs: ours.defs,
+        refs: [...ours.refs, ...added].sort(
+          (a, b) => a[1] - b[1] || a[2] - b[2],
+        ),
       };
     },
   },

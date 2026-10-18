@@ -1,5 +1,20 @@
 [
   {
+    "markdown": "\t[^1]:\n",
+    "note": "label-becomes-reference wave: head none, label line bare-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.463Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
     "markdown": "\t[^1]: def\n\nuse[^1]\n",
     "note": "space-then-tab wave: host root, indent tab. Two live-shrink clusters converge here -- `> <TAB>[^1]:` at 9 documents and `- p / <2sp><TAB>[^1]:` at 20 -- and this file records a tab after a space reaching NOTHING, so these contexts must differ.",
     "obsidian": {
@@ -39,6 +54,35 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T11:33:35.671Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": " \t[^1]:\n",
+    "note": "label-becomes-reference wave: head none, label line sp-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          0,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.464Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -223,6 +267,21 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T11:33:35.910Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "    [^1]:\n",
+    "note": "label-becomes-reference wave: head none, label line 4sp. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.465Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -7782,6 +7841,36 @@
     "obsidianVersion": "1.14.4"
   },
   {
+    "markdown": ">\t>\t[^1]:\n",
+    "note": "label-becomes-reference wave: head none, label line qq-tab-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.462Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">\t[^1]:\n",
+    "note": "label-becomes-reference wave: head none, label line q-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.461Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
     "markdown": ">\n>\tcode[^2]\n\n[^2]: def\n",
     "note": "quote-tab literal wave: first line empty, second tab. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
     "obsidian": {
@@ -8045,6 +8134,207 @@
     "obsidianVersion": "1.14.4"
   },
   {
+    "markdown": ">\nIt\n\t[^1]:\n",
+    "note": "label-becomes-reference wave: head empty-q, label line bare-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          1
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.444Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">\nIt\n \t[^1]:\n",
+    "note": "label-becomes-reference wave: head empty-q, label line sp-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          2
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          2
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.446Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">\nIt\n    [^1]:\n",
+    "note": "label-becomes-reference wave: head empty-q, label line 4sp. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.448Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">\nIt\n>\t>\t[^1]:\n",
+    "note": "label-becomes-reference wave: head empty-q, label line qq-tab-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          4
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.441Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">\nIt\n>\t[^1]:\n",
+    "note": "label-becomes-reference wave: head empty-q, label line q-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          2
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.434Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">\nIt\n> \t[^1]:\n",
+    "note": "label-becomes-reference wave: head empty-q, label line q-sp-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.437Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">\nIt\n>  \t[^1]:\n",
+    "note": "label-becomes-reference wave: head empty-q, label line q-2sp-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          4
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.439Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">\nIt\n>    [^1]:\n",
+    "note": "label-becomes-reference wave: head empty-q, label line q-4sp. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          5
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          2,
+          5
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.449Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> \t[^1]:\n",
+    "note": "label-becomes-reference wave: head none, label line q-sp-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.461Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
     "markdown": "> \t[^1]: def\n\nuse[^1]\n",
     "note": "space-then-tab wave: host quote-inline, indent tab. Two live-shrink clusters converge here -- `> <TAB>[^1]:` at 9 documents and `- p / <2sp><TAB>[^1]:` at 20 -- and this file records a tab after a space reaching NOTHING, so these contexts must differ.",
     "obsidian": {
@@ -8069,6 +8359,35 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T11:33:35.880Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">  \t[^1]:\n",
+    "note": "label-becomes-reference wave: head none, label line q-2sp-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.462Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8266,6 +8585,35 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T11:33:35.883Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">    [^1]:\n",
+    "note": "label-becomes-reference wave: head none, label line q-4sp. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          0,
+          2,
+          0
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.465Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -8992,6 +9340,180 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T11:33:35.930Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> Prose\n\t[^1]:\n",
+    "note": "label-becomes-reference wave: head plain-q, label line bare-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.458Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> Prose\n \t[^1]:\n",
+    "note": "label-becomes-reference wave: head plain-q, label line sp-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          1,
+          2
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          1,
+          2
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.459Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> Prose\n    [^1]:\n",
+    "note": "label-becomes-reference wave: head plain-q, label line 4sp. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.460Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> Prose\n>\t>\t[^1]:\n",
+    "note": "label-becomes-reference wave: head plain-q, label line qq-tab-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          1,
+          4
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.457Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> Prose\n>\t[^1]:\n",
+    "note": "label-becomes-reference wave: head plain-q, label line q-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          1,
+          2
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.451Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> Prose\n> \t[^1]:\n",
+    "note": "label-becomes-reference wave: head plain-q, label line q-sp-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          1,
+          3
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.453Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> Prose\n>  \t[^1]:\n",
+    "note": "label-becomes-reference wave: head plain-q, label line q-2sp-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          1,
+          4
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          1,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.454Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> Prose\n>    [^1]:\n",
+    "note": "label-becomes-reference wave: head plain-q, label line q-4sp. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          1,
+          5
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          1,
+          5
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.460Z",
     "obsidianVersion": "1.14.4"
   },
   {
@@ -12705,6 +13227,190 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T11:33:35.864Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "It\n\t[^1]:\n",
+    "note": "label-becomes-reference wave: head text, label line bare-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          1,
+          1
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          1,
+          1
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.470Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "It\n \t[^1]:\n",
+    "note": "label-becomes-reference wave: head text, label line sp-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          1,
+          2
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          1,
+          2
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.471Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "It\n    [^1]:\n",
+    "note": "label-becomes-reference wave: head text, label line 4sp. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          1,
+          4
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [],
+      "refs": [
+        [
+          "1",
+          1,
+          4
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.472Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "It\n>\t>\t[^1]:\n",
+    "note": "label-becomes-reference wave: head text, label line qq-tab-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.469Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "It\n>\t[^1]:\n",
+    "note": "label-becomes-reference wave: head text, label line q-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.466Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "It\n> \t[^1]:\n",
+    "note": "label-becomes-reference wave: head text, label line q-sp-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [],
+      "refs": []
+    },
+    "ours": {
+      "defs": [],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.467Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "It\n>  \t[^1]:\n",
+    "note": "label-becomes-reference wave: head text, label line q-2sp-tab. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          1,
+          2,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          1,
+          2,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.468Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "It\n>    [^1]:\n",
+    "note": "label-becomes-reference wave: head text, label line q-4sp. The ref-miss@code shrink shows Obsidian indexing a buried LABEL as a reference where we index nothing, but `> <TAB>[^1]: def` indexes nothing at all -- so the discriminator is the exact prefix.",
+    "obsidian": {
+      "defs": [
+        [
+          "1",
+          1,
+          2,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "1",
+          1,
+          2,
+          1
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T12:26:41.473Z",
     "obsidianVersion": "1.14.4"
   },
   {

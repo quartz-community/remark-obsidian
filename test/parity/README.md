@@ -6387,3 +6387,40 @@ created yet. Nothing in the score could have said so.
 That is now a procedure rather than an anecdote: **when a scored rule builds inert, move it
 before abandoning it.** The chain's own comments mark the phases, and a rule about a
 definition's extent belongs with the other passes that settle one.
+
+## `ref-miss @ code`: a rule 32 probes agree on and the corpus refuses at -143
+
+The shrink gives 43 verified forms over 73 one-away documents -- and 22 of the 73 now agree
+with live Obsidian outright, which is the highest staleness rate yet seen on a family.
+
+Its `quote + tab` cluster looked like the missing half of a shipped rule. `>` / `It` /
+`>⇥[^x-y]:` has Obsidian reporting `refs [["x-y",2,2]]` where we report nothing, so a label
+that fails to define still gets indexed. 32 probes, four heads by eight label shapes, `d`
+defining and `r` the label indexed as a reference:
+
+                q-tab   q-sp-tab  qq-tab   q-2sp-tab  sp-tab  q-4sp
+    empty-q     r/-     r/-       r/-      r/r        r/r     r/r
+    plain-q     r/-     r/-       r/-      r/r        r/r     r/r
+    none        -/-     -/-       -/-      d/d        d/d     d/d
+
+Six divergences, consistent across both quoted heads, with the two-space and four-space columns
+agreeing as controls and the unquoted rows making it a rule about the QUOTE prefix. The column
+is the prefix's own length -- `>⇥` gives 2, `>⇥>⇥` gives 4.
+
+**And it is refused at -143.**
+
+    `(?:[ \t]*>[ \t])+\t*` -- zero tabs allowed by mistake   better 17  worse 361   -285
+    `(?:[ \t]*>\t)+` -- an actual tab required                better 15  worse 184   -143
+
+The first number is a transcription error worth recording: `\t*` matches zero tabs, so the
+pattern claimed EVERY quoted label line. Fixing it halved the damage and did not change the
+sign.
+
+So this is the inverse of the family that keeps appearing here. The usual failure is a rule
+whose minimal shapes AGREE, meaning the divergence needs the dense document. This one's minimal
+shapes diverge cleanly and reproducibly, and the rule is still wrong in context: in a dense
+document a quoted tab-led label very often does define, and adding a reference there breaks
+185 documents to fix 15.
+
+Recorded with both numbers rather than narrowed a third time. A probe table proves what Obsidian
+does to a SHAPE; it cannot prove how often that shape is what a real document contains.
