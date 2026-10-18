@@ -6208,3 +6208,42 @@ That also says which instrument the other three need. `referee-shrink --live` re
 diverging document until it is small and still wrong, which is precisely the evidence a
 synthetic probe cannot manufacture -- it was built for the bidirectional 532 and has not been
 pointed at the one-away families at all.
+
+## The callout-plus-tab family: mechanism found, and it is not the callout
+
+This file has carried the 67-document family with "mechanism unknown, deliberately unfitted"
+since the earlier probe wave, which varied callout shapes plus one `> plain`, concluded the
+discriminator was the callout, and then found a four-space row refuting it.
+
+`referee-shrink --live` pointed at the 150 one-away `ref-extra` documents reduced 123 of them to
+115 verified minimal forms, and the commonest -- five documents -- is
+
+    ">\n>⇥code[^2]"
+
+a BARE `>` first line, which no earlier wave had tested. 35 probes on that axis separate it:
+
+                      tab    1sp    2sp    3sp    4sp    5sp    sp+tab
+    plain            1/1    1/1    1/1    1/1    1/1    1/1    1/1
+    empty            0/1*   1/1    1/1    1/1    1/1    0/0    0/1*
+    callout          0/1*   1/1    1/1    1/1    1/1    0/0    0/1*
+    callout + title  0/1*   1/1    1/1    1/1    1/1    0/0    0/1*
+    blank-after-text 0/1*   1/1    1/1    1/1    1/1    0/0    0/1*
+
+**It is whether the preceding quoted line can be LAZILY CONTINUED.** After `> plain` the tabbed
+line continues a paragraph and the reference is indexed; after an empty `>`, a callout, or a
+blank line following text, it starts a new block and is indented code. `blank-after-text` is
+the row that kills the callout reading -- it holds no callout at all and behaves identically.
+The space columns confirm the threshold independently: 1sp through 4sp index on both sides and
+5sp does not.
+
+### ...and the implementation is refused on size
+
+    better 1  worse 3  -- referee 5803 -> 5802
+
+48 referee documents hold the shape and only **4** have a reference we index on that line, so
+the ceiling is four and the measured result is -1. The 67 the family was sized at is not this
+shape.
+
+So the mechanism is the finding and the rule is not worth building, which are different
+outcomes and worth separating. A standing "mechanism unknown" note is now closed, the
+discriminator is stated, and the next person does not re-derive it from the callout.

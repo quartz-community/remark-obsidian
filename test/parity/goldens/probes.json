@@ -3884,6 +3884,795 @@
     "obsidianVersion": "1.14.4"
   },
   {
+    "markdown": ">\n>\tcode[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line empty, second tab. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          6
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.032Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">\n> \tcode[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line empty, second tab-after-sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          7
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.046Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">\n>     code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line empty, second 5sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.043Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">\n>    code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line empty, second 4sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          9
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          9
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.041Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">\n>   code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line empty, second 3sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          8
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          8
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.039Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">\n>  code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line empty, second 2sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          7
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          7
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.038Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": ">\n> code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line empty, second 1sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          6
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          6
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.035Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n>\tcode[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line callout, second tab. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          6
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.060Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n> \tcode[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line callout, second tab-after-sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          7
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.071Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n>     code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line callout, second 5sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.068Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n>    code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line callout, second 4sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          9
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          9
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.067Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n>   code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line callout, second 3sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          8
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          8
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.065Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n>  code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line callout, second 2sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          7
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          7
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.063Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note]\n> code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line callout, second 1sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          6
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          6
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.062Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note] T\n>\tcode[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line callout-title, second tab. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          6
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.073Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note] T\n> \tcode[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line callout-title, second tab-after-sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          7
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.084Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note] T\n>     code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line callout-title, second 5sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.082Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note] T\n>    code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line callout-title, second 4sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          9
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          9
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.081Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note] T\n>   code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line callout-title, second 3sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          8
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          8
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.080Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note] T\n>  code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line callout-title, second 2sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          7
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          7
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.078Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> [!note] T\n> code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line callout-title, second 1sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          6
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          6
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.076Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
     "markdown": "> [^1]: def\n\n> more\n\nuse[^1]\n",
     "note": "quoted definition EXTENT: what does a `blank-then-quote` line below `> [^1]: def` do to the definition's last line? def-span-shorter is 38/90 quote lines and def-span-longer is 125 -- the same construct in both directions.",
     "obsidian": {
@@ -5076,6 +5865,556 @@
     },
     "refsTrustworthy": true,
     "recordedAt": "2026-10-18T02:12:56.517Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> plain\n>\tcode[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line plain, second tab. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          6
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          6
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.048Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> plain\n>\n>\tcode[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line blank-after-text, second tab. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          2,
+          6
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.085Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> plain\n>\n> \tcode[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line blank-after-text, second tab-after-sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          2,
+          7
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.090Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> plain\n>\n>     code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line blank-after-text, second 5sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": []
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.089Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> plain\n>\n>    code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line blank-after-text, second 4sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          2,
+          9
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          2,
+          9
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.089Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> plain\n>\n>   code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line blank-after-text, second 3sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          2,
+          8
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          2,
+          8
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.088Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> plain\n>\n>  code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line blank-after-text, second 2sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          2,
+          7
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          2,
+          7
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.087Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> plain\n>\n> code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line blank-after-text, second 1sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          2,
+          6
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          4,
+          0,
+          4
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          2,
+          6
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.086Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> plain\n> \tcode[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line plain, second tab-after-sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          7
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          7
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.058Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> plain\n>     code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line plain, second 5sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          10
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          10
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.057Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> plain\n>    code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line plain, second 4sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          9
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          9
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.056Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> plain\n>   code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line plain, second 3sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          8
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          8
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.055Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> plain\n>  code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line plain, second 2sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          7
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          7
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.054Z",
+    "obsidianVersion": "1.14.4"
+  },
+  {
+    "markdown": "> plain\n> code[^2]\n\n[^2]: def\n",
+    "note": "quote-tab literal wave: first line plain, second 1sp. The 67-document callout-plus-tab family whose mechanism this file records as UNKNOWN; the minimal form from the live shrinker is a BARE `>` first line, which no earlier wave tested.",
+    "obsidian": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          6
+        ]
+      ]
+    },
+    "ours": {
+      "defs": [
+        [
+          "2",
+          3,
+          0,
+          3
+        ]
+      ],
+      "refs": [
+        [
+          "2",
+          1,
+          6
+        ]
+      ]
+    },
+    "refsTrustworthy": true,
+    "recordedAt": "2026-10-18T03:32:45.053Z",
     "obsidianVersion": "1.14.4"
   },
   {

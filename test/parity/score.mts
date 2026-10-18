@@ -911,6 +911,49 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "quote-tab-after-block-start-is-code",
+    what: "a TAB on a quoted line that cannot continue a paragraph is indented CODE, so no reference",
+    apply: (text, ours) => {
+      // The 67-document family this file records with its mechanism UNKNOWN. The earlier wave
+      // varied callout shapes plus one `> plain` and concluded "callout", then found a
+      // four-space row refuting it. The live shrinker's minimal form is a BARE `>` first line,
+      // which no wave had tested, and 35 probes then separate it cleanly:
+      //
+      //                      tab    1sp    2sp    3sp    4sp    5sp    sp+tab
+      //     plain           1/1    1/1    1/1    1/1    1/1    1/1    1/1
+      //     empty           0/1*   1/1    1/1    1/1    1/1    0/0    0/1*
+      //     callout         0/1*   1/1    1/1    1/1    1/1    0/0    0/1*
+      //     blank-after-txt 0/1*   1/1    1/1    1/1    1/1    0/0    0/1*
+      //
+      // It is not the callout. It is whether the PRECEDING quoted line can be lazily
+      // continued: after `> plain` the tab line continues a paragraph and the reference is
+      // indexed, and after an empty `>`, a callout, or a blank following text it starts a new
+      // block and is indented code. `blank-after-text` is the row that kills the callout
+      // reading, and the space columns confirm the threshold independently -- 1sp to 4sp all
+      // index, 5sp does not, on both sides.
+      const lines = text.split("\n");
+      const inner = (line: string) =>
+        line.replace(/^[ \t]*>/u, "").replace(/^[ \t]/u, "");
+      const dead = new Set<number>();
+      for (let at = 1; at < lines.length; at++) {
+        const line = lines[at] ?? "";
+        if (!/^[ \t]*>/u.test(line)) continue;
+        if (!/^[ \t]*\t/u.test(inner(line))) continue;
+        const above = lines[at - 1] ?? "";
+        if (!/^[ \t]*>/u.test(above)) continue;
+        const head = inner(above);
+        // Cannot be lazily continued: an empty quoted line, or a callout marker.
+        if (head.trim() !== "" && !/^\[![^\]]*\]/u.test(head)) continue;
+        dead.add(at);
+      }
+      if (dead.size === 0) return ours;
+      return {
+        defs: ours.defs,
+        refs: ours.refs.filter((r) => !dead.has(r[1])),
+      };
+    },
+  },
+  {
     name: "quote-tab-no-define",
     what: "a tab DIRECTLY after a quote marker means the label does not define -- SCORED, NOT SHIPPED",
     apply: (text, ours) => {
