@@ -6125,3 +6125,22 @@ deciding ownership are separate questions, and only the first one is wrong. The 
 belongs in the column pass -- `definitionColumnTransform` already derives a definition's column
 from its host's content column -- where an empty-marker host can be given `W` without touching
 what the tokenizer consumes. Reverted; baseline restored exactly at 5767 and 742.
+
+### The ownership half is refused in three scopings; the COLUMN half shipped
+
+Separating the two roles let the column half land -- `contentColumn` now gives a bare marker its
+own width, worth +11 probes at zero cost on every other oracle. The OWNERSHIP half, which would
+make a one-space line under a bare `-` the item's content rather than root, is refused:
+
+    remove `initialSize++` alone                      ledger 67 -> 62   referee flat
+    ...and widen the factorySpace limit for ALL items ledger 67 -> 77   referee -366, corpus -30
+    ...and widen it for EMPTY items only              ledger 78 -> 71   referee flat
+
+The third is the derived scoping -- `initialBlankLine` marks exactly the item the rule is about
+-- and it still loses seven probes the column fix had just gained, because lowering the
+threshold changes which definitions are inside the item at all and the two interact.
+
+So after the column fix the family stands at 78 of 91 probes agreeing, and the thirteen that
+remain all need the threshold rather than the column: three where a space-indented line under a
+bare marker should be the item's content, and ten where a tab plus spaces should be. Every
+attempt at that threshold has now cost more than it gained, across three scopings and two files.
