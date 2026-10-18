@@ -513,6 +513,80 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
   for (const value of list as Entry[]) entries.push(value);
 }
 
+/**
+ * Cluster the last run's minimal forms by the SET of constructs each carries.
+ *
+ *     npx tsx --conditions=development test/parity/referee-shrink.mts --interactions
+ *
+ * WHY A SET AND NOT A LABEL. Divergence tracks DENSITY, not any construct: a document carrying
+ * seven or more distinct constructs diverges 46% of the time against a 14.2% base, which is
+ * lift 3.24, where the strongest single construct manages 1.60. So what remains is
+ * interactions -- and **78% of minimal forms carry two or more constructs**.
+ *
+ * Every cluster table produced before this was ad-hoc, tagging a form by its FIRST matching
+ * construct, so `> ``` ` over an unquoted line counted as "fence" and `quote + comment + tab`
+ * counted as "quote". That collapses the interaction into whichever construct the tagger
+ * happened to test first, which is the one thing the evidence says must be kept.
+ *
+ * It is deliberately a SOURCE-construct set, not a node-type set. `mechanism.mts` already
+ * classifies by which of OUR nodes covers the diverging position, and that axis answers "what
+ * did we build"; this one answers "what did the author write that we could not combine".
+ */
+const CONSTRUCTS: readonly (readonly [string, RegExp])[] = [
+  ["quote", /^[ \t]*>/mu],
+  ["fence", /```|~~~/u],
+  ["math", /\$/u],
+  ["comment", /%%/u],
+  ["tab", /\t/u],
+  ["marker", /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]/mu],
+  ["wikilink", /\[\[/u],
+  ["inline-fn", /\^\[/u],
+  ["table", /\|/u],
+  ["html", /<[a-z/]/u],
+  ["indent4", /^ {4,}/mu],
+];
+
+if (process.argv.includes("--interactions")) {
+  const forms = JSON.parse(
+    fs.readFileSync("/tmp/live-shrink.json", "utf8"),
+  ) as { text: string; count: number }[];
+  const setOf = (text: string): string[] =>
+    CONSTRUCTS.filter(([, pattern]) => pattern.test(text)).map(
+      ([name]) => name,
+    );
+
+  const bySize = new Map<number, number>();
+  const bySet = new Map<string, { forms: number; docs: number }>();
+  for (const form of forms) {
+    const set = setOf(form.text);
+    bySize.set(set.length, (bySize.get(set.length) ?? 0) + 1);
+    const key = set.join(" + ") || "(none)";
+    const seen = bySet.get(key) ?? { forms: 0, docs: 0 };
+    seen.forms += 1;
+    seen.docs += form.count;
+    bySet.set(key, seen);
+  }
+  console.log(`interactions: ${forms.length} minimal forms`);
+  console.log("\n  how many constructs each carries:");
+  let multi = 0;
+  for (const size of [...bySize.keys()].sort((a, b) => a - b)) {
+    const n = bySize.get(size)!;
+    if (size >= 2) multi += n;
+    console.log(`    ${size} construct(s) : ${String(n).padStart(3)} forms`);
+  }
+  console.log(
+    `    -> ${multi} of ${forms.length} (${Math.round((100 * multi) / forms.length)}%) carry TWO OR MORE`,
+  );
+  console.log("\n  by construct SET, commonest first:");
+  for (const [key, seen] of [...bySet].sort((a, b) => b[1].docs - a[1].docs)) {
+    if (seen.docs < 2) continue;
+    console.log(
+      `    ${String(seen.docs).padStart(3)} docs  ${String(seen.forms).padStart(3)} forms   ${key}`,
+    );
+  }
+  process.exit(0);
+}
+
 if (process.argv.includes("--live")) {
   await live(entries);
   process.exit(0);

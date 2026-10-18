@@ -6518,3 +6518,73 @@ this and sits at 0 on six of seven axes -- but it tests PAIRS and triples of six
 constructs, and the documents that actually diverge carry seven or more. The gap between
 "compose is clean" and "46% of dense documents diverge" is the unexplored surface, and it is
 arity, not coverage.
+
+## Is the tooling sufficient for interactions? One step was missing, and it was mine
+
+Density says what remains is interactions. The follow-up question is whether the instruments
+here can classify and address them. Measured rather than asserted, and the answer splits.
+
+**Classification was broken, in the one step never built into a tool.** Every cluster table in
+this file came from ad-hoc python tagging each minimal form by its FIRST matching construct.
+That is a single label on a multi-construct form, and it discards the interaction:
+
+    of 93 minimal forms from the `ref-extra` shrink
+      0 constructs :  6      1 construct : 14
+      2 constructs : 30      3 constructs: 24
+      4+           : 19
+      -> 73 of 93 (78%) carry TWO OR MORE
+
+Clustered by the construct SET instead, coherent groups appear that the first-match tagger had
+been folding into "quote" and "fence":
+
+      9 docs   quote + tab              4 docs   quote + tab + marker
+      8 docs   quote + fence            2 docs   quote + math + tab
+      6 docs   quote + comment + tab
+
+`referee-shrink.mts --interactions` does this now, so the classification is reviewable and
+re-runnable rather than reconstructed from a shell history each time.
+
+**And `compose.mts` cannot generate the shape that diverges.** The instrument built for
+interactions is structurally unable to reach them, which is a sharper problem than the arity
+gap named in the density section. Its `--inside` axis builds a body as
+
+    innerSyntax.split("\n").map((line) => `${prefix}${line}`).join("\n")
+
+-- EVERY line prefixed. That is well-formed nesting. The minimal forms that actually diverge
+are PARTIALLY prefixed, where the container's body stops being marked and the next line
+continues it lazily:
+
+    of 50 minimal forms containing a quote
+      fully prefixed, what `--inside` generates : 19
+      PARTIALLY prefixed, a lazy boundary       : 31
+
+        >    %% / ⇥It %% [^x-y]
+        > / 10.    More / ⇥[^ch2*]:
+        > ``` / live[^7]
+
+The third is `quoted-fence-lazy.ts`, shipped this session at +9 -- found by shrinking the
+corpus, never by a sweep, because no cell of the grid spells it. So `compose` reading 0 on six
+of seven axes and 46% of dense documents diverging are not in tension: the sweeps are clean on
+well-formed nesting, and every lazy boundary is outside their generator.
+
+### What that means for the instruments
+
+| capability                           | state                                       |
+| ------------------------------------ | ------------------------------------------- |
+| find a dense document that diverges  | `mechanism.mts`, works                      |
+| reduce it preserving the interaction | `referee-shrink --live`, works              |
+| classify the interaction             | `--interactions`, **built here**            |
+| confirm a rule against Obsidian      | `probe-channel.ts` + the ledger, works      |
+| score a rule before building it      | `score.mts`, works                          |
+| SWEEP an interaction space           | `compose.mts`, **well-formed nesting only** |
+
+Five of six hold. The missing one is a generator for partially-prefixed bodies -- a container
+opened, its body marked for some lines and not others, the follower lazy. That is a different
+axis rather than a higher arity, and it is the one thing this harness would need before the
+remaining 15% could be swept rather than shrunk one family at a time.
+
+It is deliberately NOT built here. The density finding is hours old, the axis would be the
+eighth in a file whose seven took weeks to work to zero, and this file's own record is that an
+instrument built before its question is sharp produces a number nobody can act on -- four
+families probed on an axis that returned agreement, five counting selectors dead. The
+measurement says where to point it; pointing it is a decision, not a consequence.
