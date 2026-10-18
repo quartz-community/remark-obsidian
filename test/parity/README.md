@@ -6089,3 +6089,39 @@ for a different reason than the one first recorded.
 **A break test that fails to break is evidence about the thing you were sure of.** Eleventh
 instrument correction of this effort, and the first found by trying to validate a tool rather
 than by using one.
+
+## `containerState.size` serves TWO roles, and the bare-marker column needs them apart
+
+The 60-probe sweep says an empty item's content column is its marker's WIDTH -- `-` reports 1
+and `10.` reports 3, where CommonMark gives `W + 1` -- and `onBlank`'s `initialSize++` is
+exactly that `+1`. Removing it looks like a one-line fix and is not:
+
+    removing `initialSize++`     referee 5767 -> 5767   ledger 67 -> 62 agreeing  (5 gained, 10 lost)
+
+The gains and losses split by INDENT TYPE, which is the tell:
+
+    ++  "-" / blank / "⟨1sp⟩[^1]: x"      obs col 1, was col 0, now col 1
+    ++  "-" / blank / "⟨5sp⟩[^1]: x"      obs CODE,  was col 5, now CODE
+    --  "-" / blank / "⇥⟨1sp⟩[^1]: x"     obs col 1, was col 1, now CODE
+    --  "10." / blank / "⇥⟨3sp⟩[^1]: x"   obs col 1, was col 1, now CODE
+
+Every space row improved and every TAB row collapsed, because `size` is used for two different
+things. It is the threshold deciding what the item OWNS, and it is also the `factorySpace` limit
+`size + 1` deciding how much indent is CONSUMED before `afterPrefix` can judge it. Dropping it to
+1 caps consumption at two columns, so a tab is never taken at all.
+
+**And decoupling them naively is far worse.** Raising the limit to `max(size, tabSize) + 1` so a
+tab is always consumable takes the ledger to 77 agreeing -- the best figure any version of this
+reached -- and costs:
+
+    referee 5767 -> 5401   (-366)        corpus 30 cases broken
+
+Because the limit governs EVERY list item, not only an empty one. A probe set can be won while
+the corpus burns, which is the clearest demonstration yet of why the ledger is a change detector
+and not a target.
+
+So the bare-marker column is real, measured, and not a tokenizer change: reporting a column and
+deciding ownership are separate questions, and only the first one is wrong. The next attempt
+belongs in the column pass -- `definitionColumnTransform` already derives a definition's column
+from its host's content column -- where an empty-marker host can be given `W` without touching
+what the tokenizer consumes. Reverted; baseline restored exactly at 5767 and 742.
