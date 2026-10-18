@@ -60,6 +60,7 @@ import { commentParseTransform } from "./lib/comment-parse.js";
 import { commentDefinitionColumnTransform } from "./lib/comment-definition-column.js";
 import { commentQuoteExtentTransform } from "./lib/comment-quote-extent.js";
 import { itemCommentLazyTransform } from "./lib/item-comment-lazy.js";
+import { quotedFenceLazyTransform } from "./lib/quoted-fence-lazy.js";
 import { quoteCommentLazyTransform } from "./lib/quote-comment-lazy.js";
 import {
   ensureLineOffsets,
@@ -724,6 +725,7 @@ export default function remarkObsidian(
     // needs the comment to be its container's LAST child and this one needs a sibling after
     // it -- so the order is for reading rather than for correctness.
     if (opts.comments) itemCommentLazyTransform(tree, String(file));
+    quotedFenceLazyTransform(tree, String(file));
     // Before the footnote passes, so a definition this recovers is one they see.
     indentTabTransform(tree, String(file), (markdown) => reparse(markdown));
     // Unconditional, unlike the continuation pass above it: a definition whose
