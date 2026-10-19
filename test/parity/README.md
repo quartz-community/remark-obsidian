@@ -8455,3 +8455,55 @@ starts from a mechanism rather than from the table.
 One concrete lead for whoever takes it: `tab tab` is 28 documents with ONE diverging, so two
 consecutive tabs behave almost entirely correctly while tab-spaces-tab never does. Whatever
 separates those two is the mechanism.
+
+## The contradiction was a BLIND SPOT, not a hard problem
+
+A rule that contradicts every document it is derived from means something is unobserved, so the
+right question is which instrument is missing. Enumerating what each channel can see:
+
+    sections            root-level blocks only -- BY CONSTRUCTION
+    footnotes/refs      a definition's existence and position, not what WRAPS it
+    code (DOM)          inline code only; `<pre>` excluded by an explicit filter
+    live preview        a different parser, not an oracle for reading-mode rules
+
+**So "did this item's content become a code block" had no oracle at all.** Every conclusion
+about a container's internal blocks across this whole effort was INFERRED from whether a
+definition survived. That is how the tab-separator contradiction stood:
+
+    "*⟨2sp⟩⇥[^1]:"     obs no definition   inferred: the line became code
+    "*⇥⟨2sp⟩⇥[^1]:"    obs a definition    inferred: it did not
+
+both four or more columns in by every arithmetic available, with no way to tell which premise
+was wrong.
+
+### `blockCode` closes it, and the nesting PATH is the part that matters
+
+Every `pre > code` in the rendered reading view, with its ancestor path. A `<pre>` at root and a
+`<pre>` inside an `<li>` are different answers to the question, so the text alone would not do.
+
+    "*⟨2sp⟩⇥[^1]: def"     blockCode  ul>li>pre:"[^1]: def"     CODE, hence no definition
+    "*⇥⟨2sp⟩⇥[^1]: def"    blockCode  NONE                      not code, hence a definition
+    "*⇥[^1]: def"          blockCode  NONE                      defines
+    "*⇥⇥[^1]: def"         blockCode  ul>li>pre:"[^1]: def"      CODE, no definition
+    "*⟨2sp⟩[^1]: def"      blockCode  NONE                      defines
+
+The inference was FAITHFUL -- the definition's presence tracked the code block exactly -- which
+is worth stating plainly: the blind spot did not produce a wrong conclusion, it produced an
+unfalsifiable one. Five cells of inference became five cells of measurement, and the arithmetic
+is now a question that can be answered rather than argued.
+
+**And the arithmetic still does not reconcile.** `⟨2sp⟩⇥` and `⇥⇥` are code; `⇥`, `⇥⟨2sp⟩⇥` and
+`⟨2sp⟩` are not. No model of "a tab after a space counts one" or "a tab reaches its stop", with
+or without the five-space cap, produces that partition. The difference is that this is now a
+measurement to explain rather than a contradiction to doubt.
+
+### What the gap says about the other channels
+
+It was findable by asking what each channel is blind to BY CONSTRUCTION rather than by accident,
+which is what `overview.ts` exists for -- and this one was not registered there, because nobody
+had needed it until a rule turned on it. Two of the registered blind spots were closed the same
+way: a link's target in isolation, and rendering-only divergence. Both by the DOM, both because
+the index cannot answer a question about rendering.
+
+That is three for three: **every blind spot closed in this harness has been closed by reading
+the DOM, and every one was invisible until a rule depended on it.**

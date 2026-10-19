@@ -423,6 +423,27 @@ function project(root) {
     code: Array.from(clone.querySelectorAll("code"))
       .filter((el) => el.parentElement?.tagName.toLowerCase() !== "pre")
       .map(textOf),
+    // BLOCK code, with its NESTING PATH, which nothing in this harness could see.
+    //
+    // `sections` is root-level by construction, so it reports `list@0-0` and says nothing
+    // about what the item holds. `code` above excludes `<pre>` deliberately. Live preview is a
+    // different parser. So "did this item's content become a code block" had NO oracle, and
+    // every conclusion about it was inferred from whether a definition survived.
+    //
+    // That is how a contradiction went unresolved: `*<2sp><TAB>[^1]:` reports no definition and
+    // `*<TAB><2sp><TAB>[^1]:` reports one, both are four or more columns in by every available
+    // arithmetic, and the only way to tell which premise was wrong was to look at the block
+    // that was being reasoned about. The path is what makes it usable -- a `<pre>` at root and
+    // a `<pre>` inside an `<li>` are different answers to the question.
+    blockCode: Array.from(clone.querySelectorAll("pre > code")).map((el) => {
+      const path = [];
+      let node = el.parentElement;
+      while (node && node !== clone) {
+        path.unshift(node.tagName.toLowerCase());
+        node = node.parentElement;
+      }
+      return { path: path.join(">"), text: textOf(el) };
+    }),
     // RENDERED headings, which is a different question from INDEXED headings and the one
     // `metadataCache` cannot answer. Obsidian paints a heading inside a container and does
     // not index it -- `> text` / `> ---` reports `headings: []` while rendering an h2 -- so

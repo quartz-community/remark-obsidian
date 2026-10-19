@@ -51,6 +51,14 @@ export interface DomFacts {
   readonly emphasis: readonly string[];
   readonly strike: readonly string[];
   readonly code: readonly string[];
+  /**
+   * BLOCK code with its nesting path, the one structural question no other channel answers.
+   *
+   * `sections` is root-level, so it cannot say what a list item holds; `code` above is inline
+   * only by design. A `<pre>` at root and a `<pre>` inside an `<li>` are different answers, so
+   * the path is carried rather than just the text.
+   */
+  readonly blockCode: ReadonlyArray<{ path: string; text: string }>;
   readonly math: ReadonlyArray<{ display: boolean; tex?: string }>;
   /** RENDERED headings -- a different question from the INDEXED ones `ask.mts` returns. */
   readonly headings: readonly string[];

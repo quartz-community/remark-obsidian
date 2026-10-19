@@ -476,6 +476,10 @@ export const SCOPE: readonly ScopeBoundary[] = [
     why: "was: the projection string ${original}=>${link}|${display}@${span} is not round-trippable, since `[[a|b|c]]` records as `a|b|c` and could be target `a|b`. The DOM keeps them in separate attributes, so `ask-dom.ts` now reports `{target, display}` and `[[a|b|c]]` is unambiguously target `a`, display `b|c`",
   },
   {
+    what: "BLOCK structure inside a container -- CLOSED",
+    why: "was: no channel could answer \"did this item's content become a code block\". `sections` is root-level by construction, so a definition inside a list item reports `list@0-0` and nothing else; `ask-dom.ts`'s `code` excluded `<pre>` deliberately; live preview is a different parser. So every conclusion about a container's internal blocks was INFERRED from whether a definition survived -- which is how `*<2sp><TAB>[^1]:` reporting no definition and `*<TAB><2sp><TAB>[^1]:` reporting one stood as a contradiction no arithmetic explained. `blockCode` reports every `pre > code` with its NESTING PATH, and answers it directly: the first is `ul>li>pre` and the second is nothing. The path matters -- a `<pre>` at root and a `<pre>` inside an `<li>` are different answers",
+  },
+  {
     what: "rendering-only divergence -- CLOSED",
     why: 'was: metadataCache indexes rather than renders, so an index oracle cannot see a construct Obsidian paints and does not index. `ask-dom.ts` reports RENDERED headings beside the cache\'s indexed ones: `> text` / `> ---` is `["2:text"]` rendered against `[]` indexed, which makes the class measurable rather than merely registered',
   },
