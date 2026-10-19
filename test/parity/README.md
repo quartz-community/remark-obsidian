@@ -7976,3 +7976,63 @@ and this session's questions came from shrink clusters -- which are now exhauste
 seven families. So the honest claim is that the next discovery is cheaper, not that one is
 waiting. The two grids with cells still open (`bare-marker-tab` at 12, and the four item-host
 swallow cells) are both refused with numbers rather than unexplored.
+
+## The first SWEEP of the indentation space: 3 of 448, and it retires the space
+
+The six registered grids all CONFIRM -- each was built after a shrink cluster pointed at a
+family. None goes looking. `compose.mts` is the counter-example, and the space it sweeps is not
+this one: **seven of its eight axes hold indentation FIXED**, a constant container prefix on
+every line, while six of the seven rules landed this session were about indentation.
+
+So `grid.mts --sweep` takes the complement -- four container hosts against all sixteen `BLOCKS`
+against a seven-rung indent ladder, 448 cells, three fields each.
+
+    3 of 448 cells diverge
+
+        quote    fence     2sp+tab   code.exists   obs=1  ours=-1
+        callout  fence     2sp+tab   code.exists   obs=1  ours=-1
+        callout  footnote  2sp+tab   def.exists    obs=1  ours=-1
+
+**99.3% clean**, which was the predicted possible outcome and is a result rather than a
+disappointment: nothing until now established that the indentation space was worked out, and
+seven rules this session evidently took most of what it held.
+
+### The first run reported TWELVE, and nine were phantoms
+
+`refs.count` was compared without honouring `refsTrustworthy`. `footnoteRefs` is
+definition-gated, so references are read from a copy carrying a synthesised definition per name,
+and a document that swallows its tail eats them -- an unclosed `%%` is the measured case, and it
+is what half this sweep's cells contain. The run reported eight `comment` rows as `obs=0
+ours=1` across all four hosts, which read as a clean new family.
+
+`liveSignature` has carried that guard since the `ref-extra` run, where 28 of 115 reported forms
+were the same phantom. New code walked into the same trap, which is the fourth instance in this
+harness and the second in one session.
+
+### The three real cells are correct, tiny, and UNMEASURABLE
+
+    "> quote" / "⟨2sp⟩⇥```"    obs  blockquote@0-0  code@1-4     the quote ENDS, a root fence
+                                                                  opens and runs to EOF
+    "> quote" / "⟨2sp⟩⇥plain"  obs  blockquote@0-1               absorbed -- we agree
+    "> quote" / "⇥```"         obs  code@1-1                     indented code -- we agree
+    "- item" / "⟨2sp⟩⇥```"     obs  list@0-1                     absorbed -- we agree
+
+So a QUOTE releases a sub-threshold line that opens a FENCE, where a list absorbs it and root
+absorbs it, and `plain` and `%%` are absorbed at the same indent. `quoteLazyIndentedCodeTransform`
+declines because `⟨2sp⟩⇥` is neither four spaces nor a leading tab -- correctly, since a tab
+after a space reaches nothing -- and the release here is the FENCE opening at two columns rather
+than indented code.
+
+**And the population is ZERO.** No referee document holds a quoted line followed by a
+space-then-tab fence. This file's own standard applies: a measurement against a corpus that
+cannot adjudicate the rule is not evidence, so building it would be an unverifiable change.
+Recorded and not built.
+
+### What the sweep is worth instead
+
+All 448 cells are now in the ledger, not only the three failures -- the VALUE of a sweep is
+that 445 agree, and a ledger holding only the failures would not notice if one of the 445
+started failing. Ledger **754 -> 1202 probes, 1126 agreeing**.
+
+So the indentation space is swept, pinned, and retired, and the next sweep wants a different
+axis than indentation.
