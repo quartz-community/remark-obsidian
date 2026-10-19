@@ -7286,3 +7286,31 @@ another scoping attempt, which is how the last two rules were actually found.
 
 All 48 cells are in the probe ledger as `bare-marker-tab/*`, so the surface cannot drift while
 the rule is open. Ledger 573 -> 621 probes.
+
+### Why: a tab is ONE code plus virtual spaces, and `factorySpace` counts CODES
+
+Read rather than guessed, in `micromark/dev/lib/preprocess.js`:
+
+    case codes.ht: {
+      const next = Math.ceil(column / constants.tabSize) * constants.tabSize
+      chunks.push(codes.horizontalTab)
+      while (column++ < next) chunks.push(codes.virtualSpace)
+    }
+
+A tab becomes **one `horizontalTab` code followed by virtual spaces** filling to the next tab
+stop. `factorySpace(effects, ok, type, max)` then consumes at most `max - 1` CODES -- not
+columns -- so a bare item whose `size` is 1 takes the single tab code and leaves its virtual
+spaces pending. Those go to the child flow, which reads them as indent, which is why the
+container claims the line and the flow still builds `code@3:2`.
+
+**This corrects a note elsewhere in this file.** It says `containerState.size` is "ALREADY in
+columns", on the evidence that `sliceSerialize(token, true)` expands tabs -- and that is true
+of the MEASUREMENT while the CONSUMPTION limit beside it is in codes. The two units meet in
+`tokenizeIndent`, where `got` is columns and `size + 1` is codes, and that mismatch is the
+whole of this family.
+
+So the family is bounded by the same architectural fact the `--lazy` attempt ended on: a
+container cannot settle, from its own prefix, a question the child flow will answer with
+leftover whitespace it was handed. Two rules found by reading micromark landed tonight; this
+one needs the flow side read the same way, and the 48 ledger cells hold the answer it has to
+reproduce.
