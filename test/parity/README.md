@@ -8424,3 +8424,34 @@ of quantities.
 
 The MISS half -- `tab 2sp tab` defines where we do not -- is left: it is the opposite direction
 and the grid holds its three cells.
+
+### The MISS half: 11 documents, 100% diverging, and no mechanism
+
+    marker + tab + spaces + tab    11 referee documents, ALL 11 diverging, 9 one-away
+    marker + tab + tab             28 documents, 1 diverging
+
+A 100% divergence rate, so the shape is exactly right about itself, and 11 is above the bar
+this file has refused things at. Our trees:
+
+    "*⇥[^1]: def"        listItem > footnoteDefinition@1:3    defines
+    "*⇥⟨2sp⟩⇥[^1]: def"  listItem > code@1:3                  code, so no definition
+
+**And the arithmetic does not reconcile with the rule shipped beside it.** That rule rests on a
+space-then-tab reaching its column stop, which is what puts a label four columns in and makes
+it literal:
+
+    "*⟨2sp⟩⇥[^1]:"     obs NONE      the tab reaches its stop -> 4 columns -> code
+    "*⇥⟨2sp⟩⇥[^1]:"    obs DEFINES   the second tab apparently does not
+
+The same two characters, opposite outcomes, and no column arithmetic available here explains
+both. Counting from the item's content column, from the marker, or from column zero all put the
+second case at four or more columns and therefore in code.
+
+So it is refused on the standard this file already applies to the callout-plus-tab observable:
+**implementing an observable whose mechanism is unknown is how a number gets fitted instead of a
+rule.** The three grid cells are pinned, the population is measured at 11, and the next attempt
+starts from a mechanism rather than from the table.
+
+One concrete lead for whoever takes it: `tab tab` is 28 documents with ONE diverging, so two
+consecutive tabs behave almost entirely correctly while tab-spaces-tab never does. Whatever
+separates those two is the mechanism.
