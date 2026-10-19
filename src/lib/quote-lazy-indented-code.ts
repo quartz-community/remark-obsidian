@@ -1,9 +1,32 @@
-import type { Code, Root, RootContent } from "mdast";
+import type { Code, ListItem, Root, RootContent } from "mdast";
+import { contentColumn } from "./definition-column.js";
+import { columnsOf } from "./item-dot-threshold.js";
 import type { Node } from "unist";
 
 const QUOTED = /^[ \t]*>/u;
 const INDENTED = /^(?: {4}|\t)/u;
 const QUOTES = new Set(["blockquote", "callout"]);
+
+/**
+ * A line that OPENS A BLOCK, which is what a list item requires and a quote does not.
+ *
+ * The two hosts differ, measured eight followers each under `> Text` and `*⟨4sp⟩Text`:
+ *
+ *     under a QUOTE   fence, plain, heading, comment, thematic, marker, label  ALL code
+ *                     a quoted `>` line                                       continues
+ *     under an ITEM   fence, heading, comment, marker                          code
+ *                     plain, `>`, `---`, `[^1]:`                               absorbed
+ *
+ * So a quote releases any lazy indented line, while an item releases only one that would
+ * start a block -- everything else is lazy continuation of the item's own paragraph. Each
+ * boundary is the construct's own validity rule, from seventeen further probes: a SAME marker
+ * continues the list, `#tag` and seven hashes are not ATX, `--` is not a marker, two
+ * backticks are not a fence and a single `%` is not a comment. `---` is absent because a
+ * thematic break reads as a setext underline, the asymmetry `legacy-list.ts` records as "only
+ * a marker with a second reading loses".
+ */
+const OPENS_BLOCK =
+  /^(?:```|~~~|#{1,6}(?:[ \t]|$)|%%|(?:[-*+]|\d{1,9}[.)])(?:[ \t]|$))/u;
 
 /**
  * A LAZY line indented four columns under a ROOT quote is root indented code.
@@ -56,6 +79,10 @@ export function quoteLazyIndentedCodeTransform(
   if (source === "") return;
 
   const lines = source.split("\n");
+  const indentOf = (text: string): string => /^[ \t]*/u.exec(text)![0];
+  /** A bullet's own character, or an ordered item's delimiter -- the thing that must match. */
+  const markerOf = (text: string): string | undefined =>
+    /^[ \t]*(?:([-*+])|\d{1,9}([.)]))[ \t]/u.exec(text)?.slice(1).find(Boolean);
   const starts: number[] = [];
   let at = 0;
   for (const line of lines) {
@@ -63,13 +90,16 @@ export function quoteLazyIndentedCodeTransform(
     at += line.length + 1;
   }
 
-  const lazyRun = (from: number, to: number): [number, number] | undefined => {
+  const lazyRun = (
+    from: number,
+    to: number,
+    releases: (text: string) => boolean,
+  ): [number, number] | undefined => {
     let first = -1;
     for (let line = from + 1; line <= to; line++) {
       const text = lines[line] ?? "";
       if (text.trim() === "") continue;
-      if (QUOTED.test(text)) continue;
-      if (!INDENTED.test(text)) continue;
+      if (!releases(text)) continue;
       first = line;
       break;
     }
@@ -77,12 +107,43 @@ export function quoteLazyIndentedCodeTransform(
     let last = first;
     while (last + 1 <= to) {
       const text = lines[last + 1] ?? "";
-      if (text.trim() === "" || QUOTED.test(text) || !INDENTED.test(text))
-        break;
+      if (text.trim() === "" || !releases(text)) break;
       last += 1;
     }
     return [first, last];
   };
+
+  const quoteReleases = (text: string): boolean =>
+    !QUOTED.test(text) && INDENTED.test(text);
+
+  /**
+   * An item releases a line only BELOW its content column and only if it opens a block.
+   *
+   * `contentColumn` is called rather than re-derived: it carries the five-space cap and the
+   * bare-marker width branch, and this package records a candidate refuted by its own
+   * re-derivation of exactly this quantity.
+   */
+  const itemReleases =
+    (markerLine: number) =>
+    (text: string): boolean => {
+      if (!INDENTED.test(text)) return false;
+      const bare = text.replace(/^[ \t]+/u, "");
+      if (!OPENS_BLOCK.test(bare)) return false;
+      // THE SAME MARKER CONTINUES THE LIST, and dropping this test is what broke
+      // `commonmark/lists/312` and `313` -- the staircase examples, where `⟨4sp⟩- e` under
+      // `⟨3sp⟩- d` and `⟨4sp⟩3. c` under `⟨2sp⟩2. b` are further ITEMS and not code. The
+      // tokenizer sketch of this rule compared `containerState.marker` and the first
+      // regex-only version of it here lost that, which the gate caught on the two cases
+      // CommonMark ships for exactly this shape.
+      const mine = markerOf(bare);
+      if (mine !== undefined && mine === markerOf(lines[markerLine] ?? "")) {
+        return false;
+      }
+      const column = contentColumn(source, {
+        position: { start: { offset: starts[markerLine]! } },
+      } as unknown as ListItem);
+      return column !== undefined && columnsOf(indentOf(text)) < column;
+    };
 
   // Walked to ANY DEPTH with the parent in hand, because lazy continuation can bury a
   // column-0 quote inside another container -- the root-only scan is what left the first
@@ -94,11 +155,27 @@ export function quoteLazyIndentedCodeTransform(
       const node = children[index];
       if (!node) continue;
       walk(node as unknown as { children?: RootContent[] });
-      if (!QUOTES.has(node.type)) continue;
+      // A root-level LIST, not the `listItem` inside it. The code node has to land at ROOT to
+      // be a root code section at all, and splicing beside an item puts it inside the list --
+      // which is what made the first version of this arm completely inert while every
+      // predicate in it fired correctly.
+      const isList = node.type === "list";
+      if (!QUOTES.has(node.type) && !isList) continue;
       const position = node.position;
       if (!position || position.start.column !== 1) continue;
 
-      const run = lazyRun(position.start.line - 1, position.end.line - 1);
+      // The LAST item's marker line, because that is the item a trailing lazy line is
+      // measured against.
+      const items = (node as unknown as { children?: RootContent[] }).children;
+      const lastItem = isList ? items?.[items.length - 1] : undefined;
+      const markerLine = lastItem?.position?.start?.line;
+      if (isList && markerLine === undefined) continue;
+
+      const run = lazyRun(
+        position.start.line - 1,
+        position.end.line - 1,
+        isList ? itemReleases(markerLine! - 1) : quoteReleases,
+      );
       if (!run) continue;
       const [first, last] = run;
       const quoteEnd = position.end.line - 1;

@@ -7084,3 +7084,81 @@ makes micromark re-evaluate the line from column 0 with its whitespace unconsume
 else about this family is now measured. The next attempt should answer that question against
 micromark's own document tokenizer before touching `legacy-list.ts` again -- the construct is
 written and proven, and reinstating it is a paste once the release path is understood.
+
+## Answering it: where micromark closes a container for a lazy line
+
+The question left open was "when a container's continuation declines, what makes micromark
+re-evaluate the line from column 0 with its whitespace unconsumed?" The answer is in
+`initialize/document.js` and it is **nothing** -- declining does not close anything:
+
+    effects.attempt(item[0].continuation, documentContinue, checkNewContainers)
+
+On `nok` control goes to `checkNewContainers`, `continued` is NOT incremented, and if no new
+container starts:
+
+    function thereIsNoNewContainer(code) {
+      self.parser.lazy[self.now().line] = continued !== stack.length
+      lineStartOffset = self.now().offset
+      return flowStart(code)            // no exitContainers
+    }
+
+The line is marked LAZY and written to the EXISTING child flow. The container closes
+**retroactively**, in `writeToChild`, and only if the lazy line began a new flow block:
+
+    if (self.parser.lazy[token.start.line]) {
+      while (index--) {
+        if (/* a childFlow event spans lineStartOffset */) return    // still open: stays
+      }
+      exitContainers(continued)                                     // closes HERE
+    }
+
+So the CHILD FLOW decides, not the container. That is exactly why the `endsItemConstruct`
+experiment was inert with every predicate firing correctly: the paragraph swallowed the line,
+something spanned the boundary, and `exitContainers` never ran. **A container construct cannot
+close itself by declining** -- the paths to `exitContainers` are a new container starting, a
+continuation that SUCCEEDS with `_closeFlow`, or EOF.
+
+### Which relocated the fix, and it was a node type away all along
+
+With the mechanism understood the probe to run is obvious, and it inverts the model:
+
+    root   "Text" / "⟨4sp⟩```"      paragraph@0-1              no code -- CommonMark
+    quote  "> Text" / "⟨4sp⟩```"    blockquote@0-0  code@1-1
+    item   "*⟨4sp⟩Text" / "⟨4sp⟩```" list@0-0       code@1-1
+
+At root an indented line continues the paragraph; inside a container it breaks out. That is
+the rule `quoteLazyIndentedCodeTransform` already shipped -- **the list was simply a node type
+it did not cover**, which is the fourth instance of "same rule, two node types" here.
+
+The two hosts are not identical, measured eight followers each:
+
+    under a QUOTE   fence, plain, heading, comment, thematic, marker, label   ALL code
+                    a quoted `>` line                                        continues
+    under an ITEM   fence, heading, comment, marker                          code
+                    plain, `>`, `---`, `[^1]:`                               absorbed
+
+A quote releases any indented lazy line; an item releases only one that OPENS A BLOCK. So the
+item arm carries two conditions a quote does not -- below the item's own content column, and
+`OPENS_BLOCK` -- and `contentColumn` is called rather than re-derived.
+
+### Two inert versions before the live one, and the gate caught the third
+
+- Keyed on `listItem`: every predicate fired and the tree did not move, because the code node
+  was spliced beside the item and therefore INSIDE the list. A root code section has to be a
+  root child. Switched to the root-level `list`, measuring against its LAST item's marker.
+- Then `commonmark/lists/312` and `313` broke -- the staircase examples, where `⟨4sp⟩- e`
+  under `⟨3sp⟩- d` is a further ITEM. The regex had lost the same-marker test that the
+  tokenizer sketch carried in `containerState.marker`. CommonMark ships two cases for exactly
+  this shape and the gate failed on both.
+
+### What it measured
+
+    referee footnotes   5869 -> 5885   (+16)
+    referee code         775 -> 800    (90.5%, +25)
+    probe rows           16 of 16 agreeing, both hosts
+    compose              5 of 2112, unchanged
+    corpus               0 regressions, 450 tests, 4 gates green
+
+The `code` dimension passed 90% for the first time. And the repair that was refused at -2
+three times is the same rule: what it lacked was the host's content column and the block test,
+both of which came from reading micromark rather than from another scoping attempt.
