@@ -7590,3 +7590,51 @@ for whoever revisits the count.
 A third mechanism now hangs off `_legacyOpenSize`: a fence delimiter, and any line after a
 blank. Both are the same sentence -- B3's minimum is a floor for lazy continuation and not a
 new content column -- and it took two separate families to see it.
+
+## `def-extra @ footnoteDefinition`: the quoted-swallow rule was three gaps wide
+
+48 one-away documents, and the shrink gives two dominant clusters -- `quote + math` at 7 and
+`quote + fence` at 6 -- whose forms are all one shape:
+
+    "> <div>" / "[^1]:"     "+ <!--" / "[^x-y]:"     "> > $$" / "[^名]:"
+    "> <!--" / "[^b]:"      "> > ```" / "[^ä]:"      "- <div>" / "[^1]:"
+
+An unclosed opener inside a container swallowing the unquoted label below it -- which
+`quoted-fence-lazy.ts` already implements for a depth-one FENCE. A 32-cell grid, eight openers
+against four hosts, says how wide the real rule is:
+
+                  ```   ~~~    $$   <div>  <!--   %%    # h   plain
+    quote d1        -     -     -    X-/D  X-/D    -      D      -
+    quote d2     X-/D  X-/D  X-/D    X-/D  X-/D    -      D      -
+    item -          -     -     -    X-/D  X-/D    -      D      -
+    item +          -     -     -    X-/D  X-/D    -      D      -
+
+Three gaps, and a negative that bounds the set: a HEADING does not swallow, because it ENDS the
+container rather than running past it -- the same row the `--matrix` absorption map gives for
+heading, and the reason the opener set is not "anything that opens a block".
+
+**Two of the three gaps were one expression each.** `$$` and the HTML openers joined the
+pattern, and `> > ``` ` was never detected at all because the pass stripped ONE quote marker
+where it needed a run. Referee 5901 -> **5912, +11**, code unchanged.
+
+### The third gap closes the grid and costs 44 documents
+
+Admitting a list-marker host closes all four remaining cells -- the grid goes fully clean --
+and takes the referee from 5912 to **5868**. Refused, and the asymmetry is worth stating
+because it is not obvious from the grid:
+
+A quote marks **every line it owns**, so `not quoted` really does mean `outside the quote`, and
+the swallow is a line-local question. An item's content is bounded by INDENTATION, which this
+line scan cannot see, so `not marked` means almost every line in the document and the swallow
+runs far past the item. Same shape, same oracle answer, and only one of the two hosts is
+decidable from the line.
+
+Sixth instance of the standing note: a probe table proves what Obsidian does to a SHAPE and
+cannot prove how often that shape is what a real document contains. The first five were about
+choosing work; this one is about scoping a rule that is already right.
+
+    referee footnotes  5901 -> 5912   (+11)
+    referee code        807, unchanged
+    probe ledger       621 probes, six drifted INTO agreement, 559 agreeing
+    compose            5 of 2112, unchanged
+    corpus             0 regressions, 450 tests, 4 gates green

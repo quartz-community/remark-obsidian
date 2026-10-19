@@ -1,8 +1,41 @@
 import type { Root, RootContent } from "mdast";
 import type { Node } from "unist";
 
-const FENCE = /^ {0,3}(?:```|~~~)/u;
+/**
+ * Every opener that swallows the unquoted line below it, measured rather than assumed.
+ *
+ * A 32-cell grid -- eight openers against four hosts -- says which ones do. `D` is a
+ * definition Obsidian reports:
+ *
+ *                 ```   ~~~    $$   <div>  <!--   %%    # h   plain
+ *     quote d1      -     -     -    X-/D  X-/D    -      D      -
+ *     quote d2   X-/D  X-/D  X-/D    X-/D  X-/D    -      D      -
+ *     item -        -     -     -    X-/D  X-/D    -      D      -
+ *     item +        -     -     -    X-/D  X-/D    -      D      -
+ *
+ * So a fence, a `$$` and an HTML opener all swallow; a `%%` and a plain line already agree by
+ * other means, and a HEADING does not swallow at all -- it is the negative that bounds the
+ * set, since a heading ends the container rather than running past it.
+ */
+const OPENER = /^ {0,3}(?:```|~~~|\$\$|<[A-Za-z!/])/u;
+/** A RUN of quote markers, not one. `> > ``` ` is depth two and was not detected at all. */
+const QUOTE_RUN = /^[ \t]*(?:>[ \t]?)+/u;
 const QUOTED = /^[ \t]*>/u;
+/**
+ * THE MARKER HOST IS REFUSED, and the number is why.
+ *
+ * `- <div>` / `[^1]:` and `+ <!--` / `[^x-y]:` suppress the definition in Obsidian exactly
+ * as the quoted forms do -- the grid's bottom two rows -- and admitting them here closes all
+ * four remaining cells. It also costs 44 REFEREE DOCUMENTS, 5912 down to 5868.
+ *
+ * So the shape is real and the rule over-fires on it. A quote's content is bounded by its own
+ * marker on every line, so `not quoted` means `outside the quote`; an item's is bounded by
+ * indentation this line scan cannot see, so `not marked` means almost every line in the
+ * document. The quote half is a line-local question and the item half is not.
+ *
+ * A probe table proves what Obsidian does to a SHAPE and cannot prove how often that shape is
+ * what a real document contains. Sixth instance of that note in this harness.
+ */
 
 /**
  * An UNQUOTED definition below a quoted fence opener is inside the fence, so it does not define.
@@ -33,7 +66,7 @@ export function quotedFenceLazyTransform(tree: Root, source: string): void {
   for (let at = 0; at < lines.length; at++) {
     const line = lines[at] ?? "";
     const quoted = QUOTED.test(line);
-    if (quoted && FENCE.test(line.replace(/^[ \t]*>[ \t]?/u, ""))) {
+    if (quoted && OPENER.test(line.replace(QUOTE_RUN, ""))) {
       open = !open;
       continue;
     }
