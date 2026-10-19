@@ -7693,3 +7693,51 @@ option A: `def-span-shorter` at 66 one-away, the largest family never shrunk, wi
 that produced five rules tonight -- shrink, cluster by construct set, build a GRID around the
 dominant shape, and look for an existing rule missing an input class. Four of tonight's five
 came out of exactly that.
+
+## `def-span-shorter`, and the artifact that nearly swallowed it
+
+66 one-away documents. The shrink gives 61 forms with no cluster above three -- "diffuse" by
+the usual reading -- and four of them were rebuilt by hand to probe the family:
+
+    "[^1]: one" / "%%"          "- [^1]: def" / "⟨2sp⟩%%"
+    "[^1]: body" / "⟨2sp⟩%%"    "> [^1]: def" / "> %%"
+
+All four diverge as shrunk. **Three stop diverging the moment a trailing newline is added**,
+which made the family read as an artifact of its own reduction. Counting all 61 instead of
+four:
+
+    diverge BOTH with and without a trailing newline : 51   real
+    diverge ONLY without one                         : 10   ARTIFACT
+    diverge ONLY with one / neither                  :  0
+
+So 16% of that run described an input the oracle was never asked about -- every corpus document
+ends with a newline -- and the sample of four was unrepresentative in the alarming direction.
+`referee-shrink` now refuses to drop the final empty line, and the two earlier runs this
+session (`def-span-longer`, `ref-extra`) are affected to an unknown degree. Both concluded
+"diffuse", which this makes slightly MORE likely rather than less.
+
+### Re-shrunk, two of twelve share a shape, and it is a rule already in the package
+
+    "> [^3=]: magna" / "> 2. item"      "> [^टिप्पणी]: lorem" / "> 2. item"
+
+A 24-cell grid, three hosts against eight followers, with the definition's end line as the
+cell:
+
+                 1. item   2. item  10. item   1) item   2) item   - item   * item   plain
+    root               0         1         1         0         1        0        0       1
+    quote              0      X1/0      X1/0         0      X1/0        0        0       1
+    item               0         1         1         0         1        0        0       1
+
+Root and item agree on all eight. The quote diverges on exactly the three markers that CANNOT
+interrupt a paragraph -- CommonMark admits an ordered item as an interrupter only at 1 -- so
+`2.` opens nothing and the line is ordinary continuation. `container-lazy.ts` already carries
+that principle for a callout; this is it reaching a definition inside a quote.
+
+**The five agreeing columns are what make it the interrupt rule.** `1.` and `1)` can interrupt,
+both bullets can, and all five end the definition on both sides -- without them the obvious
+widening is "an ordered marker does not end a definition", which breaks the `1.` column.
+
+    referee footnotes  5912 -> 5914   (+2)
+    probe grid         24 of 24 agreeing
+    compose            5 of 2112, unchanged
+    corpus             0 regressions, 450 tests, 4 gates green

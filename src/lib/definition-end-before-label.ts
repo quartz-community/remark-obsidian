@@ -49,6 +49,26 @@ function quoteDepth(line: string): number {
 const QUOTED_BLOCK_OPENER =
   /^ {0,3}(?:(?:[-*+]|\d{1,9}[.)])[ \t]|\[\^[^\]]*\]:|>)/u;
 
+/**
+ * An ordered marker that CANNOT interrupt, so it opens nothing and the definition carries on.
+ *
+ * CommonMark lets an ordered item interrupt a paragraph only at 1, which `container-lazy.ts`
+ * already records for a callout -- `2.` could not have opened a list there either. The same
+ * principle, reaching a definition inside a quote, and a 24-cell grid says it is ONLY that
+ * host: three hosts against eight followers, with the definition's end line as the cell.
+ *
+ *              1. item   2. item  10. item   1) item   2) item   - item   * item   plain
+ *     root           0         1         1         0         1        0        0       1
+ *     quote          0      X1/0      X1/0         0      X1/0        0        0       1
+ *     item           0         1         1         0         1        0        0       1
+ *
+ * Root and item agree on all eight; the quote diverges on exactly the three markers that
+ * cannot interrupt. `1.` and `1)` can, and both bullets can, and all five of those already
+ * agree -- which is what makes this the interrupt rule rather than a fact about ordered
+ * markers.
+ */
+const CANNOT_INTERRUPT = /^ {0,3}(\d{1,9})[.)][ \t]/u;
+
 interface Point {
   line: number;
   column: number;
@@ -137,6 +157,10 @@ export function definitionEndBeforeLabelTransform(
         // candidate carried the guard; the first transcription of it into this pass did not,
         // and the two measured identically wrong.
         const deeper = ownDepth > 0 && quoteDepth(text) > ownDepth;
+        // An ordered marker that cannot interrupt opens nothing, so it is not an ender --
+        // see `CANNOT_INTERRUPT` above for the grid.
+        const start = CANNOT_INTERRUPT.exec(inner);
+        if (start && Number(start[1]) !== 1) continue;
         if (!deeper && !QUOTED_BLOCK_OPENER.test(inner)) continue;
       } else {
         // An INDENTED label is content, not an ender.
