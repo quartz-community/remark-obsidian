@@ -65,6 +65,7 @@ import { definitionTabPastItemTransform } from "./lib/definition-tab-past-item.j
 import { markerTabDefinitionTransform } from "./lib/marker-tab-definition.js";
 import { quotedFenceLazyTransform } from "./lib/quoted-fence-lazy.js";
 import { quoteLazyIndentedCodeTransform } from "./lib/quote-lazy-indented-code.js";
+import { quotedTabCodeTransform } from "./lib/quoted-tab-code.js";
 import { quoteCommentLazyTransform } from "./lib/quote-comment-lazy.js";
 import {
   ensureLineOffsets,
@@ -882,6 +883,10 @@ export default function remarkObsidian(
       // text left for the bare-reference pass to find.
       refBeforeLabelTransform(tree, String(file));
       bareFootnoteRefTransform(tree, String(file));
+      // AFTER the bare-reference pass, which is what CREATES the nodes this demotes. Placed
+      // before it the pass was completely inert -- the references it looks for did not exist
+      // yet -- with its own ordering comment claiming the opposite.
+      quotedTabCodeTransform(tree, String(file));
       // Before the column pass, because it decides whether there is a definition to give a
       // column to at all: B3's minimum moves the indented-code threshold with the content
       // column, so a label four past the lowered floor is code and Obsidian reports none.

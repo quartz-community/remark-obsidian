@@ -7378,3 +7378,45 @@ arrives at RELATIVE indent zero and opens a fence that swallows to the end of th
 Right about those cells, six documents wide. `better + worse + same` read first would have
 refused it before it was written, which is the rule this file sharpened this morning. The
 candidate is kept with its numbers.
+
+## A size refusal is only as good as the corpus it was counted on
+
+`ref-extra @ footnoteReference` is the largest family at 144 one-away, and it is diffuse: 91
+distinct minimal forms, largest cluster THREE documents, 46 of the 144 skipped. Nothing in its
+shape to build.
+
+Except its largest cluster is five documents of one form, with `probe:` ids -- cases promoted
+into the corpus earlier in this effort:
+
+    ">" / ">⇥code[^2]"        obs indexes NO reference, we indexed one
+
+That is the callout-plus-tab mechanism this file recorded as UNDERSTOOD and then declined on
+size at "four documents". Scored against the referee instead of counted on the corpus:
+
+    quoted-tab-after-block-start-is-code   better 12  worse 2  same 0   +10 agreeing
+
+**The population was fourteen, not four.** The original count was taken on the corpus, which
+happens to hold fewest of these shapes, and the rule was declined on it. So: a size refusal is
+only as good as the corpus it was counted on, and `score.mts` prints the figure over 6,818
+documents for free.
+
+### Two ordering mistakes, both caught by a gate
+
+- **Placed before `bareFootnoteRefTransform` the pass was INERT**, because that pass is what
+  CREATES the nodes it demotes -- while its own ordering comment claimed it ran after. The
+  referee was unmoved and nothing else said a word. Moved, and it was +6.
+- **Then `hunt/quoted-definition-tab-continuation/0` broke**, a `match` case:
+
+      "para." / blank / "> [^9]: stray" / ">" / ">⇥body cites[^b]"
+        obs footnotes    9@2:2-4:16   -- the definition REACHES the tab line
+        obs footnoteRefs b@4:12       -- so the reference IS indexed
+
+  An empty `>` does not start a fresh block while a definition is open above it: the definition
+  continues across the blank quoted line and the tab line is its content. Guarding on that --
+  read from OUR TREE, not re-scanned from the source -- fixed the case AND gained a further
+  document, 5895 to 5896.
+
+  referee footnotes 5889 -> 5896 (+7)
+  probe ledger 621 probes, three drifted INTO agreement and were re-recorded
+  compose 5 of 2112, unchanged
+  corpus 0 regressions, 450 tests, 4 gates green

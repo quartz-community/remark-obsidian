@@ -3470,6 +3470,41 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "quoted-tab-after-block-start-is-code",
+    what: "a quoted TAB line is indented code when the quoted line above it opened a block",
+    // The mechanism this file recorded as understood and then refused on size at FOUR
+    // documents. It reappears as the largest single cluster of `ref-extra @ footnoteReference`
+    // -- five documents, all `probe:` ids promoted earlier in this effort:
+    //
+    //     ">" / ">\tcode[^2]"      obs indexes NO reference, we index one
+    //
+    // It is LAZY CONTINUATION rather than anything about callouts. After `> plain` the tabbed
+    // line continues a paragraph and the reference IS indexed; after an EMPTY `>` or a callout
+    // title the quote has no open paragraph, so the tabbed line starts a fresh block, a tab is
+    // four columns, and the line is indented code whose references are literal.
+    //
+    // Scored rather than estimated this time, because "four documents" was the reason it was
+    // declined and the figure came from the corpus rather than from the referee.
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      const EMPTY_QUOTE = /^[ \t]*>[ \t]*$/u;
+      const CALLOUT = /^[ \t]*>[ \t]*\[![^\]]+\]/u;
+      const QUOTED_TAB = /^[ \t]*>\t/u;
+      const dead = new Set<number>();
+      for (let line = 1; line < lines.length; line++) {
+        if (!QUOTED_TAB.test(lines[line] ?? "")) continue;
+        const above = lines[line - 1] ?? "";
+        if (EMPTY_QUOTE.test(above) || CALLOUT.test(above)) dead.add(line);
+      }
+      if (dead.size === 0) return ours;
+      return {
+        defs: ours.defs,
+        refs: ours.refs.filter((r) => !dead.has(r[1])),
+        code: ours.code,
+      };
+    },
+  },
+  {
     name: "control-drop-all-code",
     what: "CONTROL: report no root code block at all",
     // Not a rule. It exists to prove the `code` dimension is wired in: a candidate that empties
