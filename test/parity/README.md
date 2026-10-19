@@ -7219,3 +7219,70 @@ the two halves of the empty-item rule.
 The `code` dimension has gone 742 -> 809 in one session, 84.0% to 91.6%, on three rules that
 all turned out to be about the same question: which lines a container owns when the line is
 shallower than its content column.
+
+## `def-miss @ code` is a TAB family, and the bare-marker surface mapped in full
+
+Fresh mechanism table after the night's rules -- 929 diverging, **656 of them one-away**, so a
+single rule can flip each:
+
+    ref-extra @ footnoteReference    144 one-away / 237 present
+    def-miss @ code                  104 / 127
+    ref-miss @ code                   76 / 117
+    def-span-shorter                  66 / 102
+    def-span-longer                   65 /  93
+    def-extra @ footnoteDefinition    50 / 188
+    def-col                           43 /  56
+
+`def-miss @ code` is the inverse of everything shipped tonight -- Obsidian DEFINES on a line we
+call code -- and shrinking its 104 one-away documents puts a TAB in 57 of them:
+
+    29 docs  tab + marker + indent4      14 docs  tab ALONE
+    14 docs  tab + marker                 7 docs  marker + indent4
+
+The `tab` cluster is eleven forms of ONE shape: a BARE marker, an optional blank line, then a
+tab, some spaces, and a label.
+
+    "-" / blank / "⇥⟨2sp⟩[^1]:"      "*" / blank / "⇥⟨3sp⟩[^1]:"
+    "-" / "⇥⟨3sp⟩[^1]:"              "1000." / blank / "⇥⟨1sp⟩[^1]:"
+
+### The surface, 48 cells, six marker widths against eight indents
+
+Obsidian's definition COLUMN, or `-` for no definition. `X` marks where we differ:
+
+                 tab   tab1   tab2   tab3   tab4   tab5    4sp    6sp
+    -              1      1   X1/-   X1/-      -      -      1      -
+    *              1      1   X1/-   X1/-      -      -      1      -
+    +              1      1   X1/-   X1/-      -      -      1      -
+    1)             1      1      1   X1/-      -      -      2      -
+    10.            1      1      1      1      -      -      3      3
+    1000.          -   X2/-   X2/1   X2/1   X2/1   X-/1      -      5
+
+Three rules fall out, and the first two are already recorded here and now bounded exactly:
+
+- **For a marker of width 1 to 3, a tabbed line defines at COLUMN 1 for indents 4 through 7**
+  and is code at 8. The window is the tab stop through the next one minus one, independent of
+  the marker's own width -- which is the "a leading tab makes the marker irrelevant" rule with
+  its upper bound measured rather than assumed.
+- **A bare `1000.` is different in both directions.** Its content column is 5, so a bare tab
+  reaching column 4 does NOT reach it and defines nothing -- which we get right. From column 5
+  to 8 it defines at column **2**, which no rule here explains, and at column 9 we INVENT a
+  definition it does not have.
+- We stop defining at tab+1 for widths 1 and 2, where Obsidian continues to tab+3.
+
+### Why the obvious fix is not the fix
+
+`tokenizeIndent`'s tab branch already admits this range -- `got < constants.tabSize * 2` is
+exactly the [4, 8) window -- and the item DOES claim the line. The divergence is one level
+down:
+
+    tab1    listItem > footnoteDefinition@3:2     correct
+    tab2    listItem > code@3:2                   the item claimed it, the FLOW made it code
+    tab3    listItem > code@3:2                   same
+
+So the container is already right and the child flow's tab-column accounting is what differs --
+`defineSkip` and how many of the tab's four columns remain after the item's prefix. That is the
+same layer the `--lazy` investigation ended in, and it wants reading micromark rather than
+another scoping attempt, which is how the last two rules were actually found.
+
+All 48 cells are in the probe ledger as `bare-marker-tab/*`, so the surface cannot drift while
+the rule is open. Ledger 573 -> 621 probes.
