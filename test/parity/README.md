@@ -8787,3 +8787,44 @@ Every lift in this file was taken against a baseline that has since moved, so **
 is a dated quantity and must be re-run before it chooses work.** The density figures survived
 that test; the tab figure did not. New measurements here should carry the odds ratio beside the
 lift, and the base rate they were taken at.
+
+## Re-scoring the refusals: they hold, and the decay runs the OPPOSITE way
+
+After the lift audit, the obvious follow-up was that refusal scores are dated quantities too --
+and the argument for re-running them was asymmetry: a stale lift mis-ranks work, a stale refusal
+HIDES it. The reasoning was that most refusals lost on collateral rather than on being wrong, so
+as other rules fixed the structure the collateral would shrink and a refusal might flip.
+
+**Measured, and the prediction is backwards:**
+
+    candidate                          recorded        now           verdict
+    label-in-indented-code-is-a-ref    27 / 1044    27 /  987    still -821 referee
+    quote-truncate                     91 /  395    11 /  369    still -312 referee
+
+`label-in-indented-code`'s collateral did shrink, 1044 to 987 -- and its GAINS did not move at
+all, still exactly 27. `quote-truncate` is the sharp one: its `better` **collapsed from 91 to
+11** while its `worse` barely moved, 395 to 369.
+
+### Why a refused rule's gains decay faster than its losses
+
+The mechanism is mundane once stated, and it generalises. A refused rule and a rule that LANDS
+often target the same documents: the landed rule is the correct, structural version of what the
+refused one approximated. Those documents go to agreement, which empties the refused rule's
+`better` set -- they are already right, so the rule can only leave them alone or break them. Its
+`worse` set is documents it damages, and nothing that lands protects a document from a rule that
+was wrong about it.
+
+So **`better` is competed away and `worse` is not**, and a refusal becomes MORE certain over
+time rather than less. `quote-truncate` was refused at 91/395 and is now unrefusable at 11/369.
+
+### Which inverts the value of this audit, without removing it
+
+The audit is still worth running and the reason has changed. It is not a hunting ground for
+hidden work -- it is cheap confirmation that closed families stay closed, and it retires the
+nagging question of whether a refusal was an artifact of its moment. Two of the largest in the
+file are now settled twice, at different agreement levels.
+
+The corollary is the useful part: **a refusal needs re-running only to CLOSE it, never to open
+it.** Anything genuinely hidden is in a shape nobody has scored at all, which is where the
+density finding points -- interactions, and `--interactions` clustering by construct SET, not in
+the nine candidates already carrying numbers.
