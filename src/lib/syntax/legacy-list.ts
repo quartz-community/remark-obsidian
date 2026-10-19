@@ -366,11 +366,29 @@ function tokenizeIndent(
     // closer at 2 would otherwise read as "at the content column" and be admitted -- while
     // Obsidian ends the item there and reads the closer as a new root fence. Compared against
     // the opener's 5 it is correctly shallower.
+    const seenBlank = (
+      self.containerState as unknown as { _legacyBlank?: boolean }
+    )._legacyBlank;
     const openSize =
       (self.containerState as unknown as { _legacyOpenSize?: number })
         ._legacyOpenSize ?? (self.containerState.size as number);
     const isDelimiter = code === codes.graveAccent || code === codes.tilde;
     if (isDelimiter && got < openSize) return nok(code);
+    // AND AFTER A BLANK LINE, every line is judged against the opening column, for the same
+    // reason. `_legacyBlank` already guards the LOWERING branch below -- "no blank line has
+    // intervened" -- and did not guard the later USE of a size some earlier shallower line
+    // lowered:
+    //
+    //     "2)<5sp>More" / "<2sp>===" / blank / "<2sp>[^2]:"   obs col 0, ours col 2
+    //     "2)<5sp>More" /              blank / "<2sp>[^2]:"   obs col 0, ours col 0  (agreed)
+    //     "2)<5sp>More" / "<2sp>===" /         "<2sp>[^2]:"   obs col 2, ours col 2  (agreed)
+    //
+    // The separator caps the content column at 3; the `===` line at 2 lowers `size` to 2
+    // before any blank has been seen, and the label at 2 then satisfies `got === size` and is
+    // admitted. Judged against the opener's 3 it is correctly shallower and the definition is
+    // at ROOT. The no-blank row is what keeps this from being the whole rule: there the lazy
+    // continuation really does carry the lowered floor.
+    if (seenBlank === true && got < openSize) return nok(code);
     if (got === self.containerState.size) return ok(code);
     // B3's minimum, SAFE because a fence is open.
     //
@@ -388,9 +406,6 @@ function tokenizeIndent(
     //
     // `furtherBlankLines` does not cover this -- it is only set when the item's FIRST line was
     // blank -- so the flag is kept here.
-    const seenBlank = (
-      self.containerState as unknown as { _legacyBlank?: boolean }
-    )._legacyBlank;
     // ...AND NOT THE FENCE'S OWN CLOSER, which is where the branch over-reached. A fence's
     // BODY at a shallower indent is the item's, and its CLOSER at a shallower indent is not:
     //

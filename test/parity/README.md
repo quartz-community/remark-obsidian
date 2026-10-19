@@ -7540,3 +7540,53 @@ the child flow knows. Is a paragraph open at this line? How many of a tab's four
 remain after the container's prefix? Both of tonight's shipped rules were found by READING
 micromark rather than by scoping a predicate, and both of tonight's refusals are predicates
 standing in for flow state. That is the shape of the remaining work.
+
+## The `def-col` root clamp: `_legacyBlank` guarded the lowering, not the USE
+
+The cheap question left at the end of the night, answered. Four `def-col` documents where
+Obsidian reports column 0 and we report 2, with the full context rather than the excerpt:
+
+    "2)⟨5sp⟩More $[^ch2*]$" / "⟨2sp⟩===" / blank / "⟨2sp⟩[^2]: body text"   obs col 0
+    "2)⟨7sp⟩```" / "⟨2sp⟩Prose here<!-- ... -->" / blank / "⟨2sp⟩[^3]:"      obs col 0
+
+Both are the five-space cap: the separator caps the item's content column at 3, and a label at
+2 is below it, so the definition is at ROOT.
+
+**And eight minimal probes all AGREED**, which is this file's most repeated shape -- the
+divergence needs the INTERVENING line. Adding it isolates the rule in one pass:
+
+    "2)⟨5sp⟩More" / "⟨2sp⟩===" / blank / "⟨2sp⟩[^2]:"    obs col 0   ours col 2
+    "2)⟨5sp⟩More" / "⟨2sp⟩---" / blank / "⟨2sp⟩[^2]:"    obs col 0   ours col 2
+    "2)⟨5sp⟩More" / "⟨2sp⟩text" / blank / "⟨2sp⟩[^2]:"   obs col 0   ours col 2
+    "2)⟨5sp⟩More" /              blank / "⟨2sp⟩[^2]:"    obs col 0   ours col 0   agreed
+    "2)⟨5sp⟩More" / "⟨2sp⟩===" /         "⟨2sp⟩[^2]:"    obs none    ours none    agreed
+
+The intervening line is any CONTENT at all -- a setext underline, a thematic break, plain prose
+-- so it is not about what the line is. It lowers `size` to 2 via B3's minimum, and the label
+at 2 then satisfies `got === size` and is admitted.
+
+**`_legacyBlank` already existed for exactly this and guarded the wrong half.** Its own comment
+says "AND NO BLANK LINE HAS INTERVENED", and it gates the LOWERING branch -- while the lowered
+value is then used by the early return twelve lines above it, which has no such guard. One line
+fixes it, reusing `_legacyOpenSize` added hours earlier for the fence closer:
+
+    if (seenBlank === true && got < openSize) return nok(code);
+
+The no-blank row is what keeps that from being the whole rule: there the lazy continuation
+really does carry the lowered floor, and the definition is the item's at column 2.
+
+    referee footnotes   5896 -> 5901   (+5)
+    referee code         809 -> 807    (-2)
+    probe rows           8 of 8 agreeing
+    compose              5 of 2112, unchanged
+    corpus               0 regressions, 450 tests, 4 gates green
+
+**The trade is recorded rather than hidden.** The code dimension's own breakdown says what
+moved: "we report NO root code block" fell by ten and "block count differs" rose by eight, so
+the change is producing blocks it previously missed and splitting a few others. Shipped because
+the rule is derived from eight agreeing rows and the primary oracle rises, with the losses named
+for whoever revisits the count.
+
+A third mechanism now hangs off `_legacyOpenSize`: a fence delimiter, and any line after a
+blank. Both are the same sentence -- B3's minimum is a floor for lazy continuation and not a
+new content column -- and it took two separate families to see it.
