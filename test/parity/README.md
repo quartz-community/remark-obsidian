@@ -7925,3 +7925,54 @@ That closes both span families from two directions each, 130 one-away documents:
 The math theme is visible in both -- `quote + math` is the largest set in the -1 bucket at 4
 documents -- and it is the family a 42-cell grid already measured and a candidate already
 refused at FLAT over six documents. Reaching it from a third direction does not make it bigger.
+
+## `grid.mts`: the instrument six of seven rules came from, finally built
+
+Shrinking finds the SHAPE a family reduces to. A GRID finds the rule and -- the part that
+matters -- its BOUNDARIES: the cells that AGREE are what separate "a tab in a marker separator
+reaches its stop" from "ordered markers behave oddly", and no single probe supplies them. Six
+of the seven rules landed in one session came from a grid.
+
+It existed as about two dozen throwaway scripts, each rebuilding the same cross product,
+channel call and X-marked table, each deleted after use. So a grid cost a script, was never
+re-runnable, and only the cells someone remembered to write out again reached the ledger.
+
+    grid.ts    axes, field extractors, the comparison, the renderer
+    grids.ts   the SIX named grids, transcribed from the scripts that measured them
+    grid.mts   --list | <name> | --all | --record <seeds.json>
+
+### It reproduces every hand-measured table, which is the only reason to trust it
+
+                            cells   diverging   matches the table recorded by hand
+    quoted-opener-swallow      32           4   the item hosts refused at -44
+    lazy-release               16           0   "all 16 rows agree"
+    marker-sep-column          35           4   the two remaining cells, both named
+    bare-marker-tab            48          12   twelve X marks, counted
+    ordered-interrupt          24           0   closed by the interrupt rule
+    def-end-opener             33           4   fence, tilde, math, thematic at a TAB
+    ----                      ---         ---
+                              188          24
+
+Not a single cell moved against what the scripts said. That is the break test: an instrument
+rebuilt from throwaway code is worth nothing until it reproduces the throwaway results.
+
+### And `--record` closed the ledger's registered blind spot
+
+`overview.ts` listed the ledger as blind to "a probe nobody recorded -- the ledger is only as
+wide as the sweeps someone chose to keep". Measured: of roughly three hundred cells probed by
+hand in one session, about a hundred and twenty had been written out again. Promoting all six
+grids at once:
+
+    ledger 621 -> 754 probes, 679 agreeing
+
+So the grids are now drift-asserted: a later change that moves any of those 188 cells fails
+`probes.test.ts` with the direction named. The blind spot is updated rather than deleted --
+a grid nobody WROTE is still invisible, which is a smaller gap than a grid nobody recorded.
+
+### What it does not do
+
+It does not find rules. It lowers the cost of asking a question that still has to be formed,
+and this session's questions came from shrink clusters -- which are now exhausted on four of
+seven families. So the honest claim is that the next discovery is cheaper, not that one is
+waiting. The two grids with cells still open (`bare-marker-tab` at 12, and the four item-host
+swallow cells) are both refused with numbers rather than unexplored.

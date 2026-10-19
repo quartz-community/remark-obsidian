@@ -252,7 +252,7 @@ export const ORACLES: readonly Oracle[] = [
     blind: [
       "whether we AGREE with Obsidian -- it asserts stability, because a probe usually records a divergence and a gate demanding agreement would be red from its first entry",
       "anything the referee's projection drops: no columns beyond the definition start, no code ranges, no sections",
-      "a probe nobody recorded -- the ledger is only as wide as the sweeps someone chose to keep",
+      "a probe nobody recorded -- the ledger is only as wide as the sweeps someone chose to keep, though `grid.mts --record` now promotes a whole GRID at once and closed most of that gap: of roughly three hundred cells measured by hand in one session only about a hundred and twenty had been written out again, and the six named grids brought the ledger from 498 to 754",
     ],
   },
   {
