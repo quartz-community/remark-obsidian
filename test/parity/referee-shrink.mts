@@ -272,8 +272,15 @@ async function live(entries: readonly Entry[]): Promise<void> {
       // artifact of the reduction rather than of the document. A sample of four caught three of
       // them, which is how it was found and why a sample is not a measurement.
       //
-      // Every real corpus document ends with a newline, so a reduced form that does not is
-      // describing an input the oracle was never asked about.
+      // CORRECTION to the first version of this note, which said "every real corpus document
+      // ends with a newline". It does not: 6,063 of 6,818 do and 755 do NOT. So the invariant
+      // is not "forms end with a newline" but "a form's trailing-newline status matches its
+      // ORIGINAL's" -- protecting the final empty line achieves that, because a document
+      // without one has no final empty line to protect.
+      //
+      // Verified directly on the `def-span-shorter` re-shrink: 60 of 61 reduced forms match
+      // their original, and the one that does not GAINED a newline rather than losing one,
+      // which comes from the word phase below rather than from here.
       const last = lines.length - 1;
       const candidates = lines
         .map((_, at) => at)

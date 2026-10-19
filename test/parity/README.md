@@ -7800,3 +7800,38 @@ not, because the corpus holds fewest of these shapes by construction.
 Four of the seven are now closed to shape-based attack with measurements behind them rather
 than impressions. That is a smaller queue than it looks: what remains wants either a
 discriminator nobody has derived, or the micromark layer three attempts have bounced off.
+
+### Correction: not every corpus document ends with a newline
+
+The instrument fix said "every real corpus document ends with a newline, so a reduced form that
+does not is describing an input the oracle was never asked about". The first clause is false:
+
+    referee documents ending with a newline : 6,063 of 6,818
+    not ending with one                     :   755
+
+So the invariant is not "forms end with a newline" -- it is **"a form's trailing-newline status
+matches its ORIGINAL's"**. Protecting the final empty line achieves exactly that, because a
+document without a trailing newline has no final empty line to protect, which is why the fix is
+still right. Verified directly on the re-shrink:
+
+    reduced forms matching their original's newline status : 60 of 61
+    differing                                             :  1, and it GAINED one
+
+The single drift is the benign direction and comes from the word phase rather than the line
+phase. It is left alone at one document of 61.
+
+**And the 16% artifact rate is overstated by an unknown amount.** It was measured by asking
+each form with and without a trailing newline, counting those that diverged only without --
+but for a form whose ORIGINAL lacked one, the newline-less reading is the faithful one and the
+"artifact" label is wrong. The number cannot be recovered without re-running the broken
+shrinker, which is not worth it; what stands is that the fix makes 60 of 61 faithful where the
+old tool guaranteed nothing.
+
+### `def-span-shorter`'s remaining 64, shrunk in full
+
+    reduced 61; 59 distinct minimal forms; top cluster `quote + math` at 4 documents
+
+Diffuse, like the rest. The ordered-interrupt rule shipped earlier came out of a 12-document
+sample of this family and is the only thing in it that clustered. So all three span and
+reference families are now confirmed diffuse with a correct instrument, on 87, 64 and 59 forms
+respectively.
