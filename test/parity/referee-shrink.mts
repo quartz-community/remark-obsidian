@@ -266,7 +266,18 @@ async function live(entries: readonly Entry[]): Promise<void> {
     let lines = entry.text.split("\n");
     for (let round = 0; round < 12; round++) {
       if (lines.length <= 1) break;
-      const candidates = lines.map((_, at) => at);
+      // THE FINAL EMPTY LINE IS NOT DROPPABLE, because dropping it removes the document's
+      // trailing newline -- and that alone changes a definition's extent. Of 61 forms from the
+      // `def-span-shorter` shrink, TEN diverged only without one: 16% of the output was an
+      // artifact of the reduction rather than of the document. A sample of four caught three of
+      // them, which is how it was found and why a sample is not a measurement.
+      //
+      // Every real corpus document ends with a newline, so a reduced form that does not is
+      // describing an input the oracle was never asked about.
+      const last = lines.length - 1;
+      const candidates = lines
+        .map((_, at) => at)
+        .filter((at) => !(at === last && lines[at] === ""));
 
       const without = (drop: ReadonlySet<number>) =>
         lines.filter((_, at) => !drop.has(at)).join("\n");
