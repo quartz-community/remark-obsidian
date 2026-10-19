@@ -8566,3 +8566,56 @@ behind it -- a root item carries the NEGATIVE of the line its list begins on, `-
 
 A second copy of a fact rots, and this one was born rotten. It now points at that docstring
 instead of restating it.
+
+## The first thing `blockCode` measured refutes COLUMN ARITHMETIC outright
+
+With an oracle for "did this item's content become a code block", the tab-separator question
+stops being an argument. 23 marker separators over `*<SEP>[^1]: def`, read as `blockCode`:
+
+    NOT CODE                      CODE
+    <TAB>                         <TAB><TAB>        <TAB>x3
+    1sp  2sp  3sp  4sp            5sp
+    <TAB>1sp  <TAB>2sp  <TAB>3sp  1sp<TAB>  2sp<TAB>  3sp<TAB>  4sp<TAB>
+    <TAB>1sp<TAB>                 <TAB>4sp
+    <TAB>2sp<TAB>                 1sp<TAB>1sp<TAB>   2sp<TAB>2sp<TAB>
+    <TAB>3sp<TAB>                 <TAB><TAB>2sp      2sp<TAB><TAB>
+
+**Twelve of 23 are code, and the content column does not decide which.** Computing each
+separator's content column with tabs advancing to the next four-stop, three column values hold
+cells that disagree:
+
+    column 4   ----  <TAB>        ----  3sp
+               CODE  1sp<TAB>     CODE  2sp<TAB>
+
+    column 6   CODE  5sp          ----  <TAB>2sp
+
+    column 8   CODE  <TAB><TAB>  3sp<TAB>  4sp<TAB>  <TAB>4sp
+               CODE  1sp<TAB>1sp<TAB>  2sp<TAB>2sp<TAB>  2sp<TAB><TAB>
+               ----  <TAB>1sp<TAB>  <TAB>2sp<TAB>  <TAB>3sp<TAB>
+
+Ten cells, one content column, split seven to three. **No function of the content column can
+produce that partition**, which retires every candidate this session reached for -- the
+five-space cap, the tab-to-its-stop measurement, the tab-after-space asymmetry, and
+`_legacyContentColumn` itself as an explanation for THIS family. Each of those is still right
+about what it was measured on; none of them is what decides code here.
+
+### What IS closed is a shape, three for three
+
+    <TAB> then 1-3 SPACES then <TAB>   never code, at every width probed
+
+That is the contradiction the session opened with -- `*<2sp><TAB>` is code while
+`*<TAB><2sp><TAB>` is not -- now generalised across one, two and three spaces rather than
+resting on the single case that exposed it. The mechanism is still unknown, and the four-space
+member (`<TAB>4sp<TAB>`) is deliberately not claimed because it was not probed.
+
+### And it stays a measurement
+
+A rule is NOT fitted here, on the standing ground that implementing an observable whose
+mechanism is unknown is how this harness has previously fitted a number instead of a rule --
+and this family has now refused four such numbers. 23 cells pinned is a specification and a
+regression net; it is not a backlog.
+
+Promoting it to a named grid in `grids.ts` needs `blockCode` on the FILE channel, since the
+grids run through `probe-channel.ts` and `blockCode` is DOM-only through the intermittent
+`obsidian eval`. That is the same blocker holding the `--inline` compose axes, and it is now
+load-bearing for a second instrument.
