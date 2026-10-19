@@ -7741,3 +7741,62 @@ widening is "an ordered marker does not end a definition", which breaks the `1.`
     probe grid         24 of 24 agreeing
     compose            5 of 2112, unchanged
     corpus             0 regressions, 450 tests, 4 gates green
+
+## Re-shrinking the two families written off with the broken instrument
+
+The trailing-newline artifact ran at 16%, and two families had been concluded "diffuse" with
+that shrinker. The prediction was that artifacts INFLATE form variety -- each reduces toward a
+signature the document does not have, so ddmin keeps arbitrary lines and every artifact becomes
+its own spurious form -- which would mean ~15 of `ref-extra`'s 91 forms were noise diluting
+real clusters.
+
+**The prediction was backwards, and the measurement says so plainly:**
+
+    ref-extra @ footnoteReference    broken: reduced 98, 91 distinct forms
+                                      fixed: reduced 87, 87 distinct forms
+    def-span-longer                   fixed: reduced 63, 64 distinct forms
+
+The broken shrinker produced FEWER distinct forms per document, not more. An artifact can
+reduce further than the real divergence allows -- it may drop the trailing newline and keep
+reducing -- so artifacts ended up SMALLER and COLLIDED with each other. Fixing it makes every
+form more faithful and therefore more distinct.
+
+So both families are confirmed diffuse with a correct instrument, and `ref-extra` is maximally
+so: **87 reduced documents, 87 distinct forms, one to one.** Not two of them share a shape.
+
+### What its recognisable clusters are, and the size refusals hold
+
+Clustering by construct set still shows structure in the small groups, and all three are
+families already refused on size:
+
+    html       "<ab://x[^1]>"  "see <mailto:foo@bar.com[^1]>"      a ref inside an AUTOLINK
+    wikilink   "x [[]][[^5]]"  "x [[a\][^5]]]"                     nested brackets
+    inline-fn  "^[with [brackets] [^b]]"  "^[starts\n[a] b]"        inline-footnote brackets
+
+Tonight already overturned one size refusal -- the quoted-tab rule was declined at "four
+documents" and the referee put it at fourteen -- so these were re-counted on the referee rather
+than trusted:
+
+    a reference inside an angle autolink :  6 documents,  4 diverging,  4 one-away
+    `[^name](`                           :  5 documents,  1 diverging
+
+**Both hold.** The recorded populations were right, and the quoted-tab miscount was specific to
+having been counted on the corpus instead. So the rule is narrower than "size refusals are
+unreliable": a size refusal counted on the REFEREE is sound, and one counted on the corpus is
+not, because the corpus holds fewest of these shapes by construction.
+
+### Where that leaves the queue
+
+    ref-extra @ footnoteReference   136 one-away   DIFFUSE, confirmed -- 87 forms, 87 documents
+    def-miss @ code                 102            tab virtual-spaces, three inert attempts
+    ref-miss @ code                  77            ceiling 27, collateral 40x, needs a
+                                                   discriminator nobody has
+    def-span-longer                  66            DIFFUSE, confirmed twice -- shrink and a
+                                                   FLAT scorer run
+    def-span-shorter                 64            one rule shipped tonight; remainder unshrunk
+    def-col                          41            several rules by its own direction screen
+    def-extra @ footnoteDefinition   33            down from 48 tonight
+
+Four of the seven are now closed to shape-based attack with measurements behind them rather
+than impressions. That is a smaller queue than it looks: what remains wants either a
+discriminator nobody has derived, or the micromark layer three attempts have bounced off.
