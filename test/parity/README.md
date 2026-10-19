@@ -7314,3 +7314,50 @@ container cannot settle, from its own prefix, a question the child flow will ans
 leftover whitespace it was handed. Two rules found by reading micromark landed tonight; this
 one needs the flow side read the same way, and the 48 ledger cells hold the answer it has to
 reproduce.
+
+## Two more families shrunk, and the sharpened base-rate rule earning its keep immediately
+
+`ref-miss @ paragraph` and `def-miss @ listItem` are the only two mechanisms that are **100%
+one-away** -- every document carrying them has no other divergence -- so they were shrunk next.
+
+**`ref-miss @ paragraph` (18) is a genuine long tail.** 14 distinct minimal forms, largest
+cluster TWO documents, 86% carrying two or more constructs. Nothing to build.
+
+**`def-miss @ listItem` (14) is one shape.** Nine of nine forms are `tab + marker`:
+
+    4x  "-⇥p" / "⟨2sp⟩⇥* [^1]:"          2x  "-⇥p" / blank / "⟨2sp⟩⇥[^1]:"
+    1x  "-⇥⇥p" / "⟨3sp⟩⇥[^1]:"           1x  "100.⇥p" / blank / "⟨5sp⟩⇥[^1]:"
+
+Most of the ids are `probe:` -- cases promoted into the corpus earlier in this effort -- so it
+is a known gap re-found from the other end, and it is the same marker-separator tab shape
+`def-miss @ code` reduces to. Both are blocked on the codes-versus-columns mismatch recorded
+above.
+
+### ...and then the near-miss, which is the point of this section
+
+Counting tabs over the one-away set gives a number that looks like a thesis:
+
+    one-away documents                    656
+      hold a TAB anywhere                 468   (71%)
+      ...tab in a MARKER separator        156
+      ...tab leading a line               265
+
+"468 documents blocked on one architectural fact" was the sentence about to be written. The
+rule sharpened earlier today -- classify on the failing side to find the shape, then count that
+shape on BOTH sides -- says to check first:
+
+    shape                        all   diverge   P(div|x)   lift
+    a TAB anywhere              3071       627      20.4%   1.50
+    tab in a marker separator   1067       193      18.1%   1.33
+    tab leading a line          1766       363      20.6%   1.51
+
+A tab is in 45% of the whole corpus. Lift 1.50 against a 13.6% base rate is a CORRELATE, which
+is exactly what this file recorded for the tab family once before at lift 1.40 and then
+retired as a selector. The honest size of the demonstrated blocker is the **28 documents whose
+minimal forms actually exhibit it** -- the `def-miss @ code` tab cluster and all of
+`def-miss @ listItem` -- not 468.
+
+Second time the sharpened rule has been applied today and the first time it prevented the
+error rather than explaining it afterwards. Worth recording for that reason alone: the
+discipline is cheap (the counts are one pass over the corpus) and the failure it prevents is a
+night of work pointed at a correlate.
