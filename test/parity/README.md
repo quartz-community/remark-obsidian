@@ -8083,3 +8083,37 @@ eighth. The 490 cells are in the ledger, so the 443 that agree are now drift-ass
 coverage across the two spaces where every recent rule lived, 50 open and 888 pinned, against a
 corpus of 6,818 documents nobody generated for this purpose. The next step is the root clamp's
 six cells, and it is the first lead in a while that arrives with its rule already stated.
+
+### The root clamp: six clean cells, a ceiling of four
+
+The separator sweep's largest single-direction half, with the rule already written down -- with
+the label below the item's content column there is no host, so the column is 0 rather than the
+bracket. `definitionColumnTransform` reaches exactly this case and DECLINES
+(`if (column > bracket - gap) return;`), leaving whatever the parser set.
+
+    label-below-content-column-is-root   better 4  worse 1033   agreement -926, referee -934
+
+**The ceiling is four.** At maximum reach the rule helps four documents and breaks 1033, so
+"below the content column" is not the condition: plenty of documents have a label below it
+where Obsidian still reports the bracket, and the six cells are specific to a `⇥⟨2sp⟩`
+separator in a way the predicate does not capture.
+
+### And the populations are NOT small, which is the finding
+
+    marker + tab + spaces  (tab2sp)   142 documents,  49 diverging
+    marker + space + tab   (sp+tab)   100 documents,  27 diverging
+    marker + 4 spaces                 589 documents, 101 diverging
+    marker + 5 or more (the cap)      801 documents, 165 diverging
+
+So the sweep's cells are real behaviour AND the diverging documents fail for other reasons. A
+grid cell proves what Obsidian does to a SHAPE; what a rule derived from it is WORTH is a
+separate measurement the corpus makes.
+
+**That bounds the sweep approach honestly.** 938 swept cells are a specification and a
+regression net -- 888 of them pinned at agreement, which nothing else in this harness provides
+-- and they are not a backlog. The 47 open separator cells are not 47 documents' worth of work;
+the one rule derived from the cleanest six of them is worth four.
+
+It is the density finding reached from the opposite direction: dense documents diverge through
+INTERACTIONS, so a minimal cell and a real failure share a shape without sharing a cause. The
+sweeps say what the parser does. The corpus still says what is worth fixing.

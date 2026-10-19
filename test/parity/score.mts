@@ -3652,6 +3652,70 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "label-below-content-column-is-root",
+    what: "a label indented BELOW its item's content column is at ROOT, column 0",
+    // The separator sweep's largest single-direction half. `tab2sp` puts an item's content
+    // column at the tab stop of 4, so a label at two or three columns is BELOW it:
+    //
+    //     "-<TAB><2sp>Prose" / blank / "<2sp>[^1]:"    obs col 0   ours col 2
+    //     "-<TAB><2sp>Prose" / blank / "<3sp>[^1]:"    obs col 0   ours col 3
+    //     "*<TAB><2sp>Prose" / blank / "<2sp>[^1]:"    obs col 0   ours col 2
+    //
+    // Six cells, one direction, and the rule is already written down here: with the label
+    // below the content column the item is not its HOST, so there is no host and the column is
+    // 0 rather than the bracket.
+    //
+    // `definitionColumnTransform` reaches exactly this case and DECLINES --
+    // `if (column > bracket - gap) return;` -- leaving whatever the parser set, which is the
+    // bracket. Declining is right about not using the content column and wrong about the
+    // fallback.
+    //
+    // REFUSED: better 4 / worse 1033 / same 126, agreement -926, referee -934.
+    //
+    // THE CEILING IS FOUR. At maximum reach -- every label below its host's content column --
+    // the rule helps four documents and breaks 1033, so "below the content column" is not the
+    // condition. Plenty of documents have a label below it where Obsidian still reports the
+    // bracket, and the six cells that suggested the rule are specific to a `<TAB><2sp>`
+    // separator in a way the predicate does not capture.
+    //
+    // And the population is not the problem: `tab2sp` appears in 142 referee documents with 49
+    // diverging. So the cells are real behaviour and the diverging documents fail for other
+    // reasons -- a grid cell proves what Obsidian does to a SHAPE and the corpus decides what a
+    // rule derived from it is worth, which is the same split the density finding reached from
+    // the other direction.
+    apply: (text, ours, tree) => {
+      const lines = text.split("\n");
+      const items: { from: number; to: number; offset: number }[] = [];
+      visit(tree, "listItem", (node: Node) => {
+        const from = node.position?.start?.line;
+        const to = node.position?.end?.line;
+        const offset = node.position?.start?.offset;
+        if (from === undefined || to === undefined || offset === undefined)
+          return;
+        items.push({ from: from - 1, to: to - 1, offset });
+      });
+
+      const moved = ours.defs.map((def): typeof def => {
+        const line = lines[def[1]] ?? "";
+        const indent = columnsOf(/^[ \t]*/u.exec(line)![0]);
+        // The INNERMOST item covering the label's line, which is the one whose content column
+        // decides whether it hosts the label.
+        let host: (typeof items)[number] | undefined;
+        for (const item of items) {
+          if (item.from > def[1] || item.to < def[1]) continue;
+          if (!host || item.offset > host.offset) host = item;
+        }
+        if (!host) return def;
+        const column = contentColumn(text, {
+          position: { start: { offset: host.offset } },
+        } as unknown as ListItem);
+        if (column === undefined || column <= indent) return def;
+        return [def[0], def[1], 0, def[3]];
+      });
+      return { defs: moved, refs: ours.refs, code: ours.code };
+    },
+  },
+  {
     name: "control-drop-all-code",
     what: "CONTROL: report no root code block at all",
     // Not a rule. It exists to prove the `code` dimension is wired in: a candidate that empties
