@@ -69,6 +69,35 @@ export interface Answer {
    * exhibits it, which is indistinguishable from the family having no minimal form.
    */
   readonly code: readonly (readonly [number, number])[];
+  /**
+   * Obsidian's own LIST ITEMS: each one's span and its parent index.
+   *
+   * `[startLine, startCol, endLine, endCol, parent]`, raw as the cache reports them.
+   *
+   * `parent` is a LINE NUMBER and not an index, which is easy to get wrong because the two
+   * coincide on the obvious two-line example: `- a` / `  - b` reports the nested item's parent
+   * as 0, which is both its parent's line and its parent's index. `normalize.ts` has the real
+   * encoding with seven probes behind it -- a nested item carries its parent's line, and a
+   * ROOT item carries the negative of the line its list begins on, with a list on line 0
+   * reported as -1 rather than -0. Read that docstring before comparing this field.
+   *
+   * The raw cache has carried this all along and this channel dropped it, declaring only
+   * `footnotes`, `footnoteRefs` and `sections`. `compute.test.ts` compares a listItems COUNT
+   * against a ceiling, so the field was known; what was missing is the span and the nesting in
+   * the live channel, where every grid and sweep is built.
+   *
+   * It is the quantity eleven rules in one session turned on. An item's content column, its
+   * ownership threshold, what a separator does, whether a line belongs to the item -- all of it
+   * is "how far does this item reach", and the only oracle for that was the position of a
+   * definition that happened to sit inside it.
+   */
+  readonly listItems: readonly (readonly [
+    number,
+    number,
+    number,
+    number,
+    number,
+  ])[];
 }
 
 interface Point {
@@ -86,6 +115,10 @@ export interface Cache {
   readonly sections?: readonly {
     readonly type: string;
     readonly position: { readonly start: Point; readonly end: Point };
+  }[];
+  readonly listItems?: readonly {
+    readonly position: { readonly start: Point; readonly end: Point };
+    readonly parent: number;
   }[];
 }
 interface Reply {
@@ -276,6 +309,16 @@ export async function ask(
           : [[entry.id, entry.position.start.line, entry.position.start.col]],
       ),
       refsTrustworthy: wanted.every((name) => defined.has(name.toLowerCase())),
+      listItems: (plain!.cache!.listItems ?? []).map(
+        (entry) =>
+          [
+            entry.position.start.line,
+            entry.position.start.col,
+            entry.position.end.line,
+            entry.position.end.col,
+            entry.parent,
+          ] as const,
+      ),
       code: (plain!.cache!.sections ?? []).flatMap(
         (entry): (readonly [number, number])[] =>
           entry.type === "code"

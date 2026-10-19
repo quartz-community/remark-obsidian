@@ -8507,3 +8507,62 @@ the index cannot answer a question about rendering.
 
 That is three for three: **every blind spot closed in this harness has been closed by reading
 the DOM, and every one was invisible until a rule depended on it.**
+
+## A FOURTH dormant field, and the break test split it from the third
+
+`blockCode` closed the block-structure blind spot by reading the DOM. Asking the complementary
+question -- what does an oracle already expose that no channel reads? -- found `listItems` in
+the raw cache, carried on every answer and dropped by `probe-channel.ts`, which declared only
+`footnotes`, `footnoteRefs` and `sections`.
+
+    "- a" / "  - b"   listItems [[0,0,0,3,-1], [1,2,1,5,0]]   span AND nesting
+
+`compute.test.ts` compares a listItems PROJECTION against the goldens, so the field was known
+and its corpus agreement is near-total (a ceiling of 5). What was missing is the span and the
+nesting **in the live channel**, which is where every grid and sweep is built -- so no probe
+could ask "how far does this item reach" of a document not already in the corpus.
+
+### The break test refused the use it was added for
+
+Expected: this adjudicates the tab-separator family, since an item's extent is what eleven
+rules in one session turned on. Measured:
+
+    "*⇥[^1]: def"       items [[0,0,0,11,-1]]   defines
+    "*⇥⇥[^1]: def"      items [[0,0,0,12,-1]]   CODE
+    "*⟨2sp⟩⇥[^1]: def"  items [[0,0,0,13,-1]]   CODE
+    "*⇥⟨2sp⟩⇥[^1]: def" items [[0,0,0,14,-1]]   defines
+
+All four report ONE item spanning the whole line, and the ends differ only by each line's own
+length -- 11, 12, 13, 14 characters. **The item owns the line in every case**, whether its
+content became a code block or not. So the tab family is not an EXTENT question at all, which
+retires a hypothesis rather than confirming one, and it is why `blockCode` was needed: `code`
+reports `[]` for all four, including the two the DOM shows as `ul>li>pre`.
+
+Two fields, two questions, neither substituting for the other:
+
+| question                                       | field       | channel |
+| ---------------------------------------------- | ----------- | ------- |
+| did this item's content become code?           | `blockCode` | DOM     |
+| how far does this item reach, and inside what? | `listItems` | cache   |
+
+### What it IS live for, and it confirms a shipped rule from a new direction
+
+    "- a" / "⇥# h"        items [[0,0,1,4,-1]]   the item OWNS the lazy heading line
+    "- a" / "⇥⇥⇥x"        items [[0,0,1,4,-1]]
+
+Cross-line item extent, which no other live field reports. And the first row is the shipped
+lazy-release rule seen from the other side: a list item releases a lazy line only if it opens
+a block AND the line sits BELOW the item's content column. `⇥# h` is an ATX with its space --
+an opener -- but at four columns against a content column of two, so it is not below, and the
+item keeps it. Obsidian agrees, on a document the corpus never had.
+
+### And the doc comment was wrong before it shipped
+
+Written as "`parent` is the index of the item holding it". It is a LINE NUMBER, and the two
+coincide on exactly the example anyone would test: `- a` / `  - b` reports parent 0, which is
+both the parent's line and its index. `normalize.ts` has the real encoding with seven probes
+behind it -- a root item carries the NEGATIVE of the line its list begins on, `-1` rather than
+`-0` for a list on line 0.
+
+A second copy of a fact rots, and this one was born rotten. It now points at that docstring
+instead of restating it.

@@ -476,6 +476,10 @@ export const SCOPE: readonly ScopeBoundary[] = [
     why: "was: the projection string ${original}=>${link}|${display}@${span} is not round-trippable, since `[[a|b|c]]` records as `a|b|c` and could be target `a|b`. The DOM keeps them in separate attributes, so `ask-dom.ts` now reports `{target, display}` and `[[a|b|c]]` is unambiguously target `a`, display `b|c`",
   },
   {
+    what: "an item's EXTENT in the live channel -- CLOSED",
+    why: "was: `listItems` rides on every raw cache answer and `probe-channel.ts` dropped it, declaring only `footnotes`, `footnoteRefs` and `sections`. `compute.test.ts` compares a listItems projection against the GOLDENS, so the field was known and near-total there -- what was missing is the span and the nesting LIVE, where every grid and sweep is built, so no probe could ask how far an item reaches of a document not already in the corpus. The break test then refused the use it was added for: all four tab-separator spellings report one item covering the whole line, so that family is not an extent question, which is why `blockCode` was needed beside it rather than instead of it. What it is live for is cross-line extent -- `- a` / `<TAB># h` spans to 1:4, the shipped lazy-release rule confirmed on a document the corpus never had",
+  },
+  {
     what: "BLOCK structure inside a container -- CLOSED",
     why: "was: no channel could answer \"did this item's content become a code block\". `sections` is root-level by construction, so a definition inside a list item reports `list@0-0` and nothing else; `ask-dom.ts`'s `code` excluded `<pre>` deliberately; live preview is a different parser. So every conclusion about a container's internal blocks was INFERRED from whether a definition survived -- which is how `*<2sp><TAB>[^1]:` reporting no definition and `*<TAB><2sp><TAB>[^1]:` reporting one stood as a contradiction no arithmetic explained. `blockCode` reports every `pre > code` with its NESTING PATH, and answers it directly: the first is `ul>li>pre` and the second is nothing. The path matters -- a `<pre>` at root and a `<pre>` inside an `<li>` are different answers",
   },
