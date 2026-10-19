@@ -7885,3 +7885,43 @@ truncated at its first tab unless it starts with one.
 Largest single gain of the session, from a bucket the family-level view had written off twice.
 Two cells remain in the grid -- `- ⇥p` at two and three spaces, and `1000.⇥p` at five and six
 -- both where we report no definition and Obsidian reports one.
+
+## Per-delta bucketing: it worked for a COLUMN and not for a SPAN
+
+`def-col`'s -2 bucket reduced 19 documents to 10 forms with real multiplicity and yielded +33,
+where the family-level shrink had produced near-unique forms twice. That suggested the
+procedure generally: when a mechanism's deltas run in several magnitudes, shrink one at a time.
+
+Both span families have bigger dominant buckets than `def-col` did:
+
+    def-span-shorter (64)          def-span-longer (66)
+      36  delta -1 lines             33  delta +1 lines
+      21  delta -2 lines             22  delta +2 lines
+       5  delta -3 lines              7  delta +3 lines
+
+**And both come back near-unique anyway:**
+
+    def-span-shorter, delta -1   reduced 35 -> 33 distinct forms
+    def-span-longer,  delta +1   reduced 30 -> 32 distinct forms
+
+So the procedure does not generalise, and the reason is the one worth recording rather than the
+result. **A COLUMN delta is a single arithmetic fact** -- the content column is computed by one
+function from one line, so every document off by -2 is off for the same reason and they
+collapse onto each other under minimisation. **A SPAN delta is not**: a definition can end one
+line early because a fence, a `$$`, a `%%`, a quote marker, an ordered marker or a setext
+underline took the line, and each of those reduces to a different form. Thirty-three documents
+all "-1 line" is thirty-three documents with nothing else in common.
+
+So the screen for whether per-delta bucketing will help is: **does ONE function compute the
+quantity the delta measures?** For a column, yes -- `contentColumn`. For a span end, no --
+every construct that can end a block participates.
+
+That closes both span families from two directions each, 130 one-away documents:
+
+    def-span-shorter   family-level diffuse (59 forms) AND delta-level diffuse (33 of 35)
+    def-span-longer    family-level diffuse (64 forms), delta-level diffuse (32 of 30),
+                       and a scored candidate FLAT over six documents
+
+The math theme is visible in both -- `quote + math` is the largest set in the -1 bucket at 4
+documents -- and it is the family a 42-cell grid already measured and a candidate already
+refused at FLAT over six documents. Reaching it from a third direction does not make it bigger.
