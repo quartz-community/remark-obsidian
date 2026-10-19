@@ -50,6 +50,17 @@ import type {
  *     sliceSerialize(listItemPrefix)        "2)<TAB>"   3 characters
  *     sliceSerialize(listItemPrefix, true)  "2) "       3 characters
  *     columnsOfRaw("2)<TAB>")                           4 columns
+ *
+ * NOT `item-dot-threshold.ts`'s exported `columnsOf`, which looks identical and is not: that
+ * one STOPS at the first non-whitespace character, so it measures a line's leading indent and
+ * returns 0 for `"2)<TAB>"`. This one measures a whole prefix, marker included. Seven copies
+ * of this tab-stop arithmetic exist in the package and they agree; the two that look most
+ * alike are the two that must not be merged.
+ *
+ * The one genuine divergence among them is deliberate: `quote-indented-code.ts` counts a tab
+ * AFTER a space as one column, because a tab after a space does not reach the indented-code
+ * threshold in Obsidian. That asymmetry belongs to the threshold and not to a content column,
+ * which is why it lives in exactly one of the seven.
  */
 function columnsOfRaw(raw: string): number {
   let columns = 0;

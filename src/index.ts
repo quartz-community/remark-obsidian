@@ -61,6 +61,7 @@ import { commentDefinitionColumnTransform } from "./lib/comment-definition-colum
 import { commentQuoteExtentTransform } from "./lib/comment-quote-extent.js";
 import { itemCommentLazyTransform } from "./lib/item-comment-lazy.js";
 import { definitionTabAfterQuoteTransform } from "./lib/definition-tab-after-quote.js";
+import { definitionSpaceTabSeparatorTransform } from "./lib/definition-space-tab-separator.js";
 import { definitionTabPastItemTransform } from "./lib/definition-tab-past-item.js";
 import { markerTabDefinitionTransform } from "./lib/marker-tab-definition.js";
 import { quotedFenceLazyTransform } from "./lib/quoted-fence-lazy.js";
@@ -732,6 +733,9 @@ export default function remarkObsidian(
     if (opts.comments) itemCommentLazyTransform(tree, String(file));
     quotedFenceLazyTransform(tree, String(file));
     definitionTabAfterQuoteTransform(tree, String(file));
+    // Beside the tab-separator passes above: the definition this REMOVES is one the earlier
+    // passes may have just placed, so it runs after them rather than before.
+    definitionSpaceTabSeparatorTransform(tree, String(file));
     // Beside the two above, and before every footnote pass: the lines this turns into code
     // must stop looking like definitions and references BEFORE anything indexes them.
     quoteLazyIndentedCodeTransform(tree, String(file), (markdown) =>

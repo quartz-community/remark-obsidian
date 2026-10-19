@@ -151,6 +151,41 @@ export const GRIDS: readonly Grid[] = [
     document: (opener, indent) => `[^1]: def\n${indent}${opener}\n\nuse[^1]\n`,
     field: "def.end",
   },
+  {
+    name: "tab-sequence-separator",
+    what: "a definition's column when the marker separator mixes tabs and spaces",
+    // `def-miss @ code`'s `tab + marker` cluster, 12 documents, six of them this shape. The
+    // divergences run BOTH WAYS -- we over-define and under-define -- which the direction
+    // screen says means several rules rather than one, so this is pinned as a measurement
+    // rather than attacked:
+    //
+    //     separator    obs            ours
+    //     tab          col 5          col 5     agree
+    //     tab 2sp      col 5          col 5     agree
+    //     tab 2sp tab  col 5          none      we MISS
+    //     tab tab      none           none      agree
+    //     2sp tab      none           col 5     we INVENT
+    //
+    // So a separator OPENING with a tab defines and one opening with spaces does not -- the
+    // tab-after-space asymmetry this package implements in exactly one of its seven column
+    // helpers -- except that two consecutive tabs also define nothing, which no rule here
+    // explains.
+    rows: [
+      ["i3 *", "   *"],
+      ["i0 *", "*"],
+      ["i0 100.", "100."],
+    ],
+    cols: [
+      ["tab", "\t"],
+      ["tab2sp", "\t  "],
+      ["tab2sptab", "\t  \t"],
+      ["tabtab", "\t\t"],
+      ["2sptab", "  \t"],
+      ["2sp", "  "],
+    ],
+    document: (marker, sep) => `${marker}${sep}[^1]: def\n\nuse[^1]\n`,
+    field: "def.col",
+  },
 ];
 
 export const gridNamed = (name: string): Grid | undefined =>

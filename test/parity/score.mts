@@ -3716,6 +3716,43 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "space-then-tab-separator-defines-nothing",
+    what: "a label whose marker separator is SPACES then a tab is not a definition",
+    // `tab-sequence-separator`'s single-direction half. Six of its eighteen cells diverge and
+    // they split cleanly by direction, consistently across three marker shapes:
+    //
+    //     separator      obs     ours
+    //     tab            col 5   col 5    agree
+    //     tab 2sp        col 5   col 5    agree
+    //     tab 2sp tab    col 5   NONE     we MISS
+    //     tab tab        none    none     agree
+    //     2sp tab        NONE    col 5    we INVENT   <- this candidate
+    //     2sp            col 6   col 6    agree
+    //
+    // `*<2sp>[^1]:` defines and `*<2sp><TAB>[^1]:` does not, so the trailing tab is what kills
+    // it. That is the tab-after-space asymmetry seen from the THRESHOLD side: a tab after a
+    // space contributes nothing to a content column, and this package implements that in one
+    // of its seven column helpers -- but it evidently still reaches its stop for the
+    // indented-code threshold, which puts the label at four columns and makes it literal.
+    //
+    // `sp+tab` separators are 100 referee documents with 27 diverging, so the population is
+    // real rather than grid-sized.
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      const SEP = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ ]+\t/u;
+      const dead = new Set<number>();
+      for (let line = 0; line < lines.length; line++) {
+        if (SEP.test(lines[line] ?? "")) dead.add(line);
+      }
+      if (dead.size === 0) return ours;
+      return {
+        defs: ours.defs.filter((d) => !dead.has(d[1])),
+        refs: ours.refs,
+        code: ours.code,
+      };
+    },
+  },
+  {
     name: "control-drop-all-code",
     what: "CONTROL: report no root code block at all",
     // Not a rule. It exists to prove the `code` dimension is wired in: a candidate that empties

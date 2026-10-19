@@ -8377,3 +8377,50 @@ and it unlocked one member.
 
     def-miss @ code   102 -> 82 -> 66 one-away across three fixes today
     referee           5982/6818 (87.7%), code 814/883 (92.2%)
+
+## The `tab-sequence-separator` grid: six divergences, two rules, one shipped with no losses
+
+`def-miss @ code`'s `tab + marker` cluster is 12 documents and six share a shape -- a marker
+with a tab separator and a label indented by a space-then-tab mixture. Gridded as three marker
+shapes against six separators, the eighteen cells split cleanly BY DIRECTION:
+
+                     tab   tab2sp  tab2sptab  tabtab  2sptab   2sp
+      i3 *             5        5      X5/-1      -1   X-1/5     6
+      i0 *             2        2      X2/-1      -1   X-1/2     3
+      i0 100.          5        5      X5/-1      -1   X-1/5     6
+
+**Two single-direction rules, three cells each**, consistent across every marker shape -- which
+is what makes them rules rather than a shape's accidents:
+
+    tab 2sp tab   obs defines, we MISS
+    2sp tab       obs does not, we INVENT
+
+And `tab tab` defines nothing on either side, which bounds both: it is not "a trailing tab
+kills the definition" and not "a leading tab saves it".
+
+### The INVENT half scored with no losses at all
+
+    space-then-tab-separator-defines-nothing   better 12  worse 0  same 0   +9 agreeing
+
+The only candidate this session with zero losses. `*⟨2sp⟩[^1]:` defines and `*⟨2sp⟩⇥[^1]:` does
+not, so the trailing tab is the whole of it, and the population is real rather than grid-sized:
+`sp+tab` separators are 100 referee documents with 27 diverging.
+
+**It is the tab-after-space asymmetry seen from the THRESHOLD side.** This package already
+measures that such a tab contributes nothing to a content column -- the rule lives in exactly
+one of its seven column helpers, deliberately. What this adds is that the same tab still
+reaches its stop for the indented-code threshold, which puts the label four columns in and
+makes it literal. **One tab, two answers, depending on which question is asked** -- the same
+shape as the ownership-versus-content-column separation three commits ago, in a different pair
+of quantities.
+
+    referee footnotes  5985 -> 5994   (+9, exactly as scored)
+    referee code        814, held
+    grid               6 -> 3 of 18 cells
+    probe ledger       one drifted INTO agreement, 1594 of 1692
+    compose            5 of 2112, unchanged
+    CommonMark         intact
+    corpus             0 regressions, 450 tests, 4 gates green
+
+The MISS half -- `tab 2sp tab` defines where we do not -- is left: it is the opposite direction
+and the grid holds its three cells.
