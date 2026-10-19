@@ -7638,3 +7638,58 @@ choosing work; this one is about scoping a rule that is already right.
     probe ledger       621 probes, six drifted INTO agreement, 559 agreeing
     compose            5 of 2112, unchanged
     corpus             0 regressions, 450 tests, 4 gates green
+
+## Option B refuted on both halves: the blocker was not child-flow state
+
+Two families were filed as "blocked on a premise only the child flow knows", ~180 one-away
+documents between them, and the plan was to build the capability rather than chase a sixth
+family. Both halves are now refuted, and the negative result is worth more than the plan was.
+
+### `ref-miss @ code` (77): the blocker is a DISCRIMINATOR, not flow state
+
+Reading the bare token stream settles it in one dump. For `">" / "It" / ">⇥[^x-y]: def"`:
+
+    bare micromark + gfm   blockQuote@1:1-1:2, content@2 (paragraph at ROOT),
+                           blockQuote@3:1-3:14 > gfmFootnoteDefinition 3:3-3:14
+    Obsidian               defs []   refs [["x-y",2,2], ["x-y",4,3]]
+
+**Upstream already puts a definition at the exact column Obsidian reports a reference at.** A
+quote marker's prefix consumes a space and never a tab, so `>⇥` leaves the content four columns
+in, which is indented code and no definition happens -- we get that half right and then index
+nothing, where Obsidian indexes the buried label. The asymmetry this file records for comments,
+reaching a second construct.
+
+So the rule is "a label buried in INDENTED code is a reference". Scored:
+
+    label-in-indented-code-is-a-ref   better 27  worse 1044   agreement -775, referee -824
+
+**The CEILING is the useful number.** At maximum reach -- every label in every indented code
+block -- the gain is TWENTY-SEVEN and the collateral is forty times it. So the mechanism
+explains at most 27 of the family's 77, and what is missing is a discriminator for WHICH buried
+labels count. No amount of tokenizer introspection supplies that, which is exactly what the
+option-B premise assumed it would.
+
+### `def-miss @ code` (102): consuming the virtual spaces is INERT
+
+The mechanism is understood and recorded: the preprocessor turns one tab into a
+`horizontalTab` code plus virtual spaces, `factorySpace`'s limit counts CODES, so an item of
+size 1 takes the tab code alone and hands three virtual spaces to the child flow. Bare
+micromark confirms the shape -- `linePrefix 3:1-3:2` spans the single tab code and the virtual
+spaces land inside `codeFlowValue`.
+
+Consuming them in the tab branch, as the item's own indent, changes NOTHING: referee 5912
+before and after. Third inert attempt in this layer, after `endsItemConstruct` and the
+`--lazy` plumbing, so it is reverted rather than kept as dead code.
+
+### What the three attempts have in common
+
+Each identified a real mechanism, implemented it faithfully, and moved nothing -- because in
+every case the container was already doing what it should and the decision belongs to a flow
+the container cannot reach into usefully. `inFence()` works because it asks a YES/NO question
+about a construct that is open; none of these three is that shape.
+
+**So the remaining work is families, not capability.** The next step is the one that was
+option A: `def-span-shorter` at 66 one-away, the largest family never shrunk, with the loop
+that produced five rules tonight -- shrink, cluster by construct set, build a GRID around the
+dominant shape, and look for an existing rule missing an input class. Four of tonight's five
+came out of exactly that.

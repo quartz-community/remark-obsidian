@@ -3587,6 +3587,71 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "label-in-indented-code-is-a-ref",
+    what: "a label buried in INDENTED code is indexed as a reference, as a commented one is",
+    // `ref-miss @ code` is 77 one-away -- Obsidian indexes a reference where our node is code
+    // -- and reading the bare token stream reframes it. For ">" / "It" / ">\t[^x-y]: def":
+    //
+    //     bare micromark + gfm   blockQuote@1, content@2, blockQuote@3 >
+    //                            gfmFootnoteDefinition 3:3-3:14
+    //     Obsidian               defs []   refs [["x-y",2,2], ["x-y",4,3]]
+    //
+    // So upstream puts a DEFINITION at exactly the column Obsidian reports a REFERENCE at. A
+    // quote marker's prefix consumes a space and never a tab, so `>\t` leaves the content four
+    // columns in, which is indented code -- and the definition does not happen. We get that
+    // half right and then index nothing, where Obsidian indexes the buried label.
+    //
+    // That is the asymmetry this file already records for comments: a definition inside one
+    // does not define, and the label is still a reference. INDENTED code only -- the same note
+    // records that a label inside a FENCE is not indexed, and that scanning both cost 12
+    // against 19.
+    //
+    // REFUSED, CATASTROPHICALLY: better 27 / worse 1044 / same 26, agreement -775, referee -824.
+    //
+    // THE CEILING IS THE USEFUL NUMBER. At maximum reach -- every label in every indented code
+    // block -- the rule gains TWENTY-SEVEN documents and breaks 1044. So the mechanism explains
+    // at most 27 of this family's 77, and the collateral is forty times the gain: Obsidian
+    // indexes a buried label in the specific case where a container's own geometry buried it,
+    // and not merely because a label sits in indented code.
+    //
+    // Which also refutes the premise this was built under. The family was filed as "blocked on
+    // child-flow state", and reading the bare token stream showed the blocker is not flow state
+    // at all -- upstream already puts a definition at the exact column Obsidian reports a
+    // reference at. What is missing is a DISCRIMINATOR for which buried labels count, and no
+    // amount of tokenizer introspection supplies that.
+    apply: (text, ours, tree) => {
+      const added: Ref[] = [];
+      const LABEL = /\[\^([^\]\s]+)\]:/u;
+      visit(tree, "code", (node: Node) => {
+        const from = node.position?.start?.offset;
+        const to = node.position?.end?.offset;
+        const line = node.position?.start?.line;
+        if (from === undefined || to === undefined || line === undefined)
+          return;
+        // INDENTED, not fenced: the source slice decides, because an mdast `code` node carries
+        // no marker of which construct built it.
+        const raw = text.slice(from, to);
+        if (/^ {0,3}(?:```|~~~)/u.test(raw)) return;
+        const rows = raw.split("\n");
+        for (let at = 0; at < rows.length; at++) {
+          const found = LABEL.exec(rows[at] ?? "");
+          if (!found) continue;
+          added.push([
+            found[1]!,
+            line - 1 + at,
+            (node.position!.start.column ?? 1) - 1 + (found.index ?? 0),
+          ]);
+        }
+      });
+      if (added.length === 0) return ours;
+      return {
+        defs: ours.defs,
+        refs: [...ours.refs, ...added],
+        code: ours.code,
+      };
+    },
+  },
+  {
     name: "control-drop-all-code",
     what: "CONTROL: report no root code block at all",
     // Not a rule. It exists to prove the `code` dimension is wired in: a candidate that empties
