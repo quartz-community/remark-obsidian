@@ -3425,6 +3425,41 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "def-ends-at-tab-block-opener",
+    what: "a definition ends at a TAB-indented line that opens a block, rather than running past it",
+    // `def-span-longer` is 65 one-away documents with no cluster above two, and its minimal
+    // forms share one shape anyway: a definition, then a line opening a block, with our
+    // definition absorbing it.
+    //
+    //     "[^名]:" / "<2sp>10."      "[^5]:<TAB>lorem" / "<2sp>%%"
+    //     "+ " / "[^3]:" / "<TAB>#"   "- [^Omega]:" / "<5sp>$$"
+    //
+    // A 42-cell grid -- fourteen openers at three indents -- says the indent is the whole of
+    // it. At 0 and 2 columns we agree on all fourteen. Every divergence is at a TAB:
+    //
+    //     fence ```   obs 1  ours 3        math $$     obs 1  ours 3
+    //     fence ~~~   obs 1  ours 3        thematic -- obs 1  ours -1 (we lose the def)
+    //
+    // A tab is four columns, which is a footnote definition's own content column, so the line
+    // arrives at RELATIVE indent zero and opens a fence -- unclosed, swallowing to the end of
+    // the note and dragging the definition's end from 1 to 3 with it. Obsidian ends the
+    // definition at that line.
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      const OPENER = /^(?:```|~~~|\$\$|---+[ \t]*$)/u;
+      const moved = ours.defs.map((def): typeof def => {
+        for (let line = def[1] + 1; line <= def[3]; line++) {
+          const self = lines[line] ?? "";
+          if (!self.startsWith("\t")) continue;
+          if (!OPENER.test(self.replace(/^\t+/u, ""))) continue;
+          return [def[0], def[1], def[2], line];
+        }
+        return def;
+      });
+      return { defs: moved, refs: ours.refs, code: ours.code };
+    },
+  },
+  {
     name: "control-drop-all-code",
     what: "CONTROL: report no root code block at all",
     // Not a rule. It exists to prove the `code` dimension is wired in: a candidate that empties

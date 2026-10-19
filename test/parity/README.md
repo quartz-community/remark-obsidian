@@ -7361,3 +7361,20 @@ Second time the sharpened rule has been applied today and the first time it prev
 error rather than explaining it afterwards. Worth recording for that reason alone: the
 discipline is cheap (the counts are one pass over the corpus) and the failure it prevents is a
 night of work pointed at a correlate.
+
+### `def-span-longer` is a long tail from both directions
+
+65 one-away documents. The shrink gives no cluster above TWO, and the shape its forms
+nonetheless share -- a definition then a block opener, with our definition absorbing it --
+turns out to be six documents:
+
+    def-ends-at-tab-block-opener   better 3  worse 2  same 1   FLAT, referee unmoved
+
+A 42-cell grid is what located it: fourteen openers at three indents, agreeing on all fourteen
+at 0 and 2 columns, diverging on four at a TAB -- a fence, a tilde fence, `$$` and a thematic
+break. A tab is four columns, which is a footnote definition's own content column, so the line
+arrives at RELATIVE indent zero and opens a fence that swallows to the end of the note.
+
+Right about those cells, six documents wide. `better + worse + same` read first would have
+refused it before it was written, which is the rule this file sharpened this morning. The
+candidate is kept with its numbers.
