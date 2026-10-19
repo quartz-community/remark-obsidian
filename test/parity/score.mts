@@ -3444,6 +3444,16 @@ const RULES: readonly Rule[] = [
     // arrives at RELATIVE indent zero and opens a fence -- unclosed, swallowing to the end of
     // the note and dragging the definition's end from 1 to 3 with it. Obsidian ends the
     // definition at that line.
+    //
+    // REFUSED, FLAT: better 3 / worse 2 / same 1, agreement 5838 -> 5838, referee unmoved.
+    //
+    // The rule is right about those cells and the POPULATION is six documents of 6,818. Read
+    // `better + worse + same` first: a total of six does not justify a pass however the sign
+    // comes out, and the two losses are quoted definitions where the tab line is the quote's
+    // content rather than the definition's.
+    //
+    // So `def-span-longer` is a long tail established from both directions -- the shrink gives
+    // 65 documents with no cluster above two, and the shape its forms share covers six.
     apply: (text, ours) => {
       const lines = text.split("\n");
       const OPENER = /^(?:```|~~~|\$\$|---+[ \t]*$)/u;
