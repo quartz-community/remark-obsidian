@@ -71615,8 +71615,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A leading tab resets an item's content column to its own TAB STOP, where a space run leaves the marker's width in place. The threshold is `contentColumn + 4` over two different content columns: six for `⟨6sp⟩` and eight for `⇥⟨4sp⟩`, which is the tab stop plus four. So `⇥⟨3sp⟩` at seven columns is NOT code and Obsidian defines `3`, while we read it as code and define nothing. The other six cases in this family already match and are the controls -- `tab-tab` in particular is FEWER characters and MORE columns than this one, so a character count cannot discriminate, which is what refuted two implementations at -15 and -21 referee documents. The decision lives in `legacy-list.ts`'s `tokenizeIndent`, where `factorySpace` is given a limit of `containerState.size + 1` before the line is seen."
+      "triage": "match",
+      "note": "Closed by separating the item's ownership threshold from its content column and consuming a partly-eaten tab's virtual spaces: `- parent More` / blank / tab-three-spaces `[^3]: It` now reports the definition at the item's content column, as Obsidian does. Was `replicate` since the tab family was first explored."
     },
     "probe/item-tab-threshold/tab-four": {
       "id": "probe/item-tab-threshold/tab-four",

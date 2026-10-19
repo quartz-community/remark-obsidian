@@ -148,7 +148,6 @@ describe("positioned oracle", () => {
     // family's other six cases match and are the controls -- `⇥⇥` is FEWER characters and MORE
     // columns, so no character count discriminates, which refuted two implementations at -15
     // and -21 referee documents and broke `commonmark/tabs/5` in both.
-    "probe/item-tab-threshold/tab-three: a leading tab resets the item's content column",
     // AN UNCLOSED `%%` HOSTED BY A LIST ITEM is CLOSED by `itemCommentLazyTransform`, and four
     // of the six cases promoted for it now MATCH. What remains here is the CLOSED-region
     // sibling, which is a different mechanism: `commentRegionTransform` owns a `%%...%%` region
@@ -419,8 +418,8 @@ describe("positioned oracle", () => {
     //   tab-quote family, which the MAIN GATE CANNOT SEE because `meta.footnotes` is names
     //   only. The names and the rule are right -- that family took the referee from 5717 to
     //   5744 -- and a column or end line is out by the quote's own prefix.
-    footnotes: 6,
-    footnoteRefs: 6,
+    footnotes: 5,
+    footnoteRefs: 5,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
     // Obsidian reports a heading's column as its containing block's content column,
@@ -985,8 +984,6 @@ describe("positioned oracle", () => {
     "probe/def-gap/marker-tab-sep:sections",
     "probe/def-deindent/quote-indented-one:footnotes",
     "probe/empty-container/nested-list:listItems",
-    "probe/item-tab-threshold/tab-three:footnoteRefs",
-    "probe/item-tab-threshold/tab-three:footnotes",
     "probe/quote-nest/two-space:listItems",
     "probe/quote-tab-def/established:footnotes",
   ];

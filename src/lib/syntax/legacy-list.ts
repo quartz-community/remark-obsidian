@@ -501,7 +501,34 @@ function tokenizeIndent(
         self.containerState as unknown as { _legacyContentColumn?: number }
       )._legacyContentColumn = got;
     }
-    if (got === self.containerState.size) return ok(code);
+    if (got === self.containerState.size) {
+      // EAT THE PENDING VIRTUAL SPACES. The preprocessor turns one tab into a `horizontalTab`
+      // code plus virtual spaces filling to the next stop, and `factorySpace`'s limit counts
+      // CODES -- so an item of size 2 takes the tab and ONE space, leaving three virtual spaces
+      // for the child flow to read as indent. With the real space after them that is four
+      // columns and the flow builds indented code where Obsidian defines at column 1:
+      //
+      //     "-" / blank / "<TAB><2sp>[^1]:"   obs col 1, ours none
+      //     "-" / blank / "<TAB><3sp>[^1]:"   obs col 1, ours none
+      //
+      // An earlier attempt put this in the TAB BRANCH below, which `got === size` never
+      // reaches -- it was inert for that reason rather than because the idea is wrong.
+      return code === codes.virtualSpace ? eatVirtual(code) : ok(code);
+    }
+
+    function eatVirtual(next: Code): State | undefined {
+      effects.enter(types.listItemIndent);
+      return inside(next);
+
+      function inside(inner: Code): State | undefined {
+        if (inner === codes.virtualSpace) {
+          effects.consume(inner);
+          return inside;
+        }
+        effects.exit(types.listItemIndent);
+        return ok(inner);
+      }
+    }
     // ...OR anywhere between the threshold and the content column, which is the window the two
     // fields open. Without this the extra column consumed above reads as "deeper than the
     // item" and the continuation is declined.
