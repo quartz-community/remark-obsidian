@@ -229,6 +229,12 @@ function tokenizeListStart(
     self.containerState.size =
       initialSize +
       self.sliceSerialize(effects.exit(types.listItemPrefix), true).length;
+    // The OPENER's own content column, kept because B3's minimum lowers `size` as shallower
+    // lines arrive and a fence closer is judged against the column the item STARTED with --
+    // see `afterPrefix`.
+    (
+      self.containerState as unknown as { _legacyOpenSize?: number }
+    )._legacyOpenSize = self.containerState.size;
     return ok(code);
   }
 }
@@ -355,6 +361,16 @@ function tokenizeIndent(
     const tail = self.events[self.events.length - 1];
     if (!tail || tail[1].type !== types.listItemIndent) return nok(code);
     const got = tail[2].sliceSerialize(tail[1], true).length;
+    // A FENCE DELIMITER is judged against the column the item OPENED with, not the running
+    // minimum. `-<4sp>~~~` / `<2sp>body` / `<2sp>~~~` has the body lower `size` to 2, so the
+    // closer at 2 would otherwise read as "at the content column" and be admitted -- while
+    // Obsidian ends the item there and reads the closer as a new root fence. Compared against
+    // the opener's 5 it is correctly shallower.
+    const openSize =
+      (self.containerState as unknown as { _legacyOpenSize?: number })
+        ._legacyOpenSize ?? (self.containerState.size as number);
+    const isDelimiter = code === codes.graveAccent || code === codes.tilde;
+    if (isDelimiter && got < openSize) return nok(code);
     if (got === self.containerState.size) return ok(code);
     // B3's minimum, SAFE because a fence is open.
     //
@@ -375,10 +391,22 @@ function tokenizeIndent(
     const seenBlank = (
       self.containerState as unknown as { _legacyBlank?: boolean }
     )._legacyBlank;
+    // ...AND NOT THE FENCE'S OWN CLOSER, which is where the branch over-reached. A fence's
+    // BODY at a shallower indent is the item's, and its CLOSER at a shallower indent is not:
+    //
+    //     "-<4sp>~~~" / "<2sp>body" / "<2sp>~~~"   list@0-1  code@2-3   body in, closer out
+    //     "-<4sp>~~~" / "<5sp>body" / "<2sp>~~~"   list@0-1  code@2-3   same
+    //     "-<4sp>~~~" / "<2sp>body" / "<5sp>~~~"   list@0-2             closer at the column
+    //     "-<4sp>~~~" / "<2sp>~~~"                 list@0-0  code@1-2
+    //
+    // So Obsidian ends the item at a shallower closer and reads that line as a NEW root fence,
+    // unclosed, running to the end of the note -- which is the `code@2-3` in every diverging
+    // row. Indent 0 already behaved this way here, because `got > 0` excludes it.
     if (
       got > 0 &&
       got < (self.containerState.size as number) &&
       !seenBlank &&
+      !isDelimiter &&
       (inFence() || capped())
     ) {
       self.containerState.size = got;

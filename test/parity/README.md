@@ -7162,3 +7162,60 @@ item arm carries two conditions a quote does not -- below the item's own content
 The `code` dimension passed 90% for the first time. And the repair that was refused at -2
 three times is the same rule: what it lacked was the host's content column and the block test,
 both of which came from reading micromark rather than from another scoping attempt.
+
+## The `code` dimension past 91%: a fence CLOSER is not fence content
+
+With the item-lazy rule landed, the remaining 63 were re-shrunk -- the shrinker can see this
+dimension now -- and the clusters moved:
+
+      7 docs   fence + tab + marker       4 docs   fence + marker
+      6 docs   quote + tab + marker       4 docs   indent4
+      3 docs   fence + marker + indent4   3 docs   quote + indent4
+
+Fence became the commonest construct in the bucket, 14 documents across three clusters. The
+`fence + marker` cluster is four forms and ONE shape:
+
+    "2) ~~~" / "⟨2sp⟩~~~"      "*⟨3sp⟩~~~" / "⟨2sp⟩~~~"
+    "-⟨4sp⟩~~~" / "⟨2sp⟩~~~"   "⟨2sp⟩-⟨6sp⟩```" / "⟨2sp⟩```"
+
+A marker opens a fence; a SHALLOWER line closes it.
+
+### The body is the item's and the closer is not
+
+Seven probes with the body and closer indents varied independently under `-⟨4sp⟩~~~`, whose
+content column is 5:
+
+    body 2, closer 2    list@0-1  code@2-3      body IN, closer OUT
+    body 5, closer 2    list@0-1  code@2-3      same
+    body 2, closer 5    list@0-2                closer at the column: closes normally
+    body 5, closer 5    list@0-2                same
+    body 2, no closer   list@0-1
+    closer 2 only       list@0-0  code@1-2
+    body 0, closer 0    list@0-1  code@2-3      already agreed here
+
+So `inFence()` -- the branch worth +37, which admits a shallower line while a fence is open --
+was right about fence CONTENT and over-reaching on the DELIMITER. Obsidian ends the item at a
+shallower closer and reads that line as a new root fence, unclosed, running to the end of the
+note, which is the `code@2-3` in every diverging row. Indent 0 already behaved correctly here
+only because the branch carries `got > 0`.
+
+### And the comparison is against the OPENER's column, not the running minimum
+
+The first restriction -- decline the branch for a delimiter -- fixed two of the four rows and
+left `body 2, closer 2`. The reason is B3's minimum doing its job: the body at 2 lowers `size`
+to 2, so the closer at 2 then satisfies `got === size` and is admitted by the early return,
+never reaching the restriction at all.
+
+`_legacyOpenSize` records the column the item opened with, and a delimiter is judged against
+that. Both restrictions are needed and neither is sufficient alone, which is the same shape as
+the two halves of the empty-item rule.
+
+    referee footnotes   5885 -> 5889   (+4)
+    referee code         800 -> 809    (91.6%, +9)
+    probe rows           6 of 7, the remainder a span-end difference on an UNCLOSED fence
+    compose              5 of 2112, unchanged
+    corpus               0 regressions, 450 tests, 4 gates green
+
+The `code` dimension has gone 742 -> 809 in one session, 84.0% to 91.6%, on three rules that
+all turned out to be about the same question: which lines a container owns when the line is
+shallower than its content column.
