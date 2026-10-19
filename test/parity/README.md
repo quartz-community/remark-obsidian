@@ -8117,3 +8117,60 @@ the one rule derived from the cleanest six of them is worth four.
 It is the density finding reached from the opposite direction: dense documents diverge through
 INTERACTIONS, so a minimal cell and a real failure share a shape without sharing a cause. The
 sweeps say what the parser does. The corpus still says what is worth fixing.
+
+## The `tab2sp` population, and why three tokenizer attempts were inert
+
+**Item 1, the shrink.** 41 one-away documents whose marker separator is a tab followed by
+spaces, derived from the documents this time rather than from grid cells -- the inversion the
+ceiling-of-four refusal taught. 36 reduced, 33 forms, and the dominant cluster is 12 documents
+of ONE shape:
+
+    3x  "⟨3sp⟩-⇥⟨4sp⟩More" / "⇥⟨4sp⟩[^ch2*]:"
+    2x  "2)⇥⟨4sp⟩More" / "⟨7sp⟩[^1]:"
+    2x  "⟨2sp⟩1.⇥⟨4sp⟩Text" / "⟨11sp⟩[^名]:"
+
+Marker, TAB, four spaces -- a separator long enough to trip the five-space cap -- then a label
+indented past it. Ground truth on three of them:
+
+    "2)⇥⟨4sp⟩More" / "⟨7sp⟩[^1]: def"
+      obs   defs [["1",1,4,1]]           a definition at column 4
+      ours  defs []                      listItem > code@1:4 -- the item's content is CODE
+
+    "⟨3sp⟩-⇥⟨4sp⟩More" / "⇥⟨4sp⟩[^ch2*]: d"
+      obs   defs [["ch2*",1,5,1]]
+      ours  defs [["ch2*",1,1,1]]        a definition, four columns out
+
+So the item's own content becomes indented code in our tree where Obsidian keeps it as content
+and defines the label at the capped content column.
+
+**Item 2, reading `codeIndented`.** It settles why three attempts in this layer moved nothing:
+
+    factorySpaceMinMax(effects, after, nok, types.linePrefix,
+                       constants.tabSize, constants.tabSize)
+
+The threshold is a HARD FOUR COLUMNS measured from wherever the container's prefix ended -- it
+has no access to a content column and no way to be given one. A capped item cannot have a
+different code threshold in micromark without changing what the CONTAINER CONSUMED, because
+that is the only input `codeIndented` sees.
+
+**So the lever is `containerState.size` and nothing else.** Which is exactly what all three
+inert attempts reached for, and what this file has measured three ways:
+
+    B3's minimum applied in `tokenizeIndent`      -32 referee, 4 CommonMark list cases
+    lowering `size` for the bare-marker column    -366 referee
+    widening the `factorySpace` limit to match    -366 referee
+
+That is not a fourth attempt waiting to be made. It is the same attempt, and the measurements
+say the tokenizer cannot express "the cap lowers the content column but not the ownership
+threshold" -- because `size` is both, which this file recorded as a fact long before it
+explained the consequence.
+
+### What that leaves
+
+The 12-document cluster is real, its mechanism is now fully described, and the fix is
+structurally unavailable in the container. The remaining routes are a repair pass that
+re-parses the item's content -- measured at -15 and -21 on two earlier scopings of exactly this
+shape -- or vendoring `codeIndented` alongside `legacy-list.ts` so the threshold can read a
+capped column. The second is the honest suggestion and it is a much larger piece of work than
+anything attempted tonight: a second vendored construct, with the same "the price of this file
+being a vendored copy" cost `inFence()` already records.
