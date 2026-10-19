@@ -8224,3 +8224,29 @@ printing both slices side by side.
 **That is the session's clearest instance of a standing rule.** Three attempts in this area were
 abandoned as "the tokenizer cannot express this", and the fourth found a seventeen-document fix
 in the same function -- because it measured the quantity instead of trusting an argument's name.
+
+### Auditing the rest of `expandTabs`: the unit mismatch is LOAD-BEARING
+
+The prefix-width fix was a bug class, not a one-off, so every other site trusting
+`sliceSerialize(token, true)` to give columns was audited. Three exist and two were tried:
+
+    `got` in columns          referee 5964 -> 5926   -38
+    `initialSize` in columns  referee 5964            INERT
+
+**So the unit mismatch between `got` and `size` is real and deliberate**, which is the opposite
+of what the prefix fix suggested. The reason is a note this file already carries and had not
+connected to this: **`size` serves TWO ROLES.** It is the content-column width, which wants
+columns, and it is `factorySpace`'s consumption limit, which counts CODES. `got` measures what
+that limit actually consumed, so it has to be in the limit's unit -- comparing it in columns
+compares a width against a code count and loses 38 documents.
+
+`initialSize` is inert either way and was reverted rather than changed for tidiness, per the
+standing rule for a provably inert `src` change.
+
+So the audit closes with one site changed, one refused with a number, one left alone -- and the
+generalisation "measure every width in columns" is WRONG. The correct generalisation is narrower
+and was already written down: know which of `size`'s two roles a comparison is in.
+
+That is the second time in one session that a rule derived from a real fix over-generalised on
+the next application -- the orphan-line shape predicate was the first, at -95. Both times the
+fix was right and the pattern it suggested was not.

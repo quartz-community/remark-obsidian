@@ -39,6 +39,29 @@ import type {
  * `notInCurrentItem`, which must point here rather than at stock `list` or the
  * divergences stop applying from the second item onward.
  */
+/**
+ * Width in COLUMNS, counting a tab to its stop.
+ *
+ * `sliceSerialize(token, true)` is named `expandTabs` and does not expand: it replaces a tab
+ * with ONE space, so `"2)<TAB>"` serialises to `"2) "` either way and its length is a CHARACTER
+ * count. Every width in this file that is compared against another width has to use the same
+ * unit, and the unit Obsidian uses is columns.
+ *
+ *     sliceSerialize(listItemPrefix)        "2)<TAB>"   3 characters
+ *     sliceSerialize(listItemPrefix, true)  "2) "       3 characters
+ *     columnsOfRaw("2)<TAB>")                           4 columns
+ */
+function columnsOfRaw(raw: string): number {
+  let columns = 0;
+  for (const character of raw) {
+    columns +=
+      character === "\t"
+        ? constants.tabSize - (columns % constants.tabSize)
+        : 1;
+  }
+  return columns;
+}
+
 const legacyList: Construct = {
   name: "legacyList",
   tokenize: tokenizeListStart,
@@ -245,15 +268,9 @@ function tokenizeListStart(
     //
     // The first attempt at this counted columns from the EXPANDED slice and was inert by
     // construction -- that string holds no tab to expand.
-    const raw = self.sliceSerialize(effects.exit(types.listItemPrefix));
-    let columns = 0;
-    for (const character of raw) {
-      columns +=
-        character === "\t"
-          ? constants.tabSize - (columns % constants.tabSize)
-          : 1;
-    }
-    self.containerState.size = initialSize + columns;
+    self.containerState.size =
+      initialSize +
+      columnsOfRaw(self.sliceSerialize(effects.exit(types.listItemPrefix)));
     // The OPENER's own content column, kept because B3's minimum lowers `size` as shallower
     // lines arrive and a fence closer is judged against the column the item STARTED with --
     // see `afterPrefix`.
@@ -385,6 +402,21 @@ function tokenizeIndent(
     assert(self.containerState, "expected state");
     const tail = self.events[self.events.length - 1];
     if (!tail || tail[1].type !== types.listItemIndent) return nok(code);
+    // CHARACTERS, deliberately, and NOT the columns `size` beside it uses. Auditing the two
+    // other `expandTabs` sites after the prefix-width fix, both were tried as columns:
+    //
+    //     `got` in columns         referee 5964 -> 5926   -38
+    //     `initialSize` in columns referee 5964            inert
+    //
+    // The reason is the note this file already carries: `size` SERVES TWO ROLES. It is the
+    // content-column width, which wants columns, and it is `factorySpace`'s consumption limit,
+    // which counts CODES. `got` measures what that limit actually consumed, so it has to be in
+    // the limit's unit -- comparing it in columns compares a width against a code count and
+    // loses 38 documents.
+    //
+    // So the unit mismatch between `got` and `size` is real and load-bearing, which is the
+    // opposite of what the prefix-width fix suggested. `initialSize` is inert either way and
+    // is left as it was rather than changed for tidiness.
     const got = tail[2].sliceSerialize(tail[1], true).length;
     // A FENCE DELIMITER is judged against the column the item OPENED with, not the running
     // minimum. `-<4sp>~~~` / `<2sp>body` / `<2sp>~~~` has the body lower `size` to 2, so the
