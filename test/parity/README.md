@@ -8865,3 +8865,57 @@ Worth stating as the standing hazard: **a shrink ledger is a cache of past work,
 measures what was worked on.** The instrument cannot tell a representative sample from a
 convenience one, and its output looks identical either way -- which is why the document count
 against the queue size belongs in its own output rather than in a note like this one.
+
+## The full shrink: the queue is DIFFUSE at the form level, and there are no families left
+
+The prerequisite named above, finally paid: a live shrink over ALL 824 diverging documents
+rather than a sample. 100 minutes, 12,861 channel round trips.
+
+    824 documents  ->  reduced 711  ->  661 DISTINCT MINIMAL FORMS
+    97 SKIPPED (agree with live, or refs not adjudicable); 99 with untrustworthy refs
+    VERIFIED: all 661 forms still disagree with live Obsidian
+
+**661 forms from 711 reduced documents is 0.93 forms per document -- one-to-one.** Every
+document reduces to its own shape. This file previously found that ratio for one bucket
+(`ref-extra @ footnoteReference`, 87 reduced into 87 forms) and called it diffuse; it now holds
+for the WHOLE QUEUE.
+
+### The density finding is confirmed and does NOT localise
+
+    constructs per form:  0: 20   1: 84   2: 198   3: 202   4: 98   5: 49   6: 8   7: 2
+                          -> 557 of 661 (84%) carry TWO OR MORE
+
+    by construct SET, commonest first (coverage 727 of 824, 88% -- representative):
+       37 docs  31 forms   quote + tab
+       36 docs  25 forms   tab + marker
+       28 docs  23 forms   tab + marker + indent4
+       24 docs  23 forms   quote + comment
+       22 docs  20 forms   quote
+       21 docs  20 forms   (none)
+       19 docs  15 forms   indent4
+       17 docs  12 forms   fence + tab + marker
+
+84% multi-construct confirms density: what remains IS interactions, exactly as the monotonic
+line-count and construct-count curves predicted. **And the largest cluster is 37 documents
+across 31 distinct forms.** Even the top cluster is 31 separate shapes rather than one rule, and
+the top fourteen clusters together are 283 of 727 documents, 39%.
+
+So the two findings are both true and pull apart: the SIGNAL is real and strong, and it does not
+concentrate into anything a rule could address. A construct SET is a property these documents
+share; it is not a mechanism they share.
+
+### Which closes the question this effort kept re-opening
+
+"Is there a large rule left in the referee queue?" has been answered three times -- by bucket
+analysis, by per-delta bucketing, and by the ceiling of every scored candidate -- and twice the
+answer was later qualified because the grouping was suspect. This is the same answer from the
+strongest instrument available: a verified minimal form per document over the entire diverging
+set, with coverage printed.
+
+**No. The remaining 824 documents are ~661 independent interactions**, and the honest next unit
+of work on this oracle is a single document at a time, which is not worth doing at 87.9%
+agreement against an oracle whose own comparison is looser than ours in three documented ways.
+
+What that leaves as real work is everything NOT in this queue: the 97 skipped documents (refs not
+adjudicable -- an instrument gap, not a parity gap), the `--inline` axes still on the intermittent
+CLI, and the `code` dimension at 814/883 whose remaining 69 are 98% tokenizer-owned.
