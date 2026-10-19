@@ -8174,3 +8174,53 @@ shape -- or vendoring `codeIndented` alongside `legacy-list.ts` so the threshold
 capped column. The second is the honest suggestion and it is a much larger piece of work than
 anything attempted tonight: a second vendored construct, with the same "the price of this file
 being a vendored copy" cost `inFence()` already records.
+
+## Vendoring was authorised and turned out to be the wrong answer
+
+The question was whether to vendor `codeIndented` so its threshold could read a capped content
+column. Reading the token stream first says no, and then says what the real answer is.
+
+### `codeIndented` applies its threshold CORRECTLY
+
+    listItemPrefix     1:1-1:4     the item consumed THREE CHARACTERS: `2)` and a tab
+    linePrefix         2:4-2:8     the label line therefore keeps FOUR spaces
+    codeFlowValue      2:8-2:17    exactly the threshold, so the code swallows the label
+
+Four columns measured from where the container's prefix ended, applied to the four spaces it
+was handed. Nothing in the construct is wrong, so vendoring it would have reproduced the same
+result with more code to maintain. **The quantity that was wrong is the prefix width, which only
+the container can set.**
+
+### And `expandTabs` does not expand tabs
+
+The prefix width is `sliceSerialize(listItemPrefix, true).length`, read as columns because the
+second argument is named `expandTabs`. Measured on the token stream:
+
+    sliceSerialize(listItemPrefix)        "2)⇥"   3 characters
+    sliceSerialize(listItemPrefix, true)  "2) "   3 characters   <- a tab becomes ONE SPACE
+
+It DETABS rather than expanding to the stop. So `size` has been a character count for every
+prefix holding a tab, and a note elsewhere in this file claiming it was "ALREADY in columns,
+because `sliceSerialize` expands" was wrong in both directions -- a correction already made
+once today for the LIMIT, and now for the measurement beside it.
+
+Counting columns from the RAW slice gives four, the label line keeps three, the code block ends
+on its own line, and the definition survives at the content column.
+
+    referee footnotes       5947 -> 5964   (+17)
+    referee code             808 -> 809
+    separator sweep           47 -> 39 of 490 cells
+    probe ledger            nine drifted INTO agreement, 1577 of 1692 agreeing
+    compose                 5 of 2112, unchanged
+    corpus                  0 regressions, 450 tests, 4 gates green
+
+### The first attempt at it was inert BY CONSTRUCTION
+
+Counting columns from the EXPANDED slice -- the obvious reading of "measure it in columns" --
+changes nothing, because that string holds no tab to expand. It measured as a no-op, which is
+indistinguishable from "the hypothesis is wrong", and the only thing that separated them was
+printing both slices side by side.
+
+**That is the session's clearest instance of a standing rule.** Three attempts in this area were
+abandoned as "the tokenizer cannot express this", and the fourth found a seventeen-document fix
+in the same function -- because it measured the quantity instead of trusting an argument's name.

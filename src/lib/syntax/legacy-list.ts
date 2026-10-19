@@ -226,9 +226,34 @@ function tokenizeListStart(
 
   function endOfPrefix(code: Code): State | undefined {
     assert(self.containerState, "expected state");
-    self.containerState.size =
-      initialSize +
-      self.sliceSerialize(effects.exit(types.listItemPrefix), true).length;
+    // COLUMNS FROM THE RAW SLICE, which is not what `expandTabs` gives. Measured on the token
+    // stream rather than assumed:
+    //
+    //     sliceSerialize(listItemPrefix)        "2)\t"   3 chars
+    //     sliceSerialize(listItemPrefix, true)  "2) "    3 chars  <- a tab becomes ONE space
+    //
+    // So `expandTabs` detabs rather than expanding to the stop, and `size` has been a CHARACTER
+    // count for any prefix holding a tab. A note elsewhere in this package claimed it was
+    // "ALREADY in columns, because sliceSerialize expands" -- that is wrong in both directions
+    // and this is the measurement.
+    //
+    // It matters because `size` is the width the child flow skips. For
+    // `2)<TAB><4sp>More` / `<7sp>[^1]: def` a size of 3 leaves the label line FOUR spaces,
+    // exactly the indented-code threshold, so the code block swallows the definition. Four
+    // leaves three and the definition survives at the content column, which is what Obsidian
+    // reports.
+    //
+    // The first attempt at this counted columns from the EXPANDED slice and was inert by
+    // construction -- that string holds no tab to expand.
+    const raw = self.sliceSerialize(effects.exit(types.listItemPrefix));
+    let columns = 0;
+    for (const character of raw) {
+      columns +=
+        character === "\t"
+          ? constants.tabSize - (columns % constants.tabSize)
+          : 1;
+    }
+    self.containerState.size = initialSize + columns;
     // The OPENER's own content column, kept because B3's minimum lowers `size` as shallower
     // lines arrive and a fence closer is judged against the column the item STARTED with --
     // see `afterPrefix`.
