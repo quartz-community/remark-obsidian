@@ -8685,3 +8685,46 @@ axes cross, and worth nothing when it enumerates one axis.
 The three divergences run BOTH WAYS -- we miss the code block in one cell and invent it in two
 -- which by the direction screen means several rules rather than one, so they are pinned rather
 than attacked. Seventeen agreeing cells are the regression net that did not exist an hour ago.
+
+## The grid cell was real and the RULE is refused, by one count
+
+The `item-content-code` grid left `*<2sp><TAB>` diverging: Obsidian makes the item's content a
+code block and we do not, while `1.<2sp><TAB>` agrees. That reads like an ideal target -- our two
+marker paths disagreeing where Obsidian is marker-agnostic, which is the "extend a measured rule
+to an input class it was not scoped for" shape that every landing here has had.
+
+**Scored before building, and the population refuses it:**
+
+    BASE RATE 12.1%  (824 of 6818 diverging)
+
+    bullet + spaces-then-tab     n=  59  diverging=  6   P=10.2%  lift=0.84   BELOW base rate
+    ordered + spaces-then-tab    n=  41  diverging=  7   P=17.1%  lift=1.41
+    any marker + sp-then-tab     n= 100  diverging= 13   P=13.0%  lift=1.08
+    (control) marker + TAB       n=1067  diverging=146   P=13.7%  lift=1.13
+
+Fifty-nine documents carry the exact shape and **six** diverge, against 7.1 expected by chance.
+The shape is ANTI-CORRELATED with divergence, so there is no family behind the cell -- the same
+verdict that retired the 426-document tab family and the bare-marker ownership family at lift
+0.82. Six documents is also below the standing size bar, which no sign would rescue.
+
+### The control is the larger result
+
+`marker + TAB` -- the whole tab-in-separator story, the thing this effort has returned to more
+often than any other construct -- is **1,067 documents at lift 1.13**, which is the base rate.
+Previous notes sized that family at 426 with a lift of 1.40 and called it "the first feature to
+beat its base rate". On the current corpus, at the current agreement level, it no longer does.
+
+That is worth stating as a general caution rather than as a fact about tabs: **a lift is a
+measurement against a MOVING baseline.** As agreement rises, the documents a shape used to
+explain get fixed by other rules, and the shape decays into the background without anyone
+re-running the number. The 1.40 was true when it was taken and is not true now.
+
+### What it cost, and what that says about the loop
+
+One `--ids` run and one intersection: no candidate written, no transformation, no pass. The grid
+that produced the lead was built the same hour. So the instrument chain now goes
+**oracle -> grid -> population -> refusal** without an implementation cycle anywhere in it,
+which is the whole point of having built the scorer and the grids -- the first version of this
+question cost three implementations and two reverts.
+
+Fifth fitted number this family has refused.
