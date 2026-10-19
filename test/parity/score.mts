@@ -3537,8 +3537,28 @@ const RULES: readonly Rule[] = [
     // this one needs the dual -- whether a PARAGRAPH is open at that line, which is the same
     // question micromark answers with `childFlow` and we would be re-deriving. Recorded as the
     // second half of a rule whose first half shipped, with the forms it has to reproduce.
-    apply: (text, ours) => {
+    apply: (text, ours, tree) => {
       const lines = text.split("\n");
+      // Every line our tree puts inside a paragraph. If the line ABOVE the tab line is one, a
+      // paragraph was open there and the tab line continues it.
+      const paragraphLines = new Set<number>();
+      visit(tree, "paragraph", (node: Node) => {
+        const from = node.position?.start?.line;
+        const to = node.position?.end?.line;
+        if (from === undefined || to === undefined) return;
+        for (let at = from - 1; at <= to - 1; at++) paragraphLines.add(at);
+      });
+      // ...MINUS a definition's own content, which is also a paragraph in the tree. The same
+      // guard the shipped half needed, for the same reason from the other side: a definition
+      // open above the tab line makes that line its CONTENT rather than a lazy continuation of
+      // ordinary prose, and `> [!info]` / `> Text` / `> [^b]: body` / `>⇥[^Ä]: body` is the
+      // loss it removes.
+      visit(tree, "footnoteDefinition", (node: Node) => {
+        const from = node.position?.start?.line;
+        const to = node.position?.end?.line;
+        if (from === undefined || to === undefined) return;
+        for (let at = from - 1; at <= to - 1; at++) paragraphLines.delete(at);
+      });
       const QUOTED_TAB = /^((?:[ \t]*>\t)+)/u;
       const HAS_TEXT = /^[ \t]*>[ \t]*\S/u;
       const LABEL = /^\[\^([^\]\s]+)\]:/u;
@@ -3549,13 +3569,10 @@ const RULES: readonly Rule[] = [
         if (!prefix) continue;
         const label = LABEL.exec(self.slice(prefix[1]!.length));
         if (!label) continue;
-        // An OPEN PARAGRAPH above: a quoted line carrying text, or an unquoted line that is
-        // itself lazy continuation of one.
+        // An OPEN PARAGRAPH above, read from OUR TREE rather than from the previous line's
+        // shape -- the shape version is the refusal recorded above.
         const above = lines[line - 1] ?? "";
-        if (
-          !HAS_TEXT.test(above) &&
-          (above.trim() === "" || /^[ \t]*>/u.test(above))
-        ) {
+        if (!paragraphLines.has(line - 1)) {
           continue;
         }
         const depth = (prefix[1]!.match(/>/gu) ?? []).length;

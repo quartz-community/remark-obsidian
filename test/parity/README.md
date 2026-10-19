@@ -7457,3 +7457,33 @@ attempted: the rule shipped tonight needed a tree-derived DEFINITION guard, and 
 dual -- whether a PARAGRAPH is open at that line, which is what micromark answers with
 `childFlow` and we would be re-deriving. Recorded with the seven forms any implementation has
 to reproduce.
+
+### Three scorings of that half, and why it is still not shipped
+
+The progression is the record worth keeping, because each step is the standing remedy applied
+to the previous step's failure:
+
+    predicate: the previous LINE's shape          better 16  worse 82   agreement -53
+    premise from OUR TREE: is line N-1 in a para  better 15  worse 16   agreement  +4
+    ...minus a definition's own content           better 13  worse 13   agreement  +6, referee +3
+
+The first is the source-level stand-in this file names most often. The second is the standing
+remedy -- compute a structural premise from the tree -- and it moves 86 documents' worth of
+losses. The third is the DUAL of the guard the shipped half needed: a definition's content is
+also a paragraph in the tree, so `> [!info]` / `> Text` / `> [^b]: body` / `>⇥[^Ä]: body` fired
+and should not.
+
+**And it is still not shipped, on two grounds.**
+
+Thirteen gains against thirteen losses is not a derived rule. The agreement counter rises,
+which is this file's shipping test, but a rule that is right about as many documents as it is
+wrong about has a discriminator still missing -- the same reading that refused the callout
+exclusion at 34/21.
+
+And the representation is unresolved. Obsidian indexes a REFERENCE at a definition-shaped
+label, which is the commented-definition asymmetry, and this file records that family as
+belonging in the PROJECTION rather than the tree -- synthesising a reference node where the
+source spells a definition puts a construct in the tree no character asks for. The referee
+reads the tree, so moving it needs that question answered first rather than assumed.
+
+Recorded with all three scores so the next attempt starts from the third rather than the first.
