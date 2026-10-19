@@ -125,6 +125,14 @@ interface Reply {
   readonly id: string;
   readonly cache: Cache | null;
   readonly threw?: string;
+  readonly dom?: { readonly blockCode?: readonly BlockCode[] } | null;
+  readonly domThrew?: string;
+}
+
+/** A rendered `pre > code` with its ancestor tag chain, joined by `>`. */
+export interface BlockCode {
+  readonly path: string;
+  readonly text: string;
 }
 
 const REFERENCE = /\[\^([^\]\s]+)\]/gu;
@@ -164,11 +172,11 @@ export function augment(markdown: string): string {
  * Five consecutive exchanges pass either way, so this is not proven by reproduction. It is the
  * same discipline the response side already has, on the same reasoning, and costs one rename.
  */
-function writeRequest(markdowns: readonly string[]): void {
+function writeRequest(markdowns: readonly string[], dom = false): void {
   fs.writeFileSync(
     `${REQUEST}.part`,
     JSON.stringify(
-      markdowns.map((markdown, at) => ({ id: String(at), markdown })),
+      markdowns.map((markdown, at) => ({ id: String(at), markdown, dom })),
     ),
   );
   fs.renameSync(`${REQUEST}.part`, REQUEST);
@@ -219,11 +227,41 @@ export function askRawSync(
   markdowns: readonly string[],
   timeoutMs = 300_000,
 ): (Cache | null)[] {
+  return askRepliesSync(markdowns, false, timeoutMs).map(
+    (reply) => reply?.cache ?? null,
+  );
+}
+
+/**
+ * Obsidian's rendered block code for each document, through the FILE channel.
+ *
+ * `ask-dom.ts` reaches the same projection over `obsidian eval`, which returns NOTHING on
+ * failure and so reads as a real empty answer. That is why this exists: `blockCode` is the only
+ * oracle for block structure inside a container -- `sections` is root-level by construction --
+ * so it cannot sit on an intermittent transport.
+ */
+export function askBlockCode(
+  markdowns: readonly string[],
+  timeoutMs = 300_000,
+): BlockCode[][] {
+  return askRepliesSync(markdowns, true, timeoutMs).map((reply) => {
+    if (reply?.domThrew !== undefined) {
+      throw new Error(`probe-channel: render threw ${reply.domThrew}`);
+    }
+    return [...(reply?.dom?.blockCode ?? [])];
+  });
+}
+
+function askRepliesSync(
+  markdowns: readonly string[],
+  dom: boolean,
+  timeoutMs: number,
+): (Reply | undefined)[] {
   if (markdowns.length === 0) return [];
   fs.mkdirSync(DIR, { recursive: true });
   fs.rmSync(RESPONSE, { force: true });
   fs.rmSync(`${RESPONSE}.part`, { force: true });
-  writeRequest(markdowns);
+  writeRequest(markdowns, dom);
 
   const gate = new Int32Array(new SharedArrayBuffer(4));
   const until = Date.now() + timeoutMs;
@@ -241,7 +279,7 @@ export function askRawSync(
       );
     }
     const byId = new Map(replies.map((reply) => [reply.id, reply]));
-    return markdowns.map((_, at) => byId.get(String(at))?.cache ?? null);
+    return markdowns.map((_, at) => byId.get(String(at)));
   }
   throw new Error(
     `probe-channel: no response in ${timeoutMs}ms. Is Obsidian running with parity-probe enabled?`,

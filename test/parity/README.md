@@ -8619,3 +8619,41 @@ Promoting it to a named grid in `grids.ts` needs `blockCode` on the FILE channel
 grids run through `probe-channel.ts` and `blockCode` is DOM-only through the intermittent
 `obsidian eval`. That is the same blocker holding the `--inline` compose axes, and it is now
 load-bearing for a second instrument.
+
+## ...and then the oracle came off the intermittent transport
+
+`blockCode` arrived through `ask-dom.ts`, which rides `obsidian eval`. That channel **returns
+nothing when it fails**, which reads as a real empty answer -- and it failed on the very first
+run of the probe that closed the blind spot. Tolerable for a field nothing depended on;
+unacceptable once `blockCode` is the ONLY oracle for block structure inside a container.
+
+The fix is that the projection was always servable here. `__parityProbe` is a **detached**
+`MarkdownRenderer.render()`, so it needs neither focus nor `requestAnimationFrame` -- which is
+exactly why the recorder can batch the whole corpus through it, and why reading-view and
+live-preview leaves beside it are nearly dead over `obsidian eval`. `serveBatch` now calls it
+when a question asks for it, and `askBlockCode` reads it back over the file channel.
+
+    OK  *<TAB>          want ----   got none
+    OK  *<TAB><TAB>     want CODE   got ul>li>pre
+    OK  *<2sp><TAB>     want CODE   got ul>li>pre
+    OK  *<TAB><2sp><TAB> want ----  got none
+    OK  *<2sp>          want ----   got none
+    OK  <4sp>code       want CODE   got pre          <- the CONTROL
+
+Six of six against the CLI's own answers. The control is the row that matters: a root code block
+comes back `pre` where the item cases come back `ul>li>pre`, so the path discriminates on the
+NESTING dimension and not merely on presence -- which is the failure mode an inert probe has in
+this harness twelve times over.
+
+Three details are deliberate:
+
+- **Opt-in per question.** A detached render costs far more than a cache call, and the grids and
+  sweeps ask thousands of documents that want only `cache`. The fast path is unchanged.
+- **The two oracles are caught separately.** A render failure must not take out the cache answer
+  beside it; a caller asking for both still gets the one that worked.
+- **`askRawSync` delegates** rather than carrying a second copy of the wait loop, since a second
+  copy of a fact rots. One `Atomics.wait` exchange serves both.
+
+What it unblocks: promoting the 23-cell separator sweep to a named grid in `grids.ts`, which
+runs through `probe-channel.ts` and could not reach a DOM-only field. The `--inline` and
+`--inline-block` compose axes are still on the CLI, and are now the only thing left there.

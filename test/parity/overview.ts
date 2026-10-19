@@ -476,6 +476,10 @@ export const SCOPE: readonly ScopeBoundary[] = [
     why: "was: the projection string ${original}=>${link}|${display}@${span} is not round-trippable, since `[[a|b|c]]` records as `a|b|c` and could be target `a|b`. The DOM keeps them in separate attributes, so `ask-dom.ts` now reports `{target, display}` and `[[a|b|c]]` is unambiguously target `a`, display `b|c`",
   },
   {
+    what: "block code only over the INTERMITTENT transport -- CLOSED",
+    why: "was: `blockCode` arrived through `ask-dom.ts`, which rides `obsidian eval` -- a channel that returns NOTHING when it fails, reading as a real empty answer, and which failed on the first run of the probe that closed the blind spot. Tolerable for a field nothing depended on, unacceptable once `blockCode` is the only oracle for block structure inside a container. `__parityProbe` is a DETACHED `MarkdownRenderer.render()`, needing neither focus nor rAF, so `serveBatch` serves it and `askBlockCode` reads it over the file channel: six of six against the CLI, including a control proving a root `pre` is distinguished from `ul>li>pre`. Opt-in per question, since a detached render costs far more than a cache call",
+  },
+  {
     what: "an item's EXTENT in the live channel -- CLOSED",
     why: "was: `listItems` rides on every raw cache answer and `probe-channel.ts` dropped it, declaring only `footnotes`, `footnoteRefs` and `sections`. `compute.test.ts` compares a listItems projection against the GOLDENS, so the field was known and near-total there -- what was missing is the span and the nesting LIVE, where every grid and sweep is built, so no probe could ask how far an item reaches of a document not already in the corpus. The break test then refused the use it was added for: all four tab-separator spellings report one item covering the whole line, so that family is not an extent question, which is why `blockCode` was needed beside it rather than instead of it. What it is live for is cross-line extent -- `- a` / `<TAB># h` spans to 1:4, the shipped lazy-release rule confirmed on a document the corpus never had",
   },

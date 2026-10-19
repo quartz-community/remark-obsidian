@@ -317,7 +317,30 @@ module.exports = class ParityProbe extends obsidian.Plugin {
             });
             continue;
           }
-          answers.push({ id: question.id, cache });
+          // `askDom`'s `obsidian eval` returns NOTHING when it fails, which reads as a real
+          // empty answer -- unacceptable now `blockCode` is the only oracle for block
+          // structure inside a container, so the projection is served here too.
+          //
+          // Opt-in: a detached render costs far more than a cache call, and the sweeps ask
+          // thousands of documents that want only `cache`. A render failure must not take out
+          // the cache answer beside it, so the two are caught separately.
+          let dom = null;
+          let domThrew;
+          if (question.dom) {
+            try {
+              dom = await window.__parityProbe(question.markdown ?? "");
+            } catch (error) {
+              dom = null;
+              domThrew = String(
+                error && error.message ? error.message : error,
+              );
+            }
+          }
+          answers.push(
+            question.dom
+              ? { id: question.id, cache, dom, ...(domThrew ? { domThrew } : {}) }
+              : { id: question.id, cache },
+          );
         }
         fs.writeFileSync(RESPONSE + ".part", JSON.stringify(answers));
         fs.renameSync(RESPONSE + ".part", RESPONSE);
