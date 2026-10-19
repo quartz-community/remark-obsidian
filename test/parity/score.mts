@@ -3505,6 +3505,71 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "quoted-tab-label-after-paragraph-is-a-ref",
+    what: "a label on a quoted TAB line continuing an open paragraph is indexed as a reference",
+    // The OTHER half of the rule shipped tonight, and `ref-miss @ code`'s top forms are all
+    // this. After an empty `>` a quoted tab line is indented code and its brackets are
+    // literal; after an OPEN PARAGRAPH the same line continues it lazily and the label IS
+    // indexed:
+    //
+    //     ">" / "It" / ">\t[^x-y]: d"     obs ref@(2,2)   we index nothing
+    //     "> plain" / ">\t[^x-y]: d"      obs ref@(1,2)   we index nothing
+    //     ">" / "It" / ">\t>\t[^1]: d"     obs ref@(2,4)   we index nothing
+    //
+    // And only at a TAB. Two and four spaces in the same position already agree, at columns 3
+    // and 5, so this is the tab's four columns being read as indented code by us and as
+    // paragraph content by Obsidian.
+    //
+    // THE COLUMN IS 2 x QUOTE DEPTH, measured: depth 1 reports 2 and depth 2 reports 4, which
+    // is one marker plus one space per level -- the prefix width `definition-end-before-label`
+    // already records for a quote.
+    //
+    // REFUSED: better 16 / worse 82 / same 6, agreement 5845 -> 5792, referee -57.
+    //
+    // The probe rows are right and the PREDICATE is wrong, in the way this file names most
+    // often: "an open paragraph above" is tested by looking at the previous LINE's shape,
+    // which is a source-level stand-in for a structural premise. It fires on 104 documents and
+    // breaks 82 -- a quote whose previous line carries text need not have a paragraph open at
+    // the tab line, because a definition, a nested quote or a fence may have claimed it.
+    //
+    // Computing the premise from OUR TREE is the standing remedy and it is NOT attempted here:
+    // the sibling rule shipped tonight already needed a tree-derived definition guard, and
+    // this one needs the dual -- whether a PARAGRAPH is open at that line, which is the same
+    // question micromark answers with `childFlow` and we would be re-deriving. Recorded as the
+    // second half of a rule whose first half shipped, with the forms it has to reproduce.
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      const QUOTED_TAB = /^((?:[ \t]*>\t)+)/u;
+      const HAS_TEXT = /^[ \t]*>[ \t]*\S/u;
+      const LABEL = /^\[\^([^\]\s]+)\]:/u;
+      const added: Ref[] = [];
+      for (let line = 1; line < lines.length; line++) {
+        const self = lines[line] ?? "";
+        const prefix = QUOTED_TAB.exec(self);
+        if (!prefix) continue;
+        const label = LABEL.exec(self.slice(prefix[1]!.length));
+        if (!label) continue;
+        // An OPEN PARAGRAPH above: a quoted line carrying text, or an unquoted line that is
+        // itself lazy continuation of one.
+        const above = lines[line - 1] ?? "";
+        if (
+          !HAS_TEXT.test(above) &&
+          (above.trim() === "" || /^[ \t]*>/u.test(above))
+        ) {
+          continue;
+        }
+        const depth = (prefix[1]!.match(/>/gu) ?? []).length;
+        added.push([label[1]!, line, depth * 2]);
+      }
+      if (added.length === 0) return ours;
+      return {
+        defs: ours.defs,
+        refs: [...ours.refs, ...added],
+        code: ours.code,
+      };
+    },
+  },
+  {
     name: "control-drop-all-code",
     what: "CONTROL: report no root code block at all",
     // Not a rule. It exists to prove the `code` dimension is wired in: a candidate that empties

@@ -7420,3 +7420,40 @@ documents for free.
   probe ledger 621 probes, three drifted INTO agreement and were re-recorded
   compose 5 of 2112, unchanged
   corpus 0 regressions, 450 tests, 4 gates green
+
+### The other half of that rule is measured and refused
+
+`ref-miss @ code` (76 one-away) reduces to 51 forms, and its top ones are the INVERSE of the
+rule just shipped -- Obsidian indexes where we make code:
+
+    3x  ">" / "It" / ">⇥[^x-y]:"      2x  ">" / "More" / ">⇥>⇥[^1]:"
+
+Seven probes split it exactly where the shipped rule's control does:
+
+    ">" / "It" / ">⇥[^x-y]: d"     obs ref@(2,2)   ours NONE
+    "> plain" / ">⇥[^x-y]: d"      obs ref@(1,2)   ours NONE
+    ">" / "It" / ">⇥>⇥[^1]: d"      obs ref@(2,4)   ours NONE
+    ">" / ">⇥[^x-y]: d"            agree -- no paragraph open, the shipped rule's case
+    ">" / "It" / ">⟨2sp⟩[^x-y]:"    agree at column 3
+    ">" / "It" / ">⟨4sp⟩[^x-y]:"    agree at column 5
+    "It" / ">⇥[^x-y]: d"           agree
+
+So after an OPEN PARAGRAPH the quoted tab line continues it and the label is indexed, at
+column **2 x quote depth** -- depth 1 reports 2 and depth 2 reports 4. Only the tab diverges;
+two and four spaces in the same position already agree.
+
+**And the implementation is refused at -53.**
+
+    quoted-tab-label-after-paragraph-is-a-ref   better 16  worse 82   agreement -53
+
+The probe rows are right and the predicate is wrong, in the way this file names most often:
+"an open paragraph above" was tested by looking at the previous LINE's shape, which is a
+source-level stand-in for a structural premise. It fires on 104 documents and breaks 82,
+because a quote whose previous line carries text need not have a paragraph open at the tab
+line -- a definition, a nested quote or a fence may have claimed it.
+
+The remedy is the standing one, compute the premise from the tree, and it is deliberately not
+attempted: the rule shipped tonight needed a tree-derived DEFINITION guard, and this needs the
+dual -- whether a PARAGRAPH is open at that line, which is what micromark answers with
+`childFlow` and we would be re-deriving. Recorded with the seven forms any implementation has
+to reproduce.
