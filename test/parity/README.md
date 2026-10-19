@@ -8036,3 +8036,50 @@ started failing. Ledger **754 -> 1202 probes, 1126 agreeing**.
 
 So the indentation space is swept, pinned, and retired, and the next sweep wants a different
 axis than indentation.
+
+## The SEPARATOR space: 47 of 490, where indentation gave 3 of 448
+
+The indent sweep retired its space at 99.3% clean. The complement -- marker type against
+separator width against label indent, 490 cells -- is where the work is:
+
+    47 of 490 cells diverge on `def.col`
+
+    by separator        tab2sp 18   sp+tab 8   4sp 4   3sp 3   2sp 2   1sp 1
+    of those, 21 are "we report NO definition at all"
+
+Swept rather than sampled on the screen this file derived: the cap is a SINGLE ARITHMETIC FACT,
+computed by `contentColumn` from one line, and that is the condition under which a grid
+collapses usefully. It did -- fifteen times the yield of the indentation sweep from a comparable
+number of cells.
+
+### `tab2sp` is 18 cells and splits into two single-direction halves
+
+    width-1 markers (- * +)      label 2sp  obs 0  ours 2      THE ROOT CLAMP
+                                 label 3sp  obs 0  ours 3
+                                 label 6sp  obs 4  ours -1
+    width-2/3 (1. 1) 10.)        label 4sp  obs 4  ours -1     WE PRODUCE NO DEFINITION
+                                 label 5sp  obs 4  ours -1
+                                 label tab  obs 1  ours -1
+
+**The first half is the root clamp**, which this file records as already implemented: with the
+label indented BELOW the item's content column there is no host, so the column is 0 rather than
+the bracket. A `\t  ` separator puts the content column at the tab stop of 4, so labels at two
+and three columns are below it -- and we return `min(indent, floor)`, giving 2 and 3 where
+Obsidian gives 0. Six cells, one direction, and the rule is written down.
+
+**The second half is a missing definition**, not a wrong column, so it is a different mechanism
+sharing a separator class. Nine cells.
+
+### Both halves are recorded and neither is built
+
+Not for want of a rule -- the clamp's rule is a sentence -- but because this stretch has already
+shipped seven and the remaining budget is better spent banking the sweep than half-landing an
+eighth. The 490 cells are in the ledger, so the 443 that agree are now drift-asserted and the
+47 are pinned where they stand:
+
+    ledger 1202 -> 1692 probes, 1569 agreeing
+
+**The two sweeps together are the session's most reusable output.** 938 cells of systematic
+coverage across the two spaces where every recent rule lived, 50 open and 888 pinned, against a
+corpus of 6,818 documents nobody generated for this purpose. The next step is the root clamp's
+six cells, and it is the first lead in a while that arrives with its rule already stated.

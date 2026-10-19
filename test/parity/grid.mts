@@ -130,6 +130,100 @@ async function sweep(): Promise<void> {
   }
 }
 
+/**
+ * THE SEPARATOR SPACE: marker type against separator width against label indent.
+ *
+ * The indent sweep came back 3 of 448, retiring that space. This is the complement that
+ * `marker-sep-column` sampled at 5 rows by 7 columns and found +33 in -- the five-space cap,
+ * refused from six directions and still the largest thing `def-miss @ code` reduces to.
+ *
+ * Swept rather than sampled because the cap is a SINGLE ARITHMETIC FACT -- `contentColumn`
+ * computes it from one line -- which is the screen this file derived for when a grid collapses
+ * usefully: a column delta does and a span delta does not.
+ */
+async function sweepSeparator(): Promise<void> {
+  const MARKERS = ["-", "*", "+", "1.", "1)", "10.", "1000."];
+  const SEPS: ReadonlyArray<readonly [string, string]> = [
+    ["1sp", " "],
+    ["2sp", "  "],
+    ["3sp", "   "],
+    ["4sp", "    "],
+    ["5sp", "     "],
+    ["6sp", "      "],
+    ["8sp", "        "],
+    ["tab", "\t"],
+    ["tab2sp", "\t  "],
+    ["sp+tab", " \t"],
+  ];
+  const INDENTS: ReadonlyArray<readonly [string, string]> = [
+    ["0sp", ""],
+    ["2sp", "  "],
+    ["3sp", "   "],
+    ["4sp", "    "],
+    ["5sp", "     "],
+    ["6sp", "      "],
+    ["tab", "\t"],
+  ];
+
+  const docs: string[] = [];
+  const keys: { marker: string; sep: string; indent: string }[] = [];
+  for (const marker of MARKERS) {
+    for (const [sepName, sep] of SEPS) {
+      for (const [indentName, indent] of INDENTS) {
+        docs.push(`${marker}${sep}Prose\n\n${indent}[^1]: def\n\nuse[^1]\n`);
+        keys.push({ marker, sep: sepName, indent: indentName });
+      }
+    }
+  }
+
+  console.log(
+    `sweep: ${docs.length} cells -- marker x separator x label indent\n`,
+  );
+  const rows: string[] = [];
+  for (let at = 0; at < docs.length; at += 60) {
+    const slice = docs.slice(at, at + 60);
+    const answers = await ask(slice);
+    for (let i = 0; i < slice.length; i++) {
+      const key = keys[at + i]!;
+      const a = cellOf("def.col", answers[i]!);
+      const b = cellOf("def.col", oursFor(slice[i]!));
+      if (a === b) continue;
+      rows.push(
+        `    ${key.marker.padEnd(7)} sep ${key.sep.padEnd(7)} label ${key.indent.padEnd(5)} obs=${String(a).padStart(3)} ours=${String(b).padStart(3)}`,
+      );
+    }
+  }
+  const at3 = argv.indexOf("--record");
+  if (at3 !== -1) {
+    const path = argv[at3 + 1] ?? "/tmp/opencode/all.json";
+    const existing: { markdown: string; note: string }[] = fs.existsSync(path)
+      ? (JSON.parse(fs.readFileSync(path, "utf8")) as typeof existing)
+      : [];
+    const seen = new Set(existing.map((entry) => entry.markdown));
+    const added = docs
+      .map((markdown, i) => ({
+        markdown,
+        note: `sep/${keys[i]!.marker}/${keys[i]!.sep}/${keys[i]!.indent}`.replace(
+          /[^\w/.+-]/gu,
+          "",
+        ),
+      }))
+      .filter((seed) => !seen.has(seed.markdown));
+    fs.writeFileSync(path, JSON.stringify([...existing, ...added]));
+    console.log(
+      `  ${path}: ${existing.length} -> ${existing.length + added.length} seeds (${added.length} new)\n`,
+    );
+  }
+  console.log(`  ${rows.length} of ${docs.length} cells diverge on def.col\n`);
+  console.log(rows.slice(0, 36).join("\n"));
+  if (rows.length > 36) console.log(`    ... and ${rows.length - 36} more`);
+}
+
+if (argv.includes("--sweep-separator")) {
+  await sweepSeparator();
+  process.exit(0);
+}
+
 if (argv.includes("--sweep")) {
   await sweep();
   process.exit(0);
