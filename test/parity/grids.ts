@@ -186,6 +186,50 @@ export const GRIDS: readonly Grid[] = [
     document: (marker, sep) => `${marker}${sep}[^1]: def\n\nuse[^1]\n`,
     field: "def.col",
   },
+  {
+    name: "item-content-code",
+    what: "whether a list item's content becomes a code block, read from the rendered DOM",
+    // The companion to `tab-sequence-separator` above, which asks the CACHE about the same
+    // separators and therefore cannot see this: `code` is root-level on both sides, so every
+    // one of these documents reports `code: []` while the DOM shows half as `ul>li>pre`. That
+    // blindness is why the separator contradiction stood unresolved -- `*<2sp><TAB>` reporting
+    // no definition and `*<TAB><2sp><TAB>` reporting one, with no arithmetic explaining both.
+    //
+    // A 23-cell sweep refutes EVERY column rule. Computing each separator's content column with
+    // tabs advancing to the next four-stop, three column values hold cells that disagree, and
+    // the widest split is ten cells at column 8 going seven to three:
+    //
+    //     col 4   ----  tab          CODE  2sptab
+    //     col 6   CODE  5sp          ----  tab2sp
+    //     col 8   CODE  tabtab  4sptab  tab4sp      ----  tab2sptab
+    //
+    // So no function of the content column produces the partition, which retires the five-space
+    // cap, the tab-to-its-stop measurement and `_legacyContentColumn` as explanations HERE --
+    // each is still right about what it was measured on. What IS closed is a shape: a tab, then
+    // one to three spaces, then a tab is never code, three for three.
+    //
+    // Pinned as a specification and a regression net. No rule is fitted, because implementing
+    // an observable whose mechanism is unknown is how this harness has fitted a number instead
+    // of a rule, and this family has now refused four of them.
+    rows: [
+      ["*", "*"],
+      ["1.", "1."],
+    ],
+    cols: [
+      ["tab", "\t"],
+      ["tabtab", "\t\t"],
+      ["2sp", "  "],
+      ["4sp", "    "],
+      ["5sp", "     "],
+      ["2sptab", "  \t"],
+      ["4sptab", "    \t"],
+      ["tab2sp", "\t  "],
+      ["tab4sp", "\t    "],
+      ["tab2sptab", "\t  \t"],
+    ],
+    document: (marker, sep) => `${marker}${sep}[^1]: def\n`,
+    field: "code.in-item",
+  },
 ];
 
 export const gridNamed = (name: string): Grid | undefined =>

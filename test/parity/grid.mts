@@ -11,7 +11,7 @@
  * and twenty reached the ledger, because promoting them meant writing them out again.
  */
 import fs from "node:fs";
-import { ask } from "./probe-channel.js";
+import { ask, askBlockCode } from "./probe-channel.js";
 import { cellOf, cellsOf, documentsOf, oursFor, render } from "./grid.js";
 import { GRIDS, gridNamed } from "./grids.js";
 import type { Grid } from "./grid.js";
@@ -260,7 +260,11 @@ let total = 0;
 for (const grid of wanted) {
   const docs = documentsOf(grid);
   const answers = await ask(docs);
-  const cells = cellsOf(grid, answers);
+  const cells = cellsOf(
+    grid,
+    answers,
+    grid.field === "code.in-item" ? askBlockCode(docs) : undefined,
+  );
   console.log(`\n${render(grid, cells)}`);
   for (const cell of cells) {
     total++;

@@ -8657,3 +8657,31 @@ Three details are deliberate:
 What it unblocks: promoting the 23-cell separator sweep to a named grid in `grids.ts`, which
 runs through `probe-channel.ts` and could not reach a DOM-only field. The `--inline` and
 `--inline-block` compose axes are still on the CLI, and are now the only thing left there.
+
+## The sweep became a grid, and the grid found what the sweep could not
+
+Promoting the 23-cell `blockCode` sweep to `grids.ts` needed a new dimension, because the
+existing `code.exists` field is root-level on BOTH sides -- Obsidian's by construction as a slice
+of `sections`, ours because `oursFor` reads `tree.children`. Reusing it would have been INERT:
+every one of these documents reports `code: []`.
+
+`code.in-item` has their side from `askBlockCode` and ours from a walk at ANY DEPTH, and
+`cellsOf` THROWS when such a grid is run without `blockCode` rather than defaulting the oracle
+to absent -- a grid reading `theirs: -1` everywhere would report total disagreement and look
+exactly like a working grid, which is this harness's most repeated failure.
+
+    field: code.in-item   (-1 = absent)
+
+                tab  tabtab   2sp   4sp   5sp  2sptab  4sptab  tab2sp  tab4sp  tab2sptab
+    *            -1       1    -1    -1     1   X1/-1       1      -1       1      X-1/1
+    1.           -1       1    -1    -1     1       1       1      -1       1      X-1/1
+
+**3 of 20 diverge, and the grid earned its second row immediately: `1.<2sp><TAB>` AGREES where
+`*<2sp><TAB>` does not.** The sweep was single-marker, so it could not see that the MARKER
+participates -- and that is the one new fact here, bought by making a 1x23 list into a 2x10
+table. It also keeps the pattern these notes record: a probe grid is worth building when its
+axes cross, and worth nothing when it enumerates one axis.
+
+The three divergences run BOTH WAYS -- we miss the code block in one cell and invent it in two
+-- which by the direction screen means several rules rather than one, so they are pinned rather
+than attacked. Seventeen agreeing cells are the regression net that did not exist an hour ago.

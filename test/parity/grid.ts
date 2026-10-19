@@ -15,7 +15,10 @@
  * named one can be re-run after a later change and compared against what it said before, which
  * an argv cross product cannot.
  */
-import type { Answer } from "./probe-channel.js";
+import type { Node } from "unist";
+import { visit } from "unist-util-visit";
+
+import type { Answer, BlockCode } from "./probe-channel.js";
 import { refereeFactsWithTree } from "./referee-facts.js";
 
 export interface Grid {
@@ -37,6 +40,7 @@ export type FieldName =
   | "def.end"
   | "code.exists"
   | "code.second-line"
+  | "code.in-item"
   | "refs.count";
 
 /**
@@ -59,6 +63,8 @@ export function cellOf(field: FieldName, answer: Facts): number {
       return (answer.code ?? []).length > 0 ? 1 : -1;
     case "code.second-line":
       return (answer.code ?? []).some((range) => range[0] === 1) ? 1 : -1;
+    case "code.in-item":
+      return answer.codeInItem === true ? 1 : -1;
     case "refs.count":
       return answer.refs.length;
   }
@@ -68,6 +74,16 @@ export interface Facts {
   readonly defs: ReadonlyArray<readonly [string, number, number, number]>;
   readonly refs: ReadonlyArray<readonly [string, number, number]>;
   readonly code?: ReadonlyArray<readonly [number, number]>;
+  /**
+   * A code block INSIDE a list item, which `code` cannot express.
+   *
+   * `code` is root-level on both sides -- Obsidian's by construction, since it is a slice of
+   * `sections`, and ours because `oursFor` reads `tree.children`. That agreement is the point of
+   * the field and also its blind spot: every tab-separator spelling reports `code: []` while the
+   * DOM shows half of them as `ul>li>pre`. Their side comes from `askBlockCode`, ours from a
+   * walk at ANY DEPTH.
+   */
+  readonly codeInItem?: boolean;
 }
 
 /** Our side, in the same shape the channel returns, so one extractor serves both. */
@@ -79,7 +95,13 @@ export function oursFor(text: string): Facts {
       code.push([child.position.start.line - 1, child.position.end.line - 1]);
     }
   }
-  return { defs: got.defs, refs: got.refs, code };
+  let codeInItem = false;
+  visit(got.tree, "listItem", (item: Node) => {
+    visit(item, "code", () => {
+      codeInItem = true;
+    });
+  });
+  return { defs: got.defs, refs: got.refs, code, codeInItem };
 }
 
 export interface Cell {
@@ -90,14 +112,39 @@ export interface Cell {
   readonly ours: number;
 }
 
-/** Every cell of a grid, given the channel's answers in row-major order. */
-export function cellsOf(grid: Grid, answers: readonly Answer[]): Cell[] {
+/**
+ * Every cell of a grid, given the channel's answers in row-major order.
+ *
+ * `blockCode` is required for a `code.in-item` grid and ignored otherwise: the cache cannot see
+ * a code block inside a container, so without it every cell would read `theirs: -1` and the grid
+ * would report total disagreement -- which looks exactly like a working grid.
+ */
+export function cellsOf(
+  grid: Grid,
+  answers: readonly Answer[],
+  blockCode?: readonly (readonly BlockCode[])[],
+): Cell[] {
+  if (grid.field === "code.in-item" && blockCode === undefined) {
+    throw new Error(
+      `grid ${grid.name}: field code.in-item needs blockCode from askBlockCode`,
+    );
+  }
   const out: Cell[] = [];
   let at = 0;
   for (const [rowName, row] of grid.rows) {
     for (const [colName, col] of grid.cols) {
       const text = grid.document(row, col);
-      const theirs = answers[at];
+      const answer = answers[at];
+      const theirs: Facts | undefined = answer
+        ? {
+            ...answer,
+            codeInItem: blockCode
+              ? (blockCode[at] ?? []).some((found) =>
+                  found.path.includes("li>pre"),
+                )
+              : undefined,
+          }
+        : undefined;
       out.push({
         row: rowName,
         col: colName,
