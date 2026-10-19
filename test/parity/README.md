@@ -8250,3 +8250,51 @@ and was already written down: know which of `size`'s two roles a comparison is i
 That is the second time in one session that a rule derived from a real fix over-generalised on
 the next application -- the orphan-line shape predicate was the first, at -95. Both times the
 fix was right and the pattern it suggested was not.
+
+## `def-miss @ code` after the tab fixes: a +17 that CommonMark refuses
+
+Re-shrunk at 82, down from 102 without being targeted -- the prefix-width fix took twenty,
+which was the evidence that the three-attempts-blocked diagnosis was wrong. 80 reduced, 65
+forms, and the largest cluster is 7 documents with NO TAB in them at all:
+
+    2x  "1.⟨5sp⟩Morewords$[^a]$" / "⟨7sp⟩[^x-y]:"
+    2x  "* parent" / "⟨4sp⟩1.⟨5sp⟩Text" / "⟨11sp⟩[^b]: Definition"
+    2x  "1. parent" / "⟨3sp⟩1.⟨5sp⟩Some" / "⟨10sp⟩[^x-y]: Definition"
+
+The five-space cap without a tab, which every fix today was blind to. And the arithmetic is
+exact: the cap makes the consumed prefix `1.` plus ONE space, three columns, while
+`contentColumn` has always applied the single-digit-dot adjustment and returns FOUR. With
+three, the label line keeps four spaces -- the indented-code threshold -- and the code block
+swallows the definition.
+
+Carrying that adjustment into the tokenizer's `size` is **+17 referee documents** and breaks
+`commonmark/list-items/273` and `274`:
+
+    "1.⟨5sp⟩indented code" / blank / "⟨3sp⟩paragraph" / blank / "⟨7sp⟩more code"
+
+CommonMark requires ONE list spanning all of it. With size 3 the first line's content at column
+7 is four past and is correctly indented code; with size 4 it is three past and is not. **The
+same quantity has to be 3 for the first line and 4 for the label line**, and `size` is one
+field.
+
+### Third time today, and now it has cost a measured gain
+
+    `got` in columns                 -38   because `size` is also a code-count limit
+    the capped dot adjustment        +17 referee, -2 CommonMark cases
+    B3's minimum in `tokenizeIndent` -32 and 4 CommonMark cases (recorded months of work ago)
+
+Every one is the same sentence: **`size` serves two roles** -- the ownership threshold and the
+content column -- and a change that is right for one is wrong for the other. This file recorded
+that as a fact long ago and has now paid for it three times in one session, twice today with a
+positive referee delta attached.
+
+So the fix is reverted and the family is bounded differently than before: not "the tokenizer
+cannot express this" -- it can express either role -- but **the tokenizer has one field for two
+quantities, and separating them is the work.** That is a different and much better-specified
+piece than vendoring `codeIndented`, which this session already ruled out for a different
+reason.
+
+`contentColumn` is the existing proof that the two quantities differ: it computes the content
+column from the source, independently, WITH the dot adjustment, and has been right about these
+documents all along. What is missing is for the tokenizer's prefix consumption to use that
+number for the flow's benefit while leaving ownership on the narrower one.
