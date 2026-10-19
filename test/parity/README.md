@@ -8349,3 +8349,31 @@ this family were doing.
 The `code` dimension passed 92%. And the three refusals above are now explained rather than
 merely recorded: each was a correct change to one role, applied to a field that was also the
 other.
+
+### Re-asking the refused `size` changes: the gate survives the separation
+
+With ownership and the content column separate, the three refusals that conflated them were
+re-asked. The live one was `inFence() || capped()`, the gate on B3's minimum: it exists because
+a shallower line is how a SIBLING MARKER announces itself, which is an ownership question, and
+ownership now has its own field.
+
+**Removing it breaks seven cases, four of them CommonMark:**
+
+    commonmark/list-items/295, /297, commonmark/lists/310, /312
+    list/indent-staircase, probe/quote-nest/two-space, hunt/fold-mapping-inline-rewrite/1
+
+Measured against those cases BEFORE the referee delta, which is the order this family has
+earned: two of tonight's attempts in this function were caught by exactly these cases and not
+by the referee.
+
+So **the two fields are separate but not independent.** The content column feeds
+`tokenizeIndent`'s consumption limit, consumption decides how much indent the child flow is
+handed, and that is observable. Lowering the content column unconditionally still changes
+structure -- by a longer route than lowering `size` did, and to the same effect.
+
+The separation buys the capped-dot adjustment, which is +18, and buys nothing else. That is
+worth stating because the obvious reading of the previous commit is that it unlocked a class,
+and it unlocked one member.
+
+    def-miss @ code   102 -> 82 -> 66 one-away across three fixes today
+    referee           5982/6818 (87.7%), code 814/883 (92.2%)

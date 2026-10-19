@@ -524,6 +524,21 @@ function tokenizeIndent(
     //
     // `furtherBlankLines` does not cover this -- it is only set when the item's FIRST line was
     // blank -- so the flag is kept here.
+    //
+    // AND THE GATE SURVIVED THE TWO-FIELD SEPARATION, which was the first thing re-asked after
+    // it. The argument for removing it was that `inFence() || capped()` exists because a
+    // shallower line is how a SIBLING MARKER announces itself -- an ownership question -- and
+    // ownership now has its own field. Removing the gate breaks SEVEN cases:
+    //
+    //     commonmark/list-items/295, /297, commonmark/lists/310, /312
+    //     list/indent-staircase, probe/quote-nest/two-space,
+    //     hunt/fold-mapping-inline-rewrite/1
+    //
+    // So the two fields are SEPARATE BUT NOT INDEPENDENT. The content column feeds
+    // `tokenizeIndent`'s consumption limit, consumption decides how much indent the child flow
+    // is handed, and that is observable -- so lowering the content column unconditionally still
+    // changes structure, by a longer route than lowering `size` did. The separation buys the
+    // capped-dot adjustment and does not buy this.
     // ...AND NOT THE FENCE'S OWN CLOSER, which is where the branch over-reached. A fence's
     // BODY at a shallower indent is the item's, and its CLOSER at a shallower indent is not:
     //
