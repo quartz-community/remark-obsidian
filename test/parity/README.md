@@ -7835,3 +7835,53 @@ Diffuse, like the rest. The ordered-interrupt rule shipped earlier came out of a
 sample of this family and is the only thing in it that clustered. So all three span and
 reference families are now confirmed diffuse with a correct instrument, on 87, 64 and 59 forms
 respectively.
+
+## `def-col` per delta bucket: the family was diffuse, one bucket was not
+
+`def-col` is 41 one-away and its own direction screen called it several rules -- deltas running
+both ways, 19 at -2 and 9 at -1 against 5 at +2. Shrinking the WHOLE family would have
+confirmed "diffuse" again. Shrinking the **-2 bucket alone**:
+
+    reduced 19; 10 distinct minimal forms, with real multiplicity
+
+    3x  "-⇥p" / blank / "⟨4sp⟩[^1]:"        3x  "1." / "⟨4sp⟩*" / "⇥⟨4sp⟩[^1]:"
+    3x  "-⇥p" / blank / "⟨5sp⟩[^1]:"        3x  "⟨2sp⟩1.⟨5sp⟩More`[^3]`" / "⇥⟨4sp⟩[^x-y]:"
+
+Nineteen documents into ten forms where the full family gives 41 into near-unique ones. **The
+delta bucket IS the family**; the mechanism name is not. Worth stating as procedure: when the
+direction screen says several rules, shrink one direction at a time rather than concluding the
+whole is diffuse.
+
+### The grid, and a rule that was right by coincidence
+
+Five marker shapes against seven label indents, definition column as the cell:
+
+                       2sp   3sp   4sp   5sp   6sp   tab  3sp+tab
+     "-⇥p"               0     0  X4/2  X4/2  X4/-1    1    X4/2
+     "- ⇥p"           X2/0  X2/0  X2/3  X2/3  X-1/3    1    X2/-1
+     "-  p"              0     3     3     3     3     1      -1
+     "1.⇥p"              0     0     4     4     4     1       4
+     "1000.⇥p"           0     0    -1  X5/-1  X6/-1   -1       0
+
+`contentColumn`'s uncapped path took the opener's CHARACTER length, so a tab counted one
+column. The capped path -- five-or-more-space separators -- had measured a tab to its stop all
+along, and the two paths disagreed about the same quantity.
+
+**`1.⇥p` was correct by coincidence**, which is the part worth keeping: marker 2 plus a tab is
+column 4, the character count gives 3, and the single-digit-dot adjustment lifts it to 4. Right
+answer, wrong reason, and it is why the bug survived twelve recorded column probes -- every one
+of them used a space separator or the one marker where the accident cancels out.
+
+And the space-then-tab row is the asymmetry this package already records three times: `- ⇥p` is
+column 2, the marker plus its one real space, the tab reaching nothing. So the separator is
+truncated at its first tab unless it starts with one.
+
+    referee footnotes  5914 -> 5947   (+33)
+    referee code        807 -> 808    (+1)
+    probe ledger       621 probes, ZERO drifted
+    compose            5 of 2112, unchanged
+    corpus             0 regressions, 450 tests, 4 gates green
+
+Largest single gain of the session, from a bucket the family-level view had written off twice.
+Two cells remain in the grid -- `- ⇥p` at two and three spaces, and `1000.⇥p` at five and six
+-- both where we report no definition and Obsidian reports one.

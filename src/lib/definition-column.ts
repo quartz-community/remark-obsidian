@@ -327,8 +327,43 @@ export function contentColumn(
   //   `1) `   3    indent 4      ->  3            `-   `  4    indent 5      ->  4
   //
   // `1. ` against `1) ` is what isolates it: same width, same indent, columns 4 and 3.
-  const width = /^[ \t]*\d\.[ \t]$/u.test(opener[0]!)
-    ? opener[0]!.length + 1
-    : opener[0]!.length;
+  //
+  // MEASURED THE SAME TWO WAYS THE CAPPED PATH ABOVE ALREADY MEASURES IT, which this path did
+  // not: it took the opener's CHARACTER length, so a tab counted one column. A 35-cell grid --
+  // five marker shapes against seven label indents -- says the tab stop is what matters, and
+  // that `1.<TAB>` was right only by coincidence:
+  //
+  //                    2sp   3sp   4sp   5sp   6sp   tab  3sp+tab
+  //     "-<TAB>p"        0     0  X4/2  X4/2  X4/-1    1    X4/2
+  //     "- <TAB>p"    X2/0  X2/0  X2/3  X2/3  X-1/3    1    X2/-1
+  //     "-  p"           0     3     3     3     3     1      -1    already correct
+  //     "1.<TAB>p"       0     0     4     4     4     1       4    correct BY COINCIDENCE
+  //
+  // `-<TAB>` is marker 1 plus a tab, which reaches column 4; the character count gives 2.
+  // `1.<TAB>` is marker 2 plus a tab, also 4 -- and the character count gives 3 which the
+  // single-digit-dot adjustment lifts to 4, landing on the right answer for the wrong reason.
+  //
+  // AND A TAB AFTER A SPACE REACHES NOTHING, the asymmetry this package records in three other
+  // places: `- <TAB>` is column 2, the marker plus its one real space, with the tab
+  // contributing zero. So the separator is truncated at its first tab when it does not start
+  // with one.
+  const parts = /^([ \t]*(?:[-*+]|\d{1,9}[.)]))([ \t]+)/u.exec(opener[0]!);
+  let width: number;
+  if (parts && parts[2]!.startsWith("\t")) {
+    // The dot adjustment must NOT apply on top of a tab, which the capped path records too:
+    // a tab already reaches 4 and `1.<TAB>` is 4, not 5.
+    width = parts[1]!.length + (4 - (parts[1]!.length % 4));
+  } else if (parts) {
+    const tabAt = parts[2]!.indexOf("\t");
+    const reach = tabAt === -1 ? parts[2]!.length : tabAt;
+    width =
+      parts[1]!.length +
+      reach +
+      (/^[ \t]*\d\.$/u.test(parts[1]!) && reach === 1 ? 1 : 0);
+  } else {
+    width = /^[ \t]*\d\.[ \t]$/u.test(opener[0]!)
+      ? opener[0]!.length + 1
+      : opener[0]!.length;
+  }
   return Math.min(width, floor);
 }
