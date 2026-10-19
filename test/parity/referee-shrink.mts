@@ -600,6 +600,15 @@ if (process.argv.includes("--interactions")) {
     bySet.set(key, seen);
   }
   console.log(`interactions: ${forms.length} minimal forms`);
+  // The ledger is a CACHE OF PAST WORK, so clustering it measures what was worked on rather
+  // than what is wrong. A partial `--limit` sample and a full sweep produce identical-looking
+  // output, and the tab-selected 8% sample read convincingly as "the queue's interactions are
+  // tab-shaped". Coverage is printed here so that is visible without a separate note.
+  const covered = forms.reduce((sum, form) => sum + (form.count ?? 0), 0);
+  console.log(
+    `  documents covered: ${covered} -- compare against the referee's diverging count before\n` +
+      `  reading any cluster below as a property of the QUEUE rather than of this sample`,
+  );
   console.log("\n  how many constructs each carries:");
   let multi = 0;
   for (const size of [...bySize.keys()].sort((a, b) => a - b)) {

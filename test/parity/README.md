@@ -8828,3 +8828,40 @@ The corollary is the useful part: **a refusal needs re-running only to CLOSE it,
 it.** Anything genuinely hidden is in a shape nobody has scored at all, which is where the
 density finding points -- interactions, and `--interactions` clustering by construct SET, not in
 the nine candidates already carrying numbers.
+
+## `--interactions` is sound and its INPUT is the selection, not the queue
+
+Density says what remains is interactions, so the instrument built for it was finally pointed at
+the ledger. It works, and the result is the failure mode this file records four times over --
+the fifth, and the first caught before it was believed:
+
+    interactions: 55 minimal forms      76% carry TWO OR MORE constructs
+
+     15 docs  11 forms   tab + marker + indent4
+     13 docs  11 forms   tab
+     12 docs   7 forms   tab + marker
+      4 docs   4 forms   quote + tab
+      3 docs   3 forms   quote + math + tab
+      3 docs   3 forms   tab + marker + inline-fn
+
+Read as a finding, that says the queue's interactions are tab-shaped and the next rule is
+`tab + marker + indent4` at fifteen documents. **It says nothing of the kind.**
+
+    forms 55   documents covered 66 of 824 diverging (8%)
+    documents whose form holds a TAB: 63 of 66 (95%)
+
+`/tmp/live-shrink.json` holds the forms from the PARTIAL `--limit` runs made while working the
+tab families. So the input was selected for tabs, and `tab` appears in eight of the nine clusters
+because of that selection. The 76% two-or-more figure is real and the CLUSTERS are an artifact.
+
+### What it would take to answer the question
+
+A full shrink over the 824 diverging documents, not a sample -- which is live-Obsidian work and
+the real cost of this direction. Only then do the construct SETS describe the population, and only
+then can the density finding (21-40 lines at lift 3.44, 7-10 constructs at 2.60, both monotonic)
+be converted into a target.
+
+Worth stating as the standing hazard: **a shrink ledger is a cache of past work, so clustering it
+measures what was worked on.** The instrument cannot tell a representative sample from a
+convenience one, and its output looks identical either way -- which is why the document count
+against the queue size belongs in its own output rather than in a note like this one.
