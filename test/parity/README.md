@@ -8728,3 +8728,62 @@ which is the whole point of having built the scorer and the grids -- the first v
 question cost three implementations and two reverts.
 
 Fifth fitted number this family has refused.
+
+## Auditing every recorded lift, and why a LIFT is the wrong thing to record
+
+Prompted by the tab family decaying from 1.40 to 1.13 without anyone noticing. If one recorded
+lift had rotted, the rest needed re-running before any of them chose work again.
+
+    BASE RATE 12.1% over 6818 documents   (was 14.2% when these were taken)
+
+    BY LINE COUNT                          recorded            now
+      01-05   n=2783  P= 7.0%  lift 0.58
+      06-10   n=1629  P= 9.1%  lift 0.76
+      11-20   n=2192  P=17.8%  lift 1.48
+      21-40   n= 214  P=41.6%  lift 3.44   43.7% / 3.08    HELD, lift ROSE
+
+    BY CONSTRUCT COUNT
+      0-2     n=1880  P= 4.0%  lift 0.33
+      3-4     n=2840  P=10.3%  lift 0.85
+      5-6     n=1635  P=19.0%  lift 1.57
+      7-10    n= 459  P=31.4%  lift 2.60   46.0% / 3.24    DECAYED, still strongest
+
+    TAB ANYWHERE
+      present n=3071  P=17.9%                30.5%
+      absent  n=3747  P= 7.3%                14.8%
+      odds ratio 2.75                        2.06          ROSE
+
+**The density findings hold, and both are MONOTONIC across every bucket** -- a dose-response
+curve, which is the signature of a real effect rather than a co-occurrence. They remain the
+strongest signals in the corpus by a wide margin, so the advice to build the next selector on
+interactions rather than constructs survives its own audit.
+
+### A correction: "the tab story is a correlate" was too broad
+
+Said in the previous session note, and it over-generalised a measurement of one POSITION into a
+claim about the character. Two different quantities:
+
+    tab in a MARKER SEPARATOR   n=1067   lift 1.13    spent, at the base rate
+    tab ANYWHERE                n=3071   lift 1.48, odds ratio 2.75    strongly predictive
+
+Both are correct and they are not in tension. A tab still marks a document as hard; the marker
+separator specifically is the position that no longer pays -- which is exactly what the recorded
+localisation already said, 426 tabs ON a disagreeing line against 512 elsewhere. The honest claim
+is narrower than the one that was written down.
+
+### And the methodological finding: record ODDS RATIOS, not lifts
+
+The tab lift fell while its odds ratio ROSE, on the same corpus, from the same data. That is not
+a contradiction -- it is the definition of the two statistics:
+
+- a **lift** is `P(diverge | shape) / P(diverge)`, so its denominator is the project's own
+  progress. Every rule that lands lowers the base rate and inflates every surviving lift, while
+  every rule that lands inside a shape deflates that shape's numerator. The number moves for two
+  unrelated reasons and cannot be read.
+- an **odds ratio** compares the shape against its own complement, so it is invariant to the
+  baseline and means the same thing a year later.
+
+Every lift in this file was taken against a baseline that has since moved, so **a recorded lift
+is a dated quantity and must be re-run before it chooses work.** The density figures survived
+that test; the tab figure did not. New measurements here should carry the odds ratio beside the
+lift, and the base rate they were taken at.
