@@ -8298,3 +8298,54 @@ reason.
 column from the source, independently, WITH the dot adjustment, and has been right about these
 documents all along. What is missing is for the tokenizer's prefix consumption to use that
 number for the flow's benefit while leaving ownership on the narrower one.
+
+## Separating `size`'s two roles, which three refusals had been asking for
+
+The fact was recorded long ago -- `size` is both the ownership threshold and the content column
+-- and this session paid for it three times before doing anything about it:
+
+    `got` measured in columns            -38   it is also a code-count limit
+    the capped dot adjustment in `size`  +17 referee, -2 CommonMark cases
+    B3's minimum in the ownership test   -32 and 4 CommonMark cases (recorded long before)
+
+The quantities differ for exactly one shape: a CAPPED single-digit-dot item. `1.⟨5sp⟩` consumes
+three columns of prefix and its content column is four, because `1.` counts one column more than
+it occupies -- the quirk `contentColumn` has always applied and the tokenizer never did.
+
+**Three changes, each doing one thing:**
+
+- `_legacyContentColumn` recorded beside `size` when the item opens, carrying the adjustment.
+- `tokenizeIndent` consumes up to the CONTENT COLUMN while `afterPrefix` still decides ownership
+  against `size`, with an acceptance window between them.
+- **B3's minimum applied to the content column too**, which is the half that reconciles the two
+  fields with CommonMark and took one more iteration to find.
+
+### The CommonMark case is what forced the third change
+
+    "1.⟨5sp⟩indented code" / blank / "⟨3sp⟩paragraph" / blank / "⟨7sp⟩more code"
+
+`commonmark/list-items/273` requires one list whose last line is CODE. With the content column
+fixed at four, the extra column is consumed and `⟨7sp⟩more code` is three past -- a paragraph,
+and the case fails. Lowering the content column when `⟨3sp⟩paragraph` arrives leaves the later
+line four past and therefore code.
+
+And the divergence this pair exists for has NO intervening shallower line:
+
+    "1.⟨5sp⟩Morewords$[^a]$" / "⟨7sp⟩[^x-y]:"    the column stays 4, the label is 3 past,
+                                                  and the definition survives
+
+So the two cases differ by one line, and the minimum is what tells them apart. Fixing the column
+without the minimum passes one and fails the other, which is what the two earlier attempts at
+this family were doing.
+
+    referee footnotes   5964 -> 5982   (+18)
+    referee code         809 -> 814    (92.2%, +5)
+    separator sweep       39 of 490, unchanged
+    probe ledger        ZERO drift across 1692 probes
+    compose             5 of 2112, unchanged
+    CommonMark          273 and 274 intact
+    corpus              0 regressions, 450 tests, 4 gates green
+
+The `code` dimension passed 92%. And the three refusals above are now explained rather than
+merely recorded: each was a correct change to one role, applied to a field that was also the
+other.

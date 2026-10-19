@@ -247,6 +247,14 @@ function tokenizeListStart(
     return nok(code);
   }
 
+  /** Whether `otherPrefix` fired, read locally -- `tokenizeIndent` has its own copy. */
+  function capped(): boolean {
+    return (
+      (self.containerState as unknown as { _legacyCapped?: boolean })
+        ._legacyCapped === true
+    );
+  }
+
   function endOfPrefix(code: Code): State | undefined {
     assert(self.containerState, "expected state");
     // COLUMNS FROM THE RAW SLICE, which is not what `expandTabs` gives. Measured on the token
@@ -268,15 +276,31 @@ function tokenizeListStart(
     //
     // The first attempt at this counted columns from the EXPANDED slice and was inert by
     // construction -- that string holds no tab to expand.
-    self.containerState.size =
-      initialSize +
-      columnsOfRaw(self.sliceSerialize(effects.exit(types.listItemPrefix)));
+    const prefix = self.sliceSerialize(effects.exit(types.listItemPrefix));
+    self.containerState.size = initialSize + columnsOfRaw(prefix);
     // The OPENER's own content column, kept because B3's minimum lowers `size` as shallower
     // lines arrive and a fence closer is judged against the column the item STARTED with --
     // see `afterPrefix`.
     (
       self.containerState as unknown as { _legacyOpenSize?: number }
     )._legacyOpenSize = self.containerState.size;
+    // THE CONTENT COLUMN, as a SECOND field beside the ownership threshold.
+    //
+    // `size` serves two roles and this package has now paid for that three times: `got` in
+    // columns cost 38 documents, B3's minimum in the ownership test cost 32 and four CommonMark
+    // cases, and carrying the single-digit-dot adjustment into `size` is +17 referee documents
+    // and breaks `commonmark/list-items/273` and `274`.
+    //
+    // The two quantities genuinely differ for a CAPPED `1.` item: the prefix it consumed is
+    // three columns, and `contentColumn` returns FOUR because `1.` counts one more column than
+    // it occupies. Ownership wants three -- 273 needs `<7sp>more code` to be four past and
+    // therefore code -- while the flow wants four, so a label at seven columns is three past
+    // and stays a definition.
+    (
+      self.containerState as unknown as { _legacyContentColumn?: number }
+    )._legacyContentColumn =
+      self.containerState.size +
+      (capped() && /^[ \t]*\d\.[ \t]*$/u.test(prefix) ? 1 : 0);
     return ok(code);
   }
 }
@@ -391,11 +415,24 @@ function tokenizeIndent(
   assert(self.containerState, "expected state");
   assert(typeof self.containerState.size === "number", "expected size");
 
+  // CONSUMED UP TO THE CONTENT COLUMN, not the ownership threshold. These differ only for a
+  // capped single-digit-dot item, where the prefix is three columns and the content column is
+  // four -- see `endOfPrefix`. Consuming the extra column is what leaves a label at seven
+  // columns three past the content rather than four, so it stays a definition instead of
+  // becoming indented code.
+  //
+  // Ownership still answers to `size` in `afterPrefix` below, which is what keeps
+  // `commonmark/list-items/273` intact: its `<3sp>paragraph` lowers the column through B3's
+  // minimum, so the later `<7sp>more code` is four past the LOWERED column and is code.
+  const contentColumn =
+    (self.containerState as unknown as { _legacyContentColumn?: number })
+      ._legacyContentColumn ?? (self.containerState.size as number);
+
   return factorySpace(
     effects,
     afterPrefix,
     types.listItemIndent,
-    self.containerState.size + 1,
+    contentColumn + 1,
   );
 
   function afterPrefix(code: Code): State | undefined {
@@ -446,7 +483,31 @@ function tokenizeIndent(
     // at ROOT. The no-blank row is what keeps this from being the whole rule: there the lazy
     // continuation really does carry the lowered floor.
     if (seenBlank === true && got < openSize) return nok(code);
+    // B3'S MINIMUM, APPLIED TO THE CONTENT COLUMN. A line shallower than the content column
+    // lowers it, exactly as the existing branch below lowers `size` -- and this is the half
+    // that reconciles the two fields with CommonMark.
+    //
+    //     "1.<5sp>indented code" / blank / "<3sp>paragraph" / blank / "<7sp>more code"
+    //
+    // `<3sp>paragraph` arrives at three with the content column at four. Lowering it to three
+    // leaves `<7sp>more code` four past and therefore CODE, which is what 273 requires. Without
+    // this the content column stays four, the extra column is consumed, and `more code` is a
+    // paragraph.
+    //
+    // A label line with no shallower line above it keeps the column at four, which is the
+    // divergence this pair of fields exists for.
+    if (got >= (self.containerState.size as number) && got < contentColumn) {
+      (
+        self.containerState as unknown as { _legacyContentColumn?: number }
+      )._legacyContentColumn = got;
+    }
     if (got === self.containerState.size) return ok(code);
+    // ...OR anywhere between the threshold and the content column, which is the window the two
+    // fields open. Without this the extra column consumed above reads as "deeper than the
+    // item" and the continuation is declined.
+    if (got > (self.containerState.size as number) && got <= contentColumn) {
+      return ok(code);
+    }
     // B3's minimum, SAFE because a fence is open.
     //
     // An item's content column is the smallest indentation among its own lines, and a floor can
