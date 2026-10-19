@@ -7487,3 +7487,56 @@ source spells a definition puts a construct in the tree no character asks for. T
 reads the tree, so moving it needs that question answered first rather than assumed.
 
 Recorded with all three scores so the next attempt starts from the third rather than the first.
+
+### `def-col` is several rules, by its own direction screen
+
+43 one-away documents, classified by the column delta rather than shrunk:
+
+    delta (ours - obs)        the label line's prefix
+      19  -2                    17  leading tab
+       9  -1                     6  2 spaces
+       5  +2                     5  4 spaces / 5  5 spaces
+       3  -4                     4  3 spaces
+       3  +1                     3  space then tab
+       2  -3 / 2  +3             2  none / 1  8 spaces
+
+**The deltas run both ways**, which this file's direction screen says means several rules
+rather than one -- and probing a single axis for such a family keeps returning agreement. The
+examples confirm it:
+
+    "⟨2sp⟩> [^ملاحظة]:⇥..."   obs 5  ours 4
+    "> [^Ä]: dolor..."         obs 3  ours 2
+    "⟨2sp⟩[^2]: body text"     obs 0  ours 2     <- the ROOT CLAMP, inverted
+    "⇥⟨4sp⟩[^Ä]: Definition"   obs 5  ours 2
+    "⇥⟨5sp⟩[^x-y]: def"        obs 3  ours 1
+
+The third is the one worth a second look: with no host container the column is 0, not the
+bracket, which this file records as the root clamp and as already implemented -- so a document
+reporting 2 there is either a different host than it looks or the clamp not reaching. That is a
+single cheap question and it is left as the next one, rather than opened at the end of a long
+session.
+
+## Where the night left it
+
+    referee footnotes   5869 -> 5896   (86.0% -> 86.5%)
+    referee code         775 -> 809    (87.8% -> 91.6%)
+    probe ledger         498 -> 621 probes, 513 agreeing
+    compose              5 of 2112, seven of eight axes at zero
+    corpus               0 regressions throughout, 450 tests, 4 gates green
+
+Three rules shipped, each with its measurement:
+
+    a lazy line that ends a LIST ITEM is root indented code        +16 referee, +25 code
+    a fence CLOSER below its item's opening column ends the item    +4 referee,  +9 code
+    a quoted TAB line below an empty `>` has a literal reference    +7 referee
+
+And five refusals recorded with numbers rather than left as folklore: the orphan shape
+predicate at -95 and -2, the tab-block-opener definition end at FLAT over six documents, the
+quoted-tab reference half at -53 then +4 then +6, and the `legacy-list` tokenizer construct
+that fires correctly and changes nothing.
+
+**The theme, stated once:** every family still open ends at the same place -- a premise only
+the child flow knows. Is a paragraph open at this line? How many of a tab's four columns
+remain after the container's prefix? Both of tonight's shipped rules were found by READING
+micromark rather than by scoping a predicate, and both of tonight's refusals are predicates
+standing in for flow state. That is the shape of the remaining work.
