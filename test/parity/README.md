@@ -9296,3 +9296,65 @@ state the footnote queue reached: **its largest bucket is form-diffuse, and its 
 mechanism rather than a narrowing.** Both dimensions are now limited by the same thing, which is
 the useful conclusion: not instrument gaps, not unmined buckets, but one unwritten rule about
 which construct owns a deeper line.
+
+## The mechanism, stated: it is the QUOTE's extent, and the deeper line is a consequence
+
+Asked whether there was insight into "which construct owns a deeper line". There is, and the
+question was being asked one line too late. `sections` answers it directly -- a field that was
+available all along and never pointed at this:
+
+    released:  >  / 10.  / <5sp>Some    blockquote@0-1  code@2-2   <- quote SWALLOWS the marker
+    not:       >  / 1.   / <5sp>Some    blockquote@0-0  list@1-2   <- quote ends, LIST owns both
+    not:       >  / -    / <5sp>Some    blockquote@0-0  list@1-2
+    not:       > /blank/ 10. /<5sp>     blockquote@0-0  list@2-3
+
+**The blockquote's extent is the whole story.** Where the line is released the quote spans TWO
+lines; where it is not, the quote is one line and a `list` owns both the marker line and the
+indented one. Nothing about the deeper line differs between those rows.
+
+Two predictions, tested rather than asserted:
+
+    >  / 10.  / more prose          blockquote@0-2    the quote absorbs BOTH lines
+    >  / 1.   / more prose          blockquote@0-0 + list@1-2
+    >  / 10.<TAB>> [!tip] / <4sp)>  blockquote@0-2    absorbs all three, no root code
+    >  / 10.  / <5sp>Some / <5sp>More   blockquote@0-1 + code@2-3
+
+### The rule
+
+> A blockquote's lazy continuation absorbs every following line that CANNOT OPEN A BLOCK --
+> including an ordered marker whose start is not 1, since that cannot interrupt a paragraph.
+> An INDENTED line does break the absorption, closing the quote and starting root indented
+> code. So the deeper line's owner is decided entirely by what the lines above it left OPEN:
+> if the marker was absorbed there is no list to own the deeper line, and it falls to root.
+
+The last clause is the inherited divergence. CommonMark says indented code cannot interrupt a
+paragraph, so `para` / `<4sp>x` is ONE paragraph -- and here the indented line ends the quote
+instead. Plain prose is absorbed and indented prose is not, which no reading of CommonMark's lazy
+continuation produces.
+
+### Which explains all three guards as CONSEQUENCES rather than rules
+
+Every guard derived empirically tonight falls out of the container stack, and that is the evidence
+the model is right rather than merely plausible:
+
+| guard, derived from losses                          | what it actually is                                                                     |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| ADJACENCY -- a blank line between quote and marker  | the blank CLOSES the quote, so the marker opens a real list, which owns the deeper line |
+| CONTIGUITY -- an intervening column-0 definition    | the quote closed at that definition; something else is open                             |
+| DEPTH -- `10.<TAB>> [!tip]` keeps its `<4sp}>` line | the absorbed line is quote-prefixed, so the quote keeps absorbing                       |
+
+So the depth comparison was never a threshold. It was standing in for "is this line itself
+absorbable", and that is why three documents fitted to it pulled in three directions: a column
+cannot express a container stack.
+
+### And it says where the remaining work belongs
+
+**Not in a repair pass.** The owner of a deeper line is a function of which containers are open,
+which is precisely the state micromark's document tokenizer maintains and a repair pass over the
+finished tree cannot reconstruct. That matches the record exactly: structural fixes in
+`legacy-list.ts` paid +37, +16 and +28, where the same rules as repair passes scored +7.
+
+The concrete shape of the remaining work is therefore a container-continuation rule in the
+tokenizer: a blockquote must absorb a non-interrupting ordered marker, and an indented line must
+decline to continue it. That is one rule covering both dimensions' largest remaining buckets, and
+it is the first time in this effort that the two queues have reduced to the same piece of work.
