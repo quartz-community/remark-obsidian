@@ -9833,3 +9833,50 @@ So the cost was missed leads rather than wrong ones: 46 documents were never red
 carry clusters the queue has not seen, including `-` / blank / blank / `lazy` / `[^1]:` at five
 documents and `>` / `>` / blank / `use[^1]` at three. The oracle is sound; the funnel in front of
 it was leaking.
+
+## Auditing the rest of the comparators, after one of them turned out wrong
+
+With the skip test found broken, the question is which other comparison in this harness answers a
+strict question with a loose test. Four checked:
+
+| comparator                       | verdict                                                                                   |
+| -------------------------------- | ----------------------------------------------------------------------------------------- |
+| `liveAgreesStrictly`'s CODE half | **BROKEN, fixed** -- compared a COUNT where the gate compares RANGES                      |
+| `score.mts`'s `distance`         | clean -- full tuples in a set, so positions are compared and duplicates cannot collapse   |
+| `score.mts`'s agreement figures  | clean -- reports its own metric AND the referee's, and the referee figure matches EXACTLY |
+| `grid.ts`'s `cellOf`             | latent -- reads `defs[0]` only; documented rather than widened                            |
+
+### The defect was in the fix itself
+
+`liveAgreesStrictly` was written to replace a too-loose test and compared
+`mineCode === obs.code.length` -- a COUNT -- where `referee.mts` compares
+`JSON.stringify([...wantCode].sort())`. So a document whose code RANGES differ while their count
+matches was still skipped. Writing the strict test did not stop me reproducing the exact mistake it
+existed to fix, one dimension over.
+
+    count comparison   21 skipped, 46 reduced
+    range comparison   20 skipped, 47 reduced
+
+One document, which is the point: **a too-permissive test cannot be found by a failing
+measurement.** It shows up only by diffing against the comparison it is standing in for, which is
+now the procedure -- and the reason `referee.mts` is the single definition of agreement that every
+other comparator must be read against.
+
+### `score.mts` is clean, and the way it is clean is worth copying
+
+It prints BOTH its own stricter metric and the referee's own figure:
+
+    documents in full agreement : 5982 -> 5982   NOT ADJUDICABLE -- touches nothing
+    referee footnote agreement  : 6013 -> 6013   referee flat
+
+The second matches `referee.mts` exactly. A tool that reports the reference figure beside its own
+cannot drift from it silently, which is precisely what the shrinker did for the whole effort --
+and the remembered "5943 against 5994" that prompted this check was these two metrics, not a
+discrepancy.
+
+### `cellOf` reads only the FIRST definition
+
+Every registered grid builds a single-definition document, so this is a limit rather than a bug
+today. A two-definition grid would compare only the first and read as agreeing on the second --
+the same shape as the name-keyed signature that collapsed duplicates. Documented at the call site
+instead of widened, because widening an unexercised path is how an untested branch gets shipped.

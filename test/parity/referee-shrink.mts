@@ -162,13 +162,25 @@ function liveSignature(text: string, obs: Answer): string {
  */
 function liveAgreesStrictly(text: string, obs: Answer): boolean {
   let mine: Facts;
-  let mineCode: number;
+  // RANGES, not a count. `referee.mts` compares `JSON.stringify([...wantCode].sort())`, and the
+  // first version of this function compared `length` -- the SAME defect it was written to fix,
+  // carried into the fix: a document whose code ranges differ while their count matches would
+  // still be skipped. Found by diffing this against the gate's own comparison rather than by a
+  // failing measurement, which is the only way a TOO-PERMISSIVE test ever shows up.
+  let mineCode: string;
   try {
     const got = refereeFactsWithTree(text);
     mine = got;
-    mineCode = got.tree.children.filter(
-      (child) => child.type === "code",
-    ).length;
+    const ranges: [number, number][] = [];
+    for (const child of got.tree.children) {
+      if (child.type === "code" && child.position) {
+        ranges.push([
+          child.position.start.line - 1,
+          child.position.end.line - 1,
+        ]);
+      }
+    }
+    mineCode = JSON.stringify(ranges.sort());
   } catch {
     return false;
   }
@@ -176,7 +188,7 @@ function liveAgreesStrictly(text: string, obs: Answer): boolean {
     JSON.stringify(xs.filter((x) => x[0] !== ""));
   if (named(mine.defs) !== named(obs.defs)) return false;
   if (obs.refsTrustworthy && named(mine.refs) !== named(obs.refs)) return false;
-  return mineCode === obs.code.length;
+  return mineCode === JSON.stringify([...obs.code].sort());
 }
 
 const AGREES = JSON.stringify({

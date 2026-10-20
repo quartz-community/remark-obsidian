@@ -51,6 +51,12 @@ export type FieldName =
  * read `[]` as "Obsidian indexes nothing" when it meant "the key was not there".
  */
 export function cellOf(field: FieldName, answer: Facts): number {
+  // THE FIRST DEFINITION ONLY, which is a real limit and not a bug today: every registered
+  // grid's `document` builds a single-definition case, so `defs[0]` is the whole answer. A grid
+  // whose document carries TWO definitions would silently compare only the first and read as
+  // agreeing on the second -- the same shape as the shrinker's name-keyed signature, which
+  // collapsed duplicates and wrongly skipped 46 documents. Keep grid documents single-definition
+  // or widen this first.
   const def = answer.defs[0];
   switch (field) {
     case "def.exists":
