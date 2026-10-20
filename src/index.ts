@@ -134,6 +134,7 @@ import { quoteIndentedCodeTransform } from "./lib/quote-indented-code.js";
 import { itemDotThresholdTransform } from "./lib/item-dot-threshold.js";
 import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 import { calloutTransform } from "./lib/callout.js";
+import { adjacentIndentedCodeTransform } from "./lib/adjacent-indented-code.js";
 import { definitionIndentedCodeTransform } from "./lib/definition-indented-code.js";
 import { definitionLazySplitTransform } from "./lib/definition-lazy-split.js";
 import { mathListExtentTransform } from "./lib/math-list-extent.js";
@@ -981,6 +982,12 @@ export default function remarkObsidian(
     // After every pass that can move a list item's end, and before points are rebuilt.
     // The overlap it repairs comes from `remark-math`; its own file carries the controls.
     listItemExtentTransform(tree);
+    // After every pass that can CREATE a root code node, since it merges adjacent ones and a
+    // pass running later could leave a fresh pair unmerged. Ungated: micromark splits a run of
+    // indented lines below a quote-with-heading, and CommonMark and Obsidian AGREE it is one
+    // block, so this is not a preset divergence like `legacyLists` but a correction both
+    // targets want.
+    adjacentIndentedCodeTransform(tree, String(file));
     // Last, so every pass above only has to keep its offsets honest. This comment was
     // orphaned two passes above, where it read as a claim about `linkNbspTitle`; the
     // ordering audit is what surfaced it, since the detector attributes a comment to the

@@ -9097,3 +9097,52 @@ because empty frontmatter is real.** `---` / `---` / `> [!my note]-` is the docu
 this, and a mandatory `[\s\S]*?\r?\n` between the fences cannot match it. An UNTERMINATED `---`
 deliberately does not match either -- that is a thematic break and not frontmatter, so prefixing
 above it is correct.
+
+## Parity: the `code` dimension re-classified, and a real gain from an UPSTREAM split
+
+The old recorded breakdown of this dimension said "92 of 109 are one mechanism: we keep a line
+inside a container where Obsidian ends the container and makes the line ROOT INDENTED CODE", with
+list 69, blockquote 23, callout 8. **That family is gone**, closed by the eleven container rules
+that landed. Re-classified from scratch at 814/883 rather than inherited:
+
+    19  obs code -> ours keeps it in TEXT          we make no code at all
+    17  SPLIT: we fragment one block into two      8 at a definition, 5 at indented prose, 4 at a fence
+     5  math   5 in code   5 break   4 footnoteReference   2 comment   2 $$ extra   2 boundary
+
+### The SPLIT bucket is upstream, and probing it found the real trigger
+
+The first reading of the bucket was "1 -> 2 blocks, 19 documents, one mechanism". Reading three
+actual documents showed three different shapes, and a sub-classifier then put the heads at
+document line 0 -- because a SPLIT has the SAME lines in a different grouping, so there is no
+"extra line" and the index fell back to zero. Fixed, the bucket is 17 real splits.
+
+Then the trigger, by probing rather than by inference:
+
+    `    a` / `    b`                           stock [[0,1]]   ONE   correct
+    `    a` / blank / `    b`                   stock [[0,2]]   ONE   correct
+    `> q` / blank / `    a` / `    b`           stock [[2,3]]   ONE   correct
+    `> [!note]` / `> # h` / `    a` / `    b`   stock [[2,2],[3,3]]   TWO
+    `    a` / `    [^x]: d`                     stock [[0,1]]   ONE   -- NOT the definition
+
+**A quote carrying a heading above the run**, and neither the definition nor the blank line that
+the bucket's own labels pointed at. And it reproduces in bare `remark-parse` + `remark-gfm`, so it
+is micromark's and not this package's.
+
+### Which decided the gating, and it is the rare ungated case
+
+CommonMark has no mechanism that splits two consecutive indented chunks -- a block is "one or more
+indented chunks separated by blank lines" -- so CommonMark and Obsidian AGREE here and micromark
+differs from both. That makes it a correction both targets want rather than a preset divergence
+like `legacyLists`, so `adjacentIndentedCodeTransform` is ungated. Worth asking before wiring:
+the default assumption here is that an Obsidian-matching fix belongs behind a legacy flag, and
+this one does not.
+
+    code      814/883  ->  826/883  (93.5%)
+    footnotes 5994/6818 -> 5994/6818  unchanged
+    corpus    450 tests, 0 regressions
+
+**The projection simulation predicted +14 and the pass delivered +12**, which is the gap worth
+recording rather than smoothing: a candidate applied to the ANSWERS is an upper bound on the same
+rule applied to the TREE, because the tree version runs inside a chain where other passes have
+already moved things. Two documents of optimism on a +14 prediction is a good ratio, and it is the
+same direction every other prediction here has erred.
