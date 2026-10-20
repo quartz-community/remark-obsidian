@@ -9670,3 +9670,45 @@ Not implemented. One probe row is a lead, not a rule, and the column arithmetic 
 unexplained -- the host is `  1.` with five spaces, so the cap fires, and neither the capped
 content column nor the raw prefix width is 3. The next step is a column grid over indent x marker x
 separator against this oracle, not a fix.
+
+## The column grid: 4 of 42, an exact pattern, and the obvious cause REFUTED
+
+`host-prefix-def-column` crosses the host's indent, marker and separator with the definition line
+held at a tab plus four spaces -- the shape all eleven documents carry:
+
+    field: def.col   (-1 = absent)
+
+                  1sp      2sp      4sp      5sp      6sp      tab
+    *              -1       -1       -1       -1       -1       -1
+    1.             -1       -1       -1       -1       -1       -1
+    10.            -1       -1       -1       -1       -1       -1
+    i2 *           -1       -1       -1       -1       -1       -1
+    i2 1.          -1       -1       -1     X3/1     X3/1       -1
+    i2 10.         -1       -1       -1     X3/1     X3/1       -1
+    i4 1.          -1       -1       -1       -1       -1       -1
+
+**Four cells, and all three conditions are necessary**: indent exactly 2, an ORDERED marker, and a
+separator of five or more SPACES. Indent 0 and indent 4 report no definition at all, a bullet
+reports none at any width, and a tab separator reports none. Thirty-eight cells agree, which makes
+this a regression net as well as a specification.
+
+### And the capped-column hypothesis is wrong
+
+The delta is -2 and the host's indent is 2, which reads as `contentColumn`'s capped branch dropping
+the indent term. Instrumented, it is not:
+
+    "  1.     More"   marker="  1."  sep=5  base=5  capped=6  floor=8  => 6
+    our answer                                                            column 1
+    Obsidian                                                              column 3
+
+**Three different numbers.** `contentColumn` returns 6, so the capped branch is not what produces
+1 -- something downstream overrides it, and the grid's `i2`-only pattern is a property of that
+consumer rather than of the cap. The two documented controls still hold through the same path
+(`*<9sp>` gives 2, `1.<6sp>` gives 4), so the branch is right about what it was measured on.
+
+That is the fourth hypothesis this file has had refuted by printing the quantity rather than
+reasoning about it, and the cheapest of the four: one env-guarded line, reverted immediately.
+
+The next step is the CONSUMER -- which pass or projection turns a content column of 6 into a
+reported column of 1 -- and `pass-owner.mts` attributes exactly that kind of question by removal.
+Not a column rule, which is what the delta made it look like.

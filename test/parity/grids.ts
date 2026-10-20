@@ -230,6 +230,45 @@ export const GRIDS: readonly Grid[] = [
     document: (marker, sep) => `${marker}${sep}[^1]: def\n`,
     field: "code.in-item",
   },
+  {
+    name: "host-prefix-def-column",
+    what: "a definition's column on a tab-indented line below a list item, by the HOST's prefix",
+    // The 11-document COLUMN bucket of the five-space cap family, all at delta -2, and the first
+    // minimal form this family has ever had -- it is recorded twice as invisible without a dense
+    // document ("all six minimal spellings AGREE", "eight for eight"). Seven probes found it:
+    //
+    //     "<TAB><4sp>[^a]: d"                     no definition
+    //     "  *     More" / "<TAB><4sp>[^a]: d"    no definition      BULLET host
+    //     "  1.     More" / "<TAB><4sp>[^a]: d"   def a@1:3          ORDERED host, column 3
+    //
+    // So the host's MARKER TYPE decides whether the line defines at all -- the third place
+    // tonight where ordered and bullet part company, after the lazy release and the blockquote
+    // absorption. This crosses the host's indent, marker and separator to find where `3` comes
+    // from, since neither the capped content column nor the raw prefix width is 3.
+    //
+    // The definition line is held FIXED at a tab plus four spaces, which is the shape all eleven
+    // documents carry. No blank line between the two, which is what distinguishes this from
+    // `marker-sep-column` above.
+    rows: [
+      ["*", "*"],
+      ["1.", "1."],
+      ["10.", "10."],
+      ["i2 *", "  *"],
+      ["i2 1.", "  1."],
+      ["i2 10.", "  10."],
+      ["i4 1.", "    1."],
+    ],
+    cols: [
+      ["1sp", " "],
+      ["2sp", "  "],
+      ["4sp", "    "],
+      ["5sp", "     "],
+      ["6sp", "      "],
+      ["tab", "\t"],
+    ],
+    document: (host, sep) => `${host}${sep}More\n\t    [^a]: d\n`,
+    field: "def.col",
+  },
 ];
 
 export const gridNamed = (name: string): Grid | undefined =>
