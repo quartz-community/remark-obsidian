@@ -83,6 +83,20 @@ function fold(children: RootContent[], source: string): void {
           // prefix in the gap -- `\n> ` -- and excluding it stopped those folding, which cost
           // four corpus cases and opened five `[ footnote ]` composition rows. A blank line
           // is still rejected, since `\n` is not in the class and so cannot repeat.
+          //
+          // AN EMPTY GAP IS ADJACENT, which the regex cannot say because it demands a leading
+          // `\n`. Two nodes that touch are contiguous by definition, and inside a QUOTE that
+          // is what a folded predecessor leaves behind: folding `> a` / `> [^1]: d` stretches
+          // the paragraph to offset 16 and the next definition STARTS at 16, because micromark
+          // bounds a definition in a quote up to the next block rather than to its own last
+          // character. So `> a` / `> [^1]: d` / `> [^2]: e` folded the first and declined the
+          // second, defining it where Obsidian defines nothing -- 32 documents, the largest
+          // bucket of the name-set gap. At ROOT the same chain works because the spans do not
+          // touch, which is why this was invisible outside a container.
+          //
+          // A blank line is still rejected: it leaves `\n>\n> ` in the gap, which is neither
+          // empty nor matched.
+          (gapFrom === gapTo && previousLineHasContent(source, gapTo)) ||
           /^\n[ \t>]*$/u.test(source.slice(gapFrom, gapTo))
         : (node.position?.start?.line ?? 0) -
             (previous.position?.end?.line ?? 0) ===
@@ -140,6 +154,25 @@ function fold(children: RootContent[], source: string): void {
     }
     children.splice(index, 1);
   }
+}
+
+/**
+ * Is the line before `at` non-blank, ignoring a quote prefix?
+ *
+ * An empty gap usually means two nodes touch, but it ALSO happens when the previous node's span
+ * already swallowed the blank line between them -- an indented fence does, and the two documents
+ * that cost were `<4sp>```` / text / `[^x]: ...` / `<4sp>```` where the code block reaches to the
+ * next block and the definition below a blank line then looked adjacent. Obsidian defines those,
+ * so folding them was a loss.
+ *
+ * Checking the SOURCE rather than the node keeps this independent of whatever the previous span
+ * covers, which is the thing that was unreliable.
+ */
+function previousLineHasContent(source: string, at: number): boolean {
+  const lineStart = source.lastIndexOf("\n", at - 1) + 1;
+  if (lineStart === 0) return false;
+  const before = source.lastIndexOf("\n", lineStart - 2) + 1;
+  return source.slice(before, lineStart - 1).replace(/[ \t>]/gu, "") !== "";
 }
 
 /**
