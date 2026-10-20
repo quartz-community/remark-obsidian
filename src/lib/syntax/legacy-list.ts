@@ -63,14 +63,34 @@ import type {
  * which is why it lives in exactly one of the seven.
  */
 function columnsOfRaw(raw: string): number {
-  let columns = 0;
-  for (const character of raw) {
-    columns +=
-      character === "\t"
-        ? constants.tabSize - (columns % constants.tabSize)
-        : 1;
+  // B2's SEPARATOR rule, which applies here because this function's single caller is the item's
+  // `size` -- an ownership THRESHOLD, which is where the asymmetry above says it belongs.
+  //
+  // The reference rules group `- <TAB>` with `- ` and `-     ` at a content column of 2, while
+  // `-<TAB>`, `-<TAB><TAB>` and `10.<TAB>` sit at 4. So a tab reaches its stop only when it
+  // OPENS the separator; after a space it contributes nothing, and a second tab contributes
+  // nothing either. `contentColumn` already measures it this way -- its `reach` truncates at the
+  // first tab -- and the two agreed everywhere except on ownership, which is what left
+  // `- <TAB>item` / blank / `<2sp>[^1]: def` with the definition at ROOT and the item's own
+  // content read as indented code.
+  const split = /^([\s\S]*?)([ \t]+)$/u.exec(raw);
+  if (split === null) {
+    let columns = 0;
+    for (const character of raw) {
+      columns +=
+        character === "\t"
+          ? constants.tabSize - (columns % constants.tabSize)
+          : 1;
+    }
+    return columns;
   }
-  return columns;
+  const head = columnsOfRaw(split[1]!);
+  const run = split[2]!;
+  if (run.startsWith("\t")) {
+    return head + (constants.tabSize - (head % constants.tabSize));
+  }
+  const tabAt = run.indexOf("\t");
+  return head + (tabAt === -1 ? run.length : tabAt);
 }
 
 const legacyList: Construct = {

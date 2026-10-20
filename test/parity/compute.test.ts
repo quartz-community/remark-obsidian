@@ -418,7 +418,7 @@ describe("positioned oracle", () => {
     //   tab-quote family, which the MAIN GATE CANNOT SEE because `meta.footnotes` is names
     //   only. The names and the rule are right -- that family took the referee from 5717 to
     //   5744 -- and a column or end line is out by the quote's own prefix.
-    footnotes: 5,
+    footnotes: 4,
     footnoteRefs: 5,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
@@ -564,7 +564,7 @@ describe("positioned oracle", () => {
     // Note the other eleven new probes diverge on `sections` ONLY by two zero-width
     // `text`/`element` entries past the document, which `sourceBacked` filters -- the
     // renderer's relocated footnote section, already classified must-not-fix for `blocks`.
-    sections: 2,
+    sections: 1,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
     // invented, which is the shape of a missing collector rather than a parse bug.
@@ -929,7 +929,7 @@ describe("positioned oracle", () => {
     // now accepts a quote-prefixed line after a LIST, which is the same shape as the `html`
     // and `heading` entries it already restricted to a list, with the same evidence -- one
     // recorded probe per container.
-    listItems: 5,
+    listItems: 4,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
@@ -973,15 +973,12 @@ describe("positioned oracle", () => {
     "probe/block-nest/both-ids:blocks",
     "probe/caret-link/link-with-def:footnoteRefs",
     "probe/caret-link/link-with-def:links",
-    "probe/def-gap/marker-tab-sep:footnotes",
     "probe/item-comment/closed:footnoteRefs",
     "probe/item-comment/closed:footnotes",
     "probe/item-comment/closed:listItems",
     "probe/item-comment/closed:sections",
     "probe/quote-tab-root-def/tab:footnoteRefs",
     "probe/quote-tab-root-def/tab:footnotes",
-    "probe/def-gap/marker-tab-sep:listItems",
-    "probe/def-gap/marker-tab-sep:sections",
     "probe/def-deindent/quote-indented-one:footnotes",
     "probe/empty-container/nested-list:listItems",
     "probe/quote-nest/two-space:listItems",
