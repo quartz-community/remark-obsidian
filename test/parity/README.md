@@ -9245,3 +9245,54 @@ definition-hosted items -- it would have scored positively on those two document
 a rule Obsidian does not follow, which is the definition of fitting a number. Five probes cost
 less than one implementation and refused the hypothesis this file had written down an hour
 earlier.
+
+## Classifying the `code` remainder: one bucket left above eight, and it is form-diffuse
+
+Re-classified from scratch at 832/883 rather than inherited, since the previous two breakdowns of
+this dimension were both wrong:
+
+    15  MISSING code -> ours has TEXT          <- the only bucket above eight
+     6  same lines, GROUPING differs (1 vs 2)  <- the merge pass does not reach these
+     5  MISSING -> ours has math     5  EXTRA code (1 line)
+     4  MISSING -> ours has code     4  break     4  footnoteReference
+     1 each: comment, heading, root, paragraph, SHIFTED, EXTRA(4 lines)
+
+The two buckets that paid tonight are gone -- 17 SPLIT closed by the merge pass, 4 of 19 TEXT by
+the lazy-ordered rule. What remains of the largest bucket shrinks to **12 distinct minimal forms
+over 14 documents**, which is 0.86 per document: diffuse at form level by the same measure that
+retired the footnote queue.
+
+### Two hypotheses probed and refuted, which is why it stops here
+
+**TAB versus SPACES is not the discriminator.** The `2x` form `>` / `10.    More` / `<TAB>[^a]:`
+contradicts the shipped depth guard -- content column 7, tab indent 4 columns, yet Obsidian
+releases. Seven probes over tab, 4sp and 8sp indents with wide, narrow and bare separators: **all
+seven release.** So the asymmetry this file records for the indented-code threshold does not
+appear here.
+
+**And the depth guard is mostly doing ADJACENCY's job.** Re-reading the five documents that
+motivated it, four have a BLANK LINE between the quote and the marker -- so the adjacency guard
+added afterwards already declines them, for the right reason. Only one genuinely needs a depth
+test:
+
+    "10.<TAB>> [!tip]+<TAB>[^O]" / "<4sp>> tempor"   column 4, indent 4, obs no code
+
+Its item content is a QUOTE OPENER and the deeper line is a quoted line CONTINUING it. That is the
+ownership mechanism the contiguity guard already encodes once and the adjacency guard encodes
+again, in a third variant: a deeper line is released unless it continues the construct the item's
+content opened. **That is not a column comparison**, which is why no threshold fitted to these
+documents has held -- three of them have now pulled in different directions.
+
+So the honest state of this rule: adjacency and contiguity are derived and measured; the depth
+guard is load-bearing for exactly one document and is standing in for a construct-continuation
+test nobody has written. Relaxing it would regress that document; generalising it needs the
+third mechanism stated properly rather than approximated by a number.
+
+### Which answers the strategic question with a measurement
+
+`code` was the right dimension to work first -- 51 documents against the footnote queue's 822, and
+two structural fixes landed in it tonight for +18 with zero regressions. It is now in the same
+state the footnote queue reached: **its largest bucket is form-diffuse, and its next rule needs a
+mechanism rather than a narrowing.** Both dimensions are now limited by the same thing, which is
+the useful conclusion: not instrument gaps, not unmined buckets, but one unwritten rule about
+which construct owns a deeper line.
