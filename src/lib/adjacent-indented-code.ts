@@ -34,9 +34,15 @@ export function adjacentIndentedCodeTransform(
   source: string,
 ): void {
   const lines = source.split("\n");
+  // AT MOST THREE SPACES of indent, because a fence indented four or more is indented CODE and
+  // not a fence at all. The first version matched `[ \t]*` and so refused to merge any block
+  // whose content merely LOOKS like a fence -- `<4sp>```} / `Text` / `[^1]: body` / `<4sp>```}
+  // is one indented code block whose first line is backticks, and all six remaining
+  // same-lines-different-grouping documents were exactly that shape, contiguous with an empty
+  // gap between our two nodes.
   const fenced = (node: RootContent): boolean => {
     const at = node.position ? node.position.start.line - 1 : -1;
-    return /^[ \t]*(?:```|~~~)/u.test(lines[at] ?? "");
+    return /^ {0,3}(?:```|~~~)/u.test(lines[at] ?? "");
   };
 
   const out: RootContent[] = [];
