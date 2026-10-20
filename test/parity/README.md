@@ -8963,3 +8963,30 @@ path, the `headings` projection's 52 phantoms, `footnoteRefs` omitting its key t
 day -- and it is always the same shape: _a field read the wrong way reads as total disagreement
 or total agreement, never as something in between._ The corollary is a usable rule: **treat 0%
 and 100% as instrument readings until proven otherwise.**
+
+## ...and built: 33 of 33, with the frontmatter eight excluded by construction
+
+`ask` now retries on `refsTrustworthy: false` with the prefixed form and shifts every reported
+ref line back by the prepended count. Measured on the same 260 diverging documents:
+
+    untrustworthy refs:  41  ->  8      all 8 frontmatter-leading, i.e. the excluded set
+    refs with an out-of-range line: 1   on a NON-retried document
+
+So every document the fallback is allowed to touch is recovered, and the remainder is exactly the
+population the guard declines. The whole instrument gap closes except the frontmatter cases, which
+need an insertion point after the block rather than a different mechanism.
+
+### The out-of-range ref is pre-existing and the flag already covers it
+
+    ref ["12", 23, 0]   document has 21 lines   trusted=false   retried=false
+    doc: "---\n---\n> [!my note]-\n> - [ ] [^#tag]:..."
+
+Frontmatter-leading, so never retried: it went through the APPEND path, the document swallowed
+the tail, and `[^12]: synthesised` ended up inside the swallowing construct where its label is
+indexed as a REFERENCE at line 23 -- past the end of the real document. That is the swallow this
+whole section is about, seen from the other side.
+
+It is not a regression and it is already signalled, because `refsTrustworthy` is false on exactly
+those answers. The hazard worth writing down is for consumers rather than for this change:
+**an untrustworthy answer can carry ref positions outside the document**, so the flag is not
+advisory. Zero retried documents produce one, which is the property the shift had to have.

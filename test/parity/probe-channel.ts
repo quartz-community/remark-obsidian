@@ -160,6 +160,26 @@ export function augment(markdown: string): string {
   return `${markdown.endsWith("\n") ? markdown : `${markdown}\n`}\n${tail}\n`;
 }
 
+/** A document whose first line is `---` -- where prefixing would displace the frontmatter. */
+const LEADS_WITH_FRONTMATTER = /^---\r?\n/u;
+
+/**
+ * The same augmentation PREFIXED, which an unclosed tail construct cannot swallow.
+ *
+ * `augment` appends, so `%%` or an unterminated fence buries the synthesised definitions and the
+ * names it was meant to define stay undefined -- which is exactly the state `refsTrustworthy`
+ * reports, 97 documents of the diverging set. Measured on 41 of them, prefixing recovers 41.
+ *
+ * Returns the line shift, because every position in the answer is now that many lines late.
+ */
+function augmentPrefix(markdown: string): { text: string; lines: number } {
+  const names = referencedNames(markdown);
+  if (names.length === 0) return { text: markdown, lines: 0 };
+  const head = names.map((name) => `[^${name}]: synthesised`).join("\n\n");
+  const text = `${head}\n\n${markdown}`;
+  return { text, lines: text.split("\n").length - markdown.split("\n").length };
+}
+
 /**
  * Written to a temp name and RENAMED, because the plugin polls every 400ms.
  *
@@ -364,6 +384,47 @@ export async function ask(
             : [],
       ),
     });
+  }
+
+  const retry = out.flatMap((answer, at) =>
+    !answer.refsTrustworthy && !LEADS_WITH_FRONTMATTER.test(markdowns[at]!)
+      ? [at]
+      : [],
+  );
+  if (retry.length === 0) return out;
+
+  const prefixed = retry.map((at) => augmentPrefix(markdowns[at]!));
+  const second = await exchange(
+    prefixed.map((form) => form.text),
+    timeoutMs,
+  );
+  const secondById = new Map(second.map((reply) => [reply.id, reply]));
+  for (const [which, at] of retry.entries()) {
+    const reply = secondById.get(String(which));
+    const shift = prefixed[which]!.lines;
+    if (!reply?.cache) continue;
+    const defined = new Set(
+      (reply.cache.footnotes ?? []).map((entry) => entry.id?.toLowerCase()),
+    );
+    const wanted = referencedNames(markdowns[at]!);
+    if (!wanted.every((name) => defined.has(name.toLowerCase()))) continue;
+    out[at] = {
+      ...out[at]!,
+      refs: (reply.cache.footnoteRefs ?? []).flatMap((entry): Ref[] =>
+        entry.id === undefined ||
+        !entry.position ||
+        entry.position.start.line < shift
+          ? []
+          : [
+              [
+                entry.id,
+                entry.position.start.line - shift,
+                entry.position.start.col,
+              ],
+            ],
+      ),
+      refsTrustworthy: true,
+    };
   }
   return out;
 }
