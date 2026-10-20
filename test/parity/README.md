@@ -9620,3 +9620,53 @@ That is the third family this effort has found closed by other work rather than 
 after the container-line-becomes-root-code bucket (92 of 109, gone) and the `def-end+1` tab slice.
 **A refused family is worth re-counting before it is re-attempted**, which is the same lesson the
 lift audit reached from the other side, and it costs one predicate.
+
+## Screening the three candidates: LIFT SELECTS HARDNESS, NOT MECHANISM
+
+The three families were ranked by lift and the ranking turned out BACKWARDS. Classified by
+direction and per-delta -- the two screens this file already has -- before any code:
+
+    quoted %%    lift 2.78   20 MISS / 18 INVENT  + 9 start-line, 12 end-line over 4 deltas
+    quoted $$    lift 1.83   15 MISS /  8 INVENT  + 7 end-line -1, 2 at +3, 1 at +1
+    five-sp cap  lift 1.46   27 MISS / 14 INVENT  + 11 COLUMN at delta -2, 6 at -4
+
+**All three are BIDIRECTIONAL on suppression**, which by the direction screen means several rules
+each, and the premise the `%%` family was refused on three times describes only **18 of its 63
+documents**. Its positional half shatters into nine start-line and twelve end-line cases across
+four deltas. There is no single rule in either of the top two.
+
+The lesson is worth stating because it cost the previous section's recommendation:
+
+> **A lift measures how CONCENTRATED difficulty is, not whether one mechanism causes it.** A
+> family needs a lift AND a one-directional mechanism before it is a target. The blockquote rule
+> had both -- lift 12.23 with 15 of 19 documents all under-producing in the same direction. These
+> three have the first and not the second.
+
+### The weakest lift has the only tractable sub-mechanism
+
+Eleven documents with a COLUMN delta of exactly -2, and `contentColumn` is the one function that
+computes a column -- which is this file's own screen for whether per-delta bucketing means
+anything. Six sampled, and all six are one shape:
+
+    ours=1 obs=3   "<TAB><5sp>[^x-y]: def"
+    ours=1 obs=3   "<TAB><4sp>[^O]: More"        prev "  *     More"
+    ours=1 obs=3   "<TAB><4sp>[^x-y]: Definition" prev "  1.     More`[^3]`"
+
+### And it has a MINIMAL FORM, which this family has never had
+
+The five-space cap is recorded here twice as invisible without the dense document -- "all six
+minimal spellings AGREE", "eight for eight". Seven probes, and one reproduces it:
+
+    "<TAB><4sp>[^a]: d"                     no definition
+    "  *     More" / "<TAB><4sp>[^a]: d"    no definition      <- BULLET host
+    "  1.     More" / "<TAB><4sp>[^a]: d"   def a@1:3          <- ORDERED host, column 3
+
+**The ordered host is the discriminator**, which is the third time tonight that an ordered marker
+has behaved differently from a bullet -- after the lazy-release rule and the blockquote absorption.
+That is now a pattern worth naming rather than a coincidence: wherever this package diverges around
+a list, the ordered/bullet split is the first thing to test.
+
+Not implemented. One probe row is a lead, not a rule, and the column arithmetic behind `3` is
+unexplained -- the host is `  1.` with five spaces, so the cap fires, and neither the capped
+content column nor the raw prefix width is 3. The next step is a column grid over indent x marker x
+separator against this oracle, not a fix.
