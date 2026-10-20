@@ -73,24 +73,29 @@ function columnsOfRaw(raw: string): number {
   // first tab -- and the two agreed everywhere except on ownership, which is what left
   // `- <TAB>item` / blank / `<2sp>[^1]: def` with the definition at ROOT and the item's own
   // content read as indented code.
-  const split = /^([\s\S]*?)([ \t]+)$/u.exec(raw);
-  if (split === null) {
-    let columns = 0;
-    for (const character of raw) {
-      columns +=
-        character === "\t"
-          ? constants.tabSize - (columns % constants.tabSize)
-          : 1;
-    }
-    return columns;
+  // COUNTED BACK rather than matched: `/^([\s\S]*?)([ \t]+)$/` is a second-degree polynomial to
+  // the ReDoS lint, since both quantifiers can consume a space -- the same trap this file already
+  // records for `/^(\t+)[ \t]*$/` two functions down.
+  let at = raw.length;
+  while (at > 0) {
+    const character = raw[at - 1];
+    if (character !== " " && character !== "\t") break;
+    at -= 1;
   }
-  const head = columnsOfRaw(split[1]!);
-  const run = split[2]!;
+  let columns = 0;
+  for (const character of raw.slice(0, at)) {
+    columns +=
+      character === "\t"
+        ? constants.tabSize - (columns % constants.tabSize)
+        : 1;
+  }
+  const run = raw.slice(at);
+  if (run.length === 0) return columns;
   if (run.startsWith("\t")) {
-    return head + (constants.tabSize - (head % constants.tabSize));
+    return columns + (constants.tabSize - (columns % constants.tabSize));
   }
   const tabAt = run.indexOf("\t");
-  return head + (tabAt === -1 ? run.length : tabAt);
+  return columns + (tabAt === -1 ? run.length : tabAt);
 }
 
 const legacyList: Construct = {
