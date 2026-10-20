@@ -9358,3 +9358,56 @@ The concrete shape of the remaining work is therefore a container-continuation r
 tokenizer: a blockquote must absorb a non-interrupting ordered marker, and an indented line must
 decline to continue it. That is one rule covering both dimensions' largest remaining buckets, and
 it is the first time in this effort that the two queues have reduced to the same piece of work.
+
+## The model completed: a BLOCKQUOTE ABSORBS ANY LINE THAT OPENS NO BLOCK
+
+The previous section derived the rule as lazy paragraph continuation. That is wrong, and the probe
+that settles it is an EMPTY quote -- which has no paragraph to continue:
+
+    EMPTY quote / prose      blockquote@0-1              absorbs
+    quote w/ para / prose    blockquote@0-1              absorbs -- IDENTICAL
+    EMPTY quote / 2. x       blockquote@0-1              absorbs
+    quote w/ para / 2. x     blockquote@0-1              absorbs -- IDENTICAL
+    EMPTY quote / 1. x       blockquote@0-0  list@1-1    `1.` opens a block
+    EMPTY quote / <4sp>code  blockquote@0-0  code@1-1    indented opens a block
+    quote w/ para / <4sp>    blockquote@0-0  code@1-1
+
+An empty quote behaves exactly like one holding a paragraph, so paragraph state is irrelevant and
+the rule needs no reference to it:
+
+> **A blockquote absorbs the following line unless that line OPENS A BLOCK.** An ordered marker
+> whose start is not 1 opens nothing, because it cannot interrupt; plain prose opens nothing.
+> `1.`, a bullet and an INDENTED line all open blocks and end the quote.
+
+Seven rows, no counter-example, and it subsumes everything the previous two sections derived
+empirically.
+
+### Upstream is wrong about one clause and right about the other
+
+    para / 2. x     stock: paragraph@0-1                 the interrupt rule APPLIED
+    > q  / 2. x     stock: blockquote@0-0 + list@1-1      NOT applied across the quote
+
+So micromark enforces CommonMark's ordered-interrupt rule at root and not on a line following a
+blockquote. Obsidian enforces it in both. Since CommonMark agrees with Obsidian here, it is the
+same ungated category as the adjacent-indented-code merge.
+
+Micromark is RIGHT about the indented line, which both oracles treat as a block opener even though
+CommonMark says indented code cannot interrupt a paragraph. Only the ordered clause needs changing.
+
+### Why it is NOT implemented here, with the specific open question
+
+The change belongs at `legacy-list.ts:167`, which already reads
+`if (!self.interrupt || code === codes.digit1)` -- CommonMark's rule, correctly implemented, with
+`self.interrupt` simply not set for a line following a blockquote. The fix is to decline a non-1
+marker in that situation too.
+
+What is missing is one piece of micromark knowledge: **at list-start time, can an OPEN blockquote
+be distinguished from one a blank line has already closed?** The distinction is load-bearing --
+`>` / `2. x` must be absorbed while `>` / blank / `2. x` must become a real list, and that is a
+measured difference. `inFence()`'s technique of counting unmatched `enter` events in `self.events`
+would see the blockquote in both, because this file's own notes record that a container closes
+RETROACTIVELY in `writeToChild` rather than when its continuation declines.
+
+Guessing at that is how the last tokenizer attempt in this file cost 32 referee documents and four
+CommonMark list cases. The model is complete, the call site is identified, and the one unknown is
+stated -- which is a better starting point than any amount of further narrowing.
