@@ -9146,3 +9146,62 @@ recording rather than smoothing: a candidate applied to the ANSWERS is an upper 
 rule applied to the TREE, because the tree version runs inside a chain where other passes have
 already moved things. Two documents of optimism on a +14 prediction is a good ratio, and it is the
 same direction every other prediction here has erred.
+
+## The strongest signal ever measured here, and three attempts to scope it
+
+The `code` dimension's under-produce half -- "obs code, ours keeps it in text" -- classified by
+indentation and what precedes it, then shrunk. The shrink is what found the trigger, because every
+hand-probe missed it: nine two-line forms (`10. x` / `<TAB>...` in every indent and opener) all
+reported NO code on EITHER side. The minimal forms from the ledger carried a `>` on line 0.
+
+    3x  ">\n2) | Prose here[^ch2*]\\[^ch2*]\n\t| [^3]"
+    2x  ">\n10.\n     Some\n"
+    1x  ">>\n2)\n\t---\n"
+
+Probed from there, 17 questions give an exact rule:
+
+    >  / 10. / <5sp>Some      code@2      -- the quote is REQUIRED
+       / 10. / <5sp>Some      []          -- no quote, no code
+    blank / 10. / <5sp>Some   []          -- a blank line is not a quote
+    > q / 10. / <5sp>Some     code@2      -- non-empty quote behaves the same
+
+    1.  []    2.  code@2    10. code@2    -  []    *  []    +  []
+    1)  []    2)  code@2                           -- the discriminator is `start !== 1`
+
+**Lift 12.23** -- 19 documents carry the shape, 15 diverge, 78.9% against a 6.5% base. Nothing
+measured in this file has been above 3.44, and the mechanism is already written down one file
+over: `container-lazy.ts` refuses to absorb a non-1 ordered list into a CALLOUT for exactly this
+reason. A quote host is the input class it was never scoped for, which is the shape every landing
+here has had.
+
+### Three attempts, and the third is the inverse of the sibling test
+
+    attempt            code        footnotes
+    unguarded          +15         -15        exactly the ceiling, exactly cancelled
+    + contiguity       +12          -8
+    + strictly deeper   +8        2-for-2 trade, net 0
+
+The unguarded version hit the predicted ceiling of 15 and cost 15 footnote documents. Both guards
+came from reading the documents it broke rather than from narrowing until the number went green:
+
+- **CONTIGUOUS with the marker.** The three worst losses are `10.` then a COLUMN-0 DEFINITION then
+  the indented lines, where the list has already ended at the definition and the indented lines
+  are its continuation -- Obsidian reports `code: []` for all three. Lazy continuation continues
+  the line above it, so a line that is not itself released breaks the chain.
+- **STRICTLY DEEPER than the item's content column**, which is the INVERSE of what `itemReleases`
+  tests two functions above. That arm handles a line too SHALLOW to belong to the item; this one
+  handles a line too DEEP, which becomes indented code. Five documents pin it, and the strictness
+  comes from the one where indent EQUALS the column and Obsidian keeps the line.
+
+That inversion is the part worth carrying: **two arms of one pass can need opposite comparisons
+against the same quantity**, and `size`'s two roles were the last instance of the same lesson.
+
+### And the remaining two losses are a lead, not a mystery
+
+    "10. [^Ä]: Definition" / "<6sp>%%"      column 4, indent 6, released -- obs []
+    "2)  [^b]: def" / "<TAB><2sp>$$"        column 4, indent 6, released -- obs []
+
+Both have the item's content as a FOOTNOTE DEFINITION, where the deeper line continues the
+definition rather than the item. The same ownership mechanism as the contiguity guard, one level
+in. Not fixed, because it would be a fourth pass over one rule and the stop condition here is
+three -- recorded with its shape so the next attempt starts from a hypothesis rather than a count.

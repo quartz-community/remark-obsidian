@@ -145,6 +145,59 @@ export function quoteLazyIndentedCodeTransform(
       return column !== undefined && columnsOf(indentOf(text)) < column;
     };
 
+  /**
+   * The same release, for an ordered list BELOW A QUOTE whose start is not 1.
+   *
+   * `2.`, `10.` and `2)` cannot interrupt a paragraph, so below a quote they are not a list at
+   * all -- the line is lazy continuation, and an indented line beneath it falls to ROOT code.
+   * `container-lazy.ts` already carries that reasoning for a callout host; this is the same rule
+   * with a quote host, which is the input class it was never scoped for.
+   *
+   * Measured against live Obsidian, `>` / `<marker>` / `<5sp>Some`:
+   *
+   *     1.  []          2.  code@2      -  []
+   *     1)  []          2)  code@2      *  []
+   *                     10. code@2      +  []
+   *
+   * So the discriminator is `start !== 1` and not the marker's width, and a bullet never
+   * releases however wide it is. A non-empty quote behaves identically to an empty one, and a
+   * blank line in place of the quote releases NOTHING -- the quote is required.
+   *
+   * Neither of `itemReleases`'s own guards can express this: a plain prose line opens no block,
+   * and the content column of a bare `10.` is 3 while the released line sits at 5, so the
+   * below-the-column test refuses it too. Relaxing either would break what they were measured
+   * for, so this is a separate predicate rather than a widening. The same-marker guard IS kept,
+   * because CommonMark's staircase cases depend on it.
+   */
+  const itemReleasesBelowQuote =
+    (markerLine: number) =>
+    (text: string): boolean => {
+      if (!INDENTED.test(text)) return false;
+      const bare = text.replace(/^[ \t]+/u, "");
+      const mine = markerOf(bare);
+      if (mine !== undefined && mine === markerOf(lines[markerLine] ?? "")) {
+        return false;
+      }
+      // STRICTLY DEEPER than the item's content column, which is the INVERSE of the test
+      // `itemReleases` applies. That pass handles a line too SHALLOW to belong to the item; this
+      // one handles a line too DEEP, which becomes indented code -- and because the item is
+      // lazy continuation rather than a real list, the code lands at ROOT.
+      //
+      // Derived from the five documents the unguarded version cost, which all have the line at
+      // or below the content column and no code in Obsidian at all:
+      //
+      //     "10." / "<5sp>Some"          column 3, indent 5   RELEASE   obs code@2
+      //     "10.<5sp>Text" / "<4sp>[^N]" column 8, indent 4   no        obs []
+      //     "10.<4sp>```" / "<5sp>It"    column 7, indent 5   no        obs []
+      //     "10.<TAB>> [!tip]" / "<4sp>>" column 4, indent 4  no        obs []
+      //
+      // The last is why the comparison is STRICT: an equal indent is the item's own content.
+      const column = contentColumn(source, {
+        position: { start: { offset: starts[markerLine]! } },
+      } as unknown as ListItem);
+      return column !== undefined && columnsOf(indentOf(text)) > column;
+    };
+
   // Walked to ANY DEPTH with the parent in hand, because lazy continuation can bury a
   // column-0 quote inside another container -- the root-only scan is what left the first
   // version of `quoted-fence-lazy.ts` completely inert.
@@ -171,13 +224,35 @@ export function quoteLazyIndentedCodeTransform(
       const markerLine = lastItem?.position?.start?.line;
       if (isList && markerLine === undefined) continue;
 
+      // A quote IMMEDIATELY above is what makes a non-1 ordered marker lazy continuation
+      // rather than a list, so the predicate is chosen per host rather than per line.
+      const previous = index > 0 ? children[index - 1] : undefined;
+      const start = (node as unknown as { start?: number | null }).start;
+      const belowQuote =
+        isList &&
+        typeof start === "number" &&
+        start !== 1 &&
+        previous !== undefined &&
+        QUOTES.has(previous.type);
+
       const run = lazyRun(
         position.start.line - 1,
         position.end.line - 1,
-        isList ? itemReleases(markerLine! - 1) : quoteReleases,
+        isList
+          ? belowQuote
+            ? itemReleasesBelowQuote(markerLine! - 1)
+            : itemReleases(markerLine! - 1)
+          : quoteReleases,
       );
       if (!run) continue;
       const [first, last] = run;
+      // CONTIGUOUS with the marker, for the below-quote arm only. Lazy continuation continues
+      // the line above it, so a line that is not itself released breaks the chain -- and the
+      // three documents this cost all have the same shape: `10.` then a COLUMN-0 definition
+      // then the indented lines, where the list has already ended at the definition and the
+      // indented lines are its continuation. Obsidian reports `code: []` for all three. Every
+      // probe that established the rule had the released line at marker + 1.
+      if (belowQuote && first !== markerLine!) continue;
       const quoteEnd = position.end.line - 1;
 
       const code: Code = {
