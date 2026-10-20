@@ -9924,3 +9924,52 @@ Three instances, all in instruments that carried correct warnings: the SKIPPED c
 `defs[0]`, and `liveAgreesStrictly` comparing a code COUNT where the gate compares RANGES. The
 third had no warning to ignore -- it was written during this audit, by me, in the function whose
 purpose was to fix the first.
+
+## Auditing comment-only enforcement, and converting the live-channel one
+
+Asked where else the only guard is somebody happening to read a comment. Surveyed, and the
+answers split three ways:
+
+| invariant                                        | enforcement                                     | verdict           |
+| ------------------------------------------------ | ----------------------------------------------- | ----------------- |
+| every `*.test.ts` registered as an oracle        | `overview.test.ts` asserts the lists are equal  | REAL              |
+| every `replicate` case still diverging           | `parity.test.ts` fails when one starts matching | REAL              |
+| every oracle has a non-empty `blind` list        | asserted                                        | REAL              |
+| every live-channel FIELD has a reader            | **nothing**                                     | **CLOSED HERE**   |
+| `PROJECTION_KEYS` exhaustive over `Projections`  | `satisfies` -- which does NOT check it          | still open, noted |
+| offsets read before `normalizePointsTransform`   | comment only                                    | still open        |
+| a raw slice is for `position`, never for `value` | comment only                                    | still open        |
+
+### The one that had nothing, and had already failed three times
+
+`PROJECTION_KEYS` carries `as const satisfies ReadonlyArray<keyof Projections>`, which checks that
+each ENTRY is a key and not that every key is listed -- and its own docstring names the victim:
+"the `referenceLinks` trap, which sat recorded-but-uncompared for months". The live channel had no
+check at all, and the same trap fired three more times this session: `code`, `listItems` and
+`blockCode` were each added and read by nothing, with `listItems` having sat unread in the raw
+cache for the entire effort.
+
+Two compile-time gates now, and the typecheck IS the gate rather than a test someone must write:
+
+    LIVE_ANSWER_KEYS   lists every dimension, with an `Exclude<keyof Answer, ...>` assignment
+                       that fails to compile when a field is added and not listed
+    CHANNEL_READERS    a `Record` over those keys naming the instrument that reads each, so a
+                       listed field with NO reader also fails to compile
+
+**Both break-tested, which is the part that makes them trustworthy:**
+
+    added `zzNewField` to `Answer`      error TS2322: Type 'true' is not assignable to
+                                        type '"zzNewField"'
+    removed the `listItems` reader      error TS2741: Property 'listItems' is missing in type
+                                        ... but required in type 'Record<...>'
+
+And `"nothing yet"` is a legal reader value, used for `listItems` -- the honest entry for a field
+added ahead of its consumer, written out loud rather than left absent.
+
+### What this does not fix, stated so it is not mistaken for done
+
+Three invariants remain comment-only, and each has a recorded cost: reading `.line`/`.column`
+before `normalizePointsTransform` (one pass declined its own case invisibly), using a raw source
+slice for a node's `value` (four instances, one bug class), and `PROJECTION_KEYS`'s own
+exhaustiveness. The first two are candidates for a dev-mode assertion rather than a type, since
+both are about WHEN a field is read rather than whether it exists.

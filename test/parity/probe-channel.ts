@@ -129,6 +129,36 @@ interface Reply {
   readonly domThrew?: string;
 }
 
+/**
+ * Every dimension the live channel answers.
+ *
+ * `satisfies ReadonlyArray<keyof Answer>` checks that each entry IS a field and NOT that every
+ * field is listed, which is the weakness `PROJECTION_KEYS` has and the reason `referenceLinks`
+ * sat recorded-but-uncompared for months. The assignment below closes it: adding a field to
+ * `Answer` without listing it here fails to COMPILE.
+ *
+ * `overview.ts` then maps each entry to the instrument that reads it, as a `Record`, so a listed
+ * field with no reader also fails to compile. That is the invariant this session broke twice --
+ * `code`, `listItems` and `blockCode` were each added and read by nothing, and `listItems` sat
+ * unread in the raw cache for the whole effort.
+ */
+export const LIVE_ANSWER_KEYS = [
+  "defs",
+  "refs",
+  "refsTrustworthy",
+  "code",
+  "listItems",
+] as const satisfies ReadonlyArray<keyof Answer>;
+
+type UnlistedAnswerKey = Exclude<
+  keyof Answer,
+  (typeof LIVE_ANSWER_KEYS)[number]
+>;
+const _everyAnswerKeyListed: UnlistedAnswerKey extends never
+  ? true
+  : UnlistedAnswerKey = true;
+void _everyAnswerKeyListed;
+
 /** A rendered `pre > code` with its ancestor tag chain, joined by `>`. */
 export interface BlockCode {
   readonly path: string;

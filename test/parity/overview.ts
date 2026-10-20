@@ -1,3 +1,4 @@
+import { LIVE_ANSWER_KEYS } from "./probe-channel.js";
 /**
  * One consolidated view of every oracle, axis and scope boundary in this harness.
  *
@@ -71,6 +72,33 @@ export interface Oracle {
    */
   readonly ungated?: string;
 }
+
+/**
+ * Which instrument reads each live-channel dimension.
+ *
+ * A `Record` over `LIVE_ANSWER_KEYS`, so a field added to `Answer` fails to compile until it is
+ * listed there AND given a reader here. That is the gate this session needed three times and did
+ * not have: `code`, `listItems` and `blockCode` were each added to the channel and read by
+ * nothing, and `listItems` had been sitting unread in the raw cache for the whole effort -- the
+ * `referenceLinks` trap repeating, where a recorded field nobody compares looks exactly like a
+ * field that agrees.
+ *
+ * "Nothing yet" is a legal value and the honest one for a field added ahead of its consumer. It
+ * is a STRING rather than an omission, so the register says so out loud instead of the field
+ * simply being absent.
+ */
+export const CHANNEL_READERS: Record<
+  (typeof LIVE_ANSWER_KEYS)[number],
+  string
+> = {
+  defs: "referee.mts, referee-shrink.mts, score.mts, grid.ts (def.* fields)",
+  refs: "referee.mts, referee-shrink.mts, score.mts",
+  refsTrustworthy:
+    "referee-shrink.mts (liveSignature drops refs without it) and liveAgreesStrictly; forgetting it is recorded four times",
+  code: "referee.mts (own dimension, 883 documents), score.mts, grid.ts (code.* fields)",
+  listItems:
+    "nothing yet -- added for item extent, and the break test showed it does NOT adjudicate the tab-separator family, so no instrument depends on it",
+};
 
 export const ORACLES: readonly Oracle[] = [
   {
