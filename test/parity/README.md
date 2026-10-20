@@ -10185,3 +10185,59 @@ Four counting selectors, six classification axes, a full form-level shrink, a 10
 sweep, and a night of rule derivation all concluded the remainder was structureless. **The answers
 were in a repository already cloned on this machine, in a file called
 `obsidian-reading-rules.md`.** Before mining an oracle, read everything that shipped with it.
+
+## Working the rules document: the name gap, classified, and F2 located
+
+The 315 documents whose NAME SET differs, classified against the rules document's own categories:
+
+     75  MISSING name -- other
+     55  EXTRA name -- doc has %% (F1/F2)
+     48  EXTRA name -- other
+     45  MISSING name -- doc has %% (F1/F2)
+     29  EXTRA name -- doc has ^[inline] (E3)
+     20  MISSING name -- doc has ^[inline] (E3)
+     17  same set, different ORDER or duplicates
+     16  MISSING name -- doc has $$ (M1/M2)
+      9  EXTRA name -- doc has $$ (M1/M2)
+
+`%%` is the biggest at 100 documents combined, which the rules document predicts -- its F1 note
+records the same correction costing "54 notes of the run".
+
+### It is NOT F1, which we already implement
+
+`comment.ts` line 41 already states F1's rule in its own words: "which is why `%% 50%` and `%%%` are
+plain paragraphs". Six probes against live Obsidian isolate the real gap to ONE shape:
+
+    ok    "%%" / "x" / "%% tail"      / "[^1]: def"   obs []          ours []
+    ok    "%%" / "x" / "%%"           / "[^1]: def"   obs ["1@3-3"]   ours ["1@3-3"]
+    ok    "%%" / "x" / "%% tail" / "" / "[^1]: def"   obs ["1@4-4"]   ours ["1@4-4"]
+    DIFF  "%%" / "x" / "%% culpa ex %%" / "[^1]: def" obs []          ours ["1@3-3"]
+    ok    "%% culpa ex %%" / "[^1]: def"              obs []          ours []
+
+**It is F2**, verbatim: "The closer is the first `%%` anywhere in a later line... Text after the
+closer starts a paragraph that takes lazy lines." When the closing line is itself a CLOSED PAIR, the
+first `%%` closes the comment and ` culpa ex %%` is a tail paragraph that absorbs the label below.
+We read the line as a complete inline pair instead, so the label becomes a fresh block.
+
+### Population and location, both measured
+
+    BASE 7.4% (503/6818)
+    an open %% closed by a line holding ANOTHER %%:  n=56  div=21  P=37.5%  lift=5.08
+
+Twenty-one documents, one direction (we over-define), lift 5.08. Above the size bar, past the
+direction screen, and the rule is stated rather than derived.
+
+The mechanism is `absorbCloserLine` in `src/lib/syntax/comment.ts`: after the closer it consumes
+the rest of the line INTO `commentContent`, so no tail paragraph is left to absorb the next line.
+The `%% tail` row above passes for a different reason, so that function is right for one case and
+wrong for the other -- which is why this wants a careful read of all four closer paths
+(`absorbCloserLine`, `closeAfterMidLine`, `afterLazy`, `tokenizeFlowClose`) rather than a one-line
+change at the end of a long session.
+
+### What the classification says about the rest
+
+`^[inline]` (E3) is 49 documents and the rule is equally precise -- "references, labels, and nested
+inline footnotes inside an inline footnote are dead text", including over a soft line break. `$$`
+(M1/M2) is 25. The two `other` buckets are 123 and want the same treatment: classify against the
+document's categories rather than against our mechanisms, since the document is the thing that
+turned out to have the answers.
