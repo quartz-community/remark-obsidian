@@ -9468,3 +9468,53 @@ the list already is.
 
 That is a bigger change than this one looked, and it is now precisely scoped: one construct, one
 rule, with the discriminator already measured and the trap already mapped.
+
+## Why the list construct cannot carry this rule, diagnosed to the mechanism
+
+The previous section reverted on a micromark invariant violation and guessed that the list was the
+wrong place. Instrumenting the decision point proves it, and the proof is more useful than the
+guess.
+
+**One probe of the 1692 threw**, and finding it took one script rather than a theory:
+
+    "> [^1]: magna\n> 10. item\n"      expected exit token to match current token
+
+Both lines are INSIDE the quote, so its continuation SUCCEEDED and the `10.` is ordinary quote
+content where a list must open. A quote-is-open test cannot see the difference; comparing the last
+`blockQuotePrefix`'s line against `self.now().line` can, and with that guard the throw is gone and
+all 450 tests pass.
+
+**And then the rule measured INERT -- 5996/6818 and 832/883, both unchanged.** Printing the
+quantity rather than trusting the zero is what this file says to do, and the dump is unambiguous:
+
+    ZZ2 kind=listOrdered hasType=false code=50 digit1=49 depth=1 prefixLine=1 nowLine=2
+    ZZ2 kind=listOrdered hasType=false code=50 digit1=49 depth=0 prefixLine=1 nowLine=2
+
+Every clause is TRUE on the first call and the decline fires correctly. Then the construct is
+attempted a SECOND time with `depth=0` -- the blockquote has closed in between -- and succeeds.
+
+> **Declining a container does not make another container absorb the line. It makes the document
+> tokenizer CLOSE containers and retry.** `thereIsNoNewContainer` runs `exitContainers` and the
+> flow restarts, so a construct that refuses itself out of existence is simply re-offered the same
+> line in a world where the quote is gone.
+
+That single mechanism explains both failures at once. The invariant violation was the same retry
+seen from the other side: a dangling `listOrdered` from the first attempt against stock's
+`tokenizeListEnd` during the close.
+
+### Which closes the route and sharpens the remaining one
+
+The contrapositive is not available at all -- not merely risky. "A list declines" and "a quote
+absorbs" are different operations on the container stack, and only the second is expressible:
+
+    a quote EXTENDING itself      supported -- it is what lazy continuation IS
+    a list REFUSING to open       re-offered after the quote closes, so it changes nothing
+
+So the rule has to be implemented as blockquote continuation, in a vendored `blockQuote` construct
+whose continuation accepts a line that opens no block. `container-lazy.ts` records that
+`disable: {null: [...]}` reaches container constructs, so the route exists and `legacy-list.ts` is
+the precedent for taking it.
+
+Three things are now settled that were not before: the discriminator (`inOpenQuote` plus the
+prefix-line test, measured), the shape of the rule (seven probe rows, no counter-example), and the
+construct that must carry it. What remains is the vendoring itself.
