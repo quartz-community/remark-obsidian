@@ -150,6 +150,10 @@ export const GRIDS: readonly Grid[] = [
     ],
     document: (opener, indent) => `[^1]: def\n${indent}${opener}\n\nuse[^1]\n`,
     field: "def.end",
+    // The `label` row is `[^2]: d`, a SECOND definition on purpose: this grid measures where
+    // `[^1]` ends when another label follows it. So the first definition is the measurement,
+    // declared rather than assumed.
+    firstDefinitionOnly: true,
   },
   {
     name: "tab-sequence-separator",

@@ -9880,3 +9880,47 @@ Every registered grid builds a single-definition document, so this is a limit ra
 today. A two-definition grid would compare only the first and read as agreeing on the second --
 the same shape as the name-keyed signature that collapsed duplicates. Documented at the call site
 instead of widened, because widening an unexercised path is how an untested branch gets shipped.
+
+## Enforcing instead of documenting, and the guard caught a live violation immediately
+
+The previous section documented `cellOf`'s `defs[0]` limit and called it "a limit rather than a bug
+today". **That reasoning was the same mistake the audit had just found**: the shrinker's signature
+carried a comment warning about exactly its collapse and was misread three times anyway. A note is
+not a guard, so both issues are now enforced.
+
+### `cellOf` throws, and the claim it was "not a bug today" was FALSE
+
+On its first run the guard stopped `grid.mts --all`:
+
+    Error: grid: a def.* field compares defs[0] only, and this document has 2 definitions
+           -- [["1",0,0,0],["2",1,0,1]]
+
+`def-end-opener`'s rows include `["label", "[^2]: d"]` -- a second definition on purpose, because
+that grid measures where `[^1]` ENDS when another label follows. So the measurement was right and
+the assumption was UNDECLARED, which is the part that matters: nobody reading the grid could tell
+whether the second definition was intended or overlooked.
+
+`firstDefinitionOnly` now declares it. An accidental second definition still throws; a deliberate
+one is a statement in the grid. All ten grids run again, **23 of 310 cells diverging**, and
+`tab-sequence-separator` has gone from 11 to 3 through the session's fixes.
+
+### And the counter that was misread three times no longer exists
+
+    before   67 SKIPPED (agree with live, or refs not adjudicable); 9 of those ...
+    after    20 agree with LIVE Obsidian (strict, = genuine referee staleness);
+             0 threw; 0 served from the ledger; 0 with untrustworthy refs
+
+One meaning per counter. The disjunction is gone rather than annotated -- it was annotated, and
+that is precisely why it was read as an agreement count twice as evidence of referee staleness and
+once as the "58 documents" inferred by subtraction.
+
+### The general rule this session paid for three times
+
+> **A comment cannot protect an invariant that a measurement depends on.** If a wrong reading
+> produces a plausible number, annotate nothing and make the wrong reading impossible: throw,
+> split the counter, or print the reference figure beside your own.
+
+Three instances, all in instruments that carried correct warnings: the SKIPPED counter, `cellOf`'s
+`defs[0]`, and `liveAgreesStrictly` comparing a code COUNT where the gate compares RANGES. The
+third had no warning to ignore -- it was written during this audit, by me, in the function whose
+purpose was to fix the first.

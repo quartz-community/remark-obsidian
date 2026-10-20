@@ -32,6 +32,16 @@ export interface Grid {
   readonly document: (row: string, col: string) => string;
   /** Which answer to compare. Named rather than a callback so a grid stays declarative. */
   readonly field: FieldName;
+  /**
+   * DECLARED when the document deliberately carries more than one definition.
+   *
+   * A `def.*` field reads `defs[0]`, so a second definition is silently ignored. `cellOf`
+   * throws without this flag rather than trusting a comment -- the shrinker's signature carried
+   * a warning about the same collapse and was misread three times. Setting it is a statement
+   * that the FIRST definition is the measurement, which `def-end-opener`'s `[^2]: d` row means
+   * and an accidental second definition does not.
+   */
+  readonly firstDefinitionOnly?: boolean;
 }
 
 export type FieldName =
@@ -50,13 +60,28 @@ export type FieldName =
  * at column 0 cannot be confused in a printed table -- the mistake that made an earlier probe
  * read `[]` as "Obsidian indexes nothing" when it meant "the key was not there".
  */
-export function cellOf(field: FieldName, answer: Facts): number {
-  // THE FIRST DEFINITION ONLY, which is a real limit and not a bug today: every registered
-  // grid's `document` builds a single-definition case, so `defs[0]` is the whole answer. A grid
-  // whose document carries TWO definitions would silently compare only the first and read as
-  // agreeing on the second -- the same shape as the shrinker's name-keyed signature, which
-  // collapsed duplicates and wrongly skipped 46 documents. Keep grid documents single-definition
-  // or widen this first.
+export function cellOf(
+  field: FieldName,
+  answer: Facts,
+  firstDefinitionOnly = false,
+): number {
+  // A `def.*` field reads `defs[0]`, so a document with TWO definitions would compare only the
+  // first and read as agreeing on the second. THROWN rather than documented: the shrinker's
+  // signature carried a comment warning about exactly this collapse and was still misread three
+  // times, so a note is not a guard. A grid is a specification, and one that silently ignores
+  // half an answer is worse than one that fails to load.
+  if (
+    field.startsWith("def.") &&
+    answer.defs.length > 1 &&
+    !firstDefinitionOnly
+  ) {
+    throw new Error(
+      `grid: a def.* field compares defs[0] only, and this document has ` +
+        `${answer.defs.length} definitions -- ${JSON.stringify(answer.defs)}. ` +
+        `Keep the document single-definition, or set \`firstDefinitionOnly\` ` +
+        `on the grid to declare that the first one is the measurement.`,
+    );
+  }
   const def = answer.defs[0];
   switch (field) {
     case "def.exists":
@@ -155,8 +180,10 @@ export function cellsOf(
         row: rowName,
         col: colName,
         text,
-        theirs: theirs ? cellOf(grid.field, theirs) : -1,
-        ours: cellOf(grid.field, oursFor(text)),
+        theirs: theirs
+          ? cellOf(grid.field, theirs, grid.firstDefinitionOnly)
+          : -1,
+        ours: cellOf(grid.field, oursFor(text), grid.firstDefinitionOnly),
       });
       at++;
     }

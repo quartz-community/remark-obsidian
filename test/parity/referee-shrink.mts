@@ -247,6 +247,8 @@ async function live(entries: readonly Entry[]): Promise<void> {
   const forms = new Map<string, { count: number; from: string[] }>();
   let reduced = 0;
   let agreeing = 0;
+  let threw = 0;
+  let cached = 0;
   let untrusted = 0;
 
   /**
@@ -293,7 +295,7 @@ async function live(entries: readonly Entry[]): Promise<void> {
     seenCount += 1;
     const already = done.get(key);
     if (already !== undefined) {
-      if (already === "") agreeing += 1;
+      if (already === "") cached += 1;
       else remember(already, key);
       continue;
     }
@@ -315,7 +317,8 @@ async function live(entries: readonly Entry[]): Promise<void> {
     // STRICTLY, not by the shrink signature -- see `liveAgreesStrictly`. Using the
     // position-independent signature here skipped 67 documents of which only 21 were genuine.
     if (want === "threw" || liveAgreesStrictly(entry.text, first)) {
-      agreeing += 1;
+      if (want === "threw") threw += 1;
+      else agreeing += 1;
       record(key, "", want === "threw" ? "threw" : "agrees");
       continue;
     }
@@ -379,12 +382,14 @@ async function live(entries: readonly Entry[]): Promise<void> {
   );
   console.log(
     `  reduced ${reduced}; ${sorted.length} distinct minimal forms; ` +
-      // "SKIPPED", not "agree". This counter incremented for any document the loop declined,
-      // which includes those whose refs cannot be adjudicated because the augmentation was
-      // swallowed -- so it read 34% on `ref-extra` and 0% on `def-miss @ code` and was taken
-      // twice as evidence that the referee corpus had gone stale. Asking the live application
-      // about all 967 diverging documents put the real staleness at FOURTEEN.
-      `${agreeing} SKIPPED (agree with live, or refs not adjudicable); ` +
+      // ONE MEANING PER COUNTER. The single "SKIPPED (agree with live, or refs not
+      // adjudicable)" figure that stood here carried a comment warning it was not an
+      // agreement count, and was read as one THREE TIMES -- twice as evidence the referee
+      // corpus had gone stale, and once as "58 documents" inferred by subtracting the
+      // untrustworthy figure from it. A counter whose name and meaning differ will be misread
+      // every time, so the disjunction is gone rather than annotated.
+      `${agreeing} agree with LIVE Obsidian (strict, = genuine referee staleness); ` +
+      `${threw} threw; ${cached} served from the ledger; ` +
       `${untrusted} of those have untrustworthy refs`,
   );
 
