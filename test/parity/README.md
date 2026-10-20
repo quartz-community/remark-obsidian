@@ -9205,3 +9205,43 @@ Both have the item's content as a FOOTNOTE DEFINITION, where the deeper line con
 definition rather than the item. The same ownership mechanism as the contiguity guard, one level
 in. Not fixed, because it would be a fourth pass over one rule and the stop condition here is
 three -- recorded with its shape so the next attempt starts from a hypothesis rather than a count.
+
+## ...and the fourth attempt made it zero-loss, by probing instead of narrowing
+
+The two documents the third attempt traded away were recorded as "a lead, not a mystery" with the
+hypothesis that a DEFINITION-HOSTED item owns its deeper lines. **Probed, and that hypothesis is
+wrong:**
+
+    >  / 10. [^a]: def / <6sp>%%        code@2   def a@1-1   -- released, definition does NOT absorb
+    >  / 10. [^a]: def / <6sp>Some      code@2   def a@1-1
+    >  / 2)  [^b]: def / <TAB><2sp>$$   code@2   def b@1-1
+
+All five definition-hosted minimal forms release exactly as the plain ones do. So the host is not
+the discriminator, and a fourth narrowing aimed at it would have been fitted to two documents.
+
+What the real documents have instead is a BLANK LINE between the quote and the marker:
+
+    >  / 10. [^a]: def / <6sp>%%            code@2    def a@1-1
+    >  / BLANK / 10. [^a]: def / <6sp>%%    no code   def a@2-3
+
+The blank closes the quote, so `10.` opens a REAL list, and the deeper lines become the
+definition's own content -- which the oracle states directly, `[^a]` ending at line 3 rather than
+line 1. **A blank line is not a node**, so the previous-sibling test could not see it; the guard
+compares the quote's end line to the marker line instead.
+
+    attempt             code        footnotes
+    unguarded           +15         -15            exactly the ceiling, exactly cancelled
+    + contiguity        +12          -8
+    + strictly deeper    +8        2-for-2 trade
+    + ADJACENCY          +6          +2            ZERO regressions on either dimension
+
+The fourth attempt gains less on `code` and is strictly better: the same total movement with no
+document moving backwards, verified by identity on both dimensions rather than by their totals.
+
+**The transferable part is why attempt four worked and a fourth narrowing would not have.** The
+recorded lead named a plausible mechanism; probing it refuted that mechanism and exposed a
+different one in the same documents. Had the lead been implemented as written -- excluding
+definition-hosted items -- it would have scored positively on those two documents while encoding
+a rule Obsidian does not follow, which is the definition of fitting a number. Five probes cost
+less than one implementation and refused the hypothesis this file had written down an hour
+earlier.

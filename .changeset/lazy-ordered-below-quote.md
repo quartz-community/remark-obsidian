@@ -28,9 +28,20 @@ an intervening column-0 definition means the list has already ended. And the lin
 DEEPER than the item's content column -- the inverse of the shallow test the sibling arm applies,
 since this one is about a line too deep to be item content rather than too shallow to belong.
 
-Obsidian's code-block ranges move from 826/883 to 834/883 agreeing. The footnote dimension holds
-at 5994/6818 as a two-for-two trade rather than an identity hold: two documents whose item content
-is itself a footnote definition now lose their definition to the released code, and two others
-gain. Those two are a measured lead and not a mystery -- a definition-hosted item's deeper line
-continues the definition -- but narrowing for them would be a fourth pass over this rule, so it is
-recorded instead.
+Obsidian's code-block ranges move from 826/883 to 832/883 agreeing and the footnote dimension from
+5994/6818 to 5996/6818, with ZERO regressions on either -- verified by comparing the agreeing sets
+by identity rather than by their totals, since two documents trading cancel perfectly in a net
+figure.
+
+A third guard earns that. The quote must be ADJACENT to the marker and not merely its previous
+sibling, because a blank line between them closes the quote, so the marker opens a real list and
+the deeper lines become the footnote definition's own content:
+
+```
+>  / 10. [^a]: def / <6sp>%%            code@2   def a@1-1
+>  / blank / 10. [^a]: def / <6sp>%%    no code  def a@2-3
+```
+
+A blank line is not a node, so the sibling test cannot see it. That shape is both documents an
+earlier attempt traded away, and the definition ending at line 3 rather than 1 is the oracle
+saying those lines belong to it.

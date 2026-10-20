@@ -228,12 +228,23 @@ export function quoteLazyIndentedCodeTransform(
       // rather than a list, so the predicate is chosen per host rather than per line.
       const previous = index > 0 ? children[index - 1] : undefined;
       const start = (node as unknown as { start?: number | null }).start;
+      // ADJACENT, not merely the previous sibling: a blank line between the quote and the
+      // marker closes the quote, so the marker opens a REAL list and nothing is released.
+      // Measured, `>` over `10. [^a]: def` over `<6sp>%%`:
+      //
+      //     quote adjacent        code@2    def a@1-1
+      //     quote, BLANK, marker  []        def a@2-3   -- the definition absorbs both lines
+      //
+      // The sibling test alone cannot see it, because a blank line is not a node. This is the
+      // shape of both documents the previous attempt traded away, and `[^a]` ending at line 3
+      // rather than 1 is the oracle saying the deeper lines are the DEFINITION's content.
       const belowQuote =
         isList &&
         typeof start === "number" &&
         start !== 1 &&
         previous !== undefined &&
-        QUOTES.has(previous.type);
+        QUOTES.has(previous.type) &&
+        previous.position?.end.line === markerLine! - 1;
 
       const run = lazyRun(
         position.start.line - 1,
