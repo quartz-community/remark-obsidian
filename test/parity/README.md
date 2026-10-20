@@ -9567,3 +9567,56 @@ All three have a quote above a non-1 marker where Obsidian does NOT absorb. Two 
 `>>` quote and one has the marker's content as a thematic break, so the shape that distinguishes
 them is visible but not yet measured -- and fitting a guard to three documents is what this file
 has refused five times. 19 gained against 3 lost is recorded as a trade.
+
+## Which other refused families the vendoring approach should reach
+
+The blockquote landing generalises, and the generalisation is sharper than "try vendoring":
+
+> **A repair pass can filter the facts a wrong structure produced. It cannot change which
+> construct OWNS a line.** Ownership is decided in the document tokenizer, so a family whose
+> refusals were ALL repair passes, and whose own write-up says "extent" or "owns", is being
+> refused for the wrong reason.
+
+Two independent screens already identify those families without new work. The attribution sweep
+reports **94 diverging documents owned by NO pass** and the `code` dimension as **98% tokenizer
+territory** -- documents no repair can reach by construction. And re-measuring the refused shapes
+against the current state ranks them:
+
+    BASE 7.8%  (530 of 6818 diverging on defs or code)
+
+    quoted %% (depth 1+)         n= 292  div= 63  P=21.6%  lift=2.78
+    quoted $$                    n= 246  div= 35  P=14.2%  lift=1.83
+    five-space cap (marker+5sp)  n= 801  div= 91  P=11.4%  lift=1.46
+    tab in marker separator      n=1067  div=104  P= 9.7%  lift=1.25
+    callout + tab line           n=   9  div=  0  P= 0.0%  lift=0.00
+
+### The strongest candidate is the family refused three times for exactly this reason
+
+**Quoted `%%` -- lift 2.78 over 63 documents.** Its own notes say the obstacle verbatim: "the
+opener side is settled and the closing boundary is not", and "blocked on the container's true
+extent". Three scorings refused it -- 18/65, an INERT variant, and 5/11 -- and every one of them
+was a repair pass computing a boundary heuristically after the fact. A `%%` opened inside a quote
+is bounded BY the quote, which is an ownership question the comment construct can answer and no
+pass over the finished tree can.
+
+**Quoted `$$` is the same shape at lift 1.83 over 35 documents**, and `compose.mts`'s isolate sweep
+already said so from the other direction: 34 of its 43 divergences were `comment` and `math` after
+an open container, and the sweep's own conclusion was "it is container STATE, not adjacency". That
+is the identical sentence the blockquote work ended up proving.
+
+**The five-space cap is the biggest population at 91 and the weakest case for this route.** It has
+been identified three times as wanting `legacy-list.ts` and refused four ways as a repair
+(11/97, 0/3, 31/351, plus the `ref-miss` fence sub-family) -- but its lift is 1.46, and unlike the
+`%%` family nothing has established that an OWNERSHIP decision is what it needs. Worth a
+measurement before a vendoring.
+
+### And one family closed itself
+
+`callout + tab line` was recorded as 67 documents with "the observable recorded and the mechanism
+unknown", after a four-probe model died on its fourth row. It is now **9 documents with ZERO
+diverging**. Nothing was built for it; the container rules that landed since subsumed it.
+
+That is the third family this effort has found closed by other work rather than by its own fix --
+after the container-line-becomes-root-code bucket (92 of 109, gone) and the `def-end+1` tab slice.
+**A refused family is worth re-counting before it is re-attempted**, which is the same lesson the
+lift audit reached from the other side, and it costs one predicate.
