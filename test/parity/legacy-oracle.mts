@@ -52,11 +52,22 @@ const require = createRequire(import.meta.url);
 const unified9 = require("unified9");
 const parse8 = require("remarkParse8");
 const footnotes2 = require("remarkFootnotes2");
+const math3 = require("remarkMath3");
 
-/** `inlineNotes` on, because Obsidian supports `^[inline]` and the referee records them. */
+/**
+ * The stack the referee corpus's own author identifies as Obsidian's, at the exact versions:
+ * stock `remark-parse@8.0.3` + `remark-footnotes@2.0.0` + `remark-math@3.0.1`, plus extensions
+ * for callouts, wikilinks, frontmatter and `%%` comments. They report 99.2% on footnote
+ * identification with it.
+ *
+ * `remark-math` is NOT optional and leaving it out is what made the first measurement here read
+ * 82.3%: `$$` changes where a block ends, so every definition whose extent runs past one moves.
+ * `inlineNotes` is on because Obsidian supports `^[inline]` and the referee records them.
+ */
 const legacy = (unified9.default ?? unified9)()
   .use(parse8.default ?? parse8)
-  .use(footnotes2.default ?? footnotes2, { inlineNotes: true });
+  .use(footnotes2.default ?? footnotes2, { inlineNotes: true })
+  .use(math3.default ?? math3);
 
 const parseLegacy = (text: string): Node => legacy.parse(text) as Node;
 /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
@@ -142,7 +153,23 @@ for (const { id, rec } of records) {
             (rec.defs ?? []).map((d) => [d[0].toLowerCase(), d[1], d[2], d[3]]),
           )
         : JSON.stringify([...(rec.code ?? [])].sort());
-    const ours = dim === "defs" ? defsOf(mine) : codeOf(mine);
+    // OUR side comes from the referee's own PROJECTION, not from walking the tree. Walking it
+    // reports 6134 where the projection reports 6315, because the projection applies this
+    // package's rules -- a definition buried in a `%%` comment does not define, which is worth
+    // +123 documents on its own. Measuring ours differently from the gate understated us by 181
+    // documents and overstated the blueprint by the same amount: the fourth instance tonight of
+    // a reimplemented comparison reading as a finding.
+    const ours =
+      dim === "defs"
+        ? JSON.stringify(
+            refereeFactsWithTree(text).defs.map((d) => [
+              d[0].toLowerCase(),
+              d[1],
+              d[2],
+              d[3],
+            ]),
+          )
+        : codeOf(mine);
     const theirs = dim === "defs" ? defsOf(legacyTree) : codeOf(legacyTree);
     const t = tally[dim];
     t.n += 1;

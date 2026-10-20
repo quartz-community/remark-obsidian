@@ -81,6 +81,7 @@
     "remark-rehype": "^11.1.2",
     "remark-stringify": "^11.0.0",
     "remarkFootnotes2": "npm:remark-footnotes@^2.0.0",
+    "remarkMath3": "npm:remark-math@^3.0.1",
     "remarkParse8": "npm:remark-parse@^8.0.3",
     "tsup": "^8.5.0",
     "tsx": "^4.23.15",

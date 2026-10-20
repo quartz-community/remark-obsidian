@@ -10072,3 +10072,61 @@ writes the blueprint ids. The loop is then local: diff our tree against rp8's on
 document, cluster the structural differences, fix by construct, and re-run both oracles -- with
 `referee.mts` as the gate and no Obsidian in the loop at all. That is thousands of documents per
 second against one.
+
+## The referee corpus's own author names the stack, and it reframes the target
+
+Context from the author of `obsidian-footnotes`, whose recorded answers this harness measures
+against:
+
+> Obsidian uses stock remark-parse 8.0.3 + remark-footnotes 2.0.0 + remark-math 3.0.1, along with
+> a few extra rules to add callouts, wikilinks, frontmatter, `%%` comments, and some other stuff.
+> With this setup in my jank parser, I've managed to match Obsidian about 99.2% on footnote
+> identification.
+
+All three install at those exact versions, and the measurement confirms the stack is the right
+one and the EXTENSIONS are most of the distance:
+
+    stock parse8 + footnotes2                     5609/6818
+    ...plus math3 (the version they name)         5640/6818
+    ours (micromark + 60 passes)                  6315/6818
+
+Math is worth +31 and not optional -- `$$` moves where a block ends, so every definition whose
+extent runs past one moves with it. But the jump from 5640 to 99.2% is the extensions, and `%%`
+comments alone are worth +123 documents by this file's own measurement: a definition inside a
+comment does not define, and stock has no comment construct at all.
+
+### The metrics are NOT the same, which matters before concluding we are nine points behind
+
+"Footnote identification" is names. Ours, measured three ways on the same corpus:
+
+    NAMES only (identification)   6503/6818   95.4%
+    name + START position         6465/6818   94.8%
+    name + start + END (strict)   6315/6818   92.6%
+
+So the comparable figure is **95.4% against their 99.2%** -- a 3.8-point gap, not nine. And our
+strict figure carries an end line their metric does not measure at all.
+
+### And the fourth reimplemented comparison of the night was in this instrument
+
+`legacy-oracle.mts` compared OUR side by walking the tree for `footnoteDefinition` nodes, where
+the gate uses the referee's PROJECTION -- which applies this package's rules, including the
+commented-definition one. That understated us by 181 documents and overstated the blueprint by the
+same amount:
+
+    tree walk            ours 6134   blueprint 413
+    referee projection   ours 6315   blueprint 312
+
+Fourth instance tonight, in an instrument written an hour earlier, by someone who had just written
+up the rule. The procedure that catches it is the same one every time: **compare your comparison
+against the gate's, on purpose, before believing any number it produces.**
+
+### What the blueprint is now worth
+
+    312 documents  rp8 right, we wrong      <- answer available locally
+    987 documents  we right, rp8 wrong      <- our extensions, correctly added
+    191 documents  both wrong               <- the genuinely novel remainder
+
+The 191 is the honest size of what nobody has solved, and the author reaches 99.2% -- so their
+extension rules cover most of it. That makes the highest-value action not a measurement or a
+refactor but **taking up their offer**: the exact stack is confirmed, the remaining distance is
+extension behaviour they have already worked out, and they have asked to contribute it.
