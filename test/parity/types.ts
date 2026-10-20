@@ -180,6 +180,22 @@ export const PROJECTION_KEYS = [
 ] as const satisfies ReadonlyArray<keyof Projections>;
 
 /**
+ * `satisfies` checks each ENTRY is a key; it does NOT check that every key is listed. This does.
+ *
+ * Adding a field to `Projections` without comparing it fails to COMPILE, which is the trap the
+ * docstring below already names -- `referenceLinks` sat recorded-but-uncompared for months, and a
+ * recorded field nobody compares looks exactly like a field that agrees.
+ */
+type UnlistedProjectionKey = Exclude<
+  keyof Projections,
+  (typeof PROJECTION_KEYS)[number]
+>;
+const _everyProjectionKeyListed: UnlistedProjectionKey extends never
+  ? true
+  : UnlistedProjectionKey = true;
+void _everyProjectionKeyListed;
+
+/**
  * The `metadataCache` projections the compute oracle compares.
  *
  * Beside `PROJECTION_KEYS` rather than inside `compute.test.ts`, so `overview.mts` can assert
@@ -203,4 +219,30 @@ export const COMPUTE_KEYS = [
   "listItems",
   "referenceLinks",
   "frontmatterPosition",
-] as const;
+] as const satisfies ReadonlyArray<keyof ComputedMeta>;
+
+/**
+ * The keys this oracle deliberately does NOT compare, so the check below can be exhaustive.
+ *
+ * Both need the YAML parsed, which this package does not do, so `computeOurs` emits neither --
+ * the argument is in `compute.test.ts`. Naming them is what lets a NEW field be a compile error
+ * rather than a silent omission: it has to go in one list or the other.
+ */
+const COMPUTE_KEYS_NOT_COMPARED = [
+  "frontmatter",
+  "frontmatterLinks",
+] as const satisfies ReadonlyArray<keyof ComputedMeta>;
+
+/**
+ * `COMPUTE_KEYS` carried NO `satisfies` clause at all until now, so a misspelt entry was silently
+ * uncompared -- the same failure as omitting one, with no way to notice. Both halves are checked
+ * here: every entry is a key, and every key is in exactly one of the two lists.
+ */
+type UnclassifiedComputeKey = Exclude<
+  keyof ComputedMeta,
+  (typeof COMPUTE_KEYS)[number] | (typeof COMPUTE_KEYS_NOT_COMPARED)[number]
+>;
+const _everyComputeKeyClassified: UnclassifiedComputeKey extends never
+  ? true
+  : UnclassifiedComputeKey = true;
+void _everyComputeKeyClassified;

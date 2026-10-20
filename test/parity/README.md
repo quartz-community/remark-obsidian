@@ -9973,3 +9973,45 @@ before `normalizePointsTransform` (one pass declined its own case invisibly), us
 slice for a node's `value` (four instances, one bug class), and `PROJECTION_KEYS`'s own
 exhaustiveness. The first two are candidates for a dev-mode assertion rather than a type, since
 both are about WHEN a field is read rather than whether it exists.
+
+## The remaining three, and two of them were mis-listed
+
+Asked whether the three comment-only invariants were worth mechanising. Checked each against what
+the suite already asserts, and the honest answer is that the list was wrong:
+
+| invariant                                         | actual state                                                                                                                                                                                  |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| a raw slice is for `position`, never for `value`  | **already mechanised** -- `roundtrip.test.ts` asserts `neverSettles` is EMPTY, and every instance of this bug class produced exactly non-convergence: "correct on pass 1 and grows on pass 2" |
+| offsets read before `normalizePointsTransform`    | **partly mechanised** -- `points.test.ts` gates a stale point in the OUTPUT; what is uncovered is a pass READING one and silently declining, which produces no wrong output                   |
+| `PROJECTION_KEYS` / `COMPUTE_KEYS` exhaustiveness | genuinely open, now CLOSED -- and worse than recorded                                                                                                                                         |
+
+### `COMPUTE_KEYS` had no type check of any kind
+
+`PROJECTION_KEYS` at least carried `as const satisfies ReadonlyArray<keyof Projections>`.
+`COMPUTE_KEYS` ended `] as const;` with nothing -- so a MISSPELT entry was silently uncompared,
+which is the `referenceLinks` failure with no way to notice at all. Both halves are now checked:
+
+    PROJECTION_KEYS   Exclude<keyof Projections, listed>      must be never
+    COMPUTE_KEYS      satisfies ReadonlyArray<keyof ComputedMeta>   -- added
+                      plus COMPUTE_KEYS_NOT_COMPARED for `frontmatter` and `frontmatterLinks`,
+                      so a NEW key must go in one list or the other
+
+Break-tested both ways:
+
+    Projections + zzNew     error TS2322: Type 'true' is not assignable to type '"zzNew"'
+    ComputedMeta + zzMeta   error TS2322: Type 'true' is not assignable to type '"zzMeta"'
+
+The deliberate exclusions are now a NAMED LIST rather than an absence, which is the difference
+between "we decided not to compare this" and "nobody noticed it".
+
+### What is left, and why no mechanism is recommended for it
+
+One invariant: a pass reading `.line`/`.column` before `normalizePointsTransform` rebuilds them.
+It resists typing because it is about WHEN a field is read, and it resists assertion because a
+stale point between surgery and normalisation is the DESIGN -- an assertion would fire on every
+correct pass. The recorded cost was a pass declining its own case invisibly, and an invisible
+decline has no observable to gate.
+
+So the mitigation stays what it is: `normalizePointsTransform` runs last, `points.test.ts` gates
+the output, and the convention is documented at the one call site that got it wrong. **Recommending
+no mechanism is also an answer**, and a better one than a proxy that fires on correct code.
