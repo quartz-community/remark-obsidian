@@ -10015,3 +10015,60 @@ decline has no observable to gate.
 So the mitigation stays what it is: `normalizePointsTransform` runs last, `points.test.ts` gates
 the output, and the convention is documented at the one call site that got it wrong. **Recommending
 no mechanism is also an answer**, and a better one than a proxy that fires on correct code.
+
+## A different angle: `remark-parse@8` is installable, and it answers 427 of our failures
+
+The one-document-at-a-time approach was correctly called infeasible -- months for the footnote
+tail. The angle that changes it was in this file's own README all along: Obsidian's inherited
+divergences come from **`remark-parse@8`**. The whole effort has been RE-DERIVING that parser's
+behaviour one rule at a time, by probing a live application at roughly one document per second.
+The parser installs in seconds and answers in process.
+
+    DEFS over 6818 documents          CODE over 883 documents
+      ours agree            6134        ours agree             847
+      remark-parse@8        5609        remark-parse@8         565
+      rp8 RIGHT, we wrong    411        rp8 RIGHT, we wrong      16
+      we right, rp8 wrong    936        we right, rp8 wrong     298
+      both wrong             273        both wrong               20
+
+**427 documents whose correct answer is available locally**, and 411 of them are 60% of the
+remaining definition gap.
+
+### It is a HYPOTHESIS GENERATOR, not a replacement oracle
+
+rp8 is WORSE overall -- 5609 against our 6134 -- which is expected, since sixty passes sit on
+micromark here for exactly that reason. The 936 documents where we are right and rp8 is wrong are
+the extensions and fixes this package correctly adds, and copying rp8 there would regress them.
+
+What makes it valuable is the asymmetry, used per document: **where rp8 matches the recorded
+Obsidian answer and we do not, its tree is the blueprint and the diff between the two trees is the
+work.** The recorded answer is still the authority; rp8 just supplies the candidate.
+
+### And it answers families this file had REFUSED
+
+Three spot-checks, all genuine:
+
+    want ["ch2*",15,0,16]   ours ["ch2*",15,0,18]   def-end +2
+    want []                 ours [["3",23,2,23]]    def-extra
+    want ["x-y",9,3,11]     ours ["x-y",9,3,9]      def-end -2
+
+`def-end±N` is 213 documents that these notes classified IN FULL and closed with "nothing in the
+family is worth building" -- its largest slice being the refused `quote-truncate` family and its
+tail seven mechanisms of four to seventeen documents. **That conclusion was sound about deriving
+the rule from the divergences, and wrong about the rule being unavailable.** It is implemented in
+a parser that installs with one command.
+
+The general lesson is the one this session keeps paying for in different costumes: before mining
+an oracle's disagreements for a rule, ask whether the rule is written down somewhere. Four
+counting selectors, six classification axes and a full form-level shrink all concluded the
+remainder was structureless. It is not structureless -- it is a different parser's behaviour, and
+the behaviour is installable.
+
+### How to work it
+
+    npx tsx --conditions=development test/parity/legacy-oracle.mts --ids
+
+writes the blueprint ids. The loop is then local: diff our tree against rp8's on a blueprint
+document, cluster the structural differences, fix by construct, and re-run both oracles -- with
+`referee.mts` as the gate and no Obsidian in the loop at all. That is thousands of documents per
+second against one.
