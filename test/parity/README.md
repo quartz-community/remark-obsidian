@@ -9758,3 +9758,78 @@ Not implemented, and deliberately: the consumer is now named and its scope is me
 formula covers the eight rows, and fitting one to four cells while two controls pull against it is
 the mistake this file has refused five times. The next move is a grid over the DEFINITION's prefix
 crossed with the host -- the axis these eight probes sampled by hand.
+
+## AUDIT: is the referee accurate, or is our tooling misclassifying it?
+
+Asked directly, because either answer would invalidate work built on this oracle. Both halves
+were checked, and the answers are opposite:
+
+    THE REFEREE IS FAITHFUL.          Genuine staleness is 21 of 6,818 documents -- 0.3%.
+    OUR TOOLING WAS MISCLASSIFYING.   The shrinker skipped 67 and should have skipped 21.
+
+### The number that started it was mine, and it was the third instance of a documented mistake
+
+The claimed "58 documents agree with live" was INFERRED from `67 SKIPPED ... 9 of those have
+untrustworthy refs` by subtraction. That counter's own comment in `referee-shrink.mts` says not to:
+
+    // "SKIPPED", not "agree". This counter incremented for any document the loop declined ...
+    // so it read 34% on `ref-extra` and 0% on `def-miss @ code` and was taken twice as evidence
+    // that the referee corpus had gone stale.
+
+Third time. The lesson is not "read the comment" -- it is that **a counter whose name and meaning
+differ will be misread every time it is read**, so the honest fix is to stop producing it.
+
+### Measured three ways instead, on all 67
+
+Each document asked of LIVE Obsidian and compared against both the recorded answer and ours, with
+an independent comparator -- order-sensitive lists, empty-named references dropped from both sides:
+
+    dimension   live==ours, !=rec   live==rec, !=ours   all three agree   neither
+    defs                0                   5                 62             0
+    refs               21                  39                  5             2
+
+**Zero genuine staleness on definitions.** Twenty-one on references. And 44 documents where live
+agrees with the RECORDED answer and not with us -- real divergences the shrinker declined to work.
+
+### The defect: a position-independent signature answering a strict question
+
+`liveSignature` is deliberately coarse, because its job is "did this reduction preserve the
+divergence" and dropping a line shifts every line below it. It keys definitions and references by
+NAME and compares a column and a span LENGTH. Two consequences, both measured:
+
+- **32 of the 67 carry a duplicate def or ref name**, and a name-keyed map overwrites:
+  `[["x",11,3,13],["x",15,6,17]]` against `[["x",11,3,12],["x",15,6,17]]` collapses to one entry
+  and the end-line difference on the FIRST vanishes.
+- **a reference's LINE is never compared at all**, only its column.
+
+The skip decision reused that signature to answer "does live agree with us", which is a different
+question. `liveAgreesStrictly` now answers it the way the gate does.
+
+### And fixing only the skip made things WORSE, which is the part worth keeping
+
+With a strict skip and a coarse loop, **42 of 46 documents reduced to the EMPTY STRING** -- a
+signature that cannot see a divergence cannot see it vanish either, so every line was droppable.
+A false reduction is worse than a false skip: it writes a form into the ledger that proves
+nothing, and 42 of them would have read as a 42-document family.
+
+Both tests are needed, for different reasons: the signature keeps the reduction
+position-independent, and the strict test stops it reducing past the divergence.
+
+    before       67 skipped, 0 reduced of those
+    skip only    21 skipped, 46 reduced -> 42 EMPTY forms
+    both         21 skipped, 46 reduced -> 36 real forms
+
+The 21 matches the independent three-way count exactly, which is two methods agreeing rather than
+one method repeated.
+
+### What this does and does not invalidate
+
+**`referee.mts` never used `liveSignature`.** The agreement figures every rule was measured
+against -- 6013/6818 and 847/883, each verified by identity diffs on the agreeing sets -- are
+unaffected, and so is every shipped rule. The defect was confined to WHICH documents the shrinker
+offered for reduction.
+
+So the cost was missed leads rather than wrong ones: 46 documents were never reduced, and they
+carry clusters the queue has not seen, including `-` / blank / blank / `lazy` / `[^1]:` at five
+documents and `>` / `>` / blank / `use[^1]` at three. The oracle is sound; the funnel in front of
+it was leaking.

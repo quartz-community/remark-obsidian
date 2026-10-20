@@ -136,6 +136,49 @@ function liveSignature(text: string, obs: Answer): string {
   });
 }
 
+/**
+ * Does LIVE Obsidian agree with us, compared the way `referee.mts` compares?
+ *
+ * `liveSignature` cannot answer this, and reusing it for the skip decision was a CATEGORY
+ * ERROR. That signature is deliberately POSITION-INDEPENDENT, because its job is "did this
+ * reduction preserve the divergence" -- dropping a line above a definition shifts every line
+ * below it, and a strict comparison would read a preserved divergence as a changed one. So it
+ * keys definitions and references by NAME and compares only a column and a span LENGTH.
+ *
+ * Both of those lose real divergences, measured over the 67 documents it skipped:
+ *
+ *     32 of 67 carry a DUPLICATE def or ref name, and a name-keyed map overwrites -- so
+ *        `[["x",11,3,13],["x",15,6,17]]` against `[["x",11,3,12],["x",15,6,17]]` collapses to
+ *        one entry and the end-line difference on the FIRST vanishes
+ *     a reference's LINE is never compared at all, only its column
+ *
+ * Asked properly -- live against the recorded answer against ours, on all 67 -- the verdicts
+ * invert: ZERO documents where live agrees with us against the recorded answer on `defs`, and
+ * 5 where live agrees with the RECORDED answer and not with us. On `refs`, 21 genuine and 39
+ * misclassified. So the referee corpus is faithful and the skip was wrong.
+ *
+ * This is the comparison the gate performs: order-sensitive lists, an empty-named reference
+ * excluded from both sides, `code` as its own dimension.
+ */
+function liveAgreesStrictly(text: string, obs: Answer): boolean {
+  let mine: Facts;
+  let mineCode: number;
+  try {
+    const got = refereeFactsWithTree(text);
+    mine = got;
+    mineCode = got.tree.children.filter(
+      (child) => child.type === "code",
+    ).length;
+  } catch {
+    return false;
+  }
+  const named = <T extends readonly [string, ...number[]]>(xs: readonly T[]) =>
+    JSON.stringify(xs.filter((x) => x[0] !== ""));
+  if (named(mine.defs) !== named(obs.defs)) return false;
+  if (obs.refsTrustworthy && named(mine.refs) !== named(obs.refs)) return false;
+  return mineCode === obs.code.length;
+}
+
 const AGREES = JSON.stringify({
   defsMissing: [],
   defsExtra: [],
@@ -257,7 +300,9 @@ async function live(entries: readonly Entry[]): Promise<void> {
     // answer can differ from the running app -- that is what `release-diff.mts` exists to
     // measure -- and shrinking toward a disagreement the application does not have would
     // manufacture a probe for a rule that is not there.
-    if (want === AGREES || want === "threw") {
+    // STRICTLY, not by the shrink signature -- see `liveAgreesStrictly`. Using the
+    // position-independent signature here skipped 67 documents of which only 21 were genuine.
+    if (want === "threw" || liveAgreesStrictly(entry.text, first)) {
       agreeing += 1;
       record(key, "", want === "threw" ? "threw" : "agrees");
       continue;
@@ -290,10 +335,16 @@ async function live(entries: readonly Entry[]): Promise<void> {
         lines.filter((_, at) => !drop.has(at)).join("\n");
       const probes = candidates.map((at) => without(new Set([at])));
       const answers = await askBatch(probes);
+      // BOTH tests. The signature keeps the reduction position-independent, and the strict one
+      // stops it reducing past the divergence altogether: with the skip made strict and this
+      // left coarse, 42 of 46 documents reduced to the EMPTY STRING, because a signature that
+      // cannot see their divergence cannot see it vanish either. A false reduction is worse
+      // than a false skip -- it writes a form into the ledger that proves nothing.
       const droppable = candidates.filter(
         (at, index) =>
           answers[index] !== undefined &&
-          liveSignature(probes[index]!, answers[index]!) === want,
+          liveSignature(probes[index]!, answers[index]!) === want &&
+          !liveAgreesStrictly(probes[index]!, answers[index]!),
       );
       if (droppable.length === 0) break;
 
