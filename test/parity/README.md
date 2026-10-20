@@ -8919,3 +8919,47 @@ agreement against an oracle whose own comparison is looser than ours in three do
 What that leaves as real work is everything NOT in this queue: the 97 skipped documents (refs not
 adjudicable -- an instrument gap, not a parity gap), the `--inline` axes still on the intermittent
 CLI, and the `code` dimension at 814/883 whose remaining 69 are 98% tokenizer-owned.
+
+## The refs instrument gap: PREFIX augmentation recovers all of it
+
+The full shrink left 97 documents unadjudicable -- "refs not adjudicable", an instrument gap
+rather than a parity gap. The mechanism is in `augment`: `footnoteRefs` is definition-gated, so
+the channel APPENDS a synthesised definition for every referenced name. A document with an
+unclosed tail construct -- `%%`, a fence, `$$` -- swallows those appended definitions, so they
+define nothing, the names stay undefined, and `refsTrustworthy` correctly reports that the answer
+cannot be trusted.
+
+**Definitions placed BEFORE the document cannot be tail-swallowed.** Measured on the diverging
+set:
+
+    sampled 260 diverging documents; untrustworthy refs: 41
+    PREFIX augmentation recovers: 41 of 41
+
+All of them. Scaled to the full set that is the whole 97-99, so the gap is closed by changing
+WHERE the synthesised definitions go.
+
+### One caveat that must not be lost
+
+Eight of the 41 begin with FRONTMATTER. Prefixing recovers their refs and also moves `---` off
+line 0, so what was frontmatter parses as a thematic break or setext underline instead. The refs
+come back, but from a document that means something different. Those eight need either exclusion
+or an insertion point after the frontmatter block; the other 33 are unconditionally safe.
+
+So the implementation is: try the append form, and on `refsTrustworthy: false` re-ask with the
+prefix form, shifting every reported ref line back by the number of prepended lines. The shift is
+deterministic. It is NOT built here -- recording a proven mechanism without the position
+arithmetic is better than half-applying it.
+
+### And it was nearly recorded as a REFUTATION
+
+The first run reported **0 of 41** and read as a clean kill. It was a bug in the probe: Obsidian's
+`footnotes` is an ARRAY of `{position, id}`, not an object keyed by name, so `Object.keys()`
+returned `["0","1"]` -- indices -- and the name check could never match anything.
+
+What caught it was the shape of the number rather than any suspicion about the code. **Zero of
+forty-one is too absolute for a real effect**; a mechanism that genuinely did not work would
+recover a few by luck. This file records this trap repeatedly -- the `obsidian.projections.text`
+path, the `headings` projection's 52 phantoms, `footnoteRefs` omitting its key three times in one
+day -- and it is always the same shape: _a field read the wrong way reads as total disagreement
+or total agreement, never as something in between._ The corollary is a usable rule: **treat 0%
+and 100% as instrument readings until proven otherwise.**
