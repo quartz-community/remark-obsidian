@@ -16,6 +16,7 @@ import { legacyEmphasisSyntax } from "./lib/syntax/legacy-emphasis.js";
 import { legacyDeleteSyntax } from "./lib/syntax/legacy-delete.js";
 import { legacyAutolinkSyntax } from "./lib/syntax/legacy-autolink.js";
 import { legacyCodeTextSyntax } from "./lib/syntax/legacy-code-text.js";
+import { legacyBlockQuoteSyntax } from "./lib/syntax/legacy-block-quote.js";
 import { legacyListSyntax } from "./lib/syntax/legacy-list.js";
 import { legacyEntitySyntax } from "./lib/syntax/legacy-entity.js";
 
@@ -557,6 +558,11 @@ export default function remarkObsidian(
 
   if (opts.legacyLists) {
     data.micromarkExtensions.push(legacyListSyntax());
+    // Beside the list, and gated with it because the rule is about the two meeting: a non-1
+    // ordered marker opens nothing, so the quote absorbs the line instead. Added rather than
+    // disabling stock, exactly as the list above is -- micromark tries the constructs for a
+    // code in order and the one that OPENS a container owns its continuation.
+    data.micromarkExtensions.push(legacyBlockQuoteSyntax());
   }
   if (opts.legacyCodeSpans) {
     data.micromarkExtensions.push(legacyCodeTextSyntax());

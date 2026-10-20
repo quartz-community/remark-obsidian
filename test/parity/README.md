@@ -9518,3 +9518,52 @@ the precedent for taking it.
 Three things are now settled that were not before: the discriminator (`inOpenQuote` plus the
 prefix-line test, measured), the shape of the rule (seven probe rows, no counter-example), and the
 construct that must carry it. What remains is the vendoring itself.
+
+## The vendoring landed, and it is the largest combined move of the effort
+
+`legacy-block-quote.ts` copies micromark's construct verbatim and changes ONE thing, in the
+continuation: a quote that is already OPEN claims a line whose first construct is a non-1 ordered
+marker.
+
+    footnotes  5994/6818  ->  6010/6818   +16   (19 gained, 3 lost)
+    code        826/883   ->   843/883    +17
+    corpus      450 tests, 0 regressions, 4 gates green
+
+Eight shapes checked against live 1.14.4 before the referee was run, and all eight agree --
+including every control, which is what makes the gain attributable:
+
+    >  / 10. / <5sp>Some   blockquote@0-1 + code@2-2   the rule fires
+    >  q / 2. x            blockquote@0-1              the rule fires
+    >  / 10. / more prose  blockquote@0-2              the rule fires
+    >  / 1.  / <5sp>Some   blockquote@0-0 + list@1-2   `1.` unchanged
+    >  / -   / <5sp>Some   blockquote@0-0 + list@1-2   bullet unchanged
+    >  / blank / 10.       blockquote@0-0 + list@2-3   blank-separated unchanged
+    "2. x"                 list@0-0                    bare document unchanged
+    "> [^1]: x" / "> 10."  blockquote@0-1              quote CONTENT unchanged
+
+### Three details that each cost an attempt
+
+**The value must be a STRING, not a first-digit test.** `10.` begins with `1`, and stock's
+interrupt rule tests only the first digit -- which is why stock needs a second check (`size < 2`)
+further in. A lookahead construct run through `effects.check` accumulates the digits instead and
+compares the number.
+
+**Registration ADDS the construct rather than disabling stock**, exactly as `legacy-list.ts` does.
+Pushing a separate `{disable: {null: ["blockQuote"]}}` extension object broke 74 tests: micromark
+tries every construct registered for a code in order, and the one that OPENS a container owns its
+continuation, so adding is sufficient and disabling is not required.
+
+**And the continuation also parses the FIRST opening**, which stock's own comment says. Absorbing
+there would make a bare `2. x` document open a blockquote, so the arm is gated on
+`containerState.open`.
+
+### The three regressions, recorded rather than narrowed for
+
+    ">\t[^A]: body\n>\n>\t# heading\n\n>\t>\tItend...\n2)     ***\n"
+    "...\n> More [^O]\n> [^3]: Prose here$[^x-y]$\n2)  \n\n..."
+    "...\n>>[^2]: Definition\n10. Text\\[^a]words\n"
+
+All three have a quote above a non-1 marker where Obsidian does NOT absorb. Two carry a nested
+`>>` quote and one has the marker's content as a thematic break, so the shape that distinguishes
+them is visible but not yet measured -- and fitting a guard to three documents is what this file
+has refused five times. 19 gained against 3 lost is recorded as a trade.
