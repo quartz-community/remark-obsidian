@@ -10130,3 +10130,58 @@ The 191 is the honest size of what nobody has solved, and the author reaches 99.
 extension rules cover most of it. That makes the highest-value action not a measurement or a
 refactor but **taking up their offer**: the exact stack is confirmed, the remaining distance is
 extension behaviour they have already worked out, and they have asked to contribute it.
+
+## His parser is ON DISK in the repo we lifted the referee from, and running it reframes everything
+
+The referee corpus comes from `obsidian-footnotes`, and that clone has been sitting in `/tmp` for
+this whole effort. We took its test data and never read its source. It contains:
+
+    src/parsing/obsidian-markdown.ts        the stack, assembled
+    src/parsing/remark-parse-list.js        a VENDORED remark-parse list reader
+    src/parsing/remark-parse-tokenizer.js   the tokenizer loop, vendored for speed
+    src/parsing/footnote-facts.ts           `footnoteFacts(text)` -- the whole answer
+    docs/obsidian-reading-rules.md          every rule in plain sentences, labelled A1..P2
+
+Its dependencies are exactly the three versions its author named, so it runs from our
+`node_modules` with the import specifiers remapped. Measured over all 6,818 documents, three
+metrics:
+
+    metric                 OURS            HIS          both wrong
+    names only             95.4%           100.0%            0
+    name + start           94.8%            89.3%           90
+    name + start + END     92.6%            89.3%          111
+
+### Four things fall out, and none of them is what either side assumed
+
+**His 100% on names is flattered by selection**, and his own README says so: `broad-20261004.json`
+is "a few hundred notes of the run that the reader agreed on". So the corpus partly selects for his
+agreement. It is still a complete name oracle ON THIS CORPUS, which is what makes it useful.
+
+**We are AHEAD on positions and behind on names.** 92.6% against 89.3% once the end line counts,
+95.4% against 100% when only names do. The two implementations optimise different things: his
+metric is identification, ours is identification plus extent, and neither figure contradicts the
+other.
+
+**The genuinely unsolved remainder is 111 documents, not 805.** Between the two implementations,
+98.4% of the corpus is answered on the strict metric and 100% on names. That is the number that
+makes the remaining work feasible, and it was unknowable without running his parser.
+
+**And the rules document answers things this file REFUSED.** E4 -- "what may end a definition is
+looked for only within the definition's first 1,024 characters" -- is a precise mechanical rule.
+Measured: 27 documents carry a definition that long and we get 12 of them wrong. Modest, but it
+was sitting in a markdown file while these notes closed `def-end±N` as "nothing in the family is
+worth building".
+
+### What his source is NOT used for
+
+It is not vendored and not copied. The measurement above ran from a scratch copy that was deleted
+after; what stays here is the numbers and the blueprint ids. His code is his, his rules document is
+clean-room from Obsidian's answers, and the right way to use any of it is the collaboration he
+offered rather than a silent lift.
+
+### The lesson, which is the expensive one
+
+Four counting selectors, six classification axes, a full form-level shrink, a 100-minute live
+sweep, and a night of rule derivation all concluded the remainder was structureless. **The answers
+were in a repository already cloned on this machine, in a file called
+`obsidian-reading-rules.md`.** Before mining an oracle, read everything that shipped with it.
