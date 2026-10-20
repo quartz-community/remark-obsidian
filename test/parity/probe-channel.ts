@@ -160,8 +160,15 @@ export function augment(markdown: string): string {
   return `${markdown.endsWith("\n") ? markdown : `${markdown}\n`}\n${tail}\n`;
 }
 
-/** A document whose first line is `---` -- where prefixing would displace the frontmatter. */
-const LEADS_WITH_FRONTMATTER = /^---\r?\n/u;
+/**
+ * A leading frontmatter block, including its closing fence.
+ *
+ * The inner group is OPTIONAL because empty frontmatter is real and was the document that
+ * exposed this: `---` / `---` / `> [!my note]-` has nothing between the fences, and a mandatory
+ * `[\s\S]*?\r?\n` cannot match it. An UNTERMINATED `---` deliberately does not match, since it
+ * is a thematic break rather than frontmatter, and prefixing above it is correct.
+ */
+const FRONTMATTER_BLOCK = /^---\r?\n(?:[\s\S]*?\r?\n)?---\r?\n/u;
 
 /**
  * The same augmentation PREFIXED, which an unclosed tail construct cannot swallow.
@@ -176,7 +183,12 @@ function augmentPrefix(markdown: string): { text: string; lines: number } {
   const names = referencedNames(markdown);
   if (names.length === 0) return { text: markdown, lines: 0 };
   const head = names.map((name) => `[^${name}]: synthesised`).join("\n\n");
-  const text = `${head}\n\n${markdown}`;
+  // AFTER any frontmatter, never above it: `---` must be on line 0 to be frontmatter at all, so
+  // prefixing above it turns the block into a thematic break and answers for a different
+  // document. Inserting below keeps the frontmatter intact and is still above every construct
+  // that could swallow a tail.
+  const block = FRONTMATTER_BLOCK.exec(markdown)?.[0] ?? "";
+  const text = `${block}${head}\n\n${markdown.slice(block.length)}`;
   return { text, lines: text.split("\n").length - markdown.split("\n").length };
 }
 
@@ -387,9 +399,7 @@ export async function ask(
   }
 
   const retry = out.flatMap((answer, at) =>
-    !answer.refsTrustworthy && !LEADS_WITH_FRONTMATTER.test(markdowns[at]!)
-      ? [at]
-      : [],
+    answer.refsTrustworthy ? [] : [at],
   );
   if (retry.length === 0) return out;
 

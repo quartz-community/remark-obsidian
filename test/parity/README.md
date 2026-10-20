@@ -9072,3 +9072,28 @@ not less. The last place a family could have been hiding does not contain one.
 of work here is one document at a time, and the instrument chain is now complete enough to say so
 without qualification: references fully adjudicable, block structure visible, item extent visible,
 coverage printed on every clustering.
+
+## The frontmatter insertion point closes the gap completely
+
+The prefix fallback declined documents starting with `---`, because prefixing above frontmatter
+moves it off line 0 and what was frontmatter parses as a thematic break -- real refs from a
+document that means something else. Inserting the synthesised definitions AFTER the block instead
+keeps the frontmatter intact and is still above every construct that can swallow a tail.
+
+    untrustworthy refs on 260 diverging documents
+      41   no fallback
+       8   prefix fallback, frontmatter declined
+       0   prefix fallback, inserted after the frontmatter block
+
+    out-of-range ref lines: 1 -> 0
+
+**Zero.** Every document on this oracle is now adjudicable on references, and the one ref with a
+position past the end of its document is gone -- it was on a frontmatter-leading note that the
+guard used to decline, so it fell through to the append path whose swallowed tail produced the bad
+position in the first place.
+
+One detail decided it, and the obvious regex gets it wrong: **the inner group must be OPTIONAL,
+because empty frontmatter is real.** `---` / `---` / `> [!my note]-` is the document that exposed
+this, and a mandatory `[\s\S]*?\r?\n` between the fences cannot match it. An UNTERMINATED `---`
+deliberately does not match either -- that is a thematic break and not frontmatter, so prefixing
+above it is correct.
