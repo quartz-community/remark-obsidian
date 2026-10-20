@@ -9712,3 +9712,49 @@ reasoning about it, and the cheapest of the four: one env-guarded line, reverted
 The next step is the CONSUMER -- which pass or projection turns a content column of 6 into a
 reported column of 1 -- and `pass-owner.mts` attributes exactly that kind of question by removal.
 Not a column rule, which is what the delta made it look like.
+
+## The consumer, found: `indentTabs` returns the TAB RUN and discards the rest
+
+`definition-column.ts` computes the column as
+
+    const indentTabs = tabRun > 0 && !/[^ \t]/u.test(prefix) ? tabRun : undefined;
+    const column = indentTabs ? indentTabs : ... host ? contentColumn(source, host) ...
+
+so an all-whitespace prefix beginning with a tab short-circuits to **the number of tabs**, and
+`contentColumn`'s 6 never reaches the output. `<TAB><4sp>` has `tabRun = 1`, which is the 1 the
+grid reports. The branch's own comment says it was measured on `- p` / blank / `<TAB><1sp>` with
+BULLET hosts -- the grid's four cells are an ordered host at indent 2 with no blank line, an input
+class it was never scoped for.
+
+### And it is too coarse by construction, which eight probes show
+
+Holding the host at `  1.<5sp>More` and varying only the definition's own prefix:
+
+    prefix        obs column
+    <TAB>              1
+    <TAB><1sp>         2
+    <TAB><4sp>         3
+    <4sp>              4
+    blank then <TAB><4sp>  3      -- the blank line is IRRELEVANT
+
+**The column moves with what follows the tab**, which a tab-run count cannot express: all three
+tab rows have `tabRun = 1` and Obsidian reports 1, 2 and 3. So the branch is not merely mis-scoped,
+it is the wrong shape for this host.
+
+### What the replacement is NOT, measured
+
+Three formulas fitted and refuted against the same eight rows:
+
+    min(tabRun, hostColumn)          `- p` control holds, `<TAB><1sp>` under the ordered host fails
+    min(chars, hostColumn)           the `<4sp>` row reports 4 where any clamp at 3 gives 3
+    tabRun + trailing spaces         the `- p` control wants 1 and this gives 2
+
+The `- p` / blank / `<TAB><1sp>` control is what kills all three: its prefix and the ordered host's
+`<TAB><1sp>` are the SAME two characters reporting 1 and 2. So a fourth quantity separates them --
+the host -- and this file already records the same shape from the other direction, where
+"identical inputs give opposite answers and something outside the three numbers decides it".
+
+Not implemented, and deliberately: the consumer is now named and its scope is measured, but no
+formula covers the eight rows, and fitting one to four cells while two controls pull against it is
+the mistake this file has refused five times. The next move is a grid over the DEFINITION's prefix
+crossed with the host -- the axis these eight probes sampled by hand.
