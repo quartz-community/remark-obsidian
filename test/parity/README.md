@@ -9023,3 +9023,52 @@ an inherited one, and this file's own standing rule is that a number whose prove
 is an instrument reading. Settling it needs the ledger cleared and a fresh 100-minute sweep, which
 is the next concrete step and a clean one: one command, one measurement, a number that either
 moves the ceiling or does not.
+
+## The fresh sweep: the referee's real ceiling is 58 documents, and the unlocked set is diffuse too
+
+Ledger cleared, 824 documents re-shrunk live. 13,289 round trips.
+
+                        BEFORE (pre-fix)   AFTER (prefix fallback)
+      reduced                  711                741      +30 newly measurable
+      distinct forms           661                687      +26
+      SKIPPED                   97                 67      -30
+      untrustworthy refs        99                  9      -90
+
+The skip reason is a disjunction -- "agree with live, OR refs not adjudicable" -- and the log
+states the 9 are a SUBSET of the 67. So the other 58 are skipped for the first branch:
+
+**58 of the 824 diverging documents AGREE WITH LIVE OBSIDIAN 1.14.4.** The referee's recorded
+answer is stale or wrong on them, so true agreement against the application is 6052/6818 (88.8%)
+and this oracle's effective ceiling is **6760, not 6818**.
+
+That corrects two earlier figures in opposite directions, which is why it was worth measuring
+rather than estimating. Sampling eighteen documents put staleness at **14**; the cache-served run
+suggested **97** and was explicitly not claimed. It is 58 -- four times the sampled figure and
+well under the hypothesised one. The 9 remaining unadjudicable are the frontmatter-leading set the
+prefix guard declines by construction, matching the 8-of-41 sample scaled up.
+
+### The newly unlocked population is diffuse as well
+
++30 documents reduced into +26 distinct forms, 0.87 per document. These are the only documents on
+this oracle that no analysis had ever reached -- every bucket, every scored candidate and the first
+full shrink excluded them by construction -- and they reduce one-to-one exactly like the rest:
+
+    687 forms / 757 documents covered   85% carry TWO OR MORE constructs
+      41 docs  34 forms   quote + tab
+      36 docs  25 forms   tab + marker
+      28 docs  23 forms   tab + marker + indent4
+
+The largest cluster grew from 37 to 41 documents and from 31 to 34 forms, so it got MORE diffuse,
+not less. The last place a family could have been hiding does not contain one.
+
+### Which closes the referee as a target, with a number instead of an opinion
+
+    recorded agreement        5994/6818  (87.9%)
+    agreement vs LIVE         6052/6818  (88.8%)
+    effective ceiling         6760/6818  (99.1%)   -- 58 documents the corpus is wrong about
+    remaining real gap        708 documents in 687 distinct minimal forms
+
+708 documents, 687 forms, no cluster above 41, nothing above 34 forms-per-cluster. The honest unit
+of work here is one document at a time, and the instrument chain is now complete enough to say so
+without qualification: references fully adjudicable, block structure visible, item extent visible,
+coverage printed on every clustering.
