@@ -8990,3 +8990,36 @@ It is not a regression and it is already signalled, because `refsTrustworthy` is
 those answers. The hazard worth writing down is for consumers rather than for this change:
 **an untrustworthy answer can carry ref positions outside the document**, so the flag is not
 advisory. Zero retried documents produce one, which is the property the shift had to have.
+
+## Re-running the shrink with refs adjudicable: the flag clears, and the skip needs a fresh run
+
+    referee (offline, recorded answers)   5994/6818 and 814/883   UNMOVED, as predicted
+                                          the fix is to the LIVE channel; `referee.mts` reads
+                                          recorded answers and cannot see it
+
+    shrink over the same 824              BEFORE          AFTER
+      untrustworthy refs                    99              0      <- the fix, confirmed
+      SKIPPED                               97             97
+      newly reduced                        711              0
+      channel round trips               12,861              1      <- CACHE-SERVED
+
+**The untrustworthy count going 99 to 0 is the result**: no document on this oracle is now
+unadjudicable on references, which is what the prefix fallback was built for.
+
+### And the skip count cannot be interpreted yet, which is worth stating rather than glossing
+
+The second run did **one** round trip and reduced **zero** documents: the ledger already held a
+minimal form for every id, so `--live` served the whole answer from cache. That makes the
+`97 SKIPPED` figure carried over rather than recomputed, and the skip reason is a disjunction --
+"agree with live, OR refs not adjudicable".
+
+If all 97 skips are now the FIRST branch, the consequence is large: 97 of the 824 diverging
+documents would agree with live 1.14.4, putting true agreement at 6091/6818 (89.3%) and the
+referee's recorded staleness at 97 rather than the 14 this file measured by sampling. That would
+raise the ceiling of every remaining target by more than any rule landed this week.
+
+**It is not claimed here.** A cache-served run cannot distinguish a recomputed classification from
+an inherited one, and this file's own standing rule is that a number whose provenance is unclear
+is an instrument reading. Settling it needs the ledger cleared and a fresh 100-minute sweep, which
+is the next concrete step and a clean one: one command, one measurement, a number that either
+moves the ceiling or does not.
