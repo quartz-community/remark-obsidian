@@ -9411,3 +9411,60 @@ RETROACTIVELY in `writeToChild` rather than when its continuation declines.
 Guessing at that is how the last tokenizer attempt in this file cost 32 referee documents and four
 CommonMark list cases. The model is complete, the call site is identified, and the one unknown is
 stated -- which is a better starting point than any amount of further narrowing.
+
+## The unknown is ANSWERED, and the implementation attempt found a different wall
+
+Asked to settle the one open question so the rule could be built. It is settled, by instrumenting
+the decision point and dumping everything `self` exposes on the FIRST invocation:
+
+    document              interrupt    bqDepth   lazy            wanted
+    "2. x"                undefined    0         {}              list starts
+    "para" / "2. x"       true         0         {}              stock already declines
+    "> q" / "2. x"        undefined    1         {}              ABSORB
+    ">" / "2. x"          undefined    1         {}              ABSORB
+    ">" / "" / "2. x"     false        0         {"2":true}      list starts
+    "para" / "" / "2. x"  false        0         {"2":false}     list starts
+    "- a" / "2. x"        undefined    0         {}              unchanged
+
+**`self.interrupt` cannot do it** -- a bare `2. x` and one after a quote are both `undefined`. An
+unmatched `enter:blockQuote` in `self.events` separates them exactly, and **the retroactive-close
+worry was unfounded**: the blank-line row already reads depth 0, so by the time the list construct
+runs, the blank has produced its `exit:blockQuote`. That was the whole blocking question.
+
+### And then the list construct turned out to be the wrong place
+
+Two placements tried, both failing the same way:
+
+    after `effects.enter(kind)`    micromark: "expected exit token to match current token"
+    before it, two-stage like stock  the same assertion, unchanged
+
+The assertion fires in **`micromark-core-commonmark`'s own `tokenizeListEnd`**, reached through
+`exitContainers` from `thereIsNoNewContainer` -- that is STOCK's list construct, not the vendored
+one. So making the vendored list DECLINE leaves the document tokenizer's container stack in a state
+stock's list then tries to exit and cannot.
+
+The two-stage form is not a workaround either, and it is worth recording why it was necessary at
+all: `code` at the start is only the FIRST digit, and `10.` begins with `1`. Stock enforces the
+interrupt rule in two places for exactly that reason -- first digit must be `1` at `start`, then
+`size < 2` inside -- so any mirror of it needs both halves. It still hit the same assertion.
+
+**Reverted.** Shipping past a `devlop` assertion is precisely what `--conditions=development`
+exists to prevent, and this file records a real `expected eol or eof` violation that stayed hidden
+for exactly that reason.
+
+### What the failure says about where the rule belongs
+
+The mechanism is "a blockquote ABSORBS a line that opens no block". The attempt implemented its
+contrapositive -- "a list DECLINES to open" -- and those are not the same operation on the
+container stack: one extends an open container, the other refuses a new one and leaves the
+document tokenizer to work out what happens next. The invariant violation is the evidence that
+the second is not a safe substitute for the first.
+
+So the next attempt belongs in the **blockquote's continuation** rather than the list's start: the
+quote should claim the line, which is a container EXTENDING itself -- an operation micromark
+already supports, since that is what lazy continuation is. `container-lazy.ts` records that
+`disable: {null: [...]}` reaches container constructs, so the blockquote can be vendored the way
+the list already is.
+
+That is a bigger change than this one looked, and it is now precisely scoped: one construct, one
+rule, with the discriminator already measured and the trap already mapped.
