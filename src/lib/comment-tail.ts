@@ -29,7 +29,19 @@ export function commentTailTransform(
     if (start === undefined || end === undefined) continue;
 
     const raw = source.slice(start, end);
-    const closer = raw.lastIndexOf("%%");
+    // THE FIRST `%%` ON THE CLOSING LINE, which is the rule rather than the last one on it:
+    // "the closer is the first `%%` anywhere in a later line... text after the closer starts a
+    // paragraph that takes lazy lines". `lastIndexOf` over the whole comment agrees whenever the
+    // closing line holds ONE `%%` and silently declines when it holds two, because the tail is
+    // then empty and the split never happens:
+    //
+    //     "%%" / "x" / "%% culpa ex %%" / "[^1]: def"   obs no definition, ours one
+    //
+    // Searching from the last line ending keeps the opener out of reach, so a SINGLE-line
+    // comment still lands on offset 0 and is still declined by the guard below.
+    const closingLine = raw.lastIndexOf("\n") + 1;
+    const onClosingLine = raw.indexOf("%%", closingLine);
+    const closer = onClosingLine >= 0 ? onClosingLine : raw.lastIndexOf("%%");
     if (closer <= 0) continue;
 
     const tail = raw.slice(closer + 2);
