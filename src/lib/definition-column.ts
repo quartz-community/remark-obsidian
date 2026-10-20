@@ -162,8 +162,42 @@ export function definitionColumnTransform(tree: Root, source: string): void {
     // ReDoS lint, since both quantifiers can consume a tab.
     let tabRun = 0;
     while (tabRun < prefix.length && prefix[tabRun] === "\t") tabRun += 1;
+    // Under an ORDERED host the spaces after the tab count too, clamped at the host's own
+    // indent plus one. `def-prefix-by-host` crosses the two axes and only this host row
+    // diverges, 2 of 42 cells; the tab-run count is right everywhere else:
+    //
+    //     host `  1.<5sp>More`    <TAB> 1   <TAB><1sp> 2   <TAB><4sp> 3
+    //     host `  *<5sp>More`     <TAB> 1   <TAB><1sp> 1   <TAB><4sp> none
+    //     host `1.<5sp>More`      <TAB> 1   <TAB><1sp> 1   <TAB><4sp> none
+    //
+    // All three tab cells under the ordered host have `tabRun = 1`, so the count alone cannot
+    // produce 1, 2 and 3 -- and `min(1 + spaces, indent + 1)` produces exactly those. Scoping
+    // it to an ordered host is what keeps the bullet rows at 1, including the branch's own
+    // `- p` / blank / `<TAB><1sp>` control, where the SAME two characters report 1.
+    //
+    // The fourth place tonight where ordered and bullet part company, after the lazy release,
+    // the blockquote absorption and whether the line defines at all.
+    const hostLine = host
+      ? source.slice(0, host.position!.start.offset!).lastIndexOf("\n") + 1
+      : -1;
+    const hostOrdered =
+      hostLine >= 0 &&
+      /^[ \t]*\d{1,9}[.)][ ]{5,}/u.test(
+        source.slice(hostLine, source.indexOf("\n", hostLine)),
+      );
+    const hostIndent = hostOrdered
+      ? (/^[ \t]*/u.exec(
+          source.slice(hostLine, source.indexOf("\n", hostLine)),
+        )?.[0].length ?? 0)
+      : 0;
+    let spacesAfterTabs = 0;
+    while (prefix[tabRun + spacesAfterTabs] === " ") spacesAfterTabs += 1;
     const indentTabs =
-      tabRun > 0 && !/[^ \t]/u.test(prefix) ? tabRun : undefined;
+      tabRun > 0 && !/[^ \t]/u.test(prefix)
+        ? hostOrdered
+          ? Math.min(tabRun + spacesAfterTabs, hostIndent + 1)
+          : tabRun
+        : undefined;
     const column = indentTabs
       ? indentTabs
       : tabbed

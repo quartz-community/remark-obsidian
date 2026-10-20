@@ -269,6 +269,40 @@ export const GRIDS: readonly Grid[] = [
     document: (host, sep) => `${host}${sep}More\n\t    [^a]: d\n`,
     field: "def.col",
   },
+  {
+    name: "def-prefix-by-host",
+    what: "a definition's column by its OWN prefix crossed with the host item",
+    // The axis eight hand-probes sampled, and the one that refuted three candidate formulas.
+    // `definition-column.ts`'s `indentTabs` branch short-circuits an all-whitespace prefix
+    // beginning with a tab to the NUMBER OF TABS, discarding both the spaces after it and the
+    // host's content column. Holding the host at `  1.<5sp>More`, Obsidian reports:
+    //
+    //     <TAB>  1      <TAB><1sp>  2      <TAB><4sp>  3      <4sp>  4
+    //
+    // All three tab rows have `tabRun = 1`, so a tab-run count cannot produce 1, 2 and 3. And
+    // the branch's own control -- `- p` with `<TAB><1sp>` -- reports 1 where the ordered host
+    // reports 2 on the SAME two characters, so the host is a fourth quantity no formula over
+    // the prefix alone can see. This crosses them.
+    rows: [
+      ["- p", "- p"],
+      ["* p", "* p"],
+      ["1. p", "1. p"],
+      ["i2 1. p", "  1. p"],
+      ["i0 1.+5sp", "1.     More"],
+      ["i2 1.+5sp", "  1.     More"],
+      ["i2 *+5sp", "  *     More"],
+    ],
+    cols: [
+      ["none", ""],
+      ["tab", "\t"],
+      ["tab1sp", "\t "],
+      ["tab4sp", "\t    "],
+      ["2sp", "  "],
+      ["4sp", "    "],
+    ],
+    document: (host, prefix) => `${host}\n${prefix}[^a]: d\n`,
+    field: "def.col",
+  },
 ];
 
 export const gridNamed = (name: string): Grid | undefined =>
