@@ -10930,3 +10930,40 @@ agreement, that difference is the whole problem.
 
 NEXT: shrink the 11 cascade documents and the 13 unexplained with `--live --ids`, and classify the
 REDUCTIONS rather than the originals.
+
+### `>⇥<!--` loses its definition: diagnosed to one regex, NOT yet fixed
+
+The last open verification row from the tab work. Its code block is now right; the definition
+below it vanishes. Four controls isolate it:
+
+    >⇥<!--  / [^3]: body     defs []       blockquote > code "<!--"   THE BUG
+    >⇥plain / [^3]: body     defs ["3"]    works
+    ⇥<!--   / [^3]: body     defs ["3"]    works -- root
+    >⇥<!--  / blank / def    defs ["3"]    works -- the blank line
+
+The blockquote spans `1:1-2:11` but holds only the code node ending at `1:7`, so line 2 is inside
+its span with NO NODE AT ALL. That is `htmlCommentRegions`: it pairs `<!--` with `-->`, rejects a
+region containing a blank line (which is why control four works), and with no `-->` the region
+runs to the end of the note and swallows the label.
+
+Root works because an indented opener is recognised as CODE and opens nothing. `>⇥<!--` is code
+only under the rule that landed today, and the region scanner cannot see it, for a precise
+reason:
+
+    const QUOTE_RUN = /^(?:[ \t]*>[ \t]?)*/u;
+
+`openerIndent` strips that run before measuring, and it consumes the `>` TOGETHER WITH A TAB. That
+was correct while a tab after `>` was the marker's own padding; it is wrong now that the tab is
+content indentation. So `openerIndent(">⇥<!--")` reads 0 where it should read 4.
+
+**This is the FOURTH place that has to agree about one raw tab**, after the quote's opener, flow,
+and a definition's continuation. The fix is two parts and neither is measured yet:
+
+1. `QUOTE_RUN` must consume `>` and at most one SPACE, never a tab -- the same correction made
+   in `legacy-block-quote.ts`.
+2. `htmlCommentRegions` needs the indent>=4 rejection that `commentRegions` already applies;
+   today it filters only on blank lines and `insideLabel`.
+
+Part 1 gates EVERY `%%` region through `openerIndent`, so it needs a full referee run rather than
+a probe, and part 2 is new behaviour for `<!--` supported so far by a single row. Left for the
+next session with the controls above as its gate.
