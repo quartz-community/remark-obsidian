@@ -11714,3 +11714,57 @@ delimiters from a reference nothing defines -- so an edit there is unlikely to t
 pairing or extent semantics, which is the property that separated the two fixes that shipped from
 the one that did not. `legacyLists` is the same size but is the container tokenizer, where every
 edit so far has been general.
+
+## `bareFootnoteRefs` (19 decisive): both halves route to LIST-ITEM EXTENT
+
+Fourth family through the loop. The shrink's commonest forms are a list item with content and an
+indented label, and the reproducer ids name the cascade outright -- `c292-def-only-obsidian-x1`
+paired with `c293-ref-only-plugin-x1`:
+
+    2x  "1.\n      Prose\n  [^3]:\n"               2x  "   -⇥    More\n⇥    [^ch2*]:\n"
+    2x  "  ````\n  ````\n2)\n      More\n  [^名]:"  1x  "$$\n$$\n-\n  1.  ```\n⇥More\n      [^x-y]:"
+
+Probing them verbatim splits the family three ways:
+
+    1. / 6sp Prose / 2sp label      obs defs ["3@2:2"]   ours refs ["3@2:2"]   Obsidian DEFINES
+    fences / 2) / 6sp / 2sp label   obs defs ["名@4:2"]   ours refs ["名@4:2"]   Obsidian DEFINES
+    -⇥ / 4sp More / ⇥4sp label      obs ["ch2*@1:5"]     ours ["ch2*@1:1"]     COLUMN differs
+    - / 1. ``` / ⇥More / 6sp label  obs defs [] refs []  ours refs ["x-y@5:6"] we INVENT
+    - / 2) ```` / ⇥Prose / 6sp lbl  obs defs [] refs []  ours refs ["x-y@4:6"] we INVENT
+
+Counted unreduced:
+
+    (A) Obsidian DEFINES, we emit a bare REF            43 assertions / 41 documents
+    (B) we INVENT a bare ref inside an unclosed FENCE   19 assertions / 16 documents
+
+(B) looked like the narrow one -- a scope guard on a projection pass, no container semantics. The
+probe said otherwise, and the ROOT CONTROLS are what gave it away: every root-level fence case
+already agrees.
+
+    unclosed ``` at root / unclosed ~~~ / closed fence / indented code / ref after a fence
+      -> all ok, the shield already works
+    unclosed fence IN A LIST ITEM   obs refs []   ours ["x-y@3:6"]   -> the only divergence
+
+The tree says why:
+
+    root fence     code 1:1-3:1 "text [^a] more"          extends, shields the reference
+    fence in item  list > listItem > code 2:7-2:10 ""     CLOSES IMMEDIATELY, empty
+                   paragraph 3:2-4:14 -> footnoteReference live
+
+So (B) is not a shielding gap. **An unclosed fence inside a list item does not extend**, and the
+bare reference is a downstream symptom. That is container-tokenizer extent -- the category whose
+edits have been general every time, and which cost net -19 earlier today.
+
+### Both halves, and two other families, converge on one blocker
+
+    bareFootnoteRefs (A)   43 assertions   definition does not form under a list item
+    bareFootnoteRefs (B)   19 assertions   unclosed fence in a list item does not extend
+    legacyLists            19 documents    the container tokenizer itself
+    F5 (refused earlier)    9 documents    is the list still open at a tab-indented line
+
+Four separately-discovered families terminate at LIST-ITEM EXTENT. That makes it the structural
+analogue of what `one raw tab is one indent` was for the quote: a single question -- where does a
+list item's content begin and end -- whose answer several families are waiting on. It is also the
+area with this session's worst record (two reverts and a micromark `expected exit token to match
+current token`), so it wants Oracle and a dedicated run, not an opportunistic patch at the end of
+a long session.
