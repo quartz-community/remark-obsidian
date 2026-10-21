@@ -11768,3 +11768,74 @@ list item's content begin and end -- whose answer several families are waiting o
 area with this session's worst record (two reverts and a micromark `expected exit token to match
 current token`), so it wants Oracle and a dedicated run, not an opportunistic patch at the end of
 a long session.
+
+## LIST-ITEM EXTENT: Oracle's mechanism is exact, and Q1 STILL does not ship
+
+Oracle traced the fence symptom through four files, and the chain is worth keeping because it
+explains why this area has resisted every attempt.
+
+### Why an in-item fence collapses to an empty node
+
+    -\n  1.  ```\n⇥More\n      [^x-y]:\n
+
+1. `-` is blank, so `onBlank` adds a synthetic column and the marker adds another: outer item
+   `size = 2` (legacy-list.ts:260, :294).
+2. Line 2: the outer continuation eats two spaces, `1.  ` opens a nested item at content
+   column 4, `codeFenced` enters at source column 7 (code-fenced.js:75).
+3. Line 3: the outer item consumes the raw tab AND all its virtual spaces through `eatVirtual`,
+   so the NESTED item is handed `M` -- not whitespace (legacy-list.ts:540).
+4. `notBlank` sees nonspace and jumps straight to `notInCurrentItem`. The existing `inFence`
+   exception lives only in `tokenizeIndent.afterPrefix` and is UNREACHABLE on that path
+   (legacy-list.ts:378, :616).
+5. With the inner list unmatched and no new container opening, the document tokenizer marks
+   the line LAZY (document.js:167).
+6. `codeFenced` refuses any lazy line via `nonLazyContinuation`
+   (partial-non-lazy-continuation.js:41), so `after` exits it BEFORE consuming line 3
+   (code-fenced.js:129, :340).
+7. The node therefore spans its opener to just past the backticks, `2:7-2:10`, and since no
+   `codeFlowValue` was ever entered its value is EMPTY (code-fenced.js:297).
+
+At root there is no unmatched container, so no lazy line, so the identical fence extends to EOF.
+`remark-parse@8` never meets the problem at all: it selects every line of an item BEFORE
+tokenizing the item's blocks, so its fenced tokenizer gets one assembled value
+(remarkParse8/list.js:283, code-fenced.js:145).
+
+**And it corrected an invariant recorded here earlier.** A failed continuation does NOT always
+close and retry: when no new container opens the document tokenizer first offers the line to the
+child flow as LAZY, and unmatched containers are moved out only if that lazy line starts a new
+flow block (document.js:248). The earlier note was right about the retry and wrong about the
+lazy step, which is the step this whole family turns on.
+
+### The fix, built exactly as recommended, and refused
+
+`inFence` was hoisted to module scope as `inLiteralFlow(self)` and called from `notBlank`'s
+nonspace branch, returning `ok(code)` without consuming when a literal flow is open and the code
+is not a fence delimiter. Measured on the targeted rows it worked -- diverging rows went 4 to 2,
+with the two fence targets fixed and seven controls held, including root fences, a closed fence
+in an item, a closer at column 0 and a plain lazy line.
+
+Then the full suite:
+
+    probe ledger   26 probes moved AWAY, 0 NOW AGREES
+    unit           "stops at a blank line, which still ends the container"  FAILED
+    compose        all three axes (`inside`, `nested`, `lazy`) FAILED
+    hygiene        couples more pass pairs through a moved position
+    parity         goldens marked `match` FAILED
+    10 failures across 6 files
+
+Reverted without running the referee -- 26 regressions against 0 gains settles it.
+
+### What that proves about the area
+
+The guard fires on EVERY nonspace continuation line while a literal is open, which is vastly more
+documents than the fence family. Oracle called the precheck low-risk for the exit-token invariant
+and was right; low risk to an INVARIANT is not the same as narrow in BEHAVIOUR, and this harness
+now has four data points on that distinction.
+
+So the conclusion is the one Oracle allowed for but I hoped to avoid: **a continuation predicate
+cannot express list-item ownership.** rp8 decides which lines belong to an item BEFORE tokenizing
+its blocks; micromark decides line by line, and a per-line predicate strong enough to hold a
+fence open is also strong enough to hold everything else open. The four families waiting here --
+43 assertions, 19, 19 and 9 -- need the rp8 LINE-SELECTION model ported, not another guard. That
+is a dedicated piece of work with its own risk budget, and it is now the single largest
+identified structural item in the queue.
