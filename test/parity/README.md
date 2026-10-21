@@ -11171,3 +11171,50 @@ take first.
 
 NEXT: carry `columnsOfRaw`'s tab-after-space rule into the quote's content indentation, gated by
 the nine reductions above plus the space-only controls that currently pass.
+
+### The tab plan was REFUTED, and the real rule is setext
+
+The queued next action was "carry `columnsOfRaw`'s tab-after-space rule into quote content
+indentation", on the strength of nine reductions sharing `>   ⇥[^1]:`. Probed before implementing,
+and the premise is wrong:
+
+    > [^1]: def        (1sp)    ["1"] ["1"] ok        >⇥[^1]: def      (tab)     [] [] ok
+    >  [^1]: def       (2sp)    ["1"] ["1"] ok        > ⇥[^1]: def     (1sp+tab) [] [] ok
+    >   [^1]: def      (3sp)    ["1"] ["1"] ok        >  ⇥[^1]: def    (2sp+tab) ["1"] ["1"] ok
+    >    [^1]: def     (4sp)    ["1"] ["1"] ok        >   ⇥[^1]: def   (3sp+tab) ["1"] ["1"] ok
+    >     [^1]: def    (5sp)    []    []    ok        >    ⇥[^1]: def  (4sp+tab) ["1"] []  DIVERGES
+
+Nine of ten agree, INCLUDING the `>   ⇥[^1]:` shape the cluster is named for. I had hand-simplified
+the reductions down to one line and probed that -- the seventh time this session that a hand-built
+form minimised away the thing that mattered, and this time I did it to forms the shrinker had
+already minimised FOR me. **Reductions are evidence; simplifying them further discards it.**
+
+Probing the reductions verbatim, all six diverge -- and so does a control with NO TAB ANYWHERE:
+
+    >   [^1]: def / >     -       OBS ["1"]  ours []   DIVERGES, and there is no tab in it
+
+So the tab was never the discriminator. Sweeping sixteen second lines at 5sp under a label at 3sp
+leaves exactly ONE diverging cell:
+
+    "x" ok   "- item" ok   "*" ok   "+" ok   "1." ok   "1. item" ok   "#" ok   "# h" ok
+    "```" ok  "~~~" ok  "$$" ok  ">" ok  "%%" ok  "<!--" ok  "|a|" ok
+    "-"  OBSIDIAN ["1"]   ours []   ** DIVERGES
+
+Not a bullet -- `*`, `+` and `- item` all agree. A SETEXT UNDERLINE. Confirmed on three markers,
+at root and quoted alike, with the tree showing what we build instead:
+
+    >   [^1]: def / >     -      ours tree: blockquote, HEADING, footnoteReference, text
+    >   [^1]: def / >     =      ours tree: blockquote, HEADING, ...
+    >   [^1]: def / >     ---    ours tree: blockquote, HEADING, ...
+       [^1]: def /      -        ours tree: HEADING, ...        -- root, same defect
+    > [^1]: def  / >   -         ours tree: blockquote, footnoteDefinition, ...   CONTROL, ok
+
+**A setext underline below a footnote definition must not consume the definition's line.** Obsidian
+keeps the definition in every case; we turn its line into a heading. The control at label-indent 1
+is what bounds it -- the defect needs the label indented into the 0-3 allowance.
+
+This is also the `pin:bug-scan-setext-label-indented-chunk#1` reduction (`[^1]:` / `===` / `chunk`)
+from the earlier shrink, so the two families share one cause.
+
+NEXT: suppress setext promotion when the underlined line is a footnote definition, gated by the six
+rows above with `- item`, `*`, `+` and label-indent-1 as controls that must not move.
