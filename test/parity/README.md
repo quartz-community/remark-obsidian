@@ -11570,3 +11570,46 @@ edit shape measured at net -19 today. `math` at 26 is the next target by the rul
 established: an untouched subsystem whose fix is unlikely to need a general change to how
 anything is matched. Size picks the candidate; the generality of the available edit decides
 whether it ships.
+
+## `math` (26 decisive): refused on BIDIRECTIONALITY, for the cost of a probe
+
+Second family through the loop. Shrinking the 26 gave an unusually clean cluster -- **13 of 26**
+share one shape, a definition followed by an indented `$$`:
+
+    "[^2]: Definition\n$$"        ">[^Ä]: def\n>    $$\n"      "> > [^2]: Some\n> > $$"
+    "[^1]:\n⇥$$\n  %%\n"         "- [^x-y]:\n\n  $$\n"        "2)⇥[^Note]:\n       $$\n>\n"
+
+Probing them verbatim showed every divergence is on the definition's END LINE, and the apparent
+rule is tidy -- `$$` does not end a definition for Obsidian, it continues one:
+
+    [^2]: Definition / $$        obs 2@0-1     ours 2@0-0     EXTENDS
+    >[^Ä]: def / >    $$         obs ä@0-1     ours ä@0-0     extends
+    > > [^2]: Some / > > $$      obs 2@0-1     ours 2@0-0     extends
+    [^1]: / ⇥$$ / 2sp %%         obs 1@0-2     ours 1@0-1     extends
+    - [^x-y]: / BLANK / 2sp $$   obs x-y@0-0   ours x-y@0-2   STOPS
+    2)⇥[^Note]: / 7sp $$ / >     obs note@0-0  ours note@0-1  stops
+
+Counted unreduced, and the tidiness collapses:
+
+    (A) we stop SHORT, next line is `$$`   12 assertions     -> `$$` should not end a definition
+    (B) we run PAST, a `$$` is inside      20 assertions     -> we already extend too far
+
+**The two directions are both real and the larger one is the opposite of the fix.** A rule that
+stops `$$` ending a definition gains at most 12 and makes some of those 20 worse. This repo's
+standing test is that a family needs a lift AND A ONE-DIRECTIONAL MECHANISM -- the same test that
+refused quoted `%%` at lift 2.78, quoted `$$` at 1.83 and the five-space cap at 1.46. This family
+has the lift and fails the direction.
+
+### What it cost, and why that is the point
+
+A probe and a count. No build, no revert, no ten-minute gate, no reverted commit. Compare the
+`%%` mechanism (a) earlier today, which was ONE-directional and counted at 18 real documents, and
+still lost 27 because the EDIT was general. The two refusals test different things and both are
+needed:
+
+    is the family real, and how big      -> count it unreduced        (killed setext: 0 documents)
+    does it point one way                -> count both directions     (killed math: 12 vs 20)
+    does the edit reach past the family  -> the full gate set         (killed `%%` (a): net -19)
+
+Three independent filters, applied in increasing order of cost. Only a candidate that passes all
+three is worth a changeset, and `%%` mechanism (b) is so far the only one this session that did.
