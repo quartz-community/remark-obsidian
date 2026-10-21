@@ -11278,3 +11278,39 @@ is to confirm the harness reproduces a KNOWN divergence before trusting it on a 
 NEXT: `bareFootnoteRefs` should leave a label alone when the line it sits on is a footnote
 definition that a setext underline has swallowed. Gate: the six confirming rows, the four controls
 (`- item`, `*`, `+`, label-indent-1), and strict unchanged.
+
+#### REFUSED ON SCORE: the setext bug is real and worth ZERO documents
+
+Scored before building, which should have happened before the three-way localisation rather than
+after it:
+
+    corpus documents with a label line followed by a setext-ish line : 38
+    corpus documents where we lose ANY recorded definition           : 147
+    documents where BOTH hold                                        :   0
+
+The predicate was verified against the two reductions it was built from before the zero was
+trusted -- both return `SETEXT=true` -- so this is a real reading and not a broken instrument,
+the check this ledger requires for any 0% or 100%.
+
+All 38 documents carrying the shape already pass. The bug is genuine against live Obsidian on six
+rows, and fixing it would move nothing.
+
+### A REDUCTION'S SHAPE IS NOT A CORPUS SHAPE
+
+This is the bound on the tool promoted two sections ago, and it is worth as much as the promotion.
+`referee-shrink --live` reduced `fuzz:20261003-2700` to `>   ⇥[^1]:` / `>     -`, which genuinely
+diverges -- verified live. But the LITERAL shape, a lost definition sitting directly above a
+setext underline, occurs in zero corpus documents. The reduction is a witness that SOME divergence
+survives minimisation; it is not evidence that THIS mechanism explains the original document.
+
+Both halves now have measured limits:
+
+    hand-built minimal forms   encode my hypothesis -- they minimise away the interaction
+                               (seven confirmations this session)
+    shrunk reductions          keep what the ORACLE says matters -- but the mechanism that makes
+                               the REDUCTION diverge can differ from the one in the original
+
+So the loop gains a step that is cheap and was skipped here: after a reduction suggests a
+mechanism, COUNT THAT MECHANISM IN THE UNREDUCED CORPUS before localising it, let alone fixing it.
+The `<!-- -->` inside `%%` fix survived that test implicitly -- it was a fifth of the reductions
+AND the shape occurs throughout the originals -- which is why it paid +14 and this one pays zero.
