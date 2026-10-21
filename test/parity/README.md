@@ -11042,3 +11042,31 @@ Not fixed here. The repair is in how `regionsFor` pairs `%%` against `htmlSpans`
 also carries the asymmetry worth 710 documents (a comment defines nothing but its references are
 still indexed), so it needs the full referee rather than these seven rows. The rows are the gate
 for the attempt, three of them controls that must not move.
+
+### Localised: the `%%` NODE is cut at the `<!--`, not the region
+
+One more measurement names the owner. Control beside bug, same shape apart from the HTML comment:
+
+    "%%\nText\n[^a]: def\n"              defs []
+      comment 1:1-4:1 "\nText\n[^a]: def\n"      runs to EOF, label buried INSIDE it
+        paragraph 2:1-3:10 ...
+
+    "%%\nText <!-- x -->\n[^a]: def\n"   defs ["a"]
+      comment 1:1-2:6 "\nText "                   CUT at the `<!--`, mid-line
+      html 2:6-2:16 "<!-- x -->"                  promoted to a ROOT SIBLING
+      footnoteDefinition 3:1-3:10                 escapes and defines
+
+So this is not `regionsFor` mispairing `%%`: with no second `%%` that function already returns one
+unclosed region to end of source. The `comment` NODE's own extent is what ends early, which puts
+the owner in `src/lib/syntax/comment.ts` (whose docstring states flow cannot stop mid-line -- and
+here it does) or in the region pass's rebuild around `htmlSpans`, which `comment-region.ts`
+collects for exactly this node type.
+
+`comment.ts`'s own claim that flow cannot stop mid-line is the strongest lead: the comment ends at
+2:6, mid-line, which that construct says is impossible. Either the invariant is being violated or
+a later pass is re-cutting the node, and the two are distinguishable by dumping the tree before
+the pass chain runs.
+
+The gate for the attempt is the seven probe rows above plus these two trees, and the trap to avoid
+is the asymmetry worth 710 documents: a comment defines nothing while its references stay indexed,
+so a fix that simply extends the node must keep the references inside it live.
