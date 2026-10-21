@@ -12010,3 +12010,39 @@ is still open, its cause is still "the item's content column differs from rp8's"
 attempt should begin by counting candidate predicates against the corpus BEFORE writing any of
 them -- the dedent rule for bare-with-content is now known to score zero, so the remaining
 assertions are some other predicate in the same family.
+
+### Counting the predicates: the family does not reduce to one
+
+Doing what the previous section prescribes, before writing anything. The family, counted
+strictly -- Obsidian DEFINES, we emit a bare REFERENCE at that exact position, and a list marker
+stands above it -- is 33 assertions, and every candidate predicate was counted against it:
+
+    P1  marker has CONTENT                             31      P4  ORDERED  21 / BULLET 12
+        marker is BARE                                  2      P5  spaces   25 / TAB      8
+    P2  bare + content immediately below (just built)   1      P6  indent < width  14
+        other                                          32          indent > width  13
+    P3  no blank between                               30          indent == width   6
+
+**The rule built and reverted above covers 1 of 33 assertions.** That is the scoping error
+measured rather than argued: a 43-assertion family was counted, a predicate worth one was
+implemented, and a 25-cell grid verified against the live application could not tell the
+difference.
+
+And no other single predicate rescues it. The dominant one is "marker has content" at 31 of 33,
+which is not a rule -- it is a description of most list items. The indent relationship, the most
+promising axis, splits 14 / 13 / 6 across three directions. The best specific combination
+available ("ordered, with content, spaces only, indent greater than width") is on the order of
+eight assertions, and would be a rule fitted to a quarter of a family whose other three quarters
+point elsewhere.
+
+**So this family is diffuse at PREDICATE level, which is a stronger statement than diffuse at form
+level.** The shrinker showed forms were diffuse while mechanisms were not -- that is what made
+`one raw tab is one indent` worth +37. Here the mechanism is understood completely (rp8 computes
+an item's content column differently, and re-parses the item's dedented source), and it still
+does not condense into an implementable condition, because the single rp8 difference manifests
+through at least three independent axes at once.
+
+The honest closing position on list-item extent: layer settled, mechanism settled, and the
+remaining 33 assertions are low yield per rule until something changes about how the item's
+content column is modelled as a whole -- which is the rp8 line-selection rewrite, now known to be
+worth 33 assertions rather than the 90 originally attributed to it.
