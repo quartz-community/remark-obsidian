@@ -11839,3 +11839,59 @@ fence open is also strong enough to hold everything else open. The four families
 43 assertions, 19, 19 and 9 -- need the rp8 LINE-SELECTION model ported, not another guard. That
 is a dedicated piece of work with its own risk budget, and it is now the single largest
 identified structural item in the queue.
+
+### Q3 built too, and refused harder -- Oracle's own confidence note was the right one
+
+The DOM evidence for Q3 is the cleanest in the ledger. `askBlockCode` on four bare-marker shapes,
+and one rule explains all of them -- `remark-parse@8` dedents an item's content by the MARKER
+WIDTH and re-parses it:
+
+    1.  / ⟨6sp⟩Prose / ⟨2sp⟩[^3]:   ol>li>pre "Prose"    def 3@2:2   dedent 2 -> 4sp CODE
+    -   / ⟨6sp⟩Prose / ⟨2sp⟩[^3]:   ul>li>pre " Prose"   def 3@2:1   dedent 1 -> 5sp code
+    10. / ⟨6sp⟩Prose / ⟨3sp⟩[^3]:   (no code)            no def      dedent 3 -> 3sp para
+    1.  / ⟨2sp⟩Prose / ⟨2sp⟩[^3]:   (no code)            no def      dedent 2 -> 0sp para
+
+The RETAINED LEADING SPACE in the bullet row is the discriminator: `-` is one column, six spaces
+leave five, the code keeps one. No threshold reproduces that; only a width does.
+
+So `_legacyContentColumn` was reduced by one for a blank-opened item, leaving `size` -- ownership
+-- untouched, exactly as Oracle's action plan said to model it. On the grid it worked:
+
+    bare-marker grid   7 of 17 diverging  ->  4 of 19   (two CommonMark controls added, both pass)
+
+Then the suite:
+
+    probe ledger   57 moved AWAY, 1 NOW AGREES
+    compute        diverges on more cases than the recorded ceiling
+    parity         goldens marked `match` FAILED
+
+Reverted. **Fifty-seven against one is twice as bad as the Q1 attempt's twenty-six**, and both
+were built from a correct, source-cited mechanism.
+
+### The warning was in the consultation and I should have weighted it
+
+Oracle closed with: _"Confidence: High on the mechanism; medium on Q3/Q4 implementation scope
+because current measured exceptions show that `size`, consumption, and reported positions cannot
+be changed independently."_
+
+That is precisely what happened. `_legacyContentColumn` is read by `tokenizeIndent`'s equality,
+window, fence, cap and raw-tab branches, every one of which was fitted against the others on
+measured evidence. Moving it by one column re-opens all of them at once. The file's own comment
+two lines above the edit says the same thing about the capped case -- that ownership wants three
+and the flow wants four -- which is the same lesson in miniature.
+
+### Where this leaves list-item extent
+
+Three attempts, three different entry points, all refused by the gates:
+
+    continuation predicate (Q1)   26 moved away, 0 gained
+    dedent width (Q3)             57 moved away, 1 gained
+    earlier container attempts    2 reverts, one micromark exit-token violation
+
+The mechanism is now fully understood and documented; what is missing is not knowledge but a
+SAFE PLACE TO PUT IT. Every quantity in `legacy-list.ts` is load-bearing for several measured
+families simultaneously, so a one-column change is never local. Porting rp8's line-selection
+model whole -- select the item's lines, dedent by the marker width, re-parse as a fresh block
+sequence -- is the only shape that keeps those quantities consistent, because it is the model
+they were all approximating. That is a rewrite of the construct, not an edit to it, and it should
+be attempted on a branch with the full gate set run per step rather than opportunistically.
