@@ -11665,3 +11665,29 @@ materialises only FORWARD, so "an unclosed `[^` precedes me on this line" is not
 knowable there. `comment-region.ts` has exactly this predicate as `insideLabel(source, at)`, but
 it works on the source string, which a text construct does not hold. Resolving that -- a
 lookbehind, a resolver, or making the scan label-aware -- is the whole of the remaining work.
+
+### Shipped: +15, zero losses
+
+The guard went in as a forward-only test, which is what made it possible at all. `labelMask`
+marks the offsets of `[^...]` spans in the SCANNED SLICE, and both queue functions decline to
+CLOSE on a marker inside one -- reusing the path `_`-never-closes-inside-a-word already took.
+
+    11 of 11 probe rows agree    450 tests pass    4 gates green
+    referee 6116 -> 6131 / 6818   +15 GAINED, 0 LOST, by --ids identity
+    assertions 23232/23935 (97.06%)   references 97.96% -> 98.10%
+
+Four controls are the ones that matter: `*b*`, `_b_` and `**strong**` still form, and so do
+`*a [^x] b*` and `**a [^y*] b**` -- emphasis that legitimately SPANS a label, whose closer is
+outside any label. The rule declines a close inside a label and nothing else.
+
+### Three families, three outcomes, one method
+
+    %% (a)          18 docs, one-directional, GENERAL edit    -> built, net -19, reverted
+    %% (b)          11 docs, one-directional, NARROW edit     -> shipped, +12 / 0
+    math            26 docs, BIDIRECTIONAL 12 vs 20           -> refused at the count, no build
+    legacyEmphasis  35 docs, 77% one-directional, NARROW      -> shipped, +15 / 0
+
+The two that shipped are the two that were both one-directional AND narrow. The one that was
+one-directional but general cost a build-and-revert; the one that was bidirectional cost a probe.
+**The filters are ordered by cost for a reason, and applying them in that order is what turned
+the queue from guesswork into arithmetic.**

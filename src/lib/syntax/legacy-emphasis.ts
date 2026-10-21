@@ -50,6 +50,48 @@ function isWordCharacter(character: string): boolean {
 }
 
 /** Port of remark-parse@8.0.3 `lib/tokenize/strong.js`; returns the inner slice. */
+/**
+ * Which offsets of `value` sit inside a `[^...]` footnote label.
+ *
+ * A GFM footnote CALL requires its name to be DEFINED, so an UNDEFINED `[^ch2*]` is not a call
+ * at all -- it stays literal text, and `bareFootnoteRefs` recognises it afterwards. That works
+ * until the name contains an emphasis delimiter: `Opening [^ch2*] and [^ch2*]` had the `*` of
+ * the first label pair with the `*` of the second, producing
+ *
+ *     text("Opening [^ch2") emphasis text("] and [^ch2") text("]")
+ *
+ * and destroying BOTH references, where Obsidian reports both. 47 assertions across 35
+ * documents, against 14 in the other direction.
+ *
+ * Only the CLOSER is tested, and that is what makes the rule expressible here at all. The
+ * construct is entered AT the marker and the scan materialises only FORWARD, so whether the
+ * OPENER is inside a label cannot be known -- but it does not need to be. The closer of a
+ * cross-label pair is always inside the second label, which IS in the scanned slice. The two
+ * cases fall out together:
+ *
+ *     a *b* and [^ch2*] and [^ch2*]   the `*b*` closer is outside any label -> emphasis forms
+ *                                     the label's own `*` finds only an in-label closer -> literal
+ *
+ * Bounded to a single line's worth of bracket state by construction: an unclosed `[` simply
+ * never marks anything, since spans are recorded only when the `]` arrives.
+ */
+function labelMask(value: string): boolean[] {
+  const inside = new Array<boolean>(value.length).fill(false);
+  let open = -1;
+  for (let index = 0; index < value.length; index++) {
+    if (value[index] === "[" && value[index + 1] === "^") {
+      open = index;
+      index++;
+      continue;
+    }
+    if (value[index] === "]" && open !== -1) {
+      for (let at = open; at <= index; at++) inside[at] = true;
+      open = -1;
+    }
+  }
+  return inside;
+}
+
 export function legacyStrongQueue(value: string): string | null {
   let index = 0;
   let character = value.charAt(index);
@@ -63,6 +105,7 @@ export function legacyStrongQueue(value: string): string | null {
 
   const marker = character;
   const length = value.length;
+  const inside = labelMask(value);
   index++;
   let queue = "";
   character = "";
@@ -70,7 +113,13 @@ export function legacyStrongQueue(value: string): string | null {
   while (index < length) {
     character = value.charAt(index);
 
-    if (character === marker && value.charAt(index + 1) === marker) {
+    // `!inside[index]` only declines the CLOSE; falling through appends the marker as content,
+    // which is the same path a non-closing marker already takes.
+    if (
+      character === marker &&
+      value.charAt(index + 1) === marker &&
+      !inside[index]
+    ) {
       // Legacy reads two ahead but only advances one; preserved deliberately.
       character = value.charAt(index + 2);
       if (character !== marker) return queue.trim() ? queue : null;
@@ -97,6 +146,7 @@ export function legacyEmphasisQueue(value: string): string | null {
 
   const marker = character;
   const length = value.length;
+  const inside = labelMask(value);
   index++;
   let queue = "";
   character = "";
@@ -111,8 +161,12 @@ export function legacyEmphasisQueue(value: string): string | null {
 
       if (character !== marker) {
         if (!queue.trim() || previous === marker) return null;
-        // `_` never closes inside a word.
-        if (marker === "_" && isWordCharacter(character)) {
+        // `_` never closes inside a word, and NEITHER marker closes inside a footnote label --
+        // the same "swallow it as content and keep scanning" path serves both.
+        if (
+          (marker === "_" && isWordCharacter(character)) ||
+          inside[index - 1]
+        ) {
           queue += marker;
           continue;
         }
