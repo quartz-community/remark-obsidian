@@ -10332,3 +10332,38 @@ this package nor the reference implementation gets right, so it is the honest si
 has solved -- against 789 documents still diverging on our strict metric. The other 603 are
 answered by one implementation or the other, which is what makes the remainder tractable rather
 than a tail.
+
+## The last four rule sections: 36 of 41 probes clean, and the gaps are too small to build
+
+A, C, D1/D3 and E2/E5 probed in one batch of 41 against live Obsidian. **36 agree.** The five that
+do not are real rules, precisely stated, and each is worth nought to two documents:
+
+| gap                                                              | probe                                                 | population  | ceiling      |
+| ---------------------------------------------------------------- | ----------------------------------------------------- | ----------- | ------------ |
+| A4, two tabs after a callout marker make the title indented code | `> [!note]<TAB><TAB>Title[^1]`                        | 1 document  | **0**        |
+| E2, a label name may not hold whitespace                         | `[^a b]: x` defines for us, not for Obsidian          | 6 documents | **2**        |
+| E5, a label name MAY hold `[` or `^`                             | `a[^^[x]]` / `a[^x[y]` -- Obsidian defines, we do not | 1 document  | **1**        |
+| A2, an ordered item in a callout body                            | we emit a reference Obsidian does not                 | --          | within A4/E2 |
+
+    BASE 4.4% (301/6818)
+    A4 callout marker then 2+ tabs   n=1   div=0   lift 0.00
+    E2 label name holds a SPACE      n=6   div=2   lift 7.55
+    E5 label name holds [ or ^       n=1   div=1   lift 22.65
+
+The lifts read as enormous and mean nothing: `n=1` at 100% is one document. This is the standing
+bar applied as written -- "read `better + worse + same` first, and a total of six does not justify
+a pass however the sign comes out" -- and three ceilings of 0, 1 and 2 do not reach it. All three
+are recorded with their shapes so a future corpus that exercises them can re-ask.
+
+**E5 is the one to re-ask first** if the corpus ever grows: it is the only gap where Obsidian
+DEFINES and we do not, which is the error direction that costs a consumer a node rather than
+giving it a spare one. The rule is "a reference's name runs to the first `]` and stops at
+whitespace, and may hold a `[` or a `^`", and these notes already record that widening the label
+pattern for brackets trips the ReDoS lint -- so it needs a counted scan rather than a regex,
+which is the same remedy `columnsOfRaw` needed tonight.
+
+### Which closes the rules document
+
+Ten sections probed, 237 probes, five fixes landed, four sections verified clean on arrival, and
+three gaps refused on size with their numbers. The only lead left above the bar is F5's
+tab-indented `%%` inside a list item: 40 documents, 9 diverging, lift 5.10, one direction.
