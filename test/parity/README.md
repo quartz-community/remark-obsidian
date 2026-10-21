@@ -10367,3 +10367,42 @@ which is the same remedy `columnsOfRaw` needed tonight.
 Ten sections probed, 237 probes, five fixes landed, four sections verified clean on arrival, and
 three gaps refused on size with their numbers. The only lead left above the bar is F5's
 tab-indented `%%` inside a list item: 40 documents, 9 diverging, lift 5.10, one direction.
+
+## F5's tab case: refused, because the STRUCTURE is wrong and not the facts
+
+The one lead left above the size bar, attempted and declined on evidence rather than on nerve.
+
+    F5: "an opener indented four spaces still ends a list item... a tab, six spaces, or plain
+         text in its place stays in the item"
+
+    "1. p" / "  10.     q" / "<4sp>%%"  / "[^1]: d"     agrees
+    "1. p" / "  10.     q" / "<TAB>%%"  / "[^1]: d"     obs no definition, ours one
+
+    BASE 4.4%   n=40  diverging=9  P=22.5%  lift=5.10   -- past both screens
+
+### Our two trees are IDENTICAL and Obsidian's are not
+
+    ours, BOTH cases      list > [ listItem > paragraph, listItem > code ]
+                          code value="%%"        <- at ROOT
+                          footnoteDefinition
+
+    obs, 4sp              rootCode [[2,2]]   defs ["1@3"]      we match
+    obs, TAB              rootCode []        defs []           no root code, no definition
+
+So for the tab case Obsidian keeps the `%%` INSIDE the item as a comment, which then runs to the
+end of its container and buries the label. We end the list at the tab-indented line, make the `%%`
+root indented code, and the label below is a fresh block.
+
+**That is why no pass can take it.** `itemCommentLazyTransform` swallows blocks below an unclosed
+`%%` that is a list item's own content, and here the `%%` is not the item's content in our tree at
+all -- it is a root sibling. A pass could delete the definition and get the footnote dimension
+right while LEAVING the spurious `code@2`, which the `code` dimension currently agrees on. That is
+the +7-against-+37 trade this file records, inverted: filtering the facts a wrong structure
+produced, and paying for it in a second dimension.
+
+The real change is whether the list is still open at a tab-indented line -- container extent, in
+the tokenizer. Tonight that area produced two reverted attempts, a micromark
+`expected exit token to match current token` invariant violation, and the finding that declining a
+container makes the document tokenizer close containers and RETRY. Nine documents does not justify
+entering it at the end of a long session, and the evidence above is what the next attempt needs:
+the structure to aim for, the dimension that would regress, and the pass that cannot reach it.
