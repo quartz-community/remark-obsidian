@@ -10584,3 +10584,32 @@ change, and net-zero totals hide a two-document trade that only `--ids` exposes.
    families, and the ledger already says structure beats facts -- tokenizer fixes paid +37, +16 and
    +28 where the same rules as repairs paid +7. That blocker is now the highest-value target in the
    queue, ahead of any further per-shape rule.
+
+### The `<!--` code guard has nothing to guard
+
+Refused on inspection, not on score. The plan was to condition the shipped "a quoted `<!--`
+swallows the unquoted label below" rule on the quote being tab-introduced. That rule is not OURS: a
+codegraph sweep for it returns only the `%%` passes (`comment-quote-extent`,
+`comment-definition-extent`, `comment-in-definition`, `comment-definition-column`). The swallow in
+`>⇥<!--` / `[^3]: body` comes from STOCK micromark's HTML block -- CommonMark type 2 runs to `-->`
+or end of input and lazy continuation pulls the label in -- so there is no condition of ours to
+gate. Obsidian does not swallow here only because its content is CODE, which is the same indent
+problem proved inert above.
+
+The measured rule in the ledger ("a quoted `$$`/`<div>`/`<!--` swallows the unquoted label below at
+any depth") is a fact about OBSIDIAN that we happen to agree with, not a pass with a knob. Treating
+a recorded fact as if it were an implementation is a new way to be wrong, and worth naming: BEFORE
+GATING A RULE, CONFIRM THE RULE IS CODE WE WROTE.
+
+### Three of the top four families terminate at one blocker
+
+    def MISSING/col0, blockquote > paragraph > break   10 docs   quote must stop absorbing once its content is code
+    def MISSING/col0, blockquote > html                 2 docs   same, via stock HTML instead of a paragraph
+    F5 (refused earlier)                                9 docs   list must be known closed at a tab-indented line
+
+All three need CONTAINER EXTENT decided in the tokenizer, and all three resist a tree repair for the
+same reason: once the line is absorbed there is no node left to move. Four attempts in this area
+have now been reverted, one of them raising micromark's `expected exit token to match current
+token`. That makes the blocker itself the highest-value target left -- 21 documents directly, and
+the ledger already credits tokenizer fixes with +37, +16 and +28 where the same rules as repairs
+paid +7. It is going to Oracle rather than to a fifth attempt.
