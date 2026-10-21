@@ -11466,3 +11466,58 @@ four fields the tool reads, silently dropping `code`, and the gate announced the
 dimension as `0/0 agree (NaN%)`. **A dimension can disappear from a report and leave only a NaN
 behind.** Spreading the original row and overriding one key is the fix, and the lesson is that a
 corrected artefact must be diffed for FIELDS, not only for values.
+
+## The `%%` target, worked through the new loop -- and refused on three grounds
+
+First run of the full chain on the largest decisive family.
+
+    ablate --emit comments        86 documents, against the CORRECTED oracle
+    referee-shrink --live --ids   86 reductions
+    classify                      13 share one shape: `%%` opened in a CONTAINER, a definition
+                                  between the markers, closer in or near the same container
+    probe the reductions VERBATIM (defs AND refs -- comparing defs alone hid four cases)
+    COUNT in the unreduced corpus
+
+The probe found TWO mechanisms in opposite directions, every one a cascade pair:
+
+    10. %% / ⟨2sp⟩[^1]: / ⟨2sp⟩%%   obs defs [] refs ["1@1:2"]     ours defs ["1"] refs []
+    +    %% / [^note]: / ⇥%%        obs defs [] refs ["note@1:0"]  ours defs ["note"] refs []
+      -> a `%%` opened in a LIST ITEM buries the definition; we do not bury
+
+    > %% / blank / > [^note]: / > %%  obs defs ["note"]  ours defs [] refs ["note@2:2"]
+      -> a `%%` followed by a BLANK inside a quote does NOT bury; we do
+
+Counted in the unreduced corpus: **(a) 18 documents, (b) 11 documents.** Real, unlike the setext
+family's zero -- so (a) was built.
+
+### What was built, and what it cost
+
+`BLOCK_OPENER` admits a list marker, and `regionsFor` gains a `closes` predicate so a `%%` line
+introduced by a MARKER may open a region but never close one -- the asymmetry derived this
+morning when the naive widening broke `- %%` / `- %%` / `[^1]: def`. On the eleven-row gate that
+worked: two of three targets fixed, the regression guard HELD, and all seven controls held
+including today's `<!-- -->` fix.
+
+Then the wider gates:
+
+    referee     6085 vs 6104 baseline -- 8 GAINED, 27 LOST, net -19
+    invariants  "list > comment": 2   -- INVALID MDAST, a list's children must be listItems
+    roundtrip   grew the set of inputs formatting cannot settle
+    compute     fuzz/comment/9:listItems, listItems 4 -> 5
+
+Reverted. Any one of those three would be enough; the content-model violation would be enough on
+its own, because the consumers of this package walk the tree -- a linter that meets
+`list > comment` is a linter that corrupts a note.
+
+### COUNTING THE MECHANISM BOUNDS THE UPSIDE, NOT THE NET
+
+This is the new lesson and it is the complement of the one learned on setext. There, counting
+the mechanism correctly predicted that a fix would be worth nothing. Here, counting correctly
+found 18 real documents -- and the fix gained 8 of them while losing 27 elsewhere, because the
+change to region PAIRING reaches every document with two `%%` markers, not only the eighteen that
+motivated it.
+
+So the count answers "is this family real and how big", which is necessary and was missing. It
+does not answer "what else does this edit touch", which only the gates answer. The loop needs
+both ends: COUNT before building to avoid the zero-value fix, and the FULL gate set after,
+because a family's size is an upper bound on gains and says nothing about losses.
