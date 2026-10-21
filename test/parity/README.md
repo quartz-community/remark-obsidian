@@ -11002,3 +11002,43 @@ And the method held: the probe that proved this inert costs seconds, where the r
 replaced costs ten minutes. **Stash-and-compare on the exact rows a change governs is the cheap
 test for inertness**, and it should run before any gate on a change whose blast radius is one
 predicate.
+
+## The shrinker earned its keep: `<!-- -->` nested in `%%`
+
+First use of `referee-shrink --live` as the replacement for the exhausted probe loop, over the 48
+documents carrying a `def EXTRA / col0` assertion. Every one reduced, to 30+ DISTINCT forms at 1x
+each -- diffuse at form level, as the full shrink found before. But one SHAPE recurs across about
+a fifth of them:
+
+    "%%\nIt<!-- [^a] -->\n[^ä]:\n"
+    "%%\nText\\[^名]<!-- [^a] -->\n[^a]:\n"
+    "%%\nText <!-- [^note] -->\n\n[^ch2*]:\n"
+    "%%\nMore $[^a]$ <!-- [^Note] -->\n[^名]:\n"
+    "Opening [^Note]\n%%\nText <!-- [^2] -->\n[^note]:\n"
+    "%%\nProse here <!-- [^Note] -->\n[^note]:\n"
+
+An HTML comment NESTED INSIDE a `%%` region, then a column-0 label. **I never hand-built that
+shape in six rounds of probing this family**, which is exactly the argument for shrinking: a
+hand-built form encodes my hypothesis about what matters, a reduction keeps what the ORACLE says
+matters.
+
+### Probed, with controls, and it is ONE defect in two directions
+
+    %% / text / label                Obsidian []      ours []       agree    CONTROL
+    %% / <!--..--> / label           Obsidian []      ours ["a"]    DIVERGES
+    %% / <!--[^r]--> / label         Obsidian []      ours ["a"]    DIVERGES
+    %% / <!--..--> / blank / label   Obsidian []      ours ["a"]    DIVERGES
+    text / <!--..--> / label         Obsidian []      ours []       agree    CONTROL, no %%
+    %% / <!-- unclosed / label       Obsidian []      ours []       agree
+    %% closed / <!--..--> / label    Obsidian ["a"]   ours []       DIVERGES  OPPOSITE WAY
+
+A CLOSED `<!-- ... -->` is terminating our `%%` region. With the `%%` unclosed our region stops at
+the HTML comment's end, so the label below escapes burial and we define it. With the `%%` closed,
+the real `%%` closer is then read as an OPENER and runs to the end of the note, so we bury a label
+Obsidian keeps. Two opposite symptoms, one boundary bug -- and the unclosed-`<!--` row agreeing is
+what pins it to the CLOSER rather than to the opener.
+
+Not fixed here. The repair is in how `regionsFor` pairs `%%` against `htmlSpans`, and that code
+also carries the asymmetry worth 710 documents (a comment defines nothing but its references are
+still indexed), so it needs the full referee rather than these seven rows. The rows are the gate
+for the attempt, three of them controls that must not move.
