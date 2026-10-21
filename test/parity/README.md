@@ -11367,3 +11367,47 @@ exits non-zero if that comes back unchanged. This is not decoration: an earlier 
 concluded "no flag matters" because it called `runSync(tree)` without the source, silently
 no-opping every source-dependent pass. A harness that cannot see a known change must not be
 allowed to report zeros.
+
+## Mining the rp8 blueprint with ablation: the `%%` subsystem is the lever
+
+The blueprint -- documents where stock `remark-parse@8` agrees with Obsidian and we do not -- was
+regenerated after this session's +51 and has shrunk with it:
+
+    DEFINITIONS   rp8 RIGHT where we are wrong : 298 -> 271      (we closed 27)
+                  we right where rp8 is wrong  : 1007
+                  both wrong                   : 186 -> 171
+    CODE          rp8 RIGHT where we are wrong : 17
+
+Ablating exactly those 271 is the question worth asking: **for documents where a known-correct
+algorithm gets it right, which of OUR passes is wrong?**
+
+    DECISIVE on the blueprint
+      50  comments        12  math        9  keepComments
+       6  legacyLists      4  bareFootnoteRefs   3  callouts
+    39 of 271 moved by no flag
+
+### Why the `comments` number is the strongest signal in the harness
+
+`legacy-oracle.mts` runs the BARE rp8 stack -- `remark-parse@8` plus `remark-footnotes@2` and
+`remark-math@3`, and **no `%%` construct at all**. So on those 50 documents a parser with no
+concept of Obsidian comments matches Obsidian, and we do not. That is not ambiguous: on them
+Obsidian applied no comment semantics and we applied some. **Our `%%` regions fire where
+Obsidian's do not.**
+
+It agrees with the global ablation, where `comments` is decisive on 86 and the subsystem
+(`comments` + `keepComments` + `parseComments`) on 134, and with the direction the `<!-- -->` fix
+moved today. Three independent measurements pointing the same way at the same subsystem, which is
+more than any family this session had before work started on it.
+
+## The loop, now mechanical end to end
+
+    ablate.mts                      which PASS      54s over the whole corpus
+    ablate.mts --emit <flag> <file> its documents   composable, no hand-copying ids
+    referee-shrink --live --ids     what TEXT       the oracle keeps what matters
+    count the mechanism in the UNREDUCED corpus     the step whose absence cost a day
+    fix the scope, verify by --ids identity
+
+Every step before `--emit` was previously done by copying ids out of a terminal, and the counting
+step did not exist at all -- its absence is what let a six-row bug worth zero documents consume a
+three-way localisation. The chain now answers which pass, which documents, which text, and how
+much, in that order, before any code is written.

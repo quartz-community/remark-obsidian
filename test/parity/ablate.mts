@@ -182,6 +182,19 @@ for (const [flag, ids] of byDecisive) {
   );
 }
 
+// `--emit <flag> <file>` writes that flag's decisive ids, which is what makes the loop
+// mechanical: ablate to find the pass, emit its ids, shrink exactly those, count the reduction's
+// mechanism in the unreduced corpus, then fix the scope. Every step before this one was done by
+// hand-copying ids out of a terminal.
+const emitAt = process.argv.indexOf("--emit");
+if (emitAt !== -1) {
+  const flag = process.argv[emitAt + 1] ?? "";
+  const out = process.argv[emitAt + 2] ?? `/tmp/opencode/decisive-${flag}.txt`;
+  const ids = decisive.get(flag) ?? [];
+  fs.writeFileSync(out, ids.join("\n") + "\n");
+  console.log(`\n  ${ids.length} ids decisive for \`${flag}\` -> ${out}`);
+}
+
 console.log("\n  CULPABLE -- toggling this flag changes our answer at all:");
 for (const [flag, n] of [...culpable].sort((a, b) => b[1] - a[1])) {
   console.log(`    ${String(n).padStart(4)}  ${flag}`);
