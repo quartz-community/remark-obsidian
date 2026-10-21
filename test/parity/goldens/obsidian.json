@@ -72286,8 +72286,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "a tab after a quote marker ends the quote, so the following column-0 line is a ROOT definition; we index the label as a reference instead. The space controls agree on both sides, which makes this a rule about the TAB. Not addressed by itemCommentLazyTransform"
+      "triage": "match",
+      "note": "a tab after a quote marker makes the quote's content INDENTED CODE, and code takes no lazy continuation line, so the following column-0 line is a root definition. Closed by `one raw tab is one indent` applied in three places at once: the quote's opener leaves the tab unspent, `legacyIndentedCodeSyntax` reads it as a whole indent in flow, and `legacyFootnoteDefinitionSyntax` accepts it as a definition's continuation. The space controls `/space` and `/two-space` still match and are what make this a rule about the TAB."
     },
     "probe/quote-tab-root-def/space": {
       "id": "probe/quote-tab-root-def/space",

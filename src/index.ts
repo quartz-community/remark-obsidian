@@ -17,6 +17,8 @@ import { legacyDeleteSyntax } from "./lib/syntax/legacy-delete.js";
 import { legacyAutolinkSyntax } from "./lib/syntax/legacy-autolink.js";
 import { legacyCodeTextSyntax } from "./lib/syntax/legacy-code-text.js";
 import { legacyBlockQuoteSyntax } from "./lib/syntax/legacy-block-quote.js";
+import { legacyFootnoteDefinitionSyntax } from "./lib/syntax/legacy-footnote-definition.js";
+import { legacyIndentedCodeSyntax } from "./lib/syntax/legacy-indented-code.js";
 import { legacyListSyntax } from "./lib/syntax/legacy-list.js";
 import { legacyEntitySyntax } from "./lib/syntax/legacy-entity.js";
 
@@ -563,6 +565,17 @@ export default function remarkObsidian(
     // disabling stock, exactly as the list above is -- micromark tries the constructs for a
     // code in order and the one that OPENS a container owns its continuation.
     data.micromarkExtensions.push(legacyBlockQuoteSyntax());
+    // ONE RAW TAB IS ONE INDENT, in the three places that have to agree about it: the quote
+    // leaves the tab unspent, flow reads it as a whole indent, and a definition's continuation
+    // accepts it so a tab line under a definition continues it instead of becoming code.
+    // Measured apart, the first two alone traded 28 documents for 32. The definition construct
+    // has to be built from whatever gfm registered, so it reads the array rather than returning
+    // a fresh extension, and it is pushed LAST so its opener is the one already in use.
+    data.micromarkExtensions.push(legacyIndentedCodeSyntax());
+    const legacyDefinition = legacyFootnoteDefinitionSyntax(
+      data.micromarkExtensions,
+    );
+    if (legacyDefinition) data.micromarkExtensions.push(legacyDefinition);
   }
   if (opts.legacyCodeSpans) {
     data.micromarkExtensions.push(legacyCodeTextSyntax());

@@ -156,12 +156,6 @@ describe("positioned oracle", () => {
     // moving the opener out from under it leaves the region unrebuilt and a buried definition
     // live.
     "probe/item-comment/closed: a CLOSED `%%` region hosted by an item buries it too",
-    // A TAB AFTER A QUOTE MARKER ends the quote, so the following column-0 line is a ROOT
-    // definition. We index the label as a reference instead. `quote-tab-root-def/space` and
-    // `/two-space` are the controls and both MATCH -- with a space the line lazily continues
-    // the quote's paragraph and defines nothing on either side, which is what makes this a
-    // rule about the TAB rather than about quoted definitions.
-    "probe/quote-tab-root-def/tab: a tab ends the quote, so the next line defines",
   ];
 
   it("places every footnote reference, except the classified cases", () => {
@@ -414,12 +408,12 @@ describe("positioned oracle", () => {
     //   fewer characters and more columns than this one, which is what refuted two
     //   implementations built on a character count at -15 and -21 referee documents.
     //
-    //   `probe/quote-tab-def/established:footnotes` -- the one position divergence in the
-    //   tab-quote family, which the MAIN GATE CANNOT SEE because `meta.footnotes` is names
-    //   only. The names and the rule are right -- that family took the referee from 5717 to
-    //   5744 -- and a column or end line is out by the quote's own prefix.
-    footnotes: 4,
-    footnoteRefs: 5,
+    //   The tab-quote family is GONE from this list. `one raw tab is one indent`, applied in
+    //   the quote's opener, in flow and in a definition's continuation together, closed
+    //   `quote-tab-root-def/tab` on both fields and `quote-tab-def/established` on
+    //   `footnotes` -- the referee went 6029 -> 6066. What is left here is unrelated.
+    footnotes: 2,
+    footnoteRefs: 4,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
     // Obsidian reports a heading's column as its containing block's content column,
@@ -977,12 +971,9 @@ describe("positioned oracle", () => {
     "probe/item-comment/closed:footnotes",
     "probe/item-comment/closed:listItems",
     "probe/item-comment/closed:sections",
-    "probe/quote-tab-root-def/tab:footnoteRefs",
-    "probe/quote-tab-root-def/tab:footnotes",
     "probe/def-deindent/quote-indented-one:footnotes",
     "probe/empty-container/nested-list:listItems",
     "probe/quote-nest/two-space:listItems",
-    "probe/quote-tab-def/established:footnotes",
   ];
 
   it("diverges on exactly the recorded cases, by identity", () => {

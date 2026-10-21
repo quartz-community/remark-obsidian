@@ -139,8 +139,20 @@ function tokenizeBlockQuoteStart(
     return nok(code);
   }
 
+  /**
+   * A SPACE, never a tab, is the marker's own whitespace.
+   *
+   * `remark-parse@8` consumes the `>` and then at most one space, so a tab survives into the
+   * quote's content and indents it. `markdownSpace` admits a tab here, spending it as padding
+   * and leaving the content a paragraph.
+   *
+   * Inert on its own: this alone raises the content's indentation from two codes to three, where
+   * four is needed. `legacyIndentedCodeSyntax` reads one raw tab as a whole indent and
+   * `legacyFootnoteDefinitionSyntax` does the same for a definition's continuation; the three
+   * only work together, and the measured rows live with the first of them.
+   */
   function after(code: Code): State | undefined {
-    if (markdownSpace(code)) {
+    if (code === codes.space) {
       effects.enter(types.blockQuotePrefixWhitespace);
       effects.consume(code);
       effects.exit(types.blockQuotePrefixWhitespace);
