@@ -10800,3 +10800,57 @@ defs now match exactly. Probed live before being written off:
 So the minimal shapes agree with the live application on both the code and the refs, and the
 residual lives inside complex documents rather than in the rule. `>⇥<!--` also still misses its
 definition though its code block is now right, which is the one verification row left.
+
+## The queue after +37, and the new top family
+
+Re-measured rather than assumed, because the tab rule moved several signatures at once:
+
+    DEFINITIONS   484 -> 455 documents wrong,  541 -> 509 wrong assertions
+
+    def EXTRA/col0        49 assertions, 40 solo     (unchanged -- now the TOP signature)
+    def MISSING/col0      55 -> 42, 35 solo          (-13, the tab rule)
+    def MISSING/quoted    40 -> 37, 26 solo
+    def EXTRA/quoted      38 -> 36, 33 solo
+    def MISSING/4+sp      33, 32 solo                (unchanged)
+    def MISSING/tab       25, 22 solo                (unchanged)
+    def END-1/quoted      29 -> 23, 17 solo          (-6, as predicted: the same tab boundary)
+
+`def END-1/quoted` shrinking by 6 without being worked is the prediction from the previous
+section paying off -- it was the definition-continuation boundary measured from the other side.
+
+### `def EXTRA/col0`, classified before reading anything
+
+Counting first this time, which is the loop's missing third step from the `def EXTRA/quoted`
+mistake:
+
+      26  NOTHING open above it            (53%)
+      23  inside an unclosed %% COMMENT    (47%)
+
+### The `%%` half is a SCOPE question on a shipped rule
+
+Two documents, read after the count rather than before it:
+
+    broad:20261004-6006          fuzz:20261003-307
+    13 "> > %%"                   0 "+    %%"     a `%%` opened inside a LIST ITEM
+    14 "> > amet ... [^x]"        1 "⇥More"
+    15 "[^Note]: dolor ..."       2 "[^note]: Definition"   buried for Obsidian, defined by us
+    16 "> > %%"                   3 "⇥%%"          the closer Obsidian honours
+
+Both are the same rule reaching a shape it does not currently cover: an unclosed `%%` buries a
+COLUMN-0 definition below it even when the opener sits inside a container -- a quote at depth two,
+or a list item -- and the label line itself is unquoted and merely absorbed.
+
+**And both are cascade pairs.** `broad:20261004-6006` has Obsidian holding an extra `note`
+REFERENCE exactly where we hold an extra `note` DEFINITION; `fuzz:20261003-307` has
+`refs: ["note"]` against our `refs: []`. That is the buried-label-degrades-to-a-reference rule,
+worth +123 when it landed, so each of these documents is ONE decision worth TWO assertions --
+the pairing predicted when assertion selection was adopted, now confirmed on real documents.
+
+`item-comment-lazy.ts` already swallows blocks below an unclosed `%%` that is a list item's own
+content, so this is its scope rather than a new pass.
+
+### One singleton defect, recorded and not chased
+
+`fuzz:20261003-307` emits `2@5` TWICE, as `0-5` and `0-6`, where Obsidian has only `0-6`. Counted
+across the corpus: **1 document, 1 duplicated label.** A pass is adding a definition without
+removing the one it replaces, but at one occurrence in 6,818 it is a note, not a target.
