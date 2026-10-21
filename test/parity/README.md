@@ -10854,3 +10854,34 @@ content, so this is its scope rather than a new pass.
 `fuzz:20261003-307` emits `2@5` TWICE, as `0-5` and `0-6`, where Obsidian has only `0-6`. Counted
 across the corpus: **1 document, 1 duplicated label.** A pass is adding a definition without
 removing the one it replaces, but at one occurrence in 6,818 it is a note, not a target.
+
+### Widening `BLOCK_OPENER` to admit a list marker: refused, and it named a new rule
+
+The `%%` half of `def EXTRA/col0` looked like a scope question on `commentRegions`, whose
+`BLOCK_OPENER` admits a quote run but no list marker. Probed before editing, and every MINIMAL
+form already agreed -- the fifth independent confirmation that minimal forms do not reach
+interaction families:
+
+    - %% / label              Obsidian []   ours []    agree
+    +    %% / label           Obsidian []   ours []    agree
+    +    %% / ⇥More / label   Obsidian []   ours []    agree
+    1. %% / label             Obsidian []   ours []    agree
+    - %% / - %% / label       Obsidian []   ours []    agree
+    THE REAL 307 SHAPE        ["2"]     vs  ["note","2","2"]    DIVERGES
+    THE REAL 6006 SHAPE       []        vs  ["note"]            DIVERGES
+
+So the discriminator is the CLOSER: an UNCLOSED `%%` that is an item's own content belongs to
+`item-comment-lazy.ts` and already works, while a CLOSED region falls to `commentRegions`.
+
+Admitting a list marker there fixed NOTHING and broke a passing row:
+
+    - %% / - %% / label       Obsidian []   ours ["1"]   ** NEW REGRESSION
+    the real 307 shape        unchanged
+
+Reverted. **A `%%` that opens a NEW LIST ITEM is not the closer of a comment opened in a previous
+item** -- admitting the marker made those two lines pair into a closed region, which left the
+label below it outside the comment and live. That is a measured rule worth keeping, and it means
+any future fix here has to pair openers and closers per ITEM, not per line.
+
+The real documents still diverge for a reason neither probe reached, which is where this family
+stands: 23 assertions, mechanism located at the opener/closer pairing, minimal forms exhausted.
