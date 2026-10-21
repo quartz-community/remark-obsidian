@@ -11218,3 +11218,27 @@ from the earlier shrink, so the two families share one cause.
 
 NEXT: suppress setext promotion when the underlined line is a footnote definition, gated by the six
 rows above with `- item`, `*`, `+` and label-indent-1 as controls that must not move.
+
+#### Localised three ways: it is a PRE-EXISTING legacy pass, not upstream and not today's work
+
+Before attempting the setext fix, three comparisons on the same two inputs:
+
+    ">   [^1]: def\n>     -\n"
+      bare remark-parse + gfm : blockquote, footnoteDefinition, heading, text   SURVIVES
+      ours, STRICT preset     : blockquote, footnoteDefinition, heading, text   SURVIVES
+      ours, LEGACY preset     : blockquote, HEADING, footnoteReference, text    DESTROYED
+
+    "   [^1]: def\n     -\n"      the same three results at root
+
+So upstream keeps the definition and puts the setext heading INSIDE it, and so does our strict
+preset. Only the legacy preset loses it. That rules out micromark, `remark-gfm` and the whole
+non-legacy chain in one measurement.
+
+Then a bisect, because `legacyFootnoteDefinitionSyntax` shipped today and reuses gfm's opener with
+a replaced continuation -- an obvious suspect for a definition that stops existing. Disabling its
+registration and re-running leaves the output BYTE-IDENTICAL, so today's construct is not the
+cause and no regression was introduced by it. The defect is pre-existing and legacy-gated.
+
+That is three candidate owners eliminated for the cost of two script runs, and it leaves the
+search to the legacy-gated passes alone. The next attempt starts by bisecting those, with the six
+confirming rows and four controls above as its gate.
