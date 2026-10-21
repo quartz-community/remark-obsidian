@@ -11691,3 +11691,26 @@ The two that shipped are the two that were both one-directional AND narrow. The 
 one-directional but general cost a build-and-revert; the one that was bidirectional cost a probe.
 **The filters are ordered by cost for a reason, and applying them in that order is what turned
 the queue from guesswork into arithmetic.**
+
+### The queue after +15
+
+    706 diverging (was 721)
+
+      78  comments        region pairing -- the edit shape measured at net -19
+      27  keepComments    %% subsystem
+      26  math            REFUSED, bidirectional 12 vs 20
+      19  legacyLists     container tokenizer, likely a general edit
+      19  bareFootnoteRefs
+      14  parseComments
+       8  labelPrecedence
+       1  legacyEmphasis  was 16 -- the family is closed
+
+`legacyEmphasis` falling 16 -> 1 is the cleanest confirmation the ablation signal is real: the
+flag was decisive on sixteen documents, one narrow guard closed fifteen of them, and the residue
+is a single document with a different cause.
+
+Next candidate is `bareFootnoteRefs` at 19. It is a PROJECTION-level post-pass -- it strips the
+delimiters from a reference nothing defines -- so an edit there is unlikely to touch container,
+pairing or extent semantics, which is the property that separated the two fixes that shipped from
+the one that did not. `legacyLists` is the same size but is the container tokenizer, where every
+edit so far has been general.
