@@ -11070,3 +11070,23 @@ the pass chain runs.
 The gate for the attempt is the seven probe rows above plus these two trees, and the trap to avoid
 is the asymmetry worth 710 documents: a comment defines nothing while its references stay indexed,
 so a fix that simply extends the node must keep the references inside it live.
+
+#### Owner determined by reading, not by instrumenting
+
+The previous note said the two candidates were distinguishable by dumping the tree before the
+pass chain. They are distinguishable more cheaply than that. In `commentRegionTransform`:
+
+    if (node.type === "html") htmlSpans.push([from, to]);        // collected
+    settled: ({start, end}) => ... || htmlSpans.some(...)         // only ever READ here
+
+`htmlSpans` is used once, in the HTML shape's `settled` predicate, and never to truncate
+anything. And the rebuild loop opens with
+
+    if (!region.closed) continue;
+
+so an UNCLOSED `%%` -- which is exactly the bug case -- never reaches this pass at all.
+
+**The owner is `src/lib/syntax/comment.ts`.** Its own docstring says flow cannot stop mid-line,
+and the measured node ends at 2:6, so the construct is terminating on the inline `<!--` against
+its own stated invariant. The next attempt starts there, with `absorbCloserLine`,
+`closeAfterMidLine` and `tokenizeFlowClose` as the states to read first.
