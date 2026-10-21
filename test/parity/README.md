@@ -10885,3 +10885,48 @@ any future fix here has to pair openers and closers per ITEM, not per line.
 
 The real documents still diverge for a reason neither probe reached, which is where this family
 stands: 23 assertions, mechanism located at the opener/closer pairing, minimal forms exhausted.
+
+### `def EXTRA/col0`, the other half: the probe loop is EXHAUSTED on this family
+
+The 26 with nothing open above, classified:
+
+      13  unexplained                                       (50%)
+      11  Obsidian records a REFERENCE at this exact spot    (42%)  -- cascade pairs
+       1  DUPLICATE name, we defined it earlier too
+       1  previous line is also a label
+
+Reading two of the cascade documents produced a real, general-looking rule:
+
+    11 "More ^[inline [^note]] %% [^2] %%"      a paragraph
+    12 "[^ch2*]: More%% [^x-y] %%"              no blank line between
+
+    OBS  defs ["a@0","b@7"]            refs [... "ch2*@12" ...]
+    OURS defs ["a@0","b@7","ch2*@12"]  refs [...]
+
+A definition cannot interrupt a paragraph, so line 12 is a lazy continuation and its label is
+indexed as a REFERENCE. Probed -- and WE ALREADY DO THIS:
+
+    para / label            Obsidian []      ours []       agree
+    para / blank / label    Obsidian ["1"]   ours ["1"]    agree
+    label / label           ["a","1"]        ["a","1"]     agree
+    heading / label         ["1"]            ["1"]         agree
+    para / label / use      []               []            agree
+
+And yet 58 of the 141 `def EXTRA` assertions have paragraph text on the line above. **The rule is
+right and is already implemented; what fails is seeing the paragraph inside a real document.**
+
+### What this changes about method
+
+That is the SIXTH independent confirmation that minimal forms do not reach interaction families,
+and the first where a shape derived FROM a real document still passed once minimised. The ledger's
+loop -- classify, read a real document, probe the shape it suggests -- has now run out on this
+family at its third step.
+
+The replacement is an instrument already built and used for exactly this: `referee-shrink.mts
+--live`, which REDUCES the real document against the live application instead of asking me to
+hand-build a smaller one. A hand-built form encodes my hypothesis about what matters; a shrink
+keeps only what the ORACLE says matters. For a family where every hypothesis has minimised to
+agreement, that difference is the whole problem.
+
+NEXT: shrink the 11 cascade documents and the 13 unexplained with `--live --ids`, and classify the
+REDUCTIONS rather than the originals.
