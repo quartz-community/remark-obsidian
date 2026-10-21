@@ -10967,3 +10967,38 @@ and a definition's continuation. The fix is two parts and neither is measured ye
 Part 1 gates EVERY `%%` region through `openerIndent`, so it needs a full referee run rather than
 a probe, and part 2 is new behaviour for `<!--` supported so far by a single row. Left for the
 next session with the controls above as its gate.
+
+#### Correction: part 1 of that fix is INERT, and the reason is worth keeping
+
+The section above named two parts and called `QUOTE_RUN` the first. Built and measured: it changes
+nothing. Eight probe rows, stashed and re-run against the live application, byte-identical with
+and without it:
+
+    >⇥<!-- / label      Obsidian ["3"]  ours []     DIVERGES both ways -- unchanged
+    >⇥%% / label        ["3"]           ["3"]       agree, with AND without
+    > %% / label        []              []          agree, with and without
+    > x / ⇥%% / label   ["1"]           ["1"]       agree, with and without
+    > x / ⟨3sp⟩%%       []              []          agree
+    > x / ⟨6sp⟩%%       ["1"]           ["1"]       agree
+    bare %% / label     []              []          agree
+    > > %% / label      []              []          agree
+
+Reverted. The cause is `SHIELDS`:
+
+    const SHIELDS = new Set(["inlineCode", "code"]);
+    const isShielded = (at) => shielded.some(([from, to]) => at >= from && at < to);
+
+The scanner collects the spans of real CODE NODES from the tree and refuses an opener inside one.
+Since `one raw tab is one indent` landed, `>⇥%%` IS a code node, so the tree-level shield already
+covers every case the source-level `openerIndent` tab path would have caught.
+
+**So today's tab work did not leave `openerIndent` wrong -- it made that path REDUNDANT.** The
+difference matters for the next attempt: there is no fourth place to correct, and `>⇥<!--` is a
+`htmlCommentRegions` problem alone. A tree-level shield beats a source-level re-derivation of the
+same fact, which is the same preference `legacyFootnoteDefinitionSyntax` follows by borrowing
+gfm's opener instead of copying it.
+
+And the method held: the probe that proved this inert costs seconds, where the referee run it
+replaced costs ten minutes. **Stash-and-compare on the exact rows a change governs is the cheap
+test for inertness**, and it should run before any gate on a change whose blast radius is one
+predicate.
