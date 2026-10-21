@@ -10660,3 +10660,87 @@ classify, read, then COUNT the read's mechanism over the whole family before bel
 documents from the first classification are the next lead, since a definition buried in a comment
 should already be dropped by the shipped rule worth +123 -- so those are a SCOPE question on
 existing code, which is the cheapest kind of work in this queue.
+
+## The container-extent blocker, diagnosed exactly -- and one container short of landing
+
+Oracle read the installed micromark and corrected three of my beliefs. Citations are to this
+repo's `node_modules`, so they are checkable.
+
+### Why the opener change was inert (it was ACTIVE, not bypassed)
+
+Preprocessing turns `>⇥Text` into `">", horizontalTab(-2), virtualSpace(-1), virtualSpace(-1)`:
+the tab opens at column 2, the next stop is 4, so it yields THREE indentation codes
+(`micromark/lib/preprocess.js:66-84`). `codeIndented` asks `factorySpaceMinMax` for exactly
+`tabSize` and `tabSize`, counting CODES rather than columns
+(`micromark-core-commonmark/dev/lib/code-indented.js:46-57`,
+`micromark-factory-space/index.js:88-115`). Three never satisfies four. Leaving the tab unspent
+raised the run from two codes to three, which is why nothing changed.
+
+And the vendored construct DOES own the opener: `parse` combines defaults first, then each
+extension's constructs are spliced at index ZERO unless marked `add: "after"`
+(`micromark/lib/parse.js:25-29`, `micromark-util-combine-extensions/index.js:82-93`), and the
+tokenizer advances past a construct only on `nok` (`micromark/lib/create-tokenizer.js:379-438`).
+
+`paragraph 1:3` was correct POSITIONING, not evidence of consumption: a real tab is one source
+character, and `virtualSpace` advances neither offset nor column
+(`micromark/lib/create-tokenizer.js:237-246`). Reading a position as a parse decision was the
+error.
+
+### Why the old `disable` attempt broke 74 tests
+
+`disable` is matched on a construct's NAME (`micromark/lib/create-tokenizer.js:411-420`), and the
+vendored quote is ALSO named `"blockQuote"`, so `{disable: {null: ["blockQuote"]}}` disabled both
+the stock construct and ours. Recoverable by renaming, and worth knowing before any future attempt.
+
+### The build, and what it achieved
+
+A `flowInitial[codes.horizontalTab]` construct reading ONE raw tab plus its immediately following
+virtual spaces as a whole indent, emitting stock `codeIndented` / `linePrefix` / `codeFlowValue`
+tokens and copying stock `atBreak` / `inside` / `after` / `furtherStart` (lazy check first), paired
+with the opener consuming only `codes.space`. Seven of the eight measured rows came right:
+
+    > Text     (space)   paragraph, no def                   agreed, unchanged
+    >⇥Text     (one tab)  blockquote,code,footnoteDefinition  FIXED, def "3", code "Text"
+    >⇥⇥Text    (two tabs) code value "⇥Text"                  FIXED, literal tab as Obsidian
+    >⟨4sp⟩     (4 spaces) no code                             agreed, unchanged
+    >⟨5sp⟩     (5 spaces) code + def                          agreed, unchanged
+    ⇥root tab  (control)  root code                           unchanged
+    >⇥>⇥Text   (depth 2)  code + def                          agreed, now via code
+    >⇥<!--                code "<!--" but NO def              code right, def still missing
+
+Gains were real: `probe/quote-tab-root-def/tab` went from a recorded `replicate` divergence to a
+match, two `compute` ceilings dropped, and two ledger probes began agreeing with Obsidian.
+
+### Why it was reverted: ONE container short
+
+    referee  6025/6818 against a 6029 baseline -- 28 GAINED, 32 LOST, net -4
+
+Every loss is one family: a tab-indented line following a DEFINITION inside a quote must CONTINUE
+that definition, not become code.
+
+    > [^1]: def / >⇥# h     def end 1 -> 0   (Obsidian says 1)
+    > [^1]: def / >⇥$$      def end 1 -> 0
+    > [^1]: def / >⇥```     def end 1 -> 0
+
+The cause is structural and now precisely located. Footnote definitions here are micromark
+CONTAINERS, from `micromark-extension-gfm-footnote`, and a container's continuation runs before
+flow. Its continuation also wants four indentation codes, so the three-code tab run closes the
+definition -- and only then does `flowInitial` see the tab and claim the line as code, which the
+tree shows as a `code` SIBLING of the definition:
+
+    blockquote, footnoteDefinition, paragraph, text, code, paragraph, ...     code = "# h"
+
+So the rule is right and incompletely applied: ONE RAW TAB IS ONE INDENT must hold in the
+definition container's continuation too, not only in flow. Applying it in one place and not the
+other moves the boundary instead of fixing it. This is the same `ESTABLISHES` semantics
+`quote-tab.ts` already records -- a definition in the quote establishes the content column, after
+which a tab is continuation rather than code.
+
+### The precise next task
+
+Vendor the footnote-definition container with a legacy continuation that accepts one raw tab plus
+its virtual run, then re-apply the pair above. That is bounded, and it should also reach
+`def END-1/quoted` (29 assertions, 21 solo documents), which is the same boundary measured from the
+other side. Regression gates to re-run: the eight rows above, the five definition-continuation
+probes, `hunt/quoted-definition-tab-continuation/0`, root tab-indented code, the strict preset, and
+the full 6,818-document diff by `--ids` identity.
