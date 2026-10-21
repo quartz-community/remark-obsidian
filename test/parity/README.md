@@ -10510,3 +10510,77 @@ either excluded or re-recorded with prefix augmentation.
 the documents a single correct fix flips on this dimension. The top eight are 292 assertions and
 228 solo documents -- which is the honest size of the next tranche, and an order of magnitude more
 than a document-population selector would have shown for the same rules.
+
+## `def MISSING / col0`: a measured table, a concrete lead, and a refusal
+
+First signature worked by assertion rather than by document. 45 documents, classified by what OUR
+tree puts the undefined label line INSIDE -- our mechanism, never the input shape:
+
+     10  math
+     10  blockquote > paragraph > break
+      5  (nothing covers the line)
+      5  paragraph > break
+      2  list > listItem > code
+      2  blockquote > blockquote > math
+      2  blockquote > html
+
+The top two are 44% of the family. Probing the second against live 1.15.0 found the discriminator
+is a TAB, and that a tab-introduced quote RELEASES the unquoted label below while a
+space-introduced one absorbs it:
+
+    > Text / [^3]: body            Obsidian no def    ours no def    agreed
+    >⇥Text / [^3]: body           Obsidian DEFINES   ours no def    DIVERGES
+    >⇥Text$[^z]$[^3] / [^3]: ...  Obsidian DEFINES   ours no def    DIVERGES
+    >⇥<!-- / [^3]: body           Obsidian DEFINES   ours no def    DIVERGES
+    >⇥>⇥Text / [^3]: body         Obsidian DEFINES   ours DEFINES   agreed
+
+`askBlockCode` then gave the mechanism outright -- the quote's content is a CODE BLOCK, and code
+takes no lazy continuation line where a paragraph does:
+
+    > Text        (space)      (no code block)
+    >⇥Text        (one tab)    blockquote>pre :: "Text"
+    >⇥⇥Text       (two tabs)   blockquote>pre :: "⇥Text"
+    >⟨4sp⟩Text    (4 spaces)   (no code block)
+    >⟨5sp⟩Text    (5 spaces)   blockquote>pre :: "Text"
+    >⇥<!--        (tab comment) blockquote>pre :: "<!--"
+
+One rule reproduces all six: after `>`, one space of padding is consumed only if it IS a space, a
+tab is never padding and counts as four columns, and 4+ remaining columns is code. CommonMark
+expands the tab to its stop instead and leaves two spaces for the two-tab row where Obsidian keeps
+a literal tab, so the tab half is legacy-gated and the space half is plain CommonMark.
+
+### The rule was already known, and already at its limit
+
+`quote-tab.ts` states this derivation in its own docstring, down to rp8 consuming "at most one
+space". It is a TREE REPAIR, and it records its own ceiling: "only a quote whose every content line
+is marked this way is rewritten. A mixture would need the lines regrouped into alternating code and
+prose, and guessing at that split is worse than leaving it recorded as a divergence." Every one of
+these ten is a MIXED quote, so the all-tab branch declines and `mixedQuote` rewrites only a
+definition's own line -- it can never RELEASE a lazy line, because by then the label is
+`blockquote > paragraph > break` with no node left to rescue and no definition in the tree at all.
+
+### The one-token tokenizer fix is inert -- reverted
+
+Consuming only a space in the vendored blockquote's `after` typechecks, passes all 450 tests, and
+does nothing:
+
+    identity diff   1 gained, 1 lost, net ZERO (6029 -> 6029)
+    target rows     all three still diverge
+    >⇥Text          still `paragraph 1:3`, so the tab is still eaten as a one-character prefix
+    >⟨5sp⟩Text      `blockquote > code > footnoteDefinition` BEFORE the change as well as after
+
+So the space threshold was never ours to fix, and the tab path is not decided in that function.
+Reverted rather than shipped: a docstring claiming a mechanism it does not deliver is worse than no
+change, and net-zero totals hide a two-document trade that only `--ids` exposes.
+
+### What it did produce
+
+1. `>⇥<!--` is CODE, not HTML. The shipped rule that a quoted `<!--` swallows the unquoted label
+   below is therefore WRONG for a tab-introduced quote and needs a code guard -- a bounded lead
+   worth 2 documents plus the probe row.
+2. **This family and F5 are blocked on the same root cause: container extent in the tokenizer.**
+   F5 needs to know whether a list is still open at a tab-indented line; this needs a quote to stop
+   absorbing once its content is code. Together they are 19 documents of the two largest remaining
+   families, and the ledger already says structure beats facts -- tokenizer fixes paid +37, +16 and
+   +28 where the same rules as repairs paid +7. That blocker is now the highest-value target in the
+   queue, ahead of any further per-shape rule.
