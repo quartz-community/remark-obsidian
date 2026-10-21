@@ -232,6 +232,7 @@ export function commentRegionTransform(
   const spans = new Set<string>();
   const shielded: Array<[number, number]> = [];
   const htmlSpans: Array<[number, number]> = [];
+  const commentSpans: Array<[number, number]> = [];
 
   visit(tree, (node: Node) => {
     const from = node.position?.start?.offset;
@@ -239,7 +240,10 @@ export function commentRegionTransform(
     if (from === undefined || to === undefined) return;
     spans.add(`${from}:${to}`);
     if (SHIELDS.has(node.type)) shielded.push([from, to]);
-    if (node.type === "comment") commentStarts.add(from);
+    if (node.type === "comment") {
+      commentStarts.add(from);
+      commentSpans.push([from, to]);
+    }
     if (node.type === "html") htmlSpans.push([from, to]);
   });
 
@@ -271,10 +275,21 @@ export function commentRegionTransform(
       // equality called that unsettled and rebuilt it into a node stopping at the
       // closer, which emptied the list item and pushed ` visible` out to the root.
       // Containment still rejects the four-character opener this pass exists for.
+      // A `<!-- ... -->` INSIDE a `%%` comment is already represented, as that comment's own
+      // text. Rebuilding around it cut the comment node at the opener and promoted the html to a
+      // root sibling, which released everything below it:
+      //
+      //     %% / `Text <!-- x -->` / [^a]: def     comment 1:1-2:6, html at root, `a` DEFINED
+      //     %% / `Text`            / [^a]: def     comment 1:1-4:1, `a` buried -- the control
+      //
+      // Obsidian buries the label in both. The same cut ran the other way with a CLOSED `%%`,
+      // where the real closer was then read as an opener and buried a label Obsidian keeps, so
+      // one containment test fixes both directions.
       settled: ({ start, end }) =>
         spans.has(`${start}:${end}`) ||
         isShielded(start) ||
-        htmlSpans.some(([from, to]) => from <= start && to >= end),
+        htmlSpans.some(([from, to]) => from <= start && to >= end) ||
+        commentSpans.some(([from, to]) => from <= start && to >= end),
       build: (start, end) => buildHtml(source, start, end),
     },
   ];

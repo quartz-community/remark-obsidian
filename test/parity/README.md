@@ -11090,3 +11090,52 @@ so an UNCLOSED `%%` -- which is exactly the bug case -- never reaches this pass 
 and the measured node ends at 2:6, so the construct is terminating on the inline `<!--` against
 its own stated invariant. The next attempt starts there, with `absorbCloserLine`,
 `closeAfterMidLine` and `tokenizeFlowClose` as the states to read first.
+
+### Fixed, at +14 -- and the owner was neither place I named
+
+Two commits ago I wrote that the owner was `src/lib/syntax/comment.ts`. **That was wrong**, and
+the grep that settled it took one call: the `%%` construct has no `<` handling at all. The real
+path is the HTML shape inside `commentRegionTransform`:
+
+- `htmlCommentRegions` finds `<!-- x -->`, which IS closed, so `if (!region.closed) continue`
+  does not skip it -- the clause that excuses the `%%` shape does not excuse this one;
+- `settled` returns false, because no `html` node exists in the tree yet;
+- `buildHtml` rebuilds around it, cutting the `%%` node at the opener.
+
+So both of my earlier guesses were wrong in the same way: I reasoned about which file OUGHT to own
+the behaviour instead of following the one region that was actually eligible to be rebuilt.
+
+The fix is one clause, beside the three already in that predicate:
+
+    commentSpans.some(([from, to]) => from <= start && to >= end)
+
+A `<!-- ... -->` inside a `%%` comment is already represented, as that comment's text.
+
+    %% / text / label                CONTROL   []      []      ok
+    %% / <!--..--> / label                     []      []      ok   was ["a"]
+    %% / <!--[^r]--> / label                   []      []      ok   was ["a"]
+    %% / <!--..--> / blank / label             []      []      ok   was ["a"]
+    text / <!--..--> / label         CONTROL   []      []      ok
+    %% / <!-- unclosed / label                 []      []      ok
+    %% closed / <!--..--> / label              ["a"]   ["a"]   ok   was []
+    - <!-- x --> visible             CONTROL   []      []      ok
+
+All four controls held, including `- <!-- x --> visible`, which is the case the adjacent
+`htmlSpans` clause exists for.
+
+    documents   6066 -> 6080 / 6818     +14  (15 gained, 1 lost)
+    ASSERTIONS 22885 -> 22901 / 23618   96.90% -> 96.96%
+      references 17987 -> 18003         +16
+      definitions 4898                  UNCHANGED
+    code blocks  847 -> 846             -1
+
+**Definitions unchanged is the right shape, not a disappointment.** Removing a SPURIOUS definition
+adds no match -- it removes a non-match -- so the gain lands on the references side as those
+labels get correctly indexed. That is the cascade pairing behaving exactly as predicted when
+assertion selection was adopted: one decision, two assertions, and only one of them visible on the
+dimension the rule appears to be about.
+
+The single lost document is `fuzz:20261003-284`, whose remaining error is a LIST-ITEM-hosted `%%`
+(`+  %%` ... `   %%`) -- the per-item opener/closer family already refused with evidence. It was
+agreeing by accident because two errors cancelled; removing one exposed the other. The `-1` on
+code blocks is the same document.
