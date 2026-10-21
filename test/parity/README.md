@@ -10456,3 +10456,57 @@ which is the commented-definition rule worth +123 documents when it landed. `def
 MISSING` is precisely that rule not reaching a shape -- we keep the definition where Obsidian has
 already demoted it. So the next work is not a new rule but the existing one's scope, measured per
 shape.
+
+## The reference side cannot be a selector, and 63% of the top signature was an artifact
+
+`ref EXTRA / col0` was the largest signature at 322 assertions, so it was the obvious first target.
+Split by what the recorded answer holds for that name:
+
+    278  name absent from the answer entirely
+     33  name is DEFINED but the ref is not recorded
+     30  same name elsewhere (a POSITION error)
+
+The rules document warns about exactly this -- "in about 290 notes of each run the oracle could not
+ask whether some reference is live... the comparison LEAVES THOSE REFERENCES OUT" -- so the 278
+were checked against the live application before being treated as ours. Sixty sampled:
+
+    LIVE Obsidian HAS the reference : 38   the corpus omitted it, we are right
+    LIVE Obsidian LACKS it          : 22   a real error of ours
+    not adjudicable live            :  0
+
+**63% of the biggest signature is the oracle omitting a reference it could not adjudicate.** Had it
+been worked as a 322-assertion target, two thirds of the "fix" would have been fitting to an
+omission -- the third artifact caught by verification in this session, after the E3 presence bucket
+and the shrinker's skip counter.
+
+### And the document's own two classes do not identify them
+
+It names frontmatter notes and notes ending inside an unclosed block. Measured over the same
+sixty: **0 of the 38 and 0 of the 22** fall in those classes, so there is no principled predicate
+to exclude them with. The likeliest remaining cause is the author's own augmentation -- he
+synthesises a definition per undefined name, appended, which a tail-swallowing note eats. That is
+the same failure this harness had and fixed with PREFIX augmentation, which would make his
+unadjudicable set and ours the same shape.
+
+### So the queue is ordered on DEFINITIONS, which are verified
+
+Definitions were checked three ways against live Obsidian across 67 documents earlier with ZERO
+staleness, so that side can carry a selector. References cannot, until the corpus's omissions are
+either excluded or re-recorded with prefix augmentation.
+
+    DEFINITIONS only: 484 documents wrong, 541 wrong assertions
+
+    signature              assertions   solo-docs
+    def MISSING/col0            55          46
+    def EXTRA/col0              49          39
+    def MISSING/quoted          40          28
+    def EXTRA/quoted            38          35
+    def MISSING/4+sp            33          32
+    def END-1/quoted            29          21
+    def MISSING/tab             25          22
+    def EXTRA/1-3sp             23          21
+
+`solo-docs` is the number of documents where that signature is the ONLY definition error, so it is
+the documents a single correct fix flips on this dimension. The top eight are 292 assertions and
+228 solo documents -- which is the honest size of the next tranche, and an order of magnitude more
+than a document-population selector would have shown for the same rules.
