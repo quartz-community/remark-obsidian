@@ -10744,3 +10744,59 @@ its virtual run, then re-apply the pair above. That is bounded, and it should al
 other side. Regression gates to re-run: the eight rows above, the five definition-continuation
 probes, `hunt/quoted-definition-tab-continuation/0`, root tab-indented code, the strict preset, and
 the full 6,818-document diff by `--ids` identity.
+
+## ONE RAW TAB IS ONE INDENT -- landed at +37, the largest single move so far
+
+The blocker from the previous section, finished. `remark-parse@8` reads a leading tab as four
+columns outright; micromark expands it to the next TAB STOP, so the same tab is worth fewer
+columns the further into a line it starts. Behind a quote marker the shortfall is exactly one.
+
+### It took THREE constructs agreeing, not one
+
+    legacyBlockQuoteSyntax          spend only a SPACE as the marker's padding
+    legacyIndentedCodeSyntax        one raw tab + its virtual spaces = a whole indent, in flow
+    legacyFootnoteDefinitionSyntax  the same run accepted as a DEFINITION's continuation
+
+Measured apart, the first two traded 28 documents for 32. The definition is a micromark CONTAINER
+and a container's continuation runs BEFORE flow, so it closed on the three-code run and flow then
+claimed its continuation line as code. **A rule that spans container layers has to be applied in
+every layer at once; applied in one, it moves the boundary instead of fixing it.** That is the
+same lesson the net-zero blockquote attempt taught in miniature, at a larger scale.
+
+### Borrow an opener, never copy one
+
+The definition construct is rebuilt from whatever `remark-gfm` already registered -- scan
+`micromarkExtensions` for the construct named `gfmFootnoteDefinition`, reuse its `tokenize` and
+`exit` verbatim, replace only `continuation`. No second dependency to drift, no 175 lines of label
+scanning duplicated, and the opener is byte-identical to the one parsing every other definition in
+the document. It returns `null` when gfm is absent, because then there is nothing to keep open.
+
+Named `legacyGfmFootnoteDefinition` deliberately: `disable` matches on a construct's NAME, so
+sharing gfm's name would make `{disable:{null:["gfmFootnoteDefinition"]}}` silently take both --
+the mistake that cost 74 tests when the vendored blockquote reused `"blockQuote"`.
+
+### The measurement
+
+    documents    6029 -> 6066 / 6818     +37   (42 gained, 5 lost, by --ids identity)
+    ASSERTIONS  22853 -> 22885 / 23618   96.76% -> 96.90%
+      definitions 4868 -> 4898 / 5257    92.60% -> 93.17%
+    probe ledger 1612 -> 1614 agreeing
+    CEILING      footnotes 4 -> 2, footnoteRefs 5 -> 4; three CEILING_IDS dropped
+    golden       probe/quote-tab-root-def/tab  replicate -> match
+
+Eleven of twelve verification rows came right, including `>⇥⇥Text` keeping the second tab verbatim
+where CommonMark leaves two spaces, and all four definition-continuation rows that the partial fix
+had broken.
+
+### The residual, probed rather than assumed
+
+Five documents still diverge, all `>⇥| … |` table rows, and on the REFS dimension only -- their
+defs now match exactly. Probed live before being written off:
+
+    >⇥| a[^n] | b |          Obsidian blockquote>pre, refs []    ours refs []     agree
+    > | a[^n] | b | (space)  no code,            refs ["n"]      ours ["n"]       agree
+    >⇥text[^n]  (control)    Obsidian blockquote>pre, refs []    ours refs []     agree
+
+So the minimal shapes agree with the live application on both the code and the refs, and the
+residual lives inside complex documents rather than in the rule. `>⇥<!--` also still misses its
+definition though its code block is now right, which is the one verification row left.
