@@ -10613,3 +10613,50 @@ have now been reverted, one of them raising micromark's `expected exit token to 
 token`. That makes the blocker itself the highest-value target left -- 21 documents directly, and
 the ledger already credits tokenizer fixes with +37, +16 and +28 where the same rules as repairs
 paid +7. It is going to Oracle rather than to a fifth attempt.
+
+## `def EXTRA / quoted`: classified twice, and the second count corrected the first
+
+38 assertions where WE define a quoted label and Obsidian does not. Classified first by INPUT
+SHAPE, which was the wrong axis and said so immediately -- the largest bucket is the most ordinary
+line in the corpus:
+
+     12  depth=1 space-after-marker 1sp-after-colon          `> [^Ω]: ex nostrud amet.`
+      6  depth=1 space-after-marker 1sp-after-colon in-%%
+      6  depth=2 space-after-marker 1sp-after-colon
+      4  depth=2 space-after-marker 1sp-after-colon in-%%
+      3  depth=1 TAB-after-marker 1sp-after-colon established in-%%
+      2  depth=1 space-after-marker none
+
+Nothing about `> [^Ω]: ex nostrud amet.` is unusual, so the cause is elsewhere in the document --
+the ledger's own rule, ignored for one pass and paid for immediately.
+
+### Reading real documents gave a mechanism, and counting it refuted the generalisation
+
+Three real documents from the top buckets all had the label sitting inside a block opened EARLIER
+in the same quote, with an intervening line that changes the quote prefix:
+
+    20 "  > ````"          fence opener, 2 spaces
+    21 "⇥> est magna tempor"  prefix changes to a TAB
+    22 "   > [^Ω]: ex..."   we define here; Obsidian does not
+    23 "   > ````"          closer, 3 spaces
+
+    13 "-  > [!NOTE]⇥[^x-y]"   14 "   > <br>"  HTML block type 7 runs to a blank line
+    15 "  > [^a$]: ..."        we define here; Obsidian does not
+
+    0 "> > ~~~"   1 "More end."  (lazy, unquoted)   3 "> > [^2]: def"   4 "> > ~~~"
+
+So the shape was convincing on three documents and WRONG on the family. Counted over all 38:
+
+      31  neither                                        (82%)
+       6  inside an UNCLOSED FENCE opened in the quote    (16%)
+       1  inside an open HTML BLOCK                       (3%)
+
+**A mechanism read off three documents is a hypothesis, not a classification.** The ledger already
+says minimal forms do not reach interaction families, and this is the mirror defect: REAL documents
+do reach them, but three of them generalise no better than one. The loop needs its third step --
+classify, read, then COUNT the read's mechanism over the whole family before believing it.
+
+7 of 38 is not worth a rule on its own, and the remaining 31 are unexplained. The 11 `in-%%`
+documents from the first classification are the next lead, since a definition buried in a comment
+should already be dropped by the shipped rule worth +123 -- so those are a SCOPE question on
+existing code, which is the cheapest kind of work in this queue.
