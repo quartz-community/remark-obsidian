@@ -11139,3 +11139,35 @@ The single lost document is `fuzz:20261003-284`, whose remaining error is a LIST
 (`+  %%` ... `   %%`) -- the per-item opener/closer family already refused with evidence. It was
 agreeing by accident because two errors cancelled; removing one exposed the other. The `-1` on
 code blocks is the same document.
+
+## `def MISSING / quoted`, shrunk: one shape is 9 of 34
+
+Second use of `referee-shrink --live`, over the 34 documents carrying a `def MISSING / quoted`
+assertion. The dominant cluster, far larger than anything the earlier shape-classification found:
+
+    ">   ⇥[^1]:\n>     -\n"                      ">   ⇥[^Ω]:\n>      $$\n"
+    ">   ⇥[^ch2*]:\n>      $$\n"                 "> >   ⇥[^note]:\n> >      >\n"
+    "> [!tip]\n>   ⇥[^b]:\n> ⇥continued\n"      "> >   ⇥[^Note]:\n> >     continued"
+    "$$\n$$\n>   ⇥[^2]:\n>     >\n"            ">   ⇥[^a]:\n>      %%\n> ⇥- item\n..."
+    ">    It^[inline [^名]]\n> >   ⇥[^note]:\n> > ⇥continued\n"
+
+A quote marker, SPACES, then a TAB, then the label. Obsidian DEFINES every one; we define none,
+because the spaces plus the tab reach four columns and we read the content as indented code.
+
+**The rule is already measured and already implemented elsewhere.** B2's marker-separator table
+says a tab reaches its stop only when it OPENS the separator -- after a space it contributes
+nothing -- and `columnsOfRaw` in `legacy-list.ts` implements exactly that for a list marker's
+separator. It was never applied to a QUOTE's content indentation. Under it, `>   ⇥[^1]:` has an
+indent of two, not six, so the label is a definition rather than code.
+
+That makes this the FIFTH place that has to agree about a tab, after the quote's opener, flow, a
+definition's continuation, and a list marker's separator -- and the second where the correct rule
+already existed in one of them and simply had not been carried across.
+
+The second cluster is `%%` inside a quote, about 7 of 34 (`> %%` / blank / `> [^note]:` / `> %%`,
+`> [^9]: orphan` / `> %%` / `> [^1]:` / `> %%`, and similar). Those overlap the per-item and
+per-quote opener/closer pairing already refused with evidence, so the tab cluster is the one to
+take first.
+
+NEXT: carry `columnsOfRaw`'s tab-after-space rule into the quote's content indentation, gated by
+the nine reductions above plus the space-only controls that currently pass.
