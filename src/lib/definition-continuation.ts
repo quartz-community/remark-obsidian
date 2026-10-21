@@ -194,6 +194,35 @@ function dedent(
 const INTERRUPT_WINDOW = 1024;
 
 /**
+ * How many characters of the ender at `at` must fit inside the window to be recognised.
+ *
+ * Read from the SOURCE rather than from the node's type, because the same type has different
+ * minima: a `code` node is three characters as a fence and one as an indented block, and a
+ * `footnoteDefinition`'s label is as long as its name. Anything unrecognised falls back to one,
+ * which reproduces the previous behaviour for it.
+ */
+function minTokenAt(source: string, at: number): number {
+  const line = source.slice(
+    at,
+    source.indexOf("\n", at) === -1 ? undefined : source.indexOf("\n", at),
+  );
+  const bare = line.replace(/^[ \t>]+/u, "");
+  const fence = /^(`{3,}|~{3,})/u.exec(bare);
+  if (fence) return at + line.length - bare.length - at + 3;
+  // A LABEL is deliberately NOT measured here, though it is the boundary the rules document
+  // states most precisely ("a label at character 1,020 no longer fits"). Absorbing a definition
+  // into a definition inverts the inner span -- measured, `[^1]: ` + 1013 x's + `\n[^2]: x`
+  // produced `footnoteDefinition off 1020-1019`, an end BEFORE its start -- because this pass
+  // copies the absorbed block's end onto the host and a sibling definition's end is already the
+  // host's. The fence and thematic-break boundaries need no such nesting and are measured below,
+  // so they are taken and this one is left, with its five probe rows still diverging.
+  if (/^(?:-{3,}|={3,}|\*{3,}|_{3,})[ \t]*$/u.test(bare)) {
+    return line.length - bare.length + 3;
+  }
+  return 1;
+}
+
+/**
  * Nothing can end a footnote definition more than 1,024 characters into it.
  *
  * `remark-footnotes@2` looks for an interrupting construct only within the definition's
@@ -239,8 +268,23 @@ export function definitionWindowTransform(tree: Root, source: string): void {
       const to = block?.position?.end?.offset;
       if (from === undefined || end === undefined) continue;
       if (at === undefined || to === undefined) continue;
-      // Counted from the label line's start, which is the definition's own start.
-      if (at - from < INTERRUPT_WINDOW) continue;
+      // Counted from the label line's start, which is the definition's own start -- and the
+      // ender's RECOGNISABLE TOKEN has to fit entirely inside the window, not merely begin in
+      // it. `remark-footnotes@2` looks at the definition's first 1,024 characters, so an ender
+      // is seen only if what survives that truncation still reads as one. Measured against
+      // live Obsidian, with the ender's start offset across the boundary:
+      //
+      //     ender    1000  1020  1023  1024  1025     (0 = ender ends it, 1 = lazy text)
+      //     heading     0     0     0     1     1     `#` alone is still a heading
+      //     item        0     0     0     1     1     `-` alone is still an item
+      //     fence       0     0     1     1     1     one backtick is NOT a fence
+      //     label       0     1     1     1     1     `[^2]` without its colon is no label
+      //
+      // So the threshold is per-ender: 1 character for a heading, an item or a quote, three
+      // for a fence or a thematic break, and the whole `[^name]:` for a label. The rules
+      // document states the same two boundaries from the other side -- "a label at character
+      // 1,020 no longer fits (`[^2]` without its colon), nor a fence at 1,022".
+      if (at - from + minTokenAt(source, at) <= INTERRUPT_WINDOW) continue;
       // Abutting, so a blank line still ends the definition.
       if (!/^\n[ \t]*$/u.test(source.slice(end, at))) continue;
 
