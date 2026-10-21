@@ -11555,3 +11555,18 @@ so its blast radius is the family itself. **The size of a family predicts the up
 GENERALITY OF THE EDIT predicts the losses.** Two fixes aimed at the same subsystem, with the same
 evidence quality behind them, separated entirely by how much of the codebase each one's condition
 touches.
+
+### The decisive queue after +12
+
+    721 diverging (was 733)
+
+      78  comments          (was 86)      19  bareFootnoteRefs
+      27  keepComments      (was 30)      16  legacyEmphasis
+      26  math              unchanged     14  parseComments  (was 16)
+      19  legacyLists       unchanged      8  labelPrecedence
+
+The `%%` subsystem is still the largest at 119, but what remains of it is region PAIRING -- the
+edit shape measured at net -19 today. `math` at 26 is the next target by the rule this session
+established: an untouched subsystem whose fix is unlikely to need a general change to how
+anything is matched. Size picks the candidate; the generality of the available edit decides
+whether it ships.
