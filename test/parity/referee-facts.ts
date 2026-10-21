@@ -104,7 +104,16 @@ function columnOf(source: string, offset: number): number {
   return offset - (source.lastIndexOf("\n", offset - 1) + 1);
 }
 
-function factsOf(tree: Root, source: string): Facts {
+/**
+ * Exported so a caller holding a tree built with NON-DEFAULT flags can project it the same way.
+ *
+ * `ablate.mts` reparses each document once per flag and has to ask "is this the same answer the
+ * referee would score?". Re-deriving the projection there would be a third copy of the two rules
+ * encoded above, and this file's own history is the argument against that: the commented-
+ * definition rule once lived in `referee.mts` alone and the shrinker spent a run measuring
+ * behaviour three commits old.
+ */
+export function factsOf(tree: Root, source: string): Facts {
   const defs: Def[] = [];
   const refs: Ref[] = [];
   let unplaced = 0;

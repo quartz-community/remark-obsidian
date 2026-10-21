@@ -11314,3 +11314,56 @@ So the loop gains a step that is cheap and was skipped here: after a reduction s
 mechanism, COUNT THAT MECHANISM IN THE UNREDUCED CORPUS before localising it, let alone fixing it.
 The `<!-- -->` inside `%%` fix survived that test implicitly -- it was a fifth of the reductions
 AND the shape occurs throughout the originals -- which is why it paid +14 and this one pays zero.
+
+## `ablate.mts`: which PASS would have to change, for every diverging document
+
+The gap this closes: the shrinker answers "what text diverges" and the signature classifier
+answers "what shape", and both were measured to the end of their usefulness this session. Forms
+are diffuse -- 687 distinct reductions across 741 documents -- while MECHANISMS are not: one rule
+closed 42 documents spanning many forms. Nothing in the harness reported mechanisms, so every
+rule was chosen by reading documents and guessing which pass owned them, a guess that was wrong
+three times on one family.
+
+For each diverging document every boolean flag is toggled in turn and the document reparsed. A
+flag is CULPABLE when toggling it changes our answer and DECISIVE when toggling it makes the
+answer MATCH the oracle. The projection is `factsOf`, the referee's own, now exported rather than
+re-derived.
+
+    756 diverging documents, 24 flags each, 54 seconds
+
+    DECISIVE -- toggling makes the document AGREE
+      86  comments            36  bareFootnoteRefs    31  keepComments
+      26  math                18  legacyLists         17  parseComments
+      16  legacyEmphasis       8  labelPrecedence      5  callouts
+       3  frontmatter          2  taskReparse          1  legacyCodeSpans
+
+    CULPABLE -- toggling changes our answer at all
+     638  bareFootnoteRefs   212  keepComments       167  parseComments
+     158  math               120  comments           103  inlineFootnotes
+      82  callouts            69  legacyLists         37  wikilinks
+
+    66 of 756 are moved by NO flag -- unconditional mechanisms with no switch
+
+**249 of 756 documents (33%) have a single flag that flips them to agreement.** That is a
+selection signal an order of magnitude sharper than anything population, lift, delta-shape or
+form clustering produced, and it is computed in under a minute rather than a ten-minute gate.
+
+### Reading it correctly
+
+DECISIVE does not mean "turn the flag off". These flags are wanted; `comments` being decisive on
+86 documents means the `%%` subsystem is WRONG IN SCOPE on them, not that Obsidian comments should
+stop being parsed. It is the cheapest kind of finding -- a scope question on code that already
+exists -- and it is directional: disabling comment parsing leaves buried definitions LIVE, so on
+those 86 our regions are TOO GREEDY and bury what Obsidian keeps. That is the same direction the
+`<!-- -->` fix moved today.
+
+Taken together the `%%` subsystem (`comments` + `keepComments` + `parseComments`) is decisive on
+**134 documents**, far larger than any shape-level family found by hand.
+
+### The harness refuses to report from a broken instrument
+
+`--self-test` reparses a case where `bareFootnoteRefs` is KNOWN to change the answer, and the tool
+exits non-zero if that comes back unchanged. This is not decoration: an earlier hand-rolled bisect
+concluded "no flag matters" because it called `runSync(tree)` without the source, silently
+no-opping every source-dependent pass. A harness that cannot see a known change must not be
+allowed to report zeros.
