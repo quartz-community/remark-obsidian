@@ -10294,3 +10294,41 @@ the end of its container and buries the label below. Nine documents, one directi
 past both screens. Not attempted here because comment extent inside a container is the area that
 produced two reverted attempts and a micromark invariant violation earlier in the session, and
 attempting it last would ship the least-verified change of the night.
+
+## Verified parity position, all instruments re-run
+
+    CORPUS (the contract gate)   3438 / 3448 match   99.7%
+                                 replicate 8, out-of-scope 1, accepted 1
+                                 450 tests, 17 files, 4 gates green
+
+    REFEREE footnotes            6029 / 6818   88.4%
+    REFEREE code ranges           847 /  883   95.9%
+
+    COMPOSE pairs                   0 / 256
+    GRIDS (10 named)               21 / 310
+
+    LEGACY ORACLE, defs          ours 6334   rp8 5640
+                                 rp8 right where we are wrong  298
+                                 we right where rp8 is wrong   992
+                                 BOTH WRONG                    186
+    LEGACY ORACLE, code          ours  847   rp8  567
+                                 BOTH WRONG                     19
+
+### What the rules-document pass moved
+
+    referee footnotes   6013  ->  6029   (+16, every step verified by identity diff)
+    grids                 23  ->  21
+    blueprint (rp8 right, we wrong)   312  ->  298
+    BOTH WRONG            191  ->  186
+    probe ledger        1594  ->  1612 agreeing
+    compute oracle        24  ->  21 diverging, three ceilings lowered
+
+Five changes landed, each with a changeset and an identity diff: the marker-separator table (B2),
+the touching definition under quoted prose, the 1,024-character window's per-ender threshold (E4),
+the comment closer being the first `%%` on its line (F2), and the fence-detection indent bound.
+
+**`BOTH WRONG` is the number to watch, and it is 186.** That is the count of documents neither
+this package nor the reference implementation gets right, so it is the honest size of what nobody
+has solved -- against 789 documents still diverging on our strict metric. The other 603 are
+answered by one implementation or the other, which is what makes the remainder tractable rather
+than a tail.
