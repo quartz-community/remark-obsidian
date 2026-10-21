@@ -11613,3 +11613,55 @@ needed:
 
 Three independent filters, applied in increasing order of cost. Only a candidate that passes all
 three is worth a changeset, and `%%` mechanism (b) is so far the only one this session that did.
+
+## `legacyEmphasis` (16 decisive): passes all three filters, diagnosed, not yet built
+
+Third family through the loop, and the first from a TEXT-level subsystem rather than block
+structure. The shrink is the cleanest of the session -- the commonest form is three characters
+of context:
+
+    3x  "Opening [^ch2*] and [^ch2*]\n"        3x  "2) | Prose here[^ch2*]\\[^ch2*]"
+    1x  "a [^4_] b [^4_]"                      1x  "-  | More [^ch2*] [^ch2*]\n"
+
+**The same emphasis delimiter inside two footnote labels.** Probed, with controls that isolate it
+to the DELIMITER rather than the name:
+
+    [^ch2*] twice                obs ["ch2*@0:8","ch2*@0:20"]  ours []   DIVERGES
+    [^4_] twice  (underscore)    obs ["4_@0:2","4_@0:10"]      ours []   DIVERGES
+    [^a*] and [^b*]  (different) obs ["a*@0:2","b*@0:10"]      ours []   DIVERGES
+    [^ch2a] twice (no delimiter) ok          [^ch2*] ONCE      ok
+    *b*  ok      _b_  ok                     emphasis itself still works
+
+The tree says it outright:
+
+    legacyEmphasis ON : text("Opening [^ch2") emphasis text("] and [^ch2") text("]")
+    legacyEmphasis OFF: text("Opening ") footnoteReference text(" and ") footnoteReference
+
+### Why it happens
+
+A GFM footnote CALL requires the name to be DEFINED. `[^ch2*]` is undefined here, so the call
+fails and the label stays literal text -- which is fine on its own, because `bareFootnoteRefs`
+recognises a bare `[^name]` afterwards, and that is why `[^ch2a]` twice is correct. But with a
+delimiter in the name, `legacyAttention` reaches the `*` first, pairs it with the one in the
+SECOND label, and emits an `emphasis` spanning `] and [^ch2`. By the time `bareFootnoteRefs` runs
+there is no `[^ch2*]` left to recognise, in either place.
+
+### It passes all three filters
+
+    real and sized      47 assertions across 35 documents
+    one-directional     47 lost against 14 invented -- 77%, where math was a 12-vs-20 minority
+    narrow edit         text-level; the guard is "this marker is inside a label", which touches
+                        no container, no pairing, no extent rule
+
+### The fix target, and the one obstacle
+
+`legacyAttention` already has the exact hook: `literal(code)` emits the marker as plain data
+instead of rejecting, with a docstring explaining that a `nok` would hand the marker back to
+micromark's core resolver and build emphasis legacy never produces. A marker inside a `[^...]`
+label should take that path.
+
+The obstacle is backward context: the construct is entered AT the marker and `createChunkScan`
+materialises only FORWARD, so "an unclosed `[^` precedes me on this line" is not currently
+knowable there. `comment-region.ts` has exactly this predicate as `insideLabel(source, at)`, but
+it works on the source string, which a text construct does not hold. Resolving that -- a
+lookbehind, a resolver, or making the scan label-aware -- is the whole of the remaining work.
