@@ -11895,3 +11895,61 @@ model whole -- select the item's lines, dedent by the marker width, re-parse as 
 sequence -- is the only shape that keeps those quantities consistent, because it is the model
 they were all approximating. That is a rewrite of the construct, not an edit to it, and it should
 be attempted on a branch with the full gate set run per step rather than opportunistically.
+
+## The rp8 model as a PASS: architecture validated, implementation not
+
+The queued item said "port rp8's line-selection model" and I had read that as rewriting the list
+construct. It is not: this repo already has the machinery, with 27 and 33 callers.
+
+    mapLines(source, start, end, startLine)   strip a region's prefixes, remember where each
+                                              line really began
+    shiftByMap(node, map, from)               place a fragment parsed from it back exactly
+
+That IS rp8's model -- select lines, dedent, re-parse -- and `indent-tab.ts` is the exact
+precedent, re-parsing a line with its indentation removed for the sibling rp8 rule about a tab
+after a space. Crucially a pass touches NONE of `legacy-list.ts`'s load-bearing quantities, which
+is what killed both tokenizer attempts. And the earlier objection -- "once a line is absorbed into
+the wrong container there is no node left to move" -- does not apply, because this re-parses the
+SOURCE region rather than moving nodes.
+
+### Three attempts at one rule, measured the same way
+
+    tokenizer continuation (Q1)   26 probes moved away, 0 gained   10 failures / 6 files
+    tokenizer dedent width (Q3)   57 probes moved away, 1 gained    4 failures / 3 files
+    PASS, bare-item dedent        14 probes moved away, 0 gained    1 failure  / 1 file
+                                  referee 6130 vs 6131 -- net -1
+    bare-marker grid              7 of 17  ->  4 of 19  ->  2 of 21
+
+**Monotonic, and the pass lands within one document of neutral.** No invariant, compose, parity or
+compute failures at all -- the thing that made the tokenizer edits unshippable simply does not
+happen here. The architecture is right; this implementation of it is not finished.
+
+### The two defects, both mine and both precise
+
+The 14 regressed probes name them exactly:
+
+    "10.\n⇥    [^1]: x"      "10. \n⇥    [^1]: x"        TAB-indented label
+    "- \n\n    [^1]: x"       "10.\n\n⇥    [^1]: def"     BLANK line after the bare marker
+
+1. **Characters versus columns.** The dedent cut up to `width` CHARACTERS
+   (`line[cut] === " " || line[cut] === "\t"`), where rp8 counts COLUMNS with tab-stop
+   arithmetic. Cutting three characters off `⇥⟨4sp⟩` removes a tab's four columns plus two
+   spaces -- six columns for a width of three. `columnsOfRaw` in `legacy-list.ts` already does
+   this arithmetic correctly and should be reused rather than re-derived.
+2. **A blank line after the bare marker is a different case.** Every space-indented regression
+   has the shape `marker` / BLANK / `label`, with no content between. That is exactly the
+   configuration `onBlank`'s synthetic column exists for, so the marker-width dedent is wrong
+   there and the +1 is right. The grid never caught it because every grid row had content
+   immediately after the marker.
+
+Neither is a rule problem; both are arithmetic. That is a materially better place to stop than
+either tokenizer attempt reached, because the next iteration is two named fixes against a
+validated architecture rather than another search for a mechanism.
+
+### What the three attempts together establish
+
+A rule can be correct, measured, DOM-confirmed and still unshippable in the wrong layer. The same
+`remark-parse@8` dedent rule, with identical evidence behind it, cost 26 probes in a continuation
+predicate, 57 in a container field, and 14 as a re-parsing pass -- and the only difference between
+those numbers is how much of the existing machinery each one had to disturb. **Choose the layer
+by what it does NOT touch.**
