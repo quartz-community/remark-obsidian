@@ -11521,3 +11521,37 @@ So the count answers "is this family real and how big", which is necessary and w
 does not answer "what else does this edit touch", which only the gates answer. The loop needs
 both ends: COUNT before building to avoid the zero-value fix, and the FULL gate set after,
 because a family's size is an upper bound on gains and says nothing about losses.
+
+### Mechanism (b) shipped: +12, zero losses
+
+The second of the two `%%` mechanisms the loop found, and the one that does NOT touch region
+pairing in general -- which is precisely why it landed where (a) did not.
+
+    > %% / BLANK / > [^1]: def / > %%    Obsidian DEFINES, we buried    <- 11 documents
+
+An unquoted empty line ends the blockquote, so the quote below is a NEW one and a `%%` opened in
+the first cannot reach a closer in the second. `closesQuotedComment` rejects that closer, which
+leaves the region UNCLOSED -- the right shape rather than a fallback, because
+`commentQuoteExtentTransform` already bounds an unclosed comment to its quote and that is the
+extent Obsidian reports.
+
+Three controls keep it narrow, and each one refutes a broader rule I might have written:
+
+    %% / BLANK / [^1]: def / %%      buries    a blank is NOT a general terminator
+    > %% / > / > [^1]: / > %%        buries    a `>`-only line keeps the quote OPEN, so the
+                                               test is EMPTINESS, not blankness
+    - %% / BLANK / - [^1]: / - %%    DEFINES   already right -- this is about QUOTES, not
+                                               containers in general
+
+    8 of 8 probe rows agree      450 tests pass      4 gates green
+    referee 6104 -> 6116 / 6818   +12 GAINED, 0 LOST, by --ids identity
+    assertions 23205/23935 (96.95%)   definitions 93.17% -> 93.36%
+
+### Why (b) landed and (a) did not, in one line
+
+(a) changed how EVERY pair of `%%` markers is matched and reached far outside its 18 documents,
+losing 27. (b) rejects a closer only when the opener is quoted AND an empty line separates them,
+so its blast radius is the family itself. **The size of a family predicts the upside; the
+GENERALITY OF THE EDIT predicts the losses.** Two fixes aimed at the same subsystem, with the same
+evidence quality behind them, separated entirely by how much of the codebase each one's condition
+touches.

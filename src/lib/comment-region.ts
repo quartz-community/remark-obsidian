@@ -31,7 +31,13 @@ export interface Region {
  * No transform over the resulting tree can repair that, because the tree no
  * longer records where the regions were. Recomputing them from source does.
  */
-function regionsFor(source: string, open: string, close: string): Region[] {
+function regionsFor(
+  source: string,
+  open: string,
+  close: string,
+  closes: (source: string, opener: number, closer: number) => boolean = () =>
+    true,
+): Region[] {
   const found: Region[] = [];
   let from = 0;
 
@@ -39,7 +45,13 @@ function regionsFor(source: string, open: string, close: string): Region[] {
     const at = source.indexOf(open, from);
     if (at === -1) break;
 
-    const shut = source.indexOf(close, at + open.length);
+    let shut = source.indexOf(close, at + open.length);
+    // Not every occurrence of the closing text can CLOSE this opener. `closes` rejects one and
+    // the scan moves to the next; when none is acceptable the region is unclosed, which is the
+    // correct answer rather than a failure. Defaults to accepting, so `<!--`/`-->` is untouched.
+    while (shut !== -1 && !closes(source, at, shut)) {
+      shut = source.indexOf(close, shut + close.length);
+    }
     if (shut === -1) {
       found.push({ start: at, end: source.length, closed: false });
       break;
@@ -139,18 +151,68 @@ function openerIndent(line: string): number {
   return column;
 }
 
+/** Entirely empty: no spaces, no quote marker. A `>`-only line keeps its quote open. */
+const EMPTY_LINE = /^[ \t]*$/u;
+
+/**
+ * A comment opened inside a QUOTE cannot close past a line that ends the quote.
+ *
+ * An unquoted empty line ends a blockquote, so the quote below it is a NEW one and a `%%`
+ * opened in the first cannot reach a closer in the second. Obsidian keeps the definition
+ * between them live; we buried it, because the region spanned both quotes. Eight probes against
+ * live 1.15.0 bound the rule exactly, and only the first diverged:
+ *
+ *     > %% / BLANK / > [^1]: def / > %%    DEFINES   <- this, 11 documents
+ *     > %% / > [^1]: def / > %%            buries    no blank, one quote
+ *     > %% / > / > [^1]: def / > %%        buries    a `>`-only line keeps the quote OPEN
+ *     %% / BLANK / [^1]: def / %%          buries    at ROOT a blank ends nothing
+ *     %% / [^1]: def / %%                  buries
+ *     - %% / BLANK / - [^1]: def / - %%    DEFINES   already right
+ *     > %% / BLANK / > [^1]: def           DEFINES   already right, unclosed
+ *     %% / BLANK / [^1]: def               buries    already right, unclosed at root
+ *
+ * Three of those are what make it narrow. The root rows say a blank line is not a general
+ * terminator -- at top level an unclosed comment runs to the end of the note, blank lines and
+ * all, which a committed golden pins. The `>`-only row says the test is EMPTINESS, not
+ * blankness: that line still carries the quote. And the list row says the rule is about the
+ * QUOTE, not about containers generally.
+ *
+ * Rejecting the closer leaves the region UNCLOSED, which is the right shape rather than a
+ * fallback: `commentQuoteExtentTransform` already bounds an unclosed comment to its quote, and
+ * that is exactly the extent Obsidian reports.
+ */
+function closesQuotedComment(
+  source: string,
+  opener: number,
+  closer: number,
+): boolean {
+  const openerLineStart = source.lastIndexOf("\n", opener - 1) + 1;
+  const openerLineEnd = source.indexOf("\n", opener);
+  const openerLine = source.slice(
+    openerLineStart,
+    openerLineEnd === -1 ? source.length : openerLineEnd,
+  );
+  if (!/^[ \t]{0,3}>/u.test(openerLine)) return true;
+  return !source
+    .slice(openerLineEnd === -1 ? source.length : openerLineEnd + 1, closer)
+    .split("\n")
+    .some((line) => EMPTY_LINE.test(line));
+}
+
 export function commentRegions(source: string): Region[] {
-  return regionsFor(source, "%%", "%%").filter((region) => {
-    const lineStart = source.lastIndexOf("\n", region.start - 1) + 1;
-    const lineEnd = source.indexOf("\n", region.start);
-    const line = source.slice(
-      lineStart,
-      lineEnd === -1 ? source.length : lineEnd,
-    );
-    if (!BLOCK_OPENER.test(line)) return false;
-    const indent = openerIndent(line);
-    return indent < 4 || continuesDefinition(source, lineStart, indent);
-  });
+  return regionsFor(source, "%%", "%%", closesQuotedComment).filter(
+    (region) => {
+      const lineStart = source.lastIndexOf("\n", region.start - 1) + 1;
+      const lineEnd = source.indexOf("\n", region.start);
+      const line = source.slice(
+        lineStart,
+        lineEnd === -1 ? source.length : lineEnd,
+      );
+      if (!BLOCK_OPENER.test(line)) return false;
+      const indent = openerIndent(line);
+      return indent < 4 || continuesDefinition(source, lineStart, indent);
+    },
+  );
 }
 
 /**
