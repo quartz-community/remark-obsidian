@@ -11411,3 +11411,58 @@ Every step before `--emit` was previously done by copying ids out of a terminal,
 step did not exist at all -- its absence is what let a six-row bug worth zero documents consume a
 three-way localisation. The chain now answers which pass, which documents, which text, and how
 much, in that order, before any code is written.
+
+## `recorder.mts`: the oracle's reference side, re-recorded and now trustworthy
+
+References are 18,361 of the 23,618 assertions the gate scores -- 78% -- and that 78% was partly
+measuring the RECORDER rather than Obsidian. The rules document says so in its own words ("in
+about 290 notes of each run the oracle could not ask whether some reference is live... the
+comparison leaves those references out"), and sampling confirmed it: of sixty `ref EXTRA / col0`
+assertions, 38 were references live Obsidian HAS and the corpus omits.
+
+The cause is augmentation. Reading `footnoteRefs` requires every name to be DEFINED, so a
+definition is synthesised per undefined name and APPENDED -- and a note that swallows its tail
+eats them, so nothing is defined, so the definition-gated field returns empty. That reads as
+"Obsidian indexes no reference here" when it means "the probe never fired". This harness had the
+identical defect and fixed it by inserting the synthesised definitions as a PREFIX, after any
+frontmatter block. `recorder.mts` re-records the corpus through that fixed path.
+
+    6,818 documents re-recorded in 34 seconds, resumable through a JSONL ledger
+
+    reference assertions, ORIGINAL corpus  : 18361
+    reference assertions, CORRECTED corpus : 18678
+    documents whose reference set changed  :    47
+      references the corpus was MISSING    :   319
+      references the corpus had, live lacks:     2
+    documents still unadjudicable          :     0
+
+**319 missing against 2 spurious.** One-directional, exactly as the augmentation theory predicts:
+a failed probe drops references, it never invents them. And prefix augmentation adjudicates the
+WHOLE corpus -- zero documents left unreadable.
+
+### What it changes about where we stand
+
+    against the ORIGINAL oracle    6080/6818  (89.2%)   assertions 96.96%
+    against the CORRECTED oracle   6104/6818  (89.5%)   assertions 96.89%
+                                   definitions 93.17%   references 97.93%   code 95.8%
+
+**24 documents were being scored as our errors when they were the oracle's omissions.** The
+assertion percentage moves slightly DOWN because the denominator grew by 317 while we match 289
+of the newly-recorded references -- about 91%, a little below our average, which is what one
+expects of references that only appear in hard documents.
+
+Two deliberate restrictions:
+
+- **Definitions are not adopted.** `ask` returns the AUGMENTED note's definitions, synthetic
+  entries included -- `[inline0`, `[inline1`, 13 of them in the first forty documents. The
+  definition side was checked three ways across 67 documents with ZERO staleness, so adopting
+  live defs would corrupt the half that is already good to repair the half that is not. Zero
+  synthetic names reach `refs`, measured on the same forty.
+- **The sibling project's corpus is untouched.** The corrected copy is written beside it and is
+  a drop-in for `PARITY_REFEREE_DIR`.
+
+That drop-in property cost one defect worth recording: the first emit rebuilt each row from the
+four fields the tool reads, silently dropping `code`, and the gate announced the loss of an entire
+dimension as `0/0 agree (NaN%)`. **A dimension can disappear from a report and leave only a NaN
+behind.** Spreading the original row and overriding one key is the fix, and the lesson is that a
+corrected artefact must be diffed for FIELDS, not only for values.
