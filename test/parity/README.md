@@ -10241,3 +10241,56 @@ inline footnotes inside an inline footnote are dead text", including over a soft
 (M1/M2) is 25. The two `other` buckets are 123 and want the same treatment: classify against the
 document's categories rather than against our mechanisms, since the document is the thing that
 turned out to have the answers.
+
+## Working the rules document end to end: what was already right
+
+The document was treated as a specification and each section probed against live Obsidian before
+any code was written. **Most of it we already implement**, which is the result worth recording
+loudest -- it is the difference between a backlog and a finished surface, and it stops the next
+reader re-deriving any of it:
+
+| rule                                                      | probes    | verdict                              |
+| --------------------------------------------------------- | --------- | ------------------------------------ |
+| **B2** content column / code threshold, full marker table | 144 cells | 2 diverging -> **FIXED**             |
+| **B3** a lazy line does not cancel de-indentation         | 8         | already correct                      |
+| **E3** inside `^[...]` everything is dead                 | 9         | already correct                      |
+| **E4** the 1,024-character window                         | 24 cells  | fence/break **FIXED**, label refused |
+| **M1/M2** math pairs from the left, no blank line         | 6         | already correct                      |
+| **B8** a task box holds any one character                 | 4         | already correct                      |
+| **B9** two lists with only blanks between are one list    | 3         | already correct                      |
+| **D2** frontmatter opens, closes, and its tail            | 4         | already correct                      |
+| **F2** the closer is the first `%%` on its line           | 6         | **FIXED**                            |
+| **F5** a four-space `%%` ends an item, a tab stays in it  | 2         | 1 diverging, lift 5.10               |
+
+Four sections -- B3, E3, M1/M2 and B8/B9/D2 -- needed no change at all, which is 26 probes
+returning clean. Two of them had been quoted here as open families.
+
+### The two corrections that cost the most to learn
+
+**E3's "49-document bucket" did not exist.** It was built by grouping the name-set gap by what each
+document CONTAINS -- `^[` -- and all nine of E3's minimal forms agree. The `^[` was incidental, the
+base-rate trap this file records five times, committed again while writing up the lesson.
+Reclassified by the divergent LINE'S OWN SHAPE, the real largest bucket was 32 documents of "we
+invent a quoted label below quoted prose", and that is what the `footnote-interrupt` fix closed for
++10 documents.
+
+**Minimal forms do not reach these families.** B3, E3, M1/M2, B8, B9, D2 and both of the
+reclassified buckets ("column-0 label / quote above" at 19, "4+sp label / marker above" at 17) all
+return 0 of N on minimal shapes while their documents still diverge. That is now five independent
+confirmations of a property this file first recorded for the five-space cap: **a rule can be
+correct in isolation and the documents carrying it still wrong, because what differs is two
+constructs meeting.** The productive loop is therefore classify -> read a REAL document -> probe
+the shape it suggests, and skipping the middle step is what produced the phantom E3 bucket.
+
+### The one open lead from this pass, with its numbers
+
+    F5, a TAB-indented `%%` inside a list item
+      "1. p" / "  10.     q" / "<TAB>%%" / "[^1]: d"    obs no definition, ours one
+      BASE 4.4%   n=40  diverging=9  P=22.5%  lift=5.10
+
+F5 says a four-space opener ends the item while "a tab, six spaces, or plain text in its place
+stays in the item" -- so the tab-indented `%%` opens a comment INSIDE the item, which then runs to
+the end of its container and buries the label below. Nine documents, one direction, lift 5.10:
+past both screens. Not attempted here because comment extent inside a container is the area that
+produced two reverted attempts and a micromark invariant violation earlier in the session, and
+attempting it last would ship the least-verified change of the night.
