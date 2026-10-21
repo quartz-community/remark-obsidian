@@ -112,6 +112,22 @@ let agree = 0;
 let unplaced = 0;
 let withCode = 0;
 let codeAgree = 0;
+/**
+ * ASSERTIONS, beside the all-or-nothing document figure.
+ *
+ * A document agrees only when EVERY definition and reference in it matches, so a rule that is
+ * the SECOND error in three hundred documents yields nothing here and is invisible to a
+ * selector that counts documents. That is measured, not supposed: of 789 failing documents 306
+ * are ONE assertion away and 349 are two, so five correct rules landed in one session moved
+ * 1479 wrong assertions and only 16 documents.
+ *
+ * Reporting both is what lets work be chosen by yield instead of by population. The document
+ * figure stays the headline because it is the contract; this is the gradient.
+ */
+let defsWanted = 0;
+let defsMatched = 0;
+let refsWanted = 0;
+let refsMatched = 0;
 const codeKinds = new Map<string, number>();
 const kinds = new Map<string, number>();
 const bump = (kind: string) => kinds.set(kind, (kinds.get(kind) ?? 0) + 1);
@@ -254,6 +270,29 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
         });
       }
     }
+    // Counted for every document, agreeing or not, and MULTISET-wise: a name repeated at two
+    // places is two assertions, which a set would collapse -- the same trap that made the
+    // shrinker's name-keyed signature wrongly skip 46 documents.
+    const overlap = (
+      want: ReadonlyArray<readonly unknown[]>,
+      mine: ReadonlyArray<readonly unknown[]>,
+    ): number => {
+      const pool = mine.map((row) => JSON.stringify(row));
+      let hit = 0;
+      for (const row of want) {
+        const at = pool.indexOf(JSON.stringify(row));
+        if (at >= 0) {
+          pool.splice(at, 1);
+          hit += 1;
+        }
+      }
+      return hit;
+    };
+    defsWanted += entry.defs.length;
+    defsMatched += overlap(entry.defs, got.defs);
+    refsWanted += entry.refs.length;
+    refsMatched += overlap(entry.refs, got.refs);
+
     if (defsMatch && refsMatch) {
       agree++;
       if (wantIds) agreed.push(key);
@@ -349,6 +388,15 @@ console.log(
 console.log(
   "  empty-named references excluded from both sides, as the corpus's own comparator does",
 );
+{
+  const assertions = defsMatched + refsMatched;
+  const wanted = defsWanted + refsWanted;
+  const pc = (a: number, b: number) =>
+    `${a}/${b} (${((100 * a) / b).toFixed(2)}%)`;
+  console.log(`  ASSERTIONS matched: ${pc(assertions, wanted)}`);
+  console.log(`    definitions      ${pc(defsMatched, defsWanted)}`);
+  console.log(`    references       ${pc(refsMatched, refsWanted)}`);
+}
 console.log(`  nodes spliced without a position: ${unplaced}`);
 console.log(
   `\ncode blocks (root level), a dimension nothing read until now:` +
