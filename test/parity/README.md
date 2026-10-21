@@ -11953,3 +11953,60 @@ A rule can be correct, measured, DOM-confirmed and still unshippable in the wron
 predicate, 57 in a container field, and 14 as a re-parsing pass -- and the only difference between
 those numbers is how much of the existing machinery each one had to disturb. **Choose the layer
 by what it does NOT touch.**
+
+### Rebuilt with both defects fixed: ZERO regressions, and ZERO yield
+
+The two named defects were repaired exactly as recorded -- `charsForColumns` does tab-stop
+arithmetic and refuses to cut a tab that would overshoot the budget, and an item whose bare marker
+is followed by a BLANK line is skipped because that is the configuration `onBlank`'s synthetic
+column exists for. Both are "do nothing here", so by construction they restore what the regressed
+probes recorded.
+
+They did:
+
+                              grid         probes            tests        referee
+    tokenizer continuation    --           26 away / 0       10 fail/6    not run
+    tokenizer dedent width    4 of 19      57 away / 1         4 fail/3   not run
+    pass, first version       2 of 21      14 away / 0         1 fail/1   6130 (-1)
+    pass, rebuilt             2 of 25       0 away / 0         0 fail     6131 (net 0)
+
+All five previously-regressed shapes pass. All CommonMark controls pass -- bare item then
+paragraph, bare item then indented code, nested bare items, item with a list. 450 tests, four
+gates green, and every corpus figure IDENTICAL to baseline:
+
+    documents 6131   assertions 23232/23935   defs 4908   refs 18324   code 846
+
+One document gained, one lost, cancelling exactly. **The rule is correct and worth nothing.**
+Reverted, by the same standard that refused setext and the net-zero blockquote opener.
+
+### The scoping error, which is the finding worth keeping
+
+The family was counted at 43 assertions across 41 documents: "Obsidian DEFINES and we emit a bare
+REFERENCE at the same position". That count is real. But the rule BUILT covers only the subset
+where the marker is bare AND content follows it immediately -- and that shape is nearly absent
+from the corpus, which is why 23 corrected grid cells moved nothing.
+
+So the count was for a SUPERSET of what the implementation addressed. The earlier lesson from
+setext was "count the mechanism in the unreduced corpus before localising it". This is finer and
+sharper:
+
+**COUNT THE PREDICATE YOU ARE ABOUT TO WRITE, NOT THE FAMILY IT BELONGS TO.**
+
+A family is a symptom class; a predicate is a line of code. `def MISSING under a list item` is 43
+assertions, `bare marker with immediate content` is approximately zero, and nothing in the
+evidence chain -- shrink, probe, DOM confirmation, even a 25-cell grid against the live
+application -- distinguished them. Only counting the exact condition would have, and that count
+costs one script.
+
+### What three days of this area have settled
+
+The architecture question is CLOSED: a re-parsing pass over the item's own source is the right
+layer. It is the only one of four approaches that reached zero regressions, and it did so while
+correcting 23 of 25 measured cells. `mapLines`/`shiftByMap` preserve positions by construction,
+which is what the plugin consumers require.
+
+What remains is a TARGETING question, not a mechanism or layer question. The 43-assertion family
+is still open, its cause is still "the item's content column differs from rp8's", and the next
+attempt should begin by counting candidate predicates against the corpus BEFORE writing any of
+them -- the dedent rule for bare-with-content is now known to score zero, so the remaining
+assertions are some other predicate in the same family.
