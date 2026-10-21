@@ -10406,3 +10406,53 @@ the tokenizer. Tonight that area produced two reverted attempts, a micromark
 container makes the document tokenizer close containers and RETRY. Nine documents does not justify
 entering it at the end of a long session, and the evidence above is what the next attempt needs:
 the structure to aim for, the dimension that would regress, and the pass that cannot reach it.
+
+## Selecting by ASSERTION, and the pairs turn out to be one decision each
+
+The document figure is all-or-nothing, so a rule that is the SECOND error in three hundred
+documents yields nothing and is invisible to every selector used here -- population, lift, delta
+shape, construct set, minimal form. All of them counted documents. `referee.mts` now reports
+assertions beside the contract figure:
+
+    DOCUMENT level, all-or-nothing   6029/6818   88.43%
+    ASSERTIONS matched              22853/23618   96.76%
+      definitions                    4868/5257    92.60%
+      references                    17985/18361   97.95%
+
+    455 one-error documents, 228 two-error documents
+
+### The two-error documents are single-mechanism cascades
+
+Clustered by which PAIR of signatures each carries, every top pair is the same line shape in
+OPPOSITE directions:
+
+     21  def EXTRA/col0     +  ref MISSING/col0
+     18  def EXTRA/quoted   +  ref MISSING/quoted
+     15  def MISSING/col0   +  ref EXTRA/col0
+     13  def EXTRA/1-3sp    +  ref MISSING/1-3sp
+     13  def EXTRA/marker   +  ref MISSING/marker
+     11  def MISSING/quoted +  ref EXTRA/quoted
+      9  def EXTRA/4+sp     +  ref MISSING/4+sp
+
+**That is one decision, not two rules.** When we invent a definition at a label, the label we
+consumed is no longer the REFERENCE Obsidian records there, so a single wrong call produces two
+wrong assertions and the document needs both to flip. These notes already said as much about the
+reference buckets -- "mostly cascades from a missing or invented definition" -- without drawing the
+scheduling conclusion: **each of those documents is one fix away, not two.**
+
+### Which makes the reachable set far larger than the document figure suggests
+
+    455  one-error documents                      one fix each
+    ~100 two-error documents in cascade pairs     one fix each, worth two assertions
+    ----
+    ~555 documents reachable by def/ref decisions on six line shapes
+
+The shapes are few -- `col0`, `quoted`, `1-3sp`, `4+sp`, `marker`, `tab` -- crossed with two
+directions. Twelve signatures cover most of 1479 wrong assertions, and the top four are 683 of
+them.
+
+And the mechanism is already named in this file: a label that is BURIED degrades to a reference,
+which is the commented-definition rule worth +123 documents when it landed. `def EXTRA + ref
+MISSING` is precisely that rule not reaching a shape -- we keep the definition where Obsidian has
+already demoted it. So the next work is not a new rule but the existing one's scope, measured per
+shape.
