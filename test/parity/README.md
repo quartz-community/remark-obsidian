@@ -11242,3 +11242,39 @@ cause and no regression was introduced by it. The defect is pre-existing and leg
 That is three candidate owners eliminated for the cost of two script runs, and it leaves the
 search to the legacy-gated passes alone. The next attempt starts by bisecting those, with the six
 confirming rows and four controls above as its gate.
+
+#### CORRECTION, and the owner: `bareFootnoteRefs`
+
+The previous note concluded "no legacy flag changes it, so the search is the legacy-gated passes
+alone". **That conclusion came from a broken instrument.** The bisect called
+
+    processor.runSync(processor.parse(md))        // no source argument
+
+and this chain's transforms read the original text off the file -- `parseOurs` passes it, and
+`chain.ts` says so in a comment. Without it every source-dependent pass silently no-ops, so the
+legacy baseline looked healthy and no flag appeared to matter. Run both ways on the same input:
+
+    flags                            WITHOUT source   WITH source
+    strict                           survives         survives
+    legacy                           survives         DESTROYED
+    legacy, bareFootnoteRefs=false   survives         survives
+
+So `preset: "legacy"` DOES destroy the definition, and the flag that does it is
+**`bareFootnoteRefs`** -- the pass that strips the delimiters from a reference nothing defines,
+as Obsidian does. It is turning the swallowed definition's label into a bare reference instead of
+leaving the definition alone.
+
+Which claims survive the correction: "not upstream" holds (bare remark-parse + gfm keeps
+`footnoteDefinition > heading` and involves none of our code), "strict is clean" holds (identical
+both ways), and "not today's `legacyFootnoteDefinitionSyntax`" holds (that bisect went through
+`refereeFactsWithTree`, which passes the source). Only the flag conclusion was wrong.
+
+**A HARNESS THAT OMITS THE SOURCE ARGUMENT READS AS A HEALTHY BASELINE.** It is the inertness trap
+again in a new costume: the previous section established stash-and-compare as the cheap test for a
+change that does nothing, and this is the same failure in the measuring instrument rather than in
+the change. Any ad-hoc chain built in a scratch script must pass the source, and the cheap check
+is to confirm the harness reproduces a KNOWN divergence before trusting it on a new one.
+
+NEXT: `bareFootnoteRefs` should leave a label alone when the line it sits on is a footnote
+definition that a setext underline has swallowed. Gate: the six confirming rows, the four controls
+(`- item`, `*`, `+`, label-indent-1), and strict unchanged.
