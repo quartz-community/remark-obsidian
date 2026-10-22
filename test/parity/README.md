@@ -12046,3 +12046,57 @@ The honest closing position on list-item extent: layer settled, mechanism settle
 remaining 33 assertions are low yield per rule until something changes about how the item's
 content column is modelled as a whole -- which is the rp8 line-selection rewrite, now known to be
 worth 33 assertions rather than the 90 originally attributed to it.
+
+## Why four attempts in a row gained nothing: I sorted the queue by the wrong column
+
+The loop did not stop working. It went two for two on its first two real uses -- quoted `%%` +12
+and `legacyEmphasis` +15 -- and it correctly REFUSED `math` and `bareFootnoteRefs` before any code
+was written, for a probe each. What then produced four reverts was the selection, and the
+predictor was already printing in every ablation run.
+
+`ablate.mts` reports two numbers per flag. DECISIVE is how many documents that flag flips to
+agreement; CULPABLE is how many it changes AT ALL. I had been reading the decisive column alone.
+Their RATIO is a blast-radius estimate, and it rank-orders every outcome this session:
+
+    flag              decisive  culpable  ratio   outcome
+    legacyEmphasis           1         1   1.00   SHIPPED +15
+    comments                78       107   0.73   SHIPPED +12 (narrow half)
+    labelPrecedence          8        14   0.57   untried
+    legacyLists             19        66   0.29   4 attempts, all reverted
+    math                    26       152   0.17   refused: bidirectional
+    keepComments            27       189   0.14   untried
+    parseComments           14       146   0.10   untried
+    bareFootnoteRefs        19       590   0.03   refused: edit too general
+
+Both fixes that shipped are the two highest ratios. Everything attempted and reverted sits at 0.29
+or below. `bareFootnoteRefs` at 0.03 means its pass participates in 590 documents to decide 19 --
+an edit there touches thirty documents for every one it fixes, which is precisely the 26, 57 and
+14 regression counts measured afterwards.
+
+**Sorting by DECISIVE puts the worst targets at the top.** 78, 27, 26, 19, 19 ranks
+`bareFootnoteRefs` and `legacyLists` as attractive; the ratio says they are the two worst things
+to touch. That one column substitution is the whole difference between the first half of the
+session and the second.
+
+### The third filter now has a number
+
+The filters were: is the family real and how big (count it), does it point one way (count both
+directions), does the edit reach past the family (the full gate set). The third was a judgment
+call, and I got it wrong four times consecutively. It is not a judgment call -- it is
+`decisive / culpable`, available before writing anything, for free, in a 54-second run.
+
+    ratio >= 0.5    the pass is close to dedicated to this family       build it
+    0.2 - 0.5       the pass participates elsewhere                     narrow the predicate first
+    < 0.2           the pass is infrastructure                          do not edit it; find the
+                                                                        family another way
+
+### And a process failure worth naming separately
+
+The list-item work was recorded as "wants Oracle and a dedicated run, not an opportunistic patch"
+BEFORE the four attempts. Then it was attempted opportunistically four times. A refusal that is
+written down and then overridden is worse than no refusal, because the second attempt pays the
+cost again with the same information. **A recorded refusal must be treated as a result, not as a
+queue item still pending.**
+
+NEXT, by ratio rather than by size: `labelPrecedence`, 8 decisive against 14 culpable -- the
+highest untried ratio and the only untried flag above 0.5.
