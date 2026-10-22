@@ -266,6 +266,18 @@ function tokenizeBlockQuoteContinuation(
       // closer: there Obsidian ends the block with the quote and parses the rest of the file as
       // ordinary flow, so swallowing it lost every definition below. The condition is therefore
       // a LOOKAHEAD, which is why it cannot live in the fence's own continuation.
+      // ...but NOT a BLANK line, which ends a quoted fence however far its closer is. Measured
+      // against live 1.15.0, with the quote/root asymmetry as the control:
+      //
+      //     > ``` / > a / > [^b]: def / > ```        defs []      the fence holds
+      //     > ``` / > a / BLANK / [^b]: def / > ```  defs ["b"]   the blank ENDED it
+      //     > ``` / > a / BLANK / > [^b]: def / ...  defs ["b"]   even re-quoted, still ended
+      //     ``` / a / BLANK / [^b]: def / ```        defs []      at ROOT a blank ends nothing
+      //
+      // The last row is why this belongs here and not in the fence: a root fence spans its
+      // blank lines, so the rule is the QUOTE's, matching the same asymmetry already recorded
+      // for a `%%` region. Absorbing blanks was this rule's own defect on arrival.
+      if (markdownLineEnding(code) || code === codes.eof) return nok(code);
       if (isFenceOpen(self.parser)) {
         return effects.check(quotedCloserAhead, absorb, nok)(code);
       }
