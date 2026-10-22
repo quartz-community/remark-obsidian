@@ -12267,3 +12267,34 @@ And the golden that broke the broad version is the most valuable artefact here. 
 built from reductions and controls passed it; only a recorded golden from earlier work knew that
 `[text][^9]` must stay literal. **A counter-example in the suite is worth more than a row in a
 probe grid, because it was recorded when someone else was looking at a different problem.**
+
+### The `[[]][[^5]]` row: third inert guard, and the stop holds
+
+The bisect worked exactly as the lesson prescribes and named the owner in one run:
+
+    x [[]][[^5]]    LEGACY paragraph,text,footnoteReference,text   wrong
+                    STRICT paragraph,text,wikilink                 correct
+                    flip labelPrecedence -> paragraph,text,wikilink
+
+    x [[^5]]        wikilink        correct already -- `^5` IS an acceptable wikilink target
+    x [[a]][[^5]]   two wikilinks   correct already -- a NON-empty first wikilink is fine
+
+So `labelPrecedence` owns this row too, and the trigger is the EMPTY first wikilink: it declines,
+leaves its brackets as text, and something in the scan then consumes them together with the
+following wikilink.
+
+The guard built from that -- decline when the reference bracket starts `[[`, the exact analogue of
+the `[^` guard that had just paid +2 -- was INERT. Both target rows unchanged, while the shipped
+fix and all thirteen controls held.
+
+**Three inert guards in one pass.** The first two were tree-based and ruled out by the node not
+existing yet; this one was character-based and correctly shaped, so what it rules out is the
+GEOMETRY: the pass is not pairing `[[]]` as a label with `[[^5]]` at `label.close + 1`. Something
+else selects those offsets, and I guessed at the geometry instead of reading it -- which is the
+same mistake as before, one level down. The lesson needed sharpening:
+
+**Read the creator, THEN read what it selects. Naming the pass is not naming the offsets.**
+
+Stopping here, with the stop condition honoured rather than overridden for a fourth time. The row
+is worth five assertions, the owner is known, and the next step is to print the labels
+`outermostLabels` actually returns for this input -- one line of instrumentation, not a guess.
