@@ -6,6 +6,8 @@ import {
   markdownSpace,
 } from "micromark-util-character";
 import { codes, constants, types } from "micromark-util-symbol";
+import { codeToCharacter } from "./legacy-scan.js";
+import { isFenceOpen, markQuoteLazyLine } from "./quote-fence-state.js";
 import type {
   Code,
   Construct,
@@ -69,6 +71,50 @@ const orderedMarkerNotOne: Construct = {
         return Number(value) === 1 ? nok(code) : ok(code);
       }
       return nok(code);
+    }
+  },
+};
+
+/**
+ * Succeeds when a QUOTED fence appears somewhere in the rest of the input.
+ *
+ * Run through `effects.check`, so the whole remainder is materialised and then rewound, exactly
+ * as `createChunkScan` does for the rescanning inline tokenizers -- the consumes have to sit
+ * inside an open token or micromark's stack desynchronises on restore.
+ *
+ * The scan starts at the beginning of the line that just failed to carry a `>`, which cannot
+ * itself match, so any hit is genuinely later.
+ */
+const QUOTED_FENCE = /^[ \t]*>[ \t]*(?:```|~~~)/mu;
+
+const quotedCloserAhead: Construct = {
+  partial: true,
+  tokenize: function tokenizeQuotedCloserAhead(
+    effects: Effects,
+    ok: State,
+    nok: State,
+  ): State {
+    const characters: string[] = [];
+    return enter;
+
+    function enter(code: Code): State | undefined {
+      // Nothing ahead at all, so no closer ahead either. Returning before `enter` is what keeps
+      // the token NON-EMPTY: entering and exiting without a consume trips micromark's
+      // `expected non-empty token`, which the referee then counts as a disagreement rather than
+      // a crash -- an error that reads exactly like a wrong answer.
+      if (code === codes.eof) return nok(code);
+      effects.enter("legacyQuotedCloserAhead");
+      return step(code);
+    }
+
+    function step(code: Code): State | undefined {
+      if (code === codes.eof) {
+        effects.exit("legacyQuotedCloserAhead");
+        return QUOTED_FENCE.test(characters.join("")) ? ok(code) : nok(code);
+      }
+      characters.push(codeToCharacter(code));
+      effects.consume(code);
+      return step;
     }
   },
 };
@@ -207,6 +253,23 @@ function tokenizeBlockQuoteContinuation(
   }
 
   function attemptMarker(code: Code): State | undefined {
-    return effects.attempt(blockQuote, ok, nok)(code);
+    return effects.attempt(blockQuote, ok, declined)(code);
+  }
+
+  function declined(code: Code): State | undefined {
+    // Only for an OPEN quote: this tokenizer also runs for the first opening, where a failure
+    // means "no quote here at all" rather than "an open quote did not continue".
+    if (self.containerState?.open === true) {
+      markQuoteLazyLine(self.parser, self.now().line);
+      // A FENCE HOLDS THE QUOTE OPEN, but only one that is going to be CLOSED. Absorbing
+      // whenever a fence was open took 29 documents whose quoted fence never reaches a quoted
+      // closer: there Obsidian ends the block with the quote and parses the rest of the file as
+      // ordinary flow, so swallowing it lost every definition below. The condition is therefore
+      // a LOOKAHEAD, which is why it cannot live in the fence's own continuation.
+      if (isFenceOpen(self.parser)) {
+        return effects.check(quotedCloserAhead, absorb, nok)(code);
+      }
+    }
+    return nok(code);
   }
 }

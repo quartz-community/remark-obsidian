@@ -125,6 +125,7 @@ declare module "micromark-util-types" {
     inlineFootnote: "inlineFootnote";
     inlineFootnoteMarker: "inlineFootnoteMarker";
     inlineFootnoteContent: "inlineFootnoteContent";
+    legacyQuotedCloserAhead: "legacyQuotedCloserAhead";
     legacyChunkScan: "legacyChunkScan";
     legacyBacktickScan: "legacyBacktickScan";
   }

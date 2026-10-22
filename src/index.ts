@@ -17,6 +17,7 @@ import { legacyDeleteSyntax } from "./lib/syntax/legacy-delete.js";
 import { legacyAutolinkSyntax } from "./lib/syntax/legacy-autolink.js";
 import { legacyCodeTextSyntax } from "./lib/syntax/legacy-code-text.js";
 import { legacyBlockQuoteSyntax } from "./lib/syntax/legacy-block-quote.js";
+import { legacyCodeFencedSyntax } from "./lib/syntax/legacy-code-fenced.js";
 import { legacyFootnoteDefinitionSyntax } from "./lib/syntax/legacy-footnote-definition.js";
 import { legacyIndentedCodeSyntax } from "./lib/syntax/legacy-indented-code.js";
 import { legacyListSyntax } from "./lib/syntax/legacy-list.js";
@@ -576,6 +577,9 @@ export default function remarkObsidian(
       data.micromarkExtensions,
     );
     if (legacyDefinition) data.micromarkExtensions.push(legacyDefinition);
+    // Beside the quote because the rule is about the two MEETING: a fence inside a blockquote
+    // runs to its QUOTED closer, so the quote absorbs the lines between rather than closing.
+    data.micromarkExtensions.push(legacyCodeFencedSyntax());
   }
   if (opts.legacyCodeSpans) {
     data.micromarkExtensions.push(legacyCodeTextSyntax());
