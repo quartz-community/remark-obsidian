@@ -12189,3 +12189,33 @@ flag was also the owner.
 
 Next, and now targeted rather than speculative: test whether a `[^name]` can be consumed as a
 link reference label, with the eleven rows above as the gate -- ten of them controls.
+
+### Second guard also inert -- stopping, with the search space halved
+
+The targeted hypothesis from the previous section: a `[^name]` should not be consumable as a
+link's REFERENCE label, because in rp8 `remark-footnotes` consumes it before the reference
+tokenizer ever runs. The pass's own `claimedByOther` already knows about `footnoteReference`; it
+was only ever asked about the LABEL's opening bracket, so asking it about the reference bracket
+too was a one-line change.
+
+Also INERT. All four targets unchanged, all eleven controls still passing. Reverted.
+
+Two inert guards in one pass means the model of it is wrong, so what they rule out is the useful
+part:
+
+- the `[` inside the failing rows is not inside a `wikilink` NODE (first guard)
+- there is no `footnoteReference` NODE at the reference bracket when this pass runs (second)
+
+Which means the footnote reference at that position does not exist YET at `labelPrecedence` time
+-- it is created later, almost certainly by `bareFootnoteRefs`, the pass that recognises a bare
+`[^name]` in text after the fact. So the ordering is the defect: a `linkReference` is formed over
+brackets that a LATER pass would have claimed, and by then the text is gone.
+
+That is a pass-ORDER question, not a predicate question, and it is the third distinct shape this
+family has taken in one investigation -- wikilink precedence, then reference-label consumption,
+now pass ordering. Each hypothesis was reasonable, measured, and wrong.
+
+**Two inert attempts in the same pass is the stop condition.** The remaining work here is worth
+ten assertions, the model has been wrong twice, and the next step is reading what actually creates
+that `linkReference` rather than guessing at a third guard. That costs one careful read when
+fresh, not a third attempt now.
