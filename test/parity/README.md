@@ -12100,3 +12100,54 @@ queue item still pending.**
 
 NEXT, by ratio rather than by size: `labelPrecedence`, 8 decisive against 14 culpable -- the
 highest untried ratio and the only untried flag above 0.5.
+
+## `labelPrecedence` (ratio 0.57): selected correctly, and it is SMALL
+
+First family chosen by ratio rather than by decisive count. The loop ran clean:
+
+    ablate --emit labelPrecedence    8 decisive, 14 culpable, ratio 0.57
+    shrink --live                    8 reduced, 7 usable (the tool flagged one degenerate)
+    classify                         two bracket constructs adjacent, one a footnote reference
+
+    "x [[]][[^5]]"     "see [text][][^1]"    "[^名][^3]"    "[^3][^3]"
+    "x [[\][[^5]]"     "[^src:2][^2]"        "[^脚注][[Note#Heading]][^یادداشت]"
+
+Probed verbatim, four of eleven rows diverge and they split into TWO predicates, with all five
+controls and both adjacent-reference rows passing:
+
+    x [[]][[^5]]          obs []          ours ["5@0:7"]       we INVENT -- ref inside [[...]]
+    x [[\][[^5]]          obs []          ours ["5@0:7"]       same
+    see [text][][^1]      obs ["1@0:12"]  ours []              we LOSE -- ref after [x][]
+    [^a][[Note#H]][^b]    obs ["a","b"]   ours ["a"]           we LOSE -- ref after ]]
+
+    CONTROLS  single ref · refs with a gap · wikilink alone · ref link alone · empty wikilink
+              [^a][^b] adjacent · [^3][^3] same name twice            all pass
+
+### Counted as PREDICATES, which is the point of the new rule
+
+    (A) we INVENT a ref inside a [[...]] span       5 assertions / 5 documents
+    (B) we LOSE a ref immediately after ]] or ][]   5 assertions / 5 documents
+
+Ten assertions total. Both are internally one-directional, the ratio says the edit should be
+narrow, and the two look like ONE rule seen twice: if a `[[...]]` span were matched before
+footnote references and consumed its own brackets, (A) stops inventing and (B) stops losing.
+
+**But ten assertions is the ceiling, and that is the number that decides.** `legacyEmphasis` was
+47 assertions and paid +15 documents; ten would pay perhaps five. `label-precedence.ts` is a
+non-trivial pass -- `containsInnerLink`, `shiftAll`, a running `defined` set -- and starting an
+edit inside it unread, for that ceiling, is exactly the error diagnosed one section above: four
+reverts came from overriding what the measurement said about scale.
+
+So this is recorded, not attempted. The next session's first move is cheap and specified: read
+`label-precedence.ts` properly, test the single hypothesis that a wikilink span should take
+precedence over footnote-reference bracket matching, and gate it on the eleven rows above --
+seven of which are controls that must not move.
+
+### The queue, honestly priced
+
+By ratio, `labelPrecedence` at 0.57 was the last untried target above the threshold, and it is
+worth ten assertions. Everything else untried is infrastructure: `keepComments` 0.14,
+`parseComments` 0.10, `bareFootnoteRefs` 0.03. **The narrow families are exhausted.** That is the
+loop working as designed -- it competed them away over this session, shipping +102 documents --
+and it means the next meaningful gain is not another family but the structural work: modelling a
+list item's content column as a whole, worth 33 assertions, on a branch with its own risk budget.
