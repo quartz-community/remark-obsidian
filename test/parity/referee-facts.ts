@@ -113,6 +113,17 @@ function columnOf(source: string, offset: number): number {
  * definition rule once lived in `referee.mts` alone and the shrinker spent a run measuring
  * behaviour three commits old.
  */
+/** Whether the label at `at` sits inside a backtick run on its line, or is escaped. */
+function isDelimited(slice: string, at: number): boolean {
+  if (at > 0 && slice[at - 1] === "\\") return true;
+  const lineStart = slice.lastIndexOf("\n", at - 1) + 1;
+  let ticks = 0;
+  for (let index = lineStart; index < at; index++) {
+    if (slice[index] === "`") ticks += 1;
+  }
+  return ticks % 2 === 1;
+}
+
 export function factsOf(tree: Root, source: string): Facts {
   const defs: Def[] = [];
   const refs: Ref[] = [];
@@ -175,7 +186,21 @@ export function factsOf(tree: Root, source: string): Facts {
       const from = at?.start?.offset;
       const to = at?.end?.offset;
       if (from !== undefined && to !== undefined) {
-        for (const match of source.slice(from, to).matchAll(LABEL)) {
+        const slice = source.slice(from, to);
+        for (const match of slice.matchAll(LABEL)) {
+          // BACKTICKS AND ESCAPES STILL COUNT inside a buried code node. The scan above exists
+          // because nothing tokenizes such a node's content, but Obsidian does not index every
+          // bracket in it -- measured against live 1.15.0, with the indentation isolated as the
+          // only variable:
+          //
+          //     %% / `More `[^b]` end`              no ref    (unindented, we agreed already)
+          //     %% / `⟨4sp⟩More `[^b]` end`         NO REF    we invented one
+          //     %% / `⟨4sp⟩plain [^6] more`         ref 6     indexed, per the rows above
+          //
+          // So the discriminator is the delimiter, not the indentation: a label inside a
+          // backtick run or behind a backslash is literal even here. 9 documents, 11
+          // assertions, every one organic rather than a probe.
+          if (isDelimited(slice, match.index)) continue;
           refs.push([
             // FOLDED, as mdast folds an identifier and as the answers record them. Pushing
             // the raw capture reported `Ä` against the answer's `ä`, for -251 documents.
