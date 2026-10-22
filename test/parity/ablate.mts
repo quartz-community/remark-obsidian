@@ -36,6 +36,16 @@ import { factsOf } from "./referee-facts.js";
  */
 interface Entry {
   readonly id: string;
+  /**
+   * The `file#index` spelling, because THE CORPUS HAS TWO ID SCHEMES AND THE TOOLS DISAGREED.
+   *
+   * A row here carries its own `id` (`broad:20261004-0`), which this file prefers. `referee.mts`
+   * keys by position instead and its `--ids` dump is therefore `broad-20261004.json#117` -- so
+   * piping one tool's ids into the other matched NOTHING and printed `0 diverging documents`,
+   * which reads exactly like "no flag matters here" rather than like a key mismatch. Both
+   * spellings are accepted now, and an empty intersection is a hard error below.
+   */
+  readonly alt: string;
   readonly text: string;
   readonly defs: unknown;
   readonly refs: unknown;
@@ -80,6 +90,7 @@ function load(): Entry[] {
       if (typeof row.text !== "string" || row.text === "") continue;
       out.push({
         id: row.id ?? `${file}#${index}`,
+        alt: `${file}#${index}`,
         text: row.text,
         defs: row.defs ?? [],
         refs: row.refs ?? [],
@@ -132,8 +143,10 @@ if (process.argv.includes("--self-test")) process.exit(0);
 
 const entries = load();
 const diverging: { entry: Entry; oracle: string }[] = [];
+let matched = 0;
 for (const entry of entries) {
-  if (wanted && !wanted.has(entry.id)) continue;
+  if (wanted && !wanted.has(entry.id) && !wanted.has(entry.alt)) continue;
+  matched += 1;
   const oracle = JSON.stringify([entry.defs, entry.refs]);
   let ours: string;
   try {
@@ -143,6 +156,20 @@ for (const entry of entries) {
   }
   if (ours !== oracle) diverging.push({ entry, oracle });
   if (diverging.length >= cap) break;
+}
+
+// An empty intersection is a KEY MISMATCH, not a result. Without this it printed
+// `0 diverging documents` and read as "no flag matters on this family".
+if (wanted && matched === 0) {
+  console.log(
+    `\n  NONE of the ${wanted.size} requested ids matched a corpus entry.\n` +
+      `  Corpus ids look like ${JSON.stringify(entries[0]?.id ?? "?")} or ${JSON.stringify(entries[0]?.alt ?? "?")};\n` +
+      `  the first requested was ${JSON.stringify([...wanted][0] ?? "?")}.`,
+  );
+  process.exit(1);
+}
+if (wanted) {
+  console.log(`  matched ${matched} of ${wanted.size} requested ids`);
 }
 
 console.log(
