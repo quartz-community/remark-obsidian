@@ -12151,3 +12151,41 @@ worth ten assertions. Everything else untried is infrastructure: `keepComments` 
 loop working as designed -- it competed them away over this session, shipping +102 documents --
 and it means the next meaningful gain is not another family but the structural work: modelling a
 list item's content column as a whole, worth 33 assertions, on a branch with its own risk budget.
+
+### The wikilink-precedence hypothesis was wrong, and the trees name the real causes
+
+Read `label-precedence.ts` as prescribed. `enclosedByConstruct` lists eight inline constructs and
+NOT `wikilink`, while the sibling `claimedByOther` does list it -- which looked exactly like an
+oversight, since the two functions ask different questions (starts-AT the bracket versus strictly
+INSIDE it). Adding `wikilink` to the enclosing test was a one-word change.
+
+It was INERT. All four target rows unchanged, all ten controls still passing. Reverted.
+
+Dumping the trees shows why, and replaces one guess with two measured mechanisms:
+
+    x [[]][[^5]]        text "x [[]]" · footnoteReference 7-11 · text "]"
+    x [[Note]]          text "x " · wikilink 2-10            <- the control, correct
+    [^a][[Note#H]][^b]  footnoteReference 0-4 · linkReference 4-18 > text "[Note#H]"
+    see [text][][^1]    text "see [text]" · linkReference 10-16
+
+There is no `wikilink` NODE in the failing rows, so no guard about wikilink spans could ever fire.
+The actual causes are different from each other:
+
+1. **`[[]]` declines as a wikilink** -- it is empty -- so the brackets stay text, and the `[^5]`
+   inside the FOLLOWING `[[` is then free to become a footnote reference. Obsidian reports
+   nothing there, so for it `[[^5]]` is a wikilink whose target is `^5`.
+2. **`[label][^ref]` is being read as a FULL REFERENCE LINK**, with the footnote reference
+   serving as the link's reference label. That is what swallows `[^b]` in row three and `[^1]`
+   in row four, and it is a `linkReference` spanning both brackets in each case.
+
+Mechanism 2 is the larger and cleaner of the two: a footnote reference should not be consumable as
+a link's reference label. Mechanism 1 is about the wikilink construct's own emptiness rule.
+
+So `labelPrecedence` was not even the owner -- it was decisive because toggling it changes which
+of these paths runs, not because it contains the defect. **A decisive flag names a pass whose
+behaviour MATTERS to the outcome, not necessarily the pass that is wrong.** That is a real limit
+on the ablation signal and the first time this session it has mattered: every previous decisive
+flag was also the owner.
+
+Next, and now targeted rather than speculative: test whether a `[^name]` can be consumed as a
+link reference label, with the eleven rows above as the gate -- ten of them controls.
