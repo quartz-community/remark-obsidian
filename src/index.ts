@@ -150,6 +150,7 @@ import { commentInDefinitionTransform } from "./lib/comment-in-definition.js";
 import { commentRegionTransform } from "./lib/comment-region.js";
 import {
   definitionContinuationTransform,
+  definitionAbsorbedItemTransform,
   definitionLazyTransform,
   definitionWindowTransform,
 } from "./lib/definition-continuation.js";
@@ -771,6 +772,9 @@ export default function remarkObsidian(
     // first line opened nothing to continue leaves its next line behind whether
     // comments are on or not.
     definitionLazyTransform(tree, String(file));
+    // Immediately after, because it finishes that pass's job for the lines the definition's own
+    // continuation already absorbed: there is no sibling paragraph left for it to nest.
+    definitionAbsorbedItemTransform(tree);
     // After the lazy absorb, so the window sees the definition at its full extent.
     definitionWindowTransform(tree, String(file));
     definitionTabTransform(tree, String(file));

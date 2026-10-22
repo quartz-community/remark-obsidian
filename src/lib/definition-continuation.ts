@@ -308,3 +308,41 @@ export function definitionWindowTransform(tree: Root, source: string): void {
     }
   });
 }
+
+/**
+ * Nest a trailing paragraph the TOKENIZER already absorbed into the definition's trailing item.
+ *
+ * `definitionLazyTransform` above nests a SIBLING paragraph into a trailing list item, and
+ * `fuzz/footnote/18` is the recorded proof that the nesting is required: `[^1]: -` / `y^2$`
+ * reports `listItems` spanning `0:6-1:4`, which only holds if the paragraph sits INSIDE the empty
+ * item. Once `legacy-footnote-definition.ts`'s continuation absorbs that lazy line itself there
+ * is no sibling left, so that pass declines and the item's span collapses to `0:6-0:7`.
+ *
+ * Matched on `[..., list, paragraph]` with the paragraph LAST, which is what keeps it off
+ * genuine in-definition siblings: `[^1]: x` / `⟨4sp⟩- item` / `⟨4sp⟩text` puts the list last and
+ * its indented text already inside the item, so the shape does not arise.
+ *
+ * And only a paragraph at COLUMN 0, because that is what makes it a lazy line. Indented content
+ * belongs to the item already and must not be moved again.
+ */
+export function definitionAbsorbedItemTransform(tree: Root): void {
+  visit(tree, "footnoteDefinition", (definition: Node) => {
+    const kids = (definition as unknown as { children: RootContent[] })
+      .children;
+    if (!Array.isArray(kids) || kids.length < 2) return;
+    const block = kids[kids.length - 1];
+    const list = kids[kids.length - 2];
+    if (block?.type !== "paragraph" || list?.type !== "list") return;
+    if (block.position?.start?.column !== 1) return;
+    const item = list.children[list.children.length - 1];
+    if (!item) return;
+
+    kids.pop();
+    (item.children as RootContent[]).push(block as never);
+    for (const node of [item, list]) {
+      if (node.position && block.position) {
+        node.position.end = { ...block.position.end };
+      }
+    }
+  });
+}
