@@ -396,6 +396,29 @@ export function labelPrecedenceTransform(
       // `[[a](u)](v)` is a link to `v` whose label happens to begin with a second
       // bracket -- a character guard on `[[` skipped it along with the wikilinks.
       if (claimedByOther(paragraph, label.open)) continue;
+      // An EMPTY label cannot take a footnote reference as its reference, tested on CHARACTERS
+      // rather than on the tree. `[a][^b]` is a legal full reference link whose reference label
+      // is `^b`, and forming one for an undefined label is right here -- `remark-parse@8` does
+      // it where CommonMark declines, which is why this pass exists. But rp8 runs
+      // `remark-footnotes` BEFORE its reference tokenizer, so a footnote reference can never
+      // serve as a link's reference.
+      //
+      // Asked of the source because at this point `[^b]` is still TEXT: the node that would
+      // answer `claimedByOther` is created by a LATER pass, and only survives because this pass
+      // left the characters alone. Two tree-based guards were built here first and both were
+      // inert for exactly that reason.
+      //
+      //     see [text][][^1]   obs ref 1@0:12   `[]` is the COLLAPSED marker of `[text]`,
+      //                        so `[^1]` is free -- we read `[]` as a label taking `[^1]`
+      //     a [text][^9] b     obs NO footnote, literal text -- a non-empty label DOES take
+      //                        `[^9]` as its reference, forming a link to an undefined label
+      //                        that renders raw. The emptiness test is what separates them.
+      if (
+        label.close === label.open + 1 &&
+        source.startsWith("[^", label.close + 1)
+      ) {
+        continue;
+      }
       // And not when another construct opened *before* this bracket and still holds
       // it. Whichever opens first wins: `[foo *bar](u)*` is a link to `u`, while
       // `*[foo*](/uri)` is emphasis with the brackets left as text, and a `[link](u)`

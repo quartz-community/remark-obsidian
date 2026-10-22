@@ -12219,3 +12219,51 @@ now pass ordering. Each hypothesis was reasonable, measured, and wrong.
 ten assertions, the model has been wrong twice, and the next step is reading what actually creates
 that `linkReference` rather than guessing at a third guard. That costs one careful read when
 fresh, not a third attempt now.
+
+### Third attempt, shipped: +2, zero losses -- and the counter-example is what made it work
+
+The read did what two guesses could not. A flag bisect on the failing input, WITH the source
+passed, named the owner in one run:
+
+    LEGACY baseline          paragraph,text,linkReference
+    STRICT                   paragraph,text
+    flipping labelPrecedence paragraph,text,footnoteReference      <- the correct answer
+
+So `labelPrecedence` was the owner after all; both earlier guards were the right FILE and the
+wrong FORM. At that point `[^1]` is still TEXT -- the `footnoteReference` node is created by a
+later pass, and only survives because this pass left the characters alone. No tree-based test can
+see it, which is exactly why two of them were inert. The guard has to read source.
+
+The first character-based version was too broad, and the suite named the boundary immediately --
+five failures, all one golden:
+
+    a [text][^9] b     obsidian "a [text][^9] b" literal, meta.footnotes []
+                       ours      "a [text]⟨fn⟩ b", footnotes ["9"]
+
+So a NON-EMPTY label does take `[^9]` as its reference, forming a link to an undefined label that
+renders raw. Only an EMPTY `[]` cannot -- because `[]` is the collapsed marker of the label before
+it, not a label of its own. Scoping the guard to `label.close === label.open + 1` separates them:
+
+    see [text][][^1]   ref 1@0:12   FIXED
+    a [text][^9] b     no footnote  counter-example PRESERVED
+    12 controls         all hold
+
+    450 tests pass    0 probes moved away    4 gates green
+    referee 6131 -> 6133 / 6818   +2 GAINED, 0 LOST    documents cross 90.0%
+    assertions 23234/23935 (97.07%)   references 98.10% -> 98.12%
+
+### What the three attempts in this one pass cost and taught
+
+    guard 1  wikilink in enclosedByConstruct        inert -- no wikilink node exists there
+    guard 2  reference bracket via claimedByOther   inert -- no footnoteReference node YET
+    guard 3  characters, scoped to an empty label   +2, zero losses
+
+The two inert attempts were not waste in hindsight: each eliminated a tree-based approach, and
+together they forced the character-based form that worked. But both were taken BEFORE reading
+what created the node, and the read -- one bisect, one run -- would have ruled out both
+immediately. **Read the creator before guarding the consumer.**
+
+And the golden that broke the broad version is the most valuable artefact here. A 15-row gate
+built from reductions and controls passed it; only a recorded golden from earlier work knew that
+`[text][^9]` must stay literal. **A counter-example in the suite is worth more than a row in a
+probe grid, because it was recorded when someone else was looking at a different problem.**
