@@ -121,6 +121,18 @@ export function definitionLazyTransform(tree: Root, source: string): void {
       if (definitionStart === undefined) continue;
       if (source.slice(definitionEnd, from) !== "\n") continue;
 
+      // ...and the definition's OWN END LINE must not be blank, which the gap test above
+      // cannot see. A definition holding an indented block runs THROUGH the blank line that
+      // follows it -- `[^a]: def` / `⟨4sp⟩```  ` / blank / `after` arrives as
+      // `footnoteDefinition@0..2` where line 2 is the blank -- so the gap to the next block
+      // really is one newline and the "no blank line before it" rule the docstring states
+      // was satisfied by a blank line that had been absorbed rather than by its absence.
+      //
+      // Obsidian ends the definition at its content: `broad-20261004.json#13` has `ch2*`
+      // spanning 15..16 where we ran to 18, taking a paragraph and its reference with it.
+      const endLineStart = source.lastIndexOf("\n", definitionEnd - 1) + 1;
+      if (source.slice(endLineStart, definitionEnd).trim() === "") continue;
+
       // Something has to follow the colon, even if only a space. A **bare**
       // `[^1]:` absorbs nothing -- `[^1]:` over `x` is a definition and a separate
       // paragraph, where `[^1]: ` over `x` is one definition. The arbiter agrees on
