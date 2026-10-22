@@ -5,7 +5,22 @@ import type { Comment } from "./types.js";
 
 const OPENS_BLOCK = /\n\[\^[^\]\n]*\]:/u;
 const BLANK_LINE = /\n[ \t]*\n/u;
-const SHIELDS = new Set(["inlineCode", "code"]);
+/**
+ * Spans whose content is LITERAL, so a region opener inside one opens nothing.
+ *
+ * Math belongs here for the same reason code does: `$$ ... $$` is TeX, not markdown, so a `%%`
+ * or a `<!--` inside it is text. Its absence let the HTML rebuild cut a math node the way it
+ * cut a `%%` comment before `commentSpans` was added -- measured against live 1.15.0, with every
+ * control passing:
+ *
+ *     $$ / `<!-- [^名] -->` / [^ch2*]        obs no refs      we invented one
+ *     $$ / `<!-- .. -->` / $$ / [^ä]:        obs defines ä    we lost it
+ *     > $$ / `> <!-- .. -->` / > [^x-y]:     obs nothing      we invented a definition
+ *     + $$ / `<!-- .. -->[^x]` / $$ / [^2]:  obs defines 2    we lost it
+ *
+ *     CONTROLS  $$ / text / $$ / label · unclosed $$ · bare `<!-- -->` · `%%` + `<!-- -->`
+ */
+const SHIELDS = new Set(["inlineCode", "code", "math", "inlineMath"]);
 
 interface Point {
   line: number;
