@@ -223,6 +223,19 @@ export const ORACLES: readonly Oracle[] = [
     test: "option-matrix.test.ts",
   },
   {
+    name: "structurally impossible positions",
+    command: "npm test",
+    gate: "absolute",
+    compares: [
+      "no node with start after its end, or a span past the source, on 8 vendored sources",
+    ],
+    blind: [
+      "any source not in position-defects.ts -- the referee corpus is not vendored, so these 8 were copied out of it",
+      "a position that is sound but WRONG; this only catches impossible ones",
+    ],
+    test: "invariant-positions.test.ts",
+  },
+  {
     name: "strict preset vs stock remark",
     command: "npm test",
     gate: "absolute",
