@@ -28,7 +28,7 @@ import type {
  * The value is accumulated as a STRING because `10.` begins with `1`: a first-digit test is what
  * stock uses for the interrupt rule and it cannot tell `1.` from `10.`, which this must.
  */
-const orderedMarkerNotOne: Construct = {
+export const orderedMarkerNotOne: Construct = {
   partial: true,
   tokenize: function tokenizeOrderedMarkerNotOne(
     effects: Effects,

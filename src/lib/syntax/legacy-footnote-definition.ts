@@ -1,6 +1,7 @@
 import { blankLine } from "micromark-core-commonmark";
 import { factorySpace } from "micromark-factory-space";
 import { codes, constants, types } from "micromark-util-symbol";
+import { orderedMarkerNotOne } from "./legacy-block-quote.js";
 import type {
   Code,
   Construct,
@@ -96,6 +97,25 @@ const newBlockAhead: Construct = {
     );
 
     function maps(code: Code): State | undefined {
+      // A NON-1 ORDERED MARKER OPENS NOTHING, so it does not end the definition either.
+      //
+      // `list.js:81` is `!self.interrupt || code === codes.digit1`: only `1.` may interrupt, and
+      // only when the flag is set. This probe runs with `self.interrupt` undefined -- which it
+      // must, because setting it for the whole map interrupts nearly everywhere (-41, and -292
+      // when restricted to three flagged constructs) -- so every marker opens a list here and
+      // ends the definition. Obsidian keeps the line:
+      //
+      //     [^ch2*]: def / 10. [^2]: Prose here     obs REFERENCES "2", we DEFINE it
+      //
+      // 39 of the 46 position-identical def/ref swaps have NO blank line before the definition,
+      // so the line should continue it, and 14 of those open with a non-1 ordered marker.
+      //
+      // `orderedMarkerNotOne` is `legacy-block-quote.ts`'s own construct, already measured there
+      // for the rule that a quote ABSORBS such a line -- the same fact from the other side.
+      return effects.check(orderedMarkerNotOne, nok, attemptMaps)(code);
+    }
+
+    function attemptMaps(code: Code): State | undefined {
       return effects.attempt(
         self.parser.constructs.document,
         ok,
