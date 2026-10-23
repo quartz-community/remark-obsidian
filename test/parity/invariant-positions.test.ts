@@ -21,6 +21,14 @@ import { violationsOf } from "./invariant-checks.js";
 import { POSITION_DEFECTS } from "./position-defects.js";
 import { refereeFactsWithTree } from "./referee-facts.js";
 
+function point(offset: number): {
+  line: number;
+  column: number;
+  offset: number;
+} {
+  return { line: 1, column: offset + 1, offset };
+}
+
 const ABSOLUTE = (kind: string): boolean =>
   kind.startsWith("end PAST source") || kind.startsWith("start AFTER end");
 
@@ -30,7 +38,7 @@ function absoluteViolations(markdown: string): string[] {
 }
 
 describe("structurally impossible positions", () => {
-  it("still produces exactly the recorded defects, and no others", () => {
+  it("produces no impossible position on any recorded source", () => {
     const moved: string[] = [];
     for (const [id, markdown, kinds] of POSITION_DEFECTS) {
       const got = absoluteViolations(markdown);
@@ -43,19 +51,18 @@ describe("structurally impossible positions", () => {
     }
     expect(
       moved,
-      "a recorded defect changed. If it is FIXED, delete its entry from position-defects.ts",
+      "a source regressed. These eight are the only inputs in CI that exercise either fix",
     ).toEqual([]);
   });
 
-  it("keeps the backlog size an explicit number", () => {
-    // Asserted so that shrinking it is a deliberate edit here rather than something that
-    // silently stops being measured. Opened at 8 documents / 20 kinds; 7 closed at once when
-    // `definition-end-before-label.ts` stopped clamping a descendant whose start is past the
-    // new reach. The remaining one is `end PAST source`, a different class.
-    expect(POSITION_DEFECTS.length).toBe(1);
+  it("keeps all eight sources, and expects zero violations from them", () => {
+    // Opened at 8 documents / 20 violation kinds and is now 8 / 0. Both numbers are asserted so
+    // that DELETING a source is a deliberate edit: these eight are the only inputs in CI that
+    // reach either fix, since the referee corpus they came from is not vendored.
+    expect(POSITION_DEFECTS.length).toBe(8);
     expect(
       POSITION_DEFECTS.reduce((total, [, , kinds]) => total + kinds.length, 0),
-    ).toBe(2);
+    ).toBe(0);
   });
 
   it("reports nothing for a document with sound positions", () => {
@@ -66,10 +73,23 @@ describe("structurally impossible positions", () => {
     ).toEqual([]);
   });
 
-  it("detects the class at all, on a source known to carry it", () => {
-    // A KNOWN-POSITIVE control, which is the half that matters: the negative above passes just
-    // as happily when `violationsOf` returns nothing for every input.
-    const [, markdown] = POSITION_DEFECTS[0]!;
-    expect(absoluteViolations(markdown).length).toBeGreaterThan(0);
+  it("detects the class at all, on a tree built to carry it", () => {
+    // A KNOWN-POSITIVE control, and the half that matters: every assertion above passes just as
+    // happily when `violationsOf` has stopped reaching anything. It can no longer borrow a real
+    // source, because all eight are clean -- so the inverted span is built by hand instead.
+    const source = "abc\n";
+    const inverted = {
+      type: "root",
+      position: { start: point(0), end: point(4) },
+      children: [
+        {
+          type: "paragraph",
+          position: { start: point(3), end: point(1) },
+          children: [],
+        },
+      ],
+    };
+    const got = violationsOf(source, inverted).filter(ABSOLUTE);
+    expect(got).toEqual(["start AFTER end: paragraph"]);
   });
 });

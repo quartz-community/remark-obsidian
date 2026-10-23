@@ -335,17 +335,29 @@ interface Point {
  * shifting those here would be work the chain undoes -- and these notes record offsets as the
  * thing that must be right before that pass runs.
  */
-function shiftBy(node: unknown, offset: number): void {
+function shiftBy(
+  node: unknown,
+  offset: number,
+  seen = new WeakSet<object>(),
+): void {
   const self = node as {
     position?: { start: { offset?: number }; end: { offset?: number } };
     children?: unknown[];
   };
   if (self.position) {
     for (const point of [self.position.start, self.position.end]) {
+      // SHIFTED AT MOST ONCE PER POINT OBJECT, because a parent and a child can SHARE one.
+      // `reparse` of a one-line quoted fragment returns a `blockquote` whose `position` is the
+      // very same object as its `code` child's -- verified by reference equality, not inferred --
+      // so the plain recursion wrote `+offset` at the quote and again at the code, turning
+      // `[0..3]` into `[160..163]` for a 134-character note. That is a span past the source,
+      // which `invariants.test.ts` asserts can never happen.
+      if (seen.has(point)) continue;
+      seen.add(point);
       point.offset = offset + (point.offset ?? 0);
     }
   }
-  for (const child of self.children ?? []) shiftBy(child, offset);
+  for (const child of self.children ?? []) shiftBy(child, offset, seen);
 }
 
 /**
