@@ -390,6 +390,29 @@ export interface RemarkObsidianOptions {
    * @see test/parity/strict.test.ts for the gate that found it.
    */
   legacyLinkDefinitions?: boolean;
+
+  /**
+   * Expand tabs as Obsidian does, instead of CommonMark's.
+   *
+   * CommonMark advances a tab to its next four-column stop everywhere. `remark-parse@8`
+   * does not: one raw tab is a whole indent wherever it starts, and a tab AFTER a space
+   * reaches no stop at all. Six passes carry that reading across quotes, lists,
+   * thematic breaks and the indented-code threshold.
+   *
+   * On by default, and measured only in `legacy`. All six ran UNCONDITIONALLY until
+   * this flag existed, costing five spec examples: `tabs/2` and `tabs/11` differed in
+   * node TYPE, `block-quotes/238` as well, and `tabs/6` and `tabs/7` in position.
+   *
+   * The six were derived, not guessed. Of fourteen tab and indent passes probed one at
+   * a time, four own exactly one example each and ten own none; `block-quotes/238` is
+   * owned JOINTLY by `quoteIndentedCodeTransform` and `quoteLazyIndentedCodeTransform`,
+   * which is why both are in the guard and neither closes it alone. The ten that own
+   * nothing are left running: most operate on footnote definitions, which the
+   * CommonMark spec has no example of, so it cannot adjudicate them either way.
+   *
+   * @see test/parity/strict.test.ts for the gate that found it.
+   */
+  legacyTabs?: boolean;
   /**
    * Find a link label by raw balanced-bracket scanning, as Obsidian does, so the
    * outermost pair wins where CommonMark gives the innermost: `[a [b](u) c](v)`
@@ -465,6 +488,7 @@ const STRICT_OVERRIDES: Partial<RemarkObsidianFlags> = {
   legacyHtmlBlocks: false,
   legacySetext: false,
   legacyLinkDefinitions: false,
+  legacyTabs: false,
   labelPrecedence: false,
   // Obsidian's reading view re-parses a task line, so `- [ ] 1.` nests where
   // CommonMark leaves two flat items.
@@ -507,6 +531,7 @@ const defaultOptions: RemarkObsidianFlags = {
   legacyHtmlBlocks: true,
   legacySetext: true,
   legacyLinkDefinitions: true,
+  legacyTabs: true,
   labelPrecedence: true,
   positionedBreaks: true,
   escapedLineBreaks: false,
@@ -744,9 +769,11 @@ export default function remarkObsidian(
     definitionIndentedCodeTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
-    quoteIndentedCodeTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
+    if (opts.legacyTabs) {
+      quoteIndentedCodeTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+    }
     // Beside the pass above, which handles the same shape when the marker sits on the code's
     // own line. A single-digit `1.` marker moves the item's CODE THRESHOLD out by one, the
     // same adjustment `definition-column.ts` already applies to the column.
@@ -786,8 +813,10 @@ export default function remarkObsidian(
     // between two items is the first item's lazy text, so the list never ended.
     listMergeTransform(tree, String(file));
     // After the quote passes have settled the block, since this reads its lines.
-    quoteTabTransform(tree, String(file));
-    listTabTransform(tree, String(file));
+    if (opts.legacyTabs) {
+      quoteTabTransform(tree, String(file));
+      listTabTransform(tree, String(file));
+    }
     // Beside the tab rule above, and like it only under the legacy list reading.
     if (opts.legacyLists) listTabStraddleTransform(tree, String(file));
     // After the quote passes have settled the block, since this reads the
@@ -808,11 +837,13 @@ export default function remarkObsidian(
     definitionSpaceTabSeparatorTransform(tree, String(file));
     // Beside the two above, and before every footnote pass: the lines this turns into code
     // must stop looking like definitions and references BEFORE anything indexes them.
-    quoteLazyIndentedCodeTransform(tree, String(file), (markdown) =>
-      reparse(markdown),
-    );
-    // Before the footnote passes, so a definition this recovers is one they see.
-    indentTabTransform(tree, String(file), (markdown) => reparse(markdown));
+    if (opts.legacyTabs) {
+      quoteLazyIndentedCodeTransform(tree, String(file), (markdown) =>
+        reparse(markdown),
+      );
+      // Before the footnote passes, so a definition this recovers is one they see.
+      indentTabTransform(tree, String(file), (markdown) => reparse(markdown));
+    }
     // Unconditional, unlike the continuation pass above it: a definition whose
     // first line opened nothing to continue leaves its next line behind whether
     // comments are on or not.
@@ -902,7 +933,7 @@ export default function remarkObsidian(
         reparse(markdown),
       );
     }
-    thematicBreakTabTransform(tree, String(file));
+    if (opts.legacyTabs) thematicBreakTabTransform(tree, String(file));
     // Before `containerSetextTransform`: that pass rebuilds a two-line container
     // paragraph in place, and the lazy line has to leave first or it folds into a
     // heading inside the quote instead of one at root.

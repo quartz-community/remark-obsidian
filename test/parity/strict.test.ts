@@ -57,8 +57,6 @@ const BY_DESIGN: readonly string[] = [
  * tokenizer divergence that later changes a type.
  */
 const POSITION_ONLY: readonly string[] = [
-  "commonmark/tabs/6",
-  "commonmark/tabs/7",
   "commonmark/block-quotes/237",
   "commonmark/block-quotes/249",
   "commonmark/list-items/280",
@@ -92,10 +90,7 @@ const POSITION_ONLY: readonly string[] = [
  * completeness, not as new work.
  */
 const LEAK: readonly string[] = [
-  "commonmark/tabs/2", // +1paragraph +1text -1code
-  "commonmark/tabs/11", // +3list +3listItem -1thematicBreak
   "commonmark/link-reference-definitions/216", // +1heading -1definition
-  "commonmark/block-quotes/238", // +1code
   "commonmark/list-items/257", // +1paragraph +1text -1code
   "commonmark/links/493", // +1link
   "commonmark/raw-html/626", // -1html   already refused, see hygiene.test.ts
@@ -150,6 +145,6 @@ describe("strict preset", () => {
     );
     // A bare count, asserted so that shrinking the backlog is a deliberate edit here rather than
     // something that silently stops being measured.
-    expect(LEAK.length).toBe(7);
+    expect(LEAK.length).toBe(4);
   });
 });
