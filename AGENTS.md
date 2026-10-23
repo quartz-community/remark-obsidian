@@ -144,6 +144,26 @@ Consequence: **narrow per-construct exclusions are the correct strategy, and the
 architectural rather than a cleverness deficit.** Forking micromark's document initializer is also
 closed off — `parse.js` hardcodes it and `mdast-util-from-markdown` imports `parse` directly.
 
+### `footnoteDefinition > code|math` escaping its parent is NOT a parity target
+
+211 violations over 210 documents, the largest structural family in the corpus, and it looks like
+the extent bug the `def-span` work keeps colliding with. Measured, it is not:
+
+|     |                                        |
+| --: | -------------------------------------- |
+| 185 | **fully agree with Obsidian** (88.1%)  |
+|  19 | disagree on definitions or their spans |
+|   6 | disagree on references only            |
+
+Against a 7.5% base rate over the 6,608 documents without the escape, that is a lift of **1.58x**
+— inside the noise band this file already records refusals at (1.24 and 1.25, with 1.45 the
+strongest in a whole table). So the escape barely predicts disagreement.
+
+And it is worse than merely unhelpful: the escape is **load-bearing for agreement in 185
+documents**. Making a definition contain its children would move all of them to gain at most 19.
+The structural violation is an mdast-correctness matter for `invariants.test.ts` to ceiling, not a
+parity lead.
+
 ### The "code node covers an indexed position" family is NOT one mechanism
 
 It has been written up as the largest single target in the effort — "233 documents, 22% of the
