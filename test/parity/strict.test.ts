@@ -76,8 +76,16 @@ const POSITION_ONLY: readonly string[] = [
  *   link-ref-defs   x5   we emit `paragraph` where CommonMark emits `definition`
  *
  * `link labels` is named in the README as a divergence strict CLEARS, so those five are
- * unambiguous leaks. Setext appears in no list at all, so it is either an undocumented flag or
- * our own defect -- resolve which before fixing.
+ * unambiguous leaks.
+ *
+ * SETEXT IS OUR OWN DEFECT, and that is checked rather than assumed. There is no setext option
+ * at all, and SIX of the seven setext passes in `src/index.ts` are UNCONDITIONAL --
+ * `definitionSetextTransform` (837), `lazySetextTransform` (869), `containerSetextTransform`
+ * (870), `setextUnderlineTransform` (873), `htmlSetextTransform` (878) and
+ * `multilineSetextTransform` (882). Only `setextDefinitionTransform` (898) carries a guard, and
+ * that guard is `opts.bareFootnoteRefs`. So `preset: "strict"` cannot turn any of this off, and
+ * the six divergences are legacy setext behaviour running unconditionally in strict -- a missing
+ * option rather than a wrong rule.
  *
  * `raw-html/626` is already recorded as a refused case in `hygiene.test.ts`; it is here for
  * completeness, not as new work.
