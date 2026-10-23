@@ -49,50 +49,48 @@ const BY_DESIGN: readonly string[] = [
 ];
 
 /**
- * Node types agree; positions or values do not. Lower severity, still unexplained.
+ * Node types agree; positions or values do not. EMPTY, and kept so it can refill.
  *
  * Strict has no position contract of its own -- that constraint belongs to legacy, whose plugin
- * consumers index by offset -- so these do not block Quartz the way a wrong node type does. They
- * are listed rather than ignored because a position drift is often the first visible symptom of a
- * tokenizer divergence that later changes a type.
+ * consumers index by offset -- so these never blocked Quartz the way a wrong node type does.
+ * They were listed rather than ignored because a position drift is often the first visible
+ * symptom of a tokenizer divergence that later changes a type, and all six closed as a
+ * side-effect of gating the passes that owned them: `tabs/6` and `tabs/7` under `legacyTabs`,
+ * `block-quotes/237`, `block-quotes/249` and `list-items/280` under `legacyContainerLazy`, and
+ * `links/507` under `legacyLinkDestinations`.
+ *
+ * The array stays because the regression test reads it. A new position-only divergence lands
+ * here, and the first test in this file will name it.
  */
-const POSITION_ONLY: readonly string[] = [
-  "commonmark/block-quotes/237",
-  "commonmark/block-quotes/249",
-  "commonmark/list-items/280",
-  "commonmark/links/507",
-];
+const POSITION_ONLY: readonly string[] = [];
 
 /**
- * Structural divergences with no Obsidian node type involved. THIS IS THE BACKLOG.
+ * Structural divergences with no Obsidian node type involved. ONE LEFT, AND IT IS REFUSED.
  *
- * Each produces a different tree shape than stock remark for input containing no Obsidian syntax,
- * which means Quartz renders these wrongly today. Two families dominate and both are legacy
- * behaviour reaching into strict:
+ * Each entry here produces a different tree shape than stock remark for input containing no
+ * Obsidian syntax, which means Quartz would render it wrongly. The list opened at 19 and every
+ * actionable one is closed: each was a legacy pass running UNCONDITIONALLY, with no option for
+ * `strict` to clear, and five options now gate them.
  *
- *   setext-headings x6   we emit `paragraph` where CommonMark emits `heading`
- *   link-ref-defs   x5   we emit `paragraph` where CommonMark emits `definition`
+ *   legacySetext            6  setext underlines, plus `link-reference-definitions/216`
+ *   legacyLinkDefinitions   6  `link-ref-defs/196`, `200`, `202`, `210`, `links/546`, `552`
+ *   legacyTabs              3  `tabs/2`, `tabs/11`, `block-quotes/238`
+ *   legacyContainerLazy     1  `list-items/257`
+ *   legacyLinkDestinations  1  `links/493`
  *
- * `link labels` is named in the README as a divergence strict CLEARS, so those five are
- * unambiguous leaks.
+ * Every owner was DERIVED by disabling one unconditional pass at a time and reading which spec
+ * examples began to agree -- 57 probed, 6 owning anything, 51 owning nothing. Guessing would have
+ * mis-scoped it twice: `block-quotes/238` is owned JOINTLY by two passes and by neither alone,
+ * and `definitionSetextTransform` was initially left out of `legacySetext` on the reasoning that
+ * the other five "closed every measured divergence" -- it owns `216`, which was then attributed
+ * to an unknown cause.
  *
- * SETEXT WAS THE SAME SHAPE AND IS CLOSED. Six spec examples -- `setext-headings/81`, `82`,
- * `84`, `86`, `93`, `95` -- emitted a paragraph where CommonMark emits a heading, because five
- * setext passes ran UNCONDITIONALLY: there was no setext option for `strict` to clear. Adding
- * `legacySetext` and gating them closed all six, with the legacy referee BYTE-IDENTICAL at
- * 6208/6818 since the flag defaults on.
- *
- * `definitionSetextTransform` was deliberately left ungated. It is a setext pass, but gating the
- * other five was sufficient, and this file's own standard is the smallest change that closes the
- * measurement rather than the one that looks symmetrical.
- *
- * `raw-html/626` is already recorded as a refused case in `hygiene.test.ts`; it is here for
- * completeness, not as new work.
+ * `raw-html/626` remains. It is already recorded as a refused case in `hygiene.test.ts`: the
+ * conversion that would close it makes `remark-stringify` escape the `<`, and re-parsing that
+ * escape grows another backslash on every pass, so one parity case does not buy a formatter that
+ * corrupts the author's file.
  */
 const LEAK: readonly string[] = [
-  "commonmark/link-reference-definitions/216", // +1heading -1definition
-  "commonmark/list-items/257", // +1paragraph +1text -1code
-  "commonmark/links/493", // +1link
   "commonmark/raw-html/626", // -1html   already refused, see hygiene.test.ts
 ];
 
@@ -145,6 +143,6 @@ describe("strict preset", () => {
     );
     // A bare count, asserted so that shrinking the backlog is a deliberate edit here rather than
     // something that silently stops being measured.
-    expect(LEAK.length).toBe(4);
+    expect(LEAK.length).toBe(1);
   });
 });

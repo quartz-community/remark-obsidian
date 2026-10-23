@@ -413,6 +413,38 @@ export interface RemarkObsidianOptions {
    * @see test/parity/strict.test.ts for the gate that found it.
    */
   legacyTabs?: boolean;
+
+  /**
+   * Continue containers onto lazy lines as Obsidian does, instead of CommonMark's.
+   *
+   * `remark-parse@8` decides which following lines a list item or blockquote still owns
+   * by a different rule than micromark, so the two disagree about lazy continuation,
+   * empty items, and how deep a continuation reaches.
+   *
+   * On by default, and measured only in `legacy`. Three passes ran UNCONDITIONALLY
+   * until this flag existed: `commonmark/list-items/257` differed in node TYPE, and
+   * `block-quotes/237`, `block-quotes/249` and `list-items/280` in position.
+   *
+   * @see test/parity/strict.test.ts for the gate that found it.
+   */
+  legacyContainerLazy?: boolean;
+
+  /**
+   * Read a link destination and title as Obsidian does, instead of CommonMark's.
+   *
+   * Two divergences, both inherited. `remark-parse@8` resolves an escape inside an
+   * angle-bracketed destination differently, and it treats a NO-BREAK SPACE as a
+   * separator between destination and title where CommonMark does not -- so
+   * `[link](/url\u00a0"title")` is a titled link to Obsidian and a link to the whole
+   * `/url "title"` under CommonMark.
+   *
+   * On by default, and measured only in `legacy`. Both passes ran UNCONDITIONALLY until
+   * this flag existed, costing `commonmark/links/493` in node TYPE and
+   * `commonmark/links/507` in position.
+   *
+   * @see test/parity/strict.test.ts for the gate that found it.
+   */
+  legacyLinkDestinations?: boolean;
   /**
    * Find a link label by raw balanced-bracket scanning, as Obsidian does, so the
    * outermost pair wins where CommonMark gives the innermost: `[a [b](u) c](v)`
@@ -489,6 +521,8 @@ const STRICT_OVERRIDES: Partial<RemarkObsidianFlags> = {
   legacySetext: false,
   legacyLinkDefinitions: false,
   legacyTabs: false,
+  legacyContainerLazy: false,
+  legacyLinkDestinations: false,
   labelPrecedence: false,
   // Obsidian's reading view re-parses a task line, so `- [ ] 1.` nests where
   // CommonMark leaves two flat items.
@@ -532,6 +566,8 @@ const defaultOptions: RemarkObsidianFlags = {
   legacySetext: true,
   legacyLinkDefinitions: true,
   legacyTabs: true,
+  legacyContainerLazy: true,
+  legacyLinkDestinations: true,
   labelPrecedence: true,
   positionedBreaks: true,
   escapedLineBreaks: false,
@@ -794,7 +830,7 @@ export default function remarkObsidian(
     definitionLazySplitTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
-    containerLazyTransform(tree, String(file));
+    if (opts.legacyContainerLazy) containerLazyTransform(tree, String(file));
     // Directly after the absorb above, which is what makes the lazy paragraph a SIBLING of
     // the item's html in the first place. Placed with the other html passes it was INERT:
     // the pair does not exist yet there, and it is not gated on `math` either, which an
@@ -802,7 +838,10 @@ export default function remarkObsidian(
     itemHtmlExtentTransform(tree, String(file));
     // The complement of the pass above: that one needs no blank line, this one
     // needs exactly the blank line it rejects.
-    listEmptyItemTransform(tree, String(file), (markdown) => reparse(markdown));
+    if (opts.legacyContainerLazy)
+      listEmptyItemTransform(tree, String(file), (markdown) =>
+        reparse(markdown),
+      );
     // After it, because that pass has already put any trailing block in the sibling
     // item and this only has to move the item. Legacy reading only.
     if (opts.legacyLists) listEmptyNestTransform(tree, String(file));
@@ -905,12 +944,14 @@ export default function remarkObsidian(
     invisibleBlankLineTransform(tree, String(file));
     // Before the lazy passes: a deeply indented continuation belongs to the item,
     // so the block structure has to settle before anything absorbs siblings.
-    listDeepContinuationTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
+    if (opts.legacyContainerLazy) {
+      listDeepContinuationTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+    }
     // Before anything reads definitions: a definition directly under a setext
     // underline is not a definition at all, it is the heading's own line.
-    definitionSetextTransform(tree, String(file));
+    if (opts.legacySetext) definitionSetextTransform(tree, String(file));
     // Before everything that reads offsets: gfm's autolink literal splices nodes
     // with no position at all, and a pass without offsets correctly stands aside.
     restoreInlinePositionsTransform(tree, String(file));
@@ -919,7 +960,8 @@ export default function remarkObsidian(
     doubledFootnoteOpenerTransform(tree, String(file));
     // Before the bracket passes: a link the tokenizer never built is still a link,
     // and the passes below ask the tree which construct owns each bracket.
-    angleDestinationEscapeTransform(tree, String(file));
+    if (opts.legacyLinkDestinations)
+      angleDestinationEscapeTransform(tree, String(file));
     // Before the bracket passes: a bare URL swallowing a `](` means the brackets
     // after it never belonged to a label at all.
     autolinkLiteralExtentTransform(tree, String(file));
@@ -1087,7 +1129,7 @@ export default function remarkObsidian(
     // Late, and order-free: it only ever rewrites a `link`'s own `url` and `title`,
     // which nothing else here reads. `pass-order.mts` confirms it -- identical output at
     // both extremes of the chain.
-    linkNbspTitleTransform(tree);
+    if (opts.legacyLinkDestinations) linkNbspTitleTransform(tree);
     // After every pass that can rewrite a paragraph's span, since it matches on one.
     blankLabelReferenceTransform(tree, String(file));
     // After every pass that can move a list item's end, and before points are rebuilt.
