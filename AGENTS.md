@@ -144,6 +144,30 @@ Consequence: **narrow per-construct exclusions are the correct strategy, and the
 architectural rather than a cleverness deficit.** Forking micromark's document initializer is also
 closed off — `parse.js` hardcodes it and `mdast-util-from-markdown` imports `parse` directly.
 
+### The "code node covers an indexed position" family is NOT one mechanism
+
+It has been written up as the largest single target in the effort — "233 documents, 22% of the
+queue, one cause", wanting the five-space cap in `legacy-list.ts`'s `tokenizeIndent`. Re-measured,
+both halves of that are wrong.
+
+It is **148 documents, not 233**: the figure predates several landings and was inherited rather
+than re-derived. And it splits by host and then by marker separator into sub-families where none
+exceeds 45:
+
+|     |                                                                                          |
+| --: | ---------------------------------------------------------------------------------------- |
+|  45 | root-hosted                                                                              |
+|  33 | blockquote-hosted                                                                        |
+|  28 | list-hosted, separator holds a TAB — **already refused four ways, ceiling 10 documents** |
+|  23 | list-hosted, separator is 1–4 spaces — an ordinary item, so a different cause entirely   |
+|  21 | list-hosted, separator ≥5 spaces — **the only part the five-space cap addresses**        |
+|   6 | footnoteDefinition / callout                                                             |
+
+So the deep tokenizer change was aimed at **21 documents**, in a function already carrying two
+recorded refusals (`got` measured in columns: −38; `initialSize` in columns: inert). The standing
+rule applies to it — read `better + worse + same` first, and a total that small does not justify
+the pass however the sign comes out.
+
 ## Rules that each cost a session
 
 - **`self.containerState` must be saved and restored** around any container-interrupt probe.
