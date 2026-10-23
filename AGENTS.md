@@ -78,15 +78,36 @@ not ship — that has been tried (+4 referee, contract 3438 → 3434) and reject
 All take `PARITY_REFEREE_DIR` (default `/tmp/opencode/corrected-answers`) and need
 `--conditions=development`.
 
-| instrument           | answers                                                                    | trap                                                                           |
-| -------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `classify.ts`        | shared primitives: loading, position identity, populations, lift, sampling | **use this instead of re-reading the corpus**; `--self-test` must be green     |
-| `referee.mts`        | how many of 6,818 documents agree                                          | diff `--ids` identities, **never totals**                                      |
-| `mechanism.mts`      | which documents are ONE mechanism from agreeing                            | classifies EXTRA facts by _host_, MISSING by _cover_                           |
-| `ablate.mts`         | per-flag DECISIVE / CULPABLE                                               | accepts both id schemes; has `--self-test`                                     |
-| `legacy-oracle.mts`  | documents where rp8 is right and we are wrong                              | **rp8 is not a ceiling** — we are right where rp8 is wrong in ~1,000 documents |
-| `referee-shrink.mts` | minimise a diverging document                                              | `--live` hits Obsidian                                                         |
-| `ask.mts`            | the live Obsidian oracle                                                   | see below                                                                      |
+| instrument           | answers                                                                    | trap                                                                                                                     |
+| -------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `classify.ts`        | shared primitives: loading, position identity, populations, lift, sampling | **use this instead of re-reading the corpus**; `--self-test` must be green                                               |
+| `referee.mts`        | how many of 6,818 documents agree                                          | diff `--ids` identities, **never totals**                                                                                |
+| `mechanism.mts`      | which documents are ONE mechanism from agreeing                            | classifies EXTRA facts by _host_, MISSING by _cover_                                                                     |
+| `ablate.mts`         | per-flag DECISIVE / CULPABLE                                               | accepts both id schemes; has `--self-test`                                                                               |
+| `legacy-oracle.mts`  | documents where rp8 is right and we are wrong                              | **rp8 needs `commonmark: true`** (see below); **it is not a ceiling** — we are right where rp8 is wrong in 742 documents |
+| `referee-shrink.mts` | minimise a diverging document                                              | `--live` hits Obsidian                                                                                                   |
+| `ask.mts`            | the live Obsidian oracle                                                   | see below                                                                                                                |
+
+### `legacy-oracle.mts` specifically
+
+**rp8 must be constructed with `commonmark: true`.** It is what accepts `1)` ordered markers, and
+`commonmark` changes behaviour in **ten** rp8 files — `interrupt.js`, `definition.js`, `list.js`,
+`paragraph.js`, `blank-line.js` among them, which is exactly the continuation and interruption
+territory this effort re-derives. The instrument passed no options for a long time, so it ran
+rp8's defaults where the flag is `false`, and every figure it produced was computed against the
+wrong parser:
+
+|                                  | wrong | correct |
+| -------------------------------- | ----: | ------: |
+| defs blueprint                   |   227 | **252** |
+| defs we right where rp8 is wrong |  1023 | **742** |
+| defs both wrong                  |   155 | **130** |
+| code blueprint                   |    17 |  **33** |
+| code we right where rp8 is wrong |   295 |  **24** |
+| code both wrong                  |    21 |   **5** |
+
+Correctly configured, rp8 explains nearly all root code-range behaviour — that dimension's
+"we are right and rp8 is wrong" collapses from 295 to 24.
 
 ### `ask.mts` specifically
 
