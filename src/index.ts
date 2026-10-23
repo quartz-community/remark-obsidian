@@ -445,6 +445,27 @@ export interface RemarkObsidianOptions {
    * @see test/parity/strict.test.ts for the gate that found it.
    */
   legacyLinkDestinations?: boolean;
+
+  /**
+   * Shape GFM tables as Obsidian does, instead of as the GFM spec defines.
+   *
+   * Six passes implement Obsidian's table reading: which rows a table owns, whether a
+   * leading pipe is required, how a short delimiter row widens, and whether an indented
+   * or label row belongs to the table.
+   *
+   * On by default, and measured only in `legacy`. All six ran UNCONDITIONALLY until this
+   * flag existed, and the CommonMark differential could not see it: tables are a GFM
+   * EXTENSION, so no CommonMark example contains one. Against the GFM spec's own 24
+   * extension examples they cost three, all structural -- `gfm/table/199` lost the table
+   * entirely to a paragraph of `break` nodes, `gfm/table/202` dropped a trailing row, and
+   * `gfm/table/203` mishandled a short delimiter row.
+   *
+   * Only `tableShortDelimiterTransform` owns an example alone; `199` and `202` need the
+   * group, which is why the guard covers all six rather than the one.
+   *
+   * @see test/parity/gfm.ts for the corpus, test/parity/strict.test.ts for the gate.
+   */
+  legacyTables?: boolean;
   /**
    * Find a link label by raw balanced-bracket scanning, as Obsidian does, so the
    * outermost pair wins where CommonMark gives the innermost: `[a [b](u) c](v)`
@@ -523,6 +544,7 @@ const STRICT_OVERRIDES: Partial<RemarkObsidianFlags> = {
   legacyTabs: false,
   legacyContainerLazy: false,
   legacyLinkDestinations: false,
+  legacyTables: false,
   labelPrecedence: false,
   // Obsidian's reading view re-parses a task line, so `- [ ] 1.` nests where
   // CommonMark leaves two flat items.
@@ -568,6 +590,7 @@ const defaultOptions: RemarkObsidianFlags = {
   legacyTabs: true,
   legacyContainerLazy: true,
   legacyLinkDestinations: true,
+  legacyTables: true,
   labelPrecedence: true,
   positionedBreaks: true,
   escapedLineBreaks: false,
@@ -899,17 +922,19 @@ export default function remarkObsidian(
     mathOutlivesTransform(tree, String(file));
     mathMidlineTransform(tree, String(file));
     listUnderDefinitionTransform(tree, String(file));
-    tableRowStyleTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
-    // Before the short-delimiter pass: a table whose rows disagree on the
-    // leading pipe is not a table at all, so there is nothing to widen.
-    tablePipeStyleTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
-    tableShortDelimiterTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
+    if (opts.legacyTables) {
+      tableRowStyleTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+      // Before the short-delimiter pass: a table whose rows disagree on the
+      // leading pipe is not a table at all, so there is nothing to widen.
+      tablePipeStyleTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+      tableShortDelimiterTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+    }
     // Placed after the three table passes so the table it folds a label row into has
     // settled its shape, and `pass-order.mts` reports that claim as UNEXERCISED: running
     // this pass first is byte-identical over the whole corpus. micromark builds the table
@@ -917,15 +942,19 @@ export default function remarkObsidian(
     // matters for a table whose shape one of those passes changes in a way that moves the
     // label row, which no recorded case does. Kept here because it is the safe position and
     // the claim is now honest about its evidence.
-    tableLabelRowTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
+    if (opts.legacyTables) {
+      tableLabelRowTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+    }
     // After every table pass, so the table is in its final shape before an indented body row
     // is taken off it. Their rules document's C2: a row indented by even one space does not
     // start with a pipe, so it is not a row and the table ends before it.
-    tableIndentedRowTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
+    if (opts.legacyTables) {
+      tableIndentedRowTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+    }
     // After the callout passes, and this one IS exercised -- `pass-order.mts` reports a
     // different tree when it runs first. It reads `calloutTitle`, which does not exist
     // until `calloutTransform` has built it, so at the top it finds nothing and the
@@ -1008,9 +1037,11 @@ export default function remarkObsidian(
         self.parse(markdown),
       );
     }
-    tableInterruptTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
+    if (opts.legacyTables) {
+      tableInterruptTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+    }
     if (opts.bareFootnoteRefs) {
       // Must precede the bare-reference pass: it re-inserts a `[^n]:` label that
       // the bare pass then reduces, as Obsidian shows it.

@@ -29,6 +29,7 @@ import { describe, expect, it } from "vitest";
 import remarkObsidian from "../../src/index.js";
 import { assertPlausible, normalizeTree } from "./classify.js";
 import { COMMONMARK_SPEC } from "./commonmark.js";
+import { GFM_SPEC_EXTENSIONS } from "./gfm.js";
 
 /**
  * Obsidian syntax is ON in strict by design, so these are correct rather than tolerated.
@@ -94,7 +95,31 @@ const LEAK: readonly string[] = [
   "commonmark/raw-html/626", // -1html   already refused, see hygiene.test.ts
 ];
 
-const RECORDED = new Set([...BY_DESIGN, ...POSITION_ONLY, ...LEAK]);
+/**
+ * GFM extension divergences. EMPTY, and the corpus exists because it could not be empty before.
+ *
+ * Tables, task list items, strikethrough, extended autolinks and disallowed raw HTML are GFM
+ * EXTENSIONS, so no CommonMark example contains one -- the 652-example differential was
+ * structurally blind to the passes implementing them, and "owns no spec example" meant "the spec
+ * has no coverage", not "this agrees". Obsidian's own docs cite this spec for GFM support.
+ *
+ * Adding the 24 tagged examples found three divergences on arrival, all tables and all
+ * structural, now closed by `legacyTables`. Autolinks, strikethrough and task lists agreed on
+ * arrival across all 16 of their examples.
+ */
+const GFM_EXTENSION: readonly string[] = [];
+
+const RECORDED = new Set([
+  ...BY_DESIGN,
+  ...POSITION_ONLY,
+  ...LEAK,
+  ...GFM_EXTENSION,
+]);
+
+const CORPUS: ReadonlyArray<readonly [string, string]> = [
+  ...COMMONMARK_SPEC,
+  ...GFM_SPEC_EXTENSIONS,
+];
 
 const stock = unified().use(remarkParse).use(remarkGfm);
 const strict = unified()
@@ -110,7 +135,7 @@ function tree(processor: typeof stock, source: string): string {
 
 function diverging(): string[] {
   const out: string[] = [];
-  for (const [id, source] of COMMONMARK_SPEC) {
+  for (const [id, source] of CORPUS) {
     if (tree(stock, source) !== tree(strict, source)) out.push(id);
   }
   return out;
@@ -119,7 +144,7 @@ function diverging(): string[] {
 describe("strict preset", () => {
   it("has no unrecorded divergence from stock remark-parse + remark-gfm", () => {
     const observed = diverging();
-    assertPlausible(observed.length, COMMONMARK_SPEC.length, "strict vs stock");
+    assertPlausible(observed.length, CORPUS.length, "strict vs stock");
 
     const unrecorded = observed.filter((id) => !RECORDED.has(id));
     expect(
@@ -139,7 +164,10 @@ describe("strict preset", () => {
 
   it("keeps the recorded sets disjoint and the backlog visible", () => {
     expect(RECORDED.size, "an id is listed twice").toBe(
-      BY_DESIGN.length + POSITION_ONLY.length + LEAK.length,
+      BY_DESIGN.length +
+        POSITION_ONLY.length +
+        LEAK.length +
+        GFM_EXTENSION.length,
     );
     // A bare count, asserted so that shrinking the backlog is a deliberate edit here rather than
     // something that silently stops being measured.
