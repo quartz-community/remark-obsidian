@@ -5,6 +5,7 @@ import { orderedMarkerNotOne } from "./legacy-block-quote.js";
 import type {
   Code,
   Construct,
+  ConstructRecord,
   Effects,
   Extension,
   State,
@@ -12,6 +13,58 @@ import type {
 } from "micromark-util-types";
 
 const INDENT_TOKEN = "gfmFootnoteDefinitionIndent";
+
+/**
+ * Constructs that cannot end a definition because `remark-parse@8` has no such block.
+ *
+ * `remark-footnotes@2` builds its interruptor list out of rp8's OWN block methods
+ * (`index.js:54-68`), so a construct rp8 never had cannot appear in that list and cannot
+ * interrupt. Probing the whole flow map hands our additions an interrupting power rp8 does not
+ * give them, and the definition stops a line early:
+ *
+ *     [^1]: body text / ⇥$$ / ␣␣%%       obs spans 3->5, we stopped at 4
+ *
+ * `$$` IS NOT LISTED HERE, and that is measured, not an oversight. The reasoning that rp8 has no
+ * math applies to it word for word, yet excluding it costs 55 documents against 6 gained --
+ * Obsidian's math fence really does end a definition, so whatever its footnote fork inherited
+ * from rp8, it is not rp8's interruptor list for this construct. Priced three ways:
+ *
+ *     commentFlow + mathFlow    +15 / -55
+ *     mathFlow alone             +6 / -55     <- the whole loss is math
+ *     commentFlow alone          +9 /   0     <- shipped
+ *
+ * A DENY list of rp8's absentees, not an allow list of its methods. Oracle's warning was that a
+ * name-based allow list silently drops a construct an extension REPLACED under a new name --
+ * `legacyCodeFenced` is exactly that, and rp8 does have fenced code, so it must keep
+ * interrupting. Naming only what rp8 lacks keeps replacements working by default.
+ */
+const ABSENT_FROM_RP8 = new Set(["commentFlow"]);
+
+const interruptorCache = new WeakMap<ConstructRecord, ConstructRecord>();
+
+/**
+ * `constructs.flow` minus the constructs rp8 never had, built once per construct map.
+ *
+ * Keys stay strings so micromark's `null` default key survives, and an entry whose constructs are
+ * all removed is dropped rather than left as an empty array.
+ */
+function rp8Interruptors(flow: ConstructRecord): ConstructRecord {
+  const cached = interruptorCache.get(flow);
+  if (cached !== undefined) return cached;
+
+  const built: ConstructRecord = {};
+  for (const [key, value] of Object.entries(flow)) {
+    if (value === undefined) continue;
+    const kept = (Array.isArray(value) ? value : [value]).filter(
+      (construct) =>
+        construct.name === undefined || !ABSENT_FROM_RP8.has(construct.name),
+    );
+    if (kept.length > 0) built[key] = kept;
+  }
+
+  interruptorCache.set(flow, built);
+  return built;
+}
 
 /**
  * One raw tab continues a footnote definition.
@@ -119,7 +172,7 @@ const newBlockAhead: Construct = {
       return effects.attempt(
         self.parser.constructs.document,
         ok,
-        effects.attempt(self.parser.constructs.flow, ok, nok),
+        effects.attempt(rp8Interruptors(self.parser.constructs.flow), ok, nok),
       )(code);
     }
   },
