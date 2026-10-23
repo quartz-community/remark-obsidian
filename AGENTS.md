@@ -25,16 +25,26 @@ on micromark's _architecture_. That mismatch is the source of nearly every open 
 `legacy` is the current default. Positions are a hard constraint for it — plugin consumers index
 by them, so a correct token at a wrong offset is a failure.
 
-**Strict is under-gated.** The 6,818-document corpus measures `legacy`. As of this writing strict
-has one smoke assertion, and a differential against stock `remark-parse` + `remark-gfm` over the
-652 CommonMark spec examples shows **32 divergences, 26 of them in node types**, clustering on
-tabs. Unlike legacy, strict has a _closed_ oracle (a published spec with known answers), so that
-work terminates. Prefer it.
+**Strict is gated, and its backlog is closed.** The 6,818-document corpus measures `legacy`, so it
+says nothing about strict — `strict.test.ts` is the gate that does, differentially against stock
+`remark-parse` + `remark-gfm` over the 652 CommonMark spec examples. It opened at **32
+divergences, 26 in node types**, and stands at **8**: seven are Obsidian syntax appearing by
+design, and one is `raw-html/626`, already a recorded refusal. Unlike legacy, strict has a
+_closed_ oracle — a published spec with known answers — which is why it terminated.
+
+Every one of the 24 closed was a legacy pass running **unconditionally**, with no option for
+`strict` to clear. Five options now gate them: `legacySetext`, `legacyLinkDefinitions`,
+`legacyTabs`, `legacyContainerLazy`, `legacyLinkDestinations`.
+
+**The policy that follows: a behaviour differing between `legacy` and `strict` belongs behind an
+option, never in an unconditional pass.** 51 of 57 unconditional passes own no spec example — most
+operate on footnote definitions, which CommonMark has no example of, so the spec cannot adjudicate
+them and gating them would be unmeasured.
 
 ## Gates — what "done" means
 
 ```bash
-npm test          # 450 tests / 17 files. Contains the contract gate.
+npm test          # 453 tests / 18 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -96,6 +106,23 @@ Re-recording goldens is `npm run parity:record` (wdio) and needs Obsidian.
 Priority heuristic, derived empirically — DECISIVE/CULPABLE ratio **≥0.5 build it · 0.2–0.5 narrow
 it · <0.2 it is infrastructure, not the cause**.
 
+### Finding which pass owns a divergence
+
+For a strict divergence, do not reason about which pass is responsible — **derive it**. Patch one
+unconditional call site to `if (false) …`, run `strict.test.ts`, and read which spec examples the
+stale-entry test says now agree. Restore, repeat. 57 passes take about five minutes, and the five
+options above were all scoped this way.
+
+Three things that recipe got right and guessing would not have:
+
+- **Probe one at a time.** A wholesale run disabling all 14 tab passes closed five examples and
+  named none of them.
+- **Then probe pairs for whatever is left over.** `block-quotes/238` is owned **jointly** by
+  `quoteIndentedCodeTransform` and `quoteLazyIndentedCodeTransform` and by neither alone.
+- **Measure before naming the option.** `legacyLinkDefinitions` looked like it owned the whole
+  link-reference-definition family; it owns six of eight, and the other two were a different
+  cause entirely.
+
 ## Architectural conclusion (do not re-litigate without new evidence)
 
 Roughly 184 divergences are **flag-irreducible**: no single flag and no pair of 24 reaches them.
@@ -122,8 +149,15 @@ closed off — `parse.js` hardcodes it and `mdast-util-from-markdown` imports `p
 - **Sample on a stride.** Six separate families were misdescribed by inspecting the shortest or
   first members. `strideSample` in `classify.ts` is the only sampler.
 - **Zero and 100% are equally suspicious.** `0 diverging documents` came from an id-scheme
-  mismatch; `652 of 652 differ` came from one additive root field (`data.lineOffsets`).
+  mismatch; `652 of 652 differ` came from one additive root field (`data.lineOffsets`);
+  `0 of 57 passes own anything` came from a matcher requiring double-quoted ids and reading only
+  stdout, while vitest prints the assertion summary single-quoted.
 - **An inert probe looks exactly like a working one.** Verify by identity (`--ids`), not by total.
+- **Only a KNOWN-POSITIVE control proves a probe is live.** The `0 of 57` above was checked with a
+  negative control first — a pass that owns nothing — which passed happily and proved nothing. The
+  bug surfaced only on a case whose answer was known in advance: deleting a real entry from the
+  recorded list and confirming the matcher found it. Scripts scraping tool output must capture
+  **both streams** and must not assume a quote style.
 - **Use the Edit tool, not scripted `python3`/`sed`, on prettier-formatted source.** Silent
   regex misses have cost four edits; nested parens defeat naive patterns.
 - **`disable` matches on construct NAME.** A vendored replacement must take a new name
