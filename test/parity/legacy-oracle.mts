@@ -66,7 +66,7 @@ const math3 = require("remarkMath3");
  * `inlineNotes` is on because Obsidian supports `^[inline]` and the referee records them.
  */
 const legacy = (unified9.default ?? unified9)()
-  .use(parse8.default ?? parse8)
+  .use(parse8.default ?? parse8, { commonmark: true, gfm: true })
   .use(footnotes2.default ?? footnotes2, { inlineNotes: true })
   .use(math3.default ?? math3);
 
