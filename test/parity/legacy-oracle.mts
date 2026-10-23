@@ -45,6 +45,7 @@ import { createRequire } from "node:module";
 
 import type { Node, Parent } from "unist";
 
+import { loadCorpus } from "./classify.js";
 import { refereeFactsWithTree } from "./referee-facts.js";
 
 const require = createRequire(import.meta.url);
@@ -72,30 +73,16 @@ const legacy = (unified9.default ?? unified9)()
 const parseLegacy = (text: string): Node => legacy.parse(text) as Node;
 /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
 
-interface Record_ {
-  readonly id?: string;
-  readonly text?: string;
-  readonly defs?: readonly (readonly [string, number, number, number])[];
-  readonly code?: readonly (readonly [number, number])[];
-}
-
 const dir = process.env.PARITY_REFEREE_DIR;
 if (dir === undefined) {
   console.error("legacy-oracle: set PARITY_REFEREE_DIR");
   process.exit(1);
 }
 
-const records: { id: string; rec: Record_ }[] = [];
-for (const file of fs.readdirSync(dir).sort()) {
-  if (!file.endsWith(".json")) continue;
-  const parsed: unknown = JSON.parse(fs.readFileSync(`${dir}/${file}`, "utf8"));
-  const rows = (Array.isArray(parsed) ? parsed : []) as Record_[];
-  for (const [at, rec] of rows.entries()) {
-    if (rec.text !== undefined) {
-      records.push({ id: rec.id ?? `${file}#${at}`, rec });
-    }
-  }
-}
+// Loading goes through `classify.ts`. A drop-in here rather than a loop restructure: every field
+// `Record_` declared is on `CorpusRow`, and the shared loader computes the same `id ?? file#index`
+// fallback this did by hand.
+const records = loadCorpus(dir).map((rec) => ({ id: rec.id, rec }));
 
 const defsOf = (tree: Node): string => {
   const out: [string, number, number, number][] = [];
