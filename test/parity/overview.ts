@@ -223,6 +223,20 @@ export const ORACLES: readonly Oracle[] = [
     test: "option-matrix.test.ts",
   },
   {
+    name: "strict preset vs stock remark",
+    command: "npm test",
+    gate: "absolute",
+    compares: [
+      "mdast equality against remark-parse + remark-gfm, over the 652 CommonMark spec examples",
+    ],
+    blind: [
+      "legacy, which is recorded against Obsidian and diverges from CommonMark deliberately",
+      "any construct the spec has no example for -- the coverage is the spec's, not ours",
+      "positions: strict has no position contract, so a node-type divergence is the blocking one",
+    ],
+    test: "strict.test.ts",
+  },
+  {
     name: "recorded contradictions",
     command:
       "TOP=24 tsx test/parity/fuzz/contradictions.ts to see the shapes behind a failure",
