@@ -209,6 +209,30 @@ recorded refusals (`got` measured in columns: −38; `initialSize` in columns: i
 rule applies to it — read `better + worse + same` first, and a total that small does not justify
 the pass however the sign comes out.
 
+## The upstream rules document, and what it already settles
+
+`obsidian-footnotes` (the project the referee corpus comes from) carries
+`docs/obsidian-reading-rules.md` — rules **A–P** with the probe ids that establish each, plus
+reference implementations in `src/parsing/`. Clone it before deriving an Obsidian rule by hand;
+most are already written down there, with the family that proves them.
+
+Verified against our parser:
+
+| rule                                                        | us                                                                 |
+| ----------------------------------------------------------- | ------------------------------------------------------------------ |
+| **E4** definition enders only within the first 1,024 chars  | correct, boundary exact                                            |
+| **B8** a task box holds ANY one character                   | correct, all of `[ ] [x] [/] [-] [>] [!]`                          |
+| **B9** lists split by only blank lines are ONE list         | correct, and a definition between keeps them apart                 |
+| **D6** a link reference definition reads across blank lines | **diverges** — the title does not absorb, so its `[^1]` stays live |
+
+**`P1`/`P2` are Obsidian CACHE BUGS, and our answer is the right one — do not chase them.** The
+cache reports a column as if a `%%` opener's indentation were absent (P1), and shifts the line
+under a callout title by the outer container's width when the callout is nested (P2). The
+document is explicit that their reader also keeps the true column and the referee lists a
+representative as a known disagreement. We have no such record, so `night:p2b-task-sp-co-quoted`
+counts against us at 6208 while being correct: obs column 8, ours 6, and 6 is right. Reproducing
+it would violate the standing rule that this is not "match Obsidian including every bug".
+
 ## Rules that each cost a session
 
 - **`self.containerState` must be saved and restored** around any container-interrupt probe.
