@@ -26,6 +26,15 @@ export interface CorpusRow {
   readonly text: string;
   readonly defs: readonly Def[];
   readonly refs: readonly Ref[];
+  /**
+   * Obsidian's own ROOT-LEVEL code-block line ranges, zero-based and inclusive.
+   *
+   * Carried because dropping it is a silent measurement loss, not a missing convenience: nine
+   * instruments read this field, `referee.mts` scores it as a third dimension over the 883
+   * documents that record one, and a loader that quietly returned `[]` would make every one of
+   * them agree for free. The first version of this module omitted it.
+   */
+  readonly code: ReadonlyArray<readonly [number, number]>;
 }
 
 export class ClassifierError extends Error {}
@@ -36,7 +45,13 @@ function isFactArray(value: unknown): value is unknown[][] {
   return Array.isArray(value) && value.every((entry) => Array.isArray(entry));
 }
 
-function readFacts(value: unknown): { defs: Def[]; refs: Ref[] } {
+type CodeRanges = ReadonlyArray<readonly [number, number]>;
+
+function readFacts(value: unknown): {
+  defs: Def[];
+  refs: Ref[];
+  code: CodeRanges;
+} {
   const row = (value ?? {}) as Record<string, unknown>;
   const defs = isFactArray(row["defs"])
     ? (row["defs"] as unknown as Def[])
@@ -44,7 +59,10 @@ function readFacts(value: unknown): { defs: Def[]; refs: Ref[] } {
   const refs = isFactArray(row["refs"])
     ? (row["refs"] as unknown as Ref[])
     : [];
-  return { defs: real(defs), refs: real(refs) };
+  const code = isFactArray(row["code"])
+    ? (row["code"] as unknown as CodeRanges)
+    : [];
+  return { defs: real(defs), refs: real(refs), code };
 }
 
 /**
@@ -86,7 +104,7 @@ export function loadCorpus(dir?: string): CorpusRow[] {
       const record = (entry ?? {}) as Record<string, unknown>;
       const text = record["text"];
       if (typeof text !== "string" || text === "") continue;
-      const { defs, refs } = readFacts(entry);
+      const { defs, refs, code } = readFacts(entry);
       rows.push({
         id:
           typeof record["id"] === "string" ? record["id"] : `${file}#${index}`,
@@ -94,6 +112,7 @@ export function loadCorpus(dir?: string): CorpusRow[] {
         text,
         defs,
         refs,
+        code,
       });
     }
   }
@@ -359,7 +378,43 @@ function selfTest(): void {
     text,
     defs: [],
     refs: [],
+    code: [],
   });
+
+  {
+    // A real round-trip through `loadCorpus`. Every other assertion here builds its rows by
+    // hand, so none of them can catch the LOADER dropping a field -- which is exactly what the
+    // first version of this module did to `code`, the field nine instruments read.
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "classify-fx-"));
+    try {
+      fs.writeFileSync(
+        path.join(dir, "fx.json"),
+        JSON.stringify([
+          {
+            id: "fx:1",
+            text: "a",
+            defs: [["n", 0, 0, 0]],
+            refs: [["n", 1, 2]],
+            code: [[3, 4]],
+          },
+          { text: "b" },
+        ]),
+      );
+      const loaded = loadCorpus(dir);
+      eq("loadCorpus reads every row", loaded.length, 2);
+      eq("loadCorpus carries code ranges", loaded[0]?.code, [[3, 4]]);
+      eq("loadCorpus defaults code to empty", loaded[1]?.code, []);
+      eq("loadCorpus keeps a row's own id", loaded[0]?.id, "fx:1");
+      eq("loadCorpus synthesises a positional id", loaded[1]?.id, "fx.json#1");
+      eq(
+        "loadCorpus carries BOTH id schemes",
+        loaded[0]?.positionalId,
+        "fx.json#0",
+      );
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  }
   const rows = [
     row("a", "aaa"),
     row("b", "bb"),

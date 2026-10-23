@@ -27,19 +27,12 @@
  * this is trying to move is the referee's, so the premise has to be the referee's too.
  */
 import fs from "node:fs";
-import path from "node:path";
 
+import { loadCorpus } from "./classify.js";
 import { refereeFactsWithTree } from "./referee-facts.js";
 
 import type { Root } from "mdast";
 import type { Node, Parent } from "unist";
-
-interface Entry {
-  readonly id?: string;
-  readonly text: string;
-  readonly defs: readonly (readonly [string, number, number, number])[];
-  readonly refs: readonly (readonly [string, number, number])[];
-}
 
 const dir =
   process.env.PARITY_REFEREE_DIR ??
@@ -49,16 +42,11 @@ if (!fs.existsSync(dir)) {
   process.exit(0);
 }
 
-const entries: Entry[] = [];
-for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
-  const raw: unknown = JSON.parse(
-    fs.readFileSync(path.join(dir, file), "utf8"),
-  );
-  const list = Array.isArray(raw)
-    ? raw
-    : Object.values(raw as Record<string, unknown>);
-  for (const value of list as Entry[]) entries.push(value);
-}
+// Loading goes through `classify.ts` rather than a local reader. Verified semantics-preserving
+// before the swap, not after: on this corpus 0 rows lack a `text` key, 0 have an empty one, 0
+// facts are `[inline*` pseudo-facts and 0 answer files are non-arrays, so every guard the shared
+// loader applies is a no-op here and this instrument's output is byte-identical.
+const entries = loadCorpus(dir);
 
 /** Zero-based line and column to a flat offset, the only unit positions compare in. */
 function offsetOf(lines: readonly string[], line: number, col: number): number {
