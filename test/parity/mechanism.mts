@@ -88,6 +88,42 @@ function coverOf(tree: Root, offset: number): string {
   return deepest;
 }
 
+/** A fact's own node types, which must not be reported as that fact's host. */
+const FACT_NODES = new Set(["footnoteReference", "footnoteDefinition", "text"]);
+
+/**
+ * `coverOf` for an EXTRA fact, which has to name its HOST rather than itself.
+ *
+ * For a MISSING fact the deepest covering node is the answer: it names what swallowed the fact.
+ * For an EXTRA one the deepest node is the node WE WRONGLY CREATED, so `coverOf` reports
+ * `ref-extra @ footnoteReference` -- "we invented a reference, and the node there is the
+ * reference we invented". True of every such document by construction, and it conveys nothing.
+ *
+ * That mattered: the tautological label sat at the TOP of this file's own table, at 92 one-away
+ * documents for `ref-extra` and 115 present for `def-extra`, so the two largest rows were the
+ * two carrying no mechanism. Skipping the fact's own types reports the paragraph, list item,
+ * comment or code node that hosts it, which is the thing a rule has to be written against.
+ */
+function hostOf(tree: Root, offset: number): string {
+  let node: Node = tree;
+  let deepest = "nothing";
+  for (;;) {
+    const kids = (node as Parent).children;
+    if (!Array.isArray(kids)) break;
+    const hit = kids.find((kid) => {
+      const from = kid.position?.start?.offset;
+      const to = kid.position?.end?.offset;
+      return (
+        from !== undefined && to !== undefined && offset >= from && offset < to
+      );
+    });
+    if (!hit) break;
+    if (!FACT_NODES.has(hit.type)) deepest = hit.type;
+    node = hit;
+  }
+  return deepest;
+}
+
 const named = <T extends readonly unknown[]>(rows: readonly T[]) =>
   rows.filter((row) => row[0] !== "");
 /** The referee's own comparison: empty names excluded, ORDER-SENSITIVE, `code` separate. */
@@ -155,7 +191,7 @@ for (const [index, entry] of entries.entries()) {
   for (const [name, def] of ourDefs) {
     if (!wantDefMap.has(name)) {
       found.add(
-        `def-extra @ ${coverOf(ours.tree, offsetOf(lines, def[1], def[2]))}`,
+        `def-extra @ ${hostOf(ours.tree, offsetOf(lines, def[1], def[2]))}`,
       );
     }
   }
@@ -169,7 +205,7 @@ for (const [index, entry] of entries.entries()) {
   for (const [name, ref] of ourRefs) {
     if (!wantRefMap.has(name)) {
       found.add(
-        `ref-extra @ ${coverOf(ours.tree, offsetOf(lines, ref[1], ref[2]))}`,
+        `ref-extra @ ${hostOf(ours.tree, offsetOf(lines, ref[1], ref[2]))}`,
       );
     }
   }
