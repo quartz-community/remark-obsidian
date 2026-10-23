@@ -351,6 +351,26 @@ export interface RemarkObsidianOptions {
    * reads a de-tagged string, which no tree can reproduce without mis-parsing.
    */
   legacyHtmlBlocks?: boolean;
+
+  /**
+   * Read setext underlines as Obsidian does, instead of CommonMark's.
+   *
+   * `remark-parse@8` resolves an underline against a different paragraph extent than
+   * micromark, so Obsidian makes headings where CommonMark does not and vice versa.
+   * Six passes implement that reading: a lazy continuation line can carry the
+   * underline, a container can hold one, an html block can swallow one, and an
+   * underline can close a paragraph that spans several lines.
+   *
+   * On by default, and measured only in `legacy` -- every one of those six passes ran
+   * UNCONDITIONALLY until this flag existed, which is why `strict` emitted a paragraph
+   * where CommonMark emits a heading on six of the 652 spec examples
+   * (`commonmark/setext-headings/81`, `82`, `84`, `86`, `93`, `95`). That was a missing
+   * option rather than a wrong rule: the legacy reading is correct for Obsidian and has
+   * no business running off-platform.
+   *
+   * @see test/parity/strict.test.ts for the gate that found it.
+   */
+  legacySetext?: boolean;
   /**
    * Find a link label by raw balanced-bracket scanning, as Obsidian does, so the
    * outermost pair wins where CommonMark gives the innermost: `[a [b](u) c](v)`
@@ -424,6 +444,7 @@ const STRICT_OVERRIDES: Partial<RemarkObsidianFlags> = {
   legacyCodeSpans: false,
   legacyLists: false,
   legacyHtmlBlocks: false,
+  legacySetext: false,
   labelPrecedence: false,
   // Obsidian's reading view re-parses a task line, so `- [ ] 1.` nests where
   // CommonMark leaves two flat items.
@@ -464,6 +485,7 @@ const defaultOptions: RemarkObsidianFlags = {
   legacyCodeSpans: true,
   legacyLists: true,
   legacyHtmlBlocks: true,
+  legacySetext: true,
   labelPrecedence: true,
   positionedBreaks: true,
   escapedLineBreaks: false,
@@ -866,22 +888,30 @@ export default function remarkObsidian(
     // Obsidian still shows.
     blankFootnoteLabelTransform(tree, String(file));
     bareCheckboxTransform(tree, String(file));
-    lazySetextTransform(tree, String(file), (markdown) => self.parse(markdown));
-    containerSetextTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
-    setextUnderlineTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
-    // After the paragraph-based setext passes: this one claims an underline the
-    // html block swallowed, which those never see.
-    htmlSetextTransform(tree, String(file));
+    if (opts.legacySetext) {
+      lazySetextTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+      containerSetextTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+      setextUnderlineTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+      // After the paragraph-based setext passes: this one claims an underline the
+      // html block swallowed, which those never see.
+      htmlSetextTransform(tree, String(file));
+    }
+    // NOT gated, and it sits BETWEEN two setext passes deliberately: the order is
+    // load-bearing here, so the guard is split around it rather than hoisting it.
     footnoteLabelTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
-    multilineSetextTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
+    if (opts.legacySetext) {
+      multilineSetextTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+    }
     tableInterruptTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );

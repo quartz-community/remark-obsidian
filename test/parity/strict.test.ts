@@ -78,14 +78,15 @@ const POSITION_ONLY: readonly string[] = [
  * `link labels` is named in the README as a divergence strict CLEARS, so those five are
  * unambiguous leaks.
  *
- * SETEXT IS OUR OWN DEFECT, and that is checked rather than assumed. There is no setext option
- * at all, and SIX of the seven setext passes in `src/index.ts` are UNCONDITIONAL --
- * `definitionSetextTransform` (837), `lazySetextTransform` (869), `containerSetextTransform`
- * (870), `setextUnderlineTransform` (873), `htmlSetextTransform` (878) and
- * `multilineSetextTransform` (882). Only `setextDefinitionTransform` (898) carries a guard, and
- * that guard is `opts.bareFootnoteRefs`. So `preset: "strict"` cannot turn any of this off, and
- * the six divergences are legacy setext behaviour running unconditionally in strict -- a missing
- * option rather than a wrong rule.
+ * SETEXT WAS THE SAME SHAPE AND IS CLOSED. Six spec examples -- `setext-headings/81`, `82`,
+ * `84`, `86`, `93`, `95` -- emitted a paragraph where CommonMark emits a heading, because five
+ * setext passes ran UNCONDITIONALLY: there was no setext option for `strict` to clear. Adding
+ * `legacySetext` and gating them closed all six, with the legacy referee BYTE-IDENTICAL at
+ * 6208/6818 since the flag defaults on.
+ *
+ * `definitionSetextTransform` was deliberately left ungated. It is a setext pass, but gating the
+ * other five was sufficient, and this file's own standard is the smallest change that closes the
+ * measurement rather than the one that looks symmetrical.
  *
  * `raw-html/626` is already recorded as a refused case in `hygiene.test.ts`; it is here for
  * completeness, not as new work.
@@ -93,12 +94,6 @@ const POSITION_ONLY: readonly string[] = [
 const LEAK: readonly string[] = [
   "commonmark/tabs/2", // +1paragraph +1text -1code
   "commonmark/tabs/11", // +3list +3listItem -1thematicBreak
-  "commonmark/setext-headings/81", // +1paragraph +2text -1heading
-  "commonmark/setext-headings/82", // +1paragraph +2text -1heading
-  "commonmark/setext-headings/84", // +2text +1paragraph -1heading
-  "commonmark/setext-headings/86", // +1paragraph +1thematicBreak -1heading
-  "commonmark/setext-headings/93", // +1text +1heading
-  "commonmark/setext-headings/95", // +1paragraph +1thematicBreak -1heading
   "commonmark/link-reference-definitions/196", // +1paragraph +9text -1definition
   "commonmark/link-reference-definitions/200", // +1paragraph +1text -1definition
   "commonmark/link-reference-definitions/202", // +1paragraph +1text -1definition
@@ -161,6 +156,6 @@ describe("strict preset", () => {
     );
     // A bare count, asserted so that shrinking the backlog is a deliberate edit here rather than
     // something that silently stops being measured.
-    expect(LEAK.length).toBe(19);
+    expect(LEAK.length).toBe(13);
   });
 });
