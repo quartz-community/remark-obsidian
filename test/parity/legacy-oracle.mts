@@ -117,6 +117,15 @@ const codeOf = (tree: Node): string => {
 
 const wantIds = process.argv.includes("--ids");
 const blueprint: Record<string, string[]> = { defs: [], code: [] };
+/**
+ * Documents where NEITHER we nor rp8 match the recorded answer.
+ *
+ * The blueprint above is where rp8 supplies the rule. This set is the complement that matters:
+ * Obsidian runs an rp8 fork, so if rp8 ALSO misses, the answer is something Obsidian added on
+ * top -- which is exactly the population no source can adjudicate and only a live probe can.
+ * Emitted because the tally has always counted it and never named it.
+ */
+const bothWrong: Record<string, string[]> = { defs: [], code: [] };
 const tally = {
   defs: { ours: 0, rp8: 0, fixes: 0, we: 0, both: 0, n: 0 },
   code: { ours: 0, rp8: 0, fixes: 0, we: 0, both: 0, n: 0 },
@@ -167,7 +176,10 @@ for (const { id, rec } of records) {
       blueprint[dim]!.push(id);
     }
     if (ours === want && theirs !== want) t.we += 1;
-    if (ours !== want && theirs !== want) t.both += 1;
+    if (ours !== want && theirs !== want) {
+      t.both += 1;
+      bothWrong[dim]!.push(id);
+    }
   }
 }
 
@@ -188,5 +200,8 @@ if (wantIds) {
     const out = `/tmp/opencode/rp8-blueprint-${dim}.txt`;
     fs.writeFileSync(out, blueprint[dim]!.join("\n") + "\n");
     console.log(`\n  ${blueprint[dim]!.length} ids -> ${out}`);
+    const bw = `/tmp/opencode/rp8-both-wrong-${dim}.txt`;
+    fs.writeFileSync(bw, bothWrong[dim]!.join("\n") + "\n");
+    console.log(`  ${bothWrong[dim]!.length} ids -> ${bw}`);
   }
 }
