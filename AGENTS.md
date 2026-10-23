@@ -27,14 +27,23 @@ by them, so a correct token at a wrong offset is a failure.
 
 **Strict is gated, and its backlog is closed.** The 6,818-document corpus measures `legacy`, so it
 says nothing about strict — `strict.test.ts` is the gate that does, differentially against stock
-`remark-parse` + `remark-gfm` over the 652 CommonMark spec examples. It opened at **32
+`remark-parse` + `remark-gfm` over **676 examples**: the 652 CommonMark spec examples
+(`commonmark.ts`) plus the 24 tagged GFM extension examples (`gfm.ts`). It opened at **32
 divergences, 26 in node types**, and stands at **8**: seven are Obsidian syntax appearing by
 design, and one is `raw-html/626`, already a recorded refusal. Unlike legacy, strict has a
-_closed_ oracle — a published spec with known answers — which is why it terminated.
+_closed_ oracle — published specs with known answers — which is why it terminated.
 
-Every one of the 24 closed was a legacy pass running **unconditionally**, with no option for
-`strict` to clear. Five options now gate them: `legacySetext`, `legacyLinkDefinitions`,
-`legacyTabs`, `legacyContainerLazy`, `legacyLinkDestinations`.
+Every one of the 27 closed was a legacy pass running **unconditionally**, with no option for
+`strict` to clear. Six options now gate them: `legacySetext`, `legacyLinkDefinitions`,
+`legacyTabs`, `legacyContainerLazy`, `legacyLinkDestinations`, `legacyTables`.
+
+**Two specs are needed, not one, and the second is not optional.** GFM is "a strict superset of
+CommonMark" (spec §1.1), so tables, task lists, strikethrough, extended autolinks and disallowed
+raw HTML appear in **no** CommonMark example. Against CommonMark alone, the six table passes
+reported "owns no spec example" — which means _the spec has no coverage there_, not _this agrees_.
+The GFM corpus found three table divergences on arrival. Obsidian's docs cite
+`github.github.com/gfm` for GFM, and footnotes are in **neither** spec: GFM froze at `0.29-gfm`
+in 2019 and GitHub shipped footnotes in 2021 without specifying them.
 
 **The policy that follows: a behaviour differing between `legacy` and `strict` belongs behind an
 option, never in an unconditional pass.** 51 of 57 unconditional passes own no spec example — most
@@ -151,7 +160,10 @@ closed off — `parse.js` hardcodes it and `mdast-util-from-markdown` imports `p
 - **Zero and 100% are equally suspicious.** `0 diverging documents` came from an id-scheme
   mismatch; `652 of 652 differ` came from one additive root field (`data.lineOffsets`);
   `0 of 57 passes own anything` came from a matcher requiring double-quoted ids and reading only
-  stdout, while vitest prints the assertion summary single-quoted.
+  stdout, while vitest prints the assertion summary single-quoted; `0 of 24 GFM extension
+examples` came from anchoring a fence pattern as `example$` when `cmark-gfm` tags the fence
+  `example table`. **Both were over-strict matchers, two days apart.** Assert the count you expect
+  before using what you extracted — 648 parsed against 672 present is what exposed the second.
 - **An inert probe looks exactly like a working one.** Verify by identity (`--ids`), not by total.
 - **Only a KNOWN-POSITIVE control proves a probe is live.** The `0 of 57` above was checked with a
   negative control first — a pass that owns nothing — which passed happily and proved nothing. The
