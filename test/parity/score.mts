@@ -546,6 +546,41 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "def-stop-at-blank-lt4",
+    what: "after a blank, a line indented <4 does not continue a definition",
+    apply: (text, ours) => {
+      const lines = text.split("\n");
+      const BLANK = /^[ \t]*$/u;
+      const stripQuote = (line: string): string => {
+        let t = line;
+        for (;;) {
+          const m = /^[ \t]{0,3}>[ \t]?/u.exec(t);
+          if (!m) break;
+          t = t.slice(m[0].length);
+        }
+        return t;
+      };
+      return {
+        refs: ours.refs,
+        defs: ours.defs.map((d): Def => {
+          for (let line = d[1] + 1; line <= d[3]; line++) {
+            if (!BLANK.test(lines[line] ?? "")) continue;
+            let at = line;
+            while (at <= d[3] && BLANK.test(lines[at] ?? "")) at++;
+            // Only blanks to the end is the TRIM rule's business, not this one.
+            if (at > d[3]) break;
+            const inner = stripQuote(lines[at] ?? "");
+            const indent = inner.length - inner.replace(/^[ \t]+/u, "").length;
+            // rp8: after a blank, four columns continues. A leading tab is four.
+            if (/^\t/u.test(inner) || indent >= 4) break;
+            return [d[0], d[1], d[2], line - 1];
+          }
+          return d;
+        }),
+      };
+    },
+  },
+  {
     name: "container-comment-swallows",
     what: "a column-0 unclosed `%%` after a container swallows to the end of the note",
     apply: (text, ours, tree) => {
