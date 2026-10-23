@@ -371,6 +371,25 @@ export interface RemarkObsidianOptions {
    * @see test/parity/strict.test.ts for the gate that found it.
    */
   legacySetext?: boolean;
+
+  /**
+   * Decide link reference definitions as Obsidian does, instead of CommonMark's.
+   *
+   * `remark-parse@8` admits a definition CommonMark rejects and promotes one CommonMark
+   * leaves as paragraph text, so the two disagree about which `[label]: /dest` lines
+   * define anything.
+   *
+   * On by default, and measured only in `legacy`. Both passes ran UNCONDITIONALLY until
+   * this flag existed, which is why `strict` emitted a paragraph where CommonMark emits
+   * a definition on six spec examples (`commonmark/link-reference-definitions/196`,
+   * `200`, `202`, `210` and `commonmark/links/546`, `552`).
+   *
+   * Distinct from `labelPrecedence`, which governs how a link LABEL's brackets are
+   * scanned; this one governs whether the DEFINITION forms at all.
+   *
+   * @see test/parity/strict.test.ts for the gate that found it.
+   */
+  legacyLinkDefinitions?: boolean;
   /**
    * Find a link label by raw balanced-bracket scanning, as Obsidian does, so the
    * outermost pair wins where CommonMark gives the innermost: `[a [b](u) c](v)`
@@ -445,6 +464,7 @@ const STRICT_OVERRIDES: Partial<RemarkObsidianFlags> = {
   legacyLists: false,
   legacyHtmlBlocks: false,
   legacySetext: false,
+  legacyLinkDefinitions: false,
   labelPrecedence: false,
   // Obsidian's reading view re-parses a task line, so `- [ ] 1.` nests where
   // CommonMark leaves two flat items.
@@ -486,6 +506,7 @@ const defaultOptions: RemarkObsidianFlags = {
   legacyLists: true,
   legacyHtmlBlocks: true,
   legacySetext: true,
+  legacyLinkDefinitions: true,
   labelPrecedence: true,
   positionedBreaks: true,
   escapedLineBreaks: false,
@@ -688,12 +709,14 @@ export default function remarkObsidian(
     );
     // After the footnote recovery above, so a `[^x]:` label is already out of
     // the way and only real link reference definitions are re-decided.
-    legacyDefinitionTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
-    legacyDefinitionPromoteTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
+    if (opts.legacyLinkDefinitions) {
+      legacyDefinitionTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+      legacyDefinitionPromoteTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+    }
     shortCommentTransform(tree);
     // Before anything reads the block structure: a swallowed `<textarea>` hides whole
     // blocks, so splitting it has to happen while the tree is still being shaped.

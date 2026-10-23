@@ -94,16 +94,10 @@ const POSITION_ONLY: readonly string[] = [
 const LEAK: readonly string[] = [
   "commonmark/tabs/2", // +1paragraph +1text -1code
   "commonmark/tabs/11", // +3list +3listItem -1thematicBreak
-  "commonmark/link-reference-definitions/196", // +1paragraph +9text -1definition
-  "commonmark/link-reference-definitions/200", // +1paragraph +1text -1definition
-  "commonmark/link-reference-definitions/202", // +1paragraph +1text -1definition
-  "commonmark/link-reference-definitions/210", // +4text -1definition
   "commonmark/link-reference-definitions/216", // +1heading -1definition
   "commonmark/block-quotes/238", // +1code
   "commonmark/list-items/257", // +1paragraph +1text -1code
   "commonmark/links/493", // +1link
-  "commonmark/links/546", // +1definition -1paragraph -1text
-  "commonmark/links/552", // +1linkReference +1break +1definition -1paragraph -1text
   "commonmark/raw-html/626", // -1html   already refused, see hygiene.test.ts
 ];
 
@@ -156,6 +150,6 @@ describe("strict preset", () => {
     );
     // A bare count, asserted so that shrinking the backlog is a deliberate edit here rather than
     // something that silently stops being measured.
-    expect(LEAK.length).toBe(13);
+    expect(LEAK.length).toBe(7);
   });
 });
