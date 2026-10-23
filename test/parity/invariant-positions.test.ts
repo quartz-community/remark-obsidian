@@ -49,11 +49,13 @@ describe("structurally impossible positions", () => {
 
   it("keeps the backlog size an explicit number", () => {
     // Asserted so that shrinking it is a deliberate edit here rather than something that
-    // silently stops being measured. 8 documents, 20 violation kinds between them.
-    expect(POSITION_DEFECTS.length).toBe(8);
+    // silently stops being measured. Opened at 8 documents / 20 kinds; 7 closed at once when
+    // `definition-end-before-label.ts` stopped clamping a descendant whose start is past the
+    // new reach. The remaining one is `end PAST source`, a different class.
+    expect(POSITION_DEFECTS.length).toBe(1);
     expect(
       POSITION_DEFECTS.reduce((total, [, , kinds]) => total + kinds.length, 0),
-    ).toBe(20);
+    ).toBe(2);
   });
 
   it("reports nothing for a document with sound positions", () => {

@@ -184,6 +184,14 @@ export function definitionEndBeforeLabelTransform(
       visit(node, (inner: Node) => {
         const at = inner.position?.end;
         if (!at) return;
+        // A descendant that STARTS past the new reach cannot be clamped to it: pulling its end
+        // back to a point before its own start makes `start > end`, which is impossible rather
+        // than merely wrong, and `legacy` promises offsets consumers splice by. Such a node lies
+        // wholly outside the definition's new extent, so its own span is still the honest one --
+        // leaving it trades an impossible position for a child-escaping-parent, which
+        // `invariants.test.ts` records as a ceiling rather than asserting away.
+        const from = inner.position?.start?.offset ?? 0;
+        if (from > (reach.offset ?? 0)) return;
         if ((at.offset ?? 0) > (reach.offset ?? 0)) {
           inner.position!.end = { ...reach };
         }
