@@ -644,6 +644,31 @@ reading stands. Sixth counting selector to die on a base rate here, and the firs
 count came from a sampler this file mandates — `strideSample` protects against reading the
 SHORTEST members, not against reading a coincidence.
 
+### Three of the five unqueued families are P1/P2, so the 68 overstates the defect count
+
+Characterising the five families the count sweep found unqueued (11 documents) turned up fewer
+defects than documents, because the cache bugs are mixed in with them:
+
+| document                      | shape                              |  obs | ours | verdict                                     |
+| ----------------------------- | ---------------------------------- | ---: | ---: | ------------------------------------------- |
+| `night:cs-pct-sp-ref`         | `%% a[^1]`                         |    2 |    4 | **P1 — ours is right**                      |
+| `night:cs-ord-co-lazy-text`   | `1. > [!note] T` / `ab cd[^1]`     |    8 |    5 | **P2 — ours is right**                      |
+| `night:p2b-task-sp-co-quoted` | `- [ ] > [!note] T` / `  > ab[^1]` |    8 |    6 | **P2 — already recorded**                   |
+| `night:p2-item-space-title`   | `- > [!note] ` / `  > ab[^1]`      |    — | none | the unplaced-node bug (`f1ef3b1`)           |
+| `night:cs-co-tab-lazy`        | `> [!note]⇥ ` / `[^1]`             |    0 | none | a genuine miss, same shape                  |
+| `night:ct-*` (2)              | `> [!note]⇥⇥Title[^1]`             | none |   16 | we over-index a tab-separated title         |
+| `night:k1463-*` (2)           | nested `%%` + definition           |      |      | the F5 family, already queued as `night:f5` |
+
+So of 11 documents: **3 are P1/P2 where our answer is correct and must not be fixed**, 2 are the
+already-recorded unplaced-node bug, 2 are the F5 family already queued elsewhere, and only the
+2 `night:ct` rows are a new question.
+
+**That means the 68-document total across the 21 named families overstates the work.** It counts
+every document where the referee disagrees, including the ones this package diverges from
+Obsidian on PURPOSE. Nothing in the instruments marks a must-not-fix case, so each has to be
+recognised by hand against the P-rules — which is exactly the trap of treating the referee as a
+target rather than a measurement.
+
 **`P1`/`P2` are Obsidian CACHE BUGS, and our answer is the right one — do not chase them.** The
 cache reports a column as if a `%%` opener's indentation were absent (P1), and shifts the line
 under a callout title by the outer container's width when the callout is nested (P2). The
