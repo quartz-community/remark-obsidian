@@ -443,10 +443,36 @@ at 34.4% — a figure that includes every label inside a fence, a comment or a c
 file's own rule covers it: where a rule's premise is structural, compute it from the tree. The
 honest number is 2.0%, not 34.4%, and only one of those two is about the rule.
 
-All 40 are the content-column and code-threshold decision, which is B2's table. So the `probe:i1`
-item owns `probe:g4` and `probe:h2`'s ordered half too, and its population is 40 rather than the
-14 `probe:i1` shows on its own. The remaining two `probe:h2` rows are the opposite direction —
-obs reports a REFERENCE at a position where we report nothing — and are a different question.
+**And no feature separates the 39 from the 1,899**, which is the third narrowing and the one
+that closes the family as a single rule. Five axes over those 1,938 positions, against a 2.0%
+base rate:
+
+| feature               |     n | defines |  rate | lift      |
+| --------------------- | ----: | ------: | ----: | --------- |
+| `inDefinition=YES`    |    41 |       7 | 17.1% | **8.48x** |
+| `prevBlank=YES`       |    15 |       1 |  6.7% | 3.31x     |
+| `firstLine=YES`       |    15 |       1 |  6.7% | 3.31x     |
+| `textBeforeLabel=YES` |    47 |       1 |  2.1% | 1.06x     |
+| `parent=paragraph`    | 1,913 |      39 |  2.0% | 1.01x     |
+| `parent=heading`      |    17 |       0 |  0.0% | 0.00x     |
+
+The only real lift is a label nested inside an EXISTING `footnoteDefinition` — 8.48x, and still
+only 17% precise: 7 gained against 34 broken, covering 7 of the 39. `prevBlank` and `firstLine`
+are 15-occurrence populations, which is the C2 trap. `textBeforeLabel` and `parent=paragraph`
+are noise, and the paragraph row covers 99% of the positions so it cannot discriminate anything
+by construction. `parent=heading` at 0 of 17 is the one clean signal and we already agree there.
+
+So `probe:i1` is narrowed three ways and is NOT one mechanism: not a threshold (D4 is 7/7), not
+an interrupt (2.0%), and not separable by any axis the tree exposes. Its 40 documents want
+individual treatment or a feature neither side records — which is the same conclusion this file
+reaches for the `code`-covers-a-position family and for `def-end+1`.
+
+The CONSOLIDATION stands even though the attribution did not: `probe:i1` owns `probe:g4` and
+`probe:h2`'s ordered half, so its population is 40 rather than the 14 it shows on its own. What
+changed is the cause — this paragraph used to read "all 40 are the content-column and
+code-threshold decision, which is B2's table", written before D4 was checked, and that is now
+refuted from three directions. The remaining two `probe:h2` rows are the opposite direction —
+obs reports a REFERENCE where we report nothing — and are a different question.
 
 The 21 classified by which of OUR root nodes covers the label line: **9 paragraph · 8 list · 2
 blockquote · 1 callout · 1 root**. And over the whole 40, **10 of the label lines are QUOTED**
