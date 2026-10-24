@@ -334,6 +334,33 @@ winning. Inline-footnote inertness has to take precedence — a one-document fix
 precedence is worth settling because the two rules meet anywhere a comment is nested in an
 inline footnote.
 
+**SETTLED against the live oracle, with a control pair.** Probed with real definitions supplied,
+which is how `footnoteRefs` can be read at all, since it is definition-gated:
+
+| document                   | obs `footnoteRefs`       |                         |
+| -------------------------- | ------------------------ | ----------------------- |
+| `a^[x %% [^1] %% y] w[^2]` | `[["2",0,20]]`           | `[^1]` DEAD             |
+| `a^[x [^1] y] w[^2]`       | `[["2",0,14]]`           | DEAD — control, no `%%` |
+| `a %% [^1] %% y[^2]`       | `[["1",0,5],["2",0,14]]` | **LIVE** — `%%` alone   |
+
+So inline-footnote inertness WINS and the `%%` rule applies only outside one. The precedence is
+no longer a hypothesis.
+
+**And its population is ONE, which only the tree could say.** A bracket-counting scan over the
+source reported 76 positions at 10 gain / 66 break — its depth counter decremented on `[^1]`'s
+own `]`, closing the span early. Asked of the tree instead, as a `footnoteReference` with a
+`footnote` ancestor, there is exactly **1** such position in 6,818 documents and it is this
+document: 1 gain / 0 break. Fifth hand-rolled span predicate to come back contaminated against a
+tree-derived answer, after D1 twice, the paragraph-interrupt scan and the label scan.
+
+**Two of the external gaps are confirmed NOT adjudicable by `metadataCache`**, recorded so they
+are not probed again. Item 24 needs list spread, and `listItems` carries only `(line, parent)`:
+`- a` / `  - b` / blank / `  - c` reports `[[0,-1],[1,0],[3,0]]`, which is our structure exactly
+and says nothing about looseness. Item 18a needs to know whether `[ a ]` became a link, and
+`links` holds internal links only — `[ a ]` with `[a]: /url` reports
+`sections: [paragraph, definition]` either way. Both are DOM questions, so only the recorder can
+settle them.
+
 ### `night:c6` is the largest family left at 11, and it is C1/C2 table formation
 
 It was missing from the working queue entirely — found by sweeping every named family for its
