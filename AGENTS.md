@@ -334,6 +334,40 @@ winning. Inline-footnote inertness has to take precedence — a one-document fix
 precedence is worth settling because the two rules meet anywhere a comment is nested in an
 inline footnote.
 
+### `night:c6` is the largest family left at 11, and it is C1/C2 table formation
+
+It was missing from the working queue entirely — found by sweeping every named family for its
+CURRENT count rather than trusting the recorded one, which also showed this session's fixes
+landing (`probe:a` 5→0, `probe:h3` 8→1, `probe:e3` 2→1). Across 21 families, 68 documents fail
+and `night:c6` is the biggest single one. Three sub-shapes:
+
+```
+A (3)  ⟨1-3sp⟩| a | b |  /  ⇥| --- | --- |  /  [^2]: two
+       obs d[2@2@0]            ours: NO definition, a bare reference at 2@2@0
+
+B (2)  a | b  /  --- | ---  /  ⟨4sp or ⇥⟩| c[^2] | d
+       obs indexes [^2] on line 2        ours: nothing there
+
+C (1)  >||  /  |-|  /  >⟨5sp⟩||[^2]
+       obs reports no reference          ours: a surplus one at 2@2@8
+```
+
+All three are the pipe-style and indentation rules, and the rules document settles each:
+
+- **A** is C1's last clause, "a tab before the header makes it indented code" — so the
+  delimiter cannot pair with the header, no table forms, and `[^2]: two` is then an ordinary
+  root definition. We form the table and the label becomes lazy text instead.
+- **B** is C2 verbatim, including its worked example: in a PIPELESS table a row "does not start
+  with a pipe", so an indented `| c[^2] | d` is still a row and the reference is live. We read
+  it as indented code and lose it.
+- **C** is the inverse, in a quote, and over-indexes.
+
+So the family is not one rule but three clauses of two rules, each with a written answer and
+2–3 documents behind it. Worth noting that it is the same arithmetic as `legacyTables` and the
+C1 refinement of 2026-10-03 ("the first-character test replaced 'after any spaces'", 45 notes
+of that run) — so the pipe-style half is already implemented and it is the TAB and INDENT
+interaction that diverges.
+
 ### D2's opener is measured, scoped, and DEFERRED at two documents
 
 Eleven documents open with `---` followed only by spaces or tabs. We treat every one as
