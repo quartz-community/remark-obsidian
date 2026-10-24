@@ -834,6 +834,34 @@ must-not-fix cache bugs, four correct-but-tiny rules, and a dozen one-document q
 analysis is finished; what is missing is oracle resolution, which is what the gap list below
 reaches from the other direction.
 
+### `night:k1463` is two unrelated singletons, and the column dimension is 99.2% agreed
+
+The last family to be characterised, and it is not a family:
+
+```
+1. p / ⟨2sp⟩10. %% / ⟨6sp⟩x / ⟨4sp⟩[^1]: def / ⟨4sp⟩%%
+   obs d[] r[1@3@4 …]     ours d[] r[…]        we LACK the buried label's reference
+
+1. p / ⟨2sp⟩10.⟨5sp⟩%% / ⟨10sp⟩x / ⟨4sp⟩[^1]: def / ⟨3sp⟩%%
+   obs d[1@3@4]           ours d[1@3@3]        a COLUMN off by one
+```
+
+The first is the failed-label-becomes-a-reference asymmetry not firing inside a nested comment.
+The second is a column, and it is worth asking whether that is systematic. Measured over every
+definition where both sides agree on name and line:
+
+|                                       |           |
+| ------------------------------------- | --------: |
+| definitions agreeing on name and line | **5,112** |
+| of those, the COLUMN differs          |    **42** |
+
+So the column dimension is **99.2% agreed**, and the 42 are not one off-by-one. They spread
+across seven deltas in BOTH directions — `+2` ×16, `+1` ×9, `+3` ×7, `+4` ×5, `-3` ×3, `-1` ×1,
+`-2` ×1 — with a tab or a quote prefix in nearly every positive one (`⇥⟨2sp⟩[^4]:` reports 3
+against our 1; `⇥⟨4sp⟩[^Ä]:` reports 5 against our 1). A constant offset is ruled out by the
+sign change alone, which is the same conclusion the earlier `def-col` work reached from a
+smaller sample.
+
 ### And classified by WHAT DIFFERS, the 66 are two mirror images plus a clean must-not-fix bucket
 
 Grouping the same documents by error signature rather than by family — the selector this file
