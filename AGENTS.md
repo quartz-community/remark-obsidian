@@ -136,6 +136,41 @@ Re-recording goldens is `npm run parity:record` (wdio) and needs Obsidian.
 Priority heuristic, derived empirically — DECISIVE/CULPABLE ratio **≥0.5 build it · 0.2–0.5 narrow
 it · <0.2 it is infrastructure, not the cause**.
 
+### The flag map over the rp8 defs blueprint
+
+Re-measured over the **corrected 252** (the earlier split ran on the wrong 227 — see
+`legacy-oracle.mts` above). `matched 252 of 252 requested ids`, 30 flags each:
+
+| flag                  | DECISIVE | CULPABLE | ratio |                            |
+| --------------------- | -------: | -------: | ----: | -------------------------- |
+| `callouts`            |        3 |        3 |  1.00 | perfect ratio, 3 documents |
+| `comments`            |   **37** |       43 |  0.86 | **build**                  |
+| `legacyLists`         |        9 |       29 |  0.31 | narrow                     |
+| `math`                |       12 |       51 |  0.24 | narrow                     |
+| `legacyContainerLazy` |        4 |       26 |  0.15 | infrastructure             |
+| `legacyTabs`          |        2 |       14 |  0.14 | infrastructure             |
+| `keepComments`        |        3 |       70 |  0.04 | infrastructure             |
+| `bareFootnoteRefs`    |        7 |      190 |  0.04 | infrastructure             |
+| `parseComments`       |        0 |       53 |  0.00 | infrastructure             |
+| `inlineFootnotes`     |        0 |       27 |  0.00 | infrastructure             |
+
+**The correction did not move the targeting**: `comments` was 35/41 = 0.854 on the wrong set and
+is 37/43 = 0.860 on the right one. Re-running was still necessary — a split computed against the
+wrong parser is not evidence of anything — but the conclusion it supports is unchanged, and that
+is the result rather than a reason to discount it.
+
+Three things this map says that are easy to get backwards:
+
+- **`bareFootnoteRefs` is the biggest mover in the package and almost never the cause.** It is
+  CULPABLE in 190 of 252 and DECISIVE in 7. A flag that changes an answer is not a flag that
+  fixes it, and this one changes nearly everything.
+- **`callouts` at 1.00 is the C2 trap, not a target.** A perfect ratio over 3 documents says
+  nothing; population comes before ratio, which this file already records costing a session.
+- **37 of 252 are moved by NO flag at all** (14.7%). Their mechanism is unconditional and has no
+  switch, so no amount of ablation will name it — these are where the unconditional passes live,
+  and where the policy above ("a behaviour differing between `legacy` and `strict` belongs behind
+  an option") has the least coverage.
+
 ### Finding which pass owns a divergence
 
 For a strict divergence, do not reason about which pass is responsible — **derive it**. Patch one
