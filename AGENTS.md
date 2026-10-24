@@ -109,6 +109,24 @@ wrong parser:
 Correctly configured, rp8 explains nearly all root code-range behaviour — that dimension's
 "we are right and rp8 is wrong" collapses from 295 to 24.
 
+The **33** code-blueprint documents, classified through `referee.mts`'s own taxonomy (root
+children only, `line - 1`, sorted compare — do not reimplement it, and note `ourFacts` in
+`classify.ts` returns `{defs, refs}` with **no `code` field**, so reading `.code` off it yields
+`undefined` and a uniform artifact):
+
+|     |                                  |
+| --: | -------------------------------- |
+|  22 | **we report NO root code block** |
+|   6 | count differs (1 vs 2)           |
+|   2 | count differs (2 vs 1)           |
+|   2 | a block STARTS elsewhere         |
+|   1 | a block ENDS elsewhere           |
+
+Hosts of the disagreeing first lines: 19 root · 10 list · 4 quote. So two thirds are one
+bucket, and it is the same "we keep a line inside a container where Obsidian ends the container
+and makes the line root indented code" mechanism the `code`-dimension work already names — not
+a new rule, and mostly NOT list-hosted, which is the part that is easy to assume backwards.
+
 ### `ask.mts` specifically
 
 - Needs **Obsidian running with a vault open**.
