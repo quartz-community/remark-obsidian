@@ -3,6 +3,7 @@ import type {
   PhrasingContent,
   Root,
   RootContent,
+  Table,
   Text,
 } from "mdast";
 import type { Node } from "unist";
@@ -34,6 +35,21 @@ interface Point {
  * the combined slice would not work: it would simply build the same table again,
  * because the delimiter row is still there. One line at a time never has a
  * delimiter row to pair with, so each is read as the inline content it is.
+ *
+ * It does not apply to a table indented into a FOOTNOTE DEFINITION. Rule C4 of
+ * the upstream reading rules is "a table interrupts a definition but not a
+ * paragraph", and in mdast a definition's text IS a paragraph, so the fold above
+ * cannot tell the two apart by node type alone. An indented table is the
+ * definition's own content, and burying it takes the references in its rows with
+ * it: `[^1]: body` over an indented `| c[^2] | d |` loses `[^2]` entirely.
+ *
+ * The INDENT is the boundary, and it was measured rather than reasoned. The pass
+ * fires in 45 documents -- 32 of 46 fires hosted by `footnoteDefinition`, 13 by
+ * root, 1 by a list item -- so this is its majority population and not a corner
+ * of it. Excluding every definition host scores 1 gain / 1 BREAK: the loss is a
+ * table at column 0 under a definition line whose label Obsidian does not resolve
+ * at all, which is the separate question of whether a definition ENDS there.
+ * Bounded to an indented table it is 1 / 0.
  */
 export function tableInterruptTransform(
   tree: Root,
@@ -55,6 +71,7 @@ export function tableInterruptTransform(
       if (gapStart === undefined || gapEnd === undefined) continue;
       if (tableEnd === undefined) continue;
       if (!BLANK.test(source.slice(gapStart, gapEnd))) continue;
+      if (interruptsDefinition(node, table)) continue;
 
       let lineOffset = gapEnd;
       let lineNumber = table.position?.start?.line ?? 1;
@@ -89,6 +106,11 @@ export function tableInterruptTransform(
       index--;
     }
   });
+}
+
+function interruptsDefinition(host: Node, table: Table): boolean {
+  const indented = (table.position?.start.column ?? 1) > 1;
+  return host.type === "footnoteDefinition" && indented;
 }
 
 function shift(node: unknown, offset: number, line: number): void {
