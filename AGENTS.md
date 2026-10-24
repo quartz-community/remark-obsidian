@@ -451,6 +451,29 @@ narrow passes each carrying its own regression risk in the dense documents this 
 of. That is a judgement about how much pass surface the package should carry, not a measurement,
 which is why it is recorded rather than acted on.
 
+**"Each would need a new pass" was an ASSUMPTION, and checking it changed one answer.** Two of
+the seven turned out to be reachable without new surface, and the difference is in the REPAIR
+rather than the rule:
+
+| rule       | what our tree does                        | repair                                          |
+| ---------- | ----------------------------------------- | ----------------------------------------------- |
+| `probe:e3` | ref revived by a later pass               | **re-run an existing pass** — shipped `e7ce248` |
+| `night:ct` | ref revived by `bareFootnoteRefs`         | needs a NEW late pass — refused                 |
+| C2         | `table@1` + `code@3`                      | needs absorption machinery                      |
+| D2         | `yaml@1`                                  | the opener is third-party; needs a post-pass    |
+| E2         | `footnoteDefinition > footnoteDefinition` | **stock remark+gfm already yields 2 defs**      |
+| `probe:b2` | nested list, no definition at all         | the tab arithmetic in the list reader           |
+
+The E2 row is the one worth keeping. Our tree nests a second definition where Obsidian makes
+none, which reads like a pass of ours to correct — and an options bisect says stock
+`remark-parse` + `remark-gfm` produces the same two definitions with this package absent, and
+no option moves it. So the nesting is upstream and un-nesting it is a repair pass, not a guard.
+
+None of this changes the verdict, and that is the point of recording it: the claim was right and
+had not been measured, in a file whose own rule is that an unverified blocker is not a blocker.
+Three times this session an assumption of exactly this shape turned out false — Obsidian was
+running, the P-rule cases were already pinned, and `night:ct` looked like `probe:e3`.
+
 **The refuted half of the tail looks nothing like this, and the contrast is the finding.** The
 same measurement applied to the families that are NOT correct-and-tiny:
 
