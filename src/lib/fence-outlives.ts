@@ -2,7 +2,18 @@ import type { Code, ListItem, Root } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 
-const OPENER = /^([`~]{3,})/;
+// AT MOST THREE SPACES, because the indentation IS the signal here. A `code` node's slice is
+// relative to its container, so inside `- p` an opener written at six columns arrives as
+// `    ~~~` -- four, which is indented code and no fence at all. Trimming the slice first made
+// every indented-code block look like an unterminated fence, and this pass then swallowed the
+// lines after it:
+//
+//     - p / blank / ⟨6sp⟩~~~ / lazy / [^1]: def / ⟨6sp⟩~~~
+//
+// Obsidian reads `lazy` and the label as one paragraph and indexes `[^1]` as a bare reference
+// at column 0; we produced one code node covering both and indexed nothing. A leading tab is
+// four columns, so it correctly fails this test too.
+const OPENER = /^ {0,3}([`~]{3,})/;
 
 /**
  * A fence opened inside a list item and never closed keeps consuming.
@@ -18,7 +29,7 @@ const OPENER = /^([`~]{3,})/;
  * nested content; a lazy continuation is unindented by definition.
  */
 function unterminated(slice: string): boolean {
-  const opener = OPENER.exec(slice.trimStart());
+  const opener = OPENER.exec(slice);
   if (!opener) return false;
 
   const marker = opener[1]!;
