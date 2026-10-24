@@ -54,7 +54,7 @@
       "rehype-stringify"
     ]
   },
-  "recordedAt": "2026-10-24T20:25:32.007Z",
+  "recordedAt": "2026-10-24T21:16:04.866Z",
   "cases": {
     "probe/label-bracket/full-unmatched-undefined": {
       "id": "probe/label-bracket/full-unmatched-undefined",
@@ -90585,6 +90585,492 @@
         }
       },
       "triage": "match"
+    },
+    "probe/external-gap/image-alt-markup": {
+      "id": "probe/external-gap/image-alt-markup",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "![foo *bar* `baz`](x.svg)\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><span alt=\"foo *bar* `baz`\" src=\"x.svg\" class=\"internal-embed is-loaded file-embed mod-empty-attachment\">“x.svg” could not be found.</span></p>",
+        "projections": {
+          "text": "x.svg",
+          "math": [],
+          "links": [
+            {
+              "path": "x.svg",
+              "heading": "",
+              "embedded": true
+            }
+          ],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "![foo *bar* `baz`](x.svg)"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [
+            "x.svg"
+          ],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:25"
+          ],
+          "links": [],
+          "embeds": [
+            "![foo *bar* `baz`](x.svg)=>x.svg|foo *bar* `baz`@0:0-0:25"
+          ],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "Item 20 of the external issue list, and NOT a divergence in anything compared: an image alt is an ATTRIBUTE, so `textContent` reports the src. The recorded `html` is the only place the raw markup would show, and html is deliberately not compared."
+    },
+    "probe/external-gap/loose-nested-blank": {
+      "id": "probe/external-gap/loose-nested-blank",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\n  - b\n\n  - c\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>a</p>\n<ul>\n<li dir=\"auto\">\n<p>b</p>\n</li>\n<li dir=\"auto\">\n<p>c</p>\n</li>\n</ul>\n</li>\n</ul>",
+        "projections": {
+          "text": "a b c",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\n  - b\n\n  - c"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-3:5"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-0:3",
+            "-|parent:0@1:2-2:0",
+            "-|parent:0@3:2-3:5"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "Item 24 of the external issue list. The recorded html proves Obsidian makes the WHOLE OUTER list loose -- the outer `<li>` carries a `<p>` wrapper -- where CommonMark [307] makes only the innermost loose, which is what we do. It still matches: `spread` appears in no compared projection, so this is a tree-level difference outside the compared surface rather than a measurable divergence."
+    },
+    "probe/external-gap/loose-explicit": {
+      "id": "probe/external-gap/loose-explicit",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\n\n- b\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>a</p>\n</li>\n<li dir=\"auto\">\n<p>b</p>\n</li>\n</ul>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\n\n- b"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-1:0",
+            "-|parent:-1@2:0-2:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "The explicitly loose control for `loose-nested-blank`: both carry `<p>` wrappers in the recorded html and both project the same text, which is what shows that `textContent` cannot separate loose from tight."
+    },
+    "probe/external-gap/loose-fence-in-item": {
+      "id": "probe/external-gap/loose-fence-in-item",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "- a\n  ```\n\n  ```\n- b\n",
+      "obsidian": {
+        "html": "<ul>\n<li dir=\"auto\">\n<p>a</p>\n<pre><code></code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>\n</li>\n<li dir=\"auto\">\n<p>b</p>\n</li>\n</ul>",
+        "projections": {
+          "text": "a b",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "list",
+              "text": "- a\n  ```\n\n  ```\n- b"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "list@0:0-4:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [
+            "-|parent:-1@0:0-3:5",
+            "-|parent:-1@4:0-4:3"
+          ],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "Item 24's second half, CommonMark [318]. Obsidian keeps the outer list loose and we do not, but no compared projection exposes list spread, so the case agrees on everything measured."
+    },
+    "probe/external-gap/autolink-lower-scheme": {
+      "id": "probe/external-gap/autolink-lower-scheme",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "<mailto:foo@bar.baz>\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\"><a data-tooltip-position=\"top\" aria-label=\"mailto:foo@bar.baz\" rel=\"noopener nofollow\" class=\"external-link\" href=\"mailto:foo@bar.baz\" target=\"_blank\">foo@bar.baz</a></p>",
+        "projections": {
+          "text": "foo@bar.baz",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "<mailto:foo@bar.baz>"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:20"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "The scheme is dropped from the rendered text in the lowercase spelling too, so 27a is not uppercase-specific; `normalize.ts` already drops it and the uppercase sibling `commonmark/autolinks/597` pins the same answer."
+    },
+    "probe/external-gap/padded-label-defined": {
+      "id": "probe/external-gap/padded-label-defined",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "[ a ]\n\n[a]: /url\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">[ a ]</p>",
+        "projections": {
+          "text": "[ a ]",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "[ a ]"
+            },
+            {
+              "type": "definition",
+              "text": "[a]: /url"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [
+            "/url@2:0-2:9"
+          ],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-0:5",
+            "definition@2:0-2:9"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "Item 18a of the external issue list. `[ a ]` with a matching `[a]: /url` stays literal text in Obsidian; we emit a `linkReference` in both presets. Strict is right per CommonMark, which trims and whitespace-collapses a label, so the gap is legacy-only. Exposure in the referee corpus is zero -- `[ x ]` appears in 132 documents and none produces a padded label, because the padding only survives when a definition matches -- which is why this case exists."
+    },
+    "probe/external-gap/fm-space-opener": {
+      "id": "probe/external-gap/fm-space-opener",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "--- \ntitle: x[^1]\n---\n",
+      "obsidian": {
+        "html": "<hr>\n<h2 data-heading=\"title: x[^1]\" dir=\"auto\">title: x1</h2>",
+        "projections": {
+          "text": "title: x1",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [
+            "2:title: x[^1]"
+          ],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "thematicBreak",
+              "text": "--- "
+            },
+            {
+              "type": "heading",
+              "text": "title: x[^1]\n---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [
+            "2:title: x[^1]"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [
+            "2:title: x[^1]@1:0"
+          ],
+          "sections": [
+            "thematicBreak@0:0-0:4",
+            "heading@1:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "D2: frontmatter opens only on an EXACT `---` first line. Obsidian reads `--- ` as a thematic break and then a setext H2 whose text `title: x[^1]` carries a LIVE reference; we open frontmatter and the reference is dead. Settled against the live oracle and worth two referee documents, so it is deferred rather than unknown."
+    },
+    "probe/external-gap/fm-tab-opener": {
+      "id": "probe/external-gap/fm-tab-opener",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "---\t\ntitle: x[^1]\n---\n",
+      "obsidian": {
+        "html": "<p dir=\"auto\">---\t<br>\ntitle: x1</p>\n<hr>",
+        "projections": {
+          "text": "--- title: x1",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "paragraph",
+              "text": "---\t\ntitle: x[^1]"
+            },
+            {
+              "type": "thematicBreak",
+              "text": "---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "paragraph@0:0-1:12",
+            "thematicBreak@2:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "replicate",
+      "note": "D2 with a tab, and a second divergence underneath it: `---\\t` is not even a thematic break to Obsidian, so lines 0 and 1 become one paragraph and the closing `---` is the thematic break. CommonMark allows trailing tabs on a thematic break. We open frontmatter for this spelling too."
+    },
+    "probe/external-gap/fm-exact-control": {
+      "id": "probe/external-gap/fm-exact-control",
+      "layer": "seed",
+      "category": "probe",
+      "markdown": "---\ntitle: x[^1]\n---\n",
+      "obsidian": {
+        "html": "<pre class=\"frontmatter language-yaml\" style=\"display: none;\"><code class=\"language-yaml is-loaded\"><span class=\"token key atrule\">title</span><span class=\"token punctuation\">:</span> x<span class=\"token punctuation\">[</span>^1<span class=\"token punctuation\">]</span></code><button class=\"copy-code-button\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-copy\"><rect x=\"8\" y=\"8\" width=\"14\" height=\"14\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg></button></pre>",
+        "projections": {
+          "text": "",
+          "math": [],
+          "links": [],
+          "tags": [],
+          "headings": [],
+          "tasks": [],
+          "highlights": [],
+          "emphasis": [],
+          "sections": [
+            {
+              "type": "yaml",
+              "text": "---\ntitle: x[^1]\n---"
+            }
+          ]
+        },
+        "meta": {
+          "headings": [],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "footnotes": []
+        },
+        "compute": {
+          "referenceLinks": [],
+          "footnotes": [],
+          "footnoteRefs": [],
+          "headings": [],
+          "sections": [
+            "yaml@0:0-2:3"
+          ],
+          "links": [],
+          "embeds": [],
+          "tags": [],
+          "listItems": [],
+          "blocks": [],
+          "frontmatter": "{\"title\":\"x[^1]\"}",
+          "frontmatterPosition": "0:0-2:3",
+          "frontmatterLinks": []
+        }
+      },
+      "triage": "match",
+      "note": "The control for the two openers below: an EXACT `---` first line does open frontmatter, and nothing renders."
     },
     "token/wikilink/balanced": {
       "id": "token/wikilink/balanced",

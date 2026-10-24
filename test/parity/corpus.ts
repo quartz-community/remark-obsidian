@@ -2898,6 +2898,31 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
   ["probe/math-closer-space/space-before-closer", "$. $\n"],
   ["probe/math-closer-space/no-space-before-closer", "$.$\n"],
   ["probe/math-closer-space/space-after-opener", "$ .$\n"],
+  // THE TWO EXTERNAL-LIST GAPS NO PROJECTION CAN REACH, which is the whole reason these are
+  // recorded cases rather than probes. Item 20: an image alt is an ATTRIBUTE, so `textContent`
+  // reports the src (`x.svg`) and says nothing about whether the alt keeps raw markup. Item 24:
+  // loose and tight differ only in `<p>` wrappers, and `textContent` flattens both to the same
+  // string -- the explicitly loose control below reports `"a b"` exactly as the tight form does.
+  // Settling either needs the recorder's stored `html`.
+  ["probe/external-gap/image-alt-markup", "![foo *bar* `baz`](x.svg)\n"],
+  ["probe/external-gap/loose-nested-blank", "- a\n  - b\n\n  - c\n"],
+  ["probe/external-gap/loose-explicit", "- a\n\n- b\n"],
+  ["probe/external-gap/loose-fence-in-item", "- a\n  ```\n\n  ```\n- b\n"],
+  // 27a, settled against the live oracle and ungated until now. Obsidian drops the SCHEME from
+  // the rendered text in BOTH spellings -- `FOO@BAR.BAZ` and `foo@bar.baz` -- so the divergence
+  // is that our text keeps it, and it is not uppercase-specific as the summary implied.
+  ["probe/external-gap/autolink-lower-scheme", "<mailto:foo@bar.baz>\n"],
+  // 18a: a padded label WITH a matching definition stays literal text. The definition is what
+  // makes the case -- `[ x ]` appears in 132 corpus documents and none produces a padded
+  // `linkReference`, because the padding only survives when a definition matches.
+  ["probe/external-gap/padded-label-defined", "[ a ]\n\n[a]: /url\n"],
+  // D2, whose structural half the live oracle settled: `--- ` is a thematic break then a setext
+  // H2 whose text carries a LIVE reference, `---⇥` is not even a thematic break so lines 0-1
+  // become one paragraph, and only an EXACT `---` opens frontmatter. We answer `yaml` to all
+  // three. The exact form is last so the three read together as the boundary.
+  ["probe/external-gap/fm-space-opener", "--- \ntitle: x[^1]\n---\n"],
+  ["probe/external-gap/fm-tab-opener", "---\t\ntitle: x[^1]\n---\n"],
+  ["probe/external-gap/fm-exact-control", "---\ntitle: x[^1]\n---\n"],
 ];
 
 /** Inline tokens, each crossed with a set of malformed delimiter states. */
