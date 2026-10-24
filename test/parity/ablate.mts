@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import path from "node:path";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
@@ -9,6 +8,7 @@ import type { Root } from "mdast";
 import remarkObsidian, { type RemarkObsidianFlags } from "../../src/index.js";
 import { PROFILES, applyTextTransform } from "./chain.js";
 import { factsOf } from "./referee-facts.js";
+import { loadCorpus } from "./classify.js";
 
 /**
  * WHICH PASS would have to change, for every document that diverges.
@@ -76,28 +76,13 @@ function answerOf(markdown: string, flags: Record<string, unknown>): string {
 }
 
 function load(): Entry[] {
-  const dir =
-    process.env["PARITY_REFEREE_DIR"] ??
-    "/tmp/opencode/of/test/obsidian-answers";
-  const out: Entry[] = [];
-  for (const file of fs.readdirSync(dir).sort()) {
-    if (!file.endsWith(".json")) continue;
-    const parsed: unknown = JSON.parse(
-      fs.readFileSync(path.join(dir, file), "utf8"),
-    );
-    const rows = Array.isArray(parsed) ? (parsed as Partial<Entry>[]) : [];
-    for (const [index, row] of rows.entries()) {
-      if (typeof row.text !== "string" || row.text === "") continue;
-      out.push({
-        id: row.id ?? `${file}#${index}`,
-        alt: `${file}#${index}`,
-        text: row.text,
-        defs: row.defs ?? [],
-        refs: row.refs ?? [],
-      });
-    }
-  }
-  return out;
+  return loadCorpus().map((row) => ({
+    id: row.id,
+    alt: row.positionalId,
+    text: row.text,
+    defs: row.defs,
+    refs: row.refs,
+  }));
 }
 
 /**
