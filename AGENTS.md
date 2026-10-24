@@ -433,11 +433,30 @@ their footnote facts — the change is SAFE for them and worth nothing on this o
 it a correct, fully-specified rule worth exactly two documents, which is the C2 situation
 verbatim, and C2 was refused on exactly that.
 
-Its structural half is real and unmeasured: `--- ` / `title: x[^1]` / `---` should read as a
-thematic break, a paragraph and a setext underline — so an H2 whose text carries a live
-reference, which is what obs reports at `1@1:8`. No corpus case covers it, so the `sections`
-projection cannot adjudicate it either. It belongs with the six external-list gaps: blocked on a
-recorded probe rather than on understanding.
+**Its structural half is now SETTLED against the live oracle, and it is no longer blocked.**
+Obsidian 1.15.0 was running, so `ask.mts` could answer it directly — and `release-diff.mts`
+having measured 1.15.0 as moving nothing across all 3,417 documents is what makes that answer
+usable against goldens pinned at 1.14.4:
+
+| document                        | obs `sections`                        | ours   |
+| ------------------------------- | ------------------------------------- | ------ |
+| `--- ` / `title: x[^1]` / `---` | `thematicBreak@0` + **`heading@1-2`** | `yaml` |
+| `---` / `title: x[^1]` / `---`  | `yaml@0-2`, frontmatter read          | `yaml` |
+| `---⇥` / `title: x[^1]` / `---` | `paragraph@0-1` + `thematicBreak@2`   | `yaml` |
+
+The space form is exactly what this file predicted: a thematic break, then a setext H2 whose
+text is `title: x[^1]` at level 2, carrying a live reference. **The tab form is not**, and that
+is the new fact — `---⇥` is not even a thematic break, so lines 0 and 1 become one paragraph and
+the closing `---` is a thematic break rather than a setext underline. CommonMark allows trailing
+tabs on a thematic break, so that is a second, separate divergence sitting underneath D2.
+
+Both spellings confirm the rule that matters: **neither opens frontmatter**, and we answer
+`yaml` for both. What remains is implementation, not evidence.
+
+**And item 25 is refuted as a parse gap by the same run.** An unclosed fence at EOF gives obs
+`code@0-2`, byte-identical to the closed form and to ours — so the summary's "a trailing empty
+line" is a rendering artifact, not a parse difference. One of the six external gaps closes on a
+measurement rather than a build.
 
 **And the narrowing is load-bearing: the test must be SPACE AND TAB ONLY.** Two corpus cases,
 `hunt/crlf-protection/0` and `/1`, carry `---\r` as their first line and are triaged `match`, so
