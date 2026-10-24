@@ -110,6 +110,7 @@ import { definitionBlankTailTransform } from "./lib/definition-blank-tail.js";
 import { definitionBlankTitleTransform } from "./lib/definition-blank-title.js";
 import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
 import { blankLabelReferenceTransform } from "./lib/blank-label-reference.js";
+import { paddedLabelReferenceTransform } from "./lib/padded-label-reference.js";
 import { textareaNotRawTransform } from "./lib/textarea-not-raw.js";
 import { closingPreInterruptSyntax } from "./lib/syntax/closing-pre-interrupt.js";
 import { labelOpenerWikilinkTransform } from "./lib/label-opener-wikilink.js";
@@ -1174,6 +1175,11 @@ export default function remarkObsidian(
     if (opts.legacyLinkDestinations) linkNbspTitleTransform(tree);
     // After every pass that can rewrite a paragraph's span, since it matches on one.
     blankLabelReferenceTransform(tree, String(file));
+    // Directly after, because that pass CREATES references and this one demotes them: a
+    // demotion placed earlier is undone, which is how `night:ct`'s fix measured inert.
+    if (opts.legacyLinkDefinitions) {
+      paddedLabelReferenceTransform(tree, String(file));
+    }
     // After every pass that can move a list item's end, and before points are rebuilt.
     // The overlap it repairs comes from `remark-math`; its own file carries the controls.
     listItemExtentTransform(tree);

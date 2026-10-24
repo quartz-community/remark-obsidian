@@ -90904,8 +90904,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "Item 18a of the external issue list. `[ a ]` with a matching `[a]: /url` stays literal text in Obsidian; we emit a `linkReference` in both presets. Strict is right per CommonMark, which trims and whitespace-collapses a label, so the gap is legacy-only. Exposure in the referee corpus is zero -- `[ x ]` appears in 132 documents and none produces a padded label, because the padding only survives when a definition matches -- which is why this case exists."
+      "triage": "match",
+      "note": "Item 18a, CLOSED by `paddedLabelReferenceTransform`. Obsidian does not trim or whitespace-collapse a link label, so `[ a ]` never resolves against `[a]: /url` and the brackets stay literal; we resolved it because mdast normalises the identifier. The rule excludes a whitespace-only label, which `commonmark/links/552` and `blank-label-reference.ts` own between them."
     },
     "probe/external-gap/fm-space-opener": {
       "id": "probe/external-gap/fm-space-opener",

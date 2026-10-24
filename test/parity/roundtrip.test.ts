@@ -47,7 +47,11 @@ const UNSTABLE: readonly string[] = [
   // reaches a fixed point on the fourth pass and holds, so repeated formatting settles -- not
   // the backslash-growing shape refused outright for corrupting a file on every pass.
   "probe/item-comment/closed",
-  "probe/label-shape/space-only-defined",
+  // `probe/label-shape/space-only-defined` is GONE, closed by
+  // `paddedLabelReferenceTransform`. Its instability was the escape churn described below --
+  // `[^ ]: x` escaped on pass 1 with the reference following on pass 2 -- and it only had a
+  // reference to escape because a PADDED label resolved against its definition. Obsidian
+  // does not trim a label, so it never resolves, and the literal text round-trips.
   "probe/math-indent/one-space-empty-body",
   "probe/math-retry/five-double-closer",
   "probe/math-retry/five-single-closer",
@@ -372,9 +376,12 @@ describe("round-trip", () => {
      *   2  a backslash before a setext run doubling: `\===` becomes `\\===`, in
      *      `probe/straddle-fold/paragraph-merge` and
      *      `hunt/fix-lazy-setext-chain-not-idempotent`.
-     *   1  `probe/label-shape/space-only-defined` is a FIFTH case of the failed
-     *      definition family above, not a singleton: `[^ ]: x` is escaped on pass 1
-     *      and the reference follows on pass 2, exactly as `[foo]: <>` does.
+     *      CLOSED. `probe/label-shape/space-only-defined` was a fifth case of the failed
+     *      definition family -- `[^ ]: x` escaped on pass 1 with the reference following on
+     *      pass 2 -- and it only ever had a reference to escape because a PADDED label
+     *      resolved against its definition. `paddedLabelReferenceTransform` stops that, so
+     *      the text is literal and round-trips. Fixed upstream of the formatter, which is
+     *      where four earlier attempts at this family looked for a `toMarkdown` handler.
      *   1  `probe/bracket-nest/label-autolink-closer` restructures a label and an
      *      autolink against each other, +30 bytes. Its own rule.
      *   1  `fuzz/inline-footnote/11` loses a line ending: `- ^[i` / `e]#a/b` is
