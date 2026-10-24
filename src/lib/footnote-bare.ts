@@ -171,20 +171,38 @@ function alignToSource(source: string, value: string): SourceAlignment | null {
   // Third rather than widening `indent`: a mode only runs when the ones before it fail,
   // so an alignment that already succeeds cannot be changed by this. That matters because
   // two earlier widenings of the indent skip are refuted below with their numbers.
-  return alignRun(source, value, "quote");
+  const quote = alignRun(source, value, "quote");
+  if (quote) return quote;
+  // Fourth, for a node whose span STARTS AT THE LINE ENDING BEFORE ITS CONTENT. A callout
+  // with an empty title leaves the body's start just past the consumed title, which on the
+  // next line is the `\n` and the container prefix rather than the value's first character:
+  //
+  //     `> [!note] ` / `> ab[^1]`   paragraph and text both start at offset 10, the `\n`,
+  //                                 while the value `ab[^1]` begins at offset 13
+  //
+  // `quote` cannot reach it -- it skips a marker run only AFTER a line ending it has already
+  // emitted into `rebuilt`, and this value holds no line ending for that skip to follow.
+  return alignRun(source, value, "lead");
 }
 
 function alignRun(
   source: string,
   value: string,
-  mode: "strict" | "indent" | "quote",
+  mode: "strict" | "indent" | "quote" | "lead",
 ): SourceAlignment | null {
   const skipIndent = mode !== "strict";
   const escaped: boolean[] = [];
   const at: number[] = [];
   const rebuilt: string[] = [];
 
-  for (let index = 0; index < source.length; index++) {
+  let begin = 0;
+  if (mode === "lead") {
+    const leading = LEADING_BREAK.exec(source);
+    if (!leading) return null;
+    begin = leading[0].length;
+  }
+
+  for (let index = begin; index < source.length; index++) {
     const character = source[index]!;
     const next = source[index + 1];
     at.push(index);
@@ -233,6 +251,13 @@ function alignRun(
 
   return rebuilt.join("") === value ? { escaped, at } : null;
 }
+
+/**
+ * A line ending, with any container prefix on the line it opens, at the START of a slice.
+ * This is what a node's span covers when its start was advanced past a consumed title but
+ * its content sits on the following line.
+ */
+const LEADING_BREAK = /^[ \t]*\n(?:[ \t]*>)*[ \t]*/u;
 
 /** A `[^label` left hanging at the end of a text node, with no closer in it. */
 const HANGING_OPENER = new RegExp(`\\[\\^[^[\\]${BLANK}]*$`, "u");
