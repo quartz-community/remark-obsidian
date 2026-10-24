@@ -327,13 +327,55 @@ run printed the BASELINE tree under a "DISABLED" header — an inert probe readi
 working one. Only the `assert` on the anchor count caught it. Anchor on a literal, and assert
 the match count before believing the probe.
 
-The fifth is `> [!note]Title` / `>⇥code[^2]`, where the glued title correctly makes it a plain
-quote, and a plain quote indexes that reference at column 6 — the recorded probe
-`> plain` / `>⇥code[^2]` → `obs 2@1:6`. We report nothing there, and the tree says why without
-naming a cause: both the glued and the plain spelling produce `blockquote > paragraph`, but the
-glued one ends `[text, break, text, text]` where the plain one ends `[text, break, text,
-footnoteReference]`. Something splits the text and does not insert the reference, so the
-`[^2]` stays literal inside a `text` node. The callout grammar is not the bug.
+The fifth was `> [!note]Title` / `>⇥code[^2]`, **fixed in `0e775bb`**: `quoted-tab-code.ts`
+carried its own callout test, `/^[ \t]*>[ \t]*\[![^\]]+\]/`, which stops at the bracket and so
+matched a glued title that A1 says is not a callout at all. Its suppression rule is right and
+untouched; only the grammar copy was wrong. **`probe:a` is now 0 of 121.**
+
+The general defect there is a DUPLICATED GRAMMAR: `callout.ts` holds the A1-verified `MARKER`
+and a deliberately loose `AT_MARKER`, and this pass had a third spelling. A grammar copied into
+a second file drifts from the verified one, and the copy is what ships in the pass nobody
+re-checks. A sweep found no further copies.
+
+### The nested-callout reference miss is an UNPLACED-NODE bug, and placing the title is not enough
+
+`- > [!note] ` / `  > ab[^1]` — note the TRAILING SPACE, which is the whole discriminator:
+
+```
+"- > [!note] "   refs (none)   <- obs wants 1@1:6
+"- > [!note]"    refs 1@1:6
+"- > plain"      refs 1@1:6
+```
+
+Both spellings are valid callouts under A1, so this is not a grammar question. The reference is
+not suppressed either — **it is in the tree with no position**, which is why the referee cannot
+see it:
+
+```
+callout@1:3
+  calloutTitle@NONE
+  paragraph@1:13
+    text@NONE "ab"   footnoteReference@NONE
+```
+
+Instrumented, the cause of the unplaced TITLE is exact: `title=""`, `firstLine=" "`,
+`blankTitle=true`, `titleNodes=[]`. `blankTitle` admits a title made of no nodes at all, so
+there is no head or tail to read and the `head && tail` spread leaves it unplaced.
+
+**Giving it a zero-width position — the fix the block path at `callout.ts:315` already carries
+for the same case — WORKS AND IS REVERTED, because nothing measures it.** It really does place
+the node (`calloutTitle@1:11`), and:
+
+|                               |             |
+| ----------------------------- | ----------- |
+| referee                       | 6234 → 6234 |
+| unplaced nodes over all 6,818 | 54 → 54     |
+| every gate                    | unmoved     |
+
+The body is the real defect and it is a SEPARATE cause: `paragraph` keeps a line-1 position and
+its children stay unplaced, so the reference is lost whatever the title does. Reverted rather
+than shipped as unmeasurable, the same way `comment-region.ts`'s `openerIndent` was. Whoever
+picks this up should start at the body paragraph, not the title.
 
 **`P1`/`P2` are Obsidian CACHE BUGS, and our answer is the right one — do not chase them.** The
 cache reports a column as if a `%%` opener's indentation were absent (P1), and shifts the line
