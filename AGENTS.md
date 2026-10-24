@@ -419,6 +419,31 @@ small does not justify the pass however the sign comes out", the standard that r
 CANDIDATE at two documents. Collectively they are **12 documents of zero-risk correctness across
 seven unrelated passes**.
 
+**Consolidating two of them into one pass was tried and FAILED ON THE PREDICATE, and the
+near-miss is the reason to record it.** `C2` and `probe:c1` are both "an indented pipe-row keeps
+its reference live", so one pass covering both would clear the per-pass bar where neither does
+alone. A line scan for an indented row holding a pipe and a `[^x]` reported 114 firing positions
+and, at document level, **8 documents that would fully agree** — four times the largest N/0 rule
+and an apparently decisive lead. Split four ways it collapses:
+
+|                     |        |                                        |
+| ------------------- | -----: | -------------------------------------- |
+| both index          | **76** | the rule is a no-op                    |
+| obs only → GAIN     | **15** |                                        |
+| we only             |      3 | pre-existing, the rule changes nothing |
+| **NEITHER → BREAK** | **20** | the rule would INVENT a reference      |
+
+15 against 20 is 43%, and the losing rows say why: `⟨4sp⟩[^1.5]: sit … ![[image.png|…`,
+`⟨4sp⟩[^4]: …[[Some note|alias]]`. They are DEFINITION LABEL lines whose pipe comes from a
+wikilink alias or an embed, not from table syntax — `[^\n]*\|[^\n]*` accepts a pipe anywhere on
+the line.
+
+So the 8 documents were my predicate, not the rule, and the trustworthy figures remain the
+tree-derived 2/0 and 1/0 above. **Sixth contaminated predicate of this effort, and the first to
+err OPTIMISTICALLY** — the other five made a rule look worse or mis-sized, and this one
+manufactured a lead. A loose predicate is not biased toward refusal; it is biased toward
+whatever its false fires happen to contain.
+
 The bar still applies per pass, so none of them is shipped here. But seven instances is no
 longer a curiosity, and the arithmetic is worth stating plainly for whoever decides: 12
 documents is 0.18% of the corpus and would take the referee to ~6248, at the cost of seven
