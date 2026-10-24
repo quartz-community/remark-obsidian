@@ -719,6 +719,51 @@ representative as a known disagreement. We have no such record, so `night:p2b-ta
 counts against us at 6208 while being correct: obs column 8, ours 6, and 6 is right. Reproducing
 it would violate the standing rule that this is not "match Obsidian including every bug".
 
+## The named-family queue is fully characterised, and every member is 1–3 documents
+
+Swept all 21 families for current counts, then characterised every one. The table is the state
+of the backlog; "40-family" means the signature obs-defines-at-P / we-emit-only-a-bare-ref-at-P,
+which `probe:i1` owns and which is refuted three ways above.
+
+| family        | now | what it is                                                      |
+| ------------- | --: | --------------------------------------------------------------- |
+| `probe:i1`    |  14 | the 40-family; not a threshold, not an interrupt, not separable |
+| `night:c6`    |  11 | three C1/C2 clauses; group A refuted 1.5%, group B is 2/0       |
+| `probe:f2`    |   6 | `%%` closer outside its container; production refused, 4 gates  |
+| `probe:h2`    |   4 | 2 are the 40-family, 2 run the opposite way                     |
+| `probe:g4`    |   3 | the 40-family                                                   |
+| `probe:e2`    |   3 | E2 measured 2/0 — correct, too small                            |
+| `night:d1`    |   3 | D1 refuted at 5/37 with the span derived correctly              |
+| `night:d2`    |   3 | D2 measured 2/0 — correct, too small                            |
+| `night:cs`    |   2 | both are P1/P2 CACHE BUGS; **our answer is right**              |
+| `night:ct`    |   2 | measured 2/0 — correct, too small                               |
+| `night:f5`    |   2 | obs buries a definition we make                                 |
+| `night:k1463` |   2 | obs indexes a reference we lack                                 |
+| `probe:d5`    |   2 | a tail on a shape we are already right about 95% of the time    |
+| `probe:b2`    |   2 | nested tab indentation; obs defines at col 4, we define nothing |
+| `probe:c5`    |   2 | 1 is the 40-family, 1 is a column difference (obs 2, ours 0)    |
+| `probe:c1`    |   1 | obs indexes a ref inside an indented table continuing a def     |
+| `probe:h3`    |   1 | remainder after `d3b4bb9`                                       |
+| `probe:e3`    |   1 | a rule CONFLICT: E3 inertness vs a reference inside `%%`        |
+| `night:p2`    |   1 | the P2 cache bug; **our answer is right**                       |
+| `h2:rg2`      |   1 | D6, the title absorbing across a blank                          |
+| `probe:a`     |   0 | closed by `f7597a3` and `0e775bb`                               |
+
+Three readings of that table that are not obvious from any single row:
+
+- **The largest family is refuted, not open.** `probe:i1` and the three families that feed it
+  (`probe:g4`, half of `probe:h2`, one of `probe:c5`) are one signature, narrowed three ways and
+  separable by no axis the tree exposes. That is ~20 of the ~60 remaining documents.
+- **At least 3 are must-not-fix** — `night:cs` ×2 and `night:p2` — where the referee counts us
+  wrong and we are right. Nothing in the instruments marks these.
+- **Four are correct rules worth exactly two documents each** (D2, E2, C2, `night:ct`), all
+  measured at N/0, all below the per-pass bar.
+
+So the backlog is not a list of unsolved problems. It is one refuted signature, a handful of
+must-not-fix cache bugs, four correct-but-tiny rules, and a dozen one-document questions. The
+analysis is finished; what is missing is oracle resolution, which is what the gap list below
+reaches from the other direction.
+
 ## The two external issue lists, swept 25 of 25 — six divergences, none buildable yet
 
 `~/Repos/obsidian-parser-issues-summary.md` (another plugin author, 25 numbered items against
