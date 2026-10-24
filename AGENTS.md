@@ -371,21 +371,37 @@ All three are the pipe-style and indentation rules, and the rules document settl
   documents.
 - **C** is the inverse, in a quote, and over-indexes.
 
-**And group B is the THIRD correct rule this session worth exactly two documents**, which is a
-pattern rather than a coincidence:
+**And group B is one of FOUR correct rules this session worth exactly two documents**, which is
+a pattern rather than a coincidence:
 
-| rule                                          | gain / break | state    |
-| --------------------------------------------- | -----------: | -------- |
-| **D2** frontmatter needs an exact `---`       |        2 / 0 | deferred |
-| **E2** a 4-space label continues a definition |        2 / 0 | deferred |
-| **C2** an indented row in a pipeless table    |        2 / 0 | deferred |
+| rule                                           | gain / break | state    |
+| ---------------------------------------------- | -----------: | -------- |
+| **D2** frontmatter needs an exact `---`        |        2 / 0 | deferred |
+| **E2** a 4-space label continues a definition  |        2 / 0 | deferred |
+| **C2** an indented row in a pipeless table     |        2 / 0 | deferred |
+| **`night:ct`** a tab-led callout title is dead |        2 / 0 | deferred |
 
-All three are fully specified in the upstream rules document, all three fire on a handful of
-positions, and none breaks anything. Individually each sits below the bar this file sets — "read
-`better + worse + same` first, and a total that small does not justify the pass however the sign
-comes out", the standard that refused the `C2` CANDIDATE at two documents. Collectively they are
-six documents of zero-risk correctness in three unrelated passes, so the bar still applies per
-pass and the aggregate is not an argument for any one of them.
+All four are fully specified, all four fire on a handful of positions, and none breaks anything.
+Individually each sits below the bar this file sets — "read `better + worse + same` first, and a
+total that small does not justify the pass however the sign comes out", the standard that
+refused the `C2` CANDIDATE at two documents. Collectively they are eight documents of zero-risk
+correctness in four unrelated passes, so the bar still applies per pass and the aggregate is not
+an argument for any one of them.
+
+**`night:ct` also shows what the narrowing is worth, which the other three did not.** Stated
+loosely — any tab in the title separator — it scores 2 gain / **33 break**, because a SINGLE
+tab separator behaves exactly like a single space and Obsidian indexes both:
+
+```
+> [!note] Title[^1]     indexed       > [!note]⇥⇥Title[^1]    DEAD
+> [!note]⇥Title[^1]     indexed       > [!note] ⇥Title[^1]    DEAD
+> [!note]  Title[^1]    indexed
+```
+
+The discriminator is that the title CONTENT begins with a tab, after `MARKER` has consumed its
+one optional `[ \t]`. Stated that way it is 2 / 0. So the same rule is a 5.7% mess or perfect
+depending on where the boundary is drawn, and the probe table above is what located it — not
+the losses, which is the distinction between narrowing and fitting.
 
 What the pattern says is about the EFFORT rather than the rules: after the referee's large
 families have been mined out, what remains is a tail of exactly-specified two-document rules.
