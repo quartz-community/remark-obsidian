@@ -810,6 +810,38 @@ must-not-fix cache bugs, four correct-but-tiny rules, and a dozen one-document q
 analysis is finished; what is missing is oracle resolution, which is what the gap list below
 reaches from the other direction.
 
+### And classified by WHAT DIFFERS, the 66 are two mirror images plus a clean must-not-fix bucket
+
+Grouping the same documents by error signature rather than by family — the selector this file
+records as the one that works, since four text-shaped selectors died:
+
+|     | signature              | families                                                             |
+| --: | ---------------------- | -------------------------------------------------------------------- |
+|  12 | `def-EXTRA + ref-MISS` | `night:c6`, `night:f5`, `probe:e2`, `probe:f2`                       |
+|  11 | `def-MISS + ref-EXTRA` | `night:c6`, `probe:c5`, `probe:d5`, `probe:g4`, `probe:h2`           |
+|  11 | `def-MISS`             | `probe:b2`, `probe:i1`                                               |
+|  10 | `ref-EXTRA`            | `h2:rg2`, `night:c6`, `night:ct`, `night:d1`, `probe:e3`, `probe:h3` |
+|   8 | `def-MISS + def-EXTRA` | `night:d2`, `night:k1463`, `probe:c5`, `probe:i1`                    |
+|   8 | `ref-MISS`             | `night:c6`, `night:d2`, `night:k1463`, `probe:c1`, `probe:h2`        |
+|   3 | `ref-MISS + ref-EXTRA` | `night:cs`, `night:p2` — **the P1/P2 must-not-fix**                  |
+|   2 | `def-MISS + ref-MISS`  | `probe:f2`                                                           |
+|   1 | `def-EXTRA`            | `probe:e2`                                                           |
+
+Three things this says that the family table cannot:
+
+- **The two largest are MIRROR IMAGES, 23 of 66 together.** `def-MISS + ref-EXTRA` is the
+  `probe:i1` signature — obs defines, we emit a bare reference — refuted three ways above.
+  `def-EXTRA + ref-MISS` is its exact complement: we define where obs buries and indexes the
+  label instead. Both directions of one swap, and both already have refusals against them
+  (`item-comment-swallows-defs-and-refs` at 0/1, `drop-defs-in-comment` at 85/218).
+- **The must-not-fix cases have their own signature.** `ref-MISS + ref-EXTRA` is 3 documents and
+  is exactly `night:cs` ×2 plus `night:p2` — the P1/P2 column shifts where our answer is right.
+  So the one bucket that must NOT be worked is cleanly separable by signature, which is a better
+  guard than recognising each by hand against the P-rules.
+- **Signatures cross families and families cross signatures.** `night:c6` appears in four rows
+  and `probe:i1` in two, which is why both the family count and the signature count overstate
+  the number of distinct mechanisms. Neither axis alone sizes the work.
+
 ## The two external issue lists, swept 25 of 25 — six divergences, none buildable yet
 
 `~/Repos/obsidian-parser-issues-summary.md` (another plugin author, 25 numbered items against
