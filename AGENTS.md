@@ -398,22 +398,46 @@ All three are the pipe-style and indentation rules, and the rules document settl
   documents.
 - **C** is the inverse, in a quote, and over-indexes.
 
-**And group B is one of FOUR correct rules this session worth exactly two documents**, which is
-a pattern rather than a coincidence:
+**And group B is one of SEVEN correct rules this session that break nothing**, which is a
+pattern rather than a coincidence. Every named family has now been measured as a predicate over
+all 6,818 documents, and the ones that are not refuted all look like this:
 
-| rule                                           | gain / break | state    |
-| ---------------------------------------------- | -----------: | -------- |
-| **D2** frontmatter needs an exact `---`        |        2 / 0 | deferred |
-| **E2** a 4-space label continues a definition  |        2 / 0 | deferred |
-| **C2** an indented row in a pipeless table     |        2 / 0 | deferred |
-| **`night:ct`** a tab-led callout title is dead |        2 / 0 | deferred |
+| rule                                                    | gain / break | fires |
+| ------------------------------------------------------- | -----------: | ----: |
+| **D2** frontmatter needs an exact `---`                 |        2 / 0 |    11 |
+| **E2** a 4-space label continues a definition           |        2 / 0 |     2 |
+| **C2** an indented row in a pipeless table              |        2 / 0 |     2 |
+| **`night:ct`** a tab-led callout title is dead          |        2 / 0 |     2 |
+| **`probe:b2`** a two-tab nested marker defines at col 4 |        2 / 0 |    27 |
+| **`probe:e3`** inline-footnote inertness beats `%%`     |        1 / 0 |     1 |
+| **`probe:c1`** a ref in an indented table row is live   |        1 / 0 |     4 |
 
-All four are fully specified, all four fire on a handful of positions, and none breaks anything.
-Individually each sits below the bar this file sets — "read `better + worse + same` first, and a
-total that small does not justify the pass however the sign comes out", the standard that
-refused the `C2` CANDIDATE at two documents. Collectively they are eight documents of zero-risk
-correctness in four unrelated passes, so the bar still applies per pass and the aggregate is not
-an argument for any one of them.
+All seven are fully specified in the upstream rules document or settled against the live oracle,
+all seven fire on a handful of positions, and **none breaks a single document**. Individually
+each sits below the bar this file sets — "read `better + worse + same` first, and a total that
+small does not justify the pass however the sign comes out", the standard that refused the `C2`
+CANDIDATE at two documents. Collectively they are **12 documents of zero-risk correctness across
+seven unrelated passes**.
+
+The bar still applies per pass, so none of them is shipped here. But seven instances is no
+longer a curiosity, and the arithmetic is worth stating plainly for whoever decides: 12
+documents is 0.18% of the corpus and would take the referee to ~6248, at the cost of seven
+narrow passes each carrying its own regression risk in the dense documents this corpus is made
+of. That is a judgement about how much pass surface the package should carry, not a measurement,
+which is why it is recorded rather than acted on.
+
+**The refuted half of the tail looks nothing like this, and the contrast is the finding.** The
+same measurement applied to the families that are NOT correct-and-tiny:
+
+| family                               | gain / break | we are already right |
+| ------------------------------------ | -----------: | -------------------: |
+| `probe:d5` `definition / %% / label` |       3 / 19 |             39 of 61 |
+| `night:f5` indented `%%` buries      |       2 / 47 |             88 of 90 |
+
+Both are comment-extent rules, both refute (14% and 4%), and in both we already agree with
+Obsidian on roughly 95% of the firing positions. So the two-document failures in those families
+are a TAIL on behaviour that is already correct, not a missing rule — which is the same verdict
+`probe:i1` got from three directions, and it is why neither is worth a pass however small.
 
 **`night:ct` also shows what the narrowing is worth, which the other three did not.** Stated
 loosely — any tab in the title separator — it scores 2 gain / **33 break**, because a SINGLE
