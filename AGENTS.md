@@ -1049,8 +1049,31 @@ With nine probes recorded, four of the six gaps close:
 | 24  | **matches** — the html proves obs makes the outer list loose, but `spread` is in no projection |
 | 27a | **never a gap** — `commonmark/autolinks/597` is `match`                                        |
 | 27c | **never a gap** — `probe/autolink/email-escaped` is `match`                                    |
-| 18a | **real**, now `replicate`                                                                      |
+| 18a | **real**, now `replicate` — measured at ONE case, see below                                    |
 | D2  | **real**, now `replicate` ×2                                                                   |
+
+**18a is measured and joins the deferred five.** The rule is that Obsidian does not trim or
+whitespace-collapse a link label, so `[ a ]` never matches `[a]: /url` and stays literal where
+CommonMark pairs them. Scanned over all 3,457 corpus cases for a `linkReference` whose RAW
+source label carries padding — three, and two of them are existing `match` cases:
+
+| case                                            | triage      | obs `text`       |
+| ----------------------------------------------- | ----------- | ---------------- |
+| `probe/external-gap/padded-label-defined`       | `replicate` | `"[ a ]"`        |
+| `commonmark/links/552` (`[\n ]`)                | **`match`** | `""`             |
+| `probe/label-shape/space-only-defined` (`[^ ]`) | **`match`** | `"[^ ] [^ ]: x"` |
+
+So a blanket "a padded label does not match" rule would break `commonmark/links/552`, where
+Obsidian renders NOTHING and we already agree. The narrowing is to exclude a WHITESPACE-ONLY
+label — `[\n ]` trims to empty and is a different rule, already owned by
+`blank-label-reference.ts`, which gates on "a definition with that exact identifier existing".
+Narrowed that way the rule is worth exactly ONE case.
+
+And it needs new surface: the match happens in mdast's identifier normalisation, so the repair
+is a demotion pass gated on `legacyLinkDefinitions`. `label-precedence.ts` has `demoteLinks`
+machinery but owns an unrelated rule. So 18a is a correct, fully-specified, one-case rule
+requiring a new pass — the same verdict as the five, and it belongs in that list rather than
+on its own.
 
 Item 24's html is the evidence no projection could give:
 `<ul><li><p>a</p><ul><li><p>b</p></li>…` — the outer `<li>` carries a `<p>`, so the outer list
