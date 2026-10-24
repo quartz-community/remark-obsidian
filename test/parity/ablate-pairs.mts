@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import path from "node:path";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
@@ -9,6 +8,7 @@ import type { Root } from "mdast";
 import remarkObsidian, { type RemarkObsidianFlags } from "../../src/index.js";
 import { PROFILES, applyTextTransform } from "./chain.js";
 import { factsOf } from "./referee-facts.js";
+import { loadCorpus } from "./classify.js";
 
 /**
  * Which PAIR of passes would have to change, for documents no single pass can fix.
@@ -65,23 +65,13 @@ const wanted = new Set(
 );
 
 const entries: { id: string; text: string; oracle: string }[] = [];
-for (const file of fs.readdirSync(dir).sort()) {
-  if (!file.endsWith(".json")) continue;
-  const parsed: unknown = JSON.parse(
-    fs.readFileSync(path.join(dir, file), "utf8"),
-  );
-  for (const [index, row] of (
-    (Array.isArray(parsed) ? parsed : []) as Record<string, unknown>[]
-  ).entries()) {
-    const id = (row["id"] as string | undefined) ?? `${file}#${index}`;
-    const text = row["text"];
-    if (typeof text !== "string" || text === "" || !wanted.has(id)) continue;
-    entries.push({
-      id,
-      text,
-      oracle: namesOf(JSON.stringify([row["defs"] ?? [], row["refs"] ?? []])),
-    });
-  }
+for (const row of loadCorpus(dir)) {
+  if (!wanted.has(row.id)) continue;
+  entries.push({
+    id: row.id,
+    text: row.text,
+    oracle: namesOf(JSON.stringify([row.defs, row.refs])),
+  });
 }
 
 // Only documents no SINGLE flag fixes, which is what pairs are for.
