@@ -1028,7 +1028,48 @@ are NOT leads for the referee queue. Their authors' own section-A items 01, 02 a
 gaps file's B1/B2/B3/B5, are flagged must-not-fix-by-matching on both sides — consistent with
 the P1/P2 policy above.
 
-### Four of the six are now settled against the live oracle, and two need the recorder
+### The recorder settled the rest: TWO real gaps, and 27a was never one
+
+`nix develop -c parity-record` works; bare `npm run parity:record` does NOT, and the failure is
+uninformative — `ECONNREFUSED` on the driver port, because the downloaded Obsidian binary needs
+the `nix-ld` the flake wires up. The wrapper also picks a free display and tears down through a
+trap. Use it, as the README says.
+
+Two things that run produced before any probe was added. **1.14.5 is inert**: re-recording moved
+the version stamp and `recordedAt` and NOTHING else across all 3,448 cases, so it is the second
+release this effort has measured as changing nothing, after 1.15.0. And **the cached service
+manifest is not what `latest` means** — reading `.obsidian-cache/obsidian-versions.json`
+directly said the newest non-beta was 1.14.4, and the service refreshed it to 1.14.5 on the run.
+
+With nine probes recorded, four of the six gaps close:
+
+| #   | outcome                                                                                        |
+| --- | ---------------------------------------------------------------------------------------------- |
+| 20  | **matches** — an alt is an attribute, outside every projection                                 |
+| 24  | **matches** — the html proves obs makes the outer list loose, but `spread` is in no projection |
+| 27a | **never a gap** — `commonmark/autolinks/597` is `match`                                        |
+| 27c | **never a gap** — `probe/autolink/email-escaped` is `match`                                    |
+| 18a | **real**, now `replicate`                                                                      |
+| D2  | **real**, now `replicate` ×2                                                                   |
+
+Item 24's html is the evidence no projection could give:
+`<ul><li><p>a</p><ul><li><p>b</p></li>…` — the outer `<li>` carries a `<p>`, so the outer list
+really is loose. We follow CommonMark [307] and make only the innermost loose. The case matches
+anyway, because list spread appears in nothing compared, so it is a tree-level difference
+outside the compared surface rather than debt.
+
+**27a was closed by a mistake, which is the part to carry.** My probe for `<MAILTO:FOO@BAR.BAZ>`
+DISPLACED `commonmark/autolinks/597` — the corpus deduplicates by markdown, so a spec case
+triaged `match` came back `unreviewed`. The README says to check for exactly that after a corpus
+change; my collision check had searched only `corpus.ts`, and 597 lives in `commonmark.ts`.
+Restoring it gave the answer: `text="FOO@BAR.BAZ"`, triage `match`. The scheme IS dropped and we
+DO match, because `normalize.ts` drops it in the PROJECTION — the governing rule, AST represents
+source and projection represents rendering. A `match` spec case had been pinning it all along.
+
+So check a new case's markdown against `corpus.ts`, `commonmark.ts` AND `gfm.ts` before adding
+it, and read the golden diff for displaced ids afterwards.
+
+### How the six looked before the recorder ran
 
 Obsidian was running, so `ask.mts` (cache) and `ask-dom.mts` (DOM projections) could be asked
 directly. `release-diff.mts` having measured 1.15.0 as moving nothing across all 3,417 documents
