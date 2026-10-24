@@ -3,7 +3,11 @@ import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 
 const EMPTY_QUOTE = /^[ \t]*>[ \t]*$/u;
-const CALLOUT = /^[ \t]*>[ \t]*\[![^\]]+\]/u;
+// A1's boundary, the same one `callout.ts:21` enforces: `[!type]`, an optional single `+`/`-`,
+// then EOL, a space or a tab. Without the lookahead this matched `> [!note]Title`, which is NOT
+// a callout -- the glued title makes it a plain quote -- and suppressing its tab line cost the
+// reference Obsidian indexes there.
+const CALLOUT = /^[ \t]*>[ \t]*\[!([^\]\n]+)\]([-+]?)(?=[ \t\n]|$)/u;
 const QUOTED_TAB = /^[ \t]*>\t/u;
 
 /**
