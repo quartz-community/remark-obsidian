@@ -121,6 +121,13 @@ const ITEM_COMMENT_CAPPED = /^[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]{1,4}%%/u;
 /** The capped opener, with a quote-marker run allowed before the list marker. */
 const QUOTED_ITEM_COMMENT =
   /^(?:[ \t]*>)*[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]{1,4}%%/u;
+/**
+ * A `%%` opener that sits inside a container: behind a quote marker, after a list
+ * marker, or both. F1 allows any spaces before the `%%`, and F1 also requires the
+ * line to hold NO other `%` -- `%%%` and `%% 50%` are paragraphs, not openers.
+ */
+const CONTAINER_COMMENT =
+  /^(?:(?:[ \t]*>)+[ \t]*(?:(?:[-*+]|\d{1,9}[.)])[ \t]{1,4})?|[ \t]*(?:[-*+]|\d{1,9}[.)])[ \t]{1,4})%%(?!.*%)/u;
 /** A definition line led by a TAB and at most three further spaces -- below the tab+4 cap. */
 const LEADING_TAB_DEF = /^\t {0,3}\[\^([^\]]+)\]:/u;
 /** A quoted line whose content opens a new block: a list marker or a footnote label. */
@@ -814,6 +821,99 @@ const RULES: readonly Rule[] = [
       const buried = ours.defs.filter((d) => d[1] > cut && d[1] < reach);
       // Inserted in DOCUMENT ORDER, because the referee compares references order-sensitively
       // and a correct set in the wrong order reads as total disagreement.
+      const refs = [
+        ...ours.refs,
+        ...buried.map((d): Ref => [d[0], d[1], d[2]]),
+      ].sort((a, b) => a[1] - b[1] || a[2] - b[2]);
+      return {
+        defs: ours.defs.filter((d) => d[1] <= cut || d[1] >= reach),
+        refs,
+      };
+    },
+  },
+  {
+    name: "container-comment-reaches-its-closer",
+    what: "a `%%` opened in a container closes at F2's later `%%`, even one outside the container",
+    apply: (text, ours) => {
+      // THE COMPLEMENT of the seven candidates above, not a rebuild of them. Every one of
+      // those carries `if (rest.includes("%%")) continue;` -- they model F2's LAST clause,
+      // "without a closer the comment runs to the end of its container", and skip the case
+      // where a closer exists. This is that skipped case.
+      //
+      // F2's FIRST clause: "the closer is the first `%%` anywhere in a later line, even
+      // escaped, inside backticks, or behind `> `". It says nothing about the closer being
+      // in the same container as the opener, and `probe:f2` says it is not:
+      //
+      //     - %%          the opener, inside a list item
+      //     [^1]: def     obs reports NO definition ...
+      //     %%            ... because THIS closes the comment, at column 0, outside the item
+      //     blank
+      //     use[^1] ...   and obs keeps these live, which is what proves line 2 CLOSES
+      //                   rather than opening a second comment
+      //
+      // The live refs below the closer are the discriminator. Under F4's reading -- the item
+      // comment ends with the item, then a fresh column-0 opener on line 2 -- that opener has
+      // no closer and would bury lines 3+, so `use[^1]` would be dead. Obsidian reports it at
+      // `1@4@3`, so line 2 is a closer.
+      //
+      // The buried label is still indexed as a REFERENCE at its own position (obs `1@1@0`),
+      // the same asymmetry `parseComments` carries and 710 documents depend on.
+      //
+      // SCORED, BUILT, AND REFUSED -- and the refusal is the useful half.
+      //
+      //     unbounded, any later `%%` closes    better 19  worse 20  same 3   referee -4
+      //     bounded at the first blank          better 19  worse  1  same 1   referee +12
+      //
+      // The bound is right and the model is sound. Production disagrees anyway. Admitting an
+      // item opener needs two edits in `comment-region.ts` -- a list marker in `BLOCK_OPENER`,
+      // and `closesQuotedComment`'s blank bound widened from quotes to containers -- and
+      // together they measured:
+      //
+      //     referee 6229 -> 6231   +2 GAINED, 0 LOST
+      //     probe:f2               6 of 23 -> 6 of 23   THE TARGET FAMILY DID NOT MOVE
+      //     4 tests failed: positioned-oracle (19 vs 18 recorded), round-trip, tree invariants
+      //     tree invariants: { 'list > comment': 2 }
+      //
+      // That last line is the mechanism. `buildComment` rebuilds the region as a `comment`
+      // node, and for an item-opened region it lands under `list` rather than `listItem`,
+      // which mdast's content model forbids. The region abstraction is source-offset based and
+      // has no way to express "inside this item", so admitting a container opener necessarily
+      // produces a node the tree cannot hold.
+      //
+      // So the +2 was collateral, not the target, and it cost four gates. The fact-level model
+      // can bury a definition by filtering a tuple; production has to put a NODE somewhere.
+      // Any future attempt needs to rebuild inside the item, not widen the region filter.
+      const lines = text.split("\n");
+      let cut = Number.POSITIVE_INFINITY;
+      let reach = lines.length;
+      for (let at = 0; at < lines.length; at++) {
+        const line = lines[at] ?? "";
+        if (!CONTAINER_COMMENT.test(line)) continue;
+        // The closer is the first `%%` on any LATER line, wherever it sits on it -- but the
+        // scan STOPS AT A BLANK. Unbounded it scored `better 19 / worse 20 / same 3`, and
+        // every worse row was one early opener reaching a `%%` many lines down and burying
+        // the span between. Production already bounds the quote case exactly here
+        // (`closesQuotedComment`: a comment opened in a quote "cannot close past a line that
+        // ends the quote"), and `comment-definition-extent` records the same fact for a
+        // definition: a blank ends it even with an unclosed `%%` inside.
+        let shut = -1;
+        for (let i = at + 1; i < lines.length; i++) {
+          const l = lines[i] ?? "";
+          if (l.replace(/^[ \t>]+/u, "").trim() === "") break;
+          if (l.includes("%%")) {
+            shut = i;
+            break;
+          }
+        }
+        if (shut === -1) continue; // no closer: the seven candidates above own this case
+        if (at < cut) {
+          cut = at;
+          reach = shut;
+        }
+      }
+      if (cut === Number.POSITIVE_INFINITY) return ours;
+
+      const buried = ours.defs.filter((d) => d[1] > cut && d[1] < reach);
       const refs = [
         ...ours.refs,
         ...buried.map((d): Ref => [d[0], d[1], d[2]]),
