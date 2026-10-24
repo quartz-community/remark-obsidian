@@ -479,6 +479,29 @@ one optional `[ \t]`. Stated that way it is 2 / 0. So the same rule is a 5.7% me
 depending on where the boundary is drawn, and the probe table above is what located it — not
 the losses, which is the distinction between narrowing and fitting.
 
+**And it is REFUSED on implementation rather than on size, which is a different reason from the
+other six.** Demoting the title's reference inside `calloutTransform` measures INERT, and an
+options bisect says why in one run:
+
+|                          |            |
+| ------------------------ | ---------: |
+| default                  |      1 ref |
+| `bareFootnoteRefs:false` | **0 refs** |
+| `keepComments:false`     |      1 ref |
+| `taskReparse:false`      |      1 ref |
+
+`calloutTransform` runs early, turns the reference into literal `[^1]` text, and
+`bareFootnoteRefTransform` at `index.ts:1074` then scans text nodes and rebuilds it. The same
+circular revival as `probe:e3` — and that is where the two part company. `probe:e3` was fixable
+by RE-RUNNING an existing pass under its existing option after the reviver (`e7ce248`, one
+line). This one has no existing late pass to re-run, so it needs NEW SURFACE at a late position,
+and new surface for two documents is exactly what the bar refuses. Reverted rather than shipped
+inert.
+
+So "a fix to an existing pass is not new pass surface" is the right test, and it has to be
+applied to the REPAIR rather than to the rule: both of these are corrections to existing
+grammars, and only one of them can be made without adding a pass.
+
 What the pattern says is about the EFFORT rather than the rules: after the referee's large
 families have been mined out, what remains is a tail of exactly-specified two-document rules.
 That is a different problem from the one the queue was built for, and it is the same conclusion
