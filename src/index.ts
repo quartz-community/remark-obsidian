@@ -1121,6 +1121,17 @@ export default function remarkObsidian(
       // definition to a block the FRAGMENT does not contain, and the node lands at its line
       // start. Obsidian indexes the label at its bracket.
       commentDefinitionColumnTransform(tree, String(file));
+      // AGAIN, because the comment parse above revives what the earlier run demoted. A `%%`
+      // nested in an inline footnote has its body re-parsed through this chain, which rebuilds
+      // a `footnoteReference` inside the `footnote` node -- so `a^[x %% [^1] %% y] w[^2]` ends
+      // up indexing `[^1]` after `inlineFootnoteInertTransform` had already made it literal.
+      //
+      // Two rules claim that character range and the live oracle settles which wins, with a
+      // control pair: `^[x %% [^1] %% y]` reports only `[^2]`, `^[x [^1] y]` reports only
+      // `[^2]` with no comment present, and `%% [^1] %%` alone DOES report `[^1]`. So E3's
+      // inertness beats the comment rule, and the comment rule applies outside an inline
+      // footnote only.
+      if (opts.inlineFootnotes) inlineFootnoteInertTransform(tree);
     }
     // LATE, and the position is the whole of why it works. Early in the chain an item whose
     // fence was broken by a column-zero line still holds that line as its own child -- a
