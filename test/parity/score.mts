@@ -1467,6 +1467,54 @@ const RULES: readonly Rule[] = [
     },
   },
   {
+    name: "defined-label-is-not-also-a-reference",
+    what: "a label that SUCCEEDS in defining is not ALSO indexed as a bare reference",
+    apply: (text, ours) => {
+      // From `probe:a`, 4 of its 5 failures and one shape:
+      //
+      //     > [!note]          obs d[1@1@5]  r[1@3@3]
+      //     > 2. [^1]: def     our d[1@1@5]  r[1@1@5 1@3@3]
+      //
+      // The DEFINITIONS agree. The whole divergence is the extra reference at `1@1@5`, the
+      // definition's own label position. All four title spellings behave identically, so the
+      // callout is incidental and the shape is `> 2. [^1]: def`.
+      //
+      // This is the exact COMPLEMENT of the asymmetry `parseComments` carries -- a label that
+      // FAILS to define is indexed as a reference, which 710 documents depend on -- so the two
+      // cannot conflict by construction: one fires only where a definition exists, the other
+      // only where it does not.
+      // SCORES better 4 / worse 0 / same 0, referee 6229 -> 6233. And it MODELS THE SYMPTOM,
+      // not the cause -- do not implement it as a reference filter. The tree says why:
+      //
+      //     callout@1:1
+      //       paragraph@2:3            <- line 2 as a PARAGRAPH
+      //         text@2:3  footnoteReference@2:6  text@2:10
+      //       list@2:3                 <- line 2 ALSO as a LIST
+      //         listItem@2:3
+      //           footnoteDefinition@2:6
+      //
+      // `paragraph@2:3` and `list@2:3` are SIBLINGS STARTING AT THE SAME POINT, so the one
+      // source line is represented twice. Some pass inserted the `list` beside the paragraph
+      // it derived it from instead of replacing it, and the surplus reference is an ordinary
+      // child of a paragraph that should no longer exist.
+      //
+      // So the rule in the name is true and is not the repair. Filtering the reference would
+      // make these four documents agree while leaving a tree that carries one line twice,
+      // which is a content-model defect the position and invariant gates exist to catch. The
+      // fix is to drop the stale paragraph, and `footnote-bare.ts` is NOT where it lives.
+      const defined = new Set(
+        ours.defs.map((d) => `${String(d[0])}@${String(d[1])}@${String(d[2])}`),
+      );
+      return {
+        defs: ours.defs,
+        refs: ours.refs.filter(
+          (r) =>
+            !defined.has(`${String(r[0])}@${String(r[1])}@${String(r[2])}`),
+        ),
+      };
+    },
+  },
+  {
     name: "refs-add-bare",
     what: "every `[^name]` outside a label is a reference we may be missing",
     apply: (text, ours) => {

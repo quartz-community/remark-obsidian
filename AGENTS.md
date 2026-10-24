@@ -286,8 +286,27 @@ four title spellings (`[!note]`, `[!note]+`, `[!NOTE]`, `>[!note]`) behave ident
 title grammar is irrelevant to them: the rule is that a label which SUCCEEDS in defining is not
 also a bare reference. That is the exact complement of the asymmetry `parseComments` carries
 (a label that FAILS to define is indexed as a reference, 710 documents), so the two cannot
-conflict — but `footnote-bare.ts` has no such guard, and it inserts at three separate sites
-(`:307`, `:472`, `:610`), so the change wants all three scoped together and scored first.
+conflict. Scored: **better 4 / worse 0 / same 0**, referee 6229 → 6233.
+
+**And it is NOT a `footnote-bare.ts` guard — that pointer was wrong.** Scoring it as a reference
+filter measures the symptom; the tree names the cause:
+
+```
+callout@1:1
+  paragraph@2:3            <- line 2 as a PARAGRAPH
+    text@2:3  footnoteReference@2:6  text@2:10
+  list@2:3                 <- line 2 ALSO as a LIST
+    listItem@2:3
+      footnoteDefinition@2:6
+```
+
+`paragraph@2:3` and `list@2:3` are SIBLINGS STARTING AT THE SAME POINT, so one source line is
+represented twice: a pass inserted the `list` beside the paragraph it derived from instead of
+replacing it, and the surplus reference is an ordinary child of a paragraph that should not
+exist. Filtering the reference would make the four documents agree while leaving a tree holding
+one line twice — a content-model defect the position and invariant gates exist to catch. The
+repair is to drop the stale paragraph, and the owning pass still has to be derived (patch a
+call site to `if (false) …` and re-run, the recipe above).
 
 The fifth is `> [!note]Title` / `>⇥code[^2]`, where the glued title correctly makes it a plain
 quote, and a plain quote indexes that reference at column 6 — the recorded probe
