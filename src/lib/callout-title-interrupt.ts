@@ -104,7 +104,12 @@ export function calloutTitleInterruptTransform(
     if (parsed?.type !== "list") return;
     for (const child of [parsed]) shift(child, from, startLine - 1);
 
-    callout.children[1] = parsed as List satisfies RootContent;
+    // `index`, not a hardcoded 1: the paragraph this list was derived from is at
+    // `children[index]`, which is 1 only when a title occupies `children[0]`. A TITLE-LESS
+    // callout has it at 0, so writing to 1 left the paragraph in place and put the list
+    // beside it -- one source line represented twice, as `paragraph@2:3` and `list@2:3`
+    // starting at the same point.
+    callout.children[index] = parsed as List satisfies RootContent;
     void (next satisfies Paragraph);
   });
 }
