@@ -304,13 +304,45 @@ most are already written down there, with the family that proves them.
 
 Verified against our parser:
 
-| rule                                                        | us                                                                 |
-| ----------------------------------------------------------- | ------------------------------------------------------------------ |
-| **E4** definition enders only within the first 1,024 chars  | correct, boundary exact                                            |
-| **B8** a task box holds ANY one character                   | correct, all of `[ ] [x] [/] [-] [>] [!]`                          |
-| **B9** lists split by only blank lines are ONE list         | correct, and a definition between keeps them apart                 |
-| **D6** a link reference definition reads across blank lines | **diverges** — the title does not absorb, so its `[^1]` stays live |
-| **A1** a callout title needs EOL/space/tab after `[!type]`  | correct — `callout.ts:21` enforces it with `(?=[ \t\n]\|$)`        |
+| rule                                                        | us                                                                       |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------ |
+| **E4** definition enders only within the first 1,024 chars  | correct, boundary exact                                                  |
+| **B8** a task box holds ANY one character                   | correct, all of `[ ] [x] [/] [-] [>] [!]`                                |
+| **B9** lists split by only blank lines are ONE list         | correct, and a definition between keeps them apart                       |
+| **D6** a link reference definition reads across blank lines | **diverges** — the title does not absorb, so its `[^1]` stays live       |
+| **A1** a callout title needs EOL/space/tab after `[!type]`  | correct — `callout.ts:21` enforces it with `(?=[ \t\n]\|$)`              |
+| **D2** frontmatter opens only on an EXACT `---` first line  | **diverges** — we open on `--- ` and `---⇥` too; 11 documents            |
+| **E2** a 4-space label after a definition line continues it | **diverges** — we define it instead; 2 documents                         |
+| **D1** nothing inside `[[ … ]]` is read                     | 3 documents emit a surplus reference, but the rule as stated scores 5/99 |
+
+### D2's opener is measured, scoped, and DEFERRED at two documents
+
+Eleven documents open with `---` followed only by spaces or tabs. We treat every one as
+frontmatter; D2 says none of them is. Measured before building, which is what defers it:
+
+|                                                      |        |
+| ---------------------------------------------------- | -----: |
+| documents whose first line is `---` + space/tab      | **11** |
+| we open frontmatter                                  |     11 |
+| currently AGREE with Obsidian anyway                 |      8 |
+| the would-be frontmatter body holds a footnote label |  **2** |
+
+Only the 2 carrying a label can move the referee, and they are exactly the two recorded
+failures (`night:d2o-1`, `night:d2o-2`). The other 8 hold no label, so re-parsing cannot change
+their footnote facts — the change is SAFE for them and worth nothing on this oracle. That makes
+it a correct, fully-specified rule worth exactly two documents, which is the C2 situation
+verbatim, and C2 was refused on exactly that.
+
+Its structural half is real and unmeasured: `--- ` / `title: x[^1]` / `---` should read as a
+thematic break, a paragraph and a setext underline — so an H2 whose text carries a live
+reference, which is what obs reports at `1@1:8`. No corpus case covers it, so the `sections`
+projection cannot adjudicate it either. It belongs with the six external-list gaps: blocked on a
+recorded probe rather than on understanding.
+
+**And the narrowing is load-bearing: the test must be SPACE AND TAB ONLY.** Two corpus cases,
+`hunt/crlf-protection/0` and `/1`, carry `---\r` as their first line and are triaged `match`, so
+a carriage return DOES open frontmatter. A `\s`-based test would have taken both out and broken
+the contract gate for a rule that never applied to them.
 
 `probe:a` is 5 of 121, and the A1 check above is why only one of the five is a callout question at
 all. Four are ONE shape — `> [!note]` / `> 2. [^1]: def` — where the DEFINITIONS agree at
