@@ -859,6 +859,35 @@ are NOT leads for the referee queue. Their authors' own section-A items 01, 02 a
 gaps file's B1/B2/B3/B5, are flagged must-not-fix-by-matching on both sides — consistent with
 the P1/P2 policy above.
 
+### Four of the six are now settled against the live oracle, and two need the recorder
+
+Obsidian was running, so `ask.mts` (cache) and `ask-dom.mts` (DOM projections) could be asked
+directly. `release-diff.mts` having measured 1.15.0 as moving nothing across all 3,417 documents
+is what makes a 1.15.0 answer usable against goldens pinned at 1.14.4.
+
+| #   | obs, measured                                    | state                                    |
+| --- | ------------------------------------------------ | ---------------------------------------- |
+| 27a | text `FOO@BAR.BAZ` — **scheme dropped**, no link | **confirmed**, and not uppercase-only    |
+| 27b | text `<a+b+c:d>` literal                         | **we already agree**                     |
+| 27c | text `foo\+@bar.example.com` — backslash KEPT    | **text agrees; only the node differs**   |
+| 18a | text `[ a ]` — stays literal                     | **confirmed**, we emit a `linkReference` |
+| 25  | `code@0-2`, byte-identical to the closed fence   | **refuted as a parse gap**               |
+| 20  | textContent is `x.svg`; the alt is an ATTRIBUTE  | needs raw HTML                           |
+| 24  | `- a`/blank/`- b` also reports `"a b"`           | needs raw HTML                           |
+
+Two things that changes. **27a is not about the uppercase scheme**: `<mailto:foo@bar.baz>` also
+renders as `foo@bar.baz`, so Obsidian drops the scheme from the TEXT in both spellings and the
+divergence is that our text keeps it. And **27c is smaller than recorded** — our text already
+matches, so only the `link` node differs, which puts it in the projection class beside 20 rather
+than the parse class.
+
+**Items 20 and 24 are confirmed unreachable by every projection either oracle exposes**, which
+is a smaller and more accurate claim than "blocked on a probe". An image alt is an attribute, so
+`textContent` reports the src. Loose and tight both flatten to the same `textContent` — the
+explicitly loose `- a` / blank / `- b` control reports `"a b"` exactly as the tight form does,
+because the `<p>` wrappers that carry the distinction do not survive `textContent`. Settling
+either needs the recorder's stored `html`, not a projection.
+
 ## Rules that each cost a session
 
 - **`self.containerState` must be saved and restored** around any container-interrupt probe.
