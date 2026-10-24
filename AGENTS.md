@@ -413,6 +413,27 @@ item owns `probe:g4` and `probe:h2`'s ordered half too, and its population is 40
 14 `probe:i1` shows on its own. The remaining two `probe:h2` rows are the opposite direction —
 obs reports a REFERENCE at a position where we report nothing — and are a different question.
 
+The 21 classified by which of OUR root nodes covers the label line: **9 paragraph · 8 list · 2
+blockquote · 1 callout · 1 root**. And over the whole 40, **10 of the label lines are QUOTED**
+(`> [^x]: …`), so a quarter of the family is blockquote-hosted whatever the indent says.
+
+**A `%%` signal in this family is NOT real, and its base rate is why.** A stride sample over the
+21 shows `%%` on the label line or the line above it repeatedly — `commodo dolor %%`, `> %%`,
+`> [^ä]: Prose here %% [^3] %%` — which reads as a comment family and nearly bought a correction
+to the paragraph above. Measured:
+
+|                  |                     |
+| ---------------- | ------------------- |
+| corpus base rate | 2,119/6,818 = 31.1% |
+| this family      | 14/40 = 35.0%       |
+| **lift**         | **1.13x**           |
+
+Inside the noise band this file already records refusals at (1.24 and 1.25, with 1.45 the
+strongest in a whole table), so the `%%` is the generator rather than the cause and the B2
+reading stands. Sixth counting selector to die on a base rate here, and the first where the
+count came from a sampler this file mandates — `strideSample` protects against reading the
+SHORTEST members, not against reading a coincidence.
+
 **`P1`/`P2` are Obsidian CACHE BUGS, and our answer is the right one — do not chase them.** The
 cache reports a column as if a `%%` opener's indentation were absent (P1), and shifts the line
 under a callout title by the outer container's width when the callout is nested (P2). The
