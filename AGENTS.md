@@ -1069,11 +1069,33 @@ label — `[\n ]` trims to empty and is a different rule, already owned by
 `blank-label-reference.ts`, which gates on "a definition with that exact identifier existing".
 Narrowed that way the rule is worth exactly ONE case.
 
-And it needs new surface: the match happens in mdast's identifier normalisation, so the repair
-is a demotion pass gated on `legacyLinkDefinitions`. `label-precedence.ts` has `demoteLinks`
-machinery but owns an unrelated rule. So 18a is a correct, fully-specified, one-case rule
-requiring a new pass — the same verdict as the five, and it belongs in that list rather than
-on its own.
+**And it SHIPPED, which retires the "deferred on size" verdict for this class.**
+`paddedLabelReferenceTransform` is a new pass gated on `legacyLinkDefinitions`, placed directly
+after `blankLabelReferenceTransform` because that pass CREATES references and this one demotes
+them — a demotion placed earlier is undone, the revival that measured `night:ct` inert.
+
+    probe/external-gap/padded-label-defined   replicate -> MATCH
+    round-trip unstable set                   20 -> 19
+    referee 6237 unchanged, 0 gained 0 lost
+    457 tests, main gate green, 0 drift, 4 gates green
+
+**It closed a round-trip entry as a side effect, which no measurement predicted.**
+`probe/label-shape/space-only-defined` was a fifth case of the failed-definition escape family
+— `[^ ]: x` escaped on pass 1 with the reference following on pass 2 — and it only ever had a
+reference to escape because a PADDED label resolved against its definition. Left literal there
+is nothing to escape. Four earlier attempts at that family went looking for a `toMarkdown`
+handler; the fix was upstream of the formatter.
+
+So the lesson for the other five is not "ship them all" but "a one-case rule can be worth more
+than its case count, and the only way to find out is to build one and gate it". The per-pass bar
+is about risk, and risk is measurable per pass rather than assumed from a total.
+
+**And a diff direction nearly reverted it.** The round-trip gate failed with
+`expected [ …(19) ] to deeply equal [ …(20) ]`, which reads as a 19 → 20 regression and as the
+`raw-html/626` escape-growth defect recurring. Vitest puts ACTUAL first, so the set had SHRUNK,
+and the `-` line in its diff is Expected rather than Received. This file already records the
+same trap for `shapes.mts` printing `obsidian -> ours`, where it cost two hours; here it nearly
+cost a working fix. Check the direction before believing a ceiling moved.
 
 Item 24's html is the evidence no projection could give:
 `<ul><li><p>a</p><ul><li><p>b</p></li>…` — the outer `<li>` carries a `<p>`, so the outer list
