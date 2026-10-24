@@ -365,8 +365,33 @@ All three are the pipe-style and indentation rules, and the rules document settl
   ends the block".
 - **B** is C2 verbatim, including its worked example: in a PIPELESS table a row "does not start
   with a pipe", so an indented `| c[^2] | d` is still a row and the reference is live. We read
-  it as indented code and lose it.
+  it as indented code and lose it. **Measured from the tree — a `table` node whose header does
+  not start with a pipe, followed by an indented line holding one — it fires on exactly 2
+  positions in 6,818 documents and scores 2 gain / 0 break.** Correct, zero-risk, and two
+  documents.
 - **C** is the inverse, in a quote, and over-indexes.
+
+**And group B is the THIRD correct rule this session worth exactly two documents**, which is a
+pattern rather than a coincidence:
+
+| rule                                          | gain / break | state    |
+| --------------------------------------------- | -----------: | -------- |
+| **D2** frontmatter needs an exact `---`       |        2 / 0 | deferred |
+| **E2** a 4-space label continues a definition |        2 / 0 | deferred |
+| **C2** an indented row in a pipeless table    |        2 / 0 | deferred |
+
+All three are fully specified in the upstream rules document, all three fire on a handful of
+positions, and none breaks anything. Individually each sits below the bar this file sets — "read
+`better + worse + same` first, and a total that small does not justify the pass however the sign
+comes out", the standard that refused the `C2` CANDIDATE at two documents. Collectively they are
+six documents of zero-risk correctness in three unrelated passes, so the bar still applies per
+pass and the aggregate is not an argument for any one of them.
+
+What the pattern says is about the EFFORT rather than the rules: after the referee's large
+families have been mined out, what remains is a tail of exactly-specified two-document rules.
+That is a different problem from the one the queue was built for, and it is the same conclusion
+the six external-list gaps reach from the other direction — the analysis is finished and the
+oracle's resolution is the limit.
 
 So the family is not one rule but three clauses of two rules, each with a written answer and
 2–3 documents behind it. Worth noting that it is the same arithmetic as `legacyTables` and the
