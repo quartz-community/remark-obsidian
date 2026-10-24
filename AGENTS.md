@@ -802,9 +802,22 @@ already-recorded unplaced-node bug, 2 are the F5 family already queued elsewhere
 
 **That means the 68-document total across the 21 named families overstates the work.** It counts
 every document where the referee disagrees, including the ones this package diverges from
-Obsidian on PURPOSE. Nothing in the instruments marks a must-not-fix case, so each has to be
-recognised by hand against the P-rules — which is exactly the trap of treating the referee as a
-target rather than a measurement.
+Obsidian on PURPOSE.
+
+**The CORPUS-side instruments already mark these; the referee cannot, and should not.** Checked
+rather than assumed, because this file previously claimed nothing marked them at all:
+`compute.test.ts`'s `KNOWN_REFERENCE_GAPS` carries two P1 entries with their reasoning, and
+`rules-doc.test.ts` carries the P2 column quirk under a comment that states the standard exactly
+— "NOT OURS, and MUST NOT REACH ZERO … We report 5 and are right, so this entry keeps the set
+exact rather than recording a debt". So a future fix toward Obsidian's cache bug fails a gate on
+the corpus side.
+
+The referee side is different by construction: its corpus belongs to a sibling project and is
+not vendored, so there is nowhere in this repo to record an exclusion for it. Adding one would
+mean editing a measurement because it disagrees with us, which this harness refuses elsewhere in
+exactly these words — "do not reach for the measurement when the measurement is what disagrees
+with you". So the referee's total legitimately counts 3 documents against us that we are right
+about, and reading it correctly is a matter of knowing that rather than of changing the tool.
 
 **`P1`/`P2` are Obsidian CACHE BUGS, and our answer is the right one — do not chase them.** The
 cache reports a column as if a `%%` opener's indentation were absent (P1), and shifts the line
@@ -850,7 +863,8 @@ Three readings of that table that are not obvious from any single row:
   (`probe:g4`, half of `probe:h2`, one of `probe:c5`) are one signature, narrowed three ways and
   separable by no axis the tree exposes. That is ~20 of the ~60 remaining documents.
 - **At least 3 are must-not-fix** — `night:cs` ×2 and `night:p2` — where the referee counts us
-  wrong and we are right. Nothing in the instruments marks these.
+  wrong and we are right. The corpus-side gates already pin this class (`KNOWN_REFERENCE_GAPS`
+  for P1, `rules-doc.test.ts`'s P2 entry); the referee cannot, since its corpus is not vendored.
 - **Four are correct rules worth exactly two documents each** (D2, E2, C2, `night:ct`), all
   measured at N/0, all below the per-pass bar.
 
