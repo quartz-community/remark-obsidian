@@ -127,6 +127,39 @@ bucket, and it is the same "we keep a line inside a container where Obsidian end
 and makes the line root indented code" mechanism the `code`-dimension work already names — not
 a new rule, and mostly NOT list-hosted, which is the part that is easy to assume backwards.
 
+**The obvious repair for that bucket is REFUSED at 0.1%, and the reconciliation is why.** 21 of
+the 22 have obs's code starting on a line indented four or more columns (16 spaces, 5 a tab),
+which reads as "we nest an indented-code block that Obsidian puts at root" and suggests moving
+it. Measured over every nested code node we produce:
+
+|                                                       |           |
+| ----------------------------------------------------- | --------: |
+| our nested (in-`listItem`) `code` nodes               | **1,637** |
+| obs has a ROOT code range starting there — would GAIN |     **2** |
+| obs does not — would BREAK                            | **1,635** |
+
+And asking what covers obs's code start line in those 22 documents explains the 2 exactly:
+
+|     |                                        |
+| --: | -------------------------------------- |
+|  20 | **NO code node anywhere** at that line |
+|   2 | `list > listItem > code`               |
+
+So in 20 of 22 we do not merely MISPLACE the code block — we never form one, because the line
+is ordinary container content to us. The repair is upstream of code formation: the container has
+to END, after which the line becomes root indented code on its own. Moving a node cannot reach
+it, and the 2 that moving would reach are below the bar that refused C2 at two documents.
+
+That is the fifth refusal in this territory, and the first to separate "misplaced" from "never
+formed" — a distinction the `code` field cannot show by itself, since it records ROOT ranges
+only and a nested block is simply absent from it.
+
+**It is also visible in a minimal case, unlike the other families here**, which is the one
+encouraging part: `- a` / blank / `⟨6sp⟩plain` gives `list > listItem > [paragraph, code]` where
+B2's `- ` row puts six columns at the code threshold. So this bucket does not need a dense
+document to reproduce, and a container-end rule could be scored against minimal probes before
+anything is built.
+
 ### `ask.mts` specifically
 
 - Needs **Obsidian running with a vault open**.
