@@ -660,6 +660,32 @@ reading stands. Sixth counting selector to die on a base rate here, and the firs
 count came from a sampler this file mandates — `strideSample` protects against reading the
 SHORTEST members, not against reading a coincidence.
 
+### The `definition / %% / label` shape is already 95% right, so `probe:d5` is a tail
+
+`comment-definition-extent.ts`'s docstring records the oracle answers for this shape and names
+the rule — "`> [^9]: orphan` makes the `%%` a CONTINUATION of that definition", so the label
+below it still defines — with `probe:d5`'s two failures as the worked example. Reading that as a
+rule to build is the trap. Measured over every occurrence:
+
+|                                           |        |
+| ----------------------------------------- | -----: |
+| `definition` / `%%` / `label` occurrences | **61** |
+| obs defines and we do not — would GAIN    |  **3** |
+| neither defines — would BREAK             | **19** |
+| we already define it — no change          | **39** |
+
+So obs defines in 42 of 61 and buries in 19, and we already agree on 58 of them. Making the `%%`
+a continuation unconditionally scores 3 / 19, which is 14% — the fourth refutation of this shape
+this session. The `%%` sometimes buries and sometimes does not, and what decides it is not in
+the three lines the shape names.
+
+**And the first version of this measurement was wrong in the direction that flatters the rule.**
+It built our-definition keys from the NAME in obs's answer, which is the empty string wherever
+obs has no definition, so the key never matched and every non-defining occurrence counted as a
+break — 22 fires and 19 breaks, with the 39 we already get right invisible. Position-only sets
+give 61/3/19/39. Both runs refuse the rule; only the second shows we are already right 95% of
+the time, which is the part that matters for whether to touch it at all.
+
 ### Three of the five unqueued families are P1/P2, so the 68 overstates the defect count
 
 Characterising the five families the count sweep found unqueued (11 documents) turned up fewer
