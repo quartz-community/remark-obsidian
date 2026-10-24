@@ -377,6 +377,42 @@ its children stay unplaced, so the reference is lost whatever the title does. Re
 than shipped as unmeasurable, the same way `comment-region.ts`'s `openerIndent` was. Whoever
 picks this up should start at the body paragraph, not the title.
 
+### `probe:g4`, `probe:h2` and `probe:i1` are ONE rule, and it is 40 documents
+
+Characterising `probe:h2` (4 of 264) and `probe:g4` (3 of 13) merges them into `probe:i1`'s
+target rather than adding two. Five of the seven failures are one shape:
+
+```
+g4      1.⇥| a | b |  /  | --- | --- |  /  ⟨4sp⟩[^2]: two
+        obs d[2@2@4]        ours: NO definition, a bare reference at 2@2@4
+
+h2|ord  1. p  /  ⟨7sp⟩* [^1]: def
+        obs d[1@1@9]        ours: NO definition, a bare reference at 1@1@9
+```
+
+Obsidian DEFINES a label we decline, and we emit a bare reference at the definition's own
+position instead. That is the **exact mirror of `probe:a` group 1**, which emitted both and is
+fixed in `f7597a3` — so the two halves of one asymmetry are now one fixed and one open.
+
+Measured as a predicate over the whole corpus rather than sized from the families:
+
+|                                                      |        |
+| ---------------------------------------------------- | -----: |
+| obs defines at P, we emit only a bare reference at P | **40** |
+| of those, fully agreeing anyway                      |      0 |
+| **actionable**                                       | **40** |
+
+By what the label line looks like: 21 other · 7 a marker on the label line · 7 four-plus
+spaces · 5 a leading tab. The 21 is the bucket to classify first, and note what it is NOT —
+no marker, no leading tab, fewer than four spaces — so the obvious indent and marker stories
+cover fewer than half of it, and reading the head of this family would get it backwards for
+the eighth time.
+
+All 40 are the content-column and code-threshold decision, which is B2's table. So the `probe:i1`
+item owns `probe:g4` and `probe:h2`'s ordered half too, and its population is 40 rather than the
+14 `probe:i1` shows on its own. The remaining two `probe:h2` rows are the opposite direction —
+obs reports a REFERENCE at a position where we report nothing — and are a different question.
+
 **`P1`/`P2` are Obsidian CACHE BUGS, and our answer is the right one — do not chase them.** The
 cache reports a column as if a `%%` opener's indentation were absent (P1), and shifts the line
 under a callout title by the outer container's width when the callout is nested (P2). The
