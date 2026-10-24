@@ -304,16 +304,35 @@ most are already written down there, with the family that proves them.
 
 Verified against our parser:
 
-| rule                                                        | us                                                                       |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------ |
-| **E4** definition enders only within the first 1,024 chars  | correct, boundary exact                                                  |
-| **B8** a task box holds ANY one character                   | correct, all of `[ ] [x] [/] [-] [>] [!]`                                |
-| **B9** lists split by only blank lines are ONE list         | correct, and a definition between keeps them apart                       |
-| **D6** a link reference definition reads across blank lines | **diverges** — the title does not absorb, so its `[^1]` stays live       |
-| **A1** a callout title needs EOL/space/tab after `[!type]`  | correct — `callout.ts:21` enforces it with `(?=[ \t\n]\|$)`              |
-| **D2** frontmatter opens only on an EXACT `---` first line  | **diverges** — we open on `--- ` and `---⇥` too; 11 documents            |
-| **E2** a 4-space label after a definition line continues it | **diverges** — we define it instead; 2 documents                         |
-| **D1** nothing inside `[[ … ]]` is read                     | 3 documents emit a surplus reference, but the rule as stated scores 5/99 |
+| rule                                                        | us                                                                                  |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| **E4** definition enders only within the first 1,024 chars  | correct, boundary exact                                                             |
+| **B8** a task box holds ANY one character                   | correct, all of `[ ] [x] [/] [-] [>] [!]`                                           |
+| **B9** lists split by only blank lines are ONE list         | correct, and a definition between keeps them apart                                  |
+| **D6** a link reference definition reads across blank lines | **diverges** — the title does not absorb, so its `[^1]` stays live                  |
+| **A1** a callout title needs EOL/space/tab after `[!type]`  | correct — `callout.ts:21` enforces it with `(?=[ \t\n]\|$)`                         |
+| **D2** frontmatter opens only on an EXACT `---` first line  | **diverges** — we open on `--- ` and `---⇥` too; 11 documents                       |
+| **E2** a 4-space label after a definition line continues it | **diverges** — we define it instead; 2 documents                                    |
+| **D1** nothing inside `[[ … ]]` is read                     | **refuted as a reference rule** — 5 gain / 37 break with the span derived correctly |
+| **E3** everything inside `^[ … ]` is dead                   | 1 document diverges, and it is a rule CONFLICT (see below)                          |
+
+**D1's predicate was wrong and fixing it did not rescue the rule**, which is the useful half.
+The first scan took the nearest earlier `[[` on the line and scored 5 gain / 99 break. D1 says a
+SECOND `[[` MOVES THE START, so the span has to be derived left to right, closing on the first
+`]]`. Done properly the false fires drop from 99 to **37** and the gains stay at **5** — so the
+tightening was real and the rule is genuinely wrong rather than mis-measured. Obsidian indexes a
+footnote reference inside a closed wikilink span in 37 of 42 recorded cases, whatever D1 says
+about contents not being parsed. Recording both numbers because a single 5/99 reads as "bad
+predicate" and the pair reads as "bad rule".
+
+**`probe:e3`'s last divergence is two rules colliding, not a missing one.**
+`a^[x %% [^1] %% y] w[^2]` — we emit a surplus reference at `0:8`, the `[^1]` inside the inline
+footnote. E3 says everything inside `^[ … ]` is dead; the F-rules say a reference inside `%%` is
+STILL INDEXED, and 710 documents depend on that asymmetry. The `%%` here sits inside the inline
+footnote, so the two rules disagree about the same character range and the comment rule is
+winning. Inline-footnote inertness has to take precedence — a one-document fix, but the
+precedence is worth settling because the two rules meet anywhere a comment is nested in an
+inline footnote.
 
 ### D2's opener is measured, scoped, and DEFERRED at two documents
 
