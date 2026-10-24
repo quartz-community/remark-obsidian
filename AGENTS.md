@@ -356,7 +356,13 @@ All three are the pipe-style and indentation rules, and the rules document settl
 
 - **A** is C1's last clause, "a tab before the header makes it indented code" — so the
   delimiter cannot pair with the header, no table forms, and `[^2]: two` is then an ordinary
-  root definition. We form the table and the label becomes lazy text instead.
+  root definition. We already decline the table (correctly): our tree is ONE paragraph spanning
+  all three lines, so the tab line is a lazy continuation and the label degrades to text. The
+  repair therefore needs the tab line to END the paragraph — **and that is refused at 1.5%**:
+  over the 66 places where our root paragraph lazily continues a tab or 4-space line, obs
+  reports a root code range at **1** and does not at **65** (51 four-space, 14 tab). Obsidian
+  does not generally make such a line code, so group A's mechanism is narrower than "the tab
+  ends the block".
 - **B** is C2 verbatim, including its worked example: in a PIPELESS table a row "does not start
   with a pipe", so an indented `| c[^2] | d` is still a row and the reference is live. We read
   it as indented code and lose it.
