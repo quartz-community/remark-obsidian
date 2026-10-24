@@ -277,6 +277,25 @@ Verified against our parser:
 | **B8** a task box holds ANY one character                   | correct, all of `[ ] [x] [/] [-] [>] [!]`                          |
 | **B9** lists split by only blank lines are ONE list         | correct, and a definition between keeps them apart                 |
 | **D6** a link reference definition reads across blank lines | **diverges** — the title does not absorb, so its `[^1]` stays live |
+| **A1** a callout title needs EOL/space/tab after `[!type]`  | correct — `callout.ts:21` enforces it with `(?=[ \t\n]\|$)`        |
+
+`probe:a` is 5 of 121, and the A1 check above is why only one of the five is a callout question at
+all. Four are ONE shape — `> [!note]` / `> 2. [^1]: def` — where the DEFINITIONS agree at
+`1@1@5` and we emit an **extra reference at that same position**, which Obsidian does not. All
+four title spellings (`[!note]`, `[!note]+`, `[!NOTE]`, `>[!note]`) behave identically, so the
+title grammar is irrelevant to them: the rule is that a label which SUCCEEDS in defining is not
+also a bare reference. That is the exact complement of the asymmetry `parseComments` carries
+(a label that FAILS to define is indexed as a reference, 710 documents), so the two cannot
+conflict — but `footnote-bare.ts` has no such guard, and it inserts at three separate sites
+(`:307`, `:472`, `:610`), so the change wants all three scoped together and scored first.
+
+The fifth is `> [!note]Title` / `>⇥code[^2]`, where the glued title correctly makes it a plain
+quote, and a plain quote indexes that reference at column 6 — the recorded probe
+`> plain` / `>⇥code[^2]` → `obs 2@1:6`. We report nothing there, and the tree says why without
+naming a cause: both the glued and the plain spelling produce `blockquote > paragraph`, but the
+glued one ends `[text, break, text, text]` where the plain one ends `[text, break, text,
+footnoteReference]`. Something splits the text and does not insert the reference, so the
+`[^2]` stays literal inside a `text` node. The callout grammar is not the bug.
 
 **`P1`/`P2` are Obsidian CACHE BUGS, and our answer is the right one — do not chase them.** The
 cache reports a column as if a `%%` opener's indentation were absent (P1), and shifts the line
