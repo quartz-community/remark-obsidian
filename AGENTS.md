@@ -408,6 +408,41 @@ no marker, no leading tab, fewer than four spaces — so the obvious indent and 
 cover fewer than half of it, and reading the head of this family would get it backwards for
 the eighth time.
 
+**The obvious reading of this family is REFUTED at 2%, and that is the useful part.** Asked of
+the tree rather than the fact tuples, 24 of the 40 land on a `break` or a `text` inside a
+paragraph — the label line was absorbed as a paragraph continuation. B2's own preamble says the
+table applies "for a line after a blank line", so these are the NO-BLANK case, and the minimal
+probes isolate it exactly:
+
+```
+- p / ⟨2sp⟩[^1]: def        defs []            refs 1@1:2
+- p / blank / ⟨2sp⟩[^1]:    defs 1@2:2         refs []
+p  / [^1]: def              defs []            refs 1@1:0
+> p / > [^1]: def           defs []            refs 1@1:2
+```
+
+With a blank we define, without one we never do, in every host. So the rule suggests itself: a
+footnote definition INTERRUPTS a paragraph. Measured over what it would actually change —
+positions where OUR tree emits a `footnoteReference` that sits on a real `[^x]:` label:
+
+|                                         |           |
+| --------------------------------------- | --------: |
+| such positions                          | **1,938** |
+| obs DEFINES there — the rule would GAIN |    **39** |
+| obs does NOT — the rule would BREAK     | **1,899** |
+
+**2.0%.** The same shape as the 57.5% refutation recorded below, four times worse. The 1,899
+break down as 783 col 0 · 566 indented · 365 quoted · 185 a marker on the line — the same
+shapes the 40 span, so no structural discriminator separates them and the family is narrow
+rather than general. It also says the failed-label-becomes-a-reference asymmetry is
+load-bearing far beyond the 710 documents already recorded for it.
+
+**And the first version of this measurement was contaminated**, which is why it is stated from
+the tree. A regex scan for label-shaped lines after a non-blank line reported 5,252 occurrences
+at 34.4% — a figure that includes every label inside a fence, a comment or a code span. This
+file's own rule covers it: where a rule's premise is structural, compute it from the tree. The
+honest number is 2.0%, not 34.4%, and only one of those two is about the rule.
+
 All 40 are the content-column and code-threshold decision, which is B2's table. So the `probe:i1`
 item owns `probe:g4` and `probe:h2`'s ordered half too, and its population is 40 rather than the
 14 `probe:i1` shows on its own. The remaining two `probe:h2` rows are the opposite direction —
