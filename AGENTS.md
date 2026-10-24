@@ -305,8 +305,27 @@ represented twice: a pass inserted the `list` beside the paragraph it derived fr
 replacing it, and the surplus reference is an ordinary child of a paragraph that should not
 exist. Filtering the reference would make the four documents agree while leaving a tree holding
 one line twice — a content-model defect the position and invariant gates exist to catch. The
-repair is to drop the stale paragraph, and the owning pass still has to be derived (patch a
-call site to `if (false) …` and re-run, the recipe above).
+repair is to drop the stale paragraph.
+
+**The owner is `calloutTitleInterruptTransform`** (`src/index.ts:962`), derived with the recipe
+above rather than guessed:
+
+```
+baseline          callout children: paragraph@2:3  list@2:3
+pass stood down   callout children: paragraph@2:3
+```
+
+So it CREATES the `list` and never removes the `paragraph` it derived it from. The repair is to
+replace rather than insert beside. Two cautions for doing it: the pass is reached only for a
+TITLE-LESS callout whose interrupting marker is not `1` (the `start !== 1` scoping the compose
+sweep established), and it takes a `reparse` callback, so the fragment it builds carries
+fragment-relative offsets that `shift` fixes up — a replacement has to keep that fixup.
+
+Deriving it cost two failed anchors, both already recorded here as traps. A `\([^)]*\)` regex
+for the signature died on the nested parens in `reparse: (markdown: string) => Root`, and the
+run printed the BASELINE tree under a "DISABLED" header — an inert probe reading exactly like a
+working one. Only the `assert` on the anchor count caught it. Anchor on a literal, and assert
+the match count before believing the probe.
 
 The fifth is `> [!note]Title` / `>⇥code[^2]`, where the glued title correctly makes it a plain
 quote, and a plain quote indexes that reference at column 6 — the recorded probe
