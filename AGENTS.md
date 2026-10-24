@@ -442,6 +442,55 @@ representative as a known disagreement. We have no such record, so `night:p2b-ta
 counts against us at 6208 while being correct: obs column 8, ours 6, and 6 is right. Reproducing
 it would violate the standing rule that this is not "match Obsidian including every bug".
 
+## The two external issue lists, swept 25 of 25 — six divergences, none buildable yet
+
+`~/Repos/obsidian-parser-issues-summary.md` (another plugin author, 25 numbered items against
+1.14.5) and `~/Repos/obsidian-parser-issues-gaps.md` (our reply, 27 additions). Every concrete
+case was run through both presets. **Nineteen are already correct** — legacy reproduces the
+reading view and strict follows CommonMark — including every item in their section B
+(`===marked===`, `%%open`, `$$5`, a code span over a line break, math in a link label, `$b$`
+over `---`, a quoted task, a quoted fence) and the list and entity items 23 and 26.
+
+**D4's threshold table reproduces 7 of 7**, which is the result that matters for targeting:
+
+```
+⟨4sp⟩ defines   ⟨5sp⟩ defines   ⟨6sp⟩ CODE
+⇥     defines   ⇥⟨3sp⟩ defines  ⇥⟨4sp⟩ CODE   ⇥⇥ CODE
+```
+
+So the 40-document B2 family is NOT a missing threshold rule — the isolated arithmetic is
+already right, and the defect is the dense-document interaction, exactly as recorded.
+
+Six genuine divergences, with the corpus exposure that decides what to do about them:
+
+| #   | case                      | Obsidian                      | ours                   |   exposure |
+| --- | ------------------------- | ----------------------------- | ---------------------- | ---------: |
+| 27a | `<MAILTO:FOO@BAR.BAZ>`    | text, scheme DROPPED, no link | a link                 |      **1** |
+| 27c | `<foo\+@bar.example.com>` | text, keeps the `\`           | a link                 |      **0** |
+| 18a | `[ a ]` with `[a]: /url`  | stays text                    | `linkReference`        |      **0** |
+| 24  | blank in a nested item    | whole OUTER list loose        | CommonMark [307]/[318] |      **0** |
+| 20  | `![foo *bar* ...](x)`     | alt keeps raw markup          | alt collapsed          | projection |
+| 25  | unclosed fence at EOF     | a trailing empty line         | `code("aaa")`          |  rendering |
+
+**None of them is buildable against this corpus, and that is the finding.** 27c, 18a and 24
+have ZERO documents exercising the rule, so any measurement over the corpus would come back
+clean while proving nothing — the failure mode this file already records costing a shipped
+regression. 27a has one document, below the bar that refused C2 at two. 20 and 25 are
+projection and rendering concerns, the same class as C2's `data-heading`.
+
+Two of the zeroes were measured rather than assumed, and both needed the precise predicate
+rather than the obvious one: `[ x ]` appears in 132 documents and **none** produces a padded
+`linkReference` label, because a padded label only forms when a matching definition exists;
+and 1,315 documents hold a nested list while **zero** hold the outer-tight/inner-loose shape
+item 24 is about — a count whose detector was control-verified on a known positive first,
+since this file treats a zero as suspect by default.
+
+So these want recorded probes against the application before any of them can be scored, which
+is the documented route (settle with `ask.mts`, then promote the shapes into `corpus.ts`). They
+are NOT leads for the referee queue. Their authors' own section-A items 01, 02 and 03, and the
+gaps file's B1/B2/B3/B5, are flagged must-not-fix-by-matching on both sides — consistent with
+the P1/P2 policy above.
+
 ## Rules that each cost a session
 
 - **`self.containerState` must be saved and restored** around any container-interrupt probe.
