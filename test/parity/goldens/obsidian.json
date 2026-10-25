@@ -90964,8 +90964,8 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "D2: frontmatter opens only on an EXACT `---` first line. Obsidian reads `--- ` as a thematic break and then a setext H2 whose text `title: x[^1]` carries a LIVE reference; we open frontmatter and the reference is dead. Settled against the live oracle and worth two referee documents, so it is deferred rather than unknown."
+      "triage": "match",
+      "note": "Frontmatter opens only on an EXACT `---` first line (D2). Closed by frontmatterExactOpenerTransform: `--- ` is a thematic break and a setext H2, which is what Obsidian and CommonMark both read."
     },
     "probe/external-gap/fm-tab-opener": {
       "id": "probe/external-gap/fm-tab-opener",

@@ -453,7 +453,7 @@ describe("positioned oracle", () => {
     // `compare.ts` already passed the transformed source to `metaOurs`; this call site
     // did not. The key is now 0.
     // D2's `--- ` opener: Obsidian makes a setext H2 of `title: x[^1]` where we open frontmatter and make no heading.
-    headings: 1,
+    headings: 0,
     // 33 -> 27. The 4 we-INVENT rows were the standalone block-identifier paragraphs --
     // we emitted a `paragraph` section Obsidian consumes -- and the cluster A fix closed
     // them along with two more, exactly as the recorded coupling predicted. The 27
@@ -560,7 +560,7 @@ describe("positioned oracle", () => {
     // `text`/`element` entries past the document, which `sourceBacked` filters -- the
     // renderer's relocated footnote section, already classified must-not-fix for `blocks`.
     // 2 added by D2's two openers, whose block structure differs because we open frontmatter where Obsidian does not.
-    sections: 3,
+    sections: 2,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
     // invented, which is the shape of a missing collector rather than a parse bug.
@@ -939,7 +939,7 @@ describe("positioned oracle", () => {
     // Quartz's FrontMatter plugin owns the YAML, and `remark-frontmatter` is not even in
     // the pinned chain.
     // Both added by D2: we report a position for `--- ` and `---⇥`, where Obsidian opens no frontmatter at all.
-    frontmatterPosition: 2,
+    frontmatterPosition: 1,
   };
 
   /**
@@ -984,9 +984,6 @@ describe("positioned oracle", () => {
     // reports none, `headings` because we make no setext heading, and `sections` because the
     // block structure differs. Settled against the live oracle and deferred at two referee
     // documents, which is why these are recorded rather than fixed.
-    "probe/external-gap/fm-space-opener:frontmatterPosition",
-    "probe/external-gap/fm-space-opener:headings",
-    "probe/external-gap/fm-space-opener:sections",
     "probe/external-gap/fm-tab-opener:frontmatterPosition",
     "probe/external-gap/fm-tab-opener:sections",
   ];

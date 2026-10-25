@@ -130,6 +130,7 @@ import { htmlTailToMarkdown } from "./lib/mdast/html-tail-to-markdown.js";
 import { linkNbspTitleTransform } from "./lib/link-nbsp-title.js";
 import { linkReferenceToMarkdown } from "./lib/mdast/link-reference-to-markdown.js";
 import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
+import { frontmatterExactOpenerTransform } from "./lib/frontmatter-exact-opener.js";
 import { lrdFootnoteTransform } from "./lib/lrd-footnote.js";
 import {
   legacyDefinitionPromoteTransform,
@@ -786,6 +787,12 @@ export default function remarkObsidian(
       // where a tail is a fence that closes awkwardly. Mutually exclusive with the
       // pass above, which is why either order works.
       frontmatterUnclosedTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+      // Last of the three: the two above rewrite a document whose frontmatter is
+      // malformed at the CLOSING fence, and this one needs to see whatever yaml
+      // node survives them to decide the OPENING fence should never have opened.
+      frontmatterExactOpenerTransform(tree, String(file), (markdown) =>
         self.parse(markdown),
       );
     }
