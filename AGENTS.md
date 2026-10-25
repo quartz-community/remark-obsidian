@@ -198,6 +198,24 @@ measured tab arithmetic carrying its own grids (600 + 184 + 61 cases placed corr
 every grid it records — its tables cover hosts with 5-space separators and this host's separator
 is a TAB. Extending it wants its own oracle grid rather than a predicate.
 
+**`commentParseTransform`'s one is REFUSED, and the tree is why.** `*⟨4sp⟩%%` over
+`⟨5sp⟩More^[inline [^Note]]end.` reports `note@1@18` for us and nothing for Obsidian or stock —
+E3's inline-footnote inertness, the rule `e7ce248` shipped. Re-running
+`inlineFootnoteInertTransform` as the last pass measures **INERT**, and the tree says it cannot
+work: the comment swallows the whole subtree into `comment > code`, so there is no
+`footnoteReference` node and no `footnote` ancestor to key on. The reference is synthesised from
+the comment's raw text by the `%%` asymmetry that 710 documents depend on.
+
+That leaves only a source-level `^[ … ]` span scan, which this file already measured in exactly
+this territory at **10 gain / 66 break** — its depth counter decrements on `[^1]`'s own `]`. The
+tree-derived form that replaced it found one position, and that position is not this one.
+
+**`commentDefinitionExtentTransform`'s one is the quoted-definition extent, and it is NOT the
+rule `eba41d3` shipped.** `> [^x-y]: body` / `>⟨6sp⟩%%` / `>` / `>⟨5sp⟩` ``` `` spans lines 0–3
+for Obsidian and stock, and 0–1 for us. The absorb pass requires a BARE label line precisely
+because widening it to quoted labels measured 0 gain / 8 break, so this wants the comment pass's
+own extent arithmetic rather than another sibling absorption.
+
 **`bareFootnoteRefTransform`'s 7 are four unrelated shapes, and only one reproduces minimally.**
 A reference in a code span, in an autolink, on a 4–6 space indented line, and in a doubly-quoted
 line. Probed in isolation, the code span, the indented line and the quoted line are all CORRECT
