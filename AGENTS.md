@@ -1095,6 +1095,61 @@ which this file already lists as a known divergence without a population. A smal
 nearly everything is a missing rule rather than a tail, so rate is worth ranking by and not only
 count. Shipped in `0323f48` at 3 gain / 0 break; the fifth case is a different shape.
 
+### The largest remaining mechanism is definition EXTENT, at 95 documents
+
+Classifying all 559 failures by error signature — not by family — turns up a bucket no family
+tracks and no earlier count had isolated:
+
+|     | signature              | generated |
+| --: | ---------------------- | --------: |
+| 110 | `ref-EXTRA`            |        81 |
+|  96 | **extent only**        |    **82** |
+|  92 | `ref-MISS`             |        67 |
+|  73 | `def-MISS`             |        46 |
+|  45 | `def-EXTRA + ref-MISS` |        32 |
+|  38 | `def-MISS + ref-EXTRA` |        12 |
+|  38 | `def-MISS + def-EXTRA` |        20 |
+|  26 | `def-EXTRA`            |        20 |
+
+**"Extent only" means every definition and every reference is at exactly the right position and
+the document still disagrees.** A `Def` is a four-tuple and the fourth field is the definition's
+END LINE, so these differ on span alone. Split, it is unambiguous:
+
+|                  |        |
+| ---------------- | -----: |
+| ORDER differs    |  **0** |
+| END LINE differs | **95** |
+
+Ordering is never the problem, which rules out the cheaper of the two explanations. 60 end LATE
+(we run past Obsidian) and 37 end EARLY, across eight deltas in both directions — so no constant
+offset, the same conclusion the earlier `def-col` work reached about columns.
+
+By what sits at the boundary:
+
+|     | we end LATE — the first line obs EXCLUDED but we kept |
+| --: | ----------------------------------------------------- |
+|  29 | **indented 4+**                                       |
+|  19 | blank                                                 |
+|   6 | col-0 text                                            |
+|   4 | quote                                                 |
+
+|     | we end EARLY — the first line obs KEPT but we dropped |
+| --: | ----------------------------------------------------- |
+|  18 | **quote**                                             |
+|  10 | indented 4+                                           |
+|   3 | blank                                                 |
+
+So two shapes carry half of it: a 4-space-indented line we absorb and Obsidian does not (29),
+and a quoted line Obsidian absorbs and we do not (18). That the SAME shape appears on both sides
+— `indented 4+` at 29 late and 10 early — says the rule is conditional rather than a threshold,
+which is why D4's isolated arithmetic reproduces 7 of 7 while the dense documents diverge.
+
+**This is the `def-span` family, which this file carries as "the −41/−292 measurements stand but
+their mechanism is unknown".** It is now sized and shaped: 95 documents, 17% of everything
+remaining, and the largest single mechanism in the corpus — bigger than every named family put
+together. It is also the cheapest to verify, because nothing else about these documents is
+wrong.
+
 ## The named-family queue is fully characterised, and every member is 1–3 documents
 
 Swept all 21 families for current counts, then characterised every one. The table is the state
