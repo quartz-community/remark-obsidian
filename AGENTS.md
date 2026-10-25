@@ -623,6 +623,30 @@ recorded refusals (`got` measured in columns: −38; `initialSize` in columns: i
 rule applies to it — read `better + worse + same` first, and a total that small does not justify
 the pass however the sign comes out.
 
+### The rules document is EXHAUSTED as a generator: 52 of 54 probes correct
+
+Six fixes came out of this document, so the remaining unverified rules were the obvious next
+seam. Audited: every rule in A–P that this record had not already checked — A2, A3, A4, A5, B1,
+B3, B4, B6, B7, C3, D4, E1, E5, F1, F3, M1, M2 — driven from the worked examples each rule
+states, 54 probes in all.
+
+**52 correct.** The two that are not are both A4's tab-separated callout title
+(`> [!note]⇥⇥Title[^1]` and `> [!note] ⇥Title[^1]`), which is `night:ct`, already measured at
+2/0 and already refused on implementation because `calloutTransform`'s demotion is revived by
+`bareFootnoteRefTransform`. So the audit found NO new buildable rule.
+
+**Five of the apparent failures were MY test, not the parser**, and the correction is the useful
+part. F1 says `%%%`, `%% %`, `%% 50%`, `%% x %%` and `\%%` are ordinary paragraphs rather than
+comment openers, and I encoded that as "so the label below defines". It does not — the label
+becomes lazy paragraph text, which is F3. Asked directly, Obsidian reports `footnotes=0` for all
+five, exactly as we do, and the oracle's `sections` agree with our root node type on 9 of 9
+opener shapes. Reading one rule's consequence without checking the neighbouring rule produced
+five phantom divergences in a row.
+
+So the generator is spent. What the document still provides is the terminator tables and the
+probe ids behind each rule, which is what made the def-span and root-code probe tables cheap to
+build; it no longer supplies unimplemented rules.
+
 ## The upstream rules document, and what it already settles
 
 `obsidian-footnotes` (the project the referee corpus comes from) carries
