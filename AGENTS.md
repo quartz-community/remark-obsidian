@@ -97,6 +97,28 @@ bucket that is 18 definitions deep in the dense corpus and had no small case unt
 the argument for more oracle coverage in one document: not new failures, but a failure small
 enough to work on.
 
+**A NAIVE RE-SYNC DEGRADES THE ORACLE, so compare row-by-row and take the MORE COMPLETE list.**
+Beyond those three files, 47 rows differ between the two copies — all of them on `refs` alone,
+with no row added or removed on either side:
+
+|                                         |        |
+| --------------------------------------- | -----: |
+| upstream refs a STRICT SUBSET of ours   | **46** |
+| upstream refs a STRICT SUPERSET of ours |      1 |
+| genuine disagreement                    |      0 |
+
+`metadataCache` only reports a reference whose name is DEFINED, so a raw recording is
+definition-gated and systematically short. This corpus is the CORRECTED one — documents augmented
+with synthesised definitions so the full list comes back — and all 47 rows carry
+`refsTrustworthy: true`. Overwriting those 46 with upstream's would replace corrected answers
+with incomplete ones while looking exactly like an update. The gating only ever REMOVES
+references, which is what makes "take the longer list" the right merge rule.
+
+The single row where upstream is ahead is a defect in OUR correction, not an upstream gain:
+`fuzz-20261003.json#1239` holds both a `%%` and an unterminated `~~~` fence, and
+`probe-channel.ts` records that combination burying the appended definitions, so the answer lost
+two references and `refsTrustworthy` was wrong for it. Adopted at 1 gain / 0 break — **6,285**.
+
 | instrument           | answers                                                                    | trap                                                                                                                     |
 | -------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `classify.ts`        | shared primitives: loading, position identity, populations, lift, sampling | **use this instead of re-reading the corpus**; `--self-test` must be green                                               |
