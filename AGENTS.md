@@ -1185,6 +1185,29 @@ and a quoted line Obsidian absorbs and we do not (18). That the SAME shape appea
 — `indented 4+` at 29 late and 10 early — says the rule is conditional rather than a threshold,
 which is why D4's isolated arithmetic reproduces 7 of 7 while the dense documents diverge.
 
+**BOTH dominant shapes are REFUSED as rules, and for the same reason: we are already right about
+roughly 90% of where they fire.** Measured as predicates over every definition both sides place
+identically:
+
+| shape                                             | fires | we already agree | would gain |     rate |
+| ------------------------------------------------- | ----: | ---------------: | ---------: | -------: |
+| an indented line right after obs's definition end |   190 |      **158** 83% |         32 |    16.8% |
+| a quoted line right after OUR definition end      |   474 |    **434** 91.6% |         25 | **5.3%** |
+
+And no axis separates the failures from the agreements. The best feature on the indented side is
+a tab-led line at 1.30x lift, inside the noise band this file already records refusals at; the
+best on the quoted side is `defLineQuoted|multiLineDef` at 2.25x lift and **12% precision** —
+7 gained against 52 broken. The minimal case the beta.7 sync supplied falls in the 6% bucket
+(`defLineBare|oneLineDef`, lift 1.19x), so having a small reproduction makes one instance legible
+without rescuing the rule.
+
+That is the fourth family to end this way — after `probe:i1`, `probe:d5` and `night:f5` — and the
+pattern is now consistent enough to state as a property of the remaining work: **where a shape
+fires often and we agree on ~90% of it, the residue is a tail and not a missing rule.** Extent
+is the largest such family rather than the largest remaining rule, so the 95 documents want
+individual treatment or a feature neither side records, which is exactly where `probe:i1` and the
+root-`code` family already arrived.
+
 **This is the `def-span` family, which this file carries as "the −41/−292 measurements stand but
 their mechanism is unknown".** It is now sized and shaped: 95 documents, 17% of everything
 remaining, and the largest single mechanism in the corpus — bigger than every named family put
