@@ -13,6 +13,20 @@ interface Point {
 }
 
 const LABEL = /^[ \t]*\[\^([^\]]*)\]:[ \t]*/;
+const WHITESPACE = /\s/u;
+
+/**
+ * A label that MIXES whitespace with content, which the footnote reader declines.
+ *
+ * A label that is entirely whitespace is excluded: `[^ ]: x` is the blank-label
+ * rule, `blank-label-reference.ts` owns it, and the goldens pin it as `match`.
+ * Without that exclusion this takes the contract gate down and grows the
+ * positioned-oracle divergences 20 -> 22 -- the same boundary the padded-label
+ * pass needed, for the same reason.
+ */
+function holdsWhitespace(label: string): boolean {
+  return WHITESPACE.test(label) && label.trim() !== "";
+}
 
 /**
  * `[^1]: x` is a footnote definition even when a `---` block precedes it.
@@ -29,6 +43,22 @@ const LABEL = /^[ \t]*\[\^([^\]]*)\]:[ \t]*/;
  * opening with `^` is always a footnote definition, never a link reference. The
  * body is rebuilt from source because the mis-parse scattered it across the
  * definition's `url` and `title`.
+ *
+ * UNLESS THE LABEL HOLDS WHITESPACE, in which case the link reference definition is
+ * the RIGHT reading and converting it back invents both a definition and a
+ * reference. A footnote label may not contain whitespace, so the footnote extension
+ * declined this one on its own rather than losing a fight with frontmatter -- the
+ * premise above simply does not hold for it. Obsidian agrees:
+ *
+ *     `[^ab]: hi`             footnotes=1   a definition
+ *     `[^a b]: hi`            footnotes=0   two paragraphs
+ *     `[^a⇥b]: hi`            footnotes=0   two paragraphs
+ *     `[^a<!-- -->b]: hi`     footnotes=0   two paragraphs
+ *
+ * The comment case is the one the corpus holds, and it is whitespace by the same
+ * test -- the spaces inside `<!-- -->`. Scoped on whitespace rather than on `<!--`
+ * because that is the actual rule and it measures better: 2 gain / 0 break against
+ * 1 / 0 for the comment-only form.
  */
 export function lrdFootnoteTransform(
   tree: Root,
@@ -53,6 +83,7 @@ export function lrdFootnoteTransform(
       const slice = source.slice(start, end);
       const label = LABEL.exec(slice);
       if (!label) continue;
+      if (holdsWhitespace(label[1] ?? "")) continue;
 
       const parsed = reparse(slice.slice(label[0].length));
       if (parsed.children.length === 0) continue;
