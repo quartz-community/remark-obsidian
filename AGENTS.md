@@ -370,6 +370,51 @@ documents**. Making a definition contain its children would move all of them to 
 The structural violation is an mdast-correctness matter for `invariants.test.ts` to ceiling, not a
 parity lead.
 
+### The UNPLACED dimension: 52 references, and a host that predicts them
+
+`referee.mts` reports `unplaced` beside its agreement figure, and the number is easy to
+misread. Measured over the tree rather than taken from the counter:
+
+|                                              |         |
+| -------------------------------------------- | ------: |
+| documents with any unplaced node             |      41 |
+| unplaced nodes                               | **232** |
+| of those, fact-bearing (`footnoteReference`) |  **52** |
+
+So the counter is the fact-bearing subset; the rest is 128 `text`, 50 `break`, 2 `calloutTitle`,
+and those cost nothing because the oracle reads neither. **Every one of the 52 comes from
+`bareFootnoteRefTransform`** — stood down, the count is 0, while nine other passes merely shift
+it (`quoteIndentedCode` stood down RAISES it to 119, so some passes are load-bearing for
+placement).
+
+**An unplaced reference is not simply a loss, which is the trap.** The referee excludes it from
+the set compare, so leaving one unplaced produces the RIGHT answer wherever Obsidian does not
+index it either. Asked of obs's own answers:
+
+| innermost container  |   n | obs indexes | obs does not |      |
+| -------------------- | --: | ----------: | -----------: | ---: |
+| `callout`            |  21 |          10 |           11 |  48% |
+| `blockquote`         |  14 |      **13** |            1 |  93% |
+| root                 |   7 |           3 |            4 |  43% |
+| `listItem`           |   6 |           3 |            3 |  50% |
+| `footnoteDefinition` |   4 |       **4** |            0 | 100% |
+
+Base rate 63.5%. At document level that is **12 placeable, 8 that placing would BREAK, 5 where
+the names do not even match** — so an indiscriminate placement rule is +12/−8 at best, which is
+the 60% the two refusals in `alignToSource`'s own docstring died at (one cost 43 documents, the
+other 14). Blockquote plus footnoteDefinition is 17 of 18 indexed, and that is the only subset
+worth attempting.
+
+**The dominant alignment failure is BY DESIGN, not a defect.** Of 84 failing `(slice, value)`
+pairs, 22 have the value equal to the slice with every `\n` removed — and no transform creates
+them: the count is 22 whichever of the six candidate passes is stood down. It is
+`rejoinSplitReferences`, which concatenates text across a `break` on purpose, to find a `[^x]`
+split over a line ending. `positionedBreaks` had already turned that ending into a positioned
+`break` correctly. So the value it hands `alignToSource` is one the source cannot reproduce, and
+refusing to align it is right — the reference is then spliced with no position. Whoever picks
+this up should give the rejoin its own offset map rather than add a fifth alignment mode, because
+the mode would have to invent a mapping the rejoin already knows.
+
 ### The root-`code` dimension, and why nothing in the queue points at it
 
 `referee.mts` reports it separately from the footnote figure — 883 documents carry an obs root
