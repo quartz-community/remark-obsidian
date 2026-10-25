@@ -7,7 +7,7 @@ measurement to establish, or a trap that has already wasted a session. Prose bel
 
 A remark plugin that makes a micromark/mdast pipeline parse Markdown the way **Obsidian** does.
 Correctness is measured, not asserted: a harness renders a generated corpus inside real Obsidian
-and compares against our output, currently **6,818 recorded documents**.
+and compares against our output, currently **6,844 recorded documents**.
 
 Obsidian internally runs a fork of **`remark-parse@8`** (rp8) — the pre-micromark architecture, a
 line-oriented tokenizer loop with an explicit `interruptors` list. We reproduce rp8's _behaviour_
@@ -25,7 +25,7 @@ on micromark's _architecture_. That mismatch is the source of nearly every open 
 `legacy` is the current default. Positions are a hard constraint for it — plugin consumers index
 by them, so a correct token at a wrong offset is a failure.
 
-**Strict is gated, and its backlog is closed.** The 6,818-document corpus measures `legacy`, so it
+**Strict is gated, and its backlog is closed.** The 6,844-document corpus measures `legacy`, so it
 says nothing about strict — `strict.test.ts` is the gate that does, differentially against stock
 `remark-parse` + `remark-gfm` over **676 examples**: the 652 CommonMark spec examples
 (`commonmark.ts`) plus the 24 tagged GFM extension examples (`gfm.ts`). It opened at **32
@@ -83,12 +83,24 @@ It was in `/tmp` for the whole effort before that, which meant the primary progr
 nine instruments depended on a directory no clone had and no CI job could reach, and the
 instruments disagreed about where it was: three different hardcoded fallbacks, two of them
 pointing at paths that no longer existed. The vendoring is identity-checked — with
-`PARITY_REFEREE_DIR` unset the referee returns the same 6,259 ids as before.
+`PARITY_REFEREE_DIR` unset the referee returned the same 6,259 ids as before.
+
+**Upstream is ACTIVE, so re-sync rather than assume.** `Comprehensive-Jason/obsidian-footnotes`
+was at `0.3.0-beta.7` against the `0.3.0-beta.6` these came from, and carried three answer files
+this corpus did not have — `c6-hunt-live`, `gate-s3-live`, `gate-s45-live`, 26 documents. Adopted:
+6,818 → **6,844**, agreement 6,259 → **6,284**, with **0 previously-agreeing documents flipped**.
+
+25 of the 26 already agreed, and the one that does not is worth more than the other 25: it is a
+MINIMAL reproduction of the second-largest `def-span` shape. `> Quote one.` / `>` / `[^1]: def` /
+`> Quote two.` ends at line 3 for Obsidian and line 2 for us — the "we end early, quoted line"
+bucket that is 18 definitions deep in the dense corpus and had no small case until now. That is
+the argument for more oracle coverage in one document: not new failures, but a failure small
+enough to work on.
 
 | instrument           | answers                                                                    | trap                                                                                                                     |
 | -------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `classify.ts`        | shared primitives: loading, position identity, populations, lift, sampling | **use this instead of re-reading the corpus**; `--self-test` must be green                                               |
-| `referee.mts`        | how many of 6,818 documents agree                                          | diff `--ids` identities, **never totals**                                                                                |
+| `referee.mts`        | how many of 6,844 documents agree                                          | diff `--ids` identities, **never totals**                                                                                |
 | `mechanism.mts`      | which documents are ONE mechanism from agreeing                            | classifies EXTRA facts by _host_, MISSING by _cover_                                                                     |
 | `ablate.mts`         | per-flag DECISIVE / CULPABLE                                               | accepts both id schemes; has `--self-test`                                                                               |
 | `legacy-oracle.mts`  | documents where rp8 is right and we are wrong                              | **rp8 needs `commonmark: true`** (see below); **it is not a ceiling** — we are right where rp8 is wrong in 742 documents |
@@ -105,11 +117,11 @@ had never been measured:
 
 |                                            |        |
 | ------------------------------------------ | -----: |
-| documents                                  |  6,818 |
-| ours agree — **the control**               |  6,252 |
-| stock `remark-parse` + `remark-gfm`        |    960 |
+| documents                                  |  6,844 |
+| ours agree — **the control**               |  6,284 |
+| stock `remark-parse` + `remark-gfm`        |    982 |
 | **SELF-INFLICTED** stock agrees, we do not | **22** |
-| we add value — we agree, stock does not    |  5,314 |
+| we add value — we agree, stock does not    |  5,324 |
 
 **The control is what makes the 22 trustworthy.** Stock has to be projected through the same
 test the referee applies to us, and there is no way to do that without restating `same`/`named`

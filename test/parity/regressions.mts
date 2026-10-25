@@ -102,7 +102,7 @@ if (idsOnly) {
 }
 
 if (selfTest) {
-  const expected = Number(process.env.PARITY_REFEREE_AGREE ?? "6252");
+  const expected = Number(process.env.PARITY_REFEREE_AGREE ?? "6284");
   const ok = oursAgree === expected;
   console.log(
     `\nself-test: ours agree ${String(oursAgree)} vs referee ${String(expected)} -- ${ok ? "OK" : "MISMATCH"}`,
