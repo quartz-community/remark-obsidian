@@ -8,6 +8,9 @@ interface ParentNode extends Node {
   children: RootContent[];
 }
 
+const TAB_LED = /^\t/u;
+const NESTED_MARKER = /^[ \t]*(?:[-*+]|\d+[.)])[ \t]/u;
+
 /**
  * A TAB past a LIST ITEM's content column is indented code, so the label does not define.
  *
@@ -32,6 +35,25 @@ interface ParentNode extends Node {
  * somewhere else. The scorer runs against the FINAL tree and measured +4 there, which is a
  * different question from "is this true where I run". So it belongs with the other passes that
  * settle a definition's extent, after everything that can create or move one.
+ *
+ * IT DOES NOT APPLY WHEN A NESTED MARKER OPENS THE LINE, and the indent's shape is what
+ * draws that line. `- a` / `    - b` / `\t\t- [^1]: def` has the definition inside the item
+ * the `- ` on its own line opens, not inside the outer one -- but this pass visits EVERY
+ * ancestor item, and the outer item's content column of 2 is overshot by a single tab
+ * advancing to column 4, after which the character tested is the second tab and the label
+ * is pruned. Stock gets this right; we were destroying it, and taking the item's content
+ * with it: a `listItem` left with no children at all.
+ *
+ * The exclusion is bounded to a TAB-LED indent, which is B2's own asymmetry -- "a tab in
+ * the indentation is consumed whole, so `\t` and `\t  ` count as inside the `- ` item, and
+ * `  \t` as code":
+ *
+ *     \t\t- [^1]: def     obs DEFINES at col 4      tab-led
+ *     \t\t* [^1]: def     obs DEFINES at col 4      tab-led
+ *       \t* [^1]: def     obs defines NOTHING       space-led, so code
+ *
+ * Without that bound the exclusion is 2 gain / 2 break, because the two space-led
+ * documents are exactly the case this pass must keep pruning. With it, 2 / 0.
  */
 export function definitionTabPastItemTransform(
   tree: Root,
@@ -60,6 +82,7 @@ export function definitionTabPastItemTransform(
         else break;
         at += 1;
       }
+      if (TAB_LED.test(raw) && NESTED_MARKER.test(raw.slice(at))) return;
       if (raw[at] === "\t") dead.add(line - 1);
     });
   });
