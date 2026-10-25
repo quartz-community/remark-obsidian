@@ -165,6 +165,39 @@ micromark syntax extensions rather than to any pass. The attribution:
 |   1 | each of `commentDefinitionExtent`, `commentParse`, `definitionTabPastItem`, `lrdFootnote` |
 |   2 | jointly owned — no single pass, so they need a PAIR probe                                 |
 
+**`lrdFootnoteTransform`'s one SHIPPED in `c90dbb9`**, and the wider predicate measured better,
+which is rare here. Its premise is that "a label opening with `^` is always a footnote
+definition" — false when the label holds whitespace, because the footnote reader declined that
+label on its own rather than losing to frontmatter. Scoped on `<!--` it is 1 gain / 0 break; on
+whitespace, **2 / 0**, and the oracle confirms the general form (`[^ab]` defines, `[^a b]`,
+`[^a⇥b]` and `[^a<!-- -->b]` are all plain paragraphs). A whitespace-ONLY label must be excluded
+— `[^ ]` is the blank-label rule — and leaving it in read as 2 gained / 0 lost on the referee
+while taking the CONTRACT GATE down and growing the positioned-oracle divergences 20 → 22. Same
+boundary `paddedLabelReferenceTransform` needed, drawn for the same reason.
+
+**`definitionTabPastItemTransform`'s remaining one is REFUSED after three attempts.** `fuzz#1205`
+puts `··⇥[^1]: def` under a host whose content column is 2, and Obsidian defines at column 3
+where we prune. The pass's own docstring says a bare tab defines nothing while "one, two or three
+spaces then a tab all define", which reads as a clean exclusion and is not:
+
+| discriminator                              | gain / break |
+| ------------------------------------------ | -----------: |
+| the consumed indent holds a SPACE          |   1 / **11** |
+| space-led AND no marker on the label line  |    1 / **9** |
+| tab-led with a nested marker — **shipped** |        2 / 0 |
+
+So the pass is right to prune a space-led indent in 11 of 12 places, and the marker test removes
+only 2 of the 11. Two of those losses are `probes#999` and `#1010`, the same `··⇥* [^1]: def`
+documents that the shipped narrowing of this pass was measured against — so this condition is
+load-bearing in both directions and the docstring's table does not generalise past its own hosts.
+
+**`definitionColumnTransform`'s two are DEFERRED on risk, not refused.** `···-⇥····More` over
+`⇥····[^ch2*]: body` is column 5 to Obsidian and to stock, and 1 to us. The pass is 403 lines of
+measured tab arithmetic carrying its own grids (600 + 184 + 61 cases placed correctly, and a
+35-cell probe table for marker shapes against label indents), and the two documents sit outside
+every grid it records — its tables cover hosts with 5-space separators and this host's separator
+is a TAB. Extending it wants its own oracle grid rather than a predicate.
+
 **`bareFootnoteRefTransform`'s 7 are four unrelated shapes, and only one reproduces minimally.**
 A reference in a code span, in an autolink, on a 4–6 space indented line, and in a doubly-quoted
 line. Probed in isolation, the code span, the indented line and the quoted line are all CORRECT
