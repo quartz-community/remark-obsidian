@@ -131,6 +131,7 @@ import { linkNbspTitleTransform } from "./lib/link-nbsp-title.js";
 import { linkReferenceToMarkdown } from "./lib/mdast/link-reference-to-markdown.js";
 import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
 import { frontmatterExactOpenerTransform } from "./lib/frontmatter-exact-opener.js";
+import { definitionNestedLabelTransform } from "./lib/definition-nested-label.js";
 import { lrdFootnoteTransform } from "./lib/lrd-footnote.js";
 import {
   legacyDefinitionPromoteTransform,
@@ -1079,6 +1080,11 @@ export default function remarkObsidian(
       // `[^1][^2]` arrives as ONE `linkReference` swallowing both pairs, so there is no plain
       // text left for the bare-reference pass to find.
       refBeforeLabelTransform(tree, String(file));
+      // Before the bare-reference pass, which is what INDEXES the label this leaves
+      // behind in the parent's text: Obsidian declines the nested definition but
+      // reports a reference at its position in 16 of 17 measured cases. The mirror
+      // of the padded-label pass, which demotes and so has to run after.
+      definitionNestedLabelTransform(tree, String(file));
       bareFootnoteRefTransform(tree, String(file));
       // AFTER the bare-reference pass, which is what CREATES the nodes this demotes. Placed
       // before it the pass was completely inert -- the references it looks for did not exist
