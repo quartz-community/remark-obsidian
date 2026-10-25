@@ -192,11 +192,37 @@ export function definitionColumnTransform(tree: Root, source: string): void {
       : 0;
     let spacesAfterTabs = 0;
     while (prefix[tabRun + spacesAfterTabs] === " ") spacesAfterTabs += 1;
+    // An INDENTED host whose marker separator holds a TAB, where the spaces after the
+    // label's own tab count too. The grids above all use a five-SPACE separator and say
+    // nothing about this host, which is why `tabRun` alone was reported for it. Asked of
+    // the oracle, four hosts crossed with five label indents:
+    //
+    //                        <TAB>  <TAB>1sp  <TAB>4sp   4sp   5sp
+    //     `-<TAB>More`         none      none      none  none  none
+    //     `1.<TAB>More`        none      none      none  none  none
+    //     `⟨3sp⟩-<TAB>⟨4sp⟩`      1         2         5     4     5
+    //     `⟨2sp⟩1.<TAB>⟨4sp⟩`     1         2         5     4     5
+    //
+    // So for an indented tab-separator host the column is the label indent's CHARACTER
+    // count, bullet and ordered alike -- `tabRun + spacesAfterTabs`, and uncapped, unlike
+    // the ordered-five-space branch above it. The unindented hosts define nothing at all,
+    // which is a different question and left to the passes that own it.
+    //
+    // The leading-indent test is load-bearing: without it the rule reads 4 gain / 12
+    // BREAK, and the losses are consecutive probe-grid pairs where `tabRun` alone is
+    // already right.
+    const hostTabbed =
+      hostLine >= 0 &&
+      /^[ ]+(?:[-*+]|\d{1,9}[.)])[ ]*\t/u.test(
+        source.slice(hostLine, source.indexOf("\n", hostLine)),
+      );
     const indentTabs =
       tabRun > 0 && !/[^ \t]/u.test(prefix)
         ? hostOrdered
           ? Math.min(tabRun + spacesAfterTabs, hostIndent + 1)
-          : tabRun
+          : hostTabbed
+            ? tabRun + spacesAfterTabs
+            : tabRun
         : undefined;
     const column = indentTabs
       ? indentTabs
