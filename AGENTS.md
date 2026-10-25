@@ -422,15 +422,32 @@ code range, 845 agree, and the largest failing kind was **23 "we report NO root 
 now 20. Because it is a separate dimension, no named family describes it and the queue cannot
 reach it, which is how a four-document rule sat unqueued.
 
-Classified by what covers obs's first code line in OUR tree:
+Re-derived against the 6,844 corpus: **849 of 884 agree (96.0%)**, and the 35 failures split
 
-|     |                                    |
-| --: | ---------------------------------- |
-|  13 | list-hosted                        |
-|   3 | root `math`                        |
-|   3 | root paragraph                     |
-|   3 | inside a root `footnoteDefinition` |
-|   1 | quoted                             |
+|     | kind                         |
+| --: | ---------------------------- |
+|  20 | we report NO root code block |
+|   8 | count differs (1 vs 2)       |
+|   3 | a block STARTS elsewhere     |
+|   2 | a block ENDS elsewhere       |
+|   2 | count differs (2 vs 1)       |
+
+**The "1 vs 2" eight are not splits.** Sampled, each holds the CORRECT range plus a SURPLUS root
+code block elsewhere in the document — `obs=[[11,15]]` against `ours=[[10,10],[11,15]]` — so they
+are a separate "we invent a code block" question rather than a boundary one.
+
+Classified by what covers obs's first code line in OUR tree, the 20 are 13 list-hosted, 3 root
+`math`, 3 root paragraph and 1 quoted, the `footnoteDefinition` trio having shipped. And split by
+whether the line is merely MISPLACED or never became code at all:
+
+|        |                                                   |
+| -----: | ------------------------------------------------- |
+|  **2** | obs's line IS covered by a nested `code` node     |
+| **18** | NO code node anywhere at that line — never formed |
+
+So the movable population is **two documents**, and relocating a nested `code` node to root is
+already refused at 2 gain / 1,635 break. The other 18 need the container to END first, which is
+upstream of code formation and cannot be reached by moving a node.
 
 The `footnoteDefinition` trio gave its rule away by NAME —
 `pin:bug-scan-setext-label-indented-chunk#1..3` — and it shipped in `8c20386` at 4 gain / 0
@@ -449,6 +466,33 @@ want of window — it ends because `===` underlines its label.
 A fourth document came with them that no measurement predicted. The predicate scored 3 fires at
 3 gain / 0 break and the referee moved 4, which is the position-versus-document distinction
 again — and the first time in this effort it ran in the generous direction.
+
+### List-item extent: re-derived, and the record is ACCURATE
+
+Unusually for this file, a recorded count survived re-derivation unchanged. The family is
+"Obsidian DEFINES, we emit a bare REFERENCE at that exact position, and a list marker stands
+above it", and `test/parity/README.md` prices it at 33 assertions with a predicate breakdown.
+Measured against the current tree and the 6,844 corpus:
+
+|                                                    | recorded | measured |
+| -------------------------------------------------- | -------: | -------: |
+| obs defines / we emit only a bare ref at that spot |        — |   **42** |
+| of those, a list marker above                      |       33 |   **32** |
+| ORDERED / BULLET                                   |    21/12 |    20/12 |
+| spaces / TAB                                       |     25/8 |     24/8 |
+| a marker on the LABEL line                         |        — |        7 |
+
+So the analysis there is current, and its verdict stands: the family is **diffuse at PREDICATE
+level**, which is stronger than diffuse at form level. The dominant axis is "the marker has
+content" at 31 of 33, which is a description of most list items rather than a rule; the indent
+relationship — the most promising axis — splits 14 / 13 / 6 across three directions; and the best
+specific combination is worth about eight assertions, fitted to a quarter of a family whose other
+three quarters point elsewhere. One rule was built and reverted there, and it covered 1 of 33.
+
+Worth stating plainly because this session re-derived several recorded figures and moved two of
+them by multiples: **this one did not move, so the deferral is evidence-backed rather than
+inherited.** It needs the item's content column modelled as a whole — the rp8 line-selection
+rewrite, on a branch with its own risk budget — and nothing smaller reaches it.
 
 ### The "code node covers an indexed position" family is NOT one mechanism
 
