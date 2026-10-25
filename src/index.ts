@@ -135,6 +135,7 @@ import { definitionNestedLabelTransform } from "./lib/definition-nested-label.js
 import { tablePipelessRowTransform } from "./lib/table-pipeless-row.js";
 import { labelSwallowsDefinitionTransform } from "./lib/label-swallows-definition.js";
 import { quoteDefinitionAbsorbTransform } from "./lib/quote-definition-absorb.js";
+import { placeDefinitionReferenceTransform } from "./lib/place-definition-reference.js";
 import { lrdFootnoteTransform } from "./lib/lrd-footnote.js";
 import {
   legacyDefinitionPromoteTransform,
@@ -1095,6 +1096,10 @@ export default function remarkObsidian(
       // of the padded-label pass, which demotes and so has to run after.
       definitionNestedLabelTransform(tree, String(file));
       bareFootnoteRefTransform(tree, String(file));
+      // After it, because it is the pass that splices the unplaced references this
+      // places. An unplaced node is invisible to the oracle, so a reference we found
+      // is otherwise reported as missing.
+      placeDefinitionReferenceTransform(tree, String(file));
       // After it, not before: this leaves the swallowed label behind as text, and
       // the pass above would re-read that text as a bare reference Obsidian does
       // not report -- the revival that measured two earlier fixes inert.
