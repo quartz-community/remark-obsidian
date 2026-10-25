@@ -253,11 +253,41 @@ That is the fifth refusal in this territory, and the first to separate "misplace
 formed" — a distinction the `code` field cannot show by itself, since it records ROOT ranges
 only and a nested block is simply absent from it.
 
-**It is also visible in a minimal case, unlike the other families here**, which is the one
-encouraging part: `- a` / blank / `⟨6sp⟩plain` gives `list > listItem > [paragraph, code]` where
-B2's `- ` row puts six columns at the code threshold. So this bucket does not need a dense
-document to reproduce, and a container-end rule could be scored against minimal probes before
-anything is built.
+**The minimal case recorded here is NOT a divergence, and the oracle says so in one probe.**
+This file claimed `- a` / blank / `⟨6sp⟩plain` reproduces the family and that a container-end
+rule could therefore be scored against minimal probes. Asked directly, Obsidian answers
+`sections: [list@0-2]` — one list spanning all three lines, **no root code section at all** — so
+it keeps that line inside the item exactly as we do. The encouraging part was an artifact of
+never asking.
+
+**And a list NEVER ends from indentation, at any depth.** Eighteen probes, with the instrument
+controlled:
+
+|                                                                           |               |
+| ------------------------------------------------------------------------- | ------------- |
+| `- a` / blank / 4sp · 5sp · 6sp · 7sp · 8sp · 10sp · tab · tab+4sp · 2tab | no code       |
+| `- a` / 4sp · 8sp · tab, no blank                                         | no code       |
+| `1. a` ordered · nested item · heading-in-list · fence-in-list            | no code       |
+| **`para` / blank / 4sp — the control**                                    | **ROOT CODE** |
+
+The control is what makes the negatives trustworthy: a four-space line after a PARAGRAPH is root
+code, so the probe detects the thing it reports absent everywhere else.
+
+**The real discriminator is the one the `def-span` table already produced**, which unifies the
+two families:
+
+    ··10.⇥a / ⇥plain  ·  ····plain  ·  ········plain      no code — every indent absorbs
+    ··10.⇥a / ⇥# heading                                  ROOT CODE, [list@0-0 code@1-1]
+
+Indent is irrelevant; a HEADING leaves the container and plain text does not. That is "a line
+that cannot interrupt a paragraph continues lazily, one that can leaves" — and once outside at
+root with four or more columns, the line is indented code. The real corpus cases agree: of four
+contexts extracted and re-asked, three reproduce standalone, and their lines are `⇥# heading`,
+`······- item` and a post-blank four-space line.
+
+So this bucket is not a container-END rule to be built. It is the paragraph-interruption rule
+applied at a container boundary, we already implement that rule for definitions, and what remains
+is why these 18 dense documents keep the line inside where an isolated probe does not.
 
 ### `ask.mts` specifically
 
