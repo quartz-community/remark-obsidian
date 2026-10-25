@@ -133,6 +133,7 @@ import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
 import { frontmatterExactOpenerTransform } from "./lib/frontmatter-exact-opener.js";
 import { definitionNestedLabelTransform } from "./lib/definition-nested-label.js";
 import { tablePipelessRowTransform } from "./lib/table-pipeless-row.js";
+import { labelSwallowsDefinitionTransform } from "./lib/label-swallows-definition.js";
 import { lrdFootnoteTransform } from "./lib/lrd-footnote.js";
 import {
   legacyDefinitionPromoteTransform,
@@ -1093,6 +1094,11 @@ export default function remarkObsidian(
       // of the padded-label pass, which demotes and so has to run after.
       definitionNestedLabelTransform(tree, String(file));
       bareFootnoteRefTransform(tree, String(file));
+      // After it, not before: this leaves the swallowed label behind as text, and
+      // the pass above would re-read that text as a bare reference Obsidian does
+      // not report -- the revival that measured two earlier fixes inert.
+      if (opts.legacyLinkDefinitions)
+        labelSwallowsDefinitionTransform(tree, String(file));
       // AFTER the bare-reference pass, which is what CREATES the nodes this demotes. Placed
       // before it the pass was completely inert -- the references it looks for did not exist
       // yet -- with its own ordering comment claiming the opposite.
