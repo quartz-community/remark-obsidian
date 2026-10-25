@@ -1,3 +1,6 @@
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
@@ -58,6 +61,7 @@ let total = 0;
 let oursAgree = 0;
 let stockAgree = 0;
 const selfInflicted: string[] = [];
+const agreeing: string[] = [];
 const weAdd: string[] = [];
 
 for (const answer of loadCorpus()) {
@@ -80,7 +84,10 @@ for (const answer of loadCorpus()) {
   const theyMatch =
     same(theirs.defs, answer.defs) && same(theirs.refs, answer.refs);
 
-  if (weMatch) oursAgree += 1;
+  if (weMatch) {
+    oursAgree += 1;
+    agreeing.push(id);
+  }
   if (theyMatch) stockAgree += 1;
   if (theyMatch && !weMatch) selfInflicted.push(id);
   if (weMatch && !theyMatch) weAdd.push(id);
@@ -102,17 +109,60 @@ if (idsOnly) {
 }
 
 if (selfTest) {
-  const expected = Number(process.env.PARITY_REFEREE_AGREE ?? "6284");
-  const ok = oursAgree === expected;
-  console.log(
-    `\nself-test: ours agree ${String(oursAgree)} vs referee ${String(expected)} -- ${ok ? "OK" : "MISMATCH"}`,
+  /**
+   * Compared by IDENTITY against the referee's own output, never against a
+   * recorded number.
+   *
+   * The first version of this asserted `oursAgree === 6252`, which is a figure
+   * that goes stale on every parity improvement -- so the self-test would have
+   * failed on good news, and this file is full of warnings about exactly that
+   * kind of inherited constant. Spawning the referee costs a couple of minutes
+   * and answers the question actually being asked: does the restated
+   * `same`/`named` reproduce the oracle's per-document verdicts?
+   */
+  const referee = spawnSync(
+    process.execPath,
+    [
+      "--import",
+      "tsx",
+      "--conditions=development",
+      fileURLToPath(new URL("referee.mts", import.meta.url)),
+      "--ids",
+    ],
+    { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 },
   );
-  if (!ok) {
+
+  if (referee.status !== 0) {
     console.log(
-      "  The replicated agreement test no longer matches the referee, so the",
-      "\n  population above is meaningless. Re-read `same`/`named` in referee.mts,",
-      "\n  or pass the current figure as PARITY_REFEREE_AGREE.",
+      `\nself-test: could not run referee.mts (status ${String(referee.status)})`,
     );
     process.exitCode = 1;
+  } else {
+    const theirs = new Set(
+      referee.stdout
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean),
+    );
+    const mine = new Set(agreeing);
+    const onlyTheirs = [...theirs].filter((id) => !mine.has(id));
+    const onlyMine = [...mine].filter((id) => !theirs.has(id));
+    const ok = onlyTheirs.length === 0 && onlyMine.length === 0;
+    console.log(
+      `\nself-test: ${String(mine.size)} agreeing vs referee ${String(theirs.size)} -- ${ok ? "IDENTICAL" : "DIVERGED"}`,
+    );
+    if (!ok) {
+      console.log(
+        `  referee-only ${String(onlyTheirs.length)}: ${onlyTheirs.slice(0, 5).join(" ")}`,
+      );
+      console.log(
+        `  ours-only    ${String(onlyMine.length)}: ${onlyMine.slice(0, 5).join(" ")}`,
+      );
+      console.log(
+        "  The replicated agreement test no longer matches the referee, so the",
+        "\n  population above is meaningless. Re-read `same`/`named` in referee.mts.",
+      );
+      process.exitCode = 1;
+    }
   }
 }
