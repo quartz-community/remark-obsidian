@@ -454,24 +454,56 @@ did not cost that at all — each for a DIFFERENT reason, which is why measuring
 | **18a**    | a correct one-case rule, too tiny | a new pass, which ALSO closed a round-trip entry (`b133c1f`)   |
 | `probe:c1` | needs new pass surface            | **an existing pass was over-firing** — an exclusion, `58f5b1c` |
 | **D2**     | the opener is third-party         | **no option and no block** — a third sibling, `2d8b93e`        |
+| **E2**     | nests two defs upstream           | an un-nesting pass — **8 documents**, `83a7526`                |
+| **C2**     | absorption machinery              | a new pass, 2 of its 5 — `8257a6a`                             |
+| `probe:b2` | deep tab arithmetic, 2 refusals   | **an existing pass was over-firing** — an exclusion, `ed3bcf9` |
 
-So the per-pass bar is about RISK, and risk is measurable per pass rather than inferred from a
-total. All four landed at zero breakage with every gate green, and two of them improved a ceiling
-no measurement had predicted — 18a closed `probe/label-shape/space-only-defined` out of the
-round-trip unstable set, and D2 took the positioned-oracle divergences from 23 to 20.
+**All seven were attempted and all seven landed, at zero breakage.** Three needed no new surface
+at all, and the two priced as hardest were the cheapest to fix. Two improved a ceiling no
+measurement predicted: 18a closed `probe/label-shape/space-only-defined` out of the round-trip
+unstable set, and D2 took the positioned-oracle divergences from 23 to 20.
 
-What remains of the seven is three, and the bisect says each genuinely needs new surface:
+**A FIGURE DERIVED FROM A NAMED FAMILY IS NOT A POPULATION.** The arithmetic that deferred these
+("12 documents across seven passes") was built from family counts, and re-measuring each as a
+corpus-wide predicate moved two of them by multiples:
 
-| rule       | stock remark+gfm       | so the repair is                              |
-| ---------- | ---------------------- | --------------------------------------------- |
-| C2         | forms `code@3`         | absorption machinery, table domain            |
-| E2         | nests TWO definitions  | an un-nesting pass                            |
-| `probe:b2` | defines nothing either | tab arithmetic, 2 refusals already in that fn |
+| rule       | recorded | measured corpus-wide |
+| ---------- | -------: | -------------------: |
+| E2         |        2 |  **9** fires, 8 docs |
+| C2         |        2 |  **8** fires, 5 gain |
+| `probe:b2` |       27 |            27, exact |
 
-**That one-run bisect is the instrument to reach for first.** Comparing stock against every
-option tells you which of the three kinds of problem you have — an existing pass over-firing (an
-exclusion), a divergence both targets agree on (no option at all), or genuine new surface — and
-it is the step that would have prevented all four wrong verdicts above.
+So the deferral was priced on populations that had never been measured the way the rules were.
+Re-derive before ranking, which is this file's own rule applied to its own table.
+
+### The three diagnoses, and the one-run bisect that separates them
+
+Comparing stock `remark-parse` + `remark-gfm` against every option tells you which kind of
+problem you have, and it is the step that would have prevented all seven wrong verdicts:
+
+| what the bisect shows                    | the repair                    | seen in                     |
+| ---------------------------------------- | ----------------------------- | --------------------------- |
+| an option moves it                       | an **exclusion** in that pass | `probe:c1` (`legacyTables`) |
+| **nothing** moves it, stock is WRONG too | genuine **new surface**       | 18a, E2, C2                 |
+| nothing moves it, **stock is RIGHT**     | we are **destroying** it      | `probe:b2`                  |
+| stock and Obsidian AGREE against us      | **no option at all**          | D2                          |
+
+**The third row is a category this file did not have, and it is the most valuable one.** For
+`probe:b2`, stock produces the correct definition and we delete it — along with the item's
+content, leaving a `listItem` with no children. A divergence where stock is RIGHT is not a
+missing feature, it is a regression one of our own passes introduced, and the fix is an
+exclusion rather than a tokenizer change. The record had it filed as "deep tab arithmetic, two
+refusals already in that function", which is why it was ranked last of the seven.
+
+**When a pass-ownership sweep reports NO OWNER, suspect the matcher before the conclusion.** The
+sweep for `probe:b2` stood down 56 passes and found nothing — a clean "not a transform" that
+would have sent the work straight into the tokenizer the record already blamed. Call sites in
+`index.ts` sit at **three** indentation depths (39 at four spaces, 57 at six, 1 at eight, 97
+total), and the matcher anchored only six. What caught it was a KNOWN-POSITIVE control: standing
+down all 97 at once gives the stock answer, proving a transform was responsible before any
+single pass was believed innocent. This file already records `0 of 57 passes own anything` from
+an over-strict matcher — same failure, two weeks apart, and only the control distinguishes it
+from a true negative.
 
 **"Each would need a new pass" was an ASSUMPTION, and checking it changed one answer.** Two of
 the seven turned out to be reachable without new surface, and the difference is in the REPAIR
@@ -923,29 +955,29 @@ Swept all 21 families for current counts, then characterised every one. The tabl
 of the backlog; "40-family" means the signature obs-defines-at-P / we-emit-only-a-bare-ref-at-P,
 which `probe:i1` owns and which is refuted three ways above.
 
-| family        | now | what it is                                                      |
-| ------------- | --: | --------------------------------------------------------------- |
-| `probe:i1`    |  14 | the 40-family; not a threshold, not an interrupt, not separable |
-| `night:c6`    |  11 | three C1/C2 clauses; group A refuted 1.5%, group B is 2/0       |
-| `probe:f2`    |   6 | `%%` closer outside its container; production refused, 4 gates  |
-| `probe:h2`    |   4 | 2 are the 40-family, 2 run the opposite way                     |
-| `probe:g4`    |   3 | the 40-family                                                   |
-| `probe:e2`    |   3 | E2 measured 2/0 — correct, too small                            |
-| `night:d1`    |   3 | D1 refuted at 5/37 with the span derived correctly              |
-| `night:d2`    |   2 | space opener **shipped `2d8b93e`**; the TAB form is a 2nd rule  |
-| `night:cs`    |   2 | both are P1/P2 CACHE BUGS; **our answer is right**              |
-| `night:ct`    |   2 | measured 2/0 — correct, too small                               |
-| `night:f5`    |   2 | obs buries a definition we make                                 |
-| `night:k1463` |   2 | obs indexes a reference we lack                                 |
-| `probe:d5`    |   2 | a tail on a shape we are already right about 95% of the time    |
-| `probe:b2`    |   2 | nested tab indentation; obs defines at col 4, we define nothing |
-| `probe:c5`    |   2 | 1 is the 40-family, 1 is a column difference (obs 2, ours 0)    |
-| `probe:c1`    |   0 | **closed by `58f5b1c`** — an existing pass was over-firing      |
-| `probe:h3`    |   1 | remainder after `d3b4bb9`                                       |
-| `probe:e3`    |   1 | a rule CONFLICT: E3 inertness vs a reference inside `%%`        |
-| `night:p2`    |   1 | the P2 cache bug; **our answer is right**                       |
-| `h2:rg2`      |   1 | D6, the title absorbing across a blank                          |
-| `probe:a`     |   0 | closed by `f7597a3` and `0e775bb`                               |
+| family        | now | what it is                                                            |
+| ------------- | --: | --------------------------------------------------------------------- |
+| `probe:i1`    |  14 | the 40-family; not a threshold, not an interrupt, not separable       |
+| `night:c6`    |   9 | group A refuted 1.5%; group B **part-shipped `8257a6a`**, 3 left      |
+| `probe:f2`    |   6 | `%%` closer outside its container; production refused, 4 gates        |
+| `probe:h2`    |   4 | 2 are the 40-family, 2 run the opposite way                           |
+| `probe:g4`    |   3 | the 40-family                                                         |
+| `probe:e2`    |   0 | **closed by `83a7526`** — 8 documents, not the 2 recorded             |
+| `night:d1`    |   3 | D1 refuted at 5/37 with the span derived correctly                    |
+| `night:d2`    |   2 | space opener **shipped `2d8b93e`**; the TAB form is a 2nd rule        |
+| `night:cs`    |   2 | both are P1/P2 CACHE BUGS; **our answer is right**                    |
+| `night:ct`    |   2 | measured 2/0 — correct, too small                                     |
+| `night:f5`    |   2 | obs buries a definition we make                                       |
+| `night:k1463` |   2 | obs indexes a reference we lack                                       |
+| `probe:d5`    |   2 | a tail on a shape we are already right about 95% of the time          |
+| `probe:b2`    |   0 | **closed by `ed3bcf9`** — stock was right and a pass of ours broke it |
+| `probe:c5`    |   2 | 1 is the 40-family, 1 is a column difference (obs 2, ours 0)          |
+| `probe:c1`    |   0 | **closed by `58f5b1c`** — an existing pass was over-firing            |
+| `probe:h3`    |   1 | remainder after `d3b4bb9`                                             |
+| `probe:e3`    |   1 | a rule CONFLICT: E3 inertness vs a reference inside `%%`              |
+| `night:p2`    |   1 | the P2 cache bug; **our answer is right**                             |
+| `h2:rg2`      |   1 | D6, the title absorbing across a blank                                |
+| `probe:a`     |   0 | closed by `f7597a3` and `0e775bb`                                     |
 
 Three readings of that table that are not obvious from any single row:
 
