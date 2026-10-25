@@ -537,11 +537,34 @@ And callout structure genuinely suppresses nothing — Obsidian indexes the refe
 isolated callout shapes — so the 10 declines there are document-specific rather than a callout
 rule, which is a narrower statement than either of the readings above it.
 
-**The verdict is therefore the original one: an indiscriminate placement rule is ~+12/−8, and the
-blockquote plus `footnoteDefinition` subset is 17 of 18.** That subset is the only part worth
-attempting, and the offsets have to be right rather than merely present — the two refusals in
-`alignToSource`'s docstring cost 43 and 14 documents by placing references Obsidian disagreed
-with.
+**The verdict is therefore the original one: an indiscriminate placement rule is ~+12/−8**, the
+same 60% the two refusals in `alignToSource`'s docstring died at, where they cost 43 and 14
+documents by placing references Obsidian disagreed with.
+
+**THE OFFSET QUESTION IS SETTLED, AND IT IS NOT WHAT BLOCKS THIS.** Scanning the source for the
+label's own `[^name]` and discarding occurrences a placed reference already owns leaves a UNIQUE
+candidate for **47 of the 52**, and where Obsidian indexes a reference at all it is always that
+candidate — **30 of 30 matched, none landing on a position carrying a different name**. So an
+offset can be derived from the source rather than fitted to the answer, which is precisely what
+the two earlier attempts could not do: they drove the unplaced COUNT down instead of matching
+known positions.
+
+**What remains is purely the decision to place, and the host decides it:**
+
+| scope                | references | documents            |
+| -------------------- | ---------: | -------------------- |
+| `footnoteDefinition` |  3 / **0** | 2 gain / **0** break |
+| `blockquote`         |     11 / 1 | 2 gain / 1 break     |
+| both                 |     14 / 1 | 4 gain / 1 break     |
+
+`footnoteDefinition` shipped in `2ae42f1` — unplaced 52 → 49, and inside a definition 4 → 1, at
+1 document rather than the simulated 2 because `broad#78`'s remaining reference has no unique
+free occurrence and is correctly skipped. Adding blockquote buys two more documents and breaks
+one, which is the trade refused for C4's loose form at 1/1 and for `footnoteInterrupt` at net
+zero.
+
+So the dimension is now: offsets solved, one host shipped, and the rest gated behind a decision
+that costs a document to widen.
 
 **The dominant alignment failure is BY DESIGN, not a defect.** Of 84 failing `(slice, value)`
 pairs, 22 have the value equal to the slice with every `\n` removed — and no transform creates
