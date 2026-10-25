@@ -9,6 +9,44 @@ interface ParentNode extends Node {
 }
 
 const UNDERLINE = /^[ \t]*(?:>[ \t]*)?(=+|-+)[ \t]*$/;
+
+interface ShiftPoint {
+  line: number;
+  column: number;
+  offset?: number;
+}
+
+function rebuild(
+  source: string,
+  headEnd: number,
+  end: number,
+  reparse: (markdown: string) => Root,
+): RootContent[] {
+  const from = headEnd + 1;
+  if (from >= end) return [];
+
+  const slice = source.slice(from, end);
+  if (slice.trim() === "") return [];
+
+  const parsed = reparse(slice);
+  const lines = source.slice(0, from).split("\n").length - 1;
+  for (const child of parsed.children) shift(child, from, lines);
+  return parsed.children;
+}
+
+function shift(node: unknown, offset: number, lines: number): void {
+  const candidate = node as {
+    position?: { start: ShiftPoint; end: ShiftPoint };
+    children?: unknown[];
+  };
+  if (candidate.position) {
+    for (const point of [candidate.position.start, candidate.position.end]) {
+      point.line += lines;
+      if (point.offset !== undefined) point.offset += offset;
+    }
+  }
+  for (const child of candidate.children ?? []) shift(child, offset, lines);
+}
 /** A hyphen run with NO trailing whitespace, which is what keeps it from being a marker. */
 const STRICT_UNDERLINE = /^ {0,3}-+$/u;
 const QUOTE_PREFIX = /^[ \t]*>[ \t]?/;
@@ -27,7 +65,11 @@ const QUOTE_PREFIX = /^[ \t]*>[ \t]?/;
  * Running before the bare-reference pass is what then reduces that to `1: `, and
  * leaves any reference that pointed at the vanished definition to be orphaned.
  */
-export function setextDefinitionTransform(tree: Root, source: string): void {
+export function setextDefinitionTransform(
+  tree: Root,
+  source: string,
+  reparse: (markdown: string) => Root,
+): void {
   visit(tree, (node: Node) => {
     const parent = node as Partial<ParentNode>;
     if (!Array.isArray(parent.children)) return;
@@ -43,13 +85,17 @@ export function setextDefinitionTransform(tree: Root, source: string): void {
       let absorbed = 0;
       let lines = source.slice(start, end).split("\n");
 
-      // Only a one-line definition is swallowed whole. Given a continuation line
-      // the underline belongs to that line instead, so `[^1]: x` / `    y` / `--`
+      // The underline has to come DIRECTLY after the label line. Given a continuation
+      // line first it belongs to that line instead, so `[^1]: x` / `    y` / `--`
       // stays a definition and `[^1]: body` / `lazy` / `===` heads only `lazy`.
-      const underlined =
-        lines.length === 2 && UNDERLINE.test(lines[lines.length - 1]!);
+      //
+      // Lines AFTER the underline are re-parsed below rather than folded into the
+      // heading. Requiring the underline to be LAST missed `[^1]: x` / `===` /
+      // `    chunk`, where the definition absorbs the indented line and Obsidian
+      // reads it as root indented code -- 3 documents, measured 3 gain / 0 break.
+      let underlineAt = UNDERLINE.test(lines[1] ?? "") ? 1 : -1;
 
-      if (!underlined) {
+      if (underlineAt === -1) {
         // `---` closes the definition and becomes a thematic break of its own.
         if (lines.length !== 1) continue;
         const next = parent.children[index + 1];
@@ -90,11 +136,12 @@ export function setextDefinitionTransform(tree: Root, source: string): void {
         end = nextEnd;
         absorbed = 1;
         lines = source.slice(start, end).split("\n");
+        underlineAt = lines.length - 1;
       }
 
-      const marker = UNDERLINE.exec(lines[lines.length - 1]!)![1]!;
+      const marker = UNDERLINE.exec(lines[underlineAt]!)![1]!;
       const content = lines
-        .slice(0, -1)
+        .slice(0, underlineAt)
         .map((line) => line.replace(QUOTE_PREFIX, ""))
         .join("\n");
 
@@ -102,7 +149,9 @@ export function setextDefinitionTransform(tree: Root, source: string): void {
       // through its host's span, so a `[^1]` inside this heading is placeable
       // only if the text carrying it is. The span ends before the underline,
       // the one line the heading's text does not include.
-      const contentEnd = start + lines.slice(0, -1).join("\n").length;
+      const contentEnd = start + lines.slice(0, underlineAt).join("\n").length;
+      const headEnd = start + lines.slice(0, underlineAt + 1).join("\n").length;
+      const trailing = rebuild(source, headEnd, end, reparse);
       const heading: Heading = {
         type: "heading",
         depth: marker.startsWith("=") ? 1 : 2,
@@ -116,16 +165,24 @@ export function setextDefinitionTransform(tree: Root, source: string): void {
         ],
       };
       if (definition.position) {
+        const absorbedEnd =
+          parent.children[index + absorbed]?.position?.end ??
+          definition.position.end;
         heading.position = {
           start: { ...definition.position.start },
-          end: {
-            ...(parent.children[index + absorbed]!.position?.end ??
-              definition.position.end),
-          },
+          end:
+            trailing.length > 0
+              ? {
+                  line: definition.position.start.line + underlineAt,
+                  column: (lines[underlineAt]?.length ?? 0) + 1,
+                  offset: headEnd,
+                }
+              : { ...absorbedEnd },
         };
       }
 
-      parent.children.splice(index, 1 + absorbed, heading);
+      parent.children.splice(index, 1 + absorbed, heading, ...trailing);
+      index += trailing.length;
     }
   });
 }

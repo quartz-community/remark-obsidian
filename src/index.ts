@@ -1069,7 +1069,7 @@ export default function remarkObsidian(
       footnoteTableSplitTransform(tree, String(file), reparse);
       // After the interrupt fold, or a definition about to be merged into the
       // paragraph above it would be turned into a heading instead.
-      setextDefinitionTransform(tree, String(file));
+      setextDefinitionTransform(tree, String(file), reparse);
       // Before the bare-reference pass, so a label this re-tokenizes is still
       // literal text and gets converted with every other one.
       // A plain parse, not the whole pipeline: the transforms splice nodes
