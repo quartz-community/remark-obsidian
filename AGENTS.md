@@ -340,6 +340,29 @@ So this bucket is not a container-END rule to be built. It is the paragraph-inte
 applied at a container boundary, we already implement that rule for definitions, and what remains
 is why these 18 dense documents keep the line inside where an isolated probe does not.
 
+**And measured against the population, that rule covers 4 of 20 — so it is not the lever
+either.** The minimal probes say a block opener whose indent falls BELOW the host item's content
+column leaves the item and becomes root code. Asked of all 20:
+
+|                                                    |       |
+| -------------------------------------------------- | ----: |
+| obs's code line is a block opener                  |    12 |
+| its indent is below the host item's content column |     4 |
+| **both — what the derived rule reaches**           | **4** |
+
+Of the other 16, eight are not openers at all (`⟨4sp⟩More`, `⟨4sp⟩g`, `⟨5sp⟩continued`,
+`⟨4sp⟩| [^ch2*] | c |`), and eight are openers sitting INSIDE the content column —
+`⟨4sp⟩# heading` under a host whose column is 2 — so the item has not been left and the
+interruption rule does not apply to them. Two independent conditions, and only a quarter of the
+population satisfies both.
+
+**And the code dimension does not move the referee's document figure**, which is the decider.
+Agreement is `defs && refs`; root code ranges are reported beside it. All 20 of these documents
+also fail on footnote facts, so repairing the code dimension alone gains ZERO documents — its
+value is as a DIAGNOSTIC that names a mechanism, which is exactly how it produced `8c20386`.
+Architectural work for 4 of 20 on a dimension that cannot move the metric is the clearest refusal
+in this file.
+
 ### `ask.mts` specifically
 
 - Needs **Obsidian running with a vault open**.
