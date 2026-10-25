@@ -132,6 +132,7 @@ import { linkReferenceToMarkdown } from "./lib/mdast/link-reference-to-markdown.
 import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
 import { frontmatterExactOpenerTransform } from "./lib/frontmatter-exact-opener.js";
 import { definitionNestedLabelTransform } from "./lib/definition-nested-label.js";
+import { tablePipelessRowTransform } from "./lib/table-pipeless-row.js";
 import { lrdFootnoteTransform } from "./lib/lrd-footnote.js";
 import {
   legacyDefinitionPromoteTransform,
@@ -961,6 +962,12 @@ export default function remarkObsidian(
     // start with a pipe, so it is not a row and the table ends before it.
     if (opts.legacyTables) {
       tableIndentedRowTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+      // The converse of the pass above, which is why they sit together: an
+      // indented row ENDS a piped table and CONTINUES a pipeless one. Gated here
+      // because GFM reads the line as indented code, so the two presets differ.
+      tablePipelessRowTransform(tree, String(file), (markdown) =>
         self.parse(markdown),
       );
     }

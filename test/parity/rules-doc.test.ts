@@ -143,7 +143,6 @@ const DIVERGING_POSITIONS: readonly string[] = [
   // C2: a PIPELESS table's rows do not start with `|`, so an indented line holding one is
   // still a row and the reference in it is live. We read indented code and the reference
   // dies. The PIPED half of C2 is fixed -- see `table-indented-row.ts`.
-  "C2 pipeless indented row",
   // D6's TITLE half is FIXED -- `definitionBlankTitleTransform` reads a title that starts
   // after a blank line, so the reference inside it is dead as Obsidian has it, across five
   // cases and both quote styles and parentheses. What it leaves is recorded against
@@ -279,7 +278,6 @@ const DIVERGING_SECTIONS: readonly string[] = [
   // `trimStart()`, so an indented row in a pipeless table stays a row. At four spaces
   // micromark makes the line indented CODE before any table logic runs, which is a different
   // defect: the row has to be re-parsed out of a `code` node rather than merely kept.
-  "C2 pipeless indented row",
   // The `<...>` DESTINATION half of D6, which `definitionBlankTitleTransform` leaves: a
   // destination running across blank lines has to be REWRITTEN rather than merely spanned,
   // and `referenceLinks` carries its value -- a field 111 corpus answers depend on.
