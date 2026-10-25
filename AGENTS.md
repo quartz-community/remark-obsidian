@@ -1028,6 +1028,38 @@ representative as a known disagreement. We have no such record, so `night:p2b-ta
 counts against us at 6208 while being correct: obs column 8, ours 6, and 6 is right. Reproducing
 it would violate the standing rule that this is not "match Obsidian including every bug".
 
+## The queue tracked 12% of the remaining work, and 69% of it has no rule name
+
+Re-derived rather than read: every corpus id's family prefix recomputed against the current
+tree, with the agreement test validated against the referee's own count first (6,252 of 6,818).
+
+|                                                       |               |
+| ----------------------------------------------------- | ------------: |
+| failing documents                                     |       **566** |
+| in `fuzz:` and `broad:` — **generated, no rule name** | **391** (69%) |
+| in named rule families                                |           175 |
+| tracked by the queue below                            |           ~68 |
+
+**So the named-family queue, which this file treats as the backlog, covers an eighth of what is
+left.** Its families are real and its characterisations hold, but the bulk of the remaining
+disagreement sits in two generated corpora that no family describes, and nothing in this record
+had ever counted them. A figure derived from the queue is not a figure about the corpus.
+
+**The family key must split on `-` OR `|`, whichever comes first.** Ids come in both shapes —
+`probe:a-bare-label` and `probe:i1|dash4|t1s1` — so a `-`-only key scatters `probe:i1` across 14
+families of one document each and hides it from any ranking. That is how `probe:i1` first
+appeared as "14 × 1 of 1" rather than "14 of 270".
+
+Families this record had never mentioned, found by the same sweep: `pin:bug` 5 of 87,
+`swap34:lrd` 4 of 5, `fact:0e4bb64` 3 of 9, `fact:94f830b` and `fact:c206eae` 2 each, about ten
+more `fact:*` singletons, `probe:g1`, `probe:g2`, `probe:i2`, `probe:j1`, `probe:j2`,
+`probe:rv:g4`, `night:d1b`, `night:d1c`, `night:d2c`, `night:d2o`, `night:p2b`, `pin:spec`.
+
+**`swap34:lrd` was the highest FAILURE RATE in the corpus at 4 of 5 — 80% — and it is D6**,
+which this file already lists as a known divergence without a population. A small family failing
+nearly everything is a missing rule rather than a tail, so rate is worth ranking by and not only
+count. Shipped in `0323f48` at 3 gain / 0 break; the fifth case is a different shape.
+
 ## The named-family queue is fully characterised, and every member is 1–3 documents
 
 Swept all 21 families for current counts, then characterised every one. The table is the state
