@@ -42,6 +42,21 @@ interface Positioned {
  * REFERENCE at 16 of the 17 positions where it declines the definition, the same
  * failed-label asymmetry that pass already owns. So this must run BEFORE it, the
  * mirror of the padded-label pass, which had to run after.
+ *
+ * A NESTED LABEL AT COLUMN 0 is the second case, and it is E4 rather than E2. A
+ * definition's enders are only read within its first 1,024 characters, so where a
+ * definition's text runs longer than that, a following `[^9]:` at column 0 cannot
+ * end it -- the label is swallowed as text and indexed as a bare reference
+ * instead. Our parser nests it as a definition, which is both a surplus
+ * definition and a lost reference. One position in 6,818 documents, and nesting
+ * is what identifies it: an ordinary column-0 label ends its predecessor and
+ * becomes a ROOT definition, so it never reaches this pass.
+ *
+ * It is measured on the referee's assertion figure rather than its document
+ * figure -- 23347 -> 23348, with the document itself still blocked by a root
+ * `code` divergence thirty lines away, which is a separate open family. Verified
+ * through the referee's own extractor rather than a hand-rolled compare, since
+ * the one in this file's history disagreed with the oracle four times.
  */
 export function definitionNestedLabelTransform(
   tree: Root,
@@ -83,6 +98,7 @@ function continues(definition: RootContent, lines: string[]): boolean {
   if (previous.trim() === "") return false;
 
   const column = definition.position?.start.column ?? 1;
+  if (column === 1) return raw.startsWith("[^");
   return column === 5 && LABEL.test(raw.slice(0, 6));
 }
 
