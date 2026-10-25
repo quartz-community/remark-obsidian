@@ -134,6 +134,7 @@ import { frontmatterExactOpenerTransform } from "./lib/frontmatter-exact-opener.
 import { definitionNestedLabelTransform } from "./lib/definition-nested-label.js";
 import { tablePipelessRowTransform } from "./lib/table-pipeless-row.js";
 import { labelSwallowsDefinitionTransform } from "./lib/label-swallows-definition.js";
+import { quoteDefinitionAbsorbTransform } from "./lib/quote-definition-absorb.js";
 import { lrdFootnoteTransform } from "./lib/lrd-footnote.js";
 import {
   legacyDefinitionPromoteTransform,
@@ -1219,6 +1220,10 @@ export default function remarkObsidian(
     // orphaned two passes above, where it read as a claim about `linkNbspTitle`; the
     // ordering audit is what surfaced it, since the detector attributes a comment to the
     // call below it and found this pass undocumented.
+    // LATE, because the shape it needs does not exist earlier: at the
+    // definition-continuation position the blockquote does not yet hold the
+    // definition and its sibling, and the pass saw zero candidates there.
+    quoteDefinitionAbsorbTransform(tree, String(file));
     normalizePointsTransform(tree, String(file));
   };
 
