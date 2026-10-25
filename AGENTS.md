@@ -329,6 +329,41 @@ documents**. Making a definition contain its children would move all of them to 
 The structural violation is an mdast-correctness matter for `invariants.test.ts` to ceiling, not a
 parity lead.
 
+### The root-`code` dimension, and why nothing in the queue points at it
+
+`referee.mts` reports it separately from the footnote figure — 883 documents carry an obs root
+code range, 845 agree, and the largest failing kind was **23 "we report NO root code block"**,
+now 20. Because it is a separate dimension, no named family describes it and the queue cannot
+reach it, which is how a four-document rule sat unqueued.
+
+Classified by what covers obs's first code line in OUR tree:
+
+|     |                                    |
+| --: | ---------------------------------- |
+|  13 | list-hosted                        |
+|   3 | root `math`                        |
+|   3 | root paragraph                     |
+|   3 | inside a root `footnoteDefinition` |
+|   1 | quoted                             |
+
+The `footnoteDefinition` trio gave its rule away by NAME —
+`pin:bug-scan-setext-label-indented-chunk#1..3` — and it shipped in `8c20386` at 4 gain / 0
+break. `setextDefinitionTransform` already owned the rule and was under-firing: it required the
+definition's slice to be exactly two lines, so `[^1]: x` / `===` / `⟨4sp⟩chunk` never matched,
+the indented line being absorbed as continuation.
+
+**Two checks before building, either of which would have wasted the work.** `pin:bug` is NOT a
+must-not-fix class — all 87 of its rows carry `refsTrustworthy: true`, so they are pinned
+regression cases rather than Obsidian defects like P1/P2, which matters because matching a cache
+bug is forbidden here and the family name reads exactly like one. And **E4 is not the
+mechanism**, which is where this started: the three documents put 12–20 characters before obs's
+code line, far inside the 1,024-character ender window, so the definition is not ending for
+want of window — it ends because `===` underlines its label.
+
+A fourth document came with them that no measurement predicted. The predicate scored 3 fires at
+3 gain / 0 break and the referee moved 4, which is the position-versus-document distinction
+again — and the first time in this effort it ran in the generous direction.
+
 ### The "code node covers an indexed position" family is NOT one mechanism
 
 It has been written up as the largest single target in the effort — "233 documents, 22% of the
