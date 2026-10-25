@@ -402,8 +402,32 @@ index it either. Asked of obs's own answers:
 Base rate 63.5%. At document level that is **12 placeable, 8 that placing would BREAK, 5 where
 the names do not even match** — so an indiscriminate placement rule is +12/−8 at best, which is
 the 60% the two refusals in `alignToSource`'s own docstring died at (one cost 43 documents, the
-other 14). Blockquote plus footnoteDefinition is 17 of 18 indexed, and that is the only subset
-worth attempting.
+other 14).
+
+**That host table is GATING NOISE, not a rule, and the check that shows it is one line: ALL 25
+of those documents have `refsTrustworthy !== true`.** Not one is trustworthy. `footnoteRefs`
+only reports a reference whose name is DEFINED, so in those rows the oracle's list is short by
+construction — and "obs has no reference there" means "obs could not report one", never "obs
+declines it". Every one of the 15 not-indexed positions sits in such a row:
+
+|                      | indexed | not | of those, untrusted |
+| -------------------- | ------: | --: | ------------------: |
+| `callout`            |      11 |  10 |              **10** |
+| `blockquote`         |      14 |   0 |                   0 |
+| root                 |       4 |   3 |               **3** |
+| `listItem`           |       4 |   2 |               **2** |
+| `footnoteDefinition` |       4 |   0 |                   0 |
+
+So `callout` at 48% was never a callout rule. Asked directly, Obsidian indexes the reference in
+**all eight** isolated callout shapes — title, body, title-less, trailing space, nested in an
+item, folded, and the plain-quote control — so callout structure suppresses nothing.
+
+**The consequence is that this dimension cannot be scored on this corpus at all**, and that is a
+stronger reason to leave it than the 60% was. The referee compares against the recorded answer,
+so wherever gating dropped a reference, leaving ours unplaced AGREES and placing it breaks —
+which is exactly what `alignToSource`'s docstring says, now with the mechanism named. Settling it
+needs the recorder to re-answer those 25 documents with synthesised definitions, which is corpus
+work rather than code work. Until then no placement rule here is measurable in either direction.
 
 **The dominant alignment failure is BY DESIGN, not a defect.** Of 84 failing `(slice, value)`
 pairs, 22 have the value equal to the slice with every `\n` removed — and no transform creates
