@@ -508,30 +508,40 @@ the names do not even match** — so an indiscriminate placement rule is +12/−
 the 60% the two refusals in `alignToSource`'s own docstring died at (one cost 43 documents, the
 other 14).
 
-**That host table is GATING NOISE, not a rule, and the check that shows it is one line: ALL 25
-of those documents have `refsTrustworthy !== true`.** Not one is trustworthy. `footnoteRefs`
-only reports a reference whose name is DEFINED, so in those rows the oracle's list is short by
-construction — and "obs has no reference there" means "obs could not report one", never "obs
-declines it". Every one of the 15 not-indexed positions sits in such a row:
+**I briefly recorded that host table as gating noise, and that was WRONG — the artifact was in my
+measurement, not in the corpus.** The claim rested on "all 25 of those documents have
+`refsTrustworthy !== true`", which is what you get by reading that field off a `loadCorpus()`
+row: **`classify.ts` does not carry `refsTrustworthy` at all**, so the read is `undefined` for
+every row and the filter reports 25 of 25 untrusted. Same shape as reading `.code` off
+`ourFacts` — a field the type never had, yielding a uniform answer that looks like a finding.
 
-|                      | indexed | not | of those, untrusted |
-| -------------------- | ------: | --: | ------------------: |
-| `callout`            |      11 |  10 |              **10** |
-| `blockquote`         |      14 |   0 |                   0 |
-| root                 |       4 |   3 |               **3** |
-| `listItem`           |       4 |   2 |               **2** |
-| `footnoteDefinition` |       4 |   0 |                   0 |
+The raw corpus rows DO carry `refsTrustworthy: true`, and the corrected answers were already in
+place. Verified the expensive way rather than by re-reading the type: `probe-channel.ts`'s
+`ask()` was run over all 25 documents, which asks Obsidian for definitions from the document as
+written and references from an AUGMENTED copy, so the gating cannot apply. All 25 came back
+trustworthy and **every one returned exactly the reference count the corpus already held**. The
+re-record was unnecessary; the corpus had been corrected all along.
 
-So `callout` at 48% was never a callout rule. Asked directly, Obsidian indexes the reference in
-**all eight** isolated callout shapes — title, body, title-less, trailing space, nested in an
-item, folded, and the plain-quote control — so callout structure suppresses nothing.
+So the host table stands as real signal, now corroborated by an independent ungated ask —
+37 of 52 indexed, 15 declined, matching the corpus exactly:
 
-**The consequence is that this dimension cannot be scored on this corpus at all**, and that is a
-stronger reason to leave it than the 60% was. The referee compares against the recorded answer,
-so wherever gating dropped a reference, leaving ours unplaced AGREES and placing it breaks —
-which is exactly what `alignToSource`'s docstring says, now with the mechanism named. Settling it
-needs the recorder to re-answer those 25 documents with synthesised definitions, which is corpus
-work rather than code work. Until then no placement rule here is measurable in either direction.
+| innermost container  |   n | obs indexes | obs does not |      |
+| -------------------- | --: | ----------: | -----------: | ---: |
+| `callout`            |  21 |          11 |           10 |  52% |
+| `blockquote`         |  14 |      **13** |            1 |  93% |
+| root                 |   7 |           4 |            3 |  57% |
+| `listItem`           |   6 |           4 |            2 |  67% |
+| `footnoteDefinition` |   4 |       **4** |            0 | 100% |
+
+And callout structure genuinely suppresses nothing — Obsidian indexes the reference in all eight
+isolated callout shapes — so the 10 declines there are document-specific rather than a callout
+rule, which is a narrower statement than either of the readings above it.
+
+**The verdict is therefore the original one: an indiscriminate placement rule is ~+12/−8, and the
+blockquote plus `footnoteDefinition` subset is 17 of 18.** That subset is the only part worth
+attempting, and the offsets have to be right rather than merely present — the two refusals in
+`alignToSource`'s docstring cost 43 and 14 documents by placing references Obsidian disagreed
+with.
 
 **The dominant alignment failure is BY DESIGN, not a defect.** Of 84 failing `(slice, value)`
 pairs, 22 have the value equal to the slice with every `\n` removed — and no transform creates
