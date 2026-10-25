@@ -8,7 +8,7 @@ import type { Root } from "mdast";
 import remarkObsidian, { type RemarkObsidianFlags } from "../../src/index.js";
 import { PROFILES, applyTextTransform } from "./chain.js";
 import { factsOf } from "./referee-facts.js";
-import { loadCorpus } from "./classify.js";
+import { REFEREE_ANSWERS, loadCorpus } from "./classify.js";
 
 /**
  * Which PAIR of passes would have to change, for documents no single pass can fix.
@@ -54,8 +54,7 @@ function namesOf(answer: string): string {
   );
 }
 
-const dir =
-  process.env["PARITY_REFEREE_DIR"] ?? "/tmp/opencode/corrected-answers";
+const dir = process.env["PARITY_REFEREE_DIR"] ?? REFEREE_ANSWERS;
 const wanted = new Set(
   fs
     .readFileSync(process.argv[2] ?? "/tmp/opencode/name-div-ids.txt", "utf8")

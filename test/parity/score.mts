@@ -56,6 +56,7 @@ import {
   type Point,
   type Ref,
 } from "./referee-facts.js";
+import { REFEREE_ANSWERS } from "./classify.js";
 
 /** A code block's line range, zero-based and inclusive, as Obsidian records it. */
 export type CodeRange = readonly [number, number];
@@ -4360,9 +4361,7 @@ const RULES: readonly Rule[] = [
   },
 ];
 
-const dir =
-  process.env.PARITY_REFEREE_DIR ??
-  "/tmp/obsidian-footnotes/test/obsidian-answers";
+const dir = process.env.PARITY_REFEREE_DIR ?? REFEREE_ANSWERS;
 if (!fs.existsSync(dir)) {
   console.log(`score: no corpus at ${dir}`);
   process.exit(0);

@@ -48,6 +48,7 @@ import { ask } from "./probe-channel.js";
 
 import type { Answer } from "./probe-channel.js";
 import type { Def, Facts, Ref } from "./referee-facts.js";
+import { REFEREE_ANSWERS } from "./classify.js";
 
 /**
  * What the disagreement is, in a form that SURVIVES DELETING A LINE.
@@ -528,9 +529,7 @@ interface Entry {
   readonly refs: readonly Ref[];
 }
 
-const dir =
-  process.env.PARITY_REFEREE_DIR ??
-  "/tmp/obsidian-footnotes/test/obsidian-answers";
+const dir = process.env.PARITY_REFEREE_DIR ?? REFEREE_ANSWERS;
 const limit = Number(process.argv[2] ?? "300");
 
 if (!fs.existsSync(dir)) {

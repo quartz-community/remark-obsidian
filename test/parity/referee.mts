@@ -24,6 +24,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { refereeFactsWithTree } from "./referee-facts.js";
+import { REFEREE_ANSWERS } from "./classify.js";
 
 interface Point {
   readonly line: number;
@@ -54,9 +55,7 @@ interface Entry {
   readonly code?: ReadonlyArray<readonly [number, number]>;
 }
 
-const dir =
-  process.env.PARITY_REFEREE_DIR ??
-  "/tmp/obsidian-footnotes/test/obsidian-answers";
+const dir = process.env.PARITY_REFEREE_DIR ?? REFEREE_ANSWERS;
 
 if (!fs.existsSync(dir)) {
   console.log(`referee: no corpus at ${dir}`);

@@ -75,8 +75,15 @@ not ship — that has been tried (+4 referee, contract 3438 → 3434) and reject
 
 ## Instruments
 
-All take `PARITY_REFEREE_DIR` (default `/tmp/opencode/corrected-answers`) and need
-`--conditions=development`.
+All read `test/parity/referee-answers/` — **vendored**, resolved from the module rather than the
+CWD — and need `--conditions=development`. `PARITY_REFEREE_DIR` still overrides it, for pointing
+an instrument at an upstream clone.
+
+It was in `/tmp` for the whole effort before that, which meant the primary progress figure and
+nine instruments depended on a directory no clone had and no CI job could reach, and the
+instruments disagreed about where it was: three different hardcoded fallbacks, two of them
+pointing at paths that no longer existed. The vendoring is identity-checked — with
+`PARITY_REFEREE_DIR` unset the referee returns the same 6,259 ids as before.
 
 | instrument           | answers                                                                    | trap                                                                                                                     |
 | -------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |

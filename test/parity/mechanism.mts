@@ -28,15 +28,13 @@
  */
 import fs from "node:fs";
 
-import { loadCorpus } from "./classify.js";
+import { REFEREE_ANSWERS, loadCorpus } from "./classify.js";
 import { refereeFactsWithTree } from "./referee-facts.js";
 
 import type { Root } from "mdast";
 import type { Node, Parent } from "unist";
 
-const dir =
-  process.env.PARITY_REFEREE_DIR ??
-  "/tmp/obsidian-footnotes/test/obsidian-answers";
+const dir = process.env.PARITY_REFEREE_DIR ?? REFEREE_ANSWERS;
 if (!fs.existsSync(dir)) {
   console.log(`mechanism: no corpus at ${dir}`);
   process.exit(0);

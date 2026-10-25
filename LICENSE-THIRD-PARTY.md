@@ -2,12 +2,23 @@
 
 ## obsidian-footnotes
 
-`test/parity/corpus-hunt.ts` holds structural markdown fixtures harvested from the
-`test/hunt/` regression pins of
-[`obsidian-footnotes`](https://github.com/Comprehensive-Jason/obsidian-footnotes).
-Only the markdown documents were taken, not that project's code or assertions.
-They cover block-structure edges a generated corpus does not reach, and were
-contributed for this purpose.
+Two things come from
+[`obsidian-footnotes`](https://github.com/Comprehensive-Jason/obsidian-footnotes),
+both contributed for this purpose.
+
+`test/parity/corpus-hunt.ts` holds structural markdown fixtures harvested from that
+project's `test/hunt/` regression pins. They cover block-structure edges a generated
+corpus does not reach.
+
+`test/parity/referee-answers/` is its `test/obsidian-answers/` directory vendored
+verbatim — 6,818 documents with the `metadataCache` answers real Obsidian gave for
+each. This IS that project's recorded measurement, not just its inputs, and it is
+what `referee.mts` and eight sibling instruments compare against. Kept
+byte-identical (see `.prettierignore`) so a diff against upstream shows answers
+changing and nothing else. The only local change is that `refsTrustworthy` is
+populated where upstream leaves it `null`, written by `recorder.mts`.
+
+None of this is published to npm; `package.json` ships `dist` only.
 
 ```
 MIT License

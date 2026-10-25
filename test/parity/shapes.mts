@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { refereeFacts } from "./referee-facts.js";
+import { REFEREE_ANSWERS } from "./classify.js";
 
 /**
  * The referee's disagreements, grouped by WHAT DIFFERS rather than by their text.
@@ -33,9 +34,7 @@ interface Entry {
   readonly refs: readonly Ref[];
 }
 
-const dir =
-  process.env.PARITY_REFEREE_DIR ??
-  "/tmp/obsidian-footnotes/test/obsidian-answers";
+const dir = process.env.PARITY_REFEREE_DIR ?? REFEREE_ANSWERS;
 if (!fs.existsSync(dir)) {
   console.log(`shapes: no corpus at ${dir}`);
   process.exit(0);

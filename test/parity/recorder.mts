@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { ask, type Answer } from "./probe-channel.js";
+import { REFEREE_ANSWERS } from "./classify.js";
 
 /**
  * Re-record the corpus's ANSWERS from the live application, with prefix augmentation.
@@ -58,7 +59,7 @@ interface Recorded {
 const DIR =
   process.env["PARITY_REFEREE_DIR"] ?? "/tmp/opencode/of/test/obsidian-answers";
 const LEDGER = "/tmp/opencode/recorded-answers.jsonl";
-const OUT = "/tmp/opencode/corrected-answers";
+const OUT = REFEREE_ANSWERS;
 
 function load(): { file: string; rows: Row[] }[] {
   const out: { file: string; rows: Row[] }[] = [];

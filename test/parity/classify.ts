@@ -15,6 +15,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { refereeFacts, type Def, type Ref } from "./referee-facts.js";
 
@@ -84,11 +85,21 @@ export function real<T extends Def | Ref>(facts: readonly T[]): T[] {
  * extractor for every document and produced a confident zero that contradicted a committed
  * instrument. An empty or unreadable corpus is a broken harness, never a finding.
  */
+/**
+ * The referee's recorded answers, VENDORED.
+ *
+ * These lived in `/tmp` for the whole effort, which meant the primary progress
+ * figure and nine instruments depended on a directory no clone would have and no
+ * CI job could reach. Resolved from this module rather than the CWD so every
+ * instrument agrees wherever it is invoked from; `PARITY_REFEREE_DIR` still wins.
+ */
+export const REFEREE_ANSWERS = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "referee-answers",
+);
+
 export function loadCorpus(dir?: string): CorpusRow[] {
-  const root =
-    dir ??
-    process.env["PARITY_REFEREE_DIR"] ??
-    "/tmp/opencode/corrected-answers";
+  const root = dir ?? process.env["PARITY_REFEREE_DIR"] ?? REFEREE_ANSWERS;
   if (!fs.existsSync(root)) {
     throw new ClassifierError(`corpus directory does not exist: ${root}`);
   }

@@ -8,3 +8,8 @@ test/parity/goldens
 
 # Owned by Obsidian, which rewrites these on its own schedule.
 test-vault/.obsidian
+
+# Vendored verbatim from `obsidian-footnotes`, which is still active. Kept
+# byte-identical so a diff against upstream shows recorded answers changing and
+# nothing else.
+test/parity/referee-answers
