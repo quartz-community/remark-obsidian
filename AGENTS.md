@@ -444,12 +444,34 @@ err OPTIMISTICALLY** — the other five made a rule look worse or mis-sized, and
 manufactured a lead. A loose predicate is not biased toward refusal; it is biased toward
 whatever its false fires happen to contain.
 
-The bar still applies per pass, so none of them is shipped here. But seven instances is no
-longer a curiosity, and the arithmetic is worth stating plainly for whoever decides: 12
-documents is 0.18% of the corpus and would take the referee to ~6248, at the cost of seven
-narrow passes each carrying its own regression risk in the dense documents this corpus is made
-of. That is a judgement about how much pass surface the package should carry, not a measurement,
-which is why it is recorded rather than acted on.
+**The deferral was then tested by building them, and it was wrong four times out of four.** The
+arithmetic above treats "a new pass per rule" as the price, and three of the four rules attempted
+did not cost that at all — each for a DIFFERENT reason, which is why measuring beat estimating:
+
+| rule       | the verdict that deferred it      | what it actually cost                                          |
+| ---------- | --------------------------------- | -------------------------------------------------------------- |
+| `probe:e3` | needs a new late pass             | **re-ran an existing pass** — one line, `e7ce248`              |
+| **18a**    | a correct one-case rule, too tiny | a new pass, which ALSO closed a round-trip entry (`b133c1f`)   |
+| `probe:c1` | needs new pass surface            | **an existing pass was over-firing** — an exclusion, `58f5b1c` |
+| **D2**     | the opener is third-party         | **no option and no block** — a third sibling, `2d8b93e`        |
+
+So the per-pass bar is about RISK, and risk is measurable per pass rather than inferred from a
+total. All four landed at zero breakage with every gate green, and two of them improved a ceiling
+no measurement had predicted — 18a closed `probe/label-shape/space-only-defined` out of the
+round-trip unstable set, and D2 took the positioned-oracle divergences from 23 to 20.
+
+What remains of the seven is three, and the bisect says each genuinely needs new surface:
+
+| rule       | stock remark+gfm       | so the repair is                              |
+| ---------- | ---------------------- | --------------------------------------------- |
+| C2         | forms `code@3`         | absorption machinery, table domain            |
+| E2         | nests TWO definitions  | an un-nesting pass                            |
+| `probe:b2` | defines nothing either | tab arithmetic, 2 refusals already in that fn |
+
+**That one-run bisect is the instrument to reach for first.** Comparing stock against every
+option tells you which of the three kinds of problem you have — an existing pass over-firing (an
+exclusion), a divergence both targets agree on (no option at all), or genuine new surface — and
+it is the step that would have prevented all four wrong verdicts above.
 
 **"Each would need a new pass" was an ASSUMPTION, and checking it changed one answer.** Two of
 the seven turned out to be reachable without new surface, and the difference is in the REPAIR
@@ -537,7 +559,7 @@ C1 refinement of 2026-10-03 ("the first-character test replaced 'after any space
 of that run) — so the pipe-style half is already implemented and it is the TAB and INDENT
 interaction that diverges.
 
-### D2's opener is measured, scoped, and DEFERRED at two documents
+### D2's opener is measured, scoped, and SHIPPED for the space form
 
 Eleven documents open with `---` followed only by spaces or tabs. We treat every one as
 frontmatter; D2 says none of them is. Measured before building, which is what defers it:
@@ -573,7 +595,29 @@ the closing `---` is a thematic break rather than a setext underline. CommonMark
 tabs on a thematic break, so that is a second, separate divergence sitting underneath D2.
 
 Both spellings confirm the rule that matters: **neither opens frontmatter**, and we answer
-`yaml` for both. What remains is implementation, not evidence.
+`yaml` for both.
+
+**The space form SHIPPED in `2d8b93e`, and it needed neither an option nor a new block.** The
+bisect asked which side of the legacy/strict split it falls on and the answer is neither —
+`yaml=1` under every option including `preset: "strict"`, against `yaml=0` for stock, because
+`--- ` is an ordinary thematic break in CommonMark too. Obsidian and CommonMark AGREE here, so
+there is nothing to gate, and `frontmatterExactOpenerTransform` joined the existing
+`if (opts.frontmatter)` block as a third sibling to the two passes already correcting this
+extension's closing-fence defects.
+
+    referee 6238 -> 6239, 1 gained 0 lost
+    positioned-oracle divergences 23 -> 20
+    ceilings  frontmatterPosition 2 -> 1   headings 1 -> 0   sections 3 -> 2
+
+The repair uses the extension's own precondition: frontmatter opens only at offset 0, so
+re-parsing the block behind a prepended blank line suppresses it without vendoring the construct
+or taking a new name. One line and one offset are rewound afterwards.
+
+**The TAB form is still open and must not be shipped on this machinery.** The same reparse gives
+`list + heading2` for `---⇥`, where the oracle says `paragraph + thematicBreak` — so it would
+replace one wrong answer with another. The third of the three disagreeing documents,
+`broad-20261004.json#323`, is now correct at its first line (`thematicBreak@1 heading2@2`) and
+fails on `def-MISS 1@25@8 ä@27@8` thirty lines later, an unrelated mechanism.
 
 **And item 25 is refuted as a parse gap by the same run.** An unclosed fence at EOF gives obs
 `code@0-2`, byte-identical to the closed form and to ours — so the summary's "a trailing empty
@@ -888,7 +932,7 @@ which `probe:i1` owns and which is refuted three ways above.
 | `probe:g4`    |   3 | the 40-family                                                   |
 | `probe:e2`    |   3 | E2 measured 2/0 — correct, too small                            |
 | `night:d1`    |   3 | D1 refuted at 5/37 with the span derived correctly              |
-| `night:d2`    |   3 | D2 measured 2/0 — correct, too small                            |
+| `night:d2`    |   2 | space opener **shipped `2d8b93e`**; the TAB form is a 2nd rule  |
 | `night:cs`    |   2 | both are P1/P2 CACHE BUGS; **our answer is right**              |
 | `night:ct`    |   2 | measured 2/0 — correct, too small                               |
 | `night:f5`    |   2 | obs buries a definition we make                                 |
@@ -896,7 +940,7 @@ which `probe:i1` owns and which is refuted three ways above.
 | `probe:d5`    |   2 | a tail on a shape we are already right about 95% of the time    |
 | `probe:b2`    |   2 | nested tab indentation; obs defines at col 4, we define nothing |
 | `probe:c5`    |   2 | 1 is the 40-family, 1 is a column difference (obs 2, ours 0)    |
-| `probe:c1`    |   1 | obs indexes a ref inside an indented table continuing a def     |
+| `probe:c1`    |   0 | **closed by `58f5b1c`** — an existing pass was over-firing      |
 | `probe:h3`    |   1 | remainder after `d3b4bb9`                                       |
 | `probe:e3`    |   1 | a rule CONFLICT: E3 inertness vs a reference inside `%%`        |
 | `night:p2`    |   1 | the P2 cache bug; **our answer is right**                       |
