@@ -392,10 +392,31 @@ All three are the pipe-style and indentation rules, and the rules document settl
   ends the block".
 - **B** is C2 verbatim, including its worked example: in a PIPELESS table a row "does not start
   with a pipe", so an indented `| c[^2] | d` is still a row and the reference is live. We read
-  it as indented code and lose it. **Measured from the tree — a `table` node whose header does
-  not start with a pipe, followed by an indented line holding one — it fires on exactly 2
-  positions in 6,818 documents and scores 2 gain / 0 break.** Correct, zero-risk, and two
-  documents.
+  it as indented code and lose it. **SHIPPED in `8257a6a`** as `tablePipelessRowTransform`,
+  gated on `legacyTables` because GFM really does read that line as code, and placed beside
+  `tableIndentedRowTransform` — its converse, since an indented row ENDS a piped table and
+  CONTINUES a pipeless one. Corpus-wide it fires on 8 positions, not the 2 recorded, and all 5
+  of its position-gains have the line under a `code` LEAF (twice `root > code`, three times
+  `root > list > listItem > code`), so one sibling-level repair reaches every host. The row is
+  rebuilt by re-parsing the table's own first two lines with the de-indented row appended;
+  re-parsing the whole table slice cannot work, because a quoted table's node starts after the
+  `>` and the slice's later lines keep a `>` the reparse then refuses to read as rows.
+
+  **Its remainder is 0, not the 3 that commit claimed, and the correction is a contaminated
+  predicate of mine.** The pipeless test read `trimStart()` of the raw header line, which leaves
+  a QUOTE MARKER in place — so `   > | हिंदी है | b` counted as pipeless when it is a piped
+  table inside a quote, and C2 never applied to it. Re-tested prefix-immune, from the character
+  at the table node's own start offset, 6 raw matches drop to 1. Of the three "list-hosted
+  remainders", two are piped tables and one real position survives, in a document carrying
+  unrelated `ref-EXTRA` and `def-EXTRA` divergences thirty lines later — so it cannot flip on
+  this oracle whatever the pass does. A synthetic-scaffolding refactor to reach it measured
+  **INERT** and was reverted.
+
+  Two rules this cost. A `trimStart()` pipeless test is wrong wherever a container prefix can
+  precede the table; ask the TREE for the opener. And **a position-level gain is not a
+  document-level gain** — C2's "5 gains" were positions, only 2 sat in documents that could
+  reach agreement, and predicting +1 from the third confused the two.
+
 - **C** is the inverse, in a quote, and over-indexes.
 
 **And group B is one of SEVEN correct rules this session that break nothing**, which is a
