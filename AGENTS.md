@@ -1292,10 +1292,40 @@ without rescuing the rule.
 
 That is the fourth family to end this way — after `probe:i1`, `probe:d5` and `night:f5` — and the
 pattern is now consistent enough to state as a property of the remaining work: **where a shape
-fires often and we agree on ~90% of it, the residue is a tail and not a missing rule.** Extent
-is the largest such family rather than the largest remaining rule, so the 95 documents want
-individual treatment or a feature neither side records, which is exactly where `probe:i1` and the
-root-`code` family already arrived.
+fires often and we agree on ~90% of it, the residue is a tail and not a missing rule.**
+
+**AND THE ORACLE SETTLES IT: extent is NOT a missing rule. We agreed on 46 of 47 probes.** All
+the measurement above is OBSERVATIONAL, taken over dense generated documents, which can only ever
+say where we are wrong. So the rule was put to the live oracle one variable at a time — 47 probes
+varying indent, an intervening blank, quoting on either side, nesting depth, and the following
+construct. Our implementation reproduces Obsidian clause for clause:
+
+|                                              |                                             |
+| -------------------------------------------- | ------------------------------------------- |
+| no blank, plain text                         | absorbs at EVERY indent — col 0 to two tabs |
+| after a blank                                | only 4+ spaces or a tab absorbs             |
+| bare definition, quoted line below           | does not absorb                             |
+| quoted definition, quoted or bare line below | absorbs                                     |
+| fence · heading · list marker · col-0 label  | do not absorb                               |
+| `---` under a label                          | setext heading, no definition at all        |
+
+So the 95 documents are **emergent from dense interaction, not a wrong clause**, and that closes
+the largest remaining family as a rule question. The generalisation the probes do support is
+worth stating because nothing in this record did: **a definition absorbs the next line exactly
+when that line cannot interrupt a paragraph** — ordinary text and INDENTED code can't, so they
+absorb; a fence, heading or marker can, so they end it.
+
+The single divergence shipped in `eba41d3` at 6 gain / 0 break: a definition inside a blockquote
+did not absorb its adjacent quoted sibling. Four corrections were needed on the way, all
+measured — the label line must be BARE (dropping that test scored 0 / **8 break**), the pass must
+run LATE (it saw ZERO candidates at the definition-continuation position), adjacency must come
+from OFFSETS rather than stale `.line`, and the fence test must slice from the LINE START, since
+a code node begins past its own indent and every indented block otherwise looks fenced.
+
+**The method is the transferable part.** Observational measurement over dense documents refused
+both dominant shapes at 83% and 91.6% and could not say why; 47 one-variable probes against the
+live oracle produced the rule, the terminators, and the one real gap in an afternoon. For a
+family that resists feature analysis, ask the oracle rather than the corpus.
 
 **This is the `def-span` family, which this file carries as "the −41/−292 measurements stand but
 their mechanism is unknown".** It is now sized and shaped: 95 documents, 17% of everything
