@@ -86,7 +86,65 @@ All take `PARITY_REFEREE_DIR` (default `/tmp/opencode/corrected-answers`) and ne
 | `ablate.mts`         | per-flag DECISIVE / CULPABLE                                               | accepts both id schemes; has `--self-test`                                                                               |
 | `legacy-oracle.mts`  | documents where rp8 is right and we are wrong                              | **rp8 needs `commonmark: true`** (see below); **it is not a ceiling** — we are right where rp8 is wrong in 742 documents |
 | `referee-shrink.mts` | minimise a diverging document                                              | `--live` hits Obsidian                                                                                                   |
+| `regressions.mts`    | which documents WE break that stock already gets right                     | organised by BLAME, not by rule; `--self-test` validates its restated agreement test against the referee's own count     |
 | `ask.mts`            | the live Obsidian oracle                                                   | see below                                                                                                                |
+
+### The blame-ordered sweep: 22 documents we break that stock gets right
+
+Every other instrument here is organised by OBSIDIAN RULE, so a divergence this package
+introduced itself is invisible to all of them — it belongs to no family, because no Obsidian
+rule is missing. `regressions.mts` is organised by BLAME instead, and the population it finds
+had never been measured:
+
+|                                            |        |
+| ------------------------------------------ | -----: |
+| documents                                  |  6,818 |
+| ours agree — **the control**               |  6,252 |
+| stock `remark-parse` + `remark-gfm`        |    960 |
+| **SELF-INFLICTED** stock agrees, we do not | **22** |
+| we add value — we agree, stock does not    |  5,314 |
+
+**The control is what makes the 22 trustworthy.** Stock has to be projected through the same
+test the referee applies to us, and there is no way to do that without restating `same`/`named`
+— which has disagreed with the oracle four times in this effort. So `--self-test` asserts that
+the restated test, applied to OUR facts, reproduces the referee's own agreeing count. Two
+details it turns on, both of which have already cost a wrong answer: `named()` drops
+empty-named rows and the compare is an ORDERED `JSON.stringify` (not a set, not a sort), and a
+`Def` is a **four**-tuple, so comparing name/line/column silently ignores its fourth field.
+
+Stood down across all 97 call sites, **19 of the 23 found were transform-owned and 4 are
+parse-phase** — those four survive with every transform disabled, so they belong to our
+micromark syntax extensions rather than to any pass. The attribution:
+
+|     | pass                                                                                      |
+| --: | ----------------------------------------------------------------------------------------- |
+|   7 | `bareFootnoteRefTransform` — one shipped (`1d64745`), 6 left                              |
+|   4 | `footnoteInterruptTransform` — **refused, see below**                                     |
+|   2 | `definitionColumnTransform`                                                               |
+|   1 | each of `commentDefinitionExtent`, `commentParse`, `definitionTabPastItem`, `lrdFootnote` |
+|   2 | jointly owned — no single pass, so they need a PAIR probe                                 |
+
+**`bareFootnoteRefTransform`'s 7 are four unrelated shapes, and only one reproduces minimally.**
+A reference in a code span, in an autolink, on a 4–6 space indented line, and in a doubly-quoted
+line. Probed in isolation, the code span, the indented line and the quoted line are all CORRECT
+— so their corpus documents have some other cause and the shape is not the mechanism. Only the
+autolink reproduced on its own, and it shipped.
+
+**`footnoteInterruptTransform`'s 4 are REFUSED after three materially different discriminators.**
+All four are one shape — an unclosed-looking fence in a list item, then a dedented label that
+Obsidian (and stock) define and we fold into the paragraph as a bare reference:
+
+| discriminator                                | gain / break |
+| -------------------------------------------- | -----------: |
+| the label is DEDENTED below its host         |  8 / **307** |
+| the host paragraph follows any `code`        |  5 / **127** |
+| the host paragraph follows an UNCLOSED fence |    **0** / 4 |
+
+The first two say the fold is overwhelmingly right in exactly those conditions — lazy
+continuation dominates. The third does not even reach the targets, and the reason is the useful
+part: in `1.⟨6sp⟩~~~` our parse produces `code@1:4`, an INDENTED code block, not a fence at all,
+so a fence predicate can never fire there. Whatever owns these four is upstream of the fold, in
+how that line becomes code.
 
 ### `legacy-oracle.mts` specifically
 
