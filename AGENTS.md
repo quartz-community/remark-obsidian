@@ -1572,6 +1572,58 @@ delimiter around the reference is the right one, and `isDelimited`'s own docstri
 reached that conclusion for the untokenized path ("the discriminator is the DELIMITER, not the
 indentation").
 
+### Every `ref-MISS` explained three ways, and two buckets CONSOLIDATE into mined dimensions
+
+`mechanism.mts` lists `ref-miss` buckets by the deepest node COVERING the position, which reads
+as one mechanism per cover. Asked instead what our tree holds for that NAME, all 249 split
+cleanly:
+
+|                                            |         |                     |
+| ------------------------------------------ | ------: | ------------------- |
+| an UNPLACED node of that name exists       |  **30** | the unplaced family |
+| a PLACED node of that name, wrong position |      59 |                     |
+| NO node of that name anywhere              | **160** | never emitted       |
+
+**And the literal `[^name]` sits at the position Obsidian reports in 228 of 232** — 96 of 96
+`code`, 54 of 54 `footnoteDefinition`, 30 of 30 `paragraph`, 27 of 27 `math`. So a `ref-MISS` is
+never an offset or alignment problem: the text is right there and the construct covering it is
+inert for us and live for Obsidian. That rules out the cheaper of the two explanations for the
+whole dimension at once.
+
+Two buckets then collapse into dimensions this file has already mined:
+
+- **`ref-miss @ paragraph` IS the unplaced family, 30 of 30.** It is the highest one-away RATIO
+  in the whole table (15 present, 15 one-away, 100%), which made it look like the best remaining
+  lead. It is the dimension where the offsets are already SOLVED — 47 of 52 unique, 30 of 30
+  correct where Obsidian indexes — and only the placement decision remains, `footnoteDefinition`
+  shipped at 3/0 in `2ae42f1` and blockquote refused at 11/1. Nothing new to find.
+- **`ref-miss @ footnoteDefinition` is a STRUCTURAL gap, 50 of 54.** The cover being the
+  definition ITSELF means the offset falls inside its range and inside NO child, so the
+  reference text was never tokenized into anything. Only 2 sit past the last child and 2 are
+  childless. That is the converse of the `footnoteDefinition > code|math` escape recorded above —
+  children that do not tile their parent's span — and that escape is load-bearing for agreement
+  in 185 documents, so this is not a free repair.
+
+What remains genuinely unexplained is the **160 never emitted**, dominated by `code` 96 (the
+indent arithmetic, already sized at 53 one-away documents) and `math` 27.
+
+### The `ref-EXTRA` remainder is 87/172 already-refused label territory
+
+Splitting the 172 that match no inert construct by fresh axes, the largest groups are the family
+this file already refuses at 97.6%:
+
+|     |                             |
+| --: | --------------------------- |
+|  35 | on a label line             |
+|  31 | on a label line, indent ≥ 4 |
+|  25 | no axis fires               |
+|  21 | on a label line, quoted     |
+|  18 | indent ≥ 4                  |
+|  13 | quoted                      |
+
+87 of 172 are on a definition label line, which is the 2,183-position / 2,130-indexed refusal.
+So the remainder is not 172 unexplored rows; it is ~85, and the only ungrouped bucket is 25.
+
 ### `ref-miss @ footnote` was PHANTOM, and `named()` is why
 
 The same run reported 22 references, in 21 documents, that Obsidian indexes and we cover with a
