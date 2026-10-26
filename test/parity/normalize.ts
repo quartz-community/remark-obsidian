@@ -519,7 +519,15 @@ export function mdastText(
       // times over for absorption -- `setext`, `indented`, `math` and `html` are taken by a
       // list and kept at root by a quote -- and it is read off the node type for the same
       // reason.
-      if (candidate.type === "list" || candidate.type === "listItem")
+      //
+      // A footnote DEFINITION is a container the same way (F2: an unclosed comment "runs to the
+      // end of its container"). `[^1]: one` / `%%` / blank / `use[^1]` renders `use⟨fn⟩`, and
+      // `fuzz:20261003-711` has Obsidian reading that `%%` as a comment inside the definition.
+      if (
+        candidate.type === "list" ||
+        candidate.type === "listItem" ||
+        candidate.type === "footnoteDefinition"
+      )
         return false;
       const kids = (candidate as { children?: Node[] }).children;
       const last = kids?.[kids.length - 1];

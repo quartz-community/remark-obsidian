@@ -9,11 +9,26 @@ import type { Root } from "mdast";
 import { normalizeIdentifier } from "micromark-util-normalize-identifier";
 
 import { mathDisplayTransform } from "../lib/math-display.js";
-import { parse8WithOffsets, type Node8, type Point8 } from "./reader.js";
+import {
+  parse8WithOffsets,
+  type Features,
+  type Node8,
+  type Point8,
+} from "./reader.js";
+
+/** The plugin options the remark-parse 8 path honours; each maps onto a reader or a step here. */
+export interface LegacyOptions extends Features {
+  keepComments: boolean;
+  parseComments: boolean;
+  lineOffsets: boolean;
+  bareFootnoteRefs: boolean;
+}
 
 interface Context {
   doc: string;
   definitions: Set<string>;
+  footnotes: Set<string>;
+  options: LegacyOptions;
 }
 
 const fold = (label: string): string =>
@@ -23,10 +38,17 @@ const fold = (label: string): string =>
     .toUpperCase()
     .toLowerCase();
 
-function collectDefinitions(node: Node8, into: Set<string>): void {
+function collectDefinitions(
+  node: Node8,
+  links: Set<string>,
+  footnotes: Set<string>,
+): void {
   if (node.type === "definition")
-    into.add(fold(String(node.label ?? node.identifier)));
-  for (const child of node.children ?? []) collectDefinitions(child, into);
+    links.add(fold(String(node.label ?? node.identifier)));
+  if (node.type === "footnoteDefinition")
+    footnotes.add(String(node.identifier));
+  for (const child of node.children ?? [])
+    collectDefinitions(child, links, footnotes);
 }
 
 /** Adjacent text nodes, as one: the reverts above leave runs a tokenizer would have merged. */
@@ -176,7 +198,12 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
   switch (node.type) {
     case "footnoteReference":
       // E3: nothing inside an inline footnote is a reference.
-      if (inNote)
+      // Without `bareFootnoteRefs`, a reference nothing defines stays literal, as in GFM.
+      if (
+        inNote ||
+        (!ctx.options.bareFootnoteRefs &&
+          !ctx.footnotes.has(String(node.identifier)))
+      )
         return [text(doc, position.start.offset, position.end.offset)];
       return [
         {
@@ -200,7 +227,19 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
     }
     case "footnote":
       return [{ type: "footnote", children: kids(true), position }];
+    case "highlight": {
+      // Continuation indent is not highlight text (`legacyHighlightQueue`'s `planBody`).
+      const strip = (n: Node8): void => {
+        if (n.type === "text")
+          n.value = String(n.value).replace(/\n[ \t]+/gu, "\n");
+        for (const child of n.children ?? []) strip(child);
+      };
+      const children = kids();
+      children.forEach(strip);
+      return [{ type: "highlight", children, position }];
+    }
     case "percentComment": {
+      if (!ctx.options.keepComments) return [];
       const from = doc.indexOf("%%", position.start.offset) + 2;
       const closed =
         doc.slice(position.end.offset - 2, position.end.offset) === "%%" &&
@@ -211,7 +250,7 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
           type: "comment",
           value: doc.slice(from, to),
           data: { hName: "obsidian-comment", hChildren: [] },
-          children: kids(),
+          ...(ctx.options.parseComments ? { children: kids() } : {}),
           position,
         },
       ];
@@ -306,12 +345,14 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
         return [{ type: "blockquote", children, position }];
       const marker = /^\[!([^\]\n]+)\]([-+]?)/u.exec(String(head.marker))!;
       const titleBlocks = children[0]!.children ?? [];
-      const titleStart =
-        head.position.start.offset + String(head.marker).length;
-      const lineEnd = doc.indexOf("\n", titleStart);
-      let title = doc
-        .slice(titleStart, lineEnd === -1 ? undefined : lineEnd)
-        .trim();
+      // The title as `calloutTransform` reads it: every value under the title, joined.
+      const collect = (nodes: readonly Node8[]): string =>
+        nodes
+          .map((n) =>
+            "value" in n ? String(n.value) : collect(n.children ?? []),
+          )
+          .join("");
+      let title = collect(titleBlocks).trim();
       const body = children.slice(1);
       const titleNode: Node8[] = [];
       if (titleBlocks.length === 1 && titleBlocks[0]!.type === "paragraph") {
@@ -388,6 +429,20 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
 }
 
 /**
+ * A child never ends after its parent. Pulling a definition's end back to its last content
+ * line leaves a final block child (a comment, html or math) ending at column 1 of the next
+ * line; it takes the same end, which is the same pull-back applied one level down.
+ */
+function clampToParent(node: Node8): void {
+  for (const child of node.children ?? []) {
+    if (node.position && child.position.end.offset > node.position.end.offset) {
+      child.position.end = { ...node.position.end };
+    }
+    clampToParent(child);
+  }
+}
+
+/**
  * remark-parse 8 reads `\r\n` as `\n`, which moves every later offset; Obsidian reports them in
  * the original text, so each is moved back. A lone `\r` keeps its length and needs nothing.
  */
@@ -409,7 +464,7 @@ function restoreCrlf(node: Node8, crlf: readonly number[]): void {
   for (const child of node.children ?? []) restoreCrlf(child, crlf);
 }
 
-export function parseLegacy8(input: string): Root {
+export function parseLegacy8(input: string, options: LegacyOptions): Root {
   const source = input.startsWith("\uFEFF") ? input.slice(1) : input;
   const crlf: number[] = [];
   for (
@@ -420,13 +475,19 @@ export function parseLegacy8(input: string): Root {
     crlf.push(at - crlf.length);
   }
   const doc = source.replace(/\r\n?/g, "\n");
-  const { tree, offsets } = parse8WithOffsets(doc);
+  const { tree, offsets } = parse8WithOffsets(doc, options);
   const definitions = new Set<string>();
-  collectDefinitions(tree, definitions);
-  const root = convert(tree, { doc, definitions }, false)[0]!;
+  const footnotes = new Set<string>();
+  collectDefinitions(tree, definitions, footnotes);
+  const root = convert(
+    tree,
+    { doc, definitions, footnotes, options },
+    false,
+  )[0]!;
   mergeText(root);
-  root.data = { lineOffsets: offsets };
-  mathDisplayTransform(root as unknown as Root, doc);
+  clampToParent(root);
+  if (options.lineOffsets) root.data = { lineOffsets: offsets };
+  if (options.math) mathDisplayTransform(root as unknown as Root, doc);
   if (crlf.length > 0) restoreCrlf(root, crlf);
   return root as unknown as Root;
 }

@@ -24,8 +24,9 @@ var lowercaseX = 'x'
 
 var tabSize = 4
 var looseListItemExpression = /\n\n(?!\s*$)/
-// Obsidian: any one character in the box (rule B8)
+// Obsidian: any one character in the box (rule B8), unless `anyTaskChar` is off
 var taskItemExpression = /^\[(.)][ \t]/
+var stockTaskItemExpression = /^\[([ X\tx])][ \t]/
 var bulletExpression = /^([ \t]*)([*+-]|\d+[.)])( {1,4}(?! )| |\t|$|(?=\n))([^\n]*)/
 var pedanticBulletExpression = /^([ \t]*)([*+-]|\d+[.)])([ \t]+)/
 var initialIndentExpression = /^( {1,4}|\t)?/gm
@@ -350,7 +351,9 @@ function listItem(ctx, value, position) {
   value = fn.apply(null, arguments)
 
   if (ctx.options.gfm) {
-    task = value.match(taskItemExpression)
+    task = value.match(
+      ctx.anyTaskChar === false ? stockTaskItemExpression : taskItemExpression
+    )
 
     if (task) {
       indent = task[0].length

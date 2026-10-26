@@ -362,16 +362,32 @@ function softBreaks(tables: any): void {
   tables.inlineTokenizers.break = softBreak;
 }
 
+/** Which of Obsidian's readers to register; the rest of the parser is remark-parse 8 as is. */
+export interface Features {
+  comments: boolean;
+  callouts: boolean;
+  wikilinks: boolean;
+  frontmatter: boolean;
+  math: boolean;
+  highlights: boolean;
+  tags: boolean;
+  inlineFootnotes: boolean;
+  customTaskChars: boolean;
+  positionedBreaks: boolean;
+}
+
 /**
  * Order matters once: remark-footnotes builds the definition's interrupt list from the block
  * readers registered when it attaches, so math before it (a `$$` line ends a definition, E1)
  * and Obsidian's readers after it (a `%%` line does not, D5).
  */
-function buildParser(): any {
+function buildParser(features: Features): any {
   const Stock = remarkParse8.Parser;
   class ObsidianParser extends Stock {}
   const tables: any = ObsidianParser.prototype;
   tables.options = { ...tables.options, commonmark: true };
+  // Not in `options`: remark-parse 8's `setOptions` keeps only the keys it knows.
+  tables.anyTaskChar = features.customTaskChars;
   tables.blockTokenizers = { ...tables.blockTokenizers };
   tables.inlineTokenizers = { ...tables.inlineTokenizers };
   tables.blockMethods = tables.blockMethods.slice();
@@ -381,37 +397,37 @@ function buildParser(): any {
   tables.interruptBlockquote = tables.interruptBlockquote.slice();
 
   const host = { Parser: ObsidianParser };
-  (remarkMath3.default ?? remarkMath3).call(host, {});
+  if (features.math) (remarkMath3.default ?? remarkMath3).call(host, {});
   (remarkFootnotes2.default ?? remarkFootnotes2).call(host, {
-    inlineNotes: true,
+    inlineNotes: features.inlineFootnotes,
   });
 
-  percentComments(tables);
-  calloutTitles(tables);
+  if (features.comments) percentComments(tables);
+  if (features.callouts) calloutTitles(tables);
   tables.blockTokenizers.list = listTokenizer;
   tablePipeStyles(tables);
-  wikilinks(tables);
-  frontmatter(tables);
-  doubleDollarMath(tables);
-  highlights(tables);
-  tags(tables);
-  softBreaks(tables);
+  if (features.wikilinks) wikilinks(tables);
+  if (features.frontmatter) frontmatter(tables);
+  if (features.math) doubleDollarMath(tables);
+  if (features.highlights) highlights(tables);
+  if (features.tags) tags(tables);
+  if (features.positionedBreaks) softBreaks(tables);
   return ObsidianParser;
 }
 
-let parserClass: any;
-
-/** Parse `doc` (line breaks already `\n`) the way Obsidian reads it. */
-export function parse8(doc: string): Node8 {
-  return parse8WithOffsets(doc).tree;
-}
+const parserClasses = new Map<string, any>();
 
 /** The tree with remark-parse 8's per-line container offset table. */
-export function parse8WithOffsets(doc: string): {
-  tree: Node8;
-  offsets: Record<number, number>;
-} {
-  parserClass ??= buildParser();
+export function parse8WithOffsets(
+  doc: string,
+  features: Features,
+): { tree: Node8; offsets: Record<number, number> } {
+  const key = JSON.stringify(features);
+  let parserClass = parserClasses.get(key);
+  if (parserClass === undefined) {
+    parserClass = buildParser(features);
+    parserClasses.set(key, parserClass);
+  }
   const file = {
     toString: () => doc,
     message: () => undefined,

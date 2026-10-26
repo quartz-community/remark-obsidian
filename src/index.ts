@@ -1,6 +1,7 @@
 /// <reference types="remark-parse" />
 /// <reference types="remark-stringify" />
 
+import { parseLegacy8 } from "./rp8/adapt.js";
 import type { Root } from "mdast";
 import type { Processor } from "unified";
 import { visit } from "unist-util-visit";
@@ -565,6 +566,24 @@ const STRICT_OVERRIDES: Partial<RemarkObsidianFlags> = {
   customTaskChars: false,
 };
 
+/** The flags that each emulate one part of remark-parse 8's reading on micromark. */
+const LEGACY_FLAGS = [
+  "legacyEmphasis",
+  "legacyStrikethrough",
+  "legacyEntities",
+  "legacyAutolinks",
+  "legacyCodeSpans",
+  "legacyLists",
+  "legacyHtmlBlocks",
+  "legacySetext",
+  "legacyLinkDefinitions",
+  "legacyTabs",
+  "legacyContainerLazy",
+  "legacyLinkDestinations",
+  "legacyTables",
+  "labelPrecedence",
+] as const satisfies readonly (keyof RemarkObsidianFlags)[];
+
 const PRESETS: Record<RemarkObsidianPreset, Partial<RemarkObsidianFlags>> = {
   legacy: {},
   strict: STRICT_OVERRIDES,
@@ -726,6 +745,14 @@ export default function remarkObsidian(
 
   if (opts.customTaskChars) {
     data.toMarkdownExtensions.push(taskCharToMarkdown());
+  }
+
+  // Every legacy flag on is remark-parse 8's reading, which is the parser Obsidian forks, so
+  // parse with it rather than correcting micromark towards it. A mixed configuration -- one
+  // legacy flag turned off -- has no remark-parse 8 equivalent and keeps the micromark path.
+  if (LEGACY_FLAGS.every((flag) => opts[flag])) {
+    self.parser = (document: string) => parseLegacy8(document, opts);
+    return undefined;
   }
 
   const needsTransform =
