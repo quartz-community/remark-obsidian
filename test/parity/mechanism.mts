@@ -116,6 +116,44 @@ const named = <T extends readonly unknown[]>(rows: readonly T[]) =>
 const agrees = (a: readonly unknown[][], b: readonly unknown[][]) =>
   JSON.stringify(named(a)) === JSON.stringify(named(b));
 
+/**
+ * The same `name@line` carried a DIFFERENT NUMBER OF TIMES than the recorded answer holds it.
+ *
+ * Computed before the maps below, because those are keyed by `name@line` and a Map COLLAPSES
+ * duplicates -- so a doubled fact compares equal to a single one and every bucket misses it.
+ * The key's stated premise is that a label occurs at most once per line; `fuzz:20261003-1779`
+ * refuted it, duplicating a whole subtree so `[^2]` defined twice at one position, and that
+ * document fell through into `order-only`. `classify.ts`'s `matchByPosition` already THROWS on
+ * the same shape rather than picking one silently, which is the behaviour this restores here.
+ *
+ * RESTRICTED TO KEYS BOTH SIDES HOLD, which is the whole blind spot and nothing more. A key
+ * only one side carries is already named by `def-miss`/`def-extra`; counting it here too made
+ * `ref-dup` fire on 308 documents and drove the one-away total from 395 to 123, because every
+ * miss became a dup as well. Only a key present on both sides with DIFFERENT COUNTS is
+ * invisible to the maps, so only that is named.
+ */
+const tally = (rows: readonly unknown[][]): Map<string, number> => {
+  const counts = new Map<string, number>();
+  for (const row of named(rows)) {
+    const at = `${String(row[0]).toLowerCase()}@${String(row[1])}`;
+    counts.set(at, (counts.get(at) ?? 0) + 1);
+  }
+  return counts;
+};
+
+const miscounted = (
+  mine: readonly unknown[][],
+  recorded: readonly unknown[][],
+): boolean => {
+  const ours = tally(mine);
+  const theirs = tally(recorded);
+  for (const [at, n] of ours) {
+    const recordedCount = theirs.get(at) ?? 0;
+    if (recordedCount > 0 && n !== recordedCount) return true;
+  }
+  return false;
+};
+
 const perDocument = new Map<string, Set<string>>();
 let diverging = 0;
 let threw = 0;
@@ -167,6 +205,20 @@ for (const [index, entry] of entries.entries()) {
   const wantRefMap = new Map(wantRefs.map((r) => [key(r[0], r[1]), r]));
 
   const found = new Set<string>();
+  if (
+    miscounted(
+      ours.defs as unknown as readonly unknown[][],
+      wantDefs as unknown as readonly unknown[][],
+    )
+  )
+    found.add("def-dup");
+  if (
+    miscounted(
+      ours.refs as unknown as readonly unknown[][],
+      wantRefs as unknown as readonly unknown[][],
+    )
+  )
+    found.add("ref-dup");
   for (const [name, def] of wantDefMap) {
     if (!ourDefs.has(name)) {
       found.add(
