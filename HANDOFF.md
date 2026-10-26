@@ -27,9 +27,10 @@ performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
 
 ## What is left
 
-1. **Dead code.** Every micromark construct and pass reachable only through one of the 14
-   deprecated `legacy*` flags is now unreachable: `legacy` never runs micromark and `strict` forces
-   the flags off. Removing it is pure deletion, gated by `strict.test.ts` (whose output cannot
+1. **Dead code.** Every micromark construct and pass reachable only through the 14 internal
+   `legacy*` switches is now unreachable: `legacy` never runs micromark and `strict` turns them
+   all off. (They were never released as options -- no published tarball carries them -- so the
+   options were removed outright.) Removing it is pure deletion, gated by `strict.test.ts` (whose output cannot
    change) and the suite. It is most of `src/lib` and would shrink the 726 KB bundle.
 2. **`strict`'s unconditional passes.** 57 passes run under both presets; 51 own no spec example.
    They existed to match Obsidian, which `legacy` no longer needs them for. Each is now a

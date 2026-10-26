@@ -2085,13 +2085,6 @@ describe("remark-obsidian", () => {
       expect(shapes("***a**", { preset: "strict" })).toEqual(["strong:a"]);
       expect(shapes("*text**", { preset: "strict" })).toEqual(["em:text"]);
     });
-
-    it("ignores the deprecated flag under the legacy preset", () => {
-      // `legacy` IS remark-parse 8's reading; there is no CommonMark attention to restore.
-      expect(shapes("***a***", { legacyEmphasis: false })).toEqual(
-        shapes("***a***"),
-      );
-    });
   });
 });
 
@@ -2176,7 +2169,7 @@ describe("legacy autolinks", () => {
     expect(links("<>")).toEqual([]);
   });
 
-  // `legacyAutolinks` is deprecated and ignored; the CommonMark reading is `strict`'s.
+  // `legacy` parses with remark-parse 8; the CommonMark reading is `strict`'s.
   it("follows CommonMark under the strict preset", () => {
     const off = (md: string) => {
       const found: string[] = [];
@@ -2286,7 +2279,7 @@ describe("legacy code spans", () => {
     );
   });
 
-  // `legacyCodeSpans` is deprecated and ignored; the CommonMark reading is `strict`'s.
+  // `legacy` parses with remark-parse 8; the CommonMark reading is `strict`'s.
   it("follows CommonMark under the strict preset", async () => {
     expect(await code("``code`", { preset: "strict" })).toBe("<p>``code`</p>");
   });
@@ -2806,7 +2799,7 @@ describe("label precedence", () => {
     expect(read("[a](u) [b](v)\n")).toEqual({ text: "a b", urls: ["u", "v"] });
   });
 
-  // `labelPrecedence` is deprecated and ignored; the CommonMark reading is `strict`'s.
+  // `legacy` parses with remark-parse 8; the CommonMark reading is `strict`'s.
   it("follows CommonMark under the strict preset", () => {
     // CommonMark's own reading: the inner link wins and the outer brackets stay as
     // text, which is what the `[` and `](v)` either side of it become.

@@ -39,10 +39,8 @@ fixed — reproducing those outside Obsidian helps nobody. `strict` parses with
 micromark, as `remark-parse` does.
 
 Add the plugin **after** `remark-parse`: under `legacy` it replaces the processor's
-parser, and a `remark-parse` added later would put micromark back. The
-`legacyEmphasis` … `labelPrecedence` options are deprecated since 2.0 and ignored —
-`legacy` has all of that behaviour and `strict` none. The feature options
-(`wikilinks`, `comments`, `math`, `callouts`, …) work under both presets.
+parser, and a `remark-parse` added later would put micromark back. The feature
+options (`wikilinks`, `comments`, `math`, `callouts`, …) work under both presets.
 
 ### Obsidian parity
 

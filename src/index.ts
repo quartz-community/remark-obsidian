@@ -255,293 +255,7 @@ export interface RemarkObsidianOptions {
    * than a neutral choice.
    */
   callouts?: boolean;
-  /**
-   * Parse `*` and `_` the way `remark-parse@8.0.3` does, which is what Obsidian
-   * ships, instead of CommonMark's delimiter-run algorithm. The two disagree on
-   * every unbalanced run: `***a**` is `<strong>*a</strong>` rather than
-   * `*<strong>a</strong>`, `*text**` is not emphasis at all, and `***a***` nests
-   * strong outside emphasis rather than the reverse.
-   *
-   * On by default, because leaving it off is not neutral — it silently produces
-   * different emphasis from the app for any such run.
-   *
-   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
-   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
-   * configurations still type-check.
-   */
-  legacyEmphasis?: boolean;
-  /**
-   * Parse `~~` the way `remark-parse@8.0.3` does, which is what Obsidian ships,
-   * instead of GFM's strikethrough. Legacy closes on the first `~~` it reaches and
-   * honours no escape at all, so `~~del\~~` is a `delete` holding `del\` where GFM
-   * reads `\~` as an escaped tilde and leaves the run literal, and `]]~~~~` renders
-   * `]]` because `~~~~` is an empty `delete` rather than four tildes.
-   *
-   * Needs `remark-gfm` registered *before* this package, which is what the chain
-   * does: a combined micromark extension prepends its constructs, so the later
-   * extension wins a shared code.
-   *
-   * On by default, because leaving it off is not neutral -- it silently produces
-   * different strikethrough from the app for any such run.
-   *
-   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
-   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
-   * configurations still type-check.
-   */
-  legacyStrikethrough?: boolean;
-  /**
-   * Resolve a character reference written without its semicolon, as HTML and
-   * Obsidian both do. CommonMark requires the terminator, so `&amp` stays four
-   * characters without this while the app renders `&`. Matching is greedy against
-   * HTML's legacy table, so `&notreal` is `¬real`, and numeric references resolve
-   * bare too.
-   *
-   * On by default, because leaving it off silently shows markup the app resolves.
-   *
-   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
-   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
-   * configurations still type-check.
-   */
-  legacyEntities?: boolean;
-  /**
-   * Let an email autolink hold a backslash, as `remark-parse@8` does.
-   * `<foo\+@bar.example.com>` links to `mailto:foo\+@bar.example.com` and shows
-   * the backslash; CommonMark reads `\+` as an escaped plus, fails the email
-   * pattern, and leaves the brackets as text.
-   *
-   * On by default, because the failure is worse than a missing link:
-   * `<a\b@c.test>` escapes the `b`, drops `<a\` as text, and autolinks the
-   * remaining `b@c.test` -- a working link to the wrong address.
-   *
-   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
-   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
-   * configurations still type-check.
-   */
-  legacyAutolinks?: boolean;
-  /**
-   * Let an inline-code opener retry with a shorter width, as Obsidian does.
-   * `` ``code` `` renders a literal backtick followed by a code span holding
-   * `code`, where CommonMark requires a closer of the opener's own width and
-   * leaves the whole run literal without one. A short opener never grows, so
-   * `` `code`` `` stays literal either way.
-   *
-   * On by default. It also makes a pathological document *faster*: an opener with
-   * no usable closer is settled from a cached run index instead of stock's
-   * end-of-context scan, which is the scan that makes cmark's increasing-run
-   * shape superlinear.
-   *
-   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
-   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
-   * configurations still type-check.
-   */
-  legacyCodeSpans?: boolean;
-  /**
-   * Use Obsidian's list container rather than CommonMark's.
-   *
-   * Obsidian runs a fork of `remark-parse@8`, whose list parsing is the more
-   * permissive of the two, and the legacy stack agrees with Obsidian on every
-   * recorded case in this family. Replacing the container is the only route: a
-   * container owns its own continuation, so a construct that declines never sees
-   * the second item of a list the stock one opened.
-   *
-   * On by default, and the default moved because the measurement said so. It was
-   * shipped off, as `labelPrecedence` was, and turning it on costs **0 regressions**
-   * across 3103 cases for 5 gained -- plus two improvements to the independent
-   * `metadataCache` oracle, which is the one that has refused two other changes.
-   *
-   * Two cases in the family remain and are recorded rather than chased: a tab-indented
-   * sibling, where `containerState.size` counts characters while `factorySpace` counts
-   * columns, and an under-indented continuation, which needs legacy's whole-item
-   * minimum-indent scan rather than a different limit.
-   *
-   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
-   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
-   * configurations still type-check.
-   */
-  legacyLists?: boolean;
-  /**
-   * Classify html block tags as Obsidian's parser does, not as CommonMark now does.
-   *
-   * micromark sorts tags into two shared lists and the fork Obsidian runs predates
-   * both revisions that matter here, so the classification differs at two points.
-   *
-   * `pre` is in `htmlRawNames`, which governs only *opening* tags, and is missing
-   * from `htmlBlockNames` -- so a bare `</pre>` falls through to a type 7 block,
-   * which refuses to interrupt a paragraph. Obsidian carries `pre` in its block-tag
-   * list, so there the closer interrupts and takes the rest of its line with it.
-   * The rule is narrower than the mechanism suggests and the arbiter pins it: of the
-   * four raw names only `</pre>` interrupts, while `</script>`, `</style>` and
-   * `</textarea>` stay absorbed. Generalising would cost six cases that match today.
-   *
-   * `textarea` is the other direction. CommonMark added it to `htmlRawNames` after
-   * the fork, so micromark lets `<textarea>` swallow every following block while
-   * Obsidian ends it at the first blank line and parses the rest as markdown.
-   *
-   * On by default. Together the two are worth 1 gained case and `sections` 39 -> 38
-   * on the independent `metadataCache` oracle, for 0 regressions. One case in the
-   * family stays open for a reason that is not parsing: inside a `<textarea>` the
-   * content is the element's *value*, so the recorder finds no `<em>` elements and
-   * reads a de-tagged string, which no tree can reproduce without mis-parsing.
-   *
-   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
-   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
-   * configurations still type-check.
-   */
-  legacyHtmlBlocks?: boolean;
 
-  /**
-   * Read setext underlines as Obsidian does, instead of CommonMark's.
-   *
-   * `remark-parse@8` resolves an underline against a different paragraph extent than
-   * micromark, so Obsidian makes headings where CommonMark does not and vice versa.
-   * Six passes implement that reading: a lazy continuation line can carry the
-   * underline, a container can hold one, an html block can swallow one, and an
-   * underline can close a paragraph that spans several lines.
-   *
-   * On by default, and measured only in `legacy` -- every one of those six passes ran
-   * UNCONDITIONALLY until this flag existed, which is why `strict` emitted a paragraph
-   * where CommonMark emits a heading on six of the 652 spec examples
-   * (`commonmark/setext-headings/81`, `82`, `84`, `86`, `93`, `95`). That was a missing
-   * option rather than a wrong rule: the legacy reading is correct for Obsidian and has
-   * no business running off-platform.
-   *
-   * @see test/parity/strict.test.ts for the gate that found it.
-   *
-   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
-   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
-   * configurations still type-check.
-   */
-  legacySetext?: boolean;
-
-  /**
-   * Decide link reference definitions as Obsidian does, instead of CommonMark's.
-   *
-   * `remark-parse@8` admits a definition CommonMark rejects and promotes one CommonMark
-   * leaves as paragraph text, so the two disagree about which `[label]: /dest` lines
-   * define anything.
-   *
-   * On by default, and measured only in `legacy`. Both passes ran UNCONDITIONALLY until
-   * this flag existed, which is why `strict` emitted a paragraph where CommonMark emits
-   * a definition on six spec examples (`commonmark/link-reference-definitions/196`,
-   * `200`, `202`, `210` and `commonmark/links/546`, `552`).
-   *
-   * Distinct from `labelPrecedence`, which governs how a link LABEL's brackets are
-   * scanned; this one governs whether the DEFINITION forms at all.
-   *
-   * @see test/parity/strict.test.ts for the gate that found it.
-   *
-   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
-   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
-   * configurations still type-check.
-   */
-  legacyLinkDefinitions?: boolean;
-
-  /**
-   * Expand tabs as Obsidian does, instead of CommonMark's.
-   *
-   * CommonMark advances a tab to its next four-column stop everywhere. `remark-parse@8`
-   * does not: one raw tab is a whole indent wherever it starts, and a tab AFTER a space
-   * reaches no stop at all. Six passes carry that reading across quotes, lists,
-   * thematic breaks and the indented-code threshold.
-   *
-   * On by default, and measured only in `legacy`. All six ran UNCONDITIONALLY until
-   * this flag existed, costing five spec examples: `tabs/2` and `tabs/11` differed in
-   * node TYPE, `block-quotes/238` as well, and `tabs/6` and `tabs/7` in position.
-   *
-   * The six were derived, not guessed. Of fourteen tab and indent passes probed one at
-   * a time, four own exactly one example each and ten own none; `block-quotes/238` is
-   * owned JOINTLY by `quoteIndentedCodeTransform` and `quoteLazyIndentedCodeTransform`,
-   * which is why both are in the guard and neither closes it alone. The ten that own
-   * nothing are left running: most operate on footnote definitions, which the
-   * CommonMark spec has no example of, so it cannot adjudicate them either way.
-   *
-   * @see test/parity/strict.test.ts for the gate that found it.
-   *
-   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
-   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
-   * configurations still type-check.
-   */
-  legacyTabs?: boolean;
-
-  /**
-   * Continue containers onto lazy lines as Obsidian does, instead of CommonMark's.
-   *
-   * `remark-parse@8` decides which following lines a list item or blockquote still owns
-   * by a different rule than micromark, so the two disagree about lazy continuation,
-   * empty items, and how deep a continuation reaches.
-   *
-   * On by default, and measured only in `legacy`. Three passes ran UNCONDITIONALLY
-   * until this flag existed: `commonmark/list-items/257` differed in node TYPE, and
-   * `block-quotes/237`, `block-quotes/249` and `list-items/280` in position.
-   *
-   * @see test/parity/strict.test.ts for the gate that found it.
-   *
-   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
-   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
-   * configurations still type-check.
-   */
-  legacyContainerLazy?: boolean;
-
-  /**
-   * Read a link destination and title as Obsidian does, instead of CommonMark's.
-   *
-   * Two divergences, both inherited. `remark-parse@8` resolves an escape inside an
-   * angle-bracketed destination differently, and it treats a NO-BREAK SPACE as a
-   * separator between destination and title where CommonMark does not -- so
-   * `[link](/url\u00a0"title")` is a titled link to Obsidian and a link to the whole
-   * `/url "title"` under CommonMark.
-   *
-   * On by default, and measured only in `legacy`. Both passes ran UNCONDITIONALLY until
-   * this flag existed, costing `commonmark/links/493` in node TYPE and
-   * `commonmark/links/507` in position.
-   *
-   * @see test/parity/strict.test.ts for the gate that found it.
-   *
-   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
-   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
-   * configurations still type-check.
-   */
-  legacyLinkDestinations?: boolean;
-
-  /**
-   * Shape GFM tables as Obsidian does, instead of as the GFM spec defines.
-   *
-   * Six passes implement Obsidian's table reading: which rows a table owns, whether a
-   * leading pipe is required, how a short delimiter row widens, and whether an indented
-   * or label row belongs to the table.
-   *
-   * On by default, and measured only in `legacy`. All six ran UNCONDITIONALLY until this
-   * flag existed, and the CommonMark differential could not see it: tables are a GFM
-   * EXTENSION, so no CommonMark example contains one. Against the GFM spec's own 24
-   * extension examples they cost three, all structural -- `gfm/table/199` lost the table
-   * entirely to a paragraph of `break` nodes, `gfm/table/202` dropped a trailing row, and
-   * `gfm/table/203` mishandled a short delimiter row.
-   *
-   * Only `tableShortDelimiterTransform` owns an example alone; `199` and `202` need the
-   * group, which is why the guard covers all six rather than the one.
-   *
-   * @see test/parity/gfm.ts for the corpus, test/parity/strict.test.ts for the gate.
-   *
-   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
-   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
-   * configurations still type-check.
-   */
-  legacyTables?: boolean;
-  /**
-   * Find a link label by raw balanced-bracket scanning, as Obsidian does, so the
-   * outermost pair wins where CommonMark gives the innermost: `[a [b](u) c](v)`
-   * links to `v` and shows `[b](u)` as written.
-   *
-   * On by default, and the default moved because the measurement said so. 369 cases
-   * in this corpus hold a nested bracket pair, which is why it shipped behind an
-   * option at all -- the actual cost of turning it on is **0 regressions** against
-   * 9 cases gained, so the estimate was an upper bound by a wide margin.
-   *
-   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
-   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
-   * configurations still type-check.
-   */
-  labelPrecedence?: boolean;
   /**
    * Convert a soft line ending into a positioned `break`, so `remark-breaks` has
    * nothing left to do.
@@ -584,10 +298,9 @@ export interface RemarkObsidianOptions {
  * link-label divergences are bugs it inherited from `remark-parse@8` and has not
  * fixed, and reproducing them off-platform helps nobody.
  *
- * The split is taken from the options' own documentation rather than from taste:
- * every flag below is one whose docstring says it parses something "as Obsidian
- * does" or "instead of CommonMark's", so turning it off is by definition the
- * compliant reading. An explicit option always wins over the preset.
+ * `legacy` parses with remark-parse 8, the parser Obsidian forks; `strict` parses with
+ * micromark, as `remark-parse` does. The feature options below work under both, and an
+ * explicit one always wins over the preset's value for it.
  */
 export type RemarkObsidianPreset = "legacy" | "strict";
 
@@ -597,20 +310,6 @@ export type RemarkObsidianFlags = Required<
 >;
 
 const STRICT_OVERRIDES: Partial<RemarkObsidianFlags> = {
-  legacyEmphasis: false,
-  legacyStrikethrough: false,
-  legacyEntities: false,
-  legacyAutolinks: false,
-  legacyCodeSpans: false,
-  legacyLists: false,
-  legacyHtmlBlocks: false,
-  legacySetext: false,
-  legacyLinkDefinitions: false,
-  legacyTabs: false,
-  legacyContainerLazy: false,
-  legacyLinkDestinations: false,
-  legacyTables: false,
-  labelPrecedence: false,
   // Obsidian's reading view re-parses a task line, so `- [ ] 1.` nests where
   // CommonMark leaves two flat items.
   taskReparse: false,
@@ -623,7 +322,11 @@ const STRICT_OVERRIDES: Partial<RemarkObsidianFlags> = {
   customTaskChars: false,
 };
 
-/** The flags that each emulate one part of remark-parse 8's reading on micromark. */
+/**
+ * The micromark path's switches for remark-parse 8's reading, one per part it emulated. Not
+ * options: never released, and removed before they were, since `legacy` parses with
+ * remark-parse 8 itself. Set from the preset alone -- all on for `legacy`, all off for `strict`.
+ */
 const LEGACY_FLAGS = [
   "legacyEmphasis",
   "legacyStrikethrough",
@@ -639,7 +342,11 @@ const LEGACY_FLAGS = [
   "legacyLinkDestinations",
   "legacyTables",
   "labelPrecedence",
-] as const satisfies readonly (keyof RemarkObsidianFlags)[];
+] as const;
+
+/** The resolved options, with the preset's internal legacy switches. */
+type Flags = RemarkObsidianFlags &
+  Record<(typeof LEGACY_FLAGS)[number], boolean>;
 
 const PRESETS: Record<RemarkObsidianPreset, Partial<RemarkObsidianFlags>> = {
   legacy: {},
@@ -661,20 +368,6 @@ const defaultOptions: RemarkObsidianFlags = {
   bareFootnoteRefs: true,
   inlineFootnotes: true,
   callouts: true,
-  legacyEmphasis: true,
-  legacyStrikethrough: true,
-  legacyEntities: true,
-  legacyAutolinks: true,
-  legacyCodeSpans: true,
-  legacyLists: true,
-  legacyHtmlBlocks: true,
-  legacySetext: true,
-  legacyLinkDefinitions: true,
-  legacyTabs: true,
-  legacyContainerLazy: true,
-  legacyLinkDestinations: true,
-  legacyTables: true,
-  labelPrecedence: true,
   positionedBreaks: true,
   escapedLineBreaks: false,
 };
@@ -708,12 +401,10 @@ export default function remarkObsidian(
     ...defaultOptions,
     ...PRESETS[preset],
     ...userOpts,
-    // The legacy flags are deprecated and ignored: `legacy` IS remark-parse 8's reading, and
-    // `strict` never has any of it.
     ...Object.fromEntries(
       LEGACY_FLAGS.map((flag) => [flag, preset === "legacy"]),
     ),
-  } as RemarkObsidianFlags;
+  } as Flags;
   // @ts-expect-error - unified `this` context
   const self = this as Processor<Root>;
   const data = self.data();

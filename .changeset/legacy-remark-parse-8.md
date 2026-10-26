@@ -14,12 +14,6 @@ references now agree on 6,828 of 6,844 documents (from 6,307), and node position
 Obsidian's: every recorded section and heading start and end matches, against 97% and 94%
 before.
 
-**Deprecated options.** `legacyEmphasis`, `legacyStrikethrough`, `legacyEntities`,
-`legacyAutolinks`, `legacyCodeSpans`, `legacyLists`, `legacyHtmlBlocks`, `legacySetext`,
-`legacyLinkDefinitions`, `legacyTabs`, `legacyContainerLazy`, `legacyLinkDestinations`,
-`legacyTables` and `labelPrecedence` are ignored. Each switched on one part of remark-parse 8's
-reading, so `legacy` now has all of them and `strict` none. They still type-check.
-
 **Tree shapes that changed in `legacy`,** each to what Obsidian reports:
 
 - A block's position starts at its line, indentation included (` ### foo` starts at column 1).

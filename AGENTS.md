@@ -42,8 +42,10 @@ highlights, tags, positioned soft breaks, and the speed-ups), `src/rp8/adapt.ts`
 this package's node types), `src/rp8/list.ts` (rp8's list reader with the two B3/B8 changes),
 `src/rp8/vendor/` (rp8, remark-footnotes 2, remark-math 3, parse-entities 2 -- see its README for
 every change made after conversion). `remarkObsidian` installs the reader as `this.parser` under
-`legacy`, so it must be `.use()`d after `remark-parse`. The 14 `legacy*` options are deprecated
-and ignored.
+`legacy`, so it must be `.use()`d after `remark-parse`. The 14 `legacy*` switches are internal,
+set from the preset (all on for `legacy`, all off for `strict`): no release ever carried them as
+options -- checked against every published tarball -- so they were removed rather than
+deprecated.
 
 **Its gates**, beyond the suite above:
 
