@@ -1784,6 +1784,56 @@ content column, the largest bucket is **16 of 94** (17%) and the next is 12. Tha
 predicate-level diffuseness recorded for list-item extent, where the dominant axis described
 most list items rather than a rule.
 
+### The `def-miss @ code` grid is BUILT, and the repair is refused at 11/65
+
+The second grid this file asked for. Built from REAL corpus contexts rather than invented
+shapes — every distinct full-indent shape among the 66 positions, each probed with the two
+lines above it, which is what makes it a population rather than a probe table. **28 shapes, and
+20 reproduce standalone with Obsidian's exact column.**
+
+Obsidian's column decomposes cleanly, and the formulas are disjoint:
+
+| condition                  | formula              | fits |
+| -------------------------- | -------------------- | ---: |
+| quote-prefixed             | marker run + 1       |    4 |
+| list marker, TAB separator | marker end + 1       |    6 |
+| otherwise                  | the label's own char |    6 |
+| root after a blank         | 0                    |    1 |
+| no formula                 | —                    |    3 |
+
+**THE COLUMN IS SECOND-ORDER, which the grid's own `ours` column shows: we emit NO definition
+in 15 of the 20.** The five where we do define we already get right. So this family is not
+column arithmetic — the line never becomes a definition at all, and a column rule would have
+nothing to attach to.
+
+Formation fails in `size`, exactly as `legacy-list.ts` predicts. For `····+⇥···[^名]` our tree
+is `listItem@3:5 > code@3:7`: `size` leaves the label FOUR columns past the content column, so
+indented code swallows it — the shape that file names ("a size of 3 leaves the label line FOUR
+spaces, exactly the indented-code threshold"). Obsidian's column 6 is the item's content column
+counting the separator tab as **ONE**, which would leave three columns and define.
+
+**So the single global change is to count a separator tab as one column, and it is REFUSED:**
+
+    separator tab as ONE column (rp8 detab)     11 gained / 65 lost     net -54
+
+`columnsOfRaw`'s tab-to-stop is right for 65 documents and wrong for 11, so the two readings
+genuinely conflict IN THE CORPUS and no global rule serves both. That is the fourth payment in
+this function — after `got` in columns (−38), B3's minimum in the ownership test (−32 and four
+CommonMark cases), and the single-digit-dot adjustment (+17 but breaks `list-items/273`/`274`) —
+and the first to measure this direction.
+
+What the next attempt needs is a DISCRIMINATOR separating these 15 from the 65, and the grid
+above is the wrong one for it: it measures the DEFINITION's reported column, while formation is
+governed by the item's CONTENT column. Those are different quantities — `columnsOfRaw`'s
+docstring cites the reference rules putting `-⇥` at content column 4, while this grid puts the
+definition at marker end + 1. Settling that needs a content-column grid, which is not built.
+
+Also worth recording: `quote-indented-code.ts` already carries this rule as ATTEMPTED AND
+REVERTED at the TRANSFORM level — unrestricted −27, plus a fence guard −27, root-level items
+only −16 — and its note that "`size` is already in columns" is corrected inside `legacy-list.ts`
+itself, which measured `expandTabs` as DETABBING rather than expanding. Two notes in this
+package disagreed about the same quantity; the measurement is in the list construct.
+
 ### The `math` extension's parity DEBT is 21 documents, and it earns 900
 
 The `$$`-after-a-nested-marker defect above was sized at the three documents known to carry it.
