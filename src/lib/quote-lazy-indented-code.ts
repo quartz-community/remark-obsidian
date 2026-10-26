@@ -292,7 +292,7 @@ export function quoteLazyIndentedCodeTransform(
       // survives the drop and keeps its end past the cut, so pulling the quote back onto it
       // leaves the quote still covering the code node. That is 15 `SIBLINGS OVERLAP`
       // violations in `compose.test.ts`, which is the gate catching exactly what it is for.
-      clamp(node, first, {
+      const removedEnd = clamp(node, first, {
         line: first,
         column: (lines[first - 1]?.length ?? 0) + 1,
         offset: (starts[first - 1] ?? 0) + (lines[first - 1]?.length ?? 0),
@@ -304,8 +304,19 @@ export function quoteLazyIndentedCodeTransform(
       // everything else past the cut. Restricting the rule to a run that reaches the quote's
       // last line avoids the deletion and costs referee 5860 -> 5858 and code 775 -> 758, so
       // the tail has to be rebuilt rather than avoided.
+      /**
+       * Rebuilt only as far as `clamp` actually REMOVED, never as far as the container's
+       * position CLAIMED.
+       *
+       * `containerLazyTransform` stretches a container's `position.end` over every block it
+       * absorbs, and a swallowed definition's span stretches with it, so the claim can reach
+       * lines the container never held. Rebuilding from the claim re-parses nodes that are
+       * still ROOT siblings and splices a second copy beside the container -- the "second
+       * copy of the rest of the note" warned of below. `fuzz:20261003-1779` duplicated three
+       * root nodes that way, defining `2@12@0` twice.
+       */
       const tail: RootContent[] = [];
-      if (last < quoteEnd) {
+      if (last < quoteEnd && removedEnd > last + 1) {
         const from = starts[last + 1]!;
         // To the QUOTE's end, not the document's: the quote's siblings were never touched,
         // and re-parsing past it would insert a second copy of the rest of the note.
@@ -369,32 +380,38 @@ function shiftBy(
  * value. The line count is what gets dropped, not a re-slice of the source, because the
  * value is what the tokenizer resolved and a slice is what the author typed.
  */
-function clamp(node: Node, maxLine: number, fallback: Point): void {
+function clamp(node: Node, maxLine: number, fallback: Point): number {
   const self = node as unknown as { children?: RootContent[]; value?: unknown };
   const children = self.children;
+  let removed = 0;
 
   if (Array.isArray(children)) {
     for (let index = children.length - 1; index >= 0; index--) {
       const child = children[index]!;
       const start = child.position?.start?.line;
       if (start !== undefined && start > maxLine) {
+        removed = Math.max(removed, child.position?.end?.line ?? 0);
         children.splice(index, 1);
         continue;
       }
-      clamp(child, maxLine, fallback);
+      removed = Math.max(removed, clamp(child, maxLine, fallback));
     }
     const last = children[children.length - 1];
     if (node.position && last?.position?.end) {
       node.position.end = { ...last.position.end };
-      return;
+      return removed;
     }
   }
 
   const end = node.position?.end;
-  if (!end || end.line <= maxLine) return;
+  if (!end || end.line <= maxLine) return removed;
+  // Counted as removed too: the leaf truncation below discards content past the cut exactly
+  // as the child deletion above does, and the caller's tail has to rebuild both.
+  removed = Math.max(removed, end.line);
   if (typeof self.value === "string") {
     const keep = self.value.split("\n").length - (end.line - maxLine);
     self.value = self.value.split("\n").slice(0, Math.max(1, keep)).join("\n");
   }
   node.position!.end = { ...fallback };
+  return removed;
 }
