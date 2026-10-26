@@ -1664,6 +1664,48 @@ done here.
 recorded as inert across thousands of documents, so this is fine for characterising a rule and
 must not be used to settle one against the goldens.
 
+### The one UNNAMEABLE document was a duplicated SUBTREE, and both halves are fixed
+
+`mechanism.mts` identified 537 of 538 diverging documents; the single hold-out reached
+`order-only`, the bucket this file keeps as a tripwire "so it cannot absorb the next blind
+spot". It was recorded as zero and had become one, which is the tripwire working.
+
+It was not an ordering problem. `fuzz:20261003-1779` emitted `[^2]:` TWICE at `2@12@0` and
+`[^x-y]` twice at `12@9`, because the TREE held a duplicated subtree — `code` / `paragraph` /
+`footnoteDefinition` present both nested in a list item and at root, with the `listItem`
+claiming `3:2-7:7` while containing nodes at lines 10–13.
+
+**The owner is `quoteLazyIndentedCodeTransform`, and the cause is CROSS-PASS.** That pass clamps
+a container back to the cut and re-parses whatever it deleted, reading the extent from
+`position.end`. `containerLazyTransform` stretches a container's `position.end` over every block
+it absorbs — and a swallowed definition's span stretches with it — so the claim reaches lines the
+container never held. Rebuilding from it re-parsed nodes that were still ROOT siblings and
+spliced a second copy beside the container. The pass's own comment warns of exactly that
+("re-parsing past it would insert a second copy of the rest of the note"); the stretched
+position is what defeated the precaution.
+
+**`clamp` REMOVES CONTENT TWO WAYS, and the first fix missed one.** Bounding by the last child's
+end is inert, because that child's span is stretched too. Bounding by the children `clamp`
+DELETED read +1/−1 — it lost `fuzz#2965`'s table, whose lines lived inside a TRUNCATED LEAF
+VALUE rather than a deleted child, so nothing was "dropped" while content really had gone.
+Counting both is what makes the bound honest, and `403f7cc` shipped at 1 gain / 0 lost:
+
+    fuzz#2965   removed 7, last 3   ->  tail rebuilt   table kept
+    fuzz#1779   removed 7, last 6   ->  no tail        duplicate gone
+
+**The labeller now names the shape, and `0026cef`'s control is the part to copy.** A duplicate
+is invisible to a map keyed on `name@line`, so `def-dup`/`ref-dup` are computed before it.
+Stated as "any count difference" the buckets fired on 308 and 213 documents and drove one-away
+395 → 123, because every MISS became a dup too; restricted to keys BOTH sides hold with
+different counts — the only case the maps cannot see — the ranking is unchanged. And the
+known-positive control APPEARED TO FAIL first: the printed table is `ranked.slice(0, 20)` and a
+mechanism on one document ranks ~30th, so it has to be read from `/tmp/mechanism.json`. Read
+there, reverting the fix fires the tripwire on 5 documents and takes `order-only` to 0.
+
+It also surfaced a population nothing could see before: **three further duplicate-emission
+documents** — `fuzz:20261003-2864` and the `reproducer:c751`/`c752` pair, each carrying
+`ref-dup` beside another mechanism.
+
 ### The PAIR table counts a SWAP twice, so its two-mechanism figure is inflated
 
 `mechanism.mts` reports 119 documents at two mechanisms and ranks the commonest pairs, the
