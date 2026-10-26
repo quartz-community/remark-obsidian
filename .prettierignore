@@ -13,3 +13,6 @@ test-vault/.obsidian
 # byte-identical so a diff against upstream shows recorded answers changing and
 # nothing else.
 test/parity/referee-answers
+
+# Vendored from remark-parse 8.0.3, kept byte-comparable with upstream so the Obsidian changes stay auditable.
+src/rp8/*.cjs

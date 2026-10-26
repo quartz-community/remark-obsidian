@@ -54,6 +54,7 @@
  *     and this chain no longer registers `remark-math`.
  */
 
+import { parseLegacy8 } from "../../src/rp8/adapt.js";
 import type { Root as MdRoot } from "mdast";
 import type { Root as HastRoot } from "hast";
 import { unified } from "unified";
@@ -321,6 +322,7 @@ export function parseOurs(
   markdown: string,
   profileName: ProfileName = "quartz-default",
 ): MdRoot {
+  if (process.env.PARITY_PARSER === "rp8") return parseLegacy8(markdown);
   const processor = unified()
     .use(remarkParse)
     .use(remarkGfm)

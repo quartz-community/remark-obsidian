@@ -890,7 +890,9 @@ export function headingName(node: Node, source: string): string {
   const start = node.position?.start?.offset;
   const end = node.position?.end?.offset;
   if (start === undefined || end === undefined) return "";
-  const raw = source.slice(start, end);
+  // Obsidian starts a heading at its LINE, indentation included (`compute` records
+  // ` ### foo` as `heading@0:0`), where micromark starts it at the `#`; read both.
+  const raw = source.slice(start, end).replace(/^[ \t]{1,3}(?=#)/, "");
   // `[ \t]*$` as well as `[ \t]+`, or an empty heading never matches at all and
   // falls through to the setext branch below, which then reports its own marker:
   // `#` was named `#` and `## ⏎#⏎### ###` named its middle heading `#`.
@@ -1550,6 +1552,9 @@ function stripBlockIds(tree: Root, source: string): Root {
         ONLY_BLOCK_ID.test(value) &&
         (child as { position?: { start?: { column?: number } } }).position
           ?.start?.column === 1 &&
+        // Obsidian starts an indented paragraph at its line (` ^blk` is `paragraph@0:0`),
+        // where micromark starts it at the content, so column 1 alone is not "unindented".
+        !/[ \t]/u.test(source[pointOf(child, "start") ?? 0] ?? "") &&
         !adjacentBlockFollows(parent.children, index, source)
       ) {
         parent.children.splice(index, 1);
