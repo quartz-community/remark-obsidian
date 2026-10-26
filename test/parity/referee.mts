@@ -377,34 +377,43 @@ if (blastFrom !== undefined) {
 }
 
 if (wantIds) {
-  for (const key of agreed) console.log(key);
-  process.exit(0);
+  // ONE write, and NO `process.exit`. Both halves are load-bearing and each was a separate
+  // truncation bug: `process.exit` DISCARDS whatever `process.stdout` still has buffered,
+  // because writes to a pipe are asynchronous -- 6,307 ids came back as 650, 933, 1874 and
+  // 2450 lines across four runs, which made `regressions.mts --self-test` report DIVERGED
+  // against a referee it had itself truncated, with `status` 0 and no error to show for it.
+  // `fs.writeSync` is not the cure: a pipe's buffer is 64 KB, so one 134 KB synchronous write
+  // comes back PARTIAL and silently drops the rest. Queueing the whole payload through
+  // `process.stdout.write` and letting the process end on its own lets Node drain it.
+  process.stdout.write(agreed.length > 0 ? `${agreed.join("\n")}\n` : "");
 }
 
-console.log(
-  `referee: ${agree}/${total} agree (${((100 * agree) / total).toFixed(1)}%)`,
-);
-console.log(
-  "  empty-named references excluded from both sides, as the corpus's own comparator does",
-);
-{
-  const assertions = defsMatched + refsMatched;
-  const wanted = defsWanted + refsWanted;
-  const pc = (a: number, b: number) =>
-    `${a}/${b} (${((100 * a) / b).toFixed(2)}%)`;
-  console.log(`  ASSERTIONS matched: ${pc(assertions, wanted)}`);
-  console.log(`    definitions      ${pc(defsMatched, defsWanted)}`);
-  console.log(`    references       ${pc(refsMatched, refsWanted)}`);
-}
-console.log(`  nodes spliced without a position: ${unplaced}`);
-console.log(
-  `\ncode blocks (root level), a dimension nothing read until now:` +
-    `\n  ${codeAgree}/${withCode} agree (${((100 * codeAgree) / withCode).toFixed(1)}%)`,
-);
-for (const [kind, count] of [...codeKinds].sort((a, b) => b[1] - a[1])) {
-  console.log(`  ${String(count).padStart(5)}  ${kind}`);
-}
-console.log("\ndisagreement kinds:");
-for (const [kind, count] of [...kinds].sort((a, b) => b[1] - a[1])) {
-  console.log(`  ${String(count).padStart(5)}  ${kind}`);
+if (!wantIds) {
+  console.log(
+    `referee: ${agree}/${total} agree (${((100 * agree) / total).toFixed(1)}%)`,
+  );
+  console.log(
+    "  empty-named references excluded from both sides, as the corpus's own comparator does",
+  );
+  {
+    const assertions = defsMatched + refsMatched;
+    const wanted = defsWanted + refsWanted;
+    const pc = (a: number, b: number) =>
+      `${a}/${b} (${((100 * a) / b).toFixed(2)}%)`;
+    console.log(`  ASSERTIONS matched: ${pc(assertions, wanted)}`);
+    console.log(`    definitions      ${pc(defsMatched, defsWanted)}`);
+    console.log(`    references       ${pc(refsMatched, refsWanted)}`);
+  }
+  console.log(`  nodes spliced without a position: ${unplaced}`);
+  console.log(
+    `\ncode blocks (root level), a dimension nothing read until now:` +
+      `\n  ${codeAgree}/${withCode} agree (${((100 * codeAgree) / withCode).toFixed(1)}%)`,
+  );
+  for (const [kind, count] of [...codeKinds].sort((a, b) => b[1] - a[1])) {
+    console.log(`  ${String(count).padStart(5)}  ${kind}`);
+  }
+  console.log("\ndisagreement kinds:");
+  for (const [kind, count] of [...kinds].sort((a, b) => b[1] - a[1])) {
+    console.log(`  ${String(count).padStart(5)}  ${kind}`);
+  }
 }
