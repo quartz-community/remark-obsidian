@@ -563,6 +563,55 @@ false, and the 288 is the proof. The reachable figure is far higher; what it cos
 mechanism rather than one architectural move, with ~288 documents needing no probing at all,
 ~249 needing the live oracle (how all 15 fixes in this session were derived), and ~3 forbidden.
 
+### Deriving from rp8's BLUEPRINT: the code dimension, and the first >70% split
+
+The 288 say rp8 holds the answer; this is what happens when the rule is derived from its TREE
+rather than from our divergences. Target: the 67 `def-miss`/`ref-miss @ code` documents in the
+rp8-available bucket.
+
+**The diff is unanimous — 71 of 71 positions are "we say `code`, rp8 says content"**, and every
+source line carries a TAB inside its container prefix:
+
+    >···⇥[^ch2*]: Definition      blockquote>code  ->  blockquote>footnoteDefinition
+    ···*⇥··⇥[^名]: Definition      listItem>code    ->  listItem>footnoteDefinition
+    ··⇥[^1]: More                 code             ->  footnoteDefinition
+    >⇥>⇥[^ä]: def                 blockquote>code  ->  paragraph>footnoteReference
+
+Three hosts — quote 27, listItem 27, root 17 — which is why the `legacy-list.ts` experiment lost
+65: it changed ONE of the three, globally.
+
+**The tab is necessary and nowhere near sufficient.** As a line-shape predicate over every
+code-covered label line: **77 gain / 800 break, 8.8%** against 2.7% without a tab. A 3.2x lift
+and useless. rp8's decision is a function of its TOKENIZER STATE, not the line's shape, so no
+line-shape approximation of it can work.
+
+**rp8 as a RUNTIME oracle for this dimension is 37.9%** — 106 gain / 174 break — and the figure
+beside it matters more: the two parsers AGREE the line is code in **2,784 of 3,064** positions
+(90.9%). On the 280 disagreements Obsidian sides with US 62% of the time, so Obsidian's fork has
+moved away from stock rp8 here too, exactly as the 1,689 says.
+
+**But split by the HOST of our code node, it separates — the first >70% in this territory:**
+
+| host                 | GAIN | BREAK |      prec |
+| -------------------- | ---: | ----: | --------: |
+| `blockquote`         |   32 |     8 | **80.0%** |
+| `footnoteDefinition` |    3 |     1 |     75.0% |
+| root                 |   24 |    11 | **68.6%** |
+| `listItem`           |   45 |    69 |     39.5% |
+| `callout`            |    2 |    82 |      2.4% |
+| `comment`            |    0 |     3 |      0.0% |
+
+**And the reason is principled rather than fitted: rp8's disagreement is informative only where
+rp8 HAS the construct.** `callout` and `comment` are this package's own extensions — rp8 has no
+concept of either, so its reading there is uninformed rather than a second opinion, and that is
+the 82 breaks. `blockquote` and root are native to both parsers. `listItem` sits between, because
+our list construct is a vendored fork and the conflict is genuine.
+
+Combined blockquote + root + footnoteDefinition is **59 gain / 20 break, 74.7%** — real signal,
+short of the N/0 bar, NOT shipped. The next narrowing to try is the one this file keeps
+rediscovering: these are POSITION-level figures, and a position-level gain is not a
+document-level gain, so re-score at document level before building anything.
+
 ### Modelling rp8's line selection: the rule is EXPRESSIBLE and the choice is NOT SELECTABLE
 
 Explored directly, because upstream reports 99.2% on this same corpus with rp8. Four
