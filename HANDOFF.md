@@ -127,12 +127,33 @@ construct.** `callout` and `comment` are this package's own extensions — rp8 h
 either, so its reading there is uninformed, and that is 82 of the breaks in one row.
 `blockquote` and root are native to both parsers.
 
-Combined blockquote + root + footnoteDefinition: **59 gain / 20 break, 74.7%.** Not shipped.
+Combined blockquote + root + footnoteDefinition: 59 gain / 20 break, 74.7% at POSITION level.
 
-**Next action:** re-score that combination at **document** level. These are position-level
-figures and a position-level gain is not a document-level gain — that has been mispredicted in
-both directions. If it holds, check whether the 20 breaks concentrate somewhere excludable on
-principle (as the callout 82 did) rather than by fitting.
+**RE-SCORED AT DOCUMENT LEVEL, AND IT IS THE LARGEST MOVEMENT IN THE BACKLOG:**
+
+| scope                                  | gained | lost |     net |
+| -------------------------------------- | -----: | ---: | ------: |
+| blockquote + root + footnoteDefinition |     50 |   12 | **+38** |
+| blockquote + root                      |     48 |   12 |     +36 |
+| blockquote only                        |     29 |    4 |     +25 |
+
+Controlled first: the simulation re-sorts the merged fact arrays and the referee compares
+ORDERED arrays, so sorting alone was scored on its own — 6,307 either way, 0 verdicts flip. The
++38 is not a sort artifact. This is also the first document-level re-score in this effort to
+come out MORE generous than its position-level figure rather than less.
+
+**It is NOT shippable as it stands, for two independent reasons.**
+
+1. **12 losses against a standing N/0 bar.** They concentrate in this package's own extensions
+   — `%%` closers 4, math 2, the `night:c6` pipeless-table family 4, plus 2 ref-only. Excluding
+   documents that hold any Obsidian-only construct cuts losses 12 → 5 but costs 22 gains (net
+   +38 → +23), so that crude exclusion is worse than none. A POSITION-level exclusion has not
+   been tried and is the obvious next narrowing — derive it on principle, not by naming the
+   losing families.
+2. **Implementing it means running rp8 AT RUNTIME.** The simulation merges rp8's facts into
+   ours. Doing it for real adds `remark-parse@8`, `remark-footnotes@2`, `remark-math@3` and
+   `unified@9` as PRODUCTION dependencies and parses every document twice — an architectural
+   decision for a package that ships to Quartz, not a pass. See §7.
 
 ### 4b. The math extension's container defect
 
@@ -177,8 +198,8 @@ gaps between a definition's children.
 
 | attempt                                        | measured                       |
 | ---------------------------------------------- | ------------------------------ |
-| adopt rp8's definition extents wholesale       | 58 gain / 98 lost, **net −40** |
-| select per document between ours and rp8's     | **51%** — a coin flip          |
+| adopt rp8's definition EXTENTS wholesale       | 58 gain / 98 lost, **net −40** |
+| select between ours and rp8's EXTENTS per doc  | **51%** — a coin flip          |
 | count a list separator tab as ONE column       | 11 gain / 65 lost, **net −54** |
 | `def-span` as a rule                           | oracle agrees **46 of 47**     |
 | …its two dominant shapes                       | 83% and 91.6% already agreeing |
@@ -236,11 +257,11 @@ reference-side ones, because line selection governs definitions while the refere
 `metadataCache` semantics rp8 has no concept of — and that is where we beat rp8 in 1,689
 documents.
 
-| option                  | consequence                                                             |
-| ----------------------- | ----------------------------------------------------------------------- |
-| stay on micromark       | keeps `strict`/CommonMark and the 1,689; the gap is rules per mechanism |
-| dual-parse with rp8     | **refused by measurement** — net −40, selector 51%                      |
-| port to rp8 as the base | 99.2% by precedent, but abandons `strict` and re-opens the 1,689        |
+| option                  | consequence                                                                                                                                                                                         |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| stay on micromark       | keeps `strict`/CommonMark and the 1,689; the gap is rules per mechanism                                                                                                                             |
+| dual-parse with rp8     | **depends entirely on scope** — EXTENTS are net −40, but the CODE dimension scoped by host is **+38 documents** (§4a), at the cost of 4 legacy production deps and a second parse of every document |
+| port to rp8 as the base | 99.2% by precedent, but abandons `strict` and re-opens the 1,689                                                                                                                                    |
 
 That is a product decision, not an engineering one. `strict` exists specifically to serve Quartz
 with CommonMark compliance, and rp8 predates CommonMark.

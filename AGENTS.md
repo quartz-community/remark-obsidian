@@ -607,10 +607,37 @@ concept of either, so its reading there is uninformed rather than a second opini
 the 82 breaks. `blockquote` and root are native to both parsers. `listItem` sits between, because
 our list construct is a vendored fork and the conflict is genuine.
 
-Combined blockquote + root + footnoteDefinition is **59 gain / 20 break, 74.7%** — real signal,
-short of the N/0 bar, NOT shipped. The next narrowing to try is the one this file keeps
-rediscovering: these are POSITION-level figures, and a position-level gain is not a
-document-level gain, so re-score at document level before building anything.
+Combined blockquote + root + footnoteDefinition is 59 gain / 20 break, 74.7% at POSITION level.
+
+**RE-SCORED AT DOCUMENT LEVEL IT IS +38, THE LARGEST MOVEMENT LEFT IN THE BACKLOG** — and the
+first document-level re-score in this effort to come out MORE generous than its position-level
+figure rather than less, which is the opposite of what this file's own rule predicts:
+
+| scope                                  | gained | lost |     net |
+| -------------------------------------- | -----: | ---: | ------: |
+| blockquote + root + footnoteDefinition |     50 |   12 | **+38** |
+| blockquote + root                      |     48 |   12 |     +36 |
+| blockquote only                        |     29 |    4 |     +25 |
+
+**Controlled before believing it.** The simulation merges rp8's facts into ours and re-sorts,
+while the referee compares ORDERED arrays — so sorting alone was scored on its own first:
+6,307 either way, 0 verdicts flipped. The +38 is not a sort artifact.
+
+**NOT SHIPPED, for two independent reasons.** Twelve losses against the N/0 bar, concentrated
+in this package's OWN extensions — `%%` closers 4, math 2, the `night:c6` pipeless-table family
+4, plus 2 ref-only. And excluding every document that holds an Obsidian-only construct cuts
+losses 12 → 5 but costs 22 gains (+38 → +23), so the crude exclusion is worse than none; a
+POSITION-level exclusion is untried and is the next narrowing, to be derived on principle
+rather than by naming the losing families.
+
+The second reason is the larger one: the simulation MERGES rp8's facts, and doing that for real
+means running rp8 at RUNTIME — `remark-parse@8`, `remark-footnotes@2`, `remark-math@3` and
+`unified@9` as production dependencies plus a second parse of every document. That is an
+architectural decision for a package that ships to Quartz, not a pass.
+
+**And it corrects the dual-parse refusal recorded above.** "Dual-parse is refused at net −40"
+is true of definition EXTENTS and false of the code dimension scoped by host, which is +38. The
+scope is the whole question; the earlier figure was not wrong, it was answering a different one.
 
 ### Modelling rp8's line selection: the rule is EXPRESSIBLE and the choice is NOT SELECTABLE
 
