@@ -1463,6 +1463,79 @@ count four or more and make code. That is `tokenizeIndent`'s territory, which al
 recorded refusals (`got` in columns −38, `initialSize` in columns inert), and it is now sized at
 53 one-away documents rather than the 21 the five-space cap was aimed at.
 
+### No HOST-level reference exclusion exists, and the discriminator is the CONSTRUCT
+
+`mechanism.mts` names a `ref-extra` bucket by its HOST, which invites one exclusion rule per
+host. Measured as rules over all 6,844 — every one of our references, scored against whether
+Obsidian indexes it — all seven refute:
+
+| host         | GAIN | BREAK |  prec |
+| ------------ | ---: | ----: | ----: |
+| `paragraph`  |  166 | 16254 |  1.0% |
+| `comment`    |   13 |  1236 |  1.0% |
+| `code`       |   11 |    47 | 19.0% |
+| `nothing`    |    5 |     6 | 45.5% |
+| `listItem`   |    2 |    23 |  8.0% |
+| `blockquote` |    1 |    10 |  9.1% |
+| `tableCell`  |    1 |   394 |  0.3% |
+
+`nothing` at 45.5% is the C2 trap — an 11-position population. The `comment` row is the one that
+looks most like a rule and is not: it reads as "Obsidian does not index inside `%%`", and the
+oracle already settled the opposite — `a %% [^1] %% y[^2]` reports BOTH references, so a `%%`
+comment keeps its reference LIVE. 1,236 breaks is that answer at corpus scale.
+
+**Classified by SOURCE CONSTRUCT instead of by host, exactly one is a rule:**
+
+| construct    | GAIN | BREAK |   prec |                                  |
+| ------------ | ---: | ----: | -----: | -------------------------------- |
+| `<!-- … -->` |    2 | **0** | 100.0% | **shipped `2f4014b`**            |
+| `` `…` ``    |    5 |     1 |  83.3% | the one break is not a code span |
+| `$…$`        |    5 |     8 |  38.5% |                                  |
+| `^[ … ]`     |    9 |    66 |  12.0% | the 10/66 scan, re-derived       |
+| `%%` … `%%`  |    6 |  1087 |   0.5% | refuted 1,087 ways               |
+
+Two comment syntaxes, OPPOSITE answers — HTML dead, Obsidian live — which is why the host-level
+`comment` row averages them into noise. The host is the wrong axis for this dimension; the
+delimiter around the reference is the right one, and `isDelimited`'s own docstring had already
+reached that conclusion for the untokenized path ("the discriminator is the DELIMITER, not the
+indentation").
+
+### `ref-miss @ footnote` was PHANTOM, and `named()` is why
+
+The same run reported 22 references, in 21 documents, that Obsidian indexes and we cover with a
+`footnote` node — which reads as our inline-footnote span running past its close, a bounded and
+oracle-answerable rule. Every one has `span="^[]"` and an **EMPTY NAME**.
+
+`referee.mts:99` is `rows.filter((row) => row[0] !== "")` — empty-named rows are excluded from
+BOTH sides, as the corpus's own comparator does. The referee never scores them. Applying the
+filter removes the bucket entirely: the family does not exist.
+
+This file already carries the rule that produced it — "never reimplement an oracle's agreement
+test" — and the failure mode is that a reimplementation without `named()` manufactures a
+plausible, well-shaped family rather than an obvious error. It ranked fifth in its own table.
+
+### Two methodological errors from one stretch, both worth more than the stretch
+
+Chasing the `` `…` `` row above produced two unsound measurements in a row. Both are recorded
+because each is a trap this file did not have.
+
+**A SHRINK PREDICATE MUST ENCODE THE DIVERGENCE, NOT OUR SIDE OF IT.** A greedy delta-debug over
+`fuzz#2570` was given `we emit a reference named note` and drove to `[^Note]` / `·` / `⇥` — three
+characters that satisfy it trivially, because a bare reference is one Obsidian indexes too. The
+predicate has to be `we emit it AND Obsidian does not`; otherwise the minimiser optimises toward
+the degenerate case and reports it as the mechanism.
+
+**A PROBE MUST GO THROUGH `parseOurs`, NOT A HAND-BUILT PROCESSOR.** An options bisect over the
+same three lines read `clean` under a locally assembled `remarkParse → remarkGfm →
+remarkObsidian({}) → remarkBreaks`, while `refereeFactsWithTree` read `LEAKS`. The contradiction
+is the tell: `parseOurs` applies **`applyTextTransform`** to the source first and passes
+**`PROFILES["quartz-default"].remarkObsidian`**, not `{}`. So the bisect measured a pipeline the
+harness does not use, and its clean sweep across all 13 flags meant nothing.
+
+Also confirmed in passing: the five `` `…` `` shapes and the `$…$` shapes are all CORRECT in
+isolation — `inlineCode` and `inlineMath` form, nothing leaks — so this file's existing note on
+that stands, and whatever flattens them in the dense documents is still unnamed.
+
 ### The largest remaining mechanism is definition EXTENT, at 95 documents
 
 Classifying all 559 failures by error signature — not by family — turns up a bucket no family
