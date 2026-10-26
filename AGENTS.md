@@ -1624,6 +1624,65 @@ this file already refuses at 97.6%:
 87 of 172 are on a definition label line, which is the 2,183-position / 2,130-indexed refusal.
 So the remainder is not 172 unexplored rows; it is ~85, and the only ungrouped bucket is 25.
 
+### The `math` extension's parity DEBT is 21 documents, and it earns 900
+
+The `$$`-after-a-nested-marker defect above was sized at the three documents known to carry it.
+Ablating the flag corpus-wide sizes the whole extension instead:
+
+|                          |         |
+| ------------------------ | ------: |
+| agreeing with math ON    |   6,304 |
+| agreeing with math OFF   |   5,425 |
+| GAINED by turning it off |  **21** |
+| LOST by turning it off   | **900** |
+
+So the extension is overwhelmingly load-bearing — turning it off is a 879-document net loss and
+was never an option — but its DEBT is 21 documents, seven times the 3 the minimal reproduction
+accounted for. That is what makes a parse-phase repair of the container interaction worth a
+branch rather than a curiosity. Of the 16 documents in the `ref-miss @ math` bucket, `math:false`
+fixes 5; the other 11 carry additional mechanisms.
+
+**Treat those two figures as ±2.** The ablation restates the agreement test rather than calling
+the referee, and it reads 6,304 where `referee.mts` reads 6,306 — so it is NOT identical, which
+is the hazard this file records for every reimplementation of an oracle's test. The direction
+and the order of magnitude are safe; the exact counts are not.
+
+### `ref-col` is CLOSED, and two thirds of it is must-not-fix
+
+| references                   |            |
+| ---------------------------- | ---------: |
+| agree on name AND line       | **17,885** |
+| of those, the COLUMN differs |      **6** |
+
+99.97% agreed, and the six do not form a family. Deltas run both ways (−3 ×2, +2 ×2, −1, −2),
+and **four of the six are the P1/P2 cache bugs where OUR answer is right**: `%% a[^1]` (obs 2,
+ours 4) and `%% [^a]: sees [^b]` (obs 12, ours 14) are P1, the `%%` opener's indentation read as
+absent; `ab cd[^1]` (obs 8, ours 5) and `··> ab[^1]` (obs 8, ours 6) are P2, the nested-callout
+shift this file already names `night:cs-ord-co-lazy-text`.
+
+The two real ones both carry emoji or `**bold**` before the reference, so they are grapheme-width
+arithmetic rather than indentation. Nothing here is buildable, and chasing the other four is
+forbidden.
+
+### `def-col` is 38 of 5,133, and it wants a GRID rather than an offset
+
+Re-derived against the current tree, the definition column dimension is **99.3% agreed** — 38
+differ, where this file previously recorded 42 of 5,112. The deltas run BOTH ways, so a constant
+offset is ruled out exactly as before:
+
+    -2 x16    -1 x9    -3 x7    +3 x3    +1 x1    -4 x1    +2 x1
+
+33 of 38 are NEGATIVE — Obsidian reports a LARGER column than we do — and the hosts say why: a
+TAB or a QUOTE prefix in nearly every one. `⇥··[^4]:` reports 3 against our 1, `⇥·····[^x-y]:`
+reports 3 against our 1, `>·····[^Ω]:` reports 4 against our 2.
+
+This is `ccbe25b`'s family with host shapes its grid does not cover, and the samples do NOT fit
+the rule that pass encodes — the label indent's character count predicts `⇥··` → 3 correctly and
+`⇥·····` → 3 wrongly (6). So the arithmetic is not uniform across tab runs and the next step is
+the same one that cracked it last time: build the oracle grid for tab-led and quote-prefixed
+hosts, then fit. Do not fit from these 38, which is this file's standing rule and the reason
+`ccbe25b` landed at 4/0 where two earlier attempts in that function measured −38 and inert.
+
 ### `ref-miss @ footnote` was PHANTOM, and `named()` is why
 
 The same run reported 22 references, in 21 documents, that Obsidian indexes and we cover with a
