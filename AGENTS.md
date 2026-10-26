@@ -1624,6 +1624,46 @@ this file already refuses at 97.6%:
 87 of 172 are on a definition label line, which is the 2,183-position / 2,130-indexed refusal.
 So the remainder is not 172 unexplored rows; it is ~85, and the only ungrouped bucket is 25.
 
+### The definition-column grid, and the false contradiction it nearly produced
+
+`def-col` (38 positions) and `def-miss @ code` (53 one-away) both want the oracle grid this file
+says to build rather than fit. 39 probes against live 1.15.0, definitions read from `footnotes`
+so the `footnoteRefs` definition-gating warning does not apply. Four clauses come out clean:
+
+| context                            | answer                                               |
+| ---------------------------------- | ---------------------------------------------------- |
+| root, 0–3 spaces                   | defines, and the column is **0 whatever the indent** |
+| root, 4+ spaces OR any leading tab | **no definition at all** — indented code             |
+| quote, `> ` · `>··` · `··> `       | column **2 · 2 · 4** — marker plus ONE space         |
+| quote, `>·····` or `>⇥`            | no definition                                        |
+| list item after a blank, 2sp · 4sp | defines, column **2** for both                       |
+| list item after a blank, 2sp + TAB | **no definition**                                    |
+
+Two of these are new and directly useful. **A root definition's column is 0 however deep its
+indent** — so the varying columns in the corpus come entirely from container prefixes, not from
+label indentation. And **the quote form counts the marker plus exactly one space**, so `>··[^a]`
+is column 2 and not 3, which is the same "indentation read as absent" shape P1 records.
+
+**MY FIRST READING OF THIS GRID WAS A FALSE CONTRADICTION, AND THE CONTEXT IS WHY.** Probed at
+root and standalone, all seven of D4's cases answer `code` — `⟨4sp⟩`, `⟨5sp⟩`, `⟨6sp⟩`, `⇥`,
+`⇥⟨3sp⟩`, `⇥⟨4sp⟩`, `⇥⇥` — which reads as refuting the table this file records as reproducing
+7 of 7. It refutes nothing: **D4 is a LIST-CONTEXT table**, as B2's own preamble says ("for a
+line after a blank line"), and in that context the probes agree — `··[^a]` and `····[^a]` both
+define at column 2 under a bullet item. I probed the wrong context and nearly filed the result
+as a parser defect. A threshold table belongs to the host it was derived in; re-probing it
+somewhere else measures a different rule.
+
+**What the grid does NOT yet cover is the case the corpus actually holds.** All 66 `def-miss @
+code` label lines carry a tab INSIDE a container prefix — `⇥>`, `>···⇥`, `···*⇥··⇥` — where
+Obsidian defines. The grid says a tab immediately before the label kills the definition, so the
+discriminator is whether the tab is consumed as container indentation or sits against the label.
+Settling that needs a second grid over tab-in-prefix shapes, which is the next step and is not
+done here.
+
+**Version caveat:** these are 1.15.0 answers and the goldens pin 1.14.5. Both releases are
+recorded as inert across thousands of documents, so this is fine for characterising a rule and
+must not be used to settle one against the goldens.
+
 ### The PAIR table counts a SWAP twice, so its two-mechanism figure is inflated
 
 `mechanism.mts` reports 119 documents at two mechanisms and ranks the commonest pairs, the
