@@ -516,6 +516,62 @@ Three things that recipe got right and guessing would not have:
 
 ## Architectural conclusion (do not re-litigate without new evidence)
 
+### Modelling rp8's line selection: the rule is EXPRESSIBLE and the choice is NOT SELECTABLE
+
+Explored directly, because upstream reports 99.2% on this same corpus with rp8. Four
+measurements, and together they close the question.
+
+**The rule is 12 lines of readable source and our oracle probes already confirmed it.**
+`remarkFootnotes2/index.js:200-213` breaks a definition when `indent < 4` AND either the
+previous line was blank or the line INTERRUPTS, with `indent` accumulating to tab stops and
+`indent > 4` disabling the test entirely. Its interruptor set (`index.js:54-68`) is every rp8
+block method except `newline`, `indentedCode`, `paragraph` and `footnoteDefinition`. That is
+exactly the rule this file recorded from 47 live probes at 46/47 — the source says why.
+
+**rp8 HAS the answer for 156 of 392 one-away documents, and only on the DEFINITION side:**
+
+| mechanism                | one-away | rp8 has it |
+| ------------------------ | -------: | ---------: |
+| `def-miss @ code`        |       53 |     **40** |
+| `def-span-longer`        |       59 |     **34** |
+| `def-col`                |       26 |     **20** |
+| `def-span-shorter`       |       32 |     **19** |
+| `def-extra @ listItem`   |       14 |     **13** |
+| `def-extra @ blockquote` |        9 |      **8** |
+| `ref-miss @ code`        |       45 |          0 |
+| `ref-extra @ paragraph`  |       76 |          5 |
+| `ref-col`                |        6 |          0 |
+
+Every definition-side family this file REFUSED is in rp8's blueprint, and no reference-side
+one is. That split is the architecture: line selection governs definitions, while the
+reference side is `metadataCache` semantics rp8 has no concept of — which is where we beat
+rp8 in **745** documents. Corrected, rp8 also now BEATS us on root code ranges, 855 to 849.
+
+**But rp8 is NOT an authority, and adopting its extents wholesale is a net loss:**
+
+|                                 |         |
+| ------------------------------- | ------: |
+| ours today                      |   6,307 |
+| with rp8's definition end lines |   6,267 |
+| gained / lost                   | 58 / 98 |
+
+Per extent it is 79 rp8-right against 107 we-right. **And no discriminator separates them** —
+"the document holds an Obsidian-only node" gives 24 gain / 23 break, **51%**, a coin flip
+against base rates of 70% and 79%; "the label line is quoted" is 44%, worse than chance.
+
+**A HAND-PORT OF THE LOOP IS NOT THE SHORTCUT.** Ported as line-shape regexes it scores 14 of
+27 root-hosted and 6 of 27 quoted, where rp8 itself gets all 53 — the eighth contaminated
+hand-rolled predicate in this effort. Run the tokenizer, do not re-implement it; and feeding
+it the right lines needs container prefix stripping, which IS the line-selection model.
+
+**So the conclusion is sharper than "not expressible".** The rule is expressible and two
+parsers each hold part of the answer, with no computable feature saying which to trust per
+document. Reaching upstream's 99.2% needs their architecture — rp8 PLUS the Obsidian
+extensions, so interactions resolve where Obsidian resolves them — not corrections on
+micromark and not rp8 alone. That is a different package, it cannot serve `strict`
+(rp8 predates CommonMark compliance), and it re-opens the 745 documents we currently win.
+A product decision, not an engineering one.
+
 Roughly 184 divergences are **flag-irreducible**: no single flag and no pair of 24 reaches them.
 An owner-aware "interruption broker" was the proposed general fix. It was **built as a shadow
 instrument and failed its own contradiction test** — for owner `footnoteDefinition`, 29 of 52
