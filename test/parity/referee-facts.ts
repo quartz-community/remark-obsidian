@@ -113,7 +113,21 @@ function columnOf(source: string, offset: number): number {
  * definition rule once lived in `referee.mts` alone and the shrinker spent a run measuring
  * behaviour three commits old.
  */
-/** Whether the label at `at` sits inside a backtick run on its line, or is escaped. */
+/**
+ * Whether the label at `at` is literal: escaped, inside a backtick run, or inside a
+ * CLOSED `<!-- … -->` -- all on its own line.
+ *
+ * The comment clause is the same kind of exclusion as the backtick one above it and rests
+ * on the same settled answer: Obsidian indexes nothing inside a closed HTML comment and
+ * keeps the reference LIVE inside an unclosed one, probed against live 1.15.0 --
+ * `x <!-- [^1] --> y` reports none, `x <!-- [^1] y` reports it at 0:7. `9298fc7` shipped
+ * that rule for the tokenized path; this scan is the untokenized one, so it needed it too.
+ *
+ * Measured over all 6,844 as a corpus-wide predicate before being written: 2 gain / 0
+ * break, against 0.5% for the `%%` form and 12.0% for inline footnotes. It is a PROJECTION
+ * fidelity fix rather than a parser fix -- our tree emits no reference at either position,
+ * so this scan was inventing one Obsidian does not report.
+ */
 function isDelimited(slice: string, at: number): boolean {
   if (at > 0 && slice[at - 1] === "\\") return true;
   const lineStart = slice.lastIndexOf("\n", at - 1) + 1;
@@ -121,7 +135,15 @@ function isDelimited(slice: string, at: number): boolean {
   for (let index = lineStart; index < at; index++) {
     if (slice[index] === "`") ticks += 1;
   }
-  return ticks % 2 === 1;
+  if (ticks % 2 === 1) return true;
+
+  const lineEnd = slice.indexOf("\n", at);
+  const before = slice.slice(lineStart, at);
+  const after = slice.slice(at, lineEnd === -1 ? undefined : lineEnd);
+  const opener = before.lastIndexOf("<!--");
+  return (
+    opener !== -1 && !before.includes("-->", opener) && after.includes("-->")
+  );
 }
 
 export function factsOf(tree: Root, source: string): Facts {
