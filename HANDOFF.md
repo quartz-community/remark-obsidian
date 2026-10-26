@@ -9,19 +9,17 @@ were Obsidian syntax bare rp8 lacks; and `strict` simply stays on micromark. The
 
 ## State
 
-|                                      | 1.x (micromark) | 2.0 (rp8) |
-| ------------------------------------ | --------------: | --------: |
-| referee (6,844 documents)            |           6,307 | **6,828** |
-| contract gate, `match` cases         |           3,447 | **3,451** |
-| positioned-oracle divergences        |              20 |     **9** |
-| RAW positions vs `compute`: sections |           97.4% |  **100%** |
-| RAW positions: headings / list items |    94.2 / 82.2% | 100/92.4% |
-| round-trips that never settle        |               0 |     **0** |
-| round-trips tolerated as converging  |              19 |     **6** |
-| structural invariant violations      |              10 |     **0** |
-| slowest gated pathological shape     |        27.6 s † |    985 ms |
-
-† `cdata-repeat`, an upstream exception the gate does not hold micromark to.
+|                                      |         1.x (micromark) |                 2.0 (rp8) |
+| ------------------------------------ | ----------------------: | ------------------------: |
+| referee (6,844 documents)            |                   6,307 |                 **6,828** |
+| contract gate, `match` cases         |                   3,447 |                 **3,451** |
+| positioned-oracle divergences        |                      20 |                     **9** |
+| RAW positions vs `compute`: sections |                   97.4% |                  **100%** |
+| RAW positions: headings / list items |            94.2 / 82.2% |                 100/92.4% |
+| round-trips that never settle        |                       0 |                     **0** |
+| round-trips tolerated as converging  |                      19 |                     **6** |
+| structural invariant violations      |                      10 |                     **0** |
+| slowest gated pathological shape     | 7.4 s (`footnote-refs`) | 985 ms (`unclosed-links`) |
 
 Suite 465 passed / 3 skipped, lint, both typechecks, format and build green. Commits on
 `rp8-legacy-prototype`: `6aa9bfa` prototype, `d73c42a` wiring, `6ba3e8e` vendoring and
