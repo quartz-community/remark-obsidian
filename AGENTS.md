@@ -2278,6 +2278,18 @@ examples` came from anchoring a fence pattern as `example$` when `cmark-gfm` tag
   `example table`. **Both were over-strict matchers, two days apart.** Assert the count you expect
   before using what you extracted — 648 parsed against 672 present is what exposed the second.
 - **An inert probe looks exactly like a working one.** Verify by identity (`--ids`), not by total.
+- **A CLEAN EXIT CAN STILL LOSE DATA, so verify an instrument's output by COUNT.**
+  `referee.mts --ids` printed 6,307 ids with `console.log` and then called `process.exit(0)`,
+  which DISCARDS whatever `process.stdout` still has buffered — writes to a pipe are
+  asynchronous. Spawned from `regressions.mts --self-test` it returned `status=0`,
+  `signal=null`, `error=none` and 650, 933, 1874 or 2450 lines, a different number every run,
+  so the self-test reported DIVERGED against a referee it had itself truncated. An interactive
+  shell pipeline flushed in time, which is why every manual `--ids | sort -u` was correct and
+  only the spawned caller suffered. **`fs.writeSync` is not the cure**: a pipe's buffer is
+  64 KB, so one 134 KB synchronous write comes back PARTIAL — that read 6,307 under `spawnSync`
+  (whose parent drains concurrently) and 2,778 through `| sort -u`. Two truncation bugs with
+  opposite triggers, and only testing BOTH call shapes separated them. Fixed in `e76fb7d` by
+  queueing through `process.stdout.write` and not exiting at all.
 - **Only a KNOWN-POSITIVE control proves a probe is live.** The `0 of 57` above was checked with a
   negative control first — a pass that owns nothing — which passed happily and proved nothing. The
   bug surfaced only on a case whose answer was known in advance: deleting a real entry from the
