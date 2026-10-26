@@ -519,6 +519,23 @@ function bracketLabelReferences(tree: Root, source: string): void {
   });
 }
 
+function inClosedComment(source: string, offset: number | undefined): boolean {
+  if (offset === undefined) return false;
+
+  const from = source.lastIndexOf("\n", offset - 1) + 1;
+  const to = source.indexOf("\n", offset);
+  const line = source.slice(from, to === -1 ? undefined : to);
+  const column = offset - from;
+
+  for (let at = line.indexOf("<!--"); at !== -1;) {
+    const close = line.indexOf("-->", at + 4);
+    if (close === -1) return false;
+    if (column > at && column < close + 3) return true;
+    at = line.indexOf("<!--", close + 3);
+  }
+  return false;
+}
+
 function insideAutolink(parent: unknown, source: string): boolean {
   const node = parent as
     | { type?: string; position?: { start?: { offset?: number } } }
@@ -629,6 +646,11 @@ export function bareFootnoteRefTransform(tree: Root, source = ""): void {
       // An escaped `\[` is a literal bracket, so this is not a reference at
       // all and must survive as written.
       if (aligned?.escaped[match.index]) continue;
+      // Measured: Obsidian indexes nothing inside a CLOSED `<!-- … -->`, and keeps
+      // the reference live inside an unclosed one -- `x <!-- [^1] y` reports it at
+      // 0:7. The inline `html` node normally keeps this text away from the scan;
+      // where a reparse has flattened it back, this is the guard.
+      if (inClosedComment(source, pointAt?.(match.index)?.offset)) continue;
       // mdast lowercases a footnote identifier, and Obsidian shows that rather
       // than the label as written: `[^Cell]` reads `cell`.
       // Read the label from the source, not the value: Obsidian does not apply
