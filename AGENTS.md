@@ -1624,6 +1624,29 @@ this file already refuses at 97.6%:
 87 of 172 are on a definition label line, which is the 2,183-position / 2,130-indexed refusal.
 So the remainder is not 172 unexplored rows; it is ~85, and the only ungrouped bucket is 25.
 
+### The PAIR table counts a SWAP twice, so its two-mechanism figure is inflated
+
+`mechanism.mts` reports 119 documents at two mechanisms and ranks the commonest pairs, the
+largest being `def-miss @ footnoteReference` + `ref-extra @ paragraph` at 26. Measured, that pair
+is ONE mechanism:
+
+|                                              |        |
+| -------------------------------------------- | -----: |
+| documents carrying both mechanisms           |     33 |
+| the two facts share the SAME `name@line@col` | **33** |
+| they sit at different positions              |  **0** |
+
+Every one is the `probe:i1` SWAP — Obsidian defines at P and we emit a bare reference at P — so
+the missing definition and the extra reference are the same event seen from two sides. A swap
+necessarily produces two facts, so **every swap document registers as two mechanisms** and enters
+the pair table, which means that table systematically overstates the count for the largest family
+in the corpus. `probe:i1` is already refuted three ways (2.0% as a paragraph-interrupt rule, no
+separating axis across five features, and not a threshold since D4 reproduces 7 of 7).
+
+The consequence for targeting: the **one-away figure is the trustworthy one** and the
+two-mechanism figure is not, because a document needing one repair can appear in it. Read the
+402 and treat 119 as an upper bound.
+
 ### Both NO-FLAG self-inflicted documents are ONE already-refused pass
 
 `fuzz#1205` and `fuzz#1623` survive every one of the 30 options, which reads as two separate
