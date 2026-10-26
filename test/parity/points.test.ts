@@ -195,9 +195,10 @@ describe("node positions", () => {
     // splices gfm's autolink literal with no position on any node it creates, so the
     // link, its text and the text either side were all unplaceable; tiling the
     // parent's span from what each child was written as places them exactly.
+    // 2.0, remark-parse 8: footnoteReference 1 -> 0 and text 2 -> 1. The reader places every
+    // reference it reads; what remains is the escaped-label case above.
     "paragraph > break": 1,
-    "paragraph > footnoteReference": 1,
-    "paragraph > text": 2,
+    "paragraph > text": 1,
   };
 
   it("does not splice more unplaced nodes than the recorded ceiling", () => {

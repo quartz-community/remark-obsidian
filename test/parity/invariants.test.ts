@@ -49,7 +49,11 @@ const CEILING = {
   // diverging from upstream's own output, which is a different kind of claim from fixing a
   // defect. Unlike item 5, nothing here reads these spans and we do not synthesise them --
   // they arrive from `remark-parse` and pass straight through.
-  "SIBLINGS OVERLAP: root > definition/heading": 10,
+  //
+  // ZERO since 2.0, and that is not a divergence from upstream: `legacy` no longer parses with
+  // `remark-parse` 11 at all. remark-parse 8, the parser Obsidian forks, starts the heading on
+  // its own line, so the overlap -- a micromark property -- does not arise. `strict` still
+  // passes micromark's spans through unchanged; this gate runs the legacy profiles.
   // CLOSED by `listItemExtentTransform`. It was `remark-math` extending an item past its
   // sibling's start when a `$$` opener shares its line with content, reproduced on bare
   // `remark-parse` + `remark-math@6.0.0` and filed in `UPSTREAM.md`. Repaired rather than

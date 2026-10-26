@@ -1,6 +1,7 @@
 /// <reference types="remark-parse" />
 /// <reference types="remark-stringify" />
 
+import type { Options as ToMarkdownOptions } from "mdast-util-to-markdown";
 import { parseLegacy8 } from "./rp8/adapt.js";
 import type { Root } from "mdast";
 import type { Processor } from "unified";
@@ -263,6 +264,10 @@ export interface RemarkObsidianOptions {
    *
    * On by default, because leaving it off is not neutral — it silently produces
    * different emphasis from the app for any such run.
+   *
+   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
+   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
+   * configurations still type-check.
    */
   legacyEmphasis?: boolean;
   /**
@@ -278,6 +283,10 @@ export interface RemarkObsidianOptions {
    *
    * On by default, because leaving it off is not neutral -- it silently produces
    * different strikethrough from the app for any such run.
+   *
+   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
+   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
+   * configurations still type-check.
    */
   legacyStrikethrough?: boolean;
   /**
@@ -288,6 +297,10 @@ export interface RemarkObsidianOptions {
    * bare too.
    *
    * On by default, because leaving it off silently shows markup the app resolves.
+   *
+   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
+   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
+   * configurations still type-check.
    */
   legacyEntities?: boolean;
   /**
@@ -299,6 +312,10 @@ export interface RemarkObsidianOptions {
    * On by default, because the failure is worse than a missing link:
    * `<a\b@c.test>` escapes the `b`, drops `<a\` as text, and autolinks the
    * remaining `b@c.test` -- a working link to the wrong address.
+   *
+   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
+   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
+   * configurations still type-check.
    */
   legacyAutolinks?: boolean;
   /**
@@ -312,6 +329,10 @@ export interface RemarkObsidianOptions {
    * no usable closer is settled from a cached run index instead of stock's
    * end-of-context scan, which is the scan that makes cmark's increasing-run
    * shape superlinear.
+   *
+   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
+   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
+   * configurations still type-check.
    */
   legacyCodeSpans?: boolean;
   /**
@@ -332,6 +353,10 @@ export interface RemarkObsidianOptions {
    * sibling, where `containerState.size` counts characters while `factorySpace` counts
    * columns, and an under-indented continuation, which needs legacy's whole-item
    * minimum-indent scan rather than a different limit.
+   *
+   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
+   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
+   * configurations still type-check.
    */
   legacyLists?: boolean;
   /**
@@ -357,6 +382,10 @@ export interface RemarkObsidianOptions {
    * family stays open for a reason that is not parsing: inside a `<textarea>` the
    * content is the element's *value*, so the recorder finds no `<em>` elements and
    * reads a de-tagged string, which no tree can reproduce without mis-parsing.
+   *
+   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
+   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
+   * configurations still type-check.
    */
   legacyHtmlBlocks?: boolean;
 
@@ -377,6 +406,10 @@ export interface RemarkObsidianOptions {
    * no business running off-platform.
    *
    * @see test/parity/strict.test.ts for the gate that found it.
+   *
+   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
+   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
+   * configurations still type-check.
    */
   legacySetext?: boolean;
 
@@ -396,6 +429,10 @@ export interface RemarkObsidianOptions {
    * scanned; this one governs whether the DEFINITION forms at all.
    *
    * @see test/parity/strict.test.ts for the gate that found it.
+   *
+   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
+   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
+   * configurations still type-check.
    */
   legacyLinkDefinitions?: boolean;
 
@@ -419,6 +456,10 @@ export interface RemarkObsidianOptions {
    * CommonMark spec has no example of, so it cannot adjudicate them either way.
    *
    * @see test/parity/strict.test.ts for the gate that found it.
+   *
+   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
+   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
+   * configurations still type-check.
    */
   legacyTabs?: boolean;
 
@@ -434,6 +475,10 @@ export interface RemarkObsidianOptions {
    * `block-quotes/237`, `block-quotes/249` and `list-items/280` in position.
    *
    * @see test/parity/strict.test.ts for the gate that found it.
+   *
+   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
+   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
+   * configurations still type-check.
    */
   legacyContainerLazy?: boolean;
 
@@ -451,6 +496,10 @@ export interface RemarkObsidianOptions {
    * `commonmark/links/507` in position.
    *
    * @see test/parity/strict.test.ts for the gate that found it.
+   *
+   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
+   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
+   * configurations still type-check.
    */
   legacyLinkDestinations?: boolean;
 
@@ -472,6 +521,10 @@ export interface RemarkObsidianOptions {
    * group, which is why the guard covers all six rather than the one.
    *
    * @see test/parity/gfm.ts for the corpus, test/parity/strict.test.ts for the gate.
+   *
+   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
+   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
+   * configurations still type-check.
    */
   legacyTables?: boolean;
   /**
@@ -483,6 +536,10 @@ export interface RemarkObsidianOptions {
    * in this corpus hold a nested bracket pair, which is why it shipped behind an
    * option at all -- the actual cost of turning it on is **0 regressions** against
    * 9 cases gained, so the estimate was an upper bound by a wide margin.
+   *
+   * @deprecated Ignored since 2.0. `preset: "legacy"` parses with remark-parse 8, the parser
+   * Obsidian forks, which IS this reading; `preset: "strict"` never has it. Kept so existing
+   * configurations still type-check.
    */
   labelPrecedence?: boolean;
   /**
@@ -622,14 +679,41 @@ const defaultOptions: RemarkObsidianFlags = {
   escapedLineBreaks: false,
 };
 
+/**
+ * `mdast-util-math`'s writer, with display inline math kept display.
+ *
+ * It writes every `inlineMath` with a single-dollar fence, so `$$x$$` came back as `$x$` and
+ * stopped being display math -- and under remark-parse 8 a padded `$ \nx\n $` is no math at
+ * all, so the formula became text on the first format. A node `mathDisplayTransform` marked
+ * display is written with the double-dollar writer instead.
+ */
+function displayAwareMathToMarkdown(): ToMarkdownOptions {
+  const single = mathToMarkdown();
+  const double = mathToMarkdown({ singleDollarTextMath: false });
+  const inline = single.handlers!.inlineMath!;
+  const display = double.handlers!.inlineMath!;
+  const inlineMath = ((node, parent, state, info) =>
+    ((node as { data?: { display?: boolean } }).data?.display === true
+      ? display
+      : inline)(node, parent, state, info)) as typeof inline;
+  (inlineMath as { peek?: unknown }).peek = (inline as { peek?: unknown }).peek;
+  return { ...single, handlers: { ...single.handlers, inlineMath } };
+}
+
 export default function remarkObsidian(
   userOpts?: RemarkObsidianOptions,
 ): undefined | ((tree: Root, file: any) => void) {
+  const preset = userOpts?.preset ?? "legacy";
   const opts = {
     ...defaultOptions,
-    ...PRESETS[userOpts?.preset ?? "legacy"],
+    ...PRESETS[preset],
     ...userOpts,
-  };
+    // The legacy flags are deprecated and ignored: `legacy` IS remark-parse 8's reading, and
+    // `strict` never has any of it.
+    ...Object.fromEntries(
+      LEGACY_FLAGS.map((flag) => [flag, preset === "legacy"]),
+    ),
+  } as RemarkObsidianFlags;
   // @ts-expect-error - unified `this` context
   const self = this as Processor<Root>;
   const data = self.data();
@@ -642,6 +726,12 @@ export default function remarkObsidian(
   data.toMarkdownExtensions.push(linkReferenceToMarkdown());
   data.toMarkdownExtensions.push(autolinkLiteralToMarkdown());
   data.toMarkdownExtensions.push(htmlTailToMarkdown());
+  // Obsidian (remark-parse 8) reads `<<https://x>` as one autolink whose address starts with
+  // `<`; CommonMark reads a `<` and then the autolink. Escaping a `<` written right before
+  // another keeps both readings, so formatting reaches a fixed point under either.
+  data.toMarkdownExtensions.push({
+    unsafe: [{ character: "<", after: "<", inConstruct: "phrasing" }],
+  });
 
   if (opts.lineOffsets) {
     data.fromMarkdownExtensions.push(lineOffsetsFromMarkdown());
@@ -694,7 +784,7 @@ export default function remarkObsidian(
     // block handling and swap in a gated text construct.
     data.micromarkExtensions.push({ ...base, text: { 36: mathTextSyntax() } });
     data.fromMarkdownExtensions.push(mathFromMarkdown());
-    data.toMarkdownExtensions.push(mathToMarkdown());
+    data.toMarkdownExtensions.push(displayAwareMathToMarkdown());
   }
 
   if (opts.legacyEmphasis) {
@@ -747,10 +837,9 @@ export default function remarkObsidian(
     data.toMarkdownExtensions.push(taskCharToMarkdown());
   }
 
-  // Every legacy flag on is remark-parse 8's reading, which is the parser Obsidian forks, so
-  // parse with it rather than correcting micromark towards it. A mixed configuration -- one
-  // legacy flag turned off -- has no remark-parse 8 equivalent and keeps the micromark path.
-  if (LEGACY_FLAGS.every((flag) => opts[flag])) {
+  // `legacy` parses with remark-parse 8, the parser Obsidian forks, rather than correcting
+  // micromark towards it. Only the micromark extensions' `toMarkdown` halves above matter then.
+  if (preset === "legacy") {
     self.parser = (document: string) => parseLegacy8(document, opts);
     return undefined;
   }

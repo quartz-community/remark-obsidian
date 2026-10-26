@@ -71,6 +71,8 @@ function percentComments(tables: any): void {
     )({
       type: "percentComment",
       block: true,
+      // The body as this reader saw it, container prefixes already stripped.
+      body: value.slice(start + 2, innerEnd),
       children,
     });
     if (
@@ -98,6 +100,7 @@ function percentComments(tables: any): void {
     return eat(value.slice(0, close + 2))({
       type: "percentComment",
       block: false,
+      body: value.slice(2, close),
       children,
     });
   };
@@ -264,7 +267,13 @@ function doubleDollarMath(tables: any): void {
     const match = DoubleDollarMath.exec(value);
     if (!match) return undefined;
     if (silent === true) return true;
-    return eat(match[0])({ type: "inlineMath", value: match[0].slice(2, -2) });
+    // One space of padding on EACH side is the writer's, as for a code span: `mdast-util-math`
+    // pads a value starting or ending with `$`, and reading it back must give the value again.
+    let body = match[0].slice(2, -2);
+    if (/[^ ]/u.test(body) && body.startsWith(" ") && body.endsWith(" ")) {
+      body = body.slice(1, -1);
+    }
+    return eat(match[0])({ type: "inlineMath", value: body });
   };
   math.locator = (value, fromIndex) => value.indexOf("$$", fromIndex);
   tables.inlineTokenizers.doubleDollarMath = math;

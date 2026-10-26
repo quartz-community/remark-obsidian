@@ -1933,8 +1933,12 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     // while ` ^blk` is reported as `paragraph@0:0-0:5`. The space sits BEFORE the
     // paragraph's start offset, so trimming the node's own slice never sees it and the
     // line prefix has to be checked instead.
+    // remark-parse 8 starts the paragraph AT its line, indentation included -- where Obsidian
+    // reports it -- so the space can sit inside the node's own slice instead.
     if (
-      source.slice(lineStarts[child.position.start.line - 1] ?? 0, from) !== ""
+      source.slice(lineStarts[child.position.start.line - 1] ?? 0, from) !==
+        "" ||
+      /^[ \t]/u.test(source.slice(from, to))
     ) {
       return;
     }
@@ -2575,6 +2579,16 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     //
     // Removing the branch outright costs 14 -> 17, which is what kept it unconditional;
     // the line count is what separates the two groups, and `base` already carries it.
+    // An EMPTY item that remark-parse 8 ends at the start of a later line has already been
+    // given Obsidian's end -- `*` / blank / `* c` is `1:0-2:0` on both -- which is what the
+    // blank-line rule below rebuilds for micromark's tree.
+    if (
+      children.length === 0 &&
+      item.position!.end.column === 1 &&
+      item.position!.end.line > item.position!.start.line
+    ) {
+      return item.position!.end;
+    }
     const oneLine = base.line === item.position!.start.line;
     const blank = hasSibling && oneLine ? blankBefore(base.line) : undefined;
     if (blank !== undefined) {

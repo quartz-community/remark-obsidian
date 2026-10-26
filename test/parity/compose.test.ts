@@ -130,24 +130,9 @@ const DIVERGING: Record<Axis, readonly string[]> = {
  * record.
  */
 const INVARIANT_VIOLATIONS: Record<string, readonly string[]> = {
-  // UPSTREAM, keep: a definition and a setext heading built from the same lines.
-  "pairs|linkdef > setext": ["SIBLINGS OVERLAP: root > definition/heading"],
-  "matrix|linkdef > setext": ["SIBLINGS OVERLAP: root > definition/heading"],
-  "isolate|linkdef > setext > comment": [
-    "SIBLINGS OVERLAP: root > definition/heading",
-  ],
-  "isolate|linkdef > setext > indented": [
-    "SIBLINGS OVERLAP: root > definition/heading",
-  ],
-  "isolate|linkdef > setext > math": [
-    "SIBLINGS OVERLAP: root > definition/heading",
-  ],
-  "isolate|linkdef > setext > thematic": [
-    "SIBLINGS OVERLAP: root > definition/heading",
-  ],
-  "isolate|linkdef > paragraph > thematic": [
-    "SIBLINGS OVERLAP: root > definition/heading",
-  ],
+  // UPSTREAM until 2.0: a definition and a setext heading built from the same lines overlapped
+  // under micromark (`UPSTREAM.md` item 2) in seven sequences. `legacy` now parses with
+  // remark-parse 8, which places the heading on its own line, so none overlap.
   // OURS: NONE. Every sequence above is upstream's, which is why there is no second group.
   //
   // All FOUR were the same defect -- a transform located a node by descending, edited it,

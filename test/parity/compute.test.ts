@@ -138,24 +138,9 @@ describe("positioned oracle", () => {
   const KNOWN_REFERENCE_GAPS = [
     "hunt/aftercloser-chain-eats-referenced-definition/0: P1, Obsidian's column is short by the `%%` marker",
     "hunt/continuation-masked-under-foreign-label/2: P1, Obsidian's column is short by the `%%` marker",
-    // A probe added to separate the caret-link confound, and it diverges by design until
-    // the rule it established is implemented: `[^1](u)` over `[^1]: one` registers the
-    // block `1` in Obsidian because the bracket becomes a LINK and never claims the
-    // caret, so the reference we report there is one Obsidian does not have.
-    "probe/caret-link/link-with-def: the bracket is a link, so the caret is a block id",
-    // A LEADING TAB resets an item's content column to its own tab stop, so `⇥⟨3sp⟩` at seven
-    // columns is below the threshold and Obsidian defines the label where we read code. The
-    // family's other six cases match and are the controls -- `⇥⇥` is FEWER characters and MORE
-    // columns, so no character count discriminates, which refuted two implementations at -15
-    // and -21 referee documents and broke `commonmark/tabs/5` in both.
-    // AN UNCLOSED `%%` HOSTED BY A LIST ITEM is CLOSED by `itemCommentLazyTransform`, and four
-    // of the six cases promoted for it now MATCH. What remains here is the CLOSED-region
-    // sibling, which is a different mechanism: `commentRegionTransform` owns a `%%...%%` region
-    // and this pass deliberately declines one, because claiming a closed opener is what broke
-    // the container lift before -- that pass finds a region's host by strict containment, so
-    // moving the opener out from under it leaves the region unrebuilt and a buried definition
-    // live.
-    "probe/item-comment/closed: a CLOSED `%%` region hosted by an item buries it too",
+    // CLOSED in 2.0 by the remark-parse 8 legacy reader, which places both where Obsidian
+    // does: `probe/caret-link/link-with-def` (the bracket is a link, so the caret is a block
+    // id) and `probe/item-comment/closed` (a closed `%%` region hosted by a list item).
   ];
 
   it("places every footnote reference, except the classified cases", () => {
@@ -299,6 +284,16 @@ describe("positioned oracle", () => {
    * first attempt at the scan quietly broke `block-id-inline/underscore-wraps`, which
    * no `compareCase` delta can see.
    */
+  /**
+   * 2.0 parses `legacy` with remark-parse 8, which moved this ceiling from 20 to 9 with
+   * nothing new: the 11 closed are `callout/nested-task-list:listItems`,
+   * `probe/caret-link/link-with-def:{footnoteRefs,links}`,
+   * `probe/def-deindent/quote-indented-one:footnotes`,
+   * `probe/external-gap/fm-tab-opener:{frontmatterPosition,sections}`,
+   * `probe/item-comment/closed:{footnoteRefs,footnotes,listItems,sections}` and
+   * `probe/quote-nest/two-space:listItems`. The per-field notes below are the micromark-era
+   * record of how each field got here; the counts are current.
+   */
   const CEILING = {
     // 17 -> 6 with `definitionColumnTransform`: a definition's start column is its
     // containing block's content column, not the position of the `[`. The 11 closed were
@@ -412,8 +407,8 @@ describe("positioned oracle", () => {
     //   the quote's opener, in flow and in a definition's continuation together, closed
     //   `quote-tab-root-def/tab` on both fields and `quote-tab-def/established` on
     //   `footnotes` -- the referee went 6029 -> 6066. What is left here is unrelated.
-    footnotes: 2,
-    footnoteRefs: 4,
+    footnotes: 0,
+    footnoteRefs: 2,
     // Attributed: all 12 are `both`, and 10 of them are ONE rule -- the same one
     // `definitionColumnTransform` already implements for footnote definitions.
     // Obsidian reports a heading's column as its containing block's content column,
@@ -560,7 +555,7 @@ describe("positioned oracle", () => {
     // `text`/`element` entries past the document, which `sourceBacked` filters -- the
     // renderer's relocated footnote section, already classified must-not-fix for `blocks`.
     // 2 added by D2's two openers, whose block structure differs because we open frontmatter where Obsidian does not.
-    sections: 2,
+    sections: 0,
     // 116 -> 31. 94 of the 116 were an ordinary markdown link this projection never
     // collected -- it only ever walked `wikilink` nodes -- and not one was a link we
     // invented, which is the shape of a missing collector rather than a parse bug.
@@ -624,7 +619,7 @@ describe("positioned oracle", () => {
     // below carry. Measured: colDelta is 2 for both its `links` and `embeds` rows and the
     // document holds a `%%`. Reproducing it would mean writing a cache bug into our own
     // offsets, so it stays counted rather than chased.
-    links: 2,
+    links: 1,
     // 31 -> 16 -> 6. First the missing collector (a markdown image was never indexed at
     // all), then the display field: the cache reports an image's alt as WRITTEN, not as
     // rendered, so it keeps a nested construct's brackets. `![foo [bar](u)](v)` displays
@@ -925,7 +920,7 @@ describe("positioned oracle", () => {
     // now accepts a quote-prefixed line after a LIST, which is the same shape as the `html`
     // and `heading` entries it already restricted to a list, with the same evidence -- one
     // recorded probe per container.
-    listItems: 4,
+    listItems: 1,
     // 7 -> 2: Obsidian reports no position at all unless the block parses as a
     // non-empty YAML mapping, and we reported one for any `---` block. The five closed
     // were an empty block, a bare scalar, an unterminated quote and duplicate keys.
@@ -939,7 +934,7 @@ describe("positioned oracle", () => {
     // Quartz's FrontMatter plugin owns the YAML, and `remark-frontmatter` is not even in
     // the pinned chain.
     // Both added by D2: we report a position for `--- ` and `---⇥`, where Obsidian opens no frontmatter at all.
-    frontmatterPosition: 1,
+    frontmatterPosition: 0,
   };
 
   /**
@@ -959,7 +954,6 @@ describe("positioned oracle", () => {
    * why that block stays -- this list is the assertion, those comments are the reasoning.
    */
   const CEILING_IDS: readonly string[] = [
-    "callout/nested-task-list:listItems",
     "fuzz/embed/24:embeds",
     "fuzz/embed/24:links",
     "fuzz/embed/75:embeds",
@@ -968,24 +962,7 @@ describe("positioned oracle", () => {
     "hunt/inline-footnote-double-parse/0:blocks",
     "hunt/inline-footnote-double-parse/1:blocks",
     "probe/block-nest/both-ids:blocks",
-    "probe/caret-link/link-with-def:footnoteRefs",
-    "probe/caret-link/link-with-def:links",
-    "probe/item-comment/closed:footnoteRefs",
-    "probe/item-comment/closed:footnotes",
-    "probe/item-comment/closed:listItems",
-    "probe/item-comment/closed:sections",
-    "probe/def-deindent/quote-indented-one:footnotes",
     "probe/empty-container/nested-list:listItems",
-    "probe/quote-nest/two-space:listItems",
-    // D2, and all five are the SAME gap: frontmatter opens only on an EXACT `---` first
-    // line. Obsidian reads `--- ` as a thematic break then a setext H2 whose text carries a
-    // live reference, and `---⇥` as a paragraph then a thematic break; we open frontmatter
-    // for both. So `frontmatterPosition` diverges because we report one where Obsidian
-    // reports none, `headings` because we make no setext heading, and `sections` because the
-    // block structure differs. Settled against the live oracle and deferred at two referee
-    // documents, which is why these are recorded rather than fixed.
-    "probe/external-gap/fm-tab-opener:frontmatterPosition",
-    "probe/external-gap/fm-tab-opener:sections",
   ];
 
   it("diverges on exactly the recorded cases, by identity", () => {

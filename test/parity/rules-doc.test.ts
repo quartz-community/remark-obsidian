@@ -168,9 +168,8 @@ const DIVERGING_POSITIONS: readonly string[] = [
   // stay shut. That is consistent with what `README.md` concludes from the other direction --
   // a construct has to claim `[^` to the first `]` before the wikilink extension, GFM's
   // footnote call and CommonMark's label start see that bracket.
-  "E5 bracket in name",
-  "E5 bracket name",
-  "E5 trailing bracket name",
+  // CLOSED in 2.0: all three E5 variants, by remark-footnotes 2's own `[^label]` reader, which
+  // takes the name to the first `]` whatever it holds -- the construct GFM's footnote lacks.
   // NOT OURS, and MUST NOT REACH ZERO. `1. > [!note] T` / `ab cd[^1]` is reported by the
   // cache at column 8 where the character really sits at 5, which their document states
   // itself under P2: "reports [^1] at column 9 instead of 6". We report 5 and are right, so
@@ -253,7 +252,8 @@ const DIVERGING_POSITIONS: readonly string[] = [
   // and the conclusion was the same: our innermost `listItem` is not always Obsidian's host.
   // Separating the two needs a host test this tree cannot currently express, so the probe stays
   // registered rather than being bought for two documents.
-  "B3 quoted item one-space lazy",
+  // CLOSED in 2.0 on POSITION by remark-parse 8's list reader with the B3 change; its SECTION
+  // starts still differ, below.
 ];
 
 /**
@@ -272,30 +272,12 @@ const DIVERGING_POSITIONS: readonly string[] = [
  * bullet-against-ordered stay apart, a real definition behind blank lines keeps three blocks,
  * and plain lazy text merged even before the fix.
  */
-const DIVERGING_SECTIONS: readonly string[] = [
-  // The FOUR-space pipeless row only. `C2 pipeless indent 2` is fixed -- `table-row-style.ts`
-  // now measures the leading pipe at the table's own content column instead of after
-  // `trimStart()`, so an indented row in a pipeless table stays a row. At four spaces
-  // micromark makes the line indented CODE before any table logic runs, which is a different
-  // defect: the row has to be re-parsed out of a `code` node rather than merely kept.
-  // The `<...>` DESTINATION half of D6, which `definitionBlankTitleTransform` leaves: a
-  // destination running across blank lines has to be REWRITTEN rather than merely spanned,
-  // and `referenceLinks` carries its value -- a field 111 corpus answers depend on.
-  "D6 angle dest over blank",
-  // B3 again, attributed above. EIGHT here against five on position, and the extra three are
-  // the same cause seen from the other side: the item's content column decides its EXTENT too,
-  // so `list` ends where we think the item stops even where the definition's own column agrees.
-  // The two cases absent from this set are the two whose definition becomes indented code,
-  // which is the boundary holding.
-  "B3 column-0 lazy excluded",
-  "B3 one-space lazy counts",
-  "B3 two-space lazy counts",
-  "B3 wide marker one-space lazy",
-  "B3 no lazy line at all",
-  "B3 quoted item one-space lazy",
-  "B3 ordered one-space lazy",
-  "B3 task item one-space lazy",
-];
+// EMPTY since 2.0. The eight B3 entries recorded here were never structure: Obsidian's section
+// list ends with the `text` and `element` it appends for the rendered footnote list, and this
+// comparison counted their start line. Filtered as `compute.test.ts` filters them, they agree
+// on the micromark tree as well as on remark-parse 8's. D6's destination half closed with
+// remark-parse 8's definition reader.
+const DIVERGING_SECTIONS: readonly string[] = [];
 
 /**
  * `referenceLinks`, which is the projection D6 is really about.
@@ -310,10 +292,10 @@ const DIVERGING_SECTIONS: readonly string[] = [
  *   and getting it wrong deletes a definition the author wrote, which is also why the pass
  *   refuses to half-reproduce it by swallowing the text.
  */
-const DIVERGING_REFERENCE_LINKS: readonly string[] = [
-  "D6 angle dest over blank",
-  "D6 unclosed title destroys definition",
-];
+// Both CLOSED in 2.0: remark-parse 8's definition reader is the one Obsidian forks, so a
+// destination over blank lines and an unclosed title destroying the definition are its own
+// behaviour rather than something to reproduce.
+const DIVERGING_REFERENCE_LINKS: readonly string[] = [];
 
 const golden = fs.existsSync(GOLDEN)
   ? (JSON.parse(fs.readFileSync(GOLDEN, "utf8")) as {
@@ -360,8 +342,17 @@ describe.skipIf(golden === undefined)("their rules document", () => {
           tree.children.map((child) => (child.position?.start.line ?? 1) - 1),
         ),
       ].sort((a, b) => a - b);
+      // Without the `text` and `element` sections Obsidian appends for its rendered footnote
+      // list: they cover no source, and `compute.test.ts` drops the same pair.
       const theirs = [
-        ...new Set(entry.obsidian.sections.map((section) => section.start)),
+        ...new Set(
+          entry.obsidian.sections
+            .filter(
+              (section) =>
+                section.type !== "text" && section.type !== "element",
+            )
+            .map((section) => section.start),
+        ),
       ].sort((a, b) => a - b);
       if (JSON.stringify(ours) !== JSON.stringify(theirs)) {
         found.push(entry.rule);

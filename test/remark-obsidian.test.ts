@@ -267,12 +267,12 @@ describe("remark-obsidian", () => {
     // inside one binds nothing, so the reference stays undefined and renders
     // as its bare label.
     const tree = processWithGfm("%%\n[^1]: buried\n%%\ntext[^1] ref\n");
-    const outside = findRendered(tree, "footnoteDefinition");
-    expect(outside).toHaveLength(0);
-    // The definition is still reachable inside the comment, which is the point
-    // of parsing the body at all.
+    expect(findNodes(tree, "footnoteDefinition")).toHaveLength(0);
+    // A comment's body is read as inline text, so the label is a REFERENCE, placed where
+    // `metadataCache` reports one -- the referee corpus's asymmetry (a label inside `%%` is
+    // indexed as a reference), and what lets a consumer find it.
     const [comment] = findNodes(tree, "comment");
-    expect(findNodes(comment, "footnoteDefinition")).toHaveLength(1);
+    expect(findNodes(comment, "footnoteReference")).toHaveLength(1);
   });
 
   it("hides block comments spanning multiple lines", () => {
@@ -713,9 +713,14 @@ describe("remark-obsidian", () => {
 
   describe("a `$$` ending a line inside a container", () => {
     it("opens a block in a quote but not at the document level", () => {
-      expect(
-        findNodes(processWithGfm("> tail $$\n> x\n> $$\n"), "math")[0].value,
-      ).toBe("x");
+      // Display math whose tex keeps its line endings, as Obsidian records it
+      // (`math/midline-quote`: display, tex "\nx\n").
+      const [quoted] = findNodes(
+        processWithGfm("> tail $$\n> x\n> $$\n"),
+        "inlineMath",
+      );
+      expect(quoted.value).toBe("\nx\n");
+      expect(quoted.data.display).toBe(true);
       // At root the same three lines stay prose plus an empty formula.
       expect(
         findNodes(processWithGfm("tail $$\nx\n$$\n"), "math")[0].value,
@@ -726,7 +731,7 @@ describe("remark-obsidian", () => {
       const tree = processWithGfm("> [^1]: def\n> tail $$\n> x\n> $$\n");
       const definition = findNodes(tree, "footnoteDefinition")[0];
       // Inside the definition, so an unreferenced one hides it as Obsidian does.
-      expect(findNodes(definition, "math").length).toBe(1);
+      expect(findNodes(definition, "inlineMath").length).toBe(1);
     });
   });
 
@@ -854,7 +859,15 @@ describe("remark-obsidian", () => {
       const tree = processWithGfm(
         "x[^1]\n\n> %%\n> [^1]: dead\n\n[^1]: live\n",
       );
-      expect(findNodes(tree, "footnoteReference").length).toBe(1);
+      // The quoted comment ends with its quote (F2), so the root label defines...
+      expect(rootTypes(tree)).toEqual([
+        "paragraph",
+        "blockquote",
+        "footnoteDefinition",
+      ]);
+      // ...and the buried one is read as a reference, as `metadataCache` indexes it.
+      const [comment] = findNodes(tree, "comment");
+      expect(findNodes(comment, "footnoteReference").length).toBe(1);
     });
 
     it("does not let a region swallow a line that opens a block", () => {
@@ -1219,7 +1232,10 @@ describe("remark-obsidian", () => {
   it("does not let a %% end a footnote definition", () => {
     const tree = processWithGfm("[^1]: a\n%%\nb\n");
     expect(rootTypes(tree)).toEqual(["footnoteDefinition"]);
-    expect(findNodes(tree, "comment").length).toBe(0);
+    // The `%%` opens a comment INSIDE the definition (D5, F2), which is how Obsidian reads
+    // `fuzz:20261003-711`: the label under such a `%%` is indexed as a reference.
+    const [definition] = findNodes(tree, "footnoteDefinition");
+    expect(findNodes(definition, "comment").length).toBe(1);
   });
 
   it("still opens a comment after a blank line", () => {
@@ -1617,9 +1633,15 @@ describe("remark-obsidian", () => {
     ).toEqual(["a[b"]);
   });
 
-  it("keeps line endings inside a highlight", () => {
+  it("keeps both lines of a highlight, its line ending a positioned break", () => {
+    // `parse` alone already returns the finished legacy tree: remark-parse 8 reads the break.
     const [node] = findNodes(parse("==a\nb=="), "highlight");
-    expect(node.children.map((c: any) => c.value)).toEqual(["a\nb"]);
+    expect(node.children.map((c: any) => c.type)).toEqual([
+      "text",
+      "break",
+      "text",
+    ]);
+    expect(node.children[1].position.start.offset).toBe(3);
   });
 
   it("does not treat a currency amount as inline math", () => {
@@ -1630,18 +1652,19 @@ describe("remark-obsidian", () => {
     expect(findNodes(parse("text $x^2$ text"), "inlineMath").length).toBe(1);
   });
 
-  it("hides inline comments spanning multiple line endings", () => {
+  it("does not pair a mid-line %% with one on a later line", () => {
+    // F1: `x %%` is no opener, and an inline pair closes on its own line. Obsidian renders
+    // `callout/title-comment-crosses-body`'s `T %%` / `hidden` as text for the same reason.
     const block = processWithGfm("before a%%\nhidden\nmore hidden%% after");
-    expect(findNodes(block, "comment").length).toBeGreaterThan(0);
+    expect(findNodes(block, "comment").length).toBe(0);
     const texts = findRendered(block, "text").map((n: any) => n.value);
-    expect(texts.join(" ")).toContain("before a");
-    expect(texts.join(" ")).toContain("after");
-    expect(texts.join(" ")).not.toContain("hidden");
+    expect(texts.join(" ")).toContain("before a%%");
+    expect(texts.join(" ")).toContain("hidden");
   });
 
-  it("keeps text following a multiline inline comment intact", () => {
+  it("keeps text following a mid-line %% intact", () => {
     const tree = processWithGfm("start %%c1\nc2\nc3%% [[link]] end");
-    expect(findNodes(tree, "comment").length).toBeGreaterThan(0);
+    expect(findNodes(tree, "comment").length).toBe(0);
     const [link] = findNodes(tree, "wikilink");
     expect(link.path).toBe("link");
     expect(
@@ -2052,15 +2075,22 @@ describe("remark-obsidian", () => {
 
     it("nests strong outside emphasis, inverting CommonMark", () => {
       expect(shapes("***a***")).toEqual(["strong:a", "em:a"]);
-      expect(shapes("***a***", { legacyEmphasis: false })).toEqual([
+      expect(shapes("***a***", { preset: "strict" })).toEqual([
         "em:a",
         "strong:a",
       ]);
     });
 
-    it("restores CommonMark attention when turned off", () => {
-      expect(shapes("***a**", { legacyEmphasis: false })).toEqual(["strong:a"]);
-      expect(shapes("*text**", { legacyEmphasis: false })).toEqual(["em:text"]);
+    it("follows CommonMark attention under the strict preset", () => {
+      expect(shapes("***a**", { preset: "strict" })).toEqual(["strong:a"]);
+      expect(shapes("*text**", { preset: "strict" })).toEqual(["em:text"]);
+    });
+
+    it("ignores the deprecated flag under the legacy preset", () => {
+      // `legacy` IS remark-parse 8's reading; there is no CommonMark attention to restore.
+      expect(shapes("***a***", { legacyEmphasis: false })).toEqual(
+        shapes("***a***"),
+      );
     });
   });
 });
@@ -2146,16 +2176,13 @@ describe("legacy autolinks", () => {
     expect(links("<>")).toEqual([]);
   });
 
-  it("can be turned off", () => {
+  // `legacyAutolinks` is deprecated and ignored; the CommonMark reading is `strict`'s.
+  it("follows CommonMark under the strict preset", () => {
     const off = (md: string) => {
       const found: string[] = [];
-      visit(
-        processWithGfm(md, { legacyAutolinks: false }),
-        "link",
-        (n: any) => {
-          found.push(n.url);
-        },
-      );
+      visit(processWithGfm(md, { preset: "strict" }), "link", (n: any) => {
+        found.push(n.url);
+      });
       return found;
     };
     // Not "no link": CommonMark escapes the plus, the brackets stay literal, and
@@ -2259,10 +2286,9 @@ describe("legacy code spans", () => {
     );
   });
 
-  it("can be turned off", async () => {
-    expect(await code("``code`", { legacyCodeSpans: false })).toBe(
-      "<p>``code`</p>",
-    );
+  // `legacyCodeSpans` is deprecated and ignored; the CommonMark reading is `strict`'s.
+  it("follows CommonMark under the strict preset", async () => {
+    expect(await code("``code`", { preset: "strict" })).toBe("<p>``code`</p>");
   });
 });
 
@@ -2382,10 +2408,12 @@ describe("short indent with a tab", () => {
    * The paragraph rows above are untouched, so the placement rule itself still holds --
    * only this node type overrides it.
    */
-  it("places the reparsed line past its own indent", () => {
-    expect(spans("  \tfoo\n")).toEqual(["paragraph@3..6"]);
-    expect(spans("   \tfoo\n")).toEqual(["paragraph@4..7"]);
-    expect(spans("  \tfoo\tbaz\t\tbim\n")).toEqual(["paragraph@3..15"]);
+  it("starts the paragraph at its line, as Obsidian places it", () => {
+    // Obsidian reports an indented paragraph from its line's start (`compute` gives ` ^blk`
+    // `paragraph@0:0`), which is where remark-parse 8 starts the node.
+    expect(spans("  \tfoo\n")).toEqual(["paragraph@0..6"]);
+    expect(spans("   \tfoo\n")).toEqual(["paragraph@0..7"]);
+    expect(spans("  \tfoo\tbaz\t\tbim\n")).toEqual(["paragraph@0..15"]);
     expect(spans(" \t[^1]: def\n")).toEqual(["footnoteDefinition@0..11"]);
   });
 
@@ -2502,9 +2530,11 @@ describe("demoted setext heading content", () => {
     );
   });
 
-  it("still makes a heading inside a container", () => {
+  it("does not make one inside a container either", () => {
+    // One content line makes a setext heading; two do not, in a quote as at the root
+    // (`commonmark/setext-headings/82` is a paragraph to Obsidian).
     expect(shape("> a\n> b\n> ===\n")).toBe(
-      "blockquote(heading(text break text))",
+      "blockquote(paragraph(text break text break text))",
     );
   });
 });
@@ -2762,10 +2792,12 @@ describe("label precedence", () => {
    * URL are `link` nodes too, and demoting one left text `remark-stringify` escapes
    * as `\<` -- so formatting twice kept adding a backslash.
    */
-  it("keeps an autolink inside the label", () => {
-    const { urls } = read("[a <https://e.test/x> b](u)\n");
-    expect(urls).toContain("u");
-    expect(urls).toContain("https://e.test/x");
+  it("reads an autolink inside the label as text", () => {
+    // remark-parse 8 reads no link inside a link, so the autolink is the label's text -- and
+    // formatting settles after one pass (`\\<` is written once and then read back as `<`).
+    const { urls, text } = read("[a <https://e.test/x> b](u)\n");
+    expect(urls).toEqual(["u"]);
+    expect(text).toBe("a <https://e.test/x> b");
   });
 
   it("leaves an ordinary link alone", () => {
@@ -2774,10 +2806,11 @@ describe("label precedence", () => {
     expect(read("[a](u) [b](v)\n")).toEqual({ text: "a b", urls: ["u", "v"] });
   });
 
-  it("can be turned off", () => {
+  // `labelPrecedence` is deprecated and ignored; the CommonMark reading is `strict`'s.
+  it("follows CommonMark under the strict preset", () => {
     // CommonMark's own reading: the inner link wins and the outer brackets stay as
     // text, which is what the `[` and `](v)` either side of it become.
-    expect(read("[a [b](u) c](v)\n", { labelPrecedence: false })).toEqual({
+    expect(read("[a [b](u) c](v)\n", { preset: "strict" })).toEqual({
       text: "[a b c](v)",
       urls: ["u"],
     });

@@ -19,47 +19,28 @@ import type { GoldenCase } from "./types.js";
  * that a fix and a regression are equally visible: both change the set, and neither can hide
  * inside a bound.
  */
+/**
+ * Inputs whose first format is not yet a fixed point -- each SETTLES, which the "reaches a fixed
+ * point" assertion below holds to; this list only stops the set growing unnoticed.
+ *
+ * 2.0 parses `legacy` with remark-parse 8 and moved it from 19 to 6. Closed: the four
+ * `commonmark/link-reference-definitions` (196, 200, 202, 216), `fuzz/inline-footnote/11`,
+ * `probe/bracket-nest/label-autolink-closer`, `probe/item-comment/closed`, and all seven
+ * display-math entries (`probe/math-indent/one-space-empty-body`, `probe/math-retry/five-*`,
+ * `probe/math-space/space-body-trailing-period`, `token/display-math/{doubled-open,nested,
+ * whitespace-body}`) -- `$$` inline math is now written with a `$$` fence, so it stays display.
+ */
 const UNSTABLE: readonly string[] = [
   "commonmark/emphasis-and-strong-emphasis/417",
   "commonmark/emphasis-and-strong-emphasis/450",
-  "commonmark/link-reference-definitions/196",
-  "commonmark/link-reference-definitions/200",
-  "commonmark/link-reference-definitions/202",
-  "commonmark/link-reference-definitions/216",
   "emphasis/nest-underscore-outer",
-  "fuzz/inline-footnote/11",
+  // NEW with remark-parse 8, and it settles on the second pass. `1. [![[[[a#h]]]]](u)` is a link
+  // only because the raw `]]` after the wikilink `[[[a#h]]` balances the brackets remark-parse
+  // 8's link scan counted inside it; the writer escapes that `]]` (correct for CommonMark), the
+  // count no longer closes, and the second read is text -- which then holds.
+  "fuzz/embed/13",
   "hunt/fix-lazy-setext-chain-not-idempotent/1",
-  "probe/bracket-nest/label-autolink-closer",
-  // 20 with the `probe/item-comment/*` promotion. One of the six new cases is unstable and it
-  // CONVERGES, which is the distinction this list exists to make -- measured pass by pass
-  // rather than inferred from the convergence gate passing:
-  //
-  //     src    "+  %%\n[^note]: It\n%%\n\nuse[^note]\n"
-  //     pass1  "* %%\n  %%\n  [^note]: It\n      %%\n\nuse[^note]\n"
-  //     pass2  "* %%\n  %%\n  [^note]: It\n\n      %%%%\n\nuse[^note]\n"
-  //     pass3  "* %%\n  %%\n\n  [^note]: It\n\n      %%%%\n\nuse[^note]\n"
-  //     pass4  identical to pass3 -- CONVERGED
-  //
-  // The item's `%%` is re-emitted as its own line and the CLOSING marker is written at six
-  // columns as `%%%%`, where it is indented code rather than a closer. That is the same
-  // missing-handler debt as the math group below: a comment region hosted by a list item has
-  // no `toMarkdown` handler that writes its closer back at the item's content column. It
-  // reaches a fixed point on the fourth pass and holds, so repeated formatting settles -- not
-  // the backslash-growing shape refused outright for corrupting a file on every pass.
-  "probe/item-comment/closed",
-  // `probe/label-shape/space-only-defined` is GONE, closed by
-  // `paddedLabelReferenceTransform`. Its instability was the escape churn described below --
-  // `[^ ]: x` escaped on pass 1 with the reference following on pass 2 -- and it only had a
-  // reference to escape because a PADDED label resolved against its definition. Obsidian
-  // does not trim a label, so it never resolves, and the literal text round-trips.
-  "probe/math-indent/one-space-empty-body",
-  "probe/math-retry/five-double-closer",
-  "probe/math-retry/five-single-closer",
-  "probe/math-space/space-body-trailing-period",
   "probe/straddle-fold/paragraph-merge",
-  "token/display-math/doubled-open",
-  "token/display-math/nested",
-  "token/display-math/whitespace-body",
 ];
 
 const goldenPath = path.join(

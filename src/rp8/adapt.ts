@@ -6,6 +6,7 @@
  * which is where mdast places a block's end.
  */
 import type { Root } from "mdast";
+import { decodeString } from "micromark-util-decode-string";
 import { normalizeIdentifier } from "micromark-util-normalize-identifier";
 
 import { mathDisplayTransform } from "../lib/math-display.js";
@@ -30,6 +31,14 @@ interface Context {
   footnotes: Set<string>;
   options: LegacyOptions;
 }
+
+/**
+ * A label as `mdast-util-from-markdown` reports it: escapes and character references decoded.
+ * remark-parse 8 keeps the raw source, which the writer then escapes again on every pass --
+ * `[ref\\[]` grew a backslash pair per format. The identifier is still made from the raw text.
+ */
+const decodeLabel = (label: unknown): unknown =>
+  typeof label === "string" ? decodeString(label) : label;
 
 const fold = (label: string): string =>
   label
@@ -240,15 +249,12 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
     }
     case "percentComment": {
       if (!ctx.options.keepComments) return [];
-      const from = doc.indexOf("%%", position.start.offset) + 2;
-      const closed =
-        doc.slice(position.end.offset - 2, position.end.offset) === "%%" &&
-        position.end.offset - 2 >= from;
-      const to = closed ? position.end.offset - 2 : position.end.offset;
       return [
         {
           type: "comment",
-          value: doc.slice(from, to),
+          // The body as the reader saw it, without container prefixes: `commentToMarkdown`
+          // writes this back, and inside a quote the writer adds `> ` itself.
+          value: String(node.body),
           data: { hName: "obsidian-comment", hChildren: [] },
           ...(ctx.options.parseComments ? { children: kids() } : {}),
           position,
@@ -311,11 +317,18 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
       ).toLowerCase();
       return [
         type === "imageReference"
-          ? { type, identifier, label, referenceType, alt, position }
+          ? {
+              type,
+              identifier,
+              label: decodeLabel(label),
+              referenceType,
+              alt,
+              position,
+            }
           : {
               type,
               identifier,
-              label,
+              label: decodeLabel(label),
               referenceType,
               children: kids(),
               position,
@@ -331,7 +344,7 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
         {
           type: "definition",
           identifier,
-          label,
+          label: decodeLabel(label),
           title: title ?? null,
           url,
           position,
@@ -417,6 +430,10 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
           };
         }
       }
+      // A line ending that closes the paragraph breaks nothing (CommonMark: "neither syntax for
+      // hard line breaks works at the end of a paragraph"); the soft-break reader still sees
+      // one before trailing whitespace, as in `> foo` / `>  `.
+      while (children[children.length - 1]?.type === "break") children.pop();
       return [{ type: "paragraph", children, position }];
     }
     default: {

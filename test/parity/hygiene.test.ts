@@ -87,31 +87,13 @@ function runTwice(markdown: string, profile: keyof typeof PROFILES) {
  * - `fuzz/misc/2` and `task/escaped-marker` are singletons, and `task/escaped-marker` is the
  *   only entry that appears under one profile and not both.
  */
-const NON_IDEMPOTENT = [
-  "commonmark/raw-html/626 [all-features]",
-  "commonmark/raw-html/626 [quartz-default]",
-  "fuzz/comment/8 [all-features]",
-  "fuzz/comment/8 [quartz-default]",
-  "fuzz/math/12 [all-features]",
-  "fuzz/math/12 [quartz-default]",
-  "fuzz/misc/2 [all-features]",
-  "fuzz/misc/2 [quartz-default]",
-  "hunt/blockquote-region-outlives-quote/2 [all-features]",
-  "hunt/blockquote-region-outlives-quote/2 [quartz-default]",
-  "math/list-boundary [all-features]",
-  "math/list-boundary [quartz-default]",
-  "math/midline-list [all-features]",
-  "math/midline-list [quartz-default]",
-  "math/unclosed-quote-lazy [all-features]",
-  "math/unclosed-quote-lazy [quartz-default]",
-  "probe/callout-block-body/comment-lazy [all-features]",
-  "probe/callout-block-body/comment-lazy [quartz-default]",
-  "probe/math-marker/dash-opener-alone [all-features]",
-  "probe/math-marker/dash-opener-alone [quartz-default]",
-  "probe/straddle/callout-comment [all-features]",
-  "probe/straddle/callout-comment [quartz-default]",
-  "task/escaped-marker [all-features]",
-] as const;
+/**
+ * EMPTY since 2.0: `legacy` parses with remark-parse 8 and runs no correction pass, so there is
+ * no pass pair left to couple. The 23 entries recorded here before were all passes
+ * re-reading a position another had moved -- `commonmark/raw-html/626`, the `fuzz/comment`,
+ * `fuzz/math`, `math/*` and comment-straddle families.
+ */
+const NON_IDEMPOTENT = [] as const;
 
 describe("chain order-coupling", () => {
   it("couples no more pass pairs through a moved position than recorded", () => {

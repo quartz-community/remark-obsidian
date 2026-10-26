@@ -72161,8 +72161,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "a CLOSED `%%` region hosted by a list item also buries the definition; different mechanism from the unclosed cases, owned by commentRegionTransform"
+      "triage": "match"
     },
     "probe/item-comment/quoted": {
       "id": "probe/item-comment/quoted",
@@ -84525,8 +84524,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "`- \\tp` / blank / `  [^1]: def` reports the LIST spanning 0:0-2:11 and the definition at column 2, so Obsidian takes the definition into the item even though the two-space indent is short of the item's content column of 3. We end the list at 0:4 and put the definition at root, where our own root rule then gives column 0. The probe was added to pin the definition content-column rule and settled it for eleven of twelve shapes; this one is a host-detection divergence underneath that rule, not a column rule, and it wants its own evidence."
+      "triage": "match"
     },
     "probe/def-gap/ordered-three": {
       "id": "probe/def-gap/ordered-three",
@@ -87624,8 +87622,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "A caret inside a bracket pair that becomes a LINK frees it for a block identifier, and a DEFINITION does not change that: `[^1](u)` over `[^1]: one` still registers `1`. With `![^1](url)` registering nothing, the discriminator is IMAGE vs LINK and not the definition -- which the previously confounded pair could not separate."
+      "triage": "match"
     },
     "probe/caret-link/link-angle-dest": {
       "id": "probe/caret-link/link-angle-dest",
@@ -91018,8 +91015,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "D2 with a tab, and a second divergence underneath it: `---\\t` is not even a thematic break to Obsidian, so lines 0 and 1 become one paragraph and the closing `---` is the thematic break. CommonMark allows trailing tabs on a thematic break. We open frontmatter for this spelling too."
+      "triage": "match"
     },
     "probe/external-gap/fm-exact-control": {
       "id": "probe/external-gap/fm-exact-control",
