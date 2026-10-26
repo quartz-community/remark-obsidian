@@ -26,18 +26,23 @@ Where Obsidian and CommonMark disagree, pick which one you want:
 | Obsidian's inherited divergences — emphasis, lists, entities, autolinks, code spans, html blocks, link labels, task re-parse, bare footnote refs, soft breaks, custom task characters | on                 | **off**  |
 
 **Use `legacy`** for an Obsidian plugin, or for Quartz rendering a vault: the point
-is that the output matches what the author saw in the app. This is what the parity
-corpus measures, so it is the default.
+is that the output matches what the author saw in the app. It parses with
+remark-parse 8 — the parser Obsidian itself forks — plus Obsidian's own readers, so
+its tokens and positions are Obsidian's rather than an approximation of them. The
+parser is vendored and bundled, and the tree it returns is ordinary mdast with this
+package's node types, so downstream remark and rehype plugins work unchanged.
 
 **Use `strict`** off-platform. Obsidian's extensions are the reason to use this
 package, but its emphasis, list, entity, autolink, code-span, html-block and
-link-label behaviour are divergences it inherited from `remark-parse@8` and has not
-fixed — reproducing those outside Obsidian helps nobody.
+link-label behaviour are divergences it inherited from remark-parse 8 and has not
+fixed — reproducing those outside Obsidian helps nobody. `strict` parses with
+micromark, as `remark-parse` does.
 
-The split is taken from the options' own documentation rather than from taste: every
-flag `strict` clears is one whose docstring says it parses something "as Obsidian
-does" or "instead of CommonMark's". An explicit option always beats the preset, so
-`{ preset: "strict", legacyLists: true }` is a valid mix.
+Add the plugin **after** `remark-parse`: under `legacy` it replaces the processor's
+parser, and a `remark-parse` added later would put micromark back. The
+`legacyEmphasis` … `labelPrecedence` options are deprecated since 2.0 and ignored —
+`legacy` has all of that behaviour and `strict` none. The feature options
+(`wikilinks`, `comments`, `math`, `callouts`, …) work under both presets.
 
 ### Obsidian parity
 

@@ -1,0 +1,41 @@
+---
+"@quartz-community/remark-obsidian": major
+---
+
+`preset: "legacy"` — the default — now parses with remark-parse 8, the parser Obsidian itself
+forks, instead of correcting micromark towards it. `preset: "strict"` is unchanged.
+
+The parser is vendored and bundled; nothing new is installed. The result is still ordinary
+mdast with this package's node types (`wikilink`, `highlight`, `tag`, `comment`, `callout`,
+`calloutTitle`, `footnote`), so every remark and rehype plugin downstream keeps working.
+
+**Closer to Obsidian.** Against Obsidian's own recorded answers, footnote definitions and
+references now agree on 6,828 of 6,844 documents (from 6,307), and node positions are
+Obsidian's: every recorded section and heading start and end matches, against 97% and 94%
+before.
+
+**Deprecated options.** `legacyEmphasis`, `legacyStrikethrough`, `legacyEntities`,
+`legacyAutolinks`, `legacyCodeSpans`, `legacyLists`, `legacyHtmlBlocks`, `legacySetext`,
+`legacyLinkDefinitions`, `legacyTabs`, `legacyContainerLazy`, `legacyLinkDestinations`,
+`legacyTables` and `labelPrecedence` are ignored. Each switched on one part of remark-parse 8's
+reading, so `legacy` now has all of them and `strict` none. They still type-check.
+
+**Tree shapes that changed in `legacy`,** each to what Obsidian reports:
+
+- A block's position starts at its line, indentation included (` ### foo` starts at column 1).
+- A `%%` comment's `children` are its body read as inline content, so a footnote label inside
+  one is a `footnoteReference` — the reference Obsidian indexes there.
+- A `%%` that is not at the start of its line pairs only with a `%%` on the same line.
+- `$$ … $$` inside a quote or list item is display `inlineMath` whose value keeps its line
+  endings.
+- `root.data.lineOffsets` is remark-parse 8's own table (a task box now counts).
+- `processor.parse()` alone returns the finished tree; nothing is left for `run()`.
+
+**Formatting is stable.** Parsing and writing back with `remark-stringify` now reaches a fixed
+point on every recorded case, and `$$` display math is written back as display math.
+
+**Security.** Published remark-parse 8 contains HTML tag expressions that backtrack
+exponentially — a 205-character line took over four minutes to parse — and quadratic
+expressions in two of its helpers. The vendored copy replaces them with linear equivalents,
+proven identical on every recorded document and on millions of generated inputs, and the
+legacy reader stays linear on every pathological input the test suite covers.

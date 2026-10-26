@@ -5,13 +5,75 @@ measurement to establish, or a trap that has already wasted a session. Prose bel
 
 ## What this package is
 
-A remark plugin that makes a micromark/mdast pipeline parse Markdown the way **Obsidian** does.
+A remark plugin that makes a remark pipeline parse Markdown the way **Obsidian** does.
 Correctness is measured, not asserted: a harness renders a generated corpus inside real Obsidian
 and compares against our output, currently **6,844 recorded documents**.
 
 Obsidian internally runs a fork of **`remark-parse@8`** (rp8) — the pre-micromark architecture, a
-line-oriented tokenizer loop with an explicit `interruptors` list. We reproduce rp8's _behaviour_
-on micromark's _architecture_. That mismatch is the source of nearly every open problem.
+line-oriented tokenizer loop with an explicit `interruptors` list. **Since 2.0 `legacy` parses
+with rp8 itself**; `strict` parses with micromark. Everything below the next section is the
+micromark-era record: still the truth about `strict`'s path, history for `legacy`.
+
+## 2.0: `legacy` IS remark-parse 8
+
+The micromark-era conclusion "the remaining gap is architectural" was right, and the architecture
+changed. Upstream `obsidian-footnotes`' reader -- rp8 plus ~10 short Obsidian readers registered
+through rp8's own tokenizer tables and interrupt lists -- asserts agreement with every answer file
+vendored here except the four P1/P2 documents. Ported, it measured:
+
+|                                      | micromark (1.x) |   rp8 (2.0) |
+| ------------------------------------ | --------------: | ----------: |
+| referee                              |           6,307 |   **6,828** |
+| contract gate, `match` cases         |   3,447 / 3,447 | 3,451/3,451 |
+| positioned oracle divergences        |              20 |       **9** |
+| RAW positions vs `compute`: sections |           97.4% |    **100%** |
+| RAW positions: headings / list items |    94.2 / 82.2% | 100 / 92.4% |
+
+The RAW row is the one to remember: `normalize.ts` compensates for micromark's offsets in several
+places (heading and paragraph starts, empty item ends), so the positioned oracle UNDERSTATED how
+far the micromark tree's own positions were from Obsidian's. rp8's are Obsidian's.
+
+Of the 16 referee documents left: 4 are P1/P2 (must not fix), 2 are correction artifacts
+(references on lines past the text's end), 4 carry references only the CORRECTED answers have
+(inside code / an unclosed fence), 6 are columns (BOM, RTL names, a frontmatter closer).
+
+**Where it lives.** `src/rp8/reader.ts` (Obsidian's readers, ported with attribution, plus
+highlights, tags, positioned soft breaks, and the speed-ups), `src/rp8/adapt.ts` (rp8's tree to
+this package's node types), `src/rp8/list.ts` (rp8's list reader with the two B3/B8 changes),
+`src/rp8/vendor/` (rp8, remark-footnotes 2, remark-math 3, parse-entities 2 -- see its README for
+every change made after conversion). `remarkObsidian` installs the reader as `this.parser` under
+`legacy`, so it must be `.use()`d after `remark-parse`. The 14 `legacy*` options are deprecated
+and ignored.
+
+**Its gates**, beyond the suite above:
+
+- `test/rp8-vendored.test.ts` -- vendored == published rp8, byte-identical trees on every corpus
+  document; the linear tag matcher == the published regexes at every `<` and on 300,000 shapes.
+- `test/rp8-speedups.test.ts` -- with == without the speed-ups, every corpus document, every
+  Obsidian reader on and off, 60,000 generated documents.
+
+Both have known-positive controls. Re-run them after ANY change under `src/rp8`.
+
+**Traps this cost, each once:**
+
+- **Published rp8 has an EXPONENTIAL ReDoS** in `util/html.js` (`recheck`'s 205-character string:
+  134 s in one `.test`) and quadratic expressions in `trim@0.0.1` and `trim-trailing-lines`.
+  Obsidian presumably inherits them. The lint only sees regex LITERALS: rp8 builds its tag
+  expressions with `new RegExp(string)`, so they were invisible to it until fed to `recheck`.
+- **`setOptions` drops unknown keys**, so a flag on rp8's `options` silently never arrives -- put
+  it on the prototype (`anyTaskChar`).
+- **remark-footnotes names its inline-note reader `inlineNote`**, not `footnote`; a wrapper on a
+  name nothing registers is an inert speed-up, which is why `precheck` now THROWS on one.
+- **A `%%` comment's `value` must be the body as the reader saw it**, container prefixes
+  stripped. Sliced from the source it carried `> ` and the writer re-added it every format -- 40
+  of 57 never-settling round-trips were that one line.
+- **`mdast-util-math` writes every `inlineMath` with `$`**, and rp8 does not read a padded
+  `$ \nx\n $` as math: display math became TEXT on the first format until display nodes were
+  written with `$$`.
+- **A projection compensation for micromark can BREAK an rp8 tree that is already right.**
+  Before "fixing" a position, compare the RAW node position with `compute`.
+- **The Write tool turns a `\uFEFF` escape into a literal BOM**, and prettier reformats `src/rp8`
+  between edits -- re-read before anchoring a scripted edit.
 
 ## Two modes, two audiences
 
@@ -53,7 +115,7 @@ them and gating them would be unmeasured.
 ## Gates — what "done" means
 
 ```bash
-npm test          # 453 tests / 18 files. Contains the contract gate.
+npm test          # 465 tests / 21 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -514,7 +576,7 @@ Three things that recipe got right and guessing would not have:
   link-reference-definition family; it owns six of eight, and the other two were a different
   cause entirely.
 
-## Architectural conclusion (do not re-litigate without new evidence)
+## Architectural conclusion (micromark era -- SUPERSEDED for `legacy` by 2.0, above)
 
 ### The 2x2 against rp8: 54% of the gap has a LOCALLY COMPUTED correct answer
 
