@@ -1624,6 +1624,61 @@ this file already refuses at 97.6%:
 87 of 172 are on a definition label line, which is the 2,183-position / 2,130-indexed refusal.
 So the remainder is not 172 unexplored rows; it is ~85, and the only ungrouped bucket is 25.
 
+### Both NO-FLAG self-inflicted documents are ONE already-refused pass
+
+`fuzz#1205` and `fuzz#1623` survive every one of the 30 options, which reads as two separate
+parse-phase defects in our micromark extensions. Stood down at `index.ts:1195`, they are one
+pass — `definitionTabPastItemTransform`:
+
+| document    | pass stood down                            | obs                        |
+| ----------- | ------------------------------------------ | -------------------------- |
+| `fuzz#1205` | `[1@4@3, b@9@0, 1@12@4]` — **exact match** | `[1@4@3, b@9@0, 1@12@4]`   |
+| `fuzz#1623` | `[note@0@0, note@8@**2**]`                 | `[note@0@0, note@8@**3**]` |
+
+So `fuzz#1205` is owned outright, and `fuzz#1623` needs TWO repairs: the pass not to prune, AND
+the column to read 3 rather than 2 — which is the `def-col` tab-prefixed arithmetic measured
+above at 38 positions. Neither is a new mechanism, and wholesale stand-down stays refused at
+1 gain / 11 break.
+
+**MY FIRST HYPOTHESIS FOR `fuzz#1623` WAS WRONG, AND THE CONTROL IS WHAT KILLED IT.** Its tree
+holds `list@6:5 > listItem@6:5` with NO children, derived from a `····+·` line that is a marker
+and a trailing space, with the definition below it ABSENT from the tree entirely. That reads as
+"an empty nested item swallows the definition" and it is not the mechanism. Varying one thing at
+a time:
+
+|                                       | ours        | stock   |
+| ------------------------------------- | ----------- | ------- |
+| `····+·` present                      | **dropped** | present |
+| the marker line REMOVED — the control | **dropped** | present |
+| `····+ x`, marker with content        | **dropped** | present |
+| `···[^note]:` spaces instead of a tab | col 2       | col 3   |
+| `[^note]:` at column 0                | present     | present |
+
+The control drops it too, so the marker line is irrelevant and the variable is the TAB. I had
+already computed a population for the marker-only reading — 131 documents carrying such a line,
+59 differing from stock — and that figure measures a predicate the control then refuted, so it
+says nothing about the hypothesis and is discarded rather than recorded. **Compute the control
+before the population, not after.**
+
+### `def-EXTRA` is diffuse at predicate level, and only 38% is the mirror family
+
+121 positions where we define and Obsidian does not:
+
+| host         |   n | obs indexes a REFERENCE there |
+| ------------ | --: | ----------------------------: |
+| `listItem`   |  71 |                            24 |
+| `blockquote` |  23 |                             9 |
+| root         |  16 |                             6 |
+| `callout`    |  11 |                             7 |
+| **total**    | 121 |                **46 — 38.0%** |
+
+So the clean mirror of `probe:i1` — we define, Obsidian indexes the label as a reference instead
+— is only 38% of it; in the other 62% Obsidian reports NEITHER fact and buries the label
+entirely. And no shape dominates: crossing host, tab-led indent, indent length and the host's
+content column, the largest bucket is **16 of 94** (17%) and the next is 12. That is the same
+predicate-level diffuseness recorded for list-item extent, where the dominant axis described
+most list items rather than a rule.
+
 ### The `math` extension's parity DEBT is 21 documents, and it earns 900
 
 The `$$`-after-a-nested-marker defect above was sized at the three documents known to carry it.
