@@ -516,6 +516,53 @@ Three things that recipe got right and guessing would not have:
 
 ## Architectural conclusion (do not re-litigate without new evidence)
 
+### The 2x2 against rp8: 54% of the gap has a LOCALLY COMPUTED correct answer
+
+The question that produced this was logical rather than empirical: Obsidian is deterministic, so
+a mechanism exists for every diverging document by construction. "Not expressible" cannot be the
+answer. The 2x2 nobody had run says where those mechanisms are, scored on the FULL referee test
+over all 6,844:
+
+|                     |           |                                  |
+| ------------------- | --------: | -------------------------------- |
+| both right          | **4,618** |                                  |
+| WE right, rp8 wrong | **1,689** | what our passes add              |
+| rp8 right, WE wrong |   **288** | correct answer available LOCALLY |
+| BOTH WRONG          |   **249** | unknown to both parsers          |
+
+**288 of the 537 diverging documents — 54% — already have a correct answer computed locally**, at
+thousands of documents per second. Those are a work queue with a known-correct blueprint, not a
+mystery: rp8's tree is the answer and the diff between the two trees is the rule. Ranked by
+mechanism, one-mechanism documents only:
+
+| rp8 HAS it              |   n | NEITHER has it          |   n |
+| ----------------------- | --: | ----------------------- | --: |
+| `ref-extra @ paragraph` |  43 | `ref-extra @ paragraph` |  33 |
+| `def-miss @ code`       |  38 | `def-span-longer`       |  31 |
+| `ref-miss @ code`       |  29 | `def-span-shorter`      |  19 |
+| `def-span-longer`       |  28 | `ref-miss @ code`       |  16 |
+| `def-col`               |  15 | `def-miss @ code`       |  15 |
+| 2+ mechanisms           |  65 | 2+ mechanisms           |  80 |
+
+**`ref-extra @ paragraph` is 43 here where the DEFS-ONLY blueprint showed 5**, because rp8 has no
+`bareFootnoteRefTransform` and simply does not emit those references. So the family this file
+refuses at 97.6% as a _rule_ has 43 documents with a local blueprint, and the defs-only figure
+understated rp8's reach by a factor of eight. Score the full test, not one dimension.
+
+**WHAT IS REFUSED IS NARROWER THAN "INEXPRESSIBLE", and only two things are:** adopting rp8's
+definition extents wholesale (58 gained / 98 lost, net −40) and SELECTING between the two answers
+per document (51%, a coin flip). Neither is a statement about the mechanism. And the 1,689
+documents where we are right and rp8 is wrong is the evidence the per-mechanism method works at
+scale — those are Obsidian's fork, extensions and cache behaviour that ~100 passes here have
+already rediscovered independently.
+
+**So the ~94% asymptote recorded earlier in this file is WRONG, and the error is instructive.**
+It was inferred from refusals of GLOBAL rules — "no single rule covers this family" read as "this
+family is unreachable". Those are different claims: the first is measured and true, the second is
+false, and the 288 is the proof. The reachable figure is far higher; what it costs is rules per
+mechanism rather than one architectural move, with ~288 documents needing no probing at all,
+~249 needing the live oracle (how all 15 fixes in this session were derived), and ~3 forbidden.
+
 ### Modelling rp8's line selection: the rule is EXPRESSIBLE and the choice is NOT SELECTABLE
 
 Explored directly, because upstream reports 99.2% on this same corpus with rp8. Four
