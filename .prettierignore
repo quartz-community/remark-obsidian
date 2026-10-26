@@ -14,5 +14,12 @@ test-vault/.obsidian
 # nothing else.
 test/parity/referee-answers
 
-# Vendored from remark-parse 8.0.3, kept byte-comparable with upstream so the Obsidian changes stay auditable.
-src/rp8/*.cjs
+# Vendored remark-parse 8 and friends, kept in upstream's own style so a diff against the
+# published files shows only the recorded changes (src/rp8/vendor/README.md).
+src/rp8/vendor/remark-parse
+src/rp8/vendor/remark-footnotes
+src/rp8/vendor/remark-math
+src/rp8/vendor/parse-entities
+src/rp8/vendor/entities-v1.ts
+src/rp8/list.ts
+src/rp8/remove-indentation.ts

@@ -1,15 +1,13 @@
-'use strict'
-// Vendored from remark-parse 8.0.3 (MIT, Titus Wormer); see remove-indentation.cjs and the
-// two lines marked "Obsidian:" -- the approach follows obsidian-footnotes' remark-parse-list.js.
-
-var trim = require('trim')
-var repeat = require('repeat-string')
-var decimal = require('is-decimal')
-var getIndent = require('remarkParse8/lib/util/get-indentation')
-var removeIndent = require('./remove-indentation.cjs')
-var interrupt = require('remarkParse8/lib/util/interrupt')
-
-module.exports = list
+// @ts-nocheck -- remark-parse 8.0.3's lib/tokenize/list.js (MIT, Titus Wormer), vendored in
+// ./vendor, with the lines marked "Obsidian:" changed. The approach follows obsidian-footnotes'
+// src/parsing/remark-parse-list.js (MIT).
+import { trim as trim } from "./vendor/helpers.js";
+import { repeat as repeat } from "./vendor/helpers.js";
+import { isDecimal as decimal } from "./vendor/helpers.js";
+import getIndent from "./vendor/remark-parse/util/get-indentation.js";
+import removeIndent from "./remove-indentation.js";
+import interrupt from "./vendor/remark-parse/util/interrupt.js";
+export default list
 
 var asterisk = '*'
 var underscore = '_'
@@ -24,7 +22,7 @@ var lowercaseX = 'x'
 
 var tabSize = 4
 var looseListItemExpression = /\n\n(?!\s*$)/
-// Obsidian: any one character in the box (rule B8), unless `anyTaskChar` is off
+// Obsidian: any one character in the box (rule B8), unless `anyTaskChar` is off.
 var taskItemExpression = /^\[(.)][ \t]/
 var stockTaskItemExpression = /^\[([ X\tx])][ \t]/
 var bulletExpression = /^([ \t]*)([*+-]|\d+[.)])( {1,4}(?! )| |\t|$|(?=\n))([^\n]*)/
@@ -351,6 +349,7 @@ function listItem(ctx, value, position) {
   value = fn.apply(null, arguments)
 
   if (ctx.options.gfm) {
+    // Obsidian: the stock box when `customTaskChars` is off.
     task = value.match(
       ctx.anyTaskChar === false ? stockTaskItemExpression : taskItemExpression
     )
@@ -433,7 +432,6 @@ function normalListItem(ctx, value, position) {
 
   return trimmedLines.join(lineFeed)
 
-  /* eslint-disable-next-line max-params */
   function replacer($0, $1, $2, $3, $4) {
     bullet = $1 + $2 + $3
     rest = $4

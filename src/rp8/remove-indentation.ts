@@ -1,10 +1,9 @@
-'use strict'
-
-var trim = require('trim')
-var repeat = require('repeat-string')
-var getIndent = require('remarkParse8/lib/util/get-indentation')
-
-module.exports = indentation
+// @ts-nocheck -- remark-parse 8.0.3's lib/util/remove-indentation.js (MIT, Titus Wormer),
+// vendored in ./vendor, with the line marked "Obsidian:" changed.
+import { trim as trim } from "./vendor/helpers.js";
+import { repeat as repeat } from "./vendor/helpers.js";
+import getIndent from "./vendor/remark-parse/util/get-indentation.js";
+export default indentation
 
 var lineFeed = '\n'
 var space = ' '
