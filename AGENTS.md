@@ -238,6 +238,78 @@ part: in `1.⟨6sp⟩~~~` our parse produces `code@1:4`, an INDENTED code block,
 so a fence predicate can never fire there. Whatever owns these four is upstream of the fold, in
 how that line becomes code.
 
+### Re-attributed at 19, and `bareFootnoteRefs` owns 11 of the 16 that are real
+
+Re-run after this session's landings the blame population is **19**, and attributing it by
+OPTION rather than by pass is one run instead of 98 stand-downs. Corrected:
+
+|                     |        |                                                      |
+| ------------------- | -----: | ---------------------------------------------------- |
+| `bareFootnoteRefs`  | **11** | the flag that fixes them, so the pass DESTROYS these |
+| `comments`          |      2 | jointly with `keepComments`                          |
+| `parseComments`     |      1 |                                                      |
+| `legacyLists`       |      1 |                                                      |
+| `math`              |      1 | `reproducers#538`                                    |
+| NO FLAG AT ALL      |      2 | `fuzz#1205`, `fuzz#1623` — parse-phase               |
+| **my own artifact** |  **3** | see below                                            |
+
+`bareFootnoteRefs` at 11 of 16 is the fourth row of the bisect table at scale — stock is RIGHT
+and a pass of ours deletes the correct answer. This file already calls that pass "the biggest
+mover in the package and almost never the cause" (CULPABLE in 190 of 252, DECISIVE in 7); on the
+SELF-INFLICTED population the relationship inverts, and it is the cause in two thirds of them.
+
+**THREE OF THE 19 WERE AN ARTIFACT OF MY OWN AGREEMENT TEST, and the tell was a flag that cannot
+work.** `fuzz#1199`, `fuzz#2344` and `reproducers#531` each read as "fixed" by 28 to 31 of the 30
+boolean options — including `lineOffsets`, which adds one additive root data field and cannot
+touch a footnote fact. An inert flag appearing to fix a document means the TEST is wrong, and it
+was: the comparison keyed on `posKey`, which is `name@line@column`, and **a `Def` is a FOUR-tuple
+whose fourth field is its END LINE**. All three agree on every position and differ only there:
+
+    fuzz#1199      obs [["x-y",0,2,3]]   ours [["x-y",0,2,1]]
+    fuzz#2344      obs [["a",3,0,4]]     ours [["a",3,0,6]]
+    reproducers#531 obs [["ä",1,2,2]]    ours [["ä",1,2,1]]
+
+So the default already passed the weak test and every flag trivially "fixed" it. They are
+`def-span` extent cases — the family settled against the oracle at 46 of 47 probes — not blame
+cases at all. This file's own rule names the trap ("a `Def` is a four-tuple, so comparing
+name/line/column silently ignores its fourth field"), which is the third time this class has cost
+a measurement here. **100% is as suspicious as 0%, and "every flag fixes it" is the 100% case.**
+
+### A closed `$$` after a NESTED list marker destroys the item's own code span
+
+`fuzz#2570` is self-inflicted, stock gets it right, and the mechanism is not a footnote rule.
+Minimised to three lines and isolated one variable at a time:
+
+| document                                    | leaks?  | inline nodes                  |
+| ------------------------------------------- | ------- | ----------------------------- |
+| `* p ``[^Note]`` end.` / `···2) $$` / `⇥$$` | **YES** | `math=""` only — NO code span |
+| the same with `$$` at column 0              | no      | `inlineCode` AND `math`       |
+| the same with the `$$` left UNCLOSED        | no      | `inlineCode`                  |
+| the same without the bullet item            | no      | `inlineCode` + `inlineMath`   |
+| the code span alone                         | no      | `inlineCode`                  |
+| any of them under `math: false`             | no      | `inlineCode`                  |
+
+So a CLOSED `$$` block opened after a nested list marker inside a list item destroys the inline
+tokenization of the item's FIRST line, and the `math` node it produces captures an EMPTY value.
+The leaked footnote reference is a SYMPTOM — `bareFootnoteRefTransform` then finds a bare
+`[^Note]` in text that should have been `inlineCode`, which is why disabling that flag "fixes" it
+and why it sits in the 11 above. The defect is in the math extension's container interaction, so
+the repair is parse-phase.
+
+**Its tree signature is too broad to use as a predicate.** An empty-valued `math` node is exactly
+what the defect produces, and it is also what legitimate `$$`/`$$` produces:
+
+|                        |         |
+| ---------------------- | ------: |
+| documents carrying one | **241** |
+| of those, AGREE anyway | **212** |
+| diverge                |      29 |
+
+12.0% against a 7.9% base rate — **1.53x**, barely outside the 1.3 `NOISE_LIFT` this module
+defines and far below usefulness. So the defect is real and minimally reproduced, but it cannot
+be found by scanning for its own signature, and the three documents known to carry it have to be
+worked individually.
+
 ### `legacy-oracle.mts` specifically
 
 **rp8 must be constructed with `commonmark: true`.** It is what accepts `1)` ordered markers, and
