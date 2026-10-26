@@ -1410,6 +1410,59 @@ which this file already lists as a known divergence without a population. A smal
 nearly everything is a missing rule rather than a tail, so rate is worth ranking by and not only
 count. Shipped in `0323f48` at 3 gain / 0 break; the fifth case is a different shape.
 
+### `mechanism.mts` ranks what is left, and 402 of 546 are ONE mechanism away
+
+This file calls it "the targeting instrument" and a whole session ran without it. Run against
+the current tree it reports the thing no signature table can: how many mechanisms a single rule
+has to beat.
+
+|              |     |
+| ------------ | --: |
+| 1 mechanism  | 402 |
+| 2 mechanisms | 119 |
+| 3 mechanisms |  20 |
+| 4 or 5       |   5 |
+
+**So 402 documents are one rule from agreeing**, and the ranking by one-away count is the
+targeting order nothing else in this record provides:
+
+| mechanism               | one-away | present |
+| ----------------------- | -------: | ------: |
+| `ref-extra @ paragraph` |   **82** |     132 |
+| `def-span-longer`       |       58 |      84 |
+| `def-miss @ code`       |       53 |      65 |
+| `ref-miss @ code`       |       45 |      67 |
+| `def-span-shorter`      |       32 |      42 |
+| `def-col`               |       26 |      35 |
+
+**`ref-extra @ paragraph` is the largest and was never characterised.** All 101 of its
+ref-EXTRA-only documents carry `refsTrustworthy: true`, so none of it is gating. Its 128
+references split by source context:
+
+|     |                        |
+| --: | ---------------------- |
+|  48 | sitting ON a label     |
+|  40 | other                  |
+|  16 | a plain quoted line    |
+|   8 | inside an HTML comment |
+|   6 | inside a `%%` comment  |
+|   4 | inside a wikilink      |
+|   4 | inside a code span     |
+
+The HTML-comment eight shipped in `9298fc7`. **The label half is REFUSED, and decisively**: our
+bare reference sits on a label Obsidian does not define in **2,183** places and Obsidian indexes
+it in **2,130** of them — 97.6%. No feature separates the 53 exceptions, every lift is 1.00x, and
+that is the failed-label asymmetry being right far beyond the 710 documents already recorded for
+it. Of those 53, 42 are the `probe:i1` signature refuted three ways, and in **zero** of the 95
+do we also define at the position — so it is not "a defined label is also a reference" either.
+
+**`def-miss @ code` is the indent arithmetic, and 65 of its 66 positions are INDENTED code**, one
+fenced. The label lines carry deep mixed indentation — `⇥>`, `······>`, `>···⇥`, `···*⇥··⇥`,
+`····+⇥···` — so Obsidian counts the indent as less than four columns and defines, where we
+count four or more and make code. That is `tokenizeIndent`'s territory, which already carries two
+recorded refusals (`got` in columns −38, `initialSize` in columns inert), and it is now sized at
+53 one-away documents rather than the 21 the five-space cap was aimed at.
+
 ### The largest remaining mechanism is definition EXTENT, at 95 documents
 
 Classifying all 559 failures by error signature — not by family — turns up a bucket no family
