@@ -1,7 +1,8 @@
-import type { Paragraph, Root, RootContent } from "mdast";
+import type { Paragraph, PhrasingContent, Root, RootContent } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 import { mapLines } from "./line-map.js";
+import { pointAt } from "./normalize-points.js";
 
 /** `math` comes from `mdast-util-math`, which `mdast` itself does not declare. */
 interface MathNode {
@@ -70,10 +71,8 @@ export function mathMidlineTransform(tree: Root, source: string): void {
       const openerStart =
         map.starts[opener]! + lines[opener]!.length - "$$".length;
 
-      const kept = lines
-        .slice(0, opener)
-        .concat(lines[opener]!.slice(0, -"$$".length))
-        .join("\n");
+      const kept = phrasingBefore(paragraph as Paragraph, openerStart, source);
+      if (!kept) continue;
       const body = lines.slice(opener + 1).join("\n");
 
       (math as unknown as MathNode).value = body;
@@ -96,7 +95,9 @@ export function mathMidlineTransform(tree: Root, source: string): void {
         }
       }
 
-      if (kept.trim() === "") {
+      if (
+        kept.every((node) => node.type === "text" && node.value.trim() === "")
+      ) {
         if (!nested) parent.children.splice(index, 1);
         else {
           const inner = (block as unknown as { children: RootContent[] })
@@ -106,9 +107,7 @@ export function mathMidlineTransform(tree: Root, source: string): void {
         return;
       }
 
-      (paragraph as Paragraph).children = [
-        { type: "text", value: kept, position: paragraph.position },
-      ];
+      (paragraph as Paragraph).children = kept;
       if (paragraph.position) {
         paragraph.position.end = {
           line: map.lines[opener]!,
@@ -119,4 +118,59 @@ export function mathMidlineTransform(tree: Root, source: string): void {
       return;
     }
   });
+}
+
+/**
+ * The paragraph's phrasing up to `at`, where the opening `$$` starts, every construct before it
+ * kept. This pass used to rebuild the paragraph as one text node sliced from the source, which
+ * flattened every construct before the `$$` -- code spans, emphasis, links, wikilinks, tags --
+ * into its raw characters: under `* p ⟨code span⟩ end.` / `   2) $$` / `\t$$`, `remark-math`
+ * keeps the code span and this pass lost it.
+ *
+ * The `$$` ends its line, so it ends a line inside a `text` node: that node is cut at the end of
+ * the line holding it, found by counting line endings, since a text value drops the indentation
+ * of each continuation line and so cannot be indexed by offset. `undefined` when the `$$` sits
+ * anywhere else, and the pass then leaves the tree as micromark built it.
+ */
+function phrasingBefore(
+  paragraph: Paragraph,
+  at: number,
+  source: string,
+): PhrasingContent[] | undefined {
+  const kept: PhrasingContent[] = [];
+  for (const child of paragraph.children) {
+    const start = child.position?.start?.offset;
+    const end = child.position?.end?.offset;
+    if (start === undefined || end === undefined) return undefined;
+    if (end <= at) {
+      kept.push(child);
+      continue;
+    }
+    if (start >= at) break;
+    if (child.type !== "text") return undefined;
+
+    const line = source.slice(start, at).split(/\r\n|\r|\n/u).length - 1;
+    const endings = [...child.value.matchAll(/\r\n|\r|\n/gu)];
+    if (line > endings.length) return undefined;
+    const previous = endings[line - 1];
+    const lineStart = previous ? previous.index + previous[0].length : 0;
+    const lineEnd = endings[line]?.index ?? child.value.length;
+    if (lineEnd - lineStart < "$$".length) return undefined;
+    if (child.value.slice(lineEnd - "$$".length, lineEnd) !== "$$") {
+      return undefined;
+    }
+    const value = child.value.slice(0, lineEnd - "$$".length);
+    if (value !== "") {
+      kept.push({
+        ...child,
+        value,
+        position: {
+          start: { ...child.position!.start },
+          end: pointAt(source, at),
+        },
+      });
+    }
+    break;
+  }
+  return kept;
 }

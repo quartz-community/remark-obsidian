@@ -87,8 +87,10 @@ alone. In detail:
   as Markdown: `---[^1]: note` defines.
 - **A `---` opener followed by spaces or a tab** opens no frontmatter.
 - **`$$`** delimits display math as in LaTeX, including `$$x^2` on one line and a closing `$$`
-  at the end of a line. Left open in a quote or list item, a bare `$$` takes the lazy lines
-  below it, while `$$y` there is text. A `$$` after a callout's marker is the title's text.
+  at the end of a line. Inside a quote or list item, a `$$` ending a line of text opens display
+  math, and the text before it keeps its formatting. Left open in a quote or list item, a bare
+  `$$` takes the lazy lines below it, while `$$y` there is text. A `$$` after a callout's
+  marker is the title's text.
 - **`[[` straight after a bracket pair** is no wikilink: `a [x][[w]] b` holds none. Likewise
   **`[^x]` there** is no footnote reference: `a [text][^9] b` is text.
 - **`[^x](u)`** is a link to `u` wherever an inline link forms, whether or not `[^x]` is

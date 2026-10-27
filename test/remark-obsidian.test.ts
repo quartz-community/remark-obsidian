@@ -727,6 +727,25 @@ describe("remark-obsidian", () => {
       // Inside the definition, so an unreferenced one hides it as Obsidian does.
       expect(findNodes(definition, "inlineMath").length).toBe(1);
     });
+
+    it("keeps every construct before the opener under strict", () => {
+      // The pass used to rebuild the paragraph as one text node from the source, so all of
+      // these came back as their raw characters. `remark-math` keeps the code span.
+      const strict = { preset: "strict" } as const;
+      const listed = processWithGfm("* p `c` end.\n   2) $$\n\t$$\n", strict);
+      expect(findNodes(listed, "inlineCode").map((n) => n.value)).toEqual([
+        "c",
+      ]);
+      const quoted = processWithGfm(
+        "> **bold** *em* [[w]] #tag $$\n> x\n> $$\n",
+        strict,
+      );
+      expect(findNodes(quoted, "strong").length).toBe(1);
+      expect(findNodes(quoted, "emphasis").length).toBe(1);
+      expect(findNodes(quoted, "wikilink").length).toBe(1);
+      expect(findNodes(quoted, "tag").length).toBe(1);
+      expect(findNodes(quoted, "math").map((n) => n.value)).toEqual(["x"]);
+    });
   });
 
   describe("display math delimiter width", () => {
