@@ -33,9 +33,45 @@ The RAW row is the one to remember: `normalize.ts` compensates for micromark's o
 places (heading and paragraph starts, empty item ends), so the positioned oracle UNDERSTATED how
 far the micromark tree's own positions were from Obsidian's. rp8's are Obsidian's.
 
-Of the 16 referee documents left: 4 are P1/P2 (must not fix), 2 are correction artifacts
-(references on lines past the text's end), 4 carry references only the CORRECTED answers have
-(inside code / an unclosed fence), 6 are columns (BOM, RTL names, a frontmatter closer).
+Of the 16 referee documents left:
+
+- **10 are Obsidian cache misplacements, where our position is the character's**, so they must
+  not be fixed:
+  - the 4 P1/P2 documents already recorded;
+  - 5 more P2 (`broad#124`, `#147`, `#189`, `#290`, `#299`);
+  - one P1-like frontmatter tail (`overnight#132`).
+- **2 are correction artifacts** (references on lines past the text's end).
+- **4 carry references only the CORRECTED answers have** (inside code / an unclosed fence).
+
+**The six "column" documents were mislabelled, and all six are the cache, not us.** They had
+been recorded as "BOM, two RTL names, a frontmatter closer, two off by one to three". None
+holds a BOM, and the names are irrelevant.
+
+Five put a footnote on the first line under a callout title, where the callout is nested in a
+list item. Probed live (1.15.0), with controls:
+
+| document                                                        | Obsidian      |
+| --------------------------------------------------------------- | ------------- |
+| `> [!note] T` / `> ab[^1]` -- not nested                        | true column 4 |
+| `10.  > quote` / `> ab[^1]` -- nested, no callout               | true column 4 |
+| `10.  > [!warning]- T` / `> x` / `> ab[^1]` -- second body line | true column 4 |
+| `+  >`, `*····>`, `2)⇥>` callouts                               | +1            |
+| `10.  >` callout                                                | +3            |
+| `- [ ]····>` callout over a `⇥>` line                           | +3            |
+
+The cache's OFFSET moves with its column. `10.  > [!warning]- T` / `> ab[^1]` reports offset 28,
+which is the `]` of `[^1]`: the position points at the wrong character, so a consumer editing
+by it would edit the wrong text. That is P2, "reports `[^1]` at column 9 instead of 6", with a
+shift that is not simply the container's width.
+
+The sixth is `---` / `a: 1` / `---- [ ] [^2]: two`. Obsidian puts the definition at column 6,
+which is the space inside `[ ]`; the label starts at 9. A plain reference in a closer's tail
+(`--- x[^2]`) is placed right, so it is the task item inside the tail that the cache measures
+without the `---`.
+
+So legacy is at every agreement the oracle can grant: it agrees on all 6,828 documents whose
+answer is neither a cache defect nor a correction artifact. Reproducing the defects would cost a
+true position each, and the shift has no derivable rule.
 
 **Markdown inside HTML is CommonMark in Obsidian too**, so both presets read it the same way.
 Obsidian's developers give performance as the reason for its HTML handling, which makes it
