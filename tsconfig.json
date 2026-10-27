@@ -15,5 +15,10 @@
     "verbatimModuleSyntax": true
   },
   "include": ["src", "test", "types"],
-  "exclude": ["dist", "node_modules"]
+  "exclude": [
+    "dist",
+    "node_modules",
+    "test/parity/**/*.e2e.ts",
+    "wdio.conf.mts"
+  ]
 }

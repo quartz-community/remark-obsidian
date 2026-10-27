@@ -52,6 +52,11 @@ export function customTaskCharTransform(tree: Root, source?: string) {
     ) {
       firstText.position.start.column += match[0].length;
       firstText.position.start.offset += match[0].length;
+      // The paragraph starts after the box too, as `mdast-util-gfm-task-list-item` places it for
+      // `[ ]` and `[x]`: a custom box left it starting AT the box, overlapping the marker.
+      if (firstChild.position) {
+        firstChild.position.start = { ...firstText.position.start };
+      }
     }
   });
 }

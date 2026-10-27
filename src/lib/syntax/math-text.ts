@@ -1,0 +1,313 @@
+/**
+ * Obsidian-compatible inline math.
+ *
+ * Adapted from `micromark-extension-math` (MIT), Copyright (c) 2020 Titus Wormer
+ * <tituswormer@gmail.com>. See LICENSE-THIRD-PARTY.md.
+ *
+ * Vendored rather than wrapped. Two of Obsidian's three divergences live inside
+ * the tokenizer's state machine, and the upstream tokenizer asserts its own
+ * `previous` guard internally, so it cannot be gated from outside. Upstream fixes
+ * are also unwanted by definition: this file reproduces Obsidian, which upstream
+ * rightly does not.
+ *
+ * Token names are deliberately unchanged so `mdast-util-math` keeps mapping them.
+ *
+ * Divergences, each pinned by a case in the parity corpus:
+ *
+ *  1. A lone `$` followed by a digit or whitespace does not open, so `$5 and $10`
+ *     is currency. Upstream applies no flanking rules at all.
+ *  2. A backslash escapes the closing delimiter, so `$x^2\$` is not math. Obsidian
+ *     honours the escape for math while ignoring it for wikilinks, embeds,
+ *     highlights and comments.
+ *  3. A closing run consumes only as many markers as the opener used, leaving the
+ *     rest as literal text, so `$x^2$$` is math followed by `$`. Upstream requires
+ *     the runs to be equal and otherwise produces no math.
+ */
+
+import type {
+  Code,
+  Construct,
+  Effects,
+  Event,
+  State,
+  Token,
+  TokenizeContext,
+} from "micromark-util-types";
+import { codes, types } from "micromark-util-symbol";
+
+const DOLLAR = codes.dollarSign;
+const BACKSLASH = codes.backslash;
+
+function isDigit(code: Code): boolean {
+  return code !== null && code >= codes.digit0 && code <= codes.digit9;
+}
+
+function isLineEnding(code: Code): boolean {
+  return (
+    code === codes.lineFeed ||
+    code === codes.carriageReturn ||
+    code === codes.carriageReturnLineFeed
+  );
+}
+
+function isWhitespaceOrEof(code: Code): boolean {
+  return (
+    code === null ||
+    code === codes.space ||
+    code === codes.horizontalTab ||
+    isLineEnding(code)
+  );
+}
+
+export function mathTextSyntax(): Construct {
+  return {
+    name: "obsidianMathText",
+    tokenize: tokenizeMathText,
+    resolve: resolveMathText,
+    previous: previousMathText,
+  };
+}
+
+/**
+ * Upstream refuses to start when the preceding character is `$`, which stops an
+ * opening run longer than its closer from pairing at all. Obsidian retries with a
+ * shorter opener, so `$$x^2$` is a literal `$` followed by inline math.
+ *
+ * Relaxing that is safe for this tokenizer alone, but not when stock `remark-math`
+ * is co-registered for `$`: micromark still attempts its tokenizer, whose internal
+ * `assert(previous.call(...))` then fires on a state we legitimately created. So the
+ * guard adapts to what is actually registered, checked here rather than at plugin
+ * setup because extensions are only merged by tokenize time — and because this
+ * package initialises before a consumer's math plugin does.
+ */
+function previousMathText(this: TokenizeContext, code: Code): boolean {
+  if (code !== DOLLAR) return true;
+  if (!hasUpstreamMathText(this)) return true;
+  return (
+    this.events[this.events.length - 1]?.[1].type === types.characterEscape
+  );
+}
+
+function hasUpstreamMathText(context: TokenizeContext): boolean {
+  const registered = context.parser.constructs.text?.[DOLLAR];
+  const list = Array.isArray(registered) ? registered : [registered];
+  return list.some((construct) => construct?.name === "mathText");
+}
+
+function tokenizeMathText(
+  this: TokenizeContext,
+  effects: Effects,
+  ok: State,
+  nok: State,
+): State {
+  let sizeOpen = 0;
+  let sizeClose = 0;
+  let token: Token;
+  /**
+   * Whether a space or tab was the last thing consumed before a candidate closer.
+   *
+   * A single-dollar closer may not sit straight after one: `$. $` renders literally
+   * in Obsidian while `$.$` is math, so the content may no more end in whitespace
+   * than it may begin with it. Probed on both sides, and `$ .$` is refused earlier
+   * by the opener for the matching reason.
+   *
+   * Only a space or tab, not a line ending. An opener may be followed by a line
+   * ending and `$a⏎b$` is a span, so what a *closer* does after one is unmeasured
+   * and left alone.
+   */
+  let afterSpace = false;
+
+  return start;
+
+  function start(code: Code): State | undefined {
+    if (code !== DOLLAR) return nok(code);
+    effects.enter("mathText");
+    effects.enter("mathTextSequence");
+    return sequenceOpen(code);
+  }
+
+  function sequenceOpen(code: Code): State | undefined {
+    // Take at most two. Obsidian's display delimiter is exactly `$$`, so an
+    // over-long run opens an empty span and leaves the rest as text: `$$$$x^2$$`
+    // is empty math followed by a literal `x^2$$`. Consuming the whole run
+    // instead made the opener four wide and nothing could close it.
+    if (code === DOLLAR && sizeOpen < 2) {
+      effects.consume(code);
+      sizeOpen++;
+      return sequenceOpen;
+    }
+
+    // A line ending after the opener is allowed, where a space or tab is not.
+    // `x^2$` over `y^2$$]]` is an inline formula holding `⏎y^2` in Obsidian -- the
+    // opener ends its line, the span crosses the ending, and the closer is the
+    // *first* `$` of the `$$` run, leaving `$]]` literal. `1. $` over `y^2$$!` is
+    // the same shape one container in.
+    //
+    // Refusing on every whitespace, as upstream does, left both as plain text:
+    // measured directly, `$a⏎b$` opened a span and `a$⏎b$` did not.
+    if (
+      sizeOpen === 1 &&
+      (isDigit(code) ||
+        code === null ||
+        code === codes.space ||
+        code === codes.horizontalTab)
+    ) {
+      return nok(code);
+    }
+
+    effects.exit("mathTextSequence");
+    return between(code);
+  }
+
+  function between(code: Code): State | undefined {
+    if (code === null) return nok(code);
+
+    if (code === DOLLAR) {
+      // A single-dollar span may not close straight after a space or tab -- and a
+      // dollar that cannot close is *content*, not the end of the attempt. The scan
+      // goes on to look for a closer that can: `$$$], $x^2$` is one span holding
+      // `], $x^2`, where the dollar before `x` sits after a space and the last one
+      // closes. Abandoning here instead let that interior dollar open a span of its
+      // own and left `$$$], ` as text.
+      //
+      // `$. $` is unaffected and still literal: its only candidate also follows a
+      // space, so the scan runs out of input with no closer and the whole attempt
+      // fails -- which is the measured rule, reached by running out rather than by
+      // giving up early.
+      if (sizeOpen === 1 && afterSpace) {
+        afterSpace = false;
+        effects.enter("mathTextData");
+        effects.consume(code);
+        return data;
+      }
+      token = effects.enter("mathTextSequence");
+      sizeClose = 0;
+      return sequenceClose(code);
+    }
+
+    if (code === codes.space) {
+      effects.enter("space");
+      effects.consume(code);
+      effects.exit("space");
+      afterSpace = true;
+      return between;
+    }
+
+    if (isLineEnding(code)) {
+      effects.enter(types.lineEnding);
+      effects.consume(code);
+      effects.exit(types.lineEnding);
+      return between;
+    }
+
+    afterSpace = false;
+    effects.enter("mathTextData");
+    return data(code);
+  }
+
+  function data(code: Code): State | undefined {
+    if (code === BACKSLASH) {
+      effects.consume(code);
+      return dataEscaped;
+    }
+
+    if (
+      code === null ||
+      code === codes.space ||
+      code === DOLLAR ||
+      isLineEnding(code)
+    ) {
+      effects.exit("mathTextData");
+      return between(code);
+    }
+
+    effects.consume(code);
+    return data;
+  }
+
+  function dataEscaped(code: Code): State | undefined {
+    if (code === null || isLineEnding(code)) {
+      effects.exit("mathTextData");
+      return between(code);
+    }
+    effects.consume(code);
+    return data;
+  }
+
+  function sequenceClose(code: Code): State | undefined {
+    if (code === DOLLAR && sizeClose < sizeOpen) {
+      effects.consume(code);
+      sizeClose++;
+      return sequenceClose;
+    }
+
+    if (sizeClose === sizeOpen) {
+      effects.exit("mathTextSequence");
+      effects.exit("mathText");
+      return ok(code);
+    }
+
+    token.type = "mathTextData";
+    return data(code);
+  }
+}
+
+/**
+ * Upstream's resolver, unchanged: strips one layer of padding when the span both
+ * opens and closes with whitespace, then merges adjacent space and data events.
+ */
+function resolveMathText(events: Event[]): Event[] {
+  let tailExitIndex = events.length - 4;
+  let headEnterIndex = 3;
+  let index: number;
+  let enter: number | undefined;
+
+  if (
+    (events[headEnterIndex]?.[1].type === types.lineEnding ||
+      events[headEnterIndex]?.[1].type === "space") &&
+    (events[tailExitIndex]?.[1].type === types.lineEnding ||
+      events[tailExitIndex]?.[1].type === "space")
+  ) {
+    index = headEnterIndex;
+
+    while (++index < tailExitIndex) {
+      if (events[index]?.[1].type === "mathTextData") {
+        events[tailExitIndex]![1].type = "mathTextPadding";
+        events[headEnterIndex]![1].type = "mathTextPadding";
+        headEnterIndex += 2;
+        tailExitIndex -= 2;
+        break;
+      }
+    }
+  }
+
+  index = headEnterIndex - 1;
+  tailExitIndex++;
+
+  while (++index <= tailExitIndex) {
+    if (enter === undefined) {
+      if (
+        index !== tailExitIndex &&
+        events[index]?.[1].type !== types.lineEnding
+      ) {
+        enter = index;
+      }
+    } else if (
+      index === tailExitIndex ||
+      events[index]?.[1].type === types.lineEnding
+    ) {
+      events[enter]![1].type = "mathTextData";
+
+      if (index !== enter + 2) {
+        events[enter]![1].end = events[index - 1]![1].end;
+        events.splice(enter + 2, index - enter - 2);
+        tailExitIndex -= index - enter - 2;
+        index = enter + 2;
+      }
+
+      enter = undefined;
+    }
+  }
+
+  return events;
+}

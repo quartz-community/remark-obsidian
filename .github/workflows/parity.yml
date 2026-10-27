@@ -1,0 +1,152 @@
+name: Obsidian parity
+
+# The parity *gate* runs in ci.yml via `npm test`, needs no Obsidian, and guards
+# every pull request. This workflow only re-records the oracle against the latest
+# public Obsidian release. It never commits: a golden change is a behaviour change
+# and needs a human to decide whether Obsidian moved or we regressed.
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      appVersion:
+        description: "Obsidian app version; defaults to the latest public release"
+        required: false
+        default: latest
+      fullProxyCheck:
+        description: "Cross-check the WHOLE corpus through Reading View (an audit; see test/parity/README.md)"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: npm
+
+      - run: npm ci
+
+      - name: Cache Obsidian downloads
+        uses: actions/cache@v4
+        with:
+          path: .obsidian-cache
+          key: obsidian-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: obsidian-cache-${{ runner.os }}-
+
+      # Reading mode renders off requestAnimationFrame, which Chromium starves for
+      # unmapped windows. Xvfb alone is not enough; a window manager must map and
+      # focus the window or every capture comes back empty.
+      #
+      # `$GITHUB_ENV` reaches only LATER steps, so the window manager started here needs
+      # DISPLAY exported in this one. Without it herbstluftwm logged `XOpenDisplay() failed`
+      # on 2026-10-26 and the whole recording ran with no window manager.
+      - name: Start virtual display
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q xvfb herbstluftwm x11-utils
+          export DISPLAY=:99
+          echo "DISPLAY=$DISPLAY" >> "$GITHUB_ENV"
+          Xvfb :99 -screen 0 1280x1024x24 +extension GLX -noreset &
+          for _ in $(seq 1 40); do xdpyinfo -display :99 >/dev/null 2>&1 && break; sleep 0.25; done
+          herbstluftwm &
+          sleep 2
+          # Fail here rather than record without one, which is what went unnoticed.
+          pgrep -x herbstluftwm >/dev/null || { echo "herbstluftwm is not running"; exit 1; }
+
+      - name: Record goldens
+        env:
+          OBSIDIAN_APP_VERSION: ${{ inputs.appVersion || 'latest' }}
+          # The scheduled run cross-checks the seed layer and every known proxy divergence
+          # through Reading View, as a local recording does. The WHOLE-corpus sweep is a manual
+          # audit (the `fullProxyCheck` input) and does not pass reliably: Reading View shows a
+          # table row's surplus cells or not depending on what it rendered earlier in the
+          # session. Both full sweeps run so far (CI 2026-10-26, locally 2026-10-27) failed on
+          # the same five such cases, and the local one rewrote two known cases' goldens to
+          # text our parse does not give. test/parity/README.md has the record.
+          PARITY_FULL_PROXY_CHECK: ${{ inputs.fullProxyCheck && '1' || '' }}
+        run: npm run parity:record
+
+      # Every recording stamps a fresh `recordedAt`, so a run where Obsidian answered exactly
+      # as before still differs from the committed file by that one line. Restore the
+      # committed file when nothing else changed, or this reports drift every week.
+      - name: Check for drift
+        id: drift
+        run: |
+          if npx tsx test/parity/goldens-unchanged.mts; then
+            git checkout -- test/parity/goldens/obsidian.json
+          fi
+          if git diff --quiet -- test/parity/goldens; then
+            echo "drift=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "drift=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "### Obsidian parity drift"
+              echo
+              echo '```diff'
+              git diff --stat -- test/parity/goldens
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload recorded goldens
+        if: steps.drift.outputs.drift == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: obsidian-goldens
+          path: test/parity/goldens/obsidian.json
+
+      - name: Verify the gate still holds against the new recording
+        if: steps.drift.outputs.drift == 'true'
+        continue-on-error: true
+        run: npm run test:parity
+
+      - name: Open a drift issue
+        if: steps.drift.outputs.drift == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = "Obsidian parity goldens drifted";
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              labels: "parity-drift",
+            });
+            const body = [
+              "The scheduled parity run recorded different output from the committed goldens.",
+              "",
+              `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              "",
+              "Download the `obsidian-goldens` artifact and diff it against",
+              "`test/parity/goldens/obsidian.json`. Either Obsidian changed behaviour",
+              "(update the goldens and re-triage) or a dependency regressed us.",
+            ].join("\n");
+            if (existing.data.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.data[0].number,
+                body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ["parity-drift"],
+              });
+            }

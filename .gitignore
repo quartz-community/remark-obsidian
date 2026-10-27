@@ -30,6 +30,7 @@ yarn-error.log*
 # Testing
 coverage/
 .nyc_output
+.omo/
 
 # Package files
 *.tgz
@@ -38,3 +39,12 @@ coverage/
 .cache/
 .eslintcache
 dist/
+.obsidian-cache/
+
+# Obsidian parity harness: the oracle rewrites fixtures into the vault on every
+# run, and the workspace file churns whenever Obsidian opens it.
+test-vault/__parity__/
+test-vault/.obsidian/workspace.json
+test-vault/.obsidian/graph.json
+.stryker-tmp/
+reports/

@@ -1,0 +1,9 @@
+{
+  "id": "parity-probe",
+  "name": "Parity Probe",
+  "version": "1.0.0",
+  "minAppVersion": "1.5.7",
+  "description": "Test-only. Exposes a detached MarkdownRenderer so the parity harness can ask a running Obsidian for DOM projections metadataCache does not carry.",
+  "author": "remark-obsidian parity harness",
+  "isDesktopOnly": true
+}

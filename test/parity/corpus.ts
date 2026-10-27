@@ -1,0 +1,3182 @@
+/**
+ * Deterministic Obsidian-parity corpus.
+ *
+ * Layered rather than random, because random bytes almost never hit a delimiter
+ * boundary: normative seeds, then a token grammar crossed with delimiter states,
+ * then structural splicing into contexts that shield or reparse markdown, then
+ * adjacency mutations around closing delimiters.
+ */
+
+import { HUNT_FIXTURES } from "./corpus-hunt.js";
+import { COMMONMARK_SPEC } from "./commonmark.js";
+import { readFileSync } from "node:fs";
+
+import { generateRange } from "./fuzz/generate.js";
+
+export type Layer =
+  "seed" | "token" | "context" | "adjacency" | "hunt" | "commonmark";
+
+export interface Case {
+  readonly id: string;
+  readonly layer: Layer;
+  readonly category: string;
+  readonly markdown: string;
+}
+
+/**
+ * Cases with documented Obsidian behavior, including the reproductions from
+ * quartz-community/remark-obsidian#4 and the forum thread it links.
+ */
+const SEEDS: ReadonlyArray<readonly [string, string]> = [
+  // ---------------------------------------------------------------------------
+  // Probe wave 2: the two families wave 1 left open.
+  // ---------------------------------------------------------------------------
+
+  // IS AN UNMATCHED BRACKET A LEGAL REFERENCE LABEL, AND HOW DOES THE REFERENCE RENDER?
+  //
+  // Wave 1 settled the definition half: `[ref[]: /uri` *is* a definition and vanishes,
+  // while `[ref[bar]]: /uri` is not and stays visible. It did not settle the reference
+  // half, which is what `commonmark/links/546` and `/547` need -- both render with one
+  // bracket consumed (`[foo]ref[]`, `[foo]ref[bar]]`) and neither produces an anchor,
+  // so the label is being read and then shown bare. These ask the reference on its own,
+  // defined and undefined, for both label shapes.
+  ["probe/label-bracket/full-unmatched-undefined", "[foo][ref[]\n"],
+  ["probe/label-bracket/full-nested-undefined", "[foo][ref[bar]]\n"],
+  ["probe/label-bracket/collapsed-unmatched", "[ref[][]\n\n[ref[]: /uri\n"],
+  [
+    "probe/label-bracket/full-unmatched-other-def",
+    "[foo][ref[]\n\n[foo]: /other\n",
+  ],
+  ["probe/label-bracket/text-then-unmatched", "see [foo][ref[] end\n"],
+  [
+    "probe/label-bracket/unmatched-two-closers",
+    "[foo][ref[]]\n\n[ref[]: /uri\n",
+  ],
+
+  // HOW FAR DOES A WIKILINK PATH RUN WHEN A `](` IS INSIDE IT?
+  //
+  // `fuzz/comment/2` holds `[[a#^blk](target]]`, and Obsidian indexes a link whose whole
+  // target is `a#^blk](target` -- the path swallows the `](` and runs to the `]]`. That
+  // is the same shape the bare-URL extent turned out to be, so it is worth asking
+  // directly rather than inferring: these vary where the closer sits and whether a
+  // destination follows, which is what separates "the path ran on" from "the outer
+  // bracket pair won".
+  ["probe/wikilink-destination/paren-inside", "[[a](b]]\n"],
+  ["probe/wikilink-destination/block-then-paren", "[[a#^blk](target]]\n"],
+  ["probe/wikilink-destination/paren-inside-tail", "[[a](b]] tail\n"],
+  ["probe/wikilink-destination/paren-then-destination", "[[a](b]](u)\n"],
+  ["probe/wikilink-destination/closer-before-paren", "[[a]](b)\n"],
+  ["probe/wikilink-destination/embed-paren-inside", "![[a](b]]\n"],
+  ["probe/wikilink-destination/alias-paren-inside", "[[a|b](c]]\n"],
+
+  // ---------------------------------------------------------------------------
+  // Probe wave: the five families the backlog could not adjudicate.
+  //
+  // Each group below answers one question the recorded cases leave open. They are
+  // batched into a single wave because a full recording is about nine minutes, and
+  // because the open cases they serve are independent of each other.
+  // ---------------------------------------------------------------------------
+
+  // WHAT DOES A BARE-URL AUTOLINK TRIM FROM ITS TAIL?
+  //
+  // Obsidian's literal runs further than GFM's: `https://e.test/p](`code`` is one
+  // link whose href is the whole string, so nothing later on the line parses. Three
+  // recorded cases show it trimming a `.` and keeping `]]`, which is not enough to
+  // pin the set -- and the set is exactly what a repair needs, since a trim that is
+  // too eager breaks the 33 bare-URL cases that already match. One character each.
+  ["probe/autolink-trail/period", "see https://e.test/p. end\n"],
+  ["probe/autolink-trail/comma", "see https://e.test/p, end\n"],
+  ["probe/autolink-trail/semicolon", "see https://e.test/p; end\n"],
+  ["probe/autolink-trail/colon", "see https://e.test/p: end\n"],
+  ["probe/autolink-trail/bang", "see https://e.test/p! end\n"],
+  ["probe/autolink-trail/question", "see https://e.test/p? end\n"],
+  ["probe/autolink-trail/close-paren", "see https://e.test/p) end\n"],
+  ["probe/autolink-trail/close-bracket", "see https://e.test/p] end\n"],
+  ["probe/autolink-trail/double-close-bracket", "see https://e.test/p]] end\n"],
+  ["probe/autolink-trail/bracket-then-paren", "see https://e.test/p]( end\n"],
+  ["probe/autolink-trail/backtick-run", "see https://e.test/p`code` end\n"],
+  ["probe/autolink-trail/star", "see https://e.test/p* end\n"],
+  ["probe/autolink-trail/strong", "see https://e.test/p**b** end\n"],
+  ["probe/autolink-trail/tilde", "see https://e.test/p~~d~~ end\n"],
+  ["probe/autolink-trail/dollar", "see https://e.test/p$x$ end\n"],
+  ["probe/autolink-trail/wikilink", "see https://e.test/p[[a]] end\n"],
+  ["probe/autolink-trail/quote", 'see https://e.test/p" end\n'],
+  ["probe/autolink-trail/trailing-period-eol", "see https://e.test/p.\n"],
+
+  // WHAT LETS AN ESCAPED LABEL REGISTER A BLOCK IDENTIFIER?
+  //
+  // `> \[^1`, `[[\[^1]` and `[\[^1]]]` each register `blocks: ["1@..."]` spanning
+  // the line, while the control `\[^1]` registers nothing. Every registering case
+  // has something before the escaped bracket, which is a hypothesis and not a rule:
+  // these vary what precedes it, and whether a closing bracket is present, so the
+  // two candidate discriminators are separated.
+  ["probe/escaped-block-id/bare-open", "\\[^1\n"],
+  // The closed control `\[^1]` is deliberately NOT repeated here: it already exists
+  // as `token/footnote-ref/escaped-open`, and because SEEDS are declared first a probe
+  // with the same markdown would displace it -- taking with it the `blocks: []`
+  // control this whole family is defined against. The pre-recording displacement
+  // check is what caught that.
+  ["probe/escaped-block-id/text-space-before", "x \\[^1\n"],
+  ["probe/escaped-block-id/text-nospace-before", "x\\[^1\n"],
+  ["probe/escaped-block-id/text-before-closed", "x \\[^1]\n"],
+  ["probe/escaped-block-id/single-bracket-before", "[\\[^1\n"],
+  ["probe/escaped-block-id/emphasis-before", "*x* \\[^1\n"],
+  ["probe/escaped-block-id/heading-marker", "# \\[^1\n"],
+  ["probe/escaped-block-id/list-marker", "- \\[^1\n"],
+  ["probe/escaped-block-id/quote-marker-closed", "> \\[^1]\n"],
+  ["probe/escaped-block-id/second-line", "head\n\\[^1\n"],
+
+  // DOES A DISPLAY OPENER RETRY WITH A SHORTER RUN?
+  //
+  // `$$$], $x^2$` gives Obsidian one inline formula holding `], $x^2` -- the opener
+  // is the *third* dollar and the two before it are literal. That is the shape the
+  // backtick retry already has (shed from the left until a closer is found), and if
+  // it holds for dollars too then `legacy-code-text.ts` has the pattern to copy.
+  // `$$$$x^2$$` already matches as an empty formula, so the retry only happens when
+  // the display pairing fails; these separate run width from closer width.
+  ["probe/math-retry/triple-no-closer", "$$$x^2\n"],
+  ["probe/math-retry/triple-single-closer", "$$$x^2$\n"],
+  ["probe/math-retry/triple-double-closer", "$$$x^2$$\n"],
+  ["probe/math-retry/five-single-closer", "$$$$$x^2$\n"],
+  ["probe/math-retry/five-double-closer", "$$$$$x^2$$\n"],
+  ["probe/math-retry/triple-space-before-closer", "$$$x^2 $\n"],
+  ["probe/math-retry/triple-then-two-singles", "$$$a$b$\n"],
+
+  // WHICH `]` STOPS A WIKILINK OPENER?
+  //
+  // A `[` right after a link text's `]` opens a label, so `[[` there is not a
+  // wikilink opener -- but declining on any preceding `]` costs three cases where
+  // the bracket closed a footnote reference instead. These separate the two, and add
+  // the shapes a tree repair would have to tell apart.
+  ["probe/label-wikilink/after-footnote-ref", "a[^1][[w]] b\n\n[^1]: d\n"],
+  ["probe/label-wikilink/after-plain-bracket", "a [x][[w]] b\n"],
+  ["probe/label-wikilink/after-wikilink", "[[a]][[b]]\n"],
+  ["probe/label-wikilink/after-image-text", "![x][[w]]\n"],
+  ["probe/label-wikilink/after-inline-footnote", "^[a][[w]]\n"],
+  ["probe/label-wikilink/defined-label", "a [x][[w]] b\n\n[[w]]: /u\n"],
+
+  // IS AN UNMATCHED BRACKET A LEGAL REFERENCE LABEL?
+  //
+  // `[foo][ref[]` renders `[foo]ref[]` in Obsidian with no anchor, and its
+  // definition line vanishes -- so `[ref[]: /uri` *is* a definition while the
+  // reference using it is not a link. `[foo][ref[bar]]` keeps its definition line
+  // visible instead, so the two are not one rule. These ask each half on its own.
+  ["probe/label-bracket/definition-then-shortcut", "[ref[]: /uri\n\n[ref[]\n"],
+  ["probe/label-bracket/shortcut-then-definition", "[ref[]\n\n[ref[]: /uri\n"],
+  [
+    "probe/label-bracket/nested-then-shortcut",
+    "[ref[bar]]: /uri\n\n[ref[bar]]\n",
+  ],
+  ["probe/label-bracket/definition-alone", "[ref[]: /uri\n"],
+  ["probe/label-bracket/nested-definition-alone", "[ref[bar]]: /uri\n"],
+
+  // `metadataCache` reports a well-formed `^[body]` as a *definition* named
+  // `[inline0`, spanning the body alone, and an empty `^[]` as a *reference*
+  // with an empty name at the caret. Every case in the corpus held at most one
+  // inline footnote, so the `0` could be a counter or a constant and nothing
+  // here could tell. These five settle it: whether the name increments, whether
+  // it restarts in a new block, and whether an empty body takes a number too.
+  // The five below settled how inline footnotes are numbered among
+  // themselves, and that was not enough: a probe mixing one with an ordinary
+  // reference named it `[inline1` where our counter, which advances only on
+  // inline footnotes, says `[inline0`. Nothing in 2636 cases discriminated the
+  // two rules, because no case put a reference before an inline footnote.
+  // These four do, with the reference defined and undefined, before and
+  // between -- so the counter's real alphabet is measured rather than assumed.
+  ["probe/inline-footnote/ref-then-inline", "a[^1] and ^[x]\n\n[^1]: body\n"],
+  ["probe/inline-footnote/undefined-ref-then-inline", "a[^nodef] and ^[x]\n"],
+  [
+    "probe/inline-footnote/inline-ref-inline",
+    "^[a] b[^1] ^[c]\n\n[^1]: body\n",
+  ],
+  [
+    "probe/inline-footnote/definition-first",
+    "[^1]: body\n\nuse[^1] and ^[x]\n",
+  ],
+  // Does a character reference need its semicolon? CommonMark says yes, so micromark
+  // leaves `&amp` as four characters. The legacy stack decodes it, and decodes
+  // `&notreal` to `¬real` -- which is HTML's own rule rather than a quirk: the
+  // historical named references resolve without a terminator and match greedily. Two
+  // seeds of the second sweep landed on `&amp`, so the shape is common in prose where
+  // someone simply forgot the semicolon. These separate "no semicolon needed" from
+  // "longest match wins", which the single `&amp` case cannot.
+  ["probe/entity/semicolon-named", "&amp;\n"],
+  ["probe/entity/bare-named", "&amp\n"],
+  ["probe/entity/bare-copy", "&copy\n"],
+  ["probe/entity/bare-nbsp-then-text", "&nbsp x\n"],
+  ["probe/entity/bare-prefix-of-longer", "&notreal\n"],
+  ["probe/entity/bare-then-semicolon", "&amp&amp;\n"],
+  ["probe/entity/bare-then-letter", "&ampx\n"],
+  ["probe/entity/numeric-bare", "&#35\n"],
+  ["probe/entity/numeric-semicolon", "&#35;\n"],
+  ["probe/entity/hex-bare", "&#x23\n"],
+  ["probe/entity/uppercase-name", "&AMP\n"],
+  ["probe/entity/unknown-name", "&nosuchthing\n"],
+  ["probe/entity/empty-reference", "&;\n"],
+  ["probe/entity/in-code-span", "`&amp`\n"],
+  // What makes a pipe row a table? GFM treats the outer pipes as optional, so
+  // `| a` over `| ---` is a table to micromark -- Obsidian reads it as a paragraph.
+  // A fuzz sweep reduced 128 failures to 118 causes and this was the one real
+  // cluster, eight independent seeds landing on `| a ⏎| --- `, so it is a frequent
+  // shape rather than the isolated fragment its single corpus case suggested. The
+  // recorded cases hinted that a trailing pipe is what decides it but covered only
+  // two of the four corners, so these cross the leading and trailing pipe with
+  // trailing whitespace.
+  ["probe/table-pipes/both-closed", "| a |\n| --- |\n"],
+  ["probe/table-pipes/neither-closed", "| a\n| ---\n"],
+  ["probe/table-pipes/header-closed-only", "| a |\n| ---\n"],
+  ["probe/table-pipes/delimiter-closed-only", "| a\n| --- |\n"],
+  ["probe/table-pipes/trailing-space-no-pipe", "| a \n| --- \n"],
+  ["probe/table-pipes/trailing-space-with-pipe", "| a | \n| --- | \n"],
+  ["probe/table-pipes/no-leading-pipe", "a | b\n--- | ---\n"],
+  ["probe/table-pipes/bare-minimal", "a|b\n-|-\n"],
+  ["probe/table-pipes/tight-closed", "|a|\n|---|\n"],
+  ["probe/table-pipes/with-body-row", "| a |\n| --- |\n| b |\n"],
+  ["probe/table-pipes/body-row-unclosed", "| a |\n| --- |\n| b\n"],
+  ["probe/table-pipes/two-columns-unclosed", "| a | b\n| --- | ---\n"],
+  // A short delimiter row builds a table of its own width, which
+  // `tableShortDelimiterTransform` reproduces -- but that promotion has to obey the
+  // same precondition as everything else here, and `| a | b |` over `| --- ` is the
+  // combination neither rule had evidence for. Two seeds of the second sweep landed
+  // on it, and GFM declines it while we promote it, so the two cannot both be right.
+  ["probe/table-pipes/short-delimiter-closed", "| a | b |\n| --- |\n"],
+  ["probe/table-pipes/short-delimiter-unclosed", "| a | b |\n| --- \n"],
+  ["probe/table-pipes/unclosed-header-short", "| a | b\n| --- \n"],
+  ["probe/table-pipes/long-delimiter-unclosed", "| a |\n| --- | ---\n"],
+  // The two construction sites still leaving nodes unplaced, probed to find out
+  // whether their six and four nodes are isolated or a family seen in part. Both
+  // constructs are thin: a callout title carrying emphasis had zero designed probes
+  // against twelve incidental, and the whole autolink construct had one against
+  // fifty-six. That ratio is what the tag bugs and the raw-HTML conclusion both came
+  // out of, so it is worth asking before deciding these are singletons.
+  ["probe/callout-title/plain", "> [!note] title\n"],
+  ["probe/callout-title/empty", "> [!note]\n"],
+  ["probe/callout-title/fold-collapsed", "> [!note]-\n"],
+  ["probe/callout-title/fold-expanded", "> [!note]+ title\n"],
+  ["probe/callout-title/emphasis", "> [!note] *em*\n"],
+  ["probe/callout-title/strong-unbalanced", "> [!note] ****strong**\n"],
+  ["probe/callout-title/definition", "> [!note] [^1]: x\n"],
+  ["probe/callout-title/list", "> [!note] - item\n"],
+  ["probe/callout-title/heading", "> [!note] # h\n"],
+  ["probe/callout-title/quote", "> [!note] > inner\n"],
+  ["probe/callout-title/fence", "> [!note] ```\n"],
+  ["probe/callout-title/pipes", "> [!note] | a |\n"],
+  // A2c, the last of the five gaps the sibling project's rules document exposed, and the
+  // only one with NO instance in the referee corpus -- so the corpus is the only instrument
+  // for it. Their claim: a `2.` item directly under a callout title starts a list, because
+  // the title line closes its own block and so is not a paragraph the marker has to
+  // interrupt. CommonMark lets an ordered item interrupt a paragraph only when it starts
+  // at 1, which is what makes the premise testable: if the title is a paragraph, `2.` stays
+  // text, and if it is not, a list opens.
+  //
+  // Both controls matter. A plain quote's first line IS a paragraph, so `2.` must stay
+  // text there; and `1.` interrupts whatever precedes it, so it must open a list in both.
+  ["probe/title-interrupt/two-in-callout", "> [!note] title\n> 2. item\n"],
+  ["probe/title-interrupt/two-in-quote", "> text\n> 2. item\n"],
+  ["probe/title-interrupt/one-in-callout", "> [!note] title\n> 1. item\n"],
+  [
+    "probe/title-interrupt/two-with-definition",
+    "> [!note] title\n> 2. [^1]: def\n\nuse[^1]\n",
+  ],
+  [
+    "probe/title-interrupt/two-lazy",
+    "> [!note] title\n2. [^1]: def\n\nuse[^1]\n",
+  ],
+  // Autolinks, which one probe has been standing in for.
+  ["probe/autolink/scheme", "<https://e.test/p>\n"],
+  ["probe/autolink/email", "<a@b.test>\n"],
+  ["probe/autolink/email-escaped", "<foo\\+@bar.example.com>\n"],
+  ["probe/autolink/escaped-closer", "<a\\>b>\n"],
+  ["probe/autolink/mailto", "<mailto:a@e.test>\n"],
+  ["probe/autolink/uppercase-scheme", "<HTTPS://E.TEST>\n"],
+  ["probe/autolink/space-inside", "<not a url>\n"],
+  ["probe/autolink/empty", "<>\n"],
+  ["probe/autolink/query-ampersand", "<https://e.test/?q=1&x=2>\n"],
+  ["probe/autolink/fragment", "<https://e.test/#frag>\n"],
+  ["probe/autolink/adjacent-text", "a<https://e.test>b\n"],
+  ["probe/autolink/in-callout-title", "> [!note] <https://e.test>\n"],
+  // The contexts a change to inline code would reach. `probe/code-run/*` pins the
+  // opener/closer matrix, but the retry would live in the tokenizer, so its blast
+  // radius is every container a code span can sit in -- and that dimension was the
+  // thin one: zero designed probes for a span inside emphasis or a table cell, one
+  // each for a link label, a blockquote and the padding rule. Probing the surface
+  // before touching the tokenizer is what shrank the link port from 367 lines to a
+  // single decision, so the same order applies here.
+  ["probe/code-context/in-emphasis", "*a ``code` b*\n"],
+  ["probe/code-context/in-emphasis-tight", "*``code`*\n"],
+  ["probe/code-context/in-strong", "**``code`**\n"],
+  ["probe/code-context/in-table-cell", "| ``code` | c |\n| --- | --- |\n"],
+  ["probe/code-context/in-blockquote", "> ``code`\n"],
+  ["probe/code-context/in-link-label", "[``code`](u)\n"],
+  ["probe/code-context/in-heading", "# ``code`\n"],
+  ["probe/code-context/in-list-item", "- ``code`\n"],
+  ["probe/code-context/two-retries", "``a` and ``b`\n"],
+  ["probe/code-context/padded-both", "`` a ``\n"],
+  ["probe/code-context/padded-backtick", "`` ` ``\n"],
+  ["probe/code-context/padded-double", "``  a  ``\n"],
+  ["probe/code-context/padded-single-run", "` a `\n"],
+  ["probe/code-context/across-line", "`a\nb`\n"],
+  ["probe/code-context/across-line-double", "``a\nb``\n"],
+  ["probe/code-context/retry-across-line", "``a\nb`\n"],
+  // How does a backtick run find its closer? micromark takes the maximal opening
+  // run and gives up when no run of equal length follows, so ` ``code` ` stays
+  // literal; Obsidian reports `` `code ``, which is what retrying one position along
+  // produces -- the second backtick opens and the trailing one closes, leaving the
+  // first as text. Inline code was thin on designed coverage at 57 probes against 61
+  // incidental hits, and the retry is the kind of rule only a full run matrix pins
+  // down, so these cross opener and closer lengths deliberately.
+  ["probe/code-run/balanced-one", "`code`\n"],
+  ["probe/code-run/balanced-two", "``code``\n"],
+  ["probe/code-run/open-two-close-one", "``code`\n"],
+  ["probe/code-run/open-one-close-two", "`code``\n"],
+  ["probe/code-run/open-three-close-one", "```code`\n"],
+  ["probe/code-run/open-one-close-three", "`code```\n"],
+  ["probe/code-run/interior-run", "`a``b`\n"],
+  ["probe/code-run/interior-single", "``a`b``\n"],
+  ["probe/code-run/unclosed", "`code\n"],
+  ["probe/code-run/lone-marker", "`\n"],
+  ["probe/code-run/two-markers", "``\n"],
+  ["probe/code-run/three-markers", "```\n"],
+  ["probe/code-run/escaped-inside", "`a\\`b`\n"],
+  ["probe/code-run/adjacent-text", "a`b`c\n"],
+  ["probe/code-run/padded", "`` a ``\n"],
+  // Which tags start a raw HTML block? `remark-parse@8` starts one only for a
+  // block-level tag, so `<br>` lands in a paragraph and a setext underline then
+  // makes a heading of it, while `<div>` opens a block that swallows the underline.
+  // The legacy stack reads `<br>⏎===` as a heading, `<pre>⏎---⏎</pre>` as a heading
+  // plus `</pre>`, and `<div>⏎a⏎===` as one block -- so the discriminator is the tag
+  // and not the line count, which three probes found only by accident. Raw html was
+  // the worst-covered construct in the corpus at 25 designed probes against 146
+  // incidental hits and 22 open cases, which is why these enumerate the tag classes.
+  ["probe/html-block/br-setext-equals", "<br>\n===\n"],
+  ["probe/html-block/br-setext-dash", "<br>\n---\n"],
+  // `div-setext` has an intervening line, so it tests the block's extent rather
+  // than the opener -- keep both, because the pair is what separates "the tag
+  // decides" from "an underline on the very next line decides".
+  ["probe/html-block/div-setext", "<div>\na\n===\n"],
+  ["probe/html-block/div-setext-direct", "<div>\n===\n"],
+  ["probe/html-block/div-setext-dash-direct", "<div>\n---\n"],
+  ["probe/html-block/span-then-text", "<span>\nplain\n"],
+  ["probe/html-block/pre-setext", "<pre>\n---\n</pre>\n"],
+  ["probe/html-block/span-setext", "<span>\n===\n"],
+  ["probe/html-block/p-setext", "<p>\n===\n"],
+  ["probe/html-block/custom-setext", "<x-tag>\n===\n"],
+  ["probe/html-block/closing-div-setext", "</div>\n===\n"],
+  ["probe/html-block/br-blank-then-underline", "<br>\n\n===\n"],
+  ["probe/html-block/br-then-text", "<br>\nplain\n"],
+  ["probe/html-block/div-then-text", "<div>\nplain\n"],
+  ["probe/html-block/br-interrupts-paragraph", "text\n<br>\nmore\n"],
+  ["probe/html-block/div-interrupts-paragraph", "text\n<div>\nmore\n"],
+  ["probe/html-block/script-body", "<script>\na\n</script>\n"],
+  // The rest of what `remark-parse@8`'s `link.js` decides, which nothing here probes.
+  // Porting that tokenizer is the largest scoped item left, and a port replaces the
+  // whole construct -- so its blast radius is this entire surface, not the bracket
+  // nesting that motivated it. Six of these features had zero designed probes and
+  // were covered only by accidental fuzz hits: both minority title styles, angle and
+  // empty destinations, nested and escaped parens. Probing first is also how the
+  // html/setext "port" turned out to be a bounded transform.
+  ["probe/link-surface/plain-destination", "[a](u)\n"],
+  ["probe/link-surface/angle-destination", "[a](<u>)\n"],
+  ["probe/link-surface/angle-with-space", "[a](<u v>)\n"],
+  ["probe/link-surface/empty-destination", "[a]()\n"],
+  ["probe/link-surface/empty-angle", "[a](<>)\n"],
+  ["probe/link-surface/nested-parens", "[a](u(v))\n"],
+  ["probe/link-surface/escaped-parens", "[a](u\\(v\\))\n"],
+  ["probe/link-surface/bare-space", "[a](u v)\n"],
+  ["probe/link-surface/title-double", '[a](u "t")\n'],
+  ["probe/link-surface/title-single", "[a](u 't')\n"],
+  ["probe/link-surface/title-parenthesis", "[a](u (t))\n"],
+  ["probe/link-surface/title-unterminated", '[a](u "t)\n'],
+  ["probe/link-surface/title-then-junk", '[a](u "t" x)\n'],
+  ["probe/link-surface/full-reference", "[a][b]\n\n[b]: /u\n"],
+  ["probe/link-surface/collapsed-reference", "[a][]\n\n[a]: /u\n"],
+  ["probe/link-surface/shortcut-reference", "[a]\n\n[a]: /u\n"],
+  // Which bracket pair wins when one encloses another? Obsidian takes the OUTER
+  // and leaves the inner literal, where CommonMark takes the inner -- both oracles
+  // agree on that for `[foo [bar](/uri)](/uri)`. Reproducing it means replacing
+  // micromark's label resolver with legacy's balanced-bracket scan, and the corpus
+  // could not adjudicate that: three designed probes covered nested brackets
+  // against twenty-seven incidental fuzz hits, so the blast radius was guesswork.
+  // These probe the precedence systematically, including every construct that can
+  // cross a label boundary, so the port can be measured rather than feared.
+  ["probe/label-precedence/plain", "[a](u)\n"],
+  ["probe/label-precedence/nested-inline", "[foo [bar](u)](v)\n"],
+  [
+    "probe/label-precedence/nested-reference",
+    "[foo [bar](u)][ref]\n\n[ref]: /r\n",
+  ],
+  [
+    "probe/label-precedence/reference-inside",
+    "[foo [bar][ref]](u)\n\n[ref]: /r\n",
+  ],
+  ["probe/label-precedence/bracket-no-link", "[a [b] c](u)\n"],
+  ["probe/label-precedence/image-inside", "[a ![b](u) c](v)\n"],
+  ["probe/label-precedence/image-outside", "![foo [bar](u)](v)\n"],
+  ["probe/label-precedence/trailing-destination", "[foo](u)](v)\n"],
+  ["probe/label-precedence/double-open", "[[a](u)](v)\n"],
+  ["probe/label-precedence/code-crosses", "[foo`](u)`\n"],
+  ["probe/label-precedence/html-attr-crosses", '[foo <b attr="](u)">\n'],
+  ["probe/label-precedence/emphasis-crosses", "[foo *bar](u)*\n"],
+  ["probe/label-precedence/wikilink-inside", "[foo [[target]] bar](u)\n"],
+  [
+    "probe/label-precedence/autolink-crosses",
+    "[foo <https://e.test/?q=](u)>\n",
+  ],
+  // Where does a footnote reference survive inside a link construct? Obsidian
+  // indexes one in a link reference definition's *destination* (`[foo]: [^9]`),
+  // which is recorded, and the referee shows it also indexing one in a reference
+  // link's label where we yield nothing at all. `[[^9]]` is the interesting case
+  // because it is two readings at once -- a wikilink targeting `^9`, or a bracket
+  // around the footnote reference `[^9]` -- so this is a precedence question
+  // between an Obsidian construct and a CommonMark one, and only Obsidian can say.
+  // Each case defines `^9` deliberately: `footnoteRefs` lists only references whose
+  // name has a definition, so without one every answer is an empty list that agrees
+  // with anything and proves nothing.
+  [
+    "probe/reference-in-link/collection-label",
+    "a [text][[^9]] b\n\n[^9]: def\n",
+  ],
+  ["probe/reference-in-link/bare-wikilink", "a [[^9]] b\n\n[^9]: def\n"],
+  ["probe/reference-in-link/link-text", "a [[^9]][text] b\n\n[^9]: def\n"],
+  ["probe/reference-in-link/inline-text", "a [[^9]](/url) b\n\n[^9]: def\n"],
+  [
+    "probe/reference-in-link/inline-title",
+    'a [text](/url "[^9]") b\n\n[^9]: def\n',
+  ],
+  ["probe/reference-in-link/image-alt", "a ![alt [^9]](/url) b\n\n[^9]: def\n"],
+  ["probe/reference-in-link/shortcut", "a [text][^9] b\n\n[^9]: def\n"],
+  [
+    "probe/reference-in-link/definition-title",
+    '[foo]: /url "[^9]"\n\n[^9]: def\n',
+  ],
+  // An unclosed `%%` inside a footnote definition: how far does it reach? The
+  // recorded corpus says Obsidian ends the definition *at* the `%%` line where
+  // we run past it, which would follow if the comment were bounded by the
+  // definition and the definition by its blank line -- the same shape as the
+  // quote rule. But `commentInDefinitionTransform` exists because a `%%` does
+  // *not* end a definition when the next line continues it lazily, so the two
+  // readings have to be separated by evidence rather than argument.
+  ["probe/definition-comment/blank-after", "[^1]: one\n%%\n\nuse[^1]\n"],
+  ["probe/definition-comment/lazy-after", "[^1]: one\n%%\nb\n"],
+  [
+    "probe/definition-comment/closed-then-blank",
+    "[^1]: one\n%% x %%\n\nuse[^1]\n",
+  ],
+  ["probe/definition-comment/indented-open", "[^1]: one\n    %%\n\nuse[^1]\n"],
+  ["probe/definition-comment/two-definitions", "[^1]: one\n%%\n\n[^2]: two\n"],
+  // The column `metadataCache` reports for a definition is short of where the
+  // `[` actually sits, by no constant amount: `    [^12]:` is column 2 to it and
+  // 4 to us, `- [ ]    [^x]:` is 6 against 9, `- [ ]  [^x]:` is 6 against 7.
+  // That is ~500 of the recorded corpus's span disagreements and the largest
+  // family left. What a cache reports is not something the legacy stack can
+  // arbitrate, so these span indentation and container type to pin the
+  // convention -- or to show it is a defect like the author's `P1`/`P2`, in which
+  // case reproducing it would be wrong.
+  ["probe/definition-column/flush", "[^1]: def\n"],
+  ["probe/definition-column/one-space", " [^1]: def\n"],
+  ["probe/definition-column/two-spaces", "  [^1]: def\n"],
+  ["probe/definition-column/three-spaces", "   [^1]: def\n"],
+  ["probe/definition-column/in-quote", "> [^1]: def\n"],
+  ["probe/definition-column/in-quote-padded", ">  [^1]: def\n"],
+  ["probe/definition-column/in-list", "- [^1]: def\n"],
+  ["probe/definition-column/in-list-padded", "-  [^1]: def\n"],
+  ["probe/definition-column/in-task", "- [ ] [^1]: def\n"],
+  ["probe/definition-column/in-task-padded", "- [ ]  [^1]: def\n"],
+  // `%%` is Obsidian's own construct, so the legacy stack cannot arbitrate it
+  // the way it settles a tab or a fence -- and inferring a rule from the
+  // recorded corpus instead went wrong once already: documents matching
+  // "`%%`, blank line, definition" looked like evidence for a blank-line
+  // terminator until `hunt/obsidian-comments/22` showed an unclosed `%%` at the
+  // top level running to end of file, blank lines and all. The apparent
+  // evidence was openers that were never openers (`%% %` holds a second `%`)
+  // and comments sitting inside a container.
+  //
+  // So these are recorded rather than reasoned. They isolate one question: what
+  // does a comment opened inside a quote do with the lines after it?
+  ["probe/quote-comment/crossing-definition", "> %%\n[^1]: def\n"],
+  ["probe/quote-comment/crossing-text", "> %%\ntext\n"],
+  ["probe/quote-comment/quoted-definition", "> %%\n> [^1]: def\n"],
+  ["probe/quote-comment/blank-then-definition", "> %%\n\n[^1]: def\n"],
+  ["probe/quote-comment/continues-then-blank", "> %%\n> more\n\n[^1]: def\n"],
+  ["probe/quote-comment/root-then-quoted", "%%\n> [^1]: def\n"],
+  ["probe/quote-comment/midline-opener", "> a %%\n[^1]: def\n"],
+  // Enumerating Obsidian's tokenizers rather than sampling them found no
+  // construct at zero coverage, but three were thin enough to be untested in
+  // practice -- and bare autolinking is the risky one. remark-parse 8 has its
+  // own `url` and `email` inline tokenizers while our side gets literal
+  // autolinks from GFM, so the two are independent implementations that agree
+  // only by coincidence. `www.` is the sharpest probe: GFM autolinks it and
+  // remark-parse 8 has no rule for it at all.
+  ["probe/autolink/bare-email", "write a@b.com now\n"],
+  ["probe/autolink/email-subdomain", "write a.b@c.co.uk now\n"],
+  ["probe/autolink/email-plus", "write a+tag@b.com now\n"],
+  ["probe/autolink/email-underscore-domain", "write a@b_c.com now\n"],
+  ["probe/autolink/email-no-tld", "write a@b now\n"],
+  ["probe/autolink/email-trailing-dot", "write a@b.com. now\n"],
+  ["probe/autolink/bare-url", "see http://a.com now\n"],
+  ["probe/autolink/url-www", "see www.example.com now\n"],
+  ["probe/autolink/url-trailing-punctuation", "see http://a.com/x. now\n"],
+  ["probe/autolink/url-parens", "see http://a.com/x_(y) now\n"],
+  ["probe/autolink/url-in-parens", "see (http://a.com) now\n"],
+  ["probe/autolink/url-query", "see http://a.com?q=1&b=2 now\n"],
+  // The other two thin tokenizers: a backslash at end of line, and a
+  // reference-style link, which is not the same construct as the definition
+  // that resolves it.
+  ["probe/break/backslash", "one\\\ntwo\n"],
+  ["probe/break/backslash-in-quote", "> one\\\n> two\n"],
+  ["probe/reference/full", "[text][label]\n\n[label]: /url\n"],
+  ["probe/reference/collapsed", "[label][]\n\n[label]: /url\n"],
+  ["probe/reference/shortcut", "[label]\n\n[label]: /url\n"],
+  ["probe/reference/image", "![alt][label]\n\n[label]: /img.png\n"],
+  // Two recorded answers about block identifiers contradict each other under
+  // any single rule: `^blk` alone registers *no* block, while ` ^blk` -- the
+  // same line with one leading space -- registers one, and `^blk` over `---`
+  // registers one too. So "preceded by whitespace" explains the first pair and
+  // not the third. These isolate what the identifier must trail, which
+  // characters it may hold, and where its span begins.
+  ["probe/block-id/alone", "^blk\n"],
+  ["probe/block-id/leading-space", " ^blk\n"],
+  ["probe/block-id/after-text", "text ^blk\n"],
+  ["probe/block-id/own-line-after-text", "text\n^blk\n"],
+  ["probe/block-id/setext", "^blk\n---\n"],
+  ["probe/block-id/heading", "# head ^blk\n"],
+  ["probe/block-id/in-quote", "> text ^blk\n"],
+  ["probe/block-id/in-list", "- item ^blk\n"],
+  ["probe/block-id/underscore", "text ^a_b\n"],
+  ["probe/block-id/uppercase", "text ^BLK\n"],
+  ["probe/block-id/trailing-space", "text ^blk \n"],
+  ["probe/block-id/two-ids", "text ^one ^two\n"],
+  // Three questions raised by `goldmark-obsidian`'s own block-id suite, which disagrees
+  // with us on 9 of its 28 cases. It is an arbiter and not an oracle -- its case 300
+  // asserts an identifier inside a block quote is "not supported", and
+  // `probe/block-id/in-quote` already records Obsidian registering one -- so each of these
+  // settles a reading of theirs against the application rather than adopting it.
+  //
+  // What DELIMITS an identifier. They register `^good` after an inline code span's closing
+  // backtick and refuse it after a letter or a period, so the closer counts as a boundary
+  // where ordinary text does not. `probe/block-id-inline/code-wraps` covers an identifier
+  // INSIDE a span and is a different question.
+  ["probe/block-delim/backtick-then-id", "`Line.`^blk\n"],
+  ["probe/block-delim/text-then-id", "Line.^blk\n"],
+  ["probe/block-delim/backtick-then-period", "`Line`.^blk\n"],
+  ["probe/block-delim/heading-backtick", "## `Title`^blk\n"],
+  // Four columns is indented CODE, where they register nothing and we register `blk`.
+  // ` ^blk` at one column already records as a live identifier, so the threshold is the
+  // question and three columns is the control for it.
+  ["probe/block-indent/four", "    ^blk\n"],
+  ["probe/block-indent/three", "   ^blk\n"],
+  // An OUTER item carrying its own identifier while the inner one does too. They register
+  // both; we register only the inner. `- a` / `  - b ^id` is already recorded with the
+  // outer item NOT named, but there the outer has no identifier of its own.
+  ["probe/block-nest/both-ids", "- Item ^one\n  - Sub ^two\n"],
+  // `listItems[].parent` encodes nesting as a negative number for a root item,
+  // and the two values recorded so far -- -1 for an item on line 0 and -10 for
+  // one on line 10 -- fit no formula yet. A child's value should be a real line
+  // number, which is what makes the root encoding readable by contrast.
+  ["probe/list-item/two-roots", "- a\n- b\n"],
+  ["probe/list-item/one-child", "- a\n  - b\n"],
+  ["probe/list-item/three-deep", "- a\n  - b\n    - c\n"],
+  ["probe/list-item/offset-by-two", "text\n\n- a\n  - b\n"],
+  ["probe/list-item/ordered", "1. a\n2. b\n"],
+  ["probe/list-item/in-quote", "> - a\n>   - b\n"],
+  ["probe/list-item/tasks", "- [ ] todo\n- [x] done\n- plain\n"],
+  // Obsidian runs on Windows and our tokenizers handle a carriage return, but
+  // at fourteen cases the corpus barely exercised one and nothing at all
+  // covered a lone CR or a byte-order mark. The axis becomes deliberate here.
+  ["probe/line-ending/crlf-paragraph", "a\r\nb\r\n"],
+  ["probe/line-ending/crlf-quote-list", "> - a\r\n>   b\r\n"],
+  ["probe/line-ending/crlf-footnote", "x[^1]\r\n\r\n[^1]: body\r\n"],
+  ["probe/line-ending/crlf-setext", "para\r\n===\r\n"],
+  [
+    "probe/line-ending/crlf-comment",
+    "%%\r\nhidden [^1]\r\n%%\r\n\r\n[^1]: d\r\n",
+  ],
+  ["probe/line-ending/lone-cr", "a\rb\r"],
+  ["probe/line-ending/bom-heading", "\ufeff# H\n\ntext\n"],
+  ["probe/inline-footnote/two-inline", "^[one] and ^[two]\n"],
+  ["probe/inline-footnote/three-inline", "^[a] ^[b] ^[c]\n"],
+  ["probe/inline-footnote/two-blocks", "^[a]\n\n^[b]\n"],
+  ["probe/inline-footnote/empty-then-body", "^[] and ^[x]\n"],
+  ["probe/inline-footnote/body-then-empty", "^[x] and ^[]\n"],
+  ["math/list-boundary", "1. Hello $$\n   Math\n   $$\n2.\n"],
+  [
+    "math/text-after-close",
+    "Here is an equation\n$$\nx = x + 1\n$$and text after\n\n[[Test 2]]\n",
+  ],
+  [
+    "math/newline-after-close",
+    "Here is an equation\n$$\nx = x + 1\n$$\nand text after\n\n[[Test 2]]\n",
+  ],
+  ["math/heading-swallow", "# H1\n[[#H2]]\n$$\na+b=c\n$$ abc\n# H2\n"],
+  ["math/empty-block", "# heading 1\n\n$$\n\n# heading 2\n"],
+  ["math/adjacent-blocks", "$$\nP(A)\n$$$$\nP(A)\n$$\n\n[[Later]]\n"],
+  ["math/triple-delim", "$$$\nMath\n$$$\n"],
+  ["math/close-on-content-line", "$$\nMath$$\n"],
+  ["math/unclosed-inner", "$$\n$Math$$\nStill math\n$$\n"],
+  ["math/block-own-line", "$$\nE=mc^2\n$$\n"],
+  ["math/inline-display", "$$E=mc^2$$\n"],
+  ["math/inline", "text $x^2$ text\n"],
+  ["math/currency", "$5 and $10\n"],
+  ["math/currency-comma", "costs $20,000 today\n"],
+  ["math/escaped-dollar", "\\$5 not math\n"],
+  ["math/in-table-pipe", "| Math |\n| --- |\n| $|x|$ |\n"],
+  ["math/in-blockquote", "> $$\n> x^2\n> $$\n"],
+
+  // Where a `$$` sits on its line decides whether it opens a block, and the
+  // recorded cases disagree: `1. Hello $$` opens one, `> tail $$` does not.
+  // Two samples cannot separate "mid-line" from "inside a definition" from
+  // "inside a quote", so each axis is probed on its own.
+  ["math/midline-plain", "tail $$\nx\n$$\n"],
+  ["math/midline-quote", "> tail $$\n> x\n> $$\n"],
+  ["math/midline-list", "1. tail $$\n   x\n   $$\n"],
+  ["math/midline-definition", "[^1]: def $$\nx\n$$\n"],
+  ["math/midline-quoted-definition", "> [^1]: def\n> tail $$\n> x\n> $$\n"],
+  ["math/linestart-list", "1. x\n   $$\n   y\n   $$\n"],
+  ["math/linestart-definition", "[^1]: def\n    $$\n    y\n    $$\n"],
+  ["math/unclosed-quote-lazy", "> $$\nlazy\n"],
+  ["math/unclosed-plain", "$$\nlazy\n"],
+
+  // An unclosed `<!--` hides the rest of the note. These measure the shapes
+  // the recorder can be trusted on.
+  //
+  // The container forms are deliberately absent. `> <!--` and `- <!--` were
+  // probed and the two renderers disagree: the detached one used for recording
+  // hides everything, a real Reading View renders what follows. Recording
+  // either would store a value Obsidian does not actually produce, so the
+  // question has to be settled through Reading View instead — see
+  // `hunt/blockquote-region-outlives-quote/1`, whose expectation came from the
+  // unfaithful path.
+  ["html/unclosed-comment-plain", "<!--\ndraft\n\nafter\n"],
+  ["html/unclosed-comment-inline", "x <!-- draft\n\nafter\n"],
+  ["html/closed-comment-quote", "> <!--\n> draft\n> -->\n\nafter\n"],
+
+  // `^[^[note]` renders as literal `^[note` with no footnote element at all,
+  // while `^[^[note]]` makes one. Two readings fit: the outer scan balances
+  // brackets and the odd `]` fails it, or the scan simply never restarts
+  // inside a failed opener the way micromark retries. These separate them —
+  // an unbalanced body with no inner `^[` tests the first, and a doubled
+  // opener surrounded by text tests the second.
+  ["footnote/inline-unbalanced-bracket", "^[a [b]\n"],
+  ["footnote/inline-bracket-open-body", "^[[note]\n"],
+  ["footnote/inline-doubled-with-text", "x ^[^[note] y\n"],
+  ["footnote/inline-extra-close", "^[^[note]]]\n"],
+
+  // `^[` nesting: the doubled and nested forms both diverge, and neither is
+  // explicable without knowing where Obsidian's scan starts and stops.
+  ["footnote/inline-plain", "^[note]\n"],
+  ["footnote/inline-unclosed", "^[note\n"],
+  ["footnote/inline-bracket-body", "^[a [b] c]\n"],
+  ["footnote/inline-escaped-open", "\\^[note]\n"],
+  ["footnote/inline-triple", "^[^[^[x]]]\n"],
+  ["footnote/inline-ref-body", "^[see [^1]]\n\n[^1]: one\n"],
+
+  ["wikilink/basic", "[[page]]\n"],
+  ["wikilink/alias", "[[page|alias]]\n"],
+  ["wikilink/heading", "[[page#heading]]\n"],
+  ["wikilink/heading-alias", "[[page#heading|alias]]\n"],
+  ["wikilink/blockref", "[[page#^block-id]]\n"],
+  ["wikilink/embed", "![[embed]]\n"],
+  ["wikilink/embed-size", "![[image.png|100x100]]\n"],
+  ["wikilink/embed-width", "![[image.png|100]]\n"],
+  ["wikilink/empty", "[[]]\n"],
+  ["wikilink/spaces-only", "[[ ]]\n"],
+  ["wikilink/padded", "[[ page ]]\n"],
+  ["wikilink/double-pipe", "[[page||alias]]\n"],
+  ["wikilink/trailing-hash", "[[page#]]\n"],
+  ["wikilink/self-heading", "[[#heading]]\n"],
+  ["wikilink/nested", "[[A[[B]]]]\n"],
+  ["wikilink/table-unescaped", "| Link |\n| --- |\n| [[Note|Alias]] |\n"],
+  ["wikilink/table-escaped", "| Link |\n| --- |\n| [[Note\\|Alias]] |\n"],
+  ["wikilink/in-code-span", "`[[page]]`\n"],
+  ["wikilink/in-fence", "```\n[[page]]\n```\n"],
+  [
+    "wikilink/unicode",
+    "[[\u975e\u5e38\u306b\u9577\u3044\u30ce\u30fc\u30c8\u540d]]\n",
+  ],
+  ["wikilink/emoji", "[[\ud83d\ude00]]\n"],
+  ["wikilink/formatted-alias", "[[page|**bold** and *italic*]]\n"],
+
+  ["tag/basic", "#tag\n"],
+  ["tag/nested", "#tag/nested\n"],
+  ["tag/numeric-only", "#123\n"],
+  ["tag/leading-digits", "#123-a\n"],
+  ["tag/hex-colour", "Color: #00FFFF\n"],
+  ["tag/midword", "foo#bar\n"],
+  ["tag/double-hash", "#tag#tag\n"],
+  ["tag/emoji", "#\ud83d\ude10\n"],
+  ["tag/parenthesised", "(#tag)\n"],
+  ["tag/in-code-span", "`#tag`\n"],
+  ["tag/in-fence", "```js\n#tag\n```\n"],
+  ["tag/trailing-punctuation", "see #tag, and #other.\n"],
+
+  ["highlight/basic", "==highlighted==\n"],
+  ["highlight/trailing-space", "before ==text == after\n"],
+  ["highlight/leading-space", "before == text== after\n"],
+  ["highlight/triple", "===text==\n"],
+  ["highlight/nested-emphasis", "==a **b** c==\n"],
+  ["highlight/across-newline", "==a\nb==\n"],
+  ["highlight/unterminated", "==a and nothing closes\n"],
+
+  // Emphasis is CommonMark's own construct, and Obsidian's legacy tokenizer
+  // diverges on it. Run lengths the TOKENS layer cannot express (it only reaches
+  // 1/1, 1/2, 2/1, 2/2, 4/2 and 2/4) are enumerated here.
+  ["emphasis/run-3-3", "***a***\n"],
+  ["emphasis/run-3-2", "***a**\n"],
+  ["emphasis/run-2-3", "**a***\n"],
+  ["emphasis/run-3-1", "***a*\n"],
+  ["emphasis/run-1-3", "*a***\n"],
+  ["emphasis/run-4-4", "****a****\n"],
+  ["emphasis/run-5-5", "*****a*****\n"],
+  ["emphasis/underscore-1-1", "_a_\n"],
+  ["emphasis/underscore-2-2", "__a__\n"],
+  ["emphasis/underscore-3-3", "___a___\n"],
+  ["emphasis/underscore-3-2", "___a__\n"],
+
+  // Flanking: whether a delimiter run may open or close depends on the characters
+  // on either side of it. This is the rule Obsidian does not apply.
+  ["emphasis/flank-both-space", "a * b * c\n"],
+  ["emphasis/flank-correct", "a *b* c\n"],
+  ["emphasis/flank-open-space", "a * b* c\n"],
+  ["emphasis/flank-close-space", "a *b * c\n"],
+  ["emphasis/flank-inverted", "a* b *c\n"],
+  ["emphasis/flank-intraword-star", "a*b*c\n"],
+  ["emphasis/flank-intraword-underscore", "a_b_c\n"],
+  ["emphasis/flank-underscore-space", "a _ b _ c\n"],
+  ["emphasis/flank-punct-inside", "*(a)*\n"],
+  ["emphasis/flank-punct-outside", "(*a*)\n"],
+  ["emphasis/flank-punct-adjacent", "a.*b*.c\n"],
+  ["emphasis/flank-cjk", "\u65e5\u672c*\u8a9e*\u30c6\u30b9\u30c8\n"],
+  // `*` plus a space at line start is a bullet, so the run never reaches the
+  // inline tokenizer at all.
+  ["emphasis/flank-line-start", "* a *\n"],
+  ["emphasis/flank-trailing-run", "**a ** b\n"],
+
+  ["emphasis/nest-strong-em", "**a *b* c**\n"],
+  ["emphasis/nest-em-strong", "*a **b** c*\n"],
+  ["emphasis/nest-mixed-markers", "**a _b_ c**\n"],
+  ["emphasis/nest-underscore-outer", "_a *b* c_\n"],
+  ["emphasis/nest-leading-em", "***a* b**\n"],
+  ["emphasis/nest-trailing-em", "**a *b***\n"],
+  ["emphasis/nest-interleaved", "*a **b* c**\n"],
+  ["emphasis/nest-repeated-strong", "**a **b** c**\n"],
+
+  ["emphasis/escape-inner", "*a\\*b*\n"],
+  ["emphasis/escape-before-close", "**a\\**\n"],
+  ["emphasis/escape-first-of-run", "\\**a**\n"],
+
+  ["emphasis/unterminated-strong", "**unterminated\n"],
+  ["emphasis/across-blank-line", "*a\n\nb*\n"],
+  ["emphasis/across-newline", "**a\nb**\n"],
+
+  // Emphasis crossed with Obsidian's own constructs, where our tokenizers and
+  // Obsidian's have to agree on precedence as well as on flanking.
+  ["emphasis/in-highlight", "==**a**==\n"],
+  ["emphasis/wraps-highlight", "**==a==**\n"],
+  ["emphasis/wraps-wikilink", "**[[link]]**\n"],
+  ["emphasis/wraps-embed", "**![[embed]]**\n"],
+  ["emphasis/wraps-tag", "**#tag**\n"],
+  ["emphasis/after-tag", "#tag**bold**\n"],
+  ["emphasis/wraps-inline-math", "**$x$**\n"],
+  ["emphasis/inside-inline-math", "$*x*$\n"],
+  ["emphasis/wraps-comment", "**%%c%%**\n"],
+  ["emphasis/in-comment", "%%**a**%%\n"],
+  ["emphasis/spans-wikilink", "**a [[b]] c**\n"],
+  ["emphasis/unbalanced-in-alias", "[[page|**a]]\n"],
+  ["emphasis/in-task", "- [ ] **a**\n"],
+  ["emphasis/in-heading", "# **a**\n"],
+  ["emphasis/in-callout-title", "> [!note] **a**\n"],
+
+  ["comment/inline", "This is an %%inline%% comment.\n"],
+  ["comment/block", "%%\nblock comment\nspanning lines\n%%\nafter\n"],
+  ["comment/nested", "%%\nline %% nested %% line\n%%\nafter\n"],
+  ["comment/empty", "# Heading 1\n%%%%\n# Heading 2\n"],
+  ["comment/unterminated", "%%\nnever closed\n"],
+
+  ["task/unchecked", "- [ ] todo\n"],
+  ["task/checked", "- [x] done\n"],
+  ["task/custom-char", "- [/] partial\n- [?] question\n- [-] cancelled\n"],
+  ["task/reparse-ordered", "- [ ] 1.\n"],
+  ["task/reparse-paren", "- [ ] 1) text\n"],
+  ["task/reparse-bullet", "- [ ] - bullet\n"],
+  ["task/reparse-quote", "- [ ] > quote\n"],
+  ["task/reparse-plain", "- [ ] 1\n- [ ] 1.1\n"],
+  ["task/nested-tab", "- [ ] parent\n\t- [ ] child\n"],
+
+  ["callout/basic", "> [!note] Title\n> Body\n"],
+  ["callout/collapsed", "> [!note]- Collapsed\n> Hidden\n"],
+  ["callout/expanded", "> [!note]+ Expanded\n> Shown\n"],
+  ["callout/unknown-type", "> [!custom] Custom\n> Body\n"],
+  ["callout/titleless", "> [!warning]\n> Body\n"],
+  ["callout/nested", "> [!question] Outer\n> > [!todo] Inner\n> > Body\n"],
+  ["callout/in-list", "- item\n  > [!note]\n  > body\n"],
+
+  ["footnote/ref", "Text with a footnote[^1].\n\n[^1]: Footnote text.\n"],
+  ["footnote/inline", "Text with an inline footnote.^[Inline text.]\n"],
+  [
+    "footnote/in-table",
+    "| A [^1] | B |\n| --- | --- |\n| C | D |\n\n[^1]: Footnote.\n",
+  ],
+
+  [
+    "html/passthrough",
+    "<div>\n**not bold**\n[[not a wikilink]]\n#not-a-tag\n</div>\n",
+  ],
+  ["html/span-inline", "<span>**not bold** [[link]]</span>\n"],
+  // MARKDOWN INSIDE HTML. Obsidian documents that it "does not render Markdown syntax inside HTML
+  // elements" for performance (its developers confirm the reason). Probed live on 1.15.0, it means
+  // CommonMark's own html-block rule and nothing more: inline elements render their Markdown, a
+  // block-level tag keeps everything up to the next blank line raw, and Markdown after that blank
+  // line renders. So `legacy` (Obsidian) and `strict` (CommonMark) agree on all fourteen; these pin
+  // both, including the shapes where the two rules would part if they ever did.
+  ["probe/html-markdown/span-inline", "<span>**b**</span>\n"],
+  ["probe/html-markdown/div-same-line", "<div>**b**</div>\n"],
+  ["probe/html-markdown/div-lines", "<div>\n**b**\n</div>\n"],
+  ["probe/html-markdown/div-blank-lines", "<div>\n\n**b**\n\n</div>\n"],
+  [
+    "probe/html-markdown/details-blank-lines",
+    "<details>\n<summary>S</summary>\n\n**b**\n\n</details>\n",
+  ],
+  ["probe/html-markdown/p-same-line", "<p>**b**</p>\n"],
+  [
+    "probe/html-markdown/table-cell",
+    "<table><tr><td>**b**</td></tr></table>\n",
+  ],
+  ["probe/html-markdown/span-alone-on-lines", "<span>\n**b**\n</span>\n"],
+  [
+    "probe/html-markdown/quote-div-blank-lines",
+    "> <div>\n>\n> **b**\n>\n> </div>\n",
+  ],
+  [
+    "probe/html-markdown/item-inline-and-block",
+    "- <mark>*e*</mark> and <div>**b**</div>\n",
+  ],
+  ["probe/html-markdown/div-interrupts-paragraph", "a\n<div>\n**b**\n</div>\n"],
+  [
+    "probe/html-markdown/div-blank-line-ends-block",
+    "<div>\n**a**\n\n**b**\n</div>\n",
+  ],
+  ["probe/html-markdown/center-blank-lines", "<center>\n\n*c*\n\n</center>\n"],
+  [
+    "probe/html-markdown/markdown-attribute",
+    '<div markdown="1">\n**b**\n</div>\n',
+  ],
+
+  [
+    "frontmatter/basic",
+    "---\ntags:\n  - project\naliases:\n  - Example\n---\n\nBody\n",
+  ],
+  [
+    "frontmatter/unterminated-string",
+    '---\ntitle: "unterminated\n---\n\nBody\n',
+  ],
+  ["frontmatter/wikilink-value", "---\ntags:\n  - [[Note]]\n---\n\nBody\n"],
+  ["frontmatter/empty", "---\n---\n\nBody\n"],
+
+  ["escape/backslash-run", "\\*not emphasis\\* and \\[\\[not a link\\]\\]\n"],
+  ["breaks/single-newline", "line one\nline two\n"],
+
+  // Reduced by the fuzz shrinker from randomly composed documents, each the
+  // smallest input that still disagreed with Obsidian. Minimal and distinct,
+  // so they read as ordinary cases rather than as generated noise.
+  ["fuzz/footnote/44", "[^1]:\n\n---\n"],
+  ["fuzz/footnote/45", "[^1]: \n\n---\n"],
+  ["fuzz/highlight/69", "1. <br>\n===\n"],
+  ["fuzz/footnote/46", "[^1]: > [\n\n---\n"],
+  ["fuzz/block-ref/14", "^blk\n</div>\n"],
+  ["fuzz/inline-footnote/33", "^[^[inline]\n"],
+  ["fuzz/inline-footnote/34", "- [ ] ^[inline]\n===\n"],
+  ["fuzz/highlight/70", "\n> ![\n===\n"],
+  ["fuzz/callout/13", "> [!n\nnote]\n"],
+
+  // Reduced by the fuzz shrinker from randomly composed documents, each the
+  // smallest input that still disagreed with Obsidian. Minimal and distinct,
+  // so they read as ordinary cases rather than as generated noise.
+  ["fuzz/highlight/42", "- [ \n===\n"],
+  ["fuzz/block-ref/10", "^blk\n---\n"],
+  ["fuzz/html/15", "# <mailto:a@e.test>\n"],
+  ["fuzz/table/12", "> > [[[link](u)]] | https:\n"],
+  ["fuzz/highlight/43", "- [ ] %\n===\n"],
+  ["fuzz/embed/66", "^![[[link](u)]]] \n"],
+  ["fuzz/inline-footnote/16", "^[]**\n"],
+  ["fuzz/strikethrough/9", "* ~~del\\~~\n"],
+  ["fuzz/embed/67", "  ![[i.png|100x200]]\n[[a|b]]\t\n"],
+  ["fuzz/highlight/44", "> <mailto:a@e.test> | ==日本語==\n"],
+  ["fuzz/footnote/27", "[^1]: # <htt\n"],
+  ["fuzz/highlight/45", "> > ~~\n===\n"],
+  ["fuzz/embed/68", "> > ![[\n===\n"],
+  ["fuzz/embed/69", "![[$x^2$]]\t&amp;\n[[~~del\\~~]]\n"],
+  ["fuzz/inline-footnote/17", "# \\[[a|b]] | $$x^2$$_under_ | [^[^1]\n"],
+  ["fuzz/highlight/46", "- [ ] ~~del~~\n===\n"],
+  ["fuzz/wikilink/12", ":a@e.test>](<br>, [[[[target]]]]\n"],
+  ["fuzz/inline-footnote/18", "| ^[^[inline]\n"],
+  ["fuzz/comment/10", "ote%%[[]]]([[target\n"],
+  ["fuzz/embed/70", "![[==[[target]]==]]\n"],
+  ["fuzz/footnote/28", "> > [^1]\n===\n"],
+  ["fuzz/embed/71", "[^1]: # ![[\n"],
+  ["fuzz/footnote/29", "[^1]\nmark==\n---\n"],
+  ["fuzz/math/12", "> $$\nunder_\n"],
+  ["fuzz/footnote/30", "[^1]: > [!note\n    [[target]]\n"],
+  ["fuzz/embed/72", "> [!note] ![[a#h]]]] | ![[i.png|100x200]] [[$]]\n"],
+  ["fuzz/misc/5", "https://e.test/p](`code`\n"],
+  ["fuzz/embed/73", "> ![[d.pdf#page=3]]]]%%note\\%%, [[target]], $#a/b$\n"],
+  ["fuzz/inline-footnote/19", "```\n\n```\n\n^[], **s\n"],
+  ["fuzz/strikethrough/10", "]]~~~~\n"],
+  ["fuzz/highlight/47", "1. *em\n===\n"],
+  ["fuzz/footnote/31", "u)[[$[^]$]]\n"],
+  ["fuzz/inline-footnote/20", "^[^[inline]*em*\n"],
+  ["fuzz/callout/8", "> [!\n[[a|b]]\n---\n"],
+  ["fuzz/embed/74", "est> | ![[==[[a#^blk]]==]]\n"],
+  [
+    "fuzz/embed/75",
+    "] ^[i\n    > [!note] $![[d.pdf#page=3]]]]$ \\ ![[img.png]]\n",
+  ],
+  ["fuzz/highlight/48", "  [[\n#tag\n===\n"],
+  ["fuzz/embed/76", "[日本語\n![[i\n---\n"],
+  ["fuzz/math/13", "](u)$^blk$\n​ **st\n"],
+  ["fuzz/html/16", "> \\ <mailto:a@e.test>\n"],
+  ["fuzz/highlight/49", "y^2$\n$y^2$\n===\n"],
+  ["fuzz/footnote/32", "[^1]: # \\\n"],
+  ["fuzz/embed/77", "[^![[img.png]]]\n"],
+  ["fuzz/wikilink/13", "[[[[a#^blk\\]]]]\n"],
+  ["fuzz/inline-footnote/21", "]]\t[^[^]]\n"],
+  ["fuzz/embed/78", "# ![[[[link](u)]]](\\[^1]\n"],
+  ["fuzz/block-ref/11", "^blk <mailto:a@e.test>\n"],
+  ["fuzz/highlight/50", "> > ***em***](\n===\n"],
+  ["fuzz/embed/79", "- [[a|b]]. ![[d.pdf#page=3. [[word]]\n"],
+  ["fuzz/footnote/33", "[^1]: **\n    %%note\n    [[target]]\n"],
+  ["fuzz/footnote/34", "[^%%note%%]\n"],
+  ["fuzz/embed/80", "![[img.png]] [[[[a#^blk]]\n"],
+  ["fuzz/embed/81", "  [[![[i.png|100x200]]]] \\ $x^2$[[a|b]]](_under_\n"],
+  ["fuzz/highlight/51", "> **\n===\n"],
+  ["fuzz/callout/9", "> [!no\n===\n"],
+  ["fuzz/highlight/52", "1. &a\n===\n"],
+  ["fuzz/html/17", "<div>\n(&amp;\n"],
+  ["fuzz/inline-footnote/22", "> #tag. ^[^[inline][[\n"],
+  ["fuzz/table/13", "[[*e\n\t~~del\\~~ | 日本語\n"],
+  ["fuzz/wikilink/14", "[[a#^blk\\]] \n"],
+  ["fuzz/embed/82", "%%\\![[d.pdf#page=3]]%%\n"],
+  ["fuzz/comment/11", "a@e.test> %%[link](u)%%\n"],
+  ["fuzz/setext/4", "_under_\n_under_\n---\n"],
+  ["fuzz/embed/83", "1. <mailto:a@e.test> \\![[d.pdf#page=3]]\n"],
+  ["fuzz/emphasis/2", "_``code`_\n"],
+  ["fuzz/highlight/53", "<br>\n===\n"],
+  ["fuzz/embed/84", "# ![[![[i.png|100]]\t[[==mark\\==]]\n"],
+  ["fuzz/footnote/35", "[^1]: > [!\n    [[a#^blk]]\n"],
+  ["fuzz/html/18", "&amp;. <mailto:a@e.test>\n"],
+  ["fuzz/embed/85", "et]] ![[日本語]]\n[[target]]\n"],
+  ["fuzz/embed/86", "]. word, ​\t![[#tag]]\n"],
+  ["fuzz/misc/6", "1]. ``code`\n"],
+  ["fuzz/html/19", "<div>\n[&amp;]]\n"],
+  ["fuzz/footnote/36", "[^1]: \nne]~~]]\n"],
+  ["fuzz/embed/87", "![[d.pdf#page=3]], [[target]]\n"],
+  ["fuzz/embed/88", "  $x^2$\t \t![[i.png|100]]]]\n ![[[[a|b]]\n"],
+  ["fuzz/footnote/37", "[^~~ ~~]\n"],
+  ["fuzz/embed/89", "  [[a|b]]](<mailto:a@e.test>\t![[==mark==]]\n"],
+  ["fuzz/inline-footnote/23", "|   [[^[inline]\n"],
+  ["fuzz/embed/90", ". ![[d.pdf#page=3]]\tx^2$\n- [[target]]\n"],
+  ["fuzz/embed/91", "![[* *]]\n"],
+  ["fuzz/embed/92", "- [ ]\n![[*\n"],
+  ["fuzz/table/14", "| $y^2$\n****st\n"],
+  ["fuzz/footnote/38", "1. [^==mark==]\n"],
+  ["fuzz/entity/2", "- &amp;\n</div>\n"],
+  ["fuzz/table/15", "[[a|b]]\n[[~~\n---\n"],
+  ["fuzz/highlight/54", "- [ ] !\n===\n"],
+  ["fuzz/footnote/39", "[^1]: # [[[\n"],
+  ["fuzz/footnote/40", "[^1]: # $x^2\n"],
+  ["fuzz/wikilink/15", "# [[a#^blk \\ \\[[a#h]]\n"],
+  ["fuzz/embed/93", "![[im\nimg.pn\n---\n"],
+  ["fuzz/wikilink/16", " [[a#h\\]]\n"],
+  ["fuzz/embed/94", "> $![[d.pdf#page=3]]$\n​\n"],
+  ["fuzz/embed/95", "> ![[i.png|100x200]]\n> [[a|b]]\n"],
+  ["fuzz/embed/96", " ![[img.png]]\n> > \\![[d.pdf#page=3]]\n"],
+  ["fuzz/block-ref/12", "^2$. $\n"],
+  ["fuzz/embed/97", "> [!note] `~~~~`![[i.png|100, ![[i.png|100x200]]\n"],
+  ["fuzz/inline-footnote/24", "- ^[]]\n"],
+  ["fuzz/html/20", "]<mailto:a@e.test>\n"],
+  ["fuzz/embed/98", "]==. ![[[[a#^blk\\]]]]\n"],
+  ["fuzz/embed/99", "1. ![[[link](u)](u)]].\n"],
+  ["fuzz/footnote/41", "> [!note] 日本語 | [^$https://e.test/p$]\n"],
+  ["fuzz/inline-footnote/25", "> > ^[], 日本語,\n"],
+  ["fuzz/callout/10", "> [!no\n [lin\n---\n"],
+  ["fuzz/embed/100", "==![[$x^2$]]==\n"],
+  ["fuzz/highlight/55", "**str\n    *e\n===\n"],
+  ["fuzz/strikethrough/11", "~~~~del~~\n"],
+  ["fuzz/embed/101", "t>, ![[i.png|100]]\n[[a#h]]\n"],
+  [
+    "fuzz/embed/102",
+    "> [!note] ![[i.png|100x200]]](**[[a|b**\t\\![[d.pdf#page=3]]\n",
+  ],
+  ["fuzz/embed/103", "[^1]: ​\n    ![[*![[i.png|100x200]]*]]\n| ~~[^1]~~\n"],
+  ["fuzz/highlight/56", "> > `c\n===\n"],
+  ["fuzz/embed/104", "> > ![[img.png]], **strong [[$y^2$]]\t[^1\n"],
+  ["fuzz/highlight/57", "- [ ] _\n===\n"],
+  ["fuzz/embed/105", "1. _![[link](u)]]_. \n"],
+  ["fuzz/embed/106", "# ![[==[[a|b]]==\n"],
+  ["fuzz/highlight/58", "> > ==[[a#h]]]]== | <http\n"],
+  ["fuzz/wikilink/17", "*em*]\n[[**str\n---\n"],
+  ["fuzz/html/21", "<mailto:a@e.test>. **strong\n"],
+  ["fuzz/embed/107", "word](![[![[``]]]]\t[[*https://e.test/p*]]\n"],
+  ["fuzz/highlight/59", "[[a#h]]\nem*\n===\n"],
+  ["fuzz/wikilink/18", "> https://e.test/p\t<mailto:a@e.test>[[a#h]]\n"],
+  ["fuzz/highlight/60", "> ![\n===\n"],
+  [
+    "fuzz/embed/108",
+    "> [!note] **strong****, _![[d.pdf#page=3]]_ \\ [[a#^blk]]\n",
+  ],
+  ["fuzz/math/14", "** *$y^2\ny^2$*\n"],
+  ["fuzz/highlight/61", "- **\n===\n"],
+  ["fuzz/footnote/42", "[^1]: \n*em*\n"],
+  ["fuzz/inline-footnote/26", ". ^[]\n"],
+  ["fuzz/embed/109", "]](![[]]](**st\n"],
+  ["fuzz/highlight/62", "> > !\n===\n"],
+  ["fuzz/inline-footnote/27", "[^[[a#^blk]]] \n"],
+  ["fuzz/highlight/63", "[[a|b]]\nimg.\n===\n"],
+  ["fuzz/embed/110", "1. ![[img.png]] \\ [[a#h\\]], ![[[[target]]\n"],
+  ["fuzz/embed/111", "![[[[a#h\\]]]]\n"],
+  ["fuzz/table/16", "| # [[[[a#h a#h]]]\n"],
+  ["fuzz/inline-footnote/28", "1. ^[i\n===\n"],
+  ["fuzz/embed/112", "> ![[https://e.test/p]]\n[[[[a#^blk]]\n"],
+  [
+    "fuzz/embed/113",
+    "| > [!note] ![[d.pdf#page=3]] | word, ^[inline] > [!note] x^2$\\![[img.png]]\t[[\n",
+  ],
+  ["fuzz/tag/9", "日本語\na#h]]\n---\n"],
+  ["fuzz/embed/114", "$x^2$\n ![[^\n---\n"],
+  ["fuzz/embed/115", " ![[#tag]]\n"],
+  ["fuzz/highlight/64", "> >  . \n===\n"],
+  ["fuzz/comment/12", "x^2$  [[a#^blk a#^blk]] %%note%% > <\n"],
+  ["fuzz/embed/116", "1], ​\n![[i.\n===\n"],
+  ["fuzz/block-ref/13", "  ==mar\n^blk [\n---\n"],
+  ["fuzz/inline-footnote/29", "> > &amp;\t[^[^1]]^\n"],
+  ["fuzz/setext/5", "<br>\n---\n"],
+  ["fuzz/embed/117", "| [[a|b a|b]]![[]]]([link](u) | c |\n"],
+  ["fuzz/callout/11", "> [!note] _under\nunder_\n"],
+  ["fuzz/inline-footnote/30", "^[**strong**]\n"],
+  ["fuzz/highlight/65", "> <ma\n===\n"],
+  ["fuzz/inline-footnote/31", "(u)%% | [^[link](u)]\n"],
+  ["fuzz/math/15", "日本語. \n$x^2\n---\n"],
+  ["fuzz/html/22", "<div>\n> > ~~<br>~~\n"],
+  ["fuzz/table/17", "| - <mailto:a@e.test> | \n"],
+  ["fuzz/strikethrough/12", "\\ ~~~~\n"],
+  ["fuzz/html/23", "- ~~~~del~~](<m\n"],
+  ["fuzz/inline-footnote/32", "  ^[i.\n  $x^2$\n===\n"],
+  ["fuzz/comment/13", "1. %%[\n===\n"],
+  [
+    "fuzz/embed/118",
+    "> [!note] **![[![[img.png]]]]** \\ ![[[[a|b]]]]]([[target]] \\ *em*\n",
+  ],
+  ["fuzz/callout/12", "> [!note] ****strong**. *em** | [link](u)\n"],
+  ["fuzz/strikethrough/13", "~del~~~~\n"],
+  ["fuzz/embed/119", "> ![[i.png|100x200]]\n[[[^1]]]\n"],
+  ["fuzz/embed/120", "![[img.\n~~de\n---\n"],
+  ["fuzz/html/24", "- <mailto:a@e.test>\n"],
+  ["fuzz/comment/14", "  [[#\note%%\n---\n"],
+  [
+    "fuzz/embed/121",
+    "> [!note] _under_ \\ ![[d.pdf#page=3 \\ \\[[target]] _under_\n",
+  ],
+  ["fuzz/table/18", "| 1. ``code` | c |\n"],
+  ["fuzz/highlight/66", "> [[a#\n===\n"],
+  ["fuzz/embed/122", "[[``]] | ![[img.png]]\n  ![[[[`code``]]]] $x^2$\n"],
+  ["fuzz/highlight/67", "1. !\n===\n"],
+  ["fuzz/embed/123", "]]]( \t![[`code`]]\n- [ ] [link](u)\n"],
+  ["fuzz/strikethrough/14", "]. ~~~~\n"],
+  ["fuzz/embed/124", "  #tag ==mark==![[mark==]]\n|   [[target]] | c |\n"],
+  ["fuzz/highlight/68", "~~del~~\n  _un\n===\n"],
+  ["fuzz/footnote/43", "~. *[^<br>]*\n"],
+  ["fuzz/embed/125", "> > ![[]]. <mailto:a@e.test>](<br>\n"],
+
+  // Reduced by the fuzz shrinker from randomly composed documents, each the
+  // smallest input that still disagreed with Obsidian. Minimal and distinct,
+  // so they read as ordinary cases rather than as generated noise.
+  ["fuzz/table/1", "| a \n| --- \n"],
+  ["fuzz/block-ref/1", "^blk\n"],
+  ["fuzz/embed/1", "![[d.pdf#page=3]]\n"],
+  ["fuzz/block-ref/2", " ^blk\n"],
+  ["fuzz/embed/2", "- ![[d.pdf#page=3]]\n"],
+  ["fuzz/html/1", "<mailto:a@e.test>\n"],
+  ["fuzz/embed/3", "> ![[d.pdf#page=3]]\n"],
+  ["fuzz/html/2", "<div>\n&amp;\n"],
+  ["fuzz/highlight/1", "- [ ]\n===\n"],
+  ["fuzz/footnote/1", "[^1]: # \n"],
+  ["fuzz/embed/4", "- [ ] ![[d.pdf#page=3]]\n"],
+  ["fuzz/block-ref/3", "# ^blk\n"],
+  ["fuzz/embed/5", "  ![[img.png]]\t[[a|b]]\n"],
+  ["fuzz/block-ref/4", "> ^blk\n"],
+  [
+    "fuzz/block-ref/5",
+    "> [!note] <mailto:a@e.test><https://e.test> ^blk$x^2$\n",
+  ],
+  ["fuzz/inline-footnote/1", "# ^[^[inline]!\n"],
+  ["fuzz/highlight/2", "- $x\n===\n"],
+  ["fuzz/inline-footnote/2", "$x^2$\n[[^[^\n===\n"],
+  ["fuzz/comment/1", "> %%n\n===\n"],
+  ["fuzz/table/2", "  [[\\[[a|b]]]]\n"],
+  ["fuzz/callout/1", "> [!\n===\n"],
+  ["fuzz/footnote/2", "[^1]: #\n"],
+  ["fuzz/html/3", "> > <mailto:a@e.test>\n"],
+  ["fuzz/setext/1", "-  *em*\n<br>\n](u)\n---\n"],
+  ["fuzz/highlight/3", "- ![\n===\n"],
+  ["fuzz/wikilink/1", "[[[](u)]]\n"],
+  ["fuzz/highlight/4", "  ==`code`== | ​\n"],
+  ["fuzz/table/3", "a#h]] | <mailto:a@e.test>\n"],
+  [
+    "fuzz/inline-footnote/3",
+    "| # [[a|b # [^^blk] [^[^1] [^1]\t1] # [[a#^blk\n",
+  ],
+  ["fuzz/footnote/3", "[^1]: # ​\n"],
+  ["fuzz/footnote/4", "([^_under_]\n"],
+  ["fuzz/footnote/5", "[^1]: # ![\n"],
+  ["fuzz/callout/2", "> [!note] ****strong** | #a/b\n"],
+  ["fuzz/misc/1", "- [ \n</div>\n"],
+  ["fuzz/callout/3", "> [!note] <mailto:a@e.test>\n"],
+  ["fuzz/comment/2", "> %%note%% \\ [[a#^blk](target]] %%==mark==%%\n"],
+  ["fuzz/comment/3", "%<br>%%\n"],
+  ["fuzz/callout/4", "> [!note]  \n"],
+  ["fuzz/wikilink/2", "> > https://e.test/p]([[[[&amp;]]]]\n"],
+  ["fuzz/embed/6", "  ![[img.png]] [[!\n> [!note] \\![[i.png|100x200]]\n"],
+  ["fuzz/highlight/5", "> > [\n===\n"],
+  ["fuzz/footnote/6", "> > [^$\n===\n"],
+  ["fuzz/highlight/6", "- 日本語\n===\n"],
+  ["fuzz/strikethrough/1", "~~~. [\n"],
+  ["fuzz/embed/7", "> ![[[^1]]]%%%%\n[[~~del~~]]\n"],
+  ["fuzz/math/1", "- ~~$x^2$~~](<mailto:a@e.test> `code``\n"],
+  ["fuzz/tag/1", "  #tag. <mailto:a@e.test>\n"],
+  ["fuzz/emphasis/1", "_under_^blk\n"],
+  ["fuzz/embed/8", "> ![[_under_]]\n[[[[under_]]]]](wor\n"],
+  ["fuzz/highlight/7", "> > #a/b\n===\n"],
+  ["fuzz/math/2", "$y^2$\n&amp;\n"],
+  ["fuzz/tag/2", "]]\t#t\n"],
+  ["fuzz/html/4", "- [ ] <mailto:a@e.test>\n"],
+  ["fuzz/highlight/8", "- [ ]  \n===\n"],
+  ["fuzz/embed/9", "- $$![[img.png]]]]$$]([[a|b\\]]\n===\n"],
+  ["fuzz/math/3", "- $y^2$~~<mailto:a@e.test>~~\n"],
+  ["fuzz/embed/10", "# ![[#tag]]\n"],
+  ["fuzz/wikilink/3", "<div>\n> [[<mailto\n"],
+  ["fuzz/setext/2", "  wor\n1]](\n---\n"],
+  ["fuzz/embed/11", "#tag](![[d.pdf#page=3]]**strong**\n"],
+  ["fuzz/wikilink/4", "]]. [[a#h\\]]\n"],
+  ["fuzz/footnote/7", "# [^1[[a#^blk\\]]#tag\n"],
+  ["fuzz/entity/1", " &amp\n"],
+  ["fuzz/embed/12", "  [^1\\]\n  ![[![\n"],
+  ["fuzz/inline-footnote/4", "[^[[a#\n\\[^1]\n"],
+  ["fuzz/highlight/9", "1. `\n===\n"],
+  ["fuzz/embed/13", "1. [![[[[a#h]]]]](u) \\ <br>\n"],
+  ["fuzz/footnote/8", "[^1]: # ~\n"],
+  ["fuzz/highlight/10", "> > $x^2$\n===\n"],
+  ["fuzz/html/5", "- <mailto:a@e.test>!\n"],
+  ["fuzz/wikilink/5", "<div>\n[[<ma\n"],
+  ["fuzz/embed/14", "> > ![[#\n===\n"],
+  ["fuzz/footnote/9", "00]]] | %%[[<br>]]%% \\ [^1]\n"],
+  ["fuzz/table/4", "~~de\na|b]]\n---\n"],
+  ["fuzz/embed/15", "# [link](u)![[d.pdf#page=3]]\n"],
+  ["fuzz/block-ref/6", "]]  ^bl\n"],
+  ["fuzz/embed/16", "- 日本語](![[d.pdf#page=3]] | [^1]\n"],
+  ["fuzz/embed/17", "![[i.png|100]]\n[[target]] _\n"],
+  ["fuzz/embed/18", ". 日本語, _[[![[i.png|100]]]]_\n# `code`[[a#^blk]]]]\n"],
+  ["fuzz/embed/19", "> > [[target]]](![[i.png|100 | *[[&amp;]]*\n"],
+  [
+    "fuzz/embed/20",
+    "| a#^blk]] | ![[d.pdf#page=3]] ^[inline\\] ^[**\\`code`\n",
+  ],
+  ["fuzz/embed/21", "1. ![[<br>]]\nu). [[a#h]]\n"],
+  ["fuzz/wikilink/6", "[[a#^blk\\]]. ​, 日本語\n"],
+  ["fuzz/comment/4", "- [ ] 日本語\t%%[link](u)%% | [[a#^blk\n"],
+  ["fuzz/highlight/11", "1. [[\n===\n"],
+  ["fuzz/highlight/12", "1. **st\n===\n"],
+  ["fuzz/footnote/10", "[^1](u)\n"],
+  ["fuzz/embed/22", "[^1]: - ![[[[a|b]]]]](^[[[a#h]]]\n"],
+  ["fuzz/embed/23", "1. ![[#a/b]]\n"],
+  ["fuzz/embed/24", "%% | ![[==mark==]], [[target]]\n"],
+  ["fuzz/footnote/11", "[^$$$]\n"],
+  [
+    "fuzz/embed/25",
+    "- i.png|100]]](![[d.pdf#page=3]]]] #a/b ![[i.png|100x200]]\n",
+  ],
+  ["fuzz/embed/26", "# &amp; [^![[img.png]]] [[target\\]]\n"],
+  ["fuzz/highlight/13", "> <m\n===\n"],
+  ["fuzz/highlight/14", "> _u\n===\n"],
+  ["fuzz/inline-footnote/5", "1. [^[[a#^blk]]]\n"],
+  ["fuzz/html/6", "- [ ] <mailto:a@e.test>, __under_under_\n"],
+  ["fuzz/embed/27", "- ![[![[d.pdf#page=3]]]] \\ [[a#^blk\n"],
+  ["fuzz/inline-footnote/6", "lk\\]]]]. [^[[target]]]\n"],
+  ["fuzz/embed/28", "- ![[a\n</div>\n"],
+  ["fuzz/embed/29", "^![[d.pdf#page=3]]]\n"],
+  ["fuzz/embed/30", "![[d.pdf#page=3\\]]\n"],
+  ["fuzz/footnote/12", "[^1]: - [ ] `code`\t#a/b[[a|b]]\n"],
+  ["fuzz/footnote/13", "[^&amp;]\n"],
+  ["fuzz/table/5", "| 1. ~~del\\~~ [[]] | c |\n"],
+  ["fuzz/misc/2", "> [li\n \n"],
+  ["fuzz/embed/31", "![[<br>]], %%note\t[[a|b]]\n"],
+  ["fuzz/wikilink/7", "- [ ] <mailto:a@e.test>. [[]]\n"],
+  ["fuzz/inline-footnote/7", ". 日本語, ^[] | c |\n"],
+  ["fuzz/comment/5", "  %%[[target]]%%\n"],
+  ["fuzz/embed/32", "> > [[a#^blk]] \\ [^[[![[i.png|100]]]]]\t[[a#h]]\n"],
+  ["fuzz/embed/33", "- *​*. *em* | ![[d.pdf#page=3]]\n"],
+  ["fuzz/footnote/14", "[^1]: >\nx200]]\n"],
+  ["fuzz/html/7", "<mailto:a@e.test>&amp;. code`\n"],
+  ["fuzz/embed/34", "> > ![[]]\n===\n"],
+  ["fuzz/math/4", "# https://e.test/p]($y^2$]([[#tag]] a#h]]\n"],
+  ["fuzz/highlight/15", "​\n[link\n===\n"],
+  ["fuzz/embed/35", " ![[d.pdf#page=3]]\n"],
+  ["fuzz/tag/3", ">\t#ta\n"],
+  ["fuzz/highlight/16", "1. [[]]\n===\n"],
+  ["fuzz/callout/5", "> [!n\n===\n"],
+  ["fuzz/embed/36", "![[![[d.pdf#page=3]] [[[[\n"],
+  [
+    "fuzz/highlight/17",
+    "- [ ] ==&amp;==, [[==[[target]]==]]. **strong**\t[[[[]]]]\n",
+  ],
+  ["fuzz/highlight/18", "> > `\n===\n"],
+  ["fuzz/embed/37", "  ![[[[a#h\\]]]]\n"],
+  ["fuzz/embed/38", "![[d.pdf#page=3]], [​](u)\n"],
+  ["fuzz/html/8", "<div>\n<http\n"],
+  ["fuzz/math/5", "> <br>\n$$\t[\n"],
+  ["fuzz/inline-footnote/8", "3]]^[[[a#^blk\\]]]\n"],
+  ["fuzz/tag/4", "```\n```\n\n> #a/\n"],
+  ["fuzz/footnote/15", "| - $x^2$. [^%%note%%%%] \n"],
+  ["fuzz/footnote/16", "[^1]: # [[]]\n"],
+  ["fuzz/inline-footnote/9", "  ^[i\n  [[\n---\n"],
+  ["fuzz/highlight/19", "*em*\n    \\_\n===\n"],
+  ["fuzz/highlight/20", "1. [[[\n===\n"],
+  ["fuzz/highlight/21", "> > [[\n===\n"],
+  ["fuzz/embed/39", "1. [[![[i.png|100x200]]]]\n[[a|b]]\n"],
+  ["fuzz/strikethrough/2", "- ~~~~del~~`code`\n"],
+  ["fuzz/inline-footnote/10", "- ^[*em*]\n"],
+  ["fuzz/html/9", "<div>\n`. &amp;\n"],
+  ["fuzz/block-ref/7", "  #a/b \n^2\\$\n===\n"],
+  ["fuzz/math/6", "]]. <mailto:a@e.test>\t$x^2\n"],
+  ["fuzz/embed/40", "# **![[img.png]]**\n[[a#h]]\n"],
+  ["fuzz/highlight/22", "=3]]]\n&amp;\n===\n"],
+  ["fuzz/comment/6", "%%[[a#h]]%%\n"],
+  ["fuzz/highlight/23", "> > [[[[a\n===\n"],
+  ["fuzz/callout/6", "> [!note] [[a#^blk\\]][[[\n"],
+  ["fuzz/table/6", "/b` ~~~~ | c |\n"],
+  ["fuzz/embed/41", "> > ![[d.pdf#page=3]],\n"],
+  ["fuzz/embed/42", "> [!note] 日本語](_==![[i\n===\n"],
+  ["fuzz/math/7", "```\n```\n\n- $y^\n"],
+  ["fuzz/strikethrough/3", "~~del\\~~\n"],
+  ["fuzz/embed/43", "```js\n```\n> > ![[ ]]\n"],
+  ["fuzz/highlight/24", "1. ==\n===\n"],
+  ["fuzz/embed/44", "![[ ]]\n===\n"],
+  ["fuzz/highlight/25", "| - #tag | 日本語 ~~del\\~~==mark== | c |\n"],
+  ["fuzz/table/7", "| > #a/b [[a#^blk\\]]\t​\n"],
+  ["fuzz/highlight/26", "- [li\n===\n"],
+  ["fuzz/embed/45", "1. ![[i.png|100\\]]\n1. [[a|b]]\n"],
+  ["fuzz/comment/7", "g]]%%*#tag*\t%%note%%\n"],
+  ["fuzz/strikethrough/4", "- *~~~~del~~*\n"],
+  ["fuzz/highlight/27", "> > 日本語\n===\n"],
+  ["fuzz/embed/46", "[^1]: > [!note] ![[[[word]]]] \n[^1]: - [^1] \n"],
+  ["fuzz/misc/3", "- [ ]\n</div>\n"],
+  ["fuzz/embed/47", "​ | ![[d.pdf#page=3]]\n"],
+  ["fuzz/embed/48", "*![[d.pdf#page=3]]*\n"],
+  ["fuzz/highlight/28", "mark==](u)](<mailto:a@e.test>, word $^blk$\n"],
+  ["fuzz/comment/8", "%%note%%\t日本語\n$y^2$\n---\n"],
+  ["fuzz/wikilink/8", "[[&am\n    [[link](u)]]\n"],
+  ["fuzz/math/8", "**$y^2\ny^2$\n---\n"],
+  ["fuzz/block-ref/8", "  ^blk](![[d.pdf#page=3]]\n"],
+  ["fuzz/strikethrough/5", ">\t~~~~\n"],
+  ["fuzz/embed/49", "| # ![[[link](u)]] # <mailt\n"],
+  ["fuzz/strikethrough/6", "- [~~~~del\n"],
+  ["fuzz/highlight/29", "\\[[a\n#a/b\n===\n"],
+  ["fuzz/wikilink/9", "[[]]](\n"],
+  ["fuzz/highlight/30", "_under\n\\$y\n===\n"],
+  ["fuzz/embed/50", "> [!note] *![[d.pdf#page=3]]]]*](#a/b\n"],
+  ["fuzz/footnote/17", "#  ]([^&amp;]\n"],
+  [
+    "fuzz/embed/51",
+    "# [[target]]. ![[i.png|100]] \\ *$$y^2$*\n# %%%%, [link](u). ![[[^1]]]![[]]\n",
+  ],
+  ["fuzz/footnote/18", "[^1]: -\ny^2$\n"],
+  ["fuzz/html/10", "ink](u) \\ <mailto:a@e.test>\n"],
+  ["fuzz/inline-footnote/11", "- ^[i\ne]#a/b\n"],
+  ["fuzz/embed/52", "- [ ] [[<br>]]\t![[d.pdf#page=3]]\n"],
+  ["fuzz/highlight/31", "- [[[\n===\n"],
+  ["fuzz/embed/53", "[[^![[]]]](\n"],
+  ["fuzz/inline-footnote/12", "^[[a#^b\na#h]\n---\n"],
+  ["fuzz/embed/54", "[a#h]]![[d.pdf#page=3]]\n"],
+  ["fuzz/highlight/32", "- [ ] [\n===\n"],
+  ["fuzz/callout/7", "> [!not\n===\n"],
+  ["fuzz/strikethrough/7", "** ~~del\\~~\n"],
+  ["fuzz/embed/55", "![[#tag]]\n"],
+  ["fuzz/highlight/33", "1. &\n===\n"],
+  ["fuzz/table/8", "[[[[a|\n    ~\n---\n"],
+  ["fuzz/embed/56", "[^1]: > > <ma\n    target]]. [![[#tag]]](u), 日本語\n"],
+  ["fuzz/html/11", "  <mailto:a@e.test>\n"],
+  ["fuzz/inline-footnote/13", "^[in\n   , _\n===\n"],
+  ["fuzz/embed/57", "> > ​ ![[d.pdf#page=3]] \\ %%note%%\n"],
+  ["fuzz/inline-footnote/14", "# ^[^[inline]\t<\n"],
+  ["fuzz/footnote/19", "  [^1]\n1]\n===\n"],
+  ["fuzz/highlight/34", "- [ ] $_under_$\n===\n"],
+  ["fuzz/highlight/35", "  [[ta\n  **str\n===\n"],
+  ["fuzz/embed/58", "_under_\t![[strong**]]\n[link\n](u) \n"],
+  ["fuzz/math/9", "> > $`code\n"],
+  ["fuzz/footnote/20", "1. [^1]\n===\n"],
+  ["fuzz/highlight/36", "under\ny^2$\n===\n"],
+  ["fuzz/block-ref/9", "^blk, ![[![[d.pdf#page=3]]\n"],
+  ["fuzz/footnote/21", ". ==[[^blk]]==\n"],
+  ["fuzz/wikilink/10", "[[a#^blk]]\t~~~~, <br>, `code`\n"],
+  ["fuzz/html/12", "# <mailto:a@e.test>\t<br>. *em*\n"],
+  ["fuzz/footnote/22", "[^1]: >\n]](a#\n"],
+  ["fuzz/table/9", "```js\n```\n\n| a \n| --- \n"],
+  ["fuzz/footnote/23", "> [^1]\nilto:a@\n---\n"],
+  ["fuzz/math/10", "- [ ] $y\n"],
+  ["fuzz/table/10", "| > ``code` \n"],
+  ["fuzz/comment/9", "- %%\nnote%%\n"],
+  ["fuzz/strikethrough/8", "l~~~~\n"],
+  ["fuzz/embed/59", "![[img.\nword, [\n---\n"],
+  ["fuzz/embed/60", "<br>. ![[d.pdf#page=3]]\n"],
+  ["fuzz/inline-footnote/15", "[^1]: > >\na/b^[\n"],
+  ["fuzz/footnote/24", "[[$x^2$]]\t[^https://e.test/p]\n"],
+  ["fuzz/highlight/37", "> > wor\n===\n"],
+  ["fuzz/footnote/25", "[^1]: # ~~\n"],
+  [
+    "fuzz/embed/61",
+    "|   target]] | mark==, [[![[https://e.test/p]]]]$y^2$   ![[d.pdf#page=3 d.pdf#page=3]]]([[[[[[target]]]]]]. _[[a#^blk]]_   [[a|b]]\t日本語 | c |\n",
+  ],
+  ["fuzz/tag/5", "ng]]\t#a/b]\n"],
+  ["fuzz/highlight/38", "[[a#h\n    ^\n===\n"],
+  ["fuzz/footnote/26", " [[`[^1]`]]\n"],
+  ["fuzz/misc/4", "1. 日本語\n</div>\n"],
+  ["fuzz/wikilink/11", "- [[a#h]]\t#tag. <ma\n"],
+  ["fuzz/embed/62", "  ![[img.png]]\n[[a#^blk]]\n"],
+  ["fuzz/highlight/39", "> > ==\n===\n"],
+  ["fuzz/html/13", "<div>\nd\t&amp;\n"],
+  ["fuzz/tag/6", "**\t#a/b\n"],
+  ["fuzz/embed/63", "> ![[![[d.pdf#page=3]]]]\n"],
+  ["fuzz/math/11", "$y^2$\n#tag\n"],
+  ["fuzz/html/14", "> <mailto:a@e.test>\n"],
+  ["fuzz/tag/7", "語\t#a/b\n"],
+  ["fuzz/highlight/40", "> `code\n===\n"],
+  ["fuzz/table/11", "| 1. <mailto:a@e.test>  $x^2\n"],
+  ["fuzz/highlight/41", "> #a\n===\n"],
+  ["fuzz/embed/64", "  ](![[ ]]\n> [!note] $**strong**$ ^[i\n"],
+  ["fuzz/embed/65", "$x^2$![[![[d.pdf#page=3]]\n"],
+  ["fuzz/setext/3", "  http\n  _u\n---\n"],
+  ["fuzz/tag/8", "rd\t#tag\n"],
+
+  // Sent by the author of Obsidian Footnotes Shortcuts as places Obsidian
+  // deviates from stock remark-parse 8 + remark-footnotes 2 + remark-math 3.
+  // Every callout point in that list was already confirmed by goldens here,
+  // so the rest is recorded rather than taken on trust -- reading one rule's
+  // "EOL" as end-of-string instead of a newline had already broken every
+  // titleless callout once.
+  ["callout/line-after-title-is-fresh-block", "> [!note]\n> [^1]: x\n"],
+  ["callout/text-after-marker-is-block", "> [!note] [^1]: x\n"],
+  ["callout/only-first-line-is-title", "> a\n> [!note] T\n"],
+  ["callout/marker-in-list-defines", "- > [!note] [^1]: x\n"],
+  ["callout/marker-in-quote-defines", "> > [!note] [^1]: x\n"],
+  ["list/lazy-line-ignored-for-min-indent", "- a\nlazy\n\n    [^1]: x\n"],
+  ["list/indented-definition-in-item", "- a\n\n    [^1]: x\n"],
+  ["table/leading-space-breaks-pipe-style", " | a |\n| --- |\n"],
+  ["table/delimiter-leading-space", "| a |\n | --- |\n"],
+  ["table/first-non-row-ends-it", "| a |\n| --- |\n| b |\nnot a row\n| c |\n"],
+  ["table/definition-row-ends-piped-table", "| a |\n| --- |\n[^1]: x | y\n"],
+  ["wikilink/contents-are-inert", "[[a|[^1]]]\n\n[^1]: x\n"],
+  ["wikilink/second-open-moves-start", "[[a[[b]]\n"],
+  ["wikilink/does-not-span-lines", "[[a\nb]]\n"],
+  ["frontmatter/closing-tail-is-markdown", "---\na: b\n---[^2]: x\n"],
+  ["frontmatter/indented-opener-is-not", " ---\na: b\n---\n"],
+  ["frontmatter/closing-line-trailing-text", "---\na: b\n--- trailing\n"],
+  ["comment/other-percent-does-not-open", "%% 50%\nstill text\n"],
+  ["comment/triple-percent-does-not-open", "%%%\ntext\n"],
+  ["comment/closes-inside-backticks", "%%\na\n`%%`\nb\n"],
+  ["comment/does-not-end-a-definition", "[^1]: a\n%%\nb\n"],
+  ["comment/interrupts-a-paragraph", "a\n%%\nb\n"],
+  ["comment/indented-under-list-item", "- a\n    %%\n    b\n"],
+  ["comment/references-inside-are-counted", "%%\na [^1]\n%%\n\n[^1]: x\n"],
+  ["math/midparagraph-inline-across-lines", "x $$a\nb$$ y\n"],
+  ["math/midparagraph-stops-at-blank-line", "x $$a\n\nb$$ y\n"],
+  ["inline-footnote/reference-inside-is-dead", "^[see [^1]]\n\n[^1]: x\n"],
+  ["inline-footnote/label-inside-is-dead", "^[[^1]: x]\n"],
+  ["inline-footnote/nested-note-is-dead", "^[a ^[b] c]\n"],
+
+  // Closing the colour-marker set. The circle and square families were
+  // already exhaustive -- all nine of each -- so what was open is whether
+  // any other colour-bearing family qualifies, and how the marker behaves
+  // against whitespace, nesting and an escaped opener.
+  ["highlight/fam-heart-orange", "==\ud83e\udde1 text==\n"],
+  ["highlight/fam-heart-yellow", "==\ud83d\udc9b text==\n"],
+  ["highlight/fam-heart-green", "==\ud83d\udc9a text==\n"],
+  ["highlight/fam-heart-blue", "==\ud83d\udc99 text==\n"],
+  ["highlight/fam-heart-purple", "==\ud83d\udc9c text==\n"],
+  ["highlight/fam-heart-black", "==\ud83d\udda4 text==\n"],
+  ["highlight/fam-book-red", "==\ud83d\udcd5 text==\n"],
+  ["highlight/fam-book-green", "==\ud83d\udcd7 text==\n"],
+  ["highlight/fam-book-blue", "==\ud83d\udcd8 text==\n"],
+  ["highlight/fam-book-orange", "==\ud83d\udcd9 text==\n"],
+  ["highlight/fam-sq-med-black", "==\u25fc text==\n"],
+  ["highlight/fam-sq-med-white", "==\u25fb text==\n"],
+  ["highlight/fam-sq-small-black", "==\u25fe text==\n"],
+  ["highlight/fam-sq-small-white", "==\u25fd text==\n"],
+  ["highlight/fam-sq-tiny-black", "==\u25aa text==\n"],
+  ["highlight/fam-sq-tiny-white", "==\u25ab text==\n"],
+  ["highlight/fam-diamond-blue-lg", "==\ud83d\udd37 text==\n"],
+  ["highlight/fam-diamond-blue-sm", "==\ud83d\udd39 text==\n"],
+  ["highlight/fam-diamond-orange-sm", "==\ud83d\udd38 text==\n"],
+  ["highlight/fam-triangle-down", "==\ud83d\udd3b text==\n"],
+  ["highlight/fam-radio-button", "==\ud83d\udd18 text==\n"],
+  ["highlight/fam-circle-red-vs", "==\ud83d\udd34\ufe0f text==\n"],
+  ["highlight/emoji-space-before", "== \ud83d\udd34 text==\n"],
+  ["highlight/emoji-nested", "==\ud83d\udd34 a ==\ud83d\udfe2 b== c==\n"],
+  ["highlight/emoji-escaped-opener", "\\==\ud83d\udd34 text==\n"],
+  ["highlight/emoji-in-comment", "%%==\ud83d\udd34 text==%%\n"],
+  ["highlight/emoji-tab-after", "==\ud83d\udd34\ttext==\n"],
+  ["highlight/emoji-newline-after", "==\ud83d\udd34\ntext==\n"],
+
+  // Pins which pictographs 1.14 treats as a colour marker: the diff showed
+  // the squares and the red circle consumed while a grinning face, a
+  // variation-selector heart and a ZWJ family were left alone.
+  ["highlight/set-circle-orange", "==\ud83d\udfe0 text==\n"],
+  ["highlight/set-circle-yellow", "==\ud83d\udfe1 text==\n"],
+  ["highlight/set-circle-green", "==\ud83d\udfe2 text==\n"],
+  ["highlight/set-circle-blue", "==\ud83d\udd35 text==\n"],
+  ["highlight/set-circle-purple", "==\ud83d\udfe3 text==\n"],
+  ["highlight/set-circle-brown", "==\ud83d\udfe4 text==\n"],
+  ["highlight/set-circle-black", "==\u26ab text==\n"],
+  ["highlight/set-circle-white", "==\u26aa text==\n"],
+  ["highlight/set-square-orange", "==\ud83d\udfe7 text==\n"],
+  ["highlight/set-square-purple", "==\ud83d\udfea text==\n"],
+  ["highlight/set-square-brown", "==\ud83d\udfeb text==\n"],
+  ["highlight/set-square-black", "==\u2b1b text==\n"],
+  ["highlight/set-square-white", "==\u2b1c text==\n"],
+  ["highlight/set-heart-red", "==\u2764 text==\n"],
+  ["highlight/set-star", "==\u2b50 text==\n"],
+  ["highlight/set-check", "==\u2705 text==\n"],
+  ["highlight/set-triangle", "==\ud83d\udd3a text==\n"],
+  ["highlight/set-moon", "==\ud83c\udf15 text==\n"],
+  ["highlight/set-diamond-orange", "==\ud83d\udd36 text==\n"],
+  ["highlight/set-flag", "==\ud83d\udea9 text==\n"],
+
+  // Obsidian 1.14 is reported to colour a highlight from a leading emoji,
+  // as Bear does. Whether that is a parse change or only a rendering one
+  // decides whether it concerns this package at all: if the emoji is
+  // consumed as a marker the highlight's content loses it, if it is left
+  // alone nothing here changes. Recorded against both 1.13.7 and 1.14.4.
+  ["highlight/emoji-space-text", "==\ud83d\udd34 text==\n"],
+  ["highlight/emoji-text-nospace", "==\ud83d\udd34text==\n"],
+  ["highlight/square-red", "==\ud83d\udfe5text==\n"],
+  ["highlight/square-yellow", "==\ud83d\udfe8 text==\n"],
+  ["highlight/square-green", "==\ud83d\udfe9 text==\n"],
+  ["highlight/square-blue", "==\ud83d\udfe6 text==\n"],
+  ["highlight/emoji-only-body", "==\ud83d\udd34==\n"],
+  ["highlight/emoji-midbody", "==te\ud83d\udd34xt==\n"],
+  ["highlight/emoji-doubled", "==\ud83d\udd34\ud83d\udfe9text==\n"],
+  ["highlight/emoji-noncolor", "==\ud83d\ude00text==\n"],
+  ["highlight/emoji-variation-selector", "==\u2764\ufe0f text==\n"],
+  [
+    "highlight/emoji-zwj-sequence",
+    "==\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67 text==\n",
+  ],
+  ["highlight/emoji-in-callout-title", "> [!note] ==\ud83d\udd34 T==\n"],
+  ["highlight/emoji-in-table-cell", "| a |\n| --- |\n| ==\ud83d\udd34 t== |\n"],
+
+  // An edge-case sweep plus the test suites of other Obsidian-Markdown
+  // implementations (obsidian-help, goldmark-obsidian, obsidian-export,
+  // mdformat-obsidian, lezer-markdown-obsidian, remark-callout, quartz).
+  // These reach surface the generated layers cannot: block references above
+  // all, which no case covered at all.
+  ["block-ref/paragraph-trailing", "A paragraph with an id. ^block-id\n"],
+  ["block-ref/no-space-before", "Text^not-an-id\n"],
+  ["block-ref/own-line-after-quote", "> A quoted block.\n\n^quote-id\n"],
+  ["block-ref/own-line-after-paragraph", "x\n\n^b\n"],
+  ["block-ref/own-line-after-list", "- x\n\n^b\n"],
+  ["block-ref/own-line-after-table", "| x |\n| --- |\n\n^b\n"],
+  ["block-ref/inside-quote", "> x\n>\n> ^b\n"],
+  [
+    "block-ref/on-list-item",
+    "- Item one\n    - Nested item\n      ^nested-id\n",
+  ],
+  ["block-ref/on-heading", "## Heading ^heading-id\n"],
+  ["block-ref/on-setext", "Setext heading ^setext-id\n---\n"],
+  ["block-ref/caret-only-line", "^\n"],
+  ["block-ref/invalid-underscore", "x ^a_b\n"],
+  ["block-ref/duplicate-id", "x ^b\n\ny ^b\n"],
+  ["block-ref/after-wikilink", "[[a]] ^b\n"],
+  [
+    "block-ref/in-callout-list",
+    "> [!note]\n> - Item one ^item-one\n> - Item two ^item-two\n",
+  ],
+  [
+    "block-ref/heading-vs-explicit",
+    "## Same title\n\n## Same title ^explicit-id\n",
+  ],
+  ["wikilink/heading-chain", "[[a#b#c|d]]\n"],
+  ["wikilink/hash-after-alias", "[[a|b#c]]\n"],
+  ["wikilink/multiple-alias-separators", "[[a|b|c]]\n"],
+  ["wikilink/empty-target-with-alias", "[[|b]]\n"],
+  ["wikilink/target-empty-alias", "[[a|]]\n"],
+  ["wikilink/escaped-fragment-separator", "[[a\\#b]]\n"],
+  ["wikilink/escaped-alias-separator", "[[a\\|b]]\n"],
+  ["wikilink/current-note-heading", "[[#Current heading]]\n"],
+  ["wikilink/current-note-block-alias", "[[#^b|c]]\n"],
+  ["wikilink/vault-heading-search", "[[## heading text]]\n"],
+  ["wikilink/vault-block-search", "[[^^block text]]\n"],
+  ["wikilink/block-target-alias", "[[Note#^block-id|Readable label]]\n"],
+  ["wikilink/needs-trimming", "[[  Note  #^id  ]]\n"],
+  ["wikilink/alias-pipe-in-table", "| Link |\n| --- |\n| [[Note\\|Alias]] |\n"],
+  ["embed/alt-and-dimensions", "![[a.png|b|100x200]]\n"],
+  ["embed/width-only", "![[image.png|100]]\n"],
+  ["embed/width-height", "![[image.png|100x145]]\n"],
+  ["embed/alt-text-dimensions", "![[image.png|Alt text 100x200]]\n"],
+  ["embed/note-heading-with-size", "![[a#b|100]]\n"],
+  ["embed/pdf-page", "![[Document.pdf#page=3]]\n"],
+  ["embed/pdf-height", "![[Document.pdf#height=400]]\n"],
+  ["embed/pdf-page-with-size", "![[a.pdf#page=3|100x200]]\n"],
+  ["embed/block-list-transclusion", "![[Tasks#^my-list-id]]\n"],
+  ["embed/wikilink-in-alias", "![[a|[[b]]]]\n"],
+  ["embed/missing-block-with-alias", "![[nonexistent#^b|c]]\n"],
+  ["embed/unclosed", "![[Unclosed embed\n"],
+  ["tag/numeric-path", "#123/456\n"],
+  ["tag/digit-leading-mixed", "#1_a-b\n"],
+  ["tag/empty-path-segment", "#a//b\n"],
+  ["tag/combining-mark", "#\u00e9\n"],
+  ["tag/inside-wikilink-alias", "[[a|#b]]\n"],
+  ["link/relative-block-fragment", "[x](a.md#^b)\n"],
+  ["link/angle-wrapped-space", "[x](<a b.md>)\n"],
+  ["link/literal-pipe-destination", "[x](a|b)\n"],
+  ["link/obsidian-scheme-autolink", "<obsidian://open?vault=v&file=a>\n"],
+  ["link/bare-url-balanced-parens", "https://a.test/x_(y).\n"],
+  ["link/reference-style-internal", '[x][a]\n\n[a]: b.md "c"\n'],
+  ["link/angle-autolink", "<https://x>\n"],
+  ["callout/marker-padding", ">[!note]\n> a\n\n>  [!note]\n> b\n"],
+  ["callout/uppercase-type", "> [!NOTE]\n> x\n"],
+  ["callout/type-inner-whitespace", "> [! note]\n> a\n\n> [!note ]\n> b\n"],
+  ["callout/empty-type", "> [!]\n> x\n"],
+  ["callout/attached-title", "> [!note]x\n> y\n"],
+  ["callout/fold-title-boundary", "> [!note]-x\n> a\n\n> [!note]+x\n> b\n"],
+  [
+    "callout/nonstandard-fold-markers",
+    "> [!note]\u00b1 T\n> a\n\n> [!note]-+ T\n> b\n",
+  ],
+  ["callout/custom-type", "> [!project-status]\n> Body\n"],
+  ["callout/type-with-spaces", "> [!type with spaces]\n> Body\n"],
+  ["callout/marker-on-second-line", "> x\n> [!note]\n> y\n"],
+  ["callout/marker-after-empty-quote-line", ">\n> [!note]\n> x\n"],
+  ["callout/title-wikilink-and-embed", "> [!note] [[A]] ![[B]]\n"],
+  ["callout/title-math-and-code", "> [!note] $x$ `$y$`\n"],
+  ["callout/title-tag-and-footnote", "> [!note] #tag [^n]\n\n[^n]: footnote\n"],
+  ["callout/title-nested-brackets-and-pipe", "> [!note] [a [b]] | c\n"],
+  [
+    "callout/title-inline-markdown",
+    "> [!note] **Bold** and *italic*\n> Body\n",
+  ],
+  [
+    "callout/title-comment-crosses-body",
+    "> [!note] T %%\n> hidden\n> %%\n> visible\n",
+  ],
+  ["callout/title-wikilink-closes-in-body", "> [!note] [[A\n> B]]\n"],
+  ["callout/body-paragraph-separation", "> [!note]\n> a\n>\n> b\n"],
+  [
+    "callout/three-level-stack",
+    "> [!note]\n>> [!tip]\n>>> [!warning]\n>>> x\n",
+  ],
+  ["callout/body-table", "> [!note]\n> | a |\n> | --- |\n> | b |\n"],
+  [
+    "callout/body-fence-shields-marker",
+    "> [!note]\n> ```md\n> > [!warning]\n> ```\n",
+  ],
+  [
+    "callout/body-fence-blank-line",
+    '> [!tip] Code\n>\n> ```js\n> alert("x")\n> ```\n',
+  ],
+  ["callout/body-list-with-blockquote", "> [!note]\n> - a\n>   > b\n"],
+  ["callout/empty-body-before-paragraph", "> [!note] T\n\nx\n"],
+  ["callout/lazy-line-and-explicit-exit", "> [!note]\n> a\nb\n\nc\n"],
+  ["callout/unquoted-thematic-break", "> [!note]\n> a\n***\nb\n"],
+  ["callout/adjacent-markers-without-gap", "> [!note]\n> a\n> [!tip]\n> b\n"],
+  ["callout/interrupts-unquoted-paragraph", "a\n> [!note]\n> b\n"],
+  ["callout/marker-inside-title", "> [!note] > [!warning] T\n> x\n"],
+  ["callout/marker-inside-table-cell", "| a |\n| --- |\n| > [!note] |\n"],
+  ["callout/marker-inside-indented-code", "    > [!note]\n    > x\n"],
+  [
+    "callout/nested-task-list",
+    "> [!note]\n> - [ ] Outer task\n> > [!todo]\n> > - [x] Inner task\n",
+  ],
+  ["blockquote/changing-depth-without-spaces", ">>>a\n>b\n>>c\nd\n"],
+  ["blockquote/bare-marker", ">\n"],
+  [
+    "task/status-alphabet",
+    '- [/] a\n- [-] b\n- [>] c\n- [?] d\n- [!] e\n- [*] f\n- ["] g\n- [x] h\n- [X] i\n',
+  ],
+  ["task/missing-spaces", "- [] a\n- [ ]x\n"],
+  ["task/ordered", "1. [ ] a\n"],
+  ["task/ordered-custom-status", "1. [?] Question\n2. [-] Cancelled\n"],
+  ["task/quote-callout-status", "> - [/] a\n\n> [!note]\n> - [-] b\n"],
+  ["task/nested-wikilink-only", "- a\n  - [ ] [[b]]\n"],
+  ["task/escaped-marker", "- \\[-\\] Literal text\n"],
+  [
+    "task/in-html-comment",
+    "<!-- - [ ] Hidden task -->\n- <!-- [x] not-a-task --> visible\n",
+  ],
+  [
+    "task/in-obsidian-comment",
+    "%%\n- [ ] Hidden task\n- [x] Also hidden\n%%\n",
+  ],
+  [
+    "task/comment-adjacent-marker",
+    "- %% hidden prefix %% [ ] text\n- [x] %% hidden suffix %% text\n",
+  ],
+  ["table/short-center-unbordered", "a|b\n:-:|---\nx|y\n"],
+  ["table/colon-only-delimiter", "|a|\n|::|\n|b|\n"],
+  ["table/single-column-short-rule", "|a|\n|-|\n|b|\n"],
+  ["table/escaped-pipe", "|a|b|\n|---|---|\n|x\\|y|z|\n"],
+  ["table/code-pipe", "|a|b|\n|---|---|\n|`x|y`|z|\n"],
+  ["table/math-pipe", "|a|b|\n|---|---|\n|$x|y$|z|\n"],
+  ["table/blank-line-interruption", "|a|\n|---|\n|b|\n\n|c|\n"],
+  ["table/paragraph-interruption", "p\n|a|\n|---|\n|b|\n"],
+  ["table/list-container", "- a\n\n  |b|\n  |---|\n  |c|\n"],
+  ["table/excess-delimiter-columns", "|a|\n|---|---|\n|b|c|\n"],
+  ["table/tab-before-pipe", "| a\t| b |\n| --- | --- |\n| c | d |\n"],
+  ["list/marker-switch", "* a\n+ b\n- c\n"],
+  ["list/zero-start-seven-next", "0. a\n7. b\n"],
+  ["list/paren-digit-limit", "1) a\n1234567890) b\n"],
+  ["list/tight-to-loose", "- a\n- b\n\n  c\n"],
+  ["list/indent-staircase", " - a\n  - b\n   - c\n    - d\n"],
+  ["list/fence-interruption", "- a\n```\nb\n```\n- c\n"],
+  ["strikethrough/single-versus-double", "~~a~~ ~b~\n"],
+  ["strikethrough/crossing-emphasis", "~~*a~~b*\n"],
+  ["heading/atx-recognition-limits", "#a\n\n####### b\n\n#\n"],
+  ["heading/closing-hash-rich-content", "# [[a]] #tag $x$ #\n"],
+  ["heading/setext-in-list", "- a\n  ---\n"],
+  ["frontmatter/not-first-line", "\n---\ntags: [a]\n---\n"],
+  ["frontmatter/unclosed-fence", "---\ntags: [a]\n# h\n"],
+  ["frontmatter/dot-close", "---\ntags: [a]\n...\n# h\n"],
+  ["frontmatter/fence-in-scalar", "---\nx: |\n  ---\n---\ny\n"],
+  [
+    "frontmatter/flow-tags-aliases",
+    "---\ntags: [a, b]\naliases: [name]\nx: '#notatag'\n---\n",
+  ],
+  ["frontmatter/block-tags", "---\ntags:\n  - journal\n  - personal\n---\n"],
+  ["frontmatter/setext-looking-body", "---\nTitle\n---\n"],
+  [
+    "frontmatter/quoted-wikilink",
+    '---\ntitle: A New Hope\nlink: "[[Episode IV]]"\nurl: https://example.com\n---\n',
+  ],
+  [
+    "frontmatter/list-wikilink",
+    '---\ncast:\n  - Mark Hamill\n  - "[[Harrison Ford]]"\n---\n',
+  ],
+  [
+    "frontmatter/typed-scalars",
+    "---\nyear: 1977\nfavorite: true\ndate: 2020-08-21\n---\n",
+  ],
+  [
+    "frontmatter/json-form",
+    '---\n{\n  "tags": ["journal"],\n  "publish": false\n}\n---\n',
+  ],
+  ["frontmatter/markdown-in-value", '---\ntitle: "**not bold**"\n---\n'],
+  ["document/mixed-endings-trailing-spaces", "a  \r\nb \nc   \r\nd\n"],
+  ["document/tab-indentation", "- a\n\t- [x] b\n\n\t# c\n"],
+  [
+    "document/invisible-delimiter-content",
+    "==\u00a0== [[\u200b]] $\u00a0x\u00a0$\n",
+  ],
+  ["thematic-break/paragraph-dashes", "p\n---\nq\n"],
+  ["thematic-break/alternative-markers", "a\n***\nb\n___\nc\n- - -\n"],
+  ["thematic-break/list-tail", "- a\n---\nb\n"],
+  [
+    "escape/line-start-delimiters",
+    "\\[[a]]\n\\![[b]]\n\\==c==\n\\%%d%%\n\\$e$\n\\*g*\n\\_i_\n\\^[j]\n",
+  ],
+  ["precedence/container-exit", "> ==a\n\nb==\n"],
+  ["precedence/code-math", "`$x$` $`x`$\n"],
+  ["precedence/comment-eats-opener", "%%[[%%a]]\n"],
+  ["precedence/math-wikilink", "$[[a]]$\n"],
+  ["precedence/wikilink-math", "[[$x$]]\n"],
+  ["precedence/highlight-tag", "==#tag==\n"],
+  ["precedence/html-obsidian-comments", "<!-- %% -->\n# h\n%%\n"],
+  ["precedence/frontmatter-boundary", "---\nx: '==a'\n---\nb==\n"],
+  ["precedence/fenced-code-boundary", "==a\n```\nb==\n```\nc\n"],
+  ["precedence/comment-in-code", "`%% not a comment %%`\n"],
+  ["precedence/embed-in-code", "`![[Note]]`\n"],
+  [
+    "comment/spans-blocks",
+    "%%\nHidden paragraph.\n\n- Hidden list\n\n> Hidden quote\n%%\n",
+  ],
+  [
+    "entity/decoded-constructs",
+    "&amp; &#35;tag &#x5B;&#x5B;a&#x5D;&#x5D; &bogus;\n",
+  ],
+  ["html/inline-break", "a<br>b\n"],
+  ["html/script-block", "<script>\n# h\n[[a]]\n</script>\n# b\n"],
+  ["html/blank-line-interruption", "<div>\n[[a]]\n\n# h\n</div>\n"],
+  [
+    "html/inline-block-boundary",
+    "a <span>*b*</span>\n\n<div>\n*c*\n</div>\n*d*\n",
+  ],
+  ["html/comment-around-block", "<!--\n- [ ] hidden\n-->\n\n- [ ] visible\n"],
+  // Where does a tab count as indentation and where as content? The worst designed
+  // coverage of anything still open: 66 incidental hits, 7 of them diverging, and not
+  // one probe. That is the profile that hid both tag bugs. The seed is
+  // `commonmark/tabs/2`, where our section text loses `bim` outright -- content
+  // vanishing after a double tab, which no rule here predicts. Tabs also expand to a
+  // four-column stop before block structure is decided, so the same character is
+  // indentation in one column and content in the next.
+  ["probe/tab/leading-one", "\tfoo\n"],
+  ["probe/tab/two-spaces-then-tab", "  \tfoo\n"],
+  ["probe/tab/three-spaces-then-tab", "   \tfoo\n"],
+  ["probe/tab/interior-single", "a\tb\n"],
+  ["probe/tab/interior-double", "a\t\tb\n"],
+  ["probe/tab/interior-runs", "a\tb\tc\n"],
+  ["probe/tab/after-double-run", "a\t\tb\tc\n"],
+  ["probe/tab/trailing-one", "a\t\n"],
+  ["probe/tab/trailing-double", "a\t\t\n"],
+  ["probe/tab/only-tabs", "\t\t\n"],
+  ["probe/tab/list-marker", "-\tfoo\n"],
+  ["probe/tab/quote-marker", ">\tfoo\n"],
+  ["probe/tab/heading-marker", "#\tfoo\n"],
+  ["probe/tab/heading-before-closer", "# foo\t#\n"],
+  ["probe/tab/table-cell", "| a\tb |\n| --- |\n"],
+  ["probe/tab/code-span", "`a\tb`\n"],
+  ["probe/tab/definition-body", "[^1]:\tbody\n"],
+  ["probe/tab/wikilink-target", "[[a\tb]]\n"],
+  // An empty container's continuation, which is the shape that just turned out to be
+  // wrong for footnote definitions: lazy continuation needs an open paragraph, and a
+  // bare marker opens none. `commonmark/list-items/280` is the seed -- Obsidian reads
+  // `-` / blank / `  foo` as one list where we leave the paragraph behind -- and the
+  // question is whether the rule generalises past the definition case already fixed.
+  // 13 incidental hits, 3 diverging, no probes.
+  ["probe/empty-container/list-blank-indented", "-\n\n  foo\n"],
+  ["probe/empty-container/list-indented", "-\n  foo\n"],
+  ["probe/empty-container/list-lazy", "-\nfoo\n"],
+  ["probe/empty-container/list-marker-space", "- \n\n  foo\n"],
+  ["probe/empty-container/list-two-blanks", "-\n\n\n  foo\n"],
+  ["probe/empty-container/list-then-item", "-\n\n- b\n"],
+  ["probe/empty-container/list-content-then-blank", "- a\n\n  foo\n"],
+  ["probe/empty-container/ordered", "1.\n\n   foo\n"],
+  ["probe/empty-container/ordered-lazy", "1.\nfoo\n"],
+  ["probe/empty-container/task-empty", "- [ ]\n\n  foo\n"],
+  ["probe/empty-container/quote-blank", ">\n\nfoo\n"],
+  ["probe/empty-container/quote-indented", ">\n  foo\n"],
+  ["probe/empty-container/quote-lazy", ">\nfoo\n"],
+  ["probe/empty-container/nested-list", "-\n\n  -\n\n    foo\n"],
+  // A footnote reference whose label holds a wikilink or an embed. Five of the eight
+  // incidental hits diverge and none is designed, so the family is measured entirely
+  // by accident -- and every one of those five is a fuzz document carrying six other
+  // constructs, which is exactly the shape the README warns cannot attribute a cause.
+  // Definitions are supplied where a name could resolve, since `footnoteRefs` lists
+  // only defined names and a probe without one proves nothing.
+  ["probe/footnote-embed/ref-embed", "[^![[img.png]]]\n"],
+  ["probe/footnote-embed/ref-wikilink", "[^[[target]]]\n"],
+  ["probe/footnote-embed/ref-embed-defined", "[^![[img.png]]]\n\n[^1]: x\n"],
+  ["probe/footnote-embed/inline-embed", "^[![[img.png]]]\n"],
+  ["probe/footnote-embed/inline-wikilink", "^[[[target]]]\n"],
+  ["probe/footnote-embed/label-alias", "[^![[i.png|100]]]\n"],
+  ["probe/footnote-embed/label-heading", "[^[[a#h]]]\n"],
+  ["probe/footnote-embed/label-block-id", "[^[[a#^blk]]]\n"],
+  ["probe/footnote-embed/nested-embed", "[^[[![[i.png]]]]]\n"],
+  ["probe/footnote-embed/ref-then-embed", "[^1]![[img.png]]\n\n[^1]: x\n"],
+  ["probe/footnote-embed/embed-then-ref", "![[img.png]][^1]\n\n[^1]: x\n"],
+  ["probe/footnote-embed/definition-embed", "[^1]: ![[img.png]]\n"],
+  // Math, which had **no** designed probes at all against 221 incidental hits and 15
+  // diverging -- the worst coverage ratio of anything open, by four times. Every one
+  // of those 15 is a fuzz document carrying six other constructs, so not one of them
+  // can attribute a cause. These cross the delimiter forms with padding, line
+  // endings, adjacency and the constructs that might or might not parse inside.
+  ["probe/math/inline-simple", "$x^2$\n"],
+  ["probe/math/inline-padded", "$ x $\n"],
+  ["probe/math/inline-empty", "$ $\n"],
+  ["probe/math/inline-across-line", "$y^2\ny^2$\n"],
+  ["probe/math/inline-blank-between", "$y^2\n\ny^2$\n"],
+  ["probe/math/lone-closer", "y^2$\n"],
+  ["probe/math/adjacent-text", "a$x$b\n"],
+  ["probe/math/currency-pair", "costs $5 and $6 total\n"],
+  ["probe/math/escaped-dollar", "\\$x\\$\n"],
+  ["probe/math/display-own-lines", "$$\nx^2\n$$\n"],
+  // Recorded as needing a re-tokenise rather than a repair pass; this pins what it
+  // would have to produce.
+  ["probe/math/display-same-line", "$$x^2$$\n"],
+  ["probe/math/display-open-only", "$$x^2\n"],
+  ["probe/math/display-tab-after", "$$\t[\n"],
+  ["probe/math/display-four", "$$$$\n"],
+  ["probe/math/emphasis-inside", "$_under_$\n"],
+  ["probe/math/strong-inside", "$**strong**$\n"],
+  ["probe/math/wikilink-inside", "$[[target]]$\n"],
+  ["probe/math/code-inside", "$`code`$\n"],
+  ["probe/math/in-wikilink", "[[$x^2$]]\n"],
+  ["probe/math/in-highlight", "==$x^2$==\n"],
+  ["probe/math/in-callout-title", "> [!note] $x^2$\n"],
+  ["probe/math/in-table-cell", "| $x^2$ |\n| --- |\n"],
+  // Emphasis across a line ending. `Foo *bar⏎baz*⏎====` reports `em:bar baz` to
+  // Obsidian, and the 35 open cases holding a `*` or `_` are the largest single
+  // group left -- against nine designed probes, all of them about delimiter runs
+  // rather than extent. The container forms are here because a callout title
+  // reportedly does *not* carry emphasis across its boundary.
+  ["probe/emphasis-span/across-line", "*bar\nbaz*\n"],
+  ["probe/emphasis-span/across-line-strong", "**bar\nbaz**\n"],
+  ["probe/emphasis-span/across-line-underscore", "_bar\nbaz_\n"],
+  ["probe/emphasis-span/three-lines", "*a\nb\nc*\n"],
+  ["probe/emphasis-span/blank-between", "*bar\n\nbaz*\n"],
+  ["probe/emphasis-span/in-setext-equals", "Foo *bar\nbaz*\n====\n"],
+  ["probe/emphasis-span/in-setext-dash", "Foo *bar\nbaz*\n----\n"],
+  ["probe/emphasis-span/in-quote", "> *bar\n> baz*\n"],
+  ["probe/emphasis-span/in-quote-lazy", "> *bar\nbaz*\n"],
+  ["probe/emphasis-span/in-list", "- *bar\n  baz*\n"],
+  ["probe/emphasis-span/in-callout-title", "> [!note] *em\nem*\n"],
+  ["probe/emphasis-span/unclosed", "*bar\n"],
+  ["probe/emphasis-span/tab-separated", "*\t*\t*\t\n"],
+  // What parses inside a footnote. `rejoinSplitReferences` established that a
+  // *reference* label is literal; these ask whether an inline footnote's body is too,
+  // which the recorded `^[**strong**]` reporting no emphasis suggests. If it holds,
+  // the rule is about footnotes generally rather than about labels.
+  ["probe/footnote-content/inline-plain", "^[plain]\n"],
+  ["probe/footnote-content/inline-strong", "^[a **strong** b]\n"],
+  ["probe/footnote-content/inline-emphasis", "^[*em*]\n"],
+  ["probe/footnote-content/inline-code", "^[`code`]\n"],
+  ["probe/footnote-content/inline-math", "^[$x^2$]\n"],
+  ["probe/footnote-content/inline-highlight", "^[==mark==]\n"],
+  ["probe/footnote-content/inline-tag", "^[#tag]\n"],
+  ["probe/footnote-content/ref-strong", "[^**strong**]\n"],
+  ["probe/footnote-content/ref-code", "[^`code`]\n"],
+  ["probe/footnote-content/ref-tag", "[^#tag]\n"],
+  ["probe/footnote-content/definition-strong", "use[^1]\n\n[^1]: **strong**\n"],
+  ["probe/footnote-content/definition-math", "use[^1]\n\n[^1]: $x^2$\n"],
+  // A tab between thematic-break markers. The legacy stack is unambiguous --
+  // `*⇥*⇥*⇥` is three nested lists there and a thematic break in CommonMark -- and
+  // Obsidian agrees with legacy, reporting `ul,ul,ul`. The corpus holds exactly one
+  // case of it, so the extent is probed before a fix is attempted: suppressing the
+  // break means replacing micromark's construct wholesale, and one case does not
+  // justify that blast radius while twelve might.
+  //
+  // The canonical `*⇥*⇥*⇥` is not repeated here: it is already
+  // `probe/emphasis-span/tab-separated`, which is where the rule surfaced. The
+  // escaped closer is likewise already covered among the legacy-delete cases.
+  ["probe/thematic-break/spaces", "* * *\n"],
+  ["probe/thematic-break/double-spaces", "*  *  *\n"],
+  ["probe/thematic-break/tight", "***\n"],
+  ["probe/thematic-break/tab-inner", "*\t*\t*\n"],
+  ["probe/thematic-break/tab-one", "* *\t*\n"],
+  ["probe/thematic-break/tab-trailing", "* * *\t\n"],
+  ["probe/thematic-break/dash-tab", "-\t-\t-\t\n"],
+  ["probe/thematic-break/dash-spaces", "- - -\n"],
+  ["probe/thematic-break/underscore-tab", "_\t_\t_\t\n"],
+  ["probe/thematic-break/underscore-spaces", "_ _ _\n"],
+  ["probe/thematic-break/five-tab", "*\t*\t*\t*\t*\t\n"],
+  // Strikethrough, which also had zero designed probes against 81 incidental hits.
+  // `legacy-delete.ts` ported `remark-parse@8`'s tokenizer here, and nothing pins
+  // that port: these lock the closing-run rule, the escape it does not honour, and
+  // the empty form `~~~~`.
+  ["probe/strikethrough/simple", "~~del~~\n"],
+  ["probe/strikethrough/single-tilde", "~x~\n"],
+  ["probe/strikethrough/four-tildes", "~~~~\n"],
+  ["probe/strikethrough/six-tildes", "~~~~~~\n"],
+  ["probe/strikethrough/unclosed", "~~del\n"],
+  ["probe/strikethrough/space-after-open", "~~ del~~\n"],
+  ["probe/strikethrough/space-before-close", "~~del ~~\n"],
+  ["probe/strikethrough/across-line", "~~del\nmore~~\n"],
+  ["probe/strikethrough/nested-emphasis", "~~*em*~~\n"],
+  ["probe/strikethrough/in-emphasis", "*~~del~~*\n"],
+  ["probe/strikethrough/adjacent-text", "a~~del~~b\n"],
+  ["probe/strikethrough/interior-single", "~~a~b~~\n"],
+  ["probe/strikethrough/in-table-cell", "| ~~del~~ |\n| --- |\n"],
+  // Embeds, the thinnest coverage left: 7 designed probes against 190 incidental
+  // hits and 22 diverging. An Obsidian-native construct, so a divergence here is
+  // more likely to be real than in a borrowed one -- unlike math and strikethrough,
+  // which the last two waves cleared. The seed is `![[a|[[b]]]]`, where Obsidian
+  // reports the *inner* link as non-embedded and does not report the outer embed at
+  // all, so nesting precedence is the question these are shaped around.
+  //
+  // That seed is `embed/wikilink-in-alias` and is not repeated here, nor is
+  // `![[d.pdf#page=3]]`, which an earlier seed already carries.
+  ["probe/embed/plain", "![[target]]\n"],
+  ["probe/embed/heading", "![[a#h]]\n"],
+  ["probe/embed/block-id", "![[a#^blk]]\n"],
+  ["probe/embed/alias", "![[a|b]]\n"],
+  ["probe/embed/size", "![[i.png|100]]\n"],
+  ["probe/embed/size-pair", "![[i.png|100x200]]\n"],
+  ["probe/embed/markdown-ext", "![[note.md]]\n"],
+  ["probe/embed/empty", "![[]]\n"],
+  ["probe/embed/unclosed", "![[a\n"],
+  ["probe/embed/escaped-marker", "\\![[a]]\n"],
+  ["probe/embed/nested-embed", "![[![[a]]]]\n"],
+  ["probe/embed/embed-in-alias", "![[a|![[b]]]]\n"],
+  ["probe/embed/in-quote", "> ![[a]]\n"],
+  ["probe/embed/in-list", "- ![[a]]\n"],
+  ["probe/embed/in-callout-title", "> [!note] ![[a]]\n"],
+  ["probe/embed/in-table-cell", "| ![[a]] |\n| --- |\n"],
+  ["probe/embed/adjacent", "x![[a]]y\n"],
+  ["probe/embed/two", "![[a]] ![[b]]\n"],
+  // Escapes. Five designed probes against 159 incidental and 13 diverging, and a
+  // global change to the escape set is already refuted -- it cost 27 regressions for
+  // 0 fixes -- so what is left has narrower causes and needs the per-character
+  // matrix nobody has recorded. Obsidian's fork escapes `$`, `=` and `%`, which
+  // stock `remark-parse@8` does not, so those three are the ones to watch. An
+  // escaped math opener lives at `probe/math/escaped-dollar` already.
+  ["probe/escape/asterisk", "a \\* b\n"],
+  ["probe/escape/underscore", "a \\_ b\n"],
+  ["probe/escape/bracket", "a \\[ b\n"],
+  ["probe/escape/close-bracket", "a \\] b\n"],
+  ["probe/escape/hash", "a \\# b\n"],
+  ["probe/escape/dollar", "a \\$ b\n"],
+  ["probe/escape/equals", "a \\= b\n"],
+  ["probe/escape/percent", "a \\% b\n"],
+  ["probe/escape/tilde", "a \\~ b\n"],
+  ["probe/escape/pipe", "a \\| b\n"],
+  ["probe/escape/bang", "a \\! b\n"],
+  ["probe/escape/backslash", "a \\\\ b\n"],
+  ["probe/escape/ampersand", "a \\& b\n"],
+  ["probe/escape/letter", "a \\z b\n"],
+  ["probe/escape/wikilink-opener", "\\[[a]]\n"],
+  ["probe/escape/highlight-opener", "\\==mark==\n"],
+  ["probe/escape/comment-opener", "\\%%note%%\n"],
+  ["probe/escape/in-code-span", "`a \\* b`\n"],
+  ["probe/escape/in-table-cell", "| a \\| b |\n| --- |\n"],
+  // An inline construct **straddling** a boundary one of our transforms reparses.
+  //
+  // Shaped this way because the ratio-selected families are spent: five of them came
+  // back essentially perfect, while every family that did yield was about an
+  // interaction rather than a construct -- and twice over it was exactly this one. A
+  // demoted setext heading had to be reparsed *together* or the emphasis was lost;
+  // a callout title had to be reparsed *apart* or the emphasis spanned a boundary
+  // Obsidian stops at. Both were found by accident. Twenty-four passes take a
+  // reparse callback, so there are twenty-four of these boundaries and nothing has
+  // ever aimed at them.
+  //
+  // Emphasis is deliberately absent: it is the one construct already known to
+  // straddle correctly, so these use the four Obsidian-native inline constructs plus
+  // code, which shields its own content and should straddle nothing.
+  // Does a setext underline outrank a container's lazy continuation?
+  //
+  // The corpus holds seven cases on this shape and they contradict every reading
+  // taken from them. `> [!` / `[[a|b]]` / `---` reports blockquote(line 0) and
+  // then heading(lines 1-2), so line 1 is not lazily continued -- while
+  // `> [!no` / `===` reports one blockquote spanning both lines, so there a lazy
+  // line *is* absorbed. The incomplete callout marker looked like the
+  // discriminator and is not: five cases share it and one matches. The third line
+  // is what differs.
+  //
+  // `fuzz/setext/1` then contradicts the obvious replacement rule, because there a
+  // *list* absorbs its lazy line and the `---` becomes a thematic break. So the
+  // container type, or the html block sitting between, matters as well.
+  //
+  // Enumerated rather than inferred: container x how many lazy lines x which line
+  // carries the underline. The `===`/`---` pair is kept because only `---` is also
+  // a thematic break, which is the likeliest source of the asymmetry.
+  // A `$$` opener sitting directly after a container marker.
+  //
+  // `math-unclosed-container.ts` requires the opener to carry a container prefix and
+  // tests that prefix for whitespace and `>` only, so `- $$y` and `1. $$y^2` fall
+  // through it -- their prefix holds a list marker. The sweep reduced four
+  // independent failures onto exactly that, which is the gap the first version of
+  // the rule left open rather than a new construct.
+  ["probe/math-marker/dash-then-opener", "- $$y\n"],
+  ["probe/math-marker/ordered-then-opener", "1. $$y^2\n"],
+  ["probe/math-marker/task-then-opener", "- [ ] $$y^\n"],
+  ["probe/math-marker/callout-title-content", "> [!note] $$y\n"],
+  ["probe/math-marker/dash-then-closed", "- $$y$$\n"],
+  ["probe/math-marker/dash-opener-alone", "- $$\ny\n"],
+
+  // A single `$` and a `$$` run meeting on the same line.
+  //
+  // `$\` \`$`, `$$ $$` and `x^2$` / `y^2$$]]` all reduced out of the sweep. The math
+  // probes cover a lone closer and an unclosed opener; what is unprobed is a line
+  // where both widths appear and the pairing is ambiguous.
+  ["probe/math-widths/code-inside-dollars", "$` `$\n"],
+  ["probe/math-widths/closer-then-double-closer", "x^2$\ny^2$$]]\n"],
+  ["probe/math-widths/triple-then-inline", "$$$], $x^2$\n"],
+  ["probe/math-widths/definition-then-inline", "[^1]:\n$x^2$\n"],
+  ["probe/math-widths/ordered-split-inline", "1. $\ny^2$$!\n"],
+
+  // An escaped bracket in front of a footnote marker, inside another construct.
+  //
+  // Four reduced forms share `\[^1`: `> \[^1`, `[[\[^1]`, `[\[^1]]]` and
+  // `![[\[^1]]]`. The escape rules here are settled at root -- `escape` came back
+  // 19 of 19 -- and `\[` in front of a label inside a wikilink or a quote is not
+  // among them.
+  ["probe/escaped-label/in-quote", "> \\[^1\n"],
+  ["probe/escaped-label/in-wikilink", "[[\\[^1]\n"],
+  ["probe/escaped-label/in-brackets", "[\\[^1]]]\n"],
+  ["probe/escaped-label/in-embed", "![[\\[^1]]]\n"],
+
+  // A whitespace-only line directly after a closed inline construct.
+  //
+  // `probe/space-line/*` settled the shape for a container opener and for prose, all
+  // six matching. The sweep then reduced four more onto a *closed* construct
+  // followed by a space-only line: `~~del~~`, `` `code` ``, `  **\u200b**`, `a#^b`.
+  ["probe/space-after/strike", "~~del~~\n \n"],
+  ["probe/space-after/code", "`code`\n \n"],
+  ["probe/space-after/strong-zwsp", "  **\u200b**\n \n"],
+  ["probe/space-after/tag-block-ref", "a#^b\n   \n"],
+
+  // An inline construct with nothing inside it.
+  //
+  // `- [ ] ~~~~` and `==ma` / whitespace both came out of the sweep, and the empty
+  // `probe/math/inline-empty` is `$ $`, and the `token/*` layer already covers the
+  // bare runs -- `====`, `**`, `****`, `~~ ~~`, `[^]`, `[^ ]` -- so only the shapes
+  // it does not reach are probed here. Writing those again displaced six recorded
+  // ids through dedup without adding coverage, which is the hazard this file warns
+  // about: dedup keeps whichever case comes first, not the designed probe.
+  ["probe/empty-inline/strike-bare", "~~~~\n"],
+  ["probe/empty-inline/strike-in-task", "- [ ] ~~~~\n"],
+  ["probe/empty-inline/code-bare", "``\n"],
+  ["probe/empty-inline/highlight-then-blank", "==ma\n \n"],
+
+  // A line holding nothing but whitespace, where a blank line would end the block.
+  //
+  // `-  ` / ` `, `>  ` / `===` and `  [[` / `   ` all reduced out of the sweep onto
+  // this shape. A space-only line is not blank to CommonMark's tokenizer but renders
+  // as one, and nothing here has ever probed the difference.
+  ["probe/space-line/after-bare-marker", "-  \n \n"],
+  ["probe/space-line/quote-then-underline", ">  \n===\n"],
+  ["probe/space-line/indented-wikilink-open", "  [[\n   \n"],
+  ["probe/space-line/between-paragraphs", "a\n \nb\n"],
+  ["probe/space-line/ends-quote", "> a\n \n> b\n"],
+  ["probe/space-line/in-list", "- a\n \n- b\n"],
+
+  // An unclosed code span, which shields whatever follows it or does not.
+  //
+  // `  \`tar` / `   ` came out of the sweep. `legacyCodeSpans` settles the *retry*
+  // rule for an opener with a closer of the wrong width; an opener with no closer at
+  // all ends up literal, and what happens to the rest of the line is not probed.
+  ["probe/code-unclosed/indented-then-space-line", "  `tar\n   \n"],
+  ["probe/code-unclosed/root-then-text", "`tar\nword\n"],
+  ["probe/code-unclosed/with-construct-after", "`tar [[a]] b\n"],
+  ["probe/code-unclosed/in-quote", "> `tar\n> word\n"],
+
+  // A comment opening inside a nested quote, with an inline construct after it.
+  //
+  // `> > %%` / `em*` reduced out of the sweep. The `%%` rules here are measured at
+  // one quote deep; a second `>` changes which container the lazy line belongs to,
+  // which is exactly the axis `probe/quote-html/*` just found mattered.
+  ["probe/nested-comment/two-deep-then-lazy", "> > %%\nem*\n"],
+
+  // A TAB AFTER A QUOTE MARKER, in a quote that is NOT entirely tab-marked.
+  //
+  // `quote-tab.ts` already read `>⇥anything` as indented code but only rewrote a quote whose
+  // EVERY line was marked that way, because a mixture "would need the lines regrouped into
+  // alternating code and prose". These five controls supply the split instead of guessing it,
+  // and they are what the mixed branch ships on:
+  //
+  //   `alone`       / `spaced`      the two that already agreed, kept as controls
+  //   `after-text`  / `after-tab`   the two that were WRONG: a tab-marked definition defined
+  //   `established` the exception -- an earlier SPACE-separated definition in the same quote
+  //                 fixes its content column, and only then does a tab-marked label define.
+  //                 `after-tab` is why the clause says space-separated: the exception must not
+  //                 chain off a definition that itself never defined.
+  ["probe/quote-tab-def/alone", ">\t[^b]: body\n\nuse[^b]\n"],
+  ["probe/quote-tab-def/spaced", ">   [^b]: body\n\nuse[^b]\n"],
+  ["probe/quote-tab-def/after-text", "> text\n>\n>\t[^b]: body\n\nuse[^b]\n"],
+  [
+    "probe/quote-tab-def/after-tab",
+    ">\t[^b]: body\n>\n>\t[^c]: more\n\nuse[^b] use[^c]\n",
+  ],
+  [
+    "probe/quote-tab-def/established",
+    "> [^a]: It\n>\n>\t[^b]: body\n\nuse[^a] use[^b]\n",
+  ],
+
+  // AN UNCLOSED `%%` OPENED TWO QUOTES DEEP.
+  //
+  // `comment-quote-extent.ts` owns depth one and cannot reach depth two: it requires the
+  // comment not to be the quote's last child, which holds at depth one only because lazy
+  // continuation pulls the root-level line into the quote. These six pin the shipped rule and
+  // its three boundaries.
+  //
+  //   `deep`     the divergence: the definition below is swallowed
+  //   `shallow` / `root`   the two spellings that already worked, as controls
+  //   `closed`   a second `%%` inside the quote, so nothing is swallowed
+  //   `blank`    a blank line ends the quote and the definition survives
+  //   `heading`  an ATX heading at column 0 ends it too, which is the lazy-continuation bound
+  [
+    "probe/quote-comment-deep/deep",
+    "> > %%\n[^note]: Definition\n\nuse[^note]\n",
+  ],
+  [
+    "probe/quote-comment-deep/shallow",
+    "> %%\n[^note]: Definition\n\nuse[^note]\n",
+  ],
+  ["probe/quote-comment-deep/root", "%%\n[^note]: Definition\n\nuse[^note]\n"],
+  [
+    "probe/quote-comment-deep/closed",
+    "> > %%\n> > %%\n[^note]: Definition\n\nuse[^note]\n",
+  ],
+  [
+    "probe/quote-comment-deep/blank",
+    "> > %%\n\n[^note]: Definition\n\nuse[^note]\n",
+  ],
+  [
+    "probe/quote-comment-deep/heading",
+    "> > %%\n## Footnotes\n[^x]: a\n\nuse[^x]\n",
+  ],
+
+  // A SETEXT UNDERLINE UNDER A DEFINITION, where the underline arrives as a LIST.
+  //
+  // `setext-definition.ts` accepted the underline as an absorbed line or a `thematicBreak`,
+  // and a bare `-` is neither: it is a bullet marker to the legacy reader, so remark builds an
+  // empty `list` and the pass declined the shape it exists for. The discriminator is TRAILING
+  // WHITESPACE -- a marker needs a space after it to be a marker.
+  ["probe/def-setext-dash/bare", "[^1]: Definition\n-\n\nuse[^1]\n"],
+  ["probe/def-setext-dash/double", "[^1]: Definition\n--\n\nuse[^1]\n"],
+  ["probe/def-setext-dash/trailing-space", "[^1]: Definition\n- \n\nuse[^1]\n"],
+  [
+    "probe/def-setext-dash/trailing-tab",
+    "[^1]: Definition\n  -\t\n\nuse[^1]\n",
+  ],
+
+  // WHERE INDENTED CODE BEGINS INSIDE A LIST ITEM, which is NOT IMPLEMENTED.
+  //
+  // Seven probes, and the threshold is SIX columns for a space-only run and EIGHT once a tab
+  // leads -- eight being the tab stop plus four. So a leading tab resets the item's content
+  // column to its own tab stop, where a space run leaves the marker's width in place; both
+  // thresholds are then `contentColumn + 4` over two different content columns.
+  //
+  // `tab-three` is the divergence and `tab-tab` is the control that refuted the simpler
+  // readings: it is FEWER characters than `tab-three` and more columns, so a character count
+  // cannot discriminate, and it is `commonmark/tabs/5`'s shape. Two implementations built on
+  // the character count measured -15 and -21 referee documents and broke that case.
+  [
+    "probe/item-tab-threshold/sp-four",
+    "- parent More\n\n    [^3]: It\n\nuse[^3]\n",
+  ],
+  [
+    "probe/item-tab-threshold/sp-five",
+    "- parent More\n\n     [^3]: It\n\nuse[^3]\n",
+  ],
+  [
+    "probe/item-tab-threshold/sp-six",
+    "- parent More\n\n      [^3]: It\n\nuse[^3]\n",
+  ],
+  ["probe/item-tab-threshold/tab", "- parent More\n\n\t[^3]: It\n\nuse[^3]\n"],
+  [
+    "probe/item-tab-threshold/tab-three",
+    "- parent More\n\n\t   [^3]: It\n\nuse[^3]\n",
+  ],
+  [
+    "probe/item-tab-threshold/tab-four",
+    "- parent More\n\n\t    [^3]: It\n\nuse[^3]\n",
+  ],
+  [
+    "probe/item-tab-threshold/tab-tab",
+    "- parent More\n\n\t\t[^3]: It\n\nuse[^3]\n",
+  ],
+  ["probe/nested-comment/two-deep-closed", "> > %%a%%\n"],
+  ["probe/nested-comment/two-deep-then-quoted", "> > %%\n> > a%%\n"],
+  ["probe/nested-comment/one-deep-then-lazy", "> %%\nem*\n"],
+
+  // AN UNCLOSED `%%` WHOSE OPENER IS A LIST ITEM'S OWN CONTENT, with the five-space cap.
+  //
+  // `quote-comment-lazy.ts` ships this rule for a blockquote at depth 2+. The same decision is
+  // open for a list item, and these cases are the minimised forms of 67 referee documents --
+  // reduced against the running app by `referee-shrink --live`, so each one is ground truth
+  // rather than a re-based lead.
+  //
+  // Obsidian reports NO definition and indexes the buried label AS A REFERENCE at its own
+  // position, which is the asymmetry `parseComments` already implements and 710 documents
+  // depend on: `1.⇥%%` / `⟨2sp⟩[^3]: It` gives `defs []` and `refs [["3",1,2],["3",3,3]]`.
+  //
+  // `four-space` and `five-space` are the DISCRIMINATING PAIR and the reason this family is
+  // here rather than implemented from the shorter cases alone. Four spaces past the marker
+  // still leaves the `%%` at the item's content column, where it opens a comment; five puts it
+  // four columns in, where it is INDENTED CODE and opens nothing -- so `five-space` is the one
+  // case in the family Obsidian DEFINES. That is the measured rule "a `%%` indented four
+  // columns is CODE", worth +7 referee documents, reaching a list item.
+  //
+  // SCORED AND NOT IMPLEMENTED. With the cap and a lazy-continuation bound the rule is
+  // `better 9 / worse 0` and moves full agreement by ZERO -- all nine documents still disagree
+  // on something else -- so it is refused on size, not on correctness. The probes carry the
+  // characterisation so the next reader does not re-derive it, which is what this layer is for.
+  ["probe/item-comment/tab", "1.\t%%\n  [^3]: It\n\nuse[^3]\n"],
+  ["probe/item-comment/two-space", "+  %%\n[^note]: It\n\nuse[^note]\n"],
+  ["probe/item-comment/four-space", "+    %%\n[^note]: It\n\nuse[^note]\n"],
+  ["probe/item-comment/five-space", "*     %%\n[^note]: It\n\nuse[^note]\n"],
+  ["probe/item-comment/closed", "+  %%\n[^note]: It\n%%\n\nuse[^note]\n"],
+  ["probe/item-comment/quoted", "> +  %%\n> [^note]: It\n\nuse[^note]\n"],
+
+  // A TAB AFTER A QUOTE MARKER ENDS THE QUOTE, so the next line is a ROOT definition.
+  //
+  // The minimised form of 40 referee documents, and the shortest is eight characters past the
+  // marker. Obsidian DEFINES the root label after a tabbed quote line and we index it as a
+  // reference instead:
+  //
+  //     >⇥It / [^3]: Def        obs defs [["3",1,0]]   ours: a REFERENCE at 1:0
+  //     > It / [^3]: Def        obs defs []            we agree -- lazy continuation
+  //     >⟨2sp⟩It / [^3]: Def    obs defs []            we agree
+  //
+  // The space forms are the controls that make this a rule about the TAB rather than about
+  // quoted definitions: with a space the root line lazily continues the quote's paragraph and
+  // defines nothing, on both sides. `quote-tab.ts` already handles a tab-marked definition
+  // INSIDE a mixed quote, worth +27; this is the other half, where the tab is on the quote's
+  // own content and the definition is at root.
+  ["probe/quote-tab-root-def/tab", ">\tIt\n[^3]: Def\n\nuse[^3]\n"],
+  ["probe/quote-tab-root-def/space", "> It\n[^3]: Def\n\nuse[^3]\n"],
+  ["probe/quote-tab-root-def/two-space", ">  It\n[^3]: Def\n\nuse[^3]\n"],
+
+  // A footnote label that looks like something else.
+  //
+  // `[^ ]`, `[^blk](u)` and `][^[^1]](` all reduced out of the sweep. The label rules
+  // here are extensive, but a label of a single space and a label followed by an
+  // inline-link destination are both unprobed.
+  ["probe/label-shape/space-only-defined", "[^ ]\n\n[^ ]: x\n"],
+  ["probe/label-shape/block-id-then-destination", "[^blk](u)\n"],
+  ["probe/label-shape/doubled-then-destination", "][^[^1]](\n"],
+
+  // An UNCLOSED `$$` carrying content on its own line.
+  //
+  // Math is the most probed construct here -- 22 `probe/math/*` plus a large seed
+  // family -- and every `$$` case in it is **closed**: `tail $$` / `x` / `$$` and
+  // `> $$` / `> x^2` / `> $$`. The sweep's reduced forms are all the other way:
+  // `> $$y^2`, `$ $$_`, `$$$$` / `#`, `^2$$` / `word$x`, `- [ ]` / tab + `$$y`.
+  // Third under-sampled axis found this way, after quote-html and block-id-inline.
+  //
+  // The question is where an unfinished display-math run ends. `math/unclosed-inner`
+  // says a `$` inside an open `$$` is content, and `math/close-on-content-line` says
+  // a closer may share a line with content -- so an opener that never closes has to
+  // either swallow to end of block or not open at all, and no recorded case says
+  // which. The container matters because `mathOutlivesTransform` already exists for
+  // a run that escapes its block.
+  ["probe/math-unclosed/root-same-line", "$$y^2\n"],
+  ["probe/math-unclosed/root-then-text", "$$y^2\nword\n"],
+  ["probe/math-unclosed/quote-same-line", "> $$y^2\n"],
+  ["probe/math-unclosed/callout-title", "> [!note] $$\n"],
+  ["probe/math-unclosed/list-tab", "- [ ]\n\t$$y\n"],
+  ["probe/math-unclosed/definition", "[^1]: $$y^2\n"],
+  ["probe/math-unclosed/inline-display-then-text", "$$y^2$$\nword\n"],
+  ["probe/math-unclosed/lone-closer-then-inline", "x^2$\n$x^2$\n"],
+  ["probe/math-unclosed/closer-then-opener", "^2$$\nword$x\n"],
+  ["probe/math-unclosed/four-dollars-then-heading", "$$$$\n#  \n"],
+  ["probe/math-unclosed/space-then-double", "$ $$_\n"],
+  ["probe/math-unclosed/text-then-empty-inline", ", $ $\n"],
+  ["probe/math-unclosed/double-then-tag", "$$y^2$$\n$#a/b\n"],
+  ["probe/math-unclosed/blank-after-opener", "$$y^2\n\nword\n"],
+
+  // Is a block identifier still one when an inline construct wraps it?
+  //
+  // Nineteen `probe/block-id*` cases settle where an identifier is recognised and
+  // all nineteen match -- but exactly **one** of them puts the `^id` inside an
+  // inline construct, and the sweep reduced five independent failures onto that
+  // shape: `*^blk*`, `> _^blk_`, `> *^blk* `, `lk *^blk*` and `1. ==^blk==`.
+  // Second under-sampled axis found the same way as `probe/quote-html/*`.
+  //
+  // The question is whether the wrapper hides the identifier. A `^id` is recognised
+  // from the raw line, so emphasis around it may be invisible to that scan or may
+  // cancel it -- and the recorded rule that a *trailing space* cancels one says the
+  // scan is strict about what follows, which cuts both ways here.
+  //
+  // Controls included: an identifier outside the construct, and one with content
+  // beside it, both of which the existing probes already fix.
+  ["probe/block-id-inline/emphasis-wraps", "*^blk*\n"],
+  ["probe/block-id-inline/underscore-wraps", "_^blk_\n"],
+  ["probe/block-id-inline/strong-wraps", "**^blk**\n"],
+  ["probe/block-id-inline/highlight-wraps", "==^blk==\n"],
+  ["probe/block-id-inline/strike-wraps", "~~^blk~~\n"],
+  ["probe/block-id-inline/code-wraps", "`^blk`\n"],
+  ["probe/block-id-inline/math-wraps", "$^blk$\n"],
+  ["probe/block-id-inline/text-then-wrapped", "x *^blk*\n"],
+  ["probe/block-id-inline/content-beside-inside", "*x ^blk*\n"],
+  ["probe/block-id-inline/outside-after-emphasis", "*x* ^blk\n"],
+  ["probe/block-id-inline/in-quote", "> *^blk*\n"],
+  ["probe/block-id-inline/in-list", "1. ==^blk==\n"],
+  ["probe/block-id-inline/wrapped-trailing-space", "*^blk* \n"],
+  ["probe/block-id-inline/wrapped-then-block", "*^blk*\nnext\n"],
+
+  // Does a quote absorb raw html at column zero, as a list does?
+  //
+  // `containerLazyTransform` documents the rule for a list and for a paragraph --
+  // `- x` over `</div>` is one list, `para` over `</div>` is a paragraph *and* an
+  // html -- and applies the list half to a blockquote too, because they share one
+  // container set. Nothing ever measured the quote.
+  //
+  // A 1000-seed sweep then reduced **seven independent failures** onto exactly this
+  // shape: `> [!` / `</div>`, `> [[` / `</div>`, `> > #` / `</div>` and four more.
+  // The corpus holds three quote-and-html cases and not one of them is this way
+  // round -- the two that match have the html *first*. That is the under-sampled
+  // family a sweep is for, and the reason to run one even when the backlog looks
+  // fragmented.
+  //
+  // The list and paragraph controls are repeated here deliberately. If the quote
+  // turns out to differ, the asymmetry is the rule, and it would be the third of
+  // its kind after lazy-setext and the empty-item interruption.
+  ["probe/quote-html/quote-close-tag", "> x\n</div>\n"],
+  ["probe/quote-html/quote-open-tag", "> x\n<div>\n"],
+  ["probe/quote-html/quote-blank-then-tag", "> x\n\n</div>\n"],
+  ["probe/quote-html/quote-nested-close-tag", "> > x\n</div>\n"],
+  ["probe/quote-html/callout-close-tag", "> [!note] x\n</div>\n"],
+  ["probe/quote-html/incomplete-callout-close-tag", "> [!\n</div>\n"],
+  ["probe/quote-html/quote-wikilink-close-tag", "> [[a\n</div>\n"],
+  ["probe/quote-html/quote-inline-tag", "> x\n<br>\n"],
+  ["probe/quote-html/quote-tag-then-text", "> x\n</div>\nmore\n"],
+  ["probe/quote-html/list-close-tag", "- x\n</div>\n"],
+  ["probe/quote-html/paragraph-close-tag", "para\n</div>\n"],
+  ["probe/quote-html/list-blank-then-tag", "- x\n\n</div>\n"],
+
+  // Where a wikilink meets inline-link syntax.
+  //
+  // Picked by measurement, not by feel: of the wikilink cases still diverging, `](`
+  // is the commonest thing sitting next to them -- 8 of 21 -- and of the 58 wikilink
+  // probes already here only **5** hold a `](` at all, all of them matching. So the
+  // axis the failures concentrate on is the one nobody aimed at, which is the
+  // coverage-measures-attention trap this file already warns about.
+  //
+  // Both orders matter and are enumerated separately: a wikilink followed by a
+  // destination, and a wikilink *as* a destination. `labelPrecedence` scans raw
+  // balanced brackets while the wikilink tokenizer claims `[[` first, so which one
+  // opens first decides each of these.
+  ["probe/wikilink-link/target-then-destination", "[[a]](u)\n"],
+  ["probe/wikilink-link/embed-then-destination", "![[a]](u)\n"],
+  ["probe/wikilink-link/alias-then-destination", "[[a|b]](u)\n"],
+  ["probe/wikilink-link/fragment-then-destination", "[[a#h]](u)\n"],
+  ["probe/wikilink-link/wikilink-as-destination", "[t]([[a]])\n"],
+  ["probe/wikilink-link/embed-as-destination", "[t](![[a]])\n"],
+  ["probe/wikilink-link/both-wikilinks", "[[a]]([[b]])\n"],
+  ["probe/wikilink-link/inner-link-in-target", "[[a](u)]]\n"],
+  ["probe/wikilink-link/inner-link-in-embed", "![[a](u)]]\n"],
+  ["probe/wikilink-link/triple-open-then-destination", "[[[a]]](u)\n"],
+  ["probe/wikilink-link/early-close-then-destination", "[[a]b]](u)\n"],
+  ["probe/wikilink-link/embed-in-label", "[![[a]]](u)\n"],
+  ["probe/wikilink-link/in-running-text", "x [[a]](u) y\n"],
+  ["probe/wikilink-link/space-before-paren", "[[a]] (u)\n"],
+  ["probe/wikilink-link/block-ref-then-destination", "[[a#^blk]](u)\n"],
+  ["probe/lazy-setext/quote-lazy-dash", "> a\nb\n---\n"],
+  ["probe/lazy-setext/quote-lazy-equals", "> a\nb\n===\n"],
+  ["probe/lazy-setext/quote-underline-is-lazy-dash", "> a\n---\n"],
+  ["probe/lazy-setext/quote-underline-is-lazy-equals", "> a\n===\n"],
+  ["probe/lazy-setext/quote-two-lazy", "> a\nb\nc\n---\n"],
+  ["probe/lazy-setext/quote-blank-then-underline", "> a\n\nb\n---\n"],
+  ["probe/lazy-setext/callout-lazy-dash", "> [!note] a\nb\n---\n"],
+  ["probe/lazy-setext/callout-underline-is-lazy", "> [!note] a\n---\n"],
+  ["probe/lazy-setext/incomplete-callout-lazy", "> [!\nb\n---\n"],
+  ["probe/lazy-setext/list-lazy-dash", "- a\nb\n---\n"],
+  ["probe/lazy-setext/list-lazy-equals", "- a\nb\n===\n"],
+  ["probe/lazy-setext/list-underline-is-lazy", "- a\n---\n"],
+  ["probe/lazy-setext/list-html-then-lazy", "- a\n<br>\nb\n---\n"],
+  ["probe/lazy-setext/quote-html-then-lazy", "> a\n<br>\nb\n---\n"],
+  ["probe/straddle/callout-highlight", "> [!note] ==a\nb==\n"],
+  ["probe/straddle/callout-math", "> [!note] $a\nb$\n"],
+  ["probe/straddle/callout-code", "> [!note] `a\nb`\n"],
+  ["probe/straddle/callout-wikilink", "> [!note] [[a\nb]]\n"],
+  ["probe/straddle/callout-comment", "> [!note] %%a\nb%%\n"],
+  ["probe/straddle/setext-highlight", "==a\nb==\n====\n"],
+  ["probe/straddle/setext-math", "$a\nb$\n====\n"],
+  ["probe/straddle/setext-code", "`a\nb`\n====\n"],
+  ["probe/straddle/setext-wikilink", "[[a\nb]]\n====\n"],
+  ["probe/straddle/setext-comment", "%%a\nb%%\n====\n"],
+  ["probe/straddle/setext-dash-highlight", "==a\nb==\n----\n"],
+  ["probe/straddle/definition-highlight", "[^1]: ==a\nb==\n"],
+  ["probe/straddle/definition-math", "[^1]: $a\nb$\n"],
+  ["probe/straddle/definition-code", "[^1]: `a\nb`\n"],
+  ["probe/straddle/task-highlight", "- [ ] ==a\n  b==\n"],
+  ["probe/straddle/task-math", "- [ ] $a\n  b$\n"],
+  ["probe/straddle/empty-item-highlight", "-\n\n  ==a==\n"],
+  ["probe/straddle/empty-item-math", "-\n\n  $x$\n"],
+  ["probe/straddle/indent-tab-highlight", "  \t==a==\n"],
+  ["probe/straddle/indent-tab-math", "  \t$x$\n"],
+  ["probe/straddle/table-interrupt-highlight", "| a |\n| --- |\n==b\nc==\n"],
+  ["probe/straddle/table-open-highlight", "==a\n| b |\n| --- |\n"],
+  ["probe/straddle/comment-crosses-highlight", "==a %%b== c%%\n"],
+  ["probe/straddle/highlight-crosses-comment", "%%a ==b%% c==\n"],
+  ["probe/straddle/quote-code-highlight", "> ==a\n>     b==\n"],
+  ["probe/straddle/html-setext-highlight", "<br>\n==a==\n===\n"],
+  // A callout whose title line is a block, *with a body under it*. The straddle
+  // probes turned this up sideways: `> [!note] %%a` / `b%%` lost the body entirely,
+  // and the same holds for a heading or a list title. `rest` is taken as
+  // `quote.children.slice(1)` only when the lead text carries the newline, and a
+  // title that parses as a block never gets that far -- so the body is dropped.
+  //
+  // Content loss, and the quoted form is an ordinary thing to write, so what
+  // Obsidian does with each needs recording rather than reasoning about.
+  ["probe/callout-block-body/heading-lazy", "> [!note] # h\nbody\n"],
+  ["probe/callout-block-body/heading-quoted", "> [!note] # h\n> body\n"],
+  ["probe/callout-block-body/list-lazy", "> [!note] - item\nbody\n"],
+  ["probe/callout-block-body/list-quoted", "> [!note] - item\n> body\n"],
+  ["probe/callout-block-body/comment-lazy", "> [!note] %%a\nbody\n"],
+  ["probe/callout-block-body/definition-quoted", "> [!note] [^1]: d\n> body\n"],
+  ["probe/callout-block-body/heading-two-lines", "> [!note] # h\n> a\n> b\n"],
+  ["probe/callout-block-body/heading-blank-body", "> [!note] # h\n>\n> body\n"],
+  // The reparse boundaries the first straddle wave left alone. One probe per pass,
+  // each putting a highlight across the line that pass rewrites, since `==` is the
+  // construct whose content is easiest to read back out of a projection.
+  ["probe/straddle-fold/paragraph-merge", "==a\n  ===\n[^1]: b==\n"],
+  ["probe/straddle-fold/inline-refold", "H\n  ===\n[^1]: ==a==\n"],
+  ["probe/straddle-fold/frontmatter-tail", "---\na: 1\n--- ==b==\n"],
+  ["probe/straddle-fold/frontmatter-tail-span", "---\na: 1\n--- ==b\nc==\n"],
+  ["probe/straddle-fold/definition-label", "[==a==]: /u\n"],
+  ["probe/straddle-fold/definition-title", "[a]: /u ==t==\n"],
+  ["probe/straddle-fold/table-split", "[^1]: ==a\n| b |\n| --- |\nc==\n"],
+  ["probe/straddle-fold/quote-indented-code", "> ==a\n> b\n    c==\n"],
+  ["probe/straddle-fold/html-setext-span", "<br>\n==a\nb==\n===\n"],
+  ["probe/straddle-fold/list-under-definition", "[^1]: ==a\n2. b==\n"],
+  ["probe/straddle-fold/footnote-interrupt", "a==b\n[^1]: c==\n"],
+  ["probe/straddle-fold/comment-in-definition", "[^1]: ==a\n%%\nb==\n"],
+  ["probe/straddle-fold/multiline-setext", "==a\nb==\n===\n[^1]: c\n"],
+  ["probe/straddle-fold/task-reparse", "- [ ] 1. ==a\n  b==\n"],
+  // Two inline constructs whose delimiters **cross**: A opens, B opens, A closes
+  // before B does. Nothing in the corpus is shaped this way on purpose, and it is
+  // the one interaction a context or adjacency case cannot produce -- both of those
+  // nest cleanly by construction. Whichever construct wins the overlap decides what
+  // the other one even sees.
+  ["probe/cross/highlight-math", "==a$b==c$\n"],
+  ["probe/cross/math-highlight", "$a==b$c==\n"],
+  ["probe/cross/highlight-code", "==a`b==c`\n"],
+  ["probe/cross/code-highlight", "`a==b`c==\n"],
+  ["probe/cross/highlight-wikilink", "==a[[b==c]]\n"],
+  ["probe/cross/wikilink-highlight", "[[a==b]]c==\n"],
+  ["probe/cross/highlight-comment", "==a%%b==c%%\n"],
+  ["probe/cross/comment-highlight", "%%a==b%%c==\n"],
+  ["probe/cross/math-wikilink", "$a[[b$c]]\n"],
+  ["probe/cross/strong-highlight", "**a==b**c==\n"],
+  ["probe/cross/highlight-strong", "==a**b==c**\n"],
+  ["probe/cross/tag-highlight", "#a==b==\n"],
+  // Bracket nesting, the family the corpus under-samples worst. A 1000-seed sweep
+  // reduced to 244 distinct causes and **39% of them** have the shape `[`..`[`..`]`..`]`
+  // against the ~24 cases recorded here -- and only 4 of those 244 appear in this
+  // corpus verbatim, so that share is new ground rather than a replay.
+  //
+  // Three questions, deliberately kept apart because each has its own fix and its
+  // own blast radius: what a *footnote* label may hold, what a *link* label may
+  // hold, and where a wikilink's own brackets end. Unbalanced runs are here too,
+  // since 23% of the reduced causes have unequal bracket counts and nothing says
+  // what they should do.
+  //
+  // `[[a](u)](v)` is not repeated: `probe/label-precedence/double-open` has it.
+  ["probe/bracket-nest/fn-wikilink", "use[^[[a]]]\n\n[^[[a]]]: d\n"],
+  ["probe/bracket-nest/fn-embed", "use[^![[a]]]\n\n[^![[a]]]: d\n"],
+  ["probe/bracket-nest/fn-plain-pair", "use[^[a]]\n\n[^[a]]: d\n"],
+  ["probe/bracket-nest/fn-interior-pair", "use[^a[b]c]\n\n[^a[b]c]: d\n"],
+  ["probe/bracket-nest/fn-inline-link", "use[^[a](u)]\n\n[^[a](u)]: d\n"],
+  ["probe/bracket-nest/fn-empty-pair", "use[^[]]\n\n[^[]]: d\n"],
+  ["probe/bracket-nest/fn-alias", "use[^[[a|b]]]\n\n[^[[a|b]]]: d\n"],
+  ["probe/bracket-nest/fn-heading", "use[^[[a#h]]]\n\n[^[[a#h]]]: d\n"],
+  ["probe/bracket-nest/fn-undefined-wikilink", "[^[[a]]]\n"],
+  ["probe/bracket-nest/link-inner-inline", "[a [b](u) c](v)\n"],
+  ["probe/bracket-nest/link-inner-pair", "[a[b]](u)\n"],
+  ["probe/bracket-nest/link-inner-wikilink", "[a[[b]]](u)\n"],
+  ["probe/bracket-nest/link-trailing-pair", "[a](u)](v)\n"],
+  ["probe/bracket-nest/link-inner-reference", "[a [b][r]](u)\n\n[r]: /r\n"],
+  ["probe/bracket-nest/link-outer-reference", "[a [b](u)][r]\n\n[r]: /r\n"],
+  ["probe/bracket-nest/link-triple", "[a [b [c](u) d](v) e](w)\n"],
+  ["probe/bracket-nest/image-inner-inline", "![a [b](u) c](v)\n"],
+  ["probe/bracket-nest/wikilink-inner", "[[a[[b]]]]\n"],
+  ["probe/bracket-nest/wikilink-doubled-open", "[[[[a]]]]\n"],
+  ["probe/bracket-nest/wikilink-extra-close", "[[a]]]]\n"],
+  ["probe/bracket-nest/wikilink-single-inner", "[[a[b]]]\n"],
+  ["probe/bracket-nest/embed-inner-wikilink", "![[a[[b]]]]\n"],
+  ["probe/bracket-nest/wikilink-in-label", "[x [[a]] y](u)\n"],
+  ["probe/bracket-nest/unbalanced-open", "[a\n"],
+  ["probe/bracket-nest/unbalanced-close", "a]\n"],
+  ["probe/bracket-nest/unbalanced-wikilink-open", "[[a\n"],
+  ["probe/bracket-nest/unbalanced-wikilink-close", "a]]\n"],
+  ["probe/bracket-nest/unbalanced-fn-open", "[^[\n"],
+  ["probe/bracket-nest/unbalanced-fn-space", "[^1 1]\n"],
+  ["probe/bracket-nest/unbalanced-three-open", "[[[a\n"],
+  ["probe/bracket-nest/unbalanced-three-close", "a]]]\n"],
+  ["probe/bracket-nest/label-code-closer", "[a`]`b](u)\n"],
+  [
+    "probe/bracket-nest/label-autolink-closer",
+    "[a<https://e.test/?q=]>b](u)\n",
+  ],
+  ["probe/bracket-nest/label-html-closer", '[a<i x="]">b](u)\n'],
+  ["probe/bracket-nest/label-math-closer", "[a$x]y$b](u)\n"],
+  ["probe/bracket-nest/label-comment-closer", "[a%%]%%b](u)\n"],
+  ["probe/bracket-nest/label-escaped-close", "[a\\]b](u)\n"],
+  ["probe/bracket-nest/label-escaped-open", "[a\\[b](u)\n"],
+  // A setext underline under a container. Across two 1000-seed ranges this is the
+  // dominant shape among reduced causes that hold no bracket at all -- 53 of 91 --
+  // and six of the nine harvested clusters carry one. `containerSetextTransform`
+  // was deliberately capped at a two-line paragraph because widening it without
+  // cases would be guessing; these are the cases.
+  ["probe/container-setext/root", "para\n===\n"],
+  ["probe/container-setext/quote-col0", "> para\n===\n"],
+  ["probe/container-setext/quote-quoted", "> para\n> ===\n"],
+  ["probe/container-setext/quote-dash", "> para\n---\n"],
+  ["probe/container-setext/quote-blank-between", "> para\n\n===\n"],
+  ["probe/container-setext/quote-two-lines", "> a\n> b\n===\n"],
+  ["probe/container-setext/list-col0", "- item\n===\n"],
+  ["probe/container-setext/list-indented", "- item\n  ===\n"],
+  ["probe/container-setext/list-dash", "- item\n---\n"],
+  ["probe/container-setext/list-two-items", "- a\n- b\n===\n"],
+  ["probe/container-setext/ordered", "1. item\n===\n"],
+  ["probe/container-setext/task", "- [ ] task\n===\n"],
+  ["probe/container-setext/list-html", "- <br>\n===\n"],
+  ["probe/container-setext/ordered-html", "1. <br>\n===\n"],
+  ["probe/container-setext/quote-math", "> $x$\n===\n"],
+  ["probe/container-setext/list-highlight", "- ==mark==\n===\n"],
+  ["probe/container-setext/callout-title", "> [!note] t\n===\n"],
+  ["probe/container-setext/then-more", "- item\n===\nmore\n"],
+  ["probe/container-setext/nested-quote", "> > para\n===\n"],
+  // What a block identifier on its own line attaches to. `^blk` alone is reported as
+  // no section at all, but `^blk` over `</div>` is reported as a paragraph and a
+  // leading space keeps it prose -- three answers with no rule between them, and
+  // `stripBlockIds` currently drops the paragraph in all three.
+  // Does a caret inside a bracket pair that becomes a LINK free the caret for a block
+  // identifier? `[^1](u)` registers `1` and `![^1](url)` over `[^1]: one` registers
+  // nothing, and those two differ in TWO ways at once -- link versus image, and whether a
+  // definition exists. These separate the pair.
+  // WHICH top-level node types end a section at their last content character, and which
+  // at the next line's column 0? Four clamp variants are refuted, so the discriminator is
+  // neither position nor node type as guessed -- `- ~~x` ends at content while `$$y` ends
+  // at 1:0, and these pin the rest of the type table.
+  ["probe/section-type/paragraph", "para\n"],
+  ["probe/section-type/heading-atx", "# H\n"],
+  ["probe/section-type/quote", "> q\n"],
+  ["probe/section-type/indented", "    code\n"],
+  ["probe/section-type/two-paras", "para\n\nsecond\n"],
+  ["probe/section-type/root-strike", "~~x\n"],
+  ["probe/section-type/root-comment", "%%c\n"],
+  // A nested item's start column against its parent's content column. 37 of 44 nested
+  // entries report the parent's content column; these vary the indent independently of
+  // the exceptions already known (same line, tabs).
+  ["probe/nested-start/three-space", "- a\n   - b\n"],
+  ["probe/nested-start/five-space", "- a\n     - b\n"],
+  ["probe/nested-start/wide-sep", "1.  a\n    - b\n"],
+  ["probe/nested-start/in-quote", "> - a\n>    - b\n"],
+  // A definition's start column diverges in BOTH directions -- `>  [^1]:` is 0:2 against
+  // our 0:3 while `1. item` over `    [^1]:` is 2:4 against our 2:3 -- so it is at least
+  // two rules and the container's prefix width is the obvious axis to vary.
+  ["probe/def-column/quote-three", ">   [^1]: def\n"],
+  ["probe/def-column/ordered-three", "1. item\n\n   [^1]: x\n"],
+  ["probe/def-column/bullet-two", "- item\n\n  [^1]: x\n"],
+  // Does a definition's reported column CAP at 4? The referee's 91 spaces-only rows say
+  // indent 4, 5, 6 and 7 all report column 4, which reads as `min(indent, 4)` rather than
+  // the bracket -- and 4 is where indented code starts, so these can only be inside an
+  // item. Varying the indent against one fixed host is what separates a cap from a
+  // coincidence.
+  ["probe/def-cap/bullet-four", "- item\n\n    [^1]: x\n"],
+  ["probe/def-cap/bullet-five", "- item\n\n     [^1]: x\n"],
+  ["probe/def-cap/bullet-six", "- item\n\n      [^1]: x\n"],
+  ["probe/def-cap/bullet-seven", "- item\n\n       [^1]: x\n"],
+  ["probe/def-cap/ordered-four", "1. item\n\n    [^1]: x\n"],
+  // B3, their rules document: an item's content column is the SMALLEST indentation among its
+  // own lines, counting only the INDENTED ones. `definition-column.ts` implements it and this
+  // corpus held ZERO cases for it -- which is the whole reason the rule had to be gated by a
+  // separate golden before it could be landed at all.
+  //
+  // The question each group settles:
+  //
+  //   `lazy`     a column-0 continuation is EXCLUDED from the minimum, so the column stays at
+  //              the marker's width. This half was always right and no case covered it.
+  //   `indented` a continuation below the marker's width pulls the column DOWN to it. This is
+  //              the half that was wrong, across four marker shapes -- bullet, wide bullet,
+  //              ordered and task -- because a rule confirmed on one marker is confirmed on
+  //              that marker's accidents.
+  //   `code`     the SAME minimum moves where indented code begins, so the definition stops
+  //              existing. This half is NOT implemented: the four `-code` cases are the
+  //              referee's own `probe:k-*` documents, which it answers `defs: []` for, and
+  //              they are here so the main gate can adjudicate a fix instead of only the
+  //              referee's four.
+  //   `quote`    the minimum is taken after the container's prefix and made absolute again.
+  //              Also not implemented -- attempted and reverted at -2 referee documents.
+  ["probe/def-deindent/lazy-zero", "- a\nlazy\n\n    [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-deindent/lazy-two", "- a\n  b\n\n    [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-deindent/no-continuation", "- a\n\n    [^1]: def\n\nuse[^1]\n"],
+  [
+    "probe/def-deindent/indented-one",
+    "- a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/indented-wide-marker",
+    "-   a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/indented-ordered",
+    "1. a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/indented-task",
+    "- [ ] a\n lazy\n\n    [^1]: def\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/code-lazy-deep",
+    "- a\nlazy\n\n        [^1]: def\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/code-task-six",
+    "- [ ] a\n\n      [^1]: def\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/code-bullet-one-five",
+    "- a\n b\n\n     [^1]: x\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/code-wide-one-five",
+    "-   a\n b\n\n     [^1]: x\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/code-wide-two-six",
+    "-   a\n  b\n\n      [^1]: x\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/code-ordered-one-six",
+    "1. a\n b\n\n      [^1]: x\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-deindent/quote-indented-one",
+    "> - a\n>  lazy\n>\n>     [^1]: def\n\nuse[^1]\n",
+  ],
+  // The definition content-column rule, on the shapes the REFEREE surfaced and cannot
+  // adjudicate -- it stores no structure, so the host item's content column has to be
+  // recovered from text and that is wrong too often to tabulate. These are the same
+  // documents reduced to one host and one definition, where the host is unambiguous.
+  //
+  // `- p` / blank / `   [^1]: def` is the one to watch: content column 2, indent 3, so a
+  // gap of ONE, and the referee says Obsidian reports 2. The gap-2 rule measured from
+  // `probe/def-cap/*` says the bracket. If both hold, the marker's width is in the rule.
+  ["probe/def-gap/bullet-three", "- p\n\n   [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-gap/bullet-tab-space", "- p\n\n\t [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-gap/bullet-tab-two", "-\tp\n\n\t  [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-gap/marker-tab-sep", "- \tp\n\n  [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-gap/ordered-three", "1. p\n\n   [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-gap/ordered-five", "1. p\n\n     [^1]: def\n\nuse[^1]\n"],
+  // Pinning the host's CONTENT COLUMN, which the six probes above imply is not what we
+  // compute. They fit `obs = contentColumn when the indent reaches it, else the bracket`
+  // only if `- ` is 2 and `1. ` is FOUR -- the recorded `1.  foo` ordered-marker quirk.
+  // These vary the marker's width independently of the indent to settle it.
+  ["probe/def-cc/two-digit-four", "12. p\n\n    [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-cc/two-digit-five", "12. p\n\n     [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-cc/two-digit-six", "12. p\n\n      [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-cc/bullet-wide-sep", "-   p\n\n     [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-cc/bullet-two-sep", "*  p\n\n    [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-cc/paren-marker", "1) p\n\n    [^1]: def\n\nuse[^1]\n"],
+
+  // What ENDS a definition, on the one family the referee cannot settle. Its largest
+  // remaining span disagreement is 91 rows where we absorb one line too many, and the
+  // line is a quote -- but a truncation rule scores better 91 / WORSE 395, because a
+  // definition absorbs a quote line far more often than not. The referee's documents are
+  // too dense to say what separates the two, so these vary the quote line's indent, the
+  // blank before it, and the definition's own host, one axis at a time.
+  ["probe/def-end/quote-plain", "[^1]: def\n> quote\n\nuse[^1]\n"],
+  ["probe/def-end/quote-indented", "[^1]: def\n  > quote\n\nuse[^1]\n"],
+  ["probe/def-end/quote-blank-before", "[^1]: def\n\n> quote\n\nuse[^1]\n"],
+  [
+    "probe/def-end/quote-after-body",
+    "[^1]: def\n    more\n> quote\n\nuse[^1]\n",
+  ],
+  [
+    "probe/def-end/quote-nested-host",
+    "- a\n\n  [^1]: def\n> quote\n\nuse[^1]\n",
+  ],
+  ["probe/def-end/quote-deeper", "[^1]: def\n>> quote\n\nuse[^1]\n"],
+
+  // The definition START COLUMN inside a host, which is the bucket the referee reports
+  // 102 documents for and provably cannot adjudicate: the same four-space prefix carries
+  // ours=2/obs=4 fourteen times and ours=4/obs=2 eleven times, so the host decides and
+  // the referee stores no structure. `probe/def-cap/*` and `probe/def-cc/*` settled the
+  // bullet and ordered hosts; these are the hosts they did not cover.
+  ["probe/def-host/quote", "> a\n\n    [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-host/nested-bullet", "- a\n  - b\n\n    [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-host/list-in-quote", "> - a\n\n    [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-host/callout", "> [!note] a\n\n    [^1]: def\n\nuse[^1]\n"],
+
+  // C3 from the sibling project's rules: in a PIPELESS table a label line holding a pipe
+  // is a ROW, not a definition. Seven referee shapes agree and four are ours to fix, but
+  // closing it needs manual table-row construction, so the rule is worth pinning on
+  // isolated cases first.
+  //
+  // The no-pipe CONTROL is already recorded as `hunt/label-after-pipeless-table/0` and
+  // already matches -- `a | b` / `--- | ---` / `[^1]: x` defines at 2:0-2:7 -- so adding a
+  // probe for it would only displace a triaged case and its note. The pipe is the axis.
+  ["probe/table-label/pipeless", "a | b\n--- | ---\n[^1]: x | y\n\nuse[^1]\n"],
+  [
+    "probe/table-label/piped",
+    "| a | b |\n| --- | --- |\n[^1]: x | y\n\nuse[^1]\n",
+  ],
+  [
+    "probe/table-label/pipeless-blank",
+    "a | b\n--- | ---\n\n[^1]: x | y\n\nuse[^1]\n",
+  ],
+  // Does a TAB count as one column or as four for the indented-code threshold? micromark
+  // follows CommonMark and advances to the next multiple of four, so `\t[^1]: def` is
+  // indented code and yields no definition here. The referee says Obsidian defines 127
+  // definitions on tab-prefixed lines that we do not, and separately that `>⇥code[^2]`
+  // keeps its reference while `>     code[^2]` does not -- both of which only hold if a
+  // tab is ONE column.
+  //
+  // Its own `listItems` rule already says so: `⇥ - baz` reports column 1, not 4. These
+  // isolate the same question for a definition, where the referee's documents are too
+  // dense to answer it (17%, 22% and 10% missed across the three tab positions).
+  ["probe/def-tab/root-one", "\t[^1]: def\n\nuse[^1]\n"],
+  ["probe/def-tab/root-two", "\t\t[^1]: def\n\nuse[^1]\n"],
+  ["probe/def-tab/spaces-then-tab", "  \t[^1]: def\n\nuse[^1]\n"],
+  ["probe/def-tab/quote-spaces-tab", ">   \t[^1]: def\n\nuse[^1]\n"],
+  ["probe/def-tab/marker-tab-spaces", "+\t   [^1]: def\n\nuse[^1]\n"],
+  ["probe/def-tab/four-spaces", "    [^1]: def\n\nuse[^1]\n"],
+  // A tab-indented nested item's start column. `- [ ] parent` over `\t- [ ] child` reports
+  // 1:1 -- the marker's own index -- while ` - foo` / `   - bar` / `\t - baz` reports 2:1,
+  // which is NOT the marker. Separate the tab from the checkbox and from the straddle.
+  ["probe/tab-nest/bullet-tab", "- parent\n\t- child\n"],
+  ["probe/tab-nest/two-tabs", "- a\n\t\t- b\n"],
+  ["probe/tab-nest/tab-then-space", "- a\n\t - b\n"],
+  // A quote-nested item's indent. `> - a` over `>    - b` reports 1:4, and the 3-space
+  // spelling is already `probe/list-item/in-quote` reporting 1:4 as well -- so the parent's
+  // content column (`> - ` is 4) explains both, and a dedup check is what surfaced that.
+  // Only the 2-space spelling is still unprobed.
+  ["probe/quote-nest/two-space", "> - a\n>  - b\n"],
+  // `* foo` / `  * bar` / blank / `  baz` reports `bar` at `parent:-1`, i.e. NOT nested,
+  // which no rule here predicts. Does the trailing indented paragraph cause it?
+  //
+  // ANSWERED, and `probe/nest-trail/*` settled the axis: the trailing block's INDENT
+  // decides it, not its kind. Paragraph, heading, quote and fence all un-nest at indent 2
+  // while a paragraph at indent 4 stays nested, because at 4 it is a child of `- b` and at
+  // 2 it is a sibling of the nested list. Implemented.
+  ["probe/nest-parent/blank-then-indented", "- a\n  - b\n\n  c\n"],
+  ["probe/nest-parent/blank-then-root", "- a\n  - b\n\nc\n"],
+  // Varying the trailing block's KIND and INDENT against one fixed nested list, which is
+  // the axis all three refuted predicates were blind to.
+  ["probe/nest-trail/para-four", "- a\n  - b\n\n    c\n"],
+  ["probe/nest-trail/heading", "- a\n  - b\n\n  # c\n"],
+  ["probe/nest-trail/quote", "- a\n  - b\n\n  > c\n"],
+  ["probe/nest-trail/fence", "- a\n  - b\n\n  ```\n  c\n  ```\n"],
+  ["probe/nest-trail/no-blank", "- a\n  - b\n  c\n"],
+  ["probe/nest-trail/blank-before-nest", "- a\n\n  - b\n\n  c\n"],
+  // Where an item ENDS when a delimited construct inside it never closes. The corpus has
+  // this in both directions -- `- ```` / `  code` / `- item` ends at 1:11 where we run to
+  // 3:0, while `- - ```` / `    fake` / `    ```` / `after` ends at 3:9 where we stop at
+  // 2:7 -- so the sibling's presence and the construct's closure are the axes.
+  ["probe/item-end/fence-unclosed-alone", "- ```\n  code\n"],
+  ["probe/item-end/fence-closed-sibling", "- ```\n  code\n  ```\n- item\n"],
+  ["probe/item-end/math-unclosed-sibling", "- $$\n  x\n- item\n"],
+  ["probe/item-end/loose-then-sibling", "- a\n\n  b\n\n- c\n"],
+  // Which block does an identifier inside a nested container name? Measured: 64 of 68
+  // golden entries name a ROOT-level child and NONE names an inner node -- but
+  // `block-ref/on-list-item` reports `nested-id@1:2-2:16`, which is the nested item at the
+  // column `listItems` projects for it rather than the column its tree node carries. So
+  // either it is an outlier or the root-level rule has a nested-container exception, and
+  // one case cannot say which.
+  ["probe/block-nest/own-line", "- a\n  - b\n    ^id\n"],
+  ["probe/block-nest/trailing", "- a\n  - b ^id\n"],
+  ["probe/block-nest/outer-own-line", "- a\n\n  ^id\n"],
+  ["probe/block-nest/in-quote", "> - a\n> - b ^id\n"],
+  // A definition freed by a comment CLOSER on its own line takes the column one past that
+  // closer (`> %% [^1]: freed` is 4:4), where a container prefix gives the content column.
+  // Both on one line, so the two candidate columns differ.
+  ["probe/def-after-comment/root-one-line", "%% h %% [^1]: x\n"],
+  ["probe/def-after-comment/quote-one-line", "> %% h %% [^1]: x\n"],
+  ["probe/caret-link/image-no-def", "![^1](url)\n"],
+  ["probe/caret-link/link-with-def", "[^1](u)\n\n[^1]: one\n"],
+  ["probe/caret-link/link-angle-dest", "[^1](<u>)\n"],
+  // Same-line list nesting is reported two ways and our tree cannot tell them apart:
+  // `- [ ] 1.` reports `parent:0` and `*\t*\t*` reports `parent:-1` for structurally
+  // identical nesting. Is the checkbox the discriminator, or the tab?
+  ["probe/same-line-nest/plain-dash", "- x - y\n"],
+  ["probe/same-line-nest/task-checked", "- [x] 1.\n"],
+  ["probe/same-line-nest/two-stars-tab", "*\t*\n"],
+  ["probe/same-line-nest/ordered-task", "1. [ ] 2.\n"],
+  // What makes a top-level section end at its last content character rather than at the
+  // next line's column 0? Four clamp variants have been refuted, so the discriminator is
+  // neither position nor node type.
+  ["probe/section-end/unclosed-strike", "- ~~x\n"],
+  ["probe/section-end/root-unclosed", "$$y\n"],
+  ["probe/section-end/item-then-text", "- a\nb\n"],
+  // Is `frontmatterPosition` really about the YAML parsing, or about what FOLLOWS the
+  // closing fence? The reported case ends `---` / `body` and the unreported one ends
+  // `---` / '' / `Body`, so the blank line is an untested alternative to YAML validity.
+  [
+    "probe/frontmatter-report/bad-no-blank",
+    '---\ntitle: "unterminated\n---\nbody\n',
+  ],
+  ["probe/frontmatter-report/good-blank", "---\na: b\n---\n\nbody\n"],
+  ["probe/frontmatter-report/scalar-no-blank", "---\nTitle\n---\nbody\n"],
+  ["probe/frontmatter-report/empty-no-blank", "---\n---\nbody\n"],
+  ["probe/frontmatter-report/quote-blank", "---\nx: '1''\n---\n\nbody\n"],
+  ["probe/block-id-extent/alone-then-html", "^blk\n</div>\n"],
+  ["probe/block-id-extent/alone-then-para", "^blk\npara\n"],
+  ["probe/block-id-extent/alone-blank-para", "^blk\n\npara\n"],
+  ["probe/block-id-extent/after-para", "para\n^blk\n"],
+  ["probe/block-id-extent/after-blank", "para\n\n^blk\n"],
+  ["probe/block-id-extent/two-ids", "^blk ^blk2\n"],
+  ["probe/block-id-extent/inline-trailing", "para ^blk\n"],
+  ["probe/block-id-extent/alone-then-list", "^blk\n- item\n"],
+  // A sweep at seeds 700000..700999 left 131 causes and no shape held two of them,
+  // so these are chosen for being *short* rather than for being frequent. Length is
+  // the only attributability signal left after the counting selectors ran out: a
+  // seven-character document can only be wrong about one thing.
+
+  // An embed whose target is a bare fragment.
+  //
+  // ` ![[#t` reduced out of the sweep. The wikilink probes cover a fragment after a
+  // path and an empty fragment, but never a target that is *only* a fragment, which
+  // is the form Obsidian resolves against the current file.
+  ["probe/embed-fragment/unclosed-leading-space", " ![[#t\n"],
+  ["probe/embed-fragment/closed", "![[#t]]\n"],
+  ["probe/embed-fragment/link-not-embed", "[[#t]]\n"],
+
+  // A block identifier inside a *strong* wrapper, and with punctuation after it.
+  //
+  // `*^blk*` and `==^blk==` are probed and fixed; `**^blk**.` reduced out of the
+  // sweep anyway. Two candidate gaps: the two-character marker, and a trailing
+  // period, which the single-marker probes never carried.
+  ["probe/block-id-wrapper/strong-trailing-period", "**^blk**.\n"],
+  ["probe/block-id-wrapper/em-trailing-period", "*^blk*.\n"],
+  ["probe/block-id-wrapper/nested-trailing-period", "_*^blk*_.\n"],
+
+  // Display math whose content is a single space.
+  //
+  // `  $$ $$.` reduced out of the sweep. The math probes cover an empty body and an
+  // unclosed opener, never a body that is whitespace -- which decides whether the
+  // run is one span or two markers.
+  // `$$ $$` bare is deliberately absent: the TOKENS cross-product already emits it as
+  // `token/display-math/whitespace-body`, and a probe here wins the dedup and displaces
+  // that id. The collision runs the opposite way to the one the checks were built for.
+  ["probe/math-space/space-body-trailing-period", "  $$ $$.\n"],
+
+  // A nested tag ended by punctuation rather than whitespace.
+  //
+  // `-  #a/b,` reduced out of the sweep. Whether the comma ends the tag decides
+  // whether the tag is `a/b` or `a/b,`, and the tag probes all end at a space.
+  ["probe/tag-boundary/nested-then-comma", "- #a/b,\n"],
+  ["probe/tag-boundary/nested-then-period", "- #a/b.\n"],
+
+  // A bare `[^1]:` over a whitespace-only line, and a reference over an escaped label.
+  //
+  // `[^1]:` absorbing nothing is fixed and probed over a *paragraph*; what the sweep
+  // reduced to is the same opener over a line that is only spaces, plus a reference
+  // whose following label carries an escaped bracket.
+  ["probe/footnote-bare/colon-then-blank-run", "[^1]:\n      \n"],
+  ["probe/footnote-bare/ref-then-escaped-label", "[^1]\n  [^1\\]\n"],
+
+  // Display math inside emphasis, spanning a line ending.
+  //
+  // `_$$y^2` / `y^2$$_` reduced out of the sweep. The inline-opener rule now allows a
+  // line ending, and this is that rule meeting an emphasis wrapper that must close on
+  // the second line.
+  ["probe/math-emphasis/display-across-lines", "_$$y^2\ny^2$$_\n"],
+
+  // A callout title holding a block identifier, and holding an inline footnote.
+  //
+  // `> [!note] ^blk` and `> [!note] ^[]` both reduced out of the sweep. A block id
+  // survives an inline wrapper and a title is not a heading, but a title is also the
+  // one line where a trailing `^id` has two readings.
+  ["probe/callout-title-caret/block-id", "> [!note] ^blk\n"],
+  ["probe/callout-title-caret/empty-inline-footnote", "> [!note] ^[]\n"],
+
+  // A comment as the whole content of an ordered item, under a setext underline.
+  //
+  // `1. %%note` / `===` reduced out of the sweep. `%%` hides at render time, so the
+  // question is whether the hidden line still counts as paragraph content for the
+  // underline to attach to.
+  ["probe/comment-setext/ordered-comment-then-equals", "1. %%note\n===\n"],
+
+  // A semicolon-less entity as the whole content of an ordered item.
+  //
+  // `---` / `1. &` reduced out of the sweep. The legacy entity construct resolves a
+  // bare reference, and a lone `&` resolves to nothing -- this checks it stays
+  // literal rather than consuming the line ending.
+  ["probe/entity-bare/lone-ampersand-in-item", "---\n1. &\n"],
+  // Sweep 800000 left 131 causes; these are again the shortest of them.
+
+  // A tag inside a *link label*, which is the shape the corpus never held.
+  //
+  // Six of the thirty shortest causes are this, and it matters more than its share:
+  // `tag.ts` was just taught that a label opener is not the end of a construct, so a
+  // tag no longer starts inside an unclosed `![[`. Every recorded `[#...` case is a
+  // `[[#heading]]` wikilink, so that change measured zero regressions against a corpus
+  // with no bare `[#tag](u)` in it at all. These decide whether the rule is right or
+  // merely unrefuted -- if Obsidian tags these, it is too broad and wants narrowing to
+  // an opener that never closes.
+  ["probe/tag-in-label/heading-full-link", "# [#tag](u)\n"],
+  ["probe/tag-in-label/quote-full-link", "> [#tag](u) \n"],
+  ["probe/tag-in-label/item-unclosed-destination", "- [#a/b](u\n"],
+  ["probe/tag-in-label/bare-label", "[#tag]\n"],
+  ["probe/tag-in-label/extra-closer", "[#a/b]] \\\n"],
+  ["probe/tag-in-label/nested-in-destination", "|100]([#a/b](u)\n"],
+
+  // A footnote label that is a single space.
+  //
+  // A whitespace-only label defines nothing, which is settled and probed for the
+  // *definition*. `[^ ]` as a bare reference reduced out of the sweep twice, once
+  // alone and once as an item's content, and a reference is the other half of that
+  // rule.
+  // The bare `[^ ]` is deliberately absent: the TOKENS cross-product already emits it
+  // as `token/footnote-ref/whitespace-body`, and a probe declared here wins the dedup
+  // and displaces that id. Second instance of that collision, same direction.
+  ["probe/footnote-space-label/item-then-bang", "- [^ ]!\n"],
+
+  // Indented display math, and what follows it on the next indented line.
+  //
+  // `  $$y^2$$` over `  [[` and over `  ![` both reduced out, as did ` $$ $$` alone.
+  // The math-marker probes cover a container prefix; two spaces is not a container, so
+  // whether the second line continues the paragraph is unprobed.
+  ["probe/math-indent/two-space-then-wikilink", "  $$y^2$$\n  [[\n"],
+  ["probe/math-indent/two-space-then-embed", "  $$y^2$$\n  ![\n"],
+  ["probe/math-indent/one-space-empty-body", " $$ $$\n"],
+
+  // A setext underline under a container whose content is hidden or empty.
+  //
+  // `- %%` / `===` and `>  ` / `===` both reduced out. The lazy-setext rules are
+  // measured for prose content; a hidden `%%` line and a blank quote line are the two
+  // cases where there may be nothing for the underline to attach to.
+  ["probe/setext-empty-host/item-comment", "- %%\n===\n"],
+  ["probe/setext-empty-host/quote-blank", ">  \n===\n"],
+
+  // An inline footnote inside a highlight inside a heading.
+  //
+  // `# ==^[inline]==` reduced out. Each pair is probed alone; the question is whether
+  // the heading's own trailing-marker handling survives two nested inline wrappers.
+  ["probe/heading-highlight-footnote/inline-note", "# ==^[inline]==\n"],
+
+  // A tag followed by an escape, and a code span followed by a whitespace-only line.
+  //
+  // `#a/b \ ` / ` ` and `` `code` `` / ` ` both reduced out, and both are a construct
+  // meeting the trailing-whitespace-line shape that a footnote definition was just
+  // taught to absorb. Whether anything else absorbs one is unmeasured.
+  ["probe/trailing-blank-line/tag-then-escape", "#a/b \\ \n \n"],
+  ["probe/trailing-blank-line/code-span", "`code`\n \n"],
+  // Boundaries left unmeasured by tonight's fixes, each one a rule that was widened
+  // only as far as its evidence went.
+
+  // A block identifier in a wrapper, with a *word* after it rather than punctuation.
+  //
+  // `*^blk*.` registers and is fixed; the tail test deliberately refuses anything
+  // holding a word character, so `*^blk* word` is the untested side of that line.
+  ["probe/block-id-tail/wrapper-then-word", "*^blk* word\n"],
+  ["probe/block-id-tail/wrapper-then-comma-word", "*^blk*, word\n"],
+
+  // A tag after a single `![` opener.
+  //
+  // `[#tag](u)` tags and `![[#t` does not, and the rule separating them counts label
+  // opener *groups*. `![#tag](u)` closes exactly one group, so the rule allows a tag
+  // here -- by construction rather than by measurement.
+  ["probe/tag-in-label/image-opener", "![#tag](u)\n"],
+
+  // An inline math closer with whitespace before it.
+  //
+  // `^2$. $` renders literally in Obsidian while we read `. ` as math, so a closer
+  // preceded by whitespace may be refused the way a highlight's content is. Probed
+  // either side of the boundary.
+  ["probe/math-closer-space/space-before-closer", "$. $\n"],
+  ["probe/math-closer-space/no-space-before-closer", "$.$\n"],
+  ["probe/math-closer-space/space-after-opener", "$ .$\n"],
+  // THE TWO EXTERNAL-LIST GAPS NO PROJECTION CAN REACH, which is the whole reason these are
+  // recorded cases rather than probes. Item 20: an image alt is an ATTRIBUTE, so `textContent`
+  // reports the src (`x.svg`) and says nothing about whether the alt keeps raw markup. Item 24:
+  // loose and tight differ only in `<p>` wrappers, and `textContent` flattens both to the same
+  // string -- the explicitly loose control below reports `"a b"` exactly as the tight form does.
+  // Settling either needs the recorder's stored `html`.
+  ["probe/external-gap/image-alt-markup", "![foo *bar* `baz`](x.svg)\n"],
+  ["probe/external-gap/loose-nested-blank", "- a\n  - b\n\n  - c\n"],
+  ["probe/external-gap/loose-explicit", "- a\n\n- b\n"],
+  ["probe/external-gap/loose-fence-in-item", "- a\n  ```\n\n  ```\n- b\n"],
+  // 27a, settled against the live oracle and ungated until now. Obsidian drops the SCHEME from
+  // the rendered text in BOTH spellings -- `FOO@BAR.BAZ` and `foo@bar.baz` -- so the divergence
+  // is that our text keeps it, and it is not uppercase-specific as the summary implied.
+  ["probe/external-gap/autolink-lower-scheme", "<mailto:foo@bar.baz>\n"],
+  // 18a: a padded label WITH a matching definition stays literal text. The definition is what
+  // makes the case -- `[ x ]` appears in 132 corpus documents and none produces a padded
+  // `linkReference`, because the padding only survives when a definition matches.
+  ["probe/external-gap/padded-label-defined", "[ a ]\n\n[a]: /url\n"],
+  // D2, whose structural half the live oracle settled: `--- ` is a thematic break then a setext
+  // H2 whose text carries a LIVE reference, `---⇥` is not even a thematic break so lines 0-1
+  // become one paragraph, and only an EXACT `---` opens frontmatter. We answer `yaml` to all
+  // three. The exact form is last so the three read together as the boundary.
+  ["probe/external-gap/fm-space-opener", "--- \ntitle: x[^1]\n---\n"],
+  ["probe/external-gap/fm-tab-opener", "---\t\ntitle: x[^1]\n---\n"],
+  ["probe/external-gap/fm-exact-control", "---\ntitle: x[^1]\n---\n"],
+];
+
+/** Inline tokens, each crossed with a set of malformed delimiter states. */
+const TOKENS: ReadonlyArray<{
+  readonly name: string;
+  readonly open: string;
+  readonly close: string;
+  readonly body: string;
+}> = [
+  { name: "wikilink", open: "[[", close: "]]", body: "target" },
+  { name: "embed", open: "![[", close: "]]", body: "target" },
+  { name: "highlight", open: "==", close: "==", body: "text" },
+  { name: "comment", open: "%%", close: "%%", body: "text" },
+  { name: "inline-math", open: "$", close: "$", body: "x^2" },
+  { name: "display-math", open: "$$", close: "$$", body: "x^2" },
+  // Included so emphasis also gets the context and adjacency layers: which
+  // containers shield it, and which trailing character lets its closer pair.
+  { name: "emphasis", open: "*", close: "*", body: "text" },
+  { name: "strong", open: "**", close: "**", body: "text" },
+  { name: "underscore-emphasis", open: "_", close: "_", body: "text" },
+  { name: "inline-footnote", open: "^[", close: "]", body: "note" },
+  // GFM's delimiter, included because Obsidian's tokenizer is a fork of
+  // remark-parse 8 rather than micromark and need not agree about it.
+  { name: "strikethrough", open: "~~", close: "~~", body: "text" },
+  // The two wikilink forms that carry a second field. `|` collides with a
+  // table cell and `#` with a heading and a tag, so both need the context
+  // and adjacency layers rather than a single balanced case.
+  { name: "wikilink-alias", open: "[[", close: "]]", body: "target|alias" },
+  { name: "wikilink-heading", open: "[[", close: "]]", body: "target#head" },
+  // No definition anywhere, so every state here is the bare-reference path.
+  { name: "footnote-ref", open: "[^", close: "]", body: "1" },
+];
+
+function tokenStates(
+  t: (typeof TOKENS)[number],
+): ReadonlyArray<readonly [string, string]> {
+  const { open, close, body } = t;
+  return [
+    ["balanced", `${open}${body}${close}`],
+    ["no-closer", `${open}${body}`],
+    ["no-opener", `${body}${close}`],
+    ["doubled-open", `${open}${open}${body}${close}`],
+    ["doubled-close", `${open}${body}${close}${close}`],
+    ["empty", `${open}${close}`],
+    ["whitespace-body", `${open} ${close}`],
+    ["nested", `${open}${open}${body}${close}${close}`],
+    ["escaped-open", `\\${open}${body}${close}`],
+    // A half-escaped closer leaves one unescaped delimiter char, which flips
+    // Obsidian's inline-vs-display decision. `$$x\$$` is the reported case.
+    ["escaped-close", `${open}${body}\\${close}`],
+    ["both-escaped", `\\${open}${body}\\${close}`],
+    ["newline-escaped-close", `${open}${body}\n${body}\\${close}`],
+    ["newline-body", `${open}${body}\n${body}${close}`],
+    ["long-body", `${open}${body.repeat(40)}${close}`],
+    ["unicode-body", `${open}\u65e5\u672c\u8a9e\u30c6\u30b9\u30c8${close}`],
+  ];
+}
+
+/** Contexts that either shield markdown or reparse their contents. */
+const CONTEXTS: ReadonlyArray<{
+  readonly name: string;
+  readonly wrap: (s: string) => string;
+}> = [
+  { name: "paragraph", wrap: (s) => `${s}\n` },
+  { name: "heading", wrap: (s) => `# ${s}\n` },
+  { name: "list-item", wrap: (s) => `- ${s}\n` },
+  { name: "ordered-item", wrap: (s) => `1. ${s}\n` },
+  { name: "task-item", wrap: (s) => `- [ ] ${s}\n` },
+  { name: "nested-list", wrap: (s) => `- outer\n  - ${s}\n` },
+  { name: "blockquote", wrap: (s) => `> ${s}\n` },
+  { name: "callout", wrap: (s) => `> [!note] Title\n> ${s}\n` },
+  { name: "table-cell", wrap: (s) => `| H |\n| --- |\n| ${s} |\n` },
+  { name: "code-span", wrap: (s) => `\`${s}\`\n` },
+  { name: "fenced-code", wrap: (s) => `\`\`\`\n${s}\n\`\`\`\n` },
+  { name: "html-block", wrap: (s) => `<div>\n${s}\n</div>\n` },
+  { name: "indented-code", wrap: (s) => `    ${s}\n` },
+  // Containers whose own syntax can collide with an inline token: a `|` with
+  // a table was already covered, these add a `#`, a `^`, a `]` and a `-`.
+  { name: "frontmatter-after", wrap: (s) => `---\nk: v\n---\n\n${s}\n` },
+  { name: "footnote-definition", wrap: (s) => `[^1]: ${s}\n` },
+  { name: "nested-quote", wrap: (s) => `> > ${s}\n` },
+  { name: "link-label", wrap: (s) => `[${s}](https://example.com)\n` },
+  { name: "setext-heading", wrap: (s) => `${s}\n===\n` },
+];
+
+/** What follows a construct decides whether its closer is recognised. */
+const ADJACENCY: ReadonlyArray<readonly [string, string]> = [
+  ["space", " next"],
+  ["period", ". next"],
+  ["comma", ", next"],
+  ["close-paren", ") next"],
+  ["close-bracket", "] next"],
+  ["pipe", "| next"],
+  ["newline", "\nnext"],
+  ["blank-line", "\n\nnext"],
+  ["crlf", "\r\nnext"],
+  ["immediate-text", "next"],
+  ["hash", "#next"],
+  ["dollar", "$next"],
+];
+
+/** Constructs whose closing delimiter is the interesting boundary. */
+const ADJACENCY_BASES: ReadonlyArray<readonly [string, string]> = [
+  ["display-math", "$$\nx\n$$"],
+  ["wikilink", "[[target]]"],
+  ["embed", "![[target]]"],
+  ["highlight", "==text=="],
+  ["comment", "%%text%%"],
+  ["tag", "#tag"],
+  ["inline-math", "$x$"],
+  ["emphasis", "*text*"],
+  ["strong", "**text**"],
+  ["inline-footnote", "^[note]"],
+];
+
+/**
+ * A fuzz run replaces the corpus rather than extending it.
+ *
+ * The point of a run is to sweep a seed range against Obsidian and report
+ * which seeds disagree; re-recording 2182 known cases alongside them would
+ * cost minutes per sweep and tell us nothing new. A failing seed is a
+ * complete reproduction on its own, so nothing is lost by isolating them.
+ */
+function fuzzCases(): Case[] | undefined {
+  // Shrinking feeds candidate reductions back through the same recorder, so
+  // it needs to supply documents rather than seeds.
+  const file = process.env.PARITY_FUZZ_FILE;
+  if (file) {
+    const supplied = JSON.parse(readFileSync(file, "utf8")) as Array<{
+      id: string;
+      markdown: string;
+    }>;
+    return supplied.map((entry) => ({
+      id: entry.id,
+      layer: "fuzz" as Layer,
+      category: "fuzz",
+      markdown: entry.markdown,
+    }));
+  }
+
+  const from = Number(process.env.PARITY_FUZZ_FROM);
+  const count = Number(process.env.PARITY_FUZZ_COUNT);
+  if (!Number.isInteger(from) || !Number.isInteger(count) || count <= 0) {
+    return undefined;
+  }
+  return generateRange(from, count).map(([seed, markdown]) => ({
+    id: `fuzz/${seed}`,
+    layer: "fuzz" as Layer,
+    category: "fuzz",
+    markdown,
+  }));
+}
+
+export function buildCorpus(): Case[] {
+  const fuzz = fuzzCases();
+  if (fuzz) return fuzz;
+
+  const cases: Case[] = [];
+  const seenMarkdown = new Set<string>();
+
+  const push = (
+    id: string,
+    layer: Layer,
+    category: string,
+    markdown: string,
+  ): void => {
+    if (seenMarkdown.has(markdown)) return;
+    seenMarkdown.add(markdown);
+    cases.push({ id, layer, category, markdown });
+  };
+
+  for (const [id, markdown] of SEEDS) {
+    push(id, "seed", id.split("/")[0] ?? "misc", markdown);
+  }
+
+  for (const token of TOKENS) {
+    for (const [state, snippet] of tokenStates(token)) {
+      push(`token/${token.name}/${state}`, "token", token.name, `${snippet}\n`);
+    }
+  }
+
+  for (const token of TOKENS) {
+    const balanced = `${token.open}${token.body}${token.close}`;
+    for (const context of CONTEXTS) {
+      push(
+        `context/${context.name}/${token.name}`,
+        "context",
+        token.name,
+        context.wrap(balanced),
+      );
+    }
+  }
+
+  for (const [baseName, base] of ADJACENCY_BASES) {
+    for (const [adjName, suffix] of ADJACENCY) {
+      push(
+        `adjacency/${baseName}/${adjName}`,
+        "adjacency",
+        baseName,
+        `${base}${suffix}\n`,
+      );
+    }
+  }
+
+  for (const [id, markdown] of COMMONMARK_SPEC) {
+    push(id, "commonmark", id.split("/")[1] ?? "misc", markdown);
+  }
+
+  for (const fixture of HUNT_FIXTURES) {
+    push(fixture.id, "hunt", fixture.category, fixture.markdown);
+  }
+
+  return cases;
+}
+
+/** Vault-safe filename for a case id. */
+export function caseFileName(id: string): string {
+  return `${id.replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "")}.md`;
+}

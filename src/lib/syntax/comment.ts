@@ -31,6 +31,52 @@ const nonLazyContinuation: Construct = {
   partial: true,
 };
 
+/**
+ * Rewindable lookahead for any further percent on the opening line.
+ *
+ * Obsidian prefers an inline comment whenever one could close on the same
+ * line, so `%%text%%` is a paragraph holding a hidden comment rather than a
+ * block comment -- a block one only wins when the construct spans lines. The
+ * test is stricter than that implies: a single stray `%` disqualifies the
+ * opener too, which is why `%% 50%` and `%%%` are plain paragraphs.
+ */
+const noCloserOnOpeningLine: Construct = {
+  partial: true,
+  tokenize(effects, ok, nok) {
+    return start;
+
+    function start(code: Code): State | undefined {
+      if (code !== PERCENT) return nok(code);
+      effects.enter("chunkString", { contentType: "string" });
+      effects.consume(code);
+      return second;
+    }
+
+    function second(code: Code): State | undefined {
+      if (code !== PERCENT) return nok(code);
+      effects.consume(code);
+      return scan;
+    }
+
+    function scan(code: Code): State | undefined {
+      if (code === null || isLineEnding(code)) {
+        effects.exit("chunkString");
+        return ok(code);
+      }
+      // Any further percent at all, not just a second `%%`. Measured: `%% 50%`
+      // and `%%%` are ordinary paragraphs in Obsidian, so one stray `%` is
+      // enough to disqualify the opener -- which also covers the closer case
+      // this used to check separately, since `%%text%%` stays inline.
+      if (code === PERCENT) {
+        effects.exit("chunkString");
+        return nok(code);
+      }
+      effects.consume(code);
+      return scan;
+    }
+  },
+};
+
 export function commentSyntax(): Extension {
   return {
     text: {
@@ -175,7 +221,11 @@ function tokenizeFlow(
     partial: true,
   };
 
-  return start;
+  return checkOpeningLine;
+
+  function checkOpeningLine(code: Code): State | undefined {
+    return effects.check(noCloserOnOpeningLine, start, nok)(code);
+  }
 
   function start(code: Code): State | undefined {
     if (code !== PERCENT) return nok(code);
@@ -189,28 +239,7 @@ function tokenizeFlow(
     if (code !== PERCENT) return nok(code);
     effects.consume(code);
     effects.exit("commentMarker");
-    return afterOpen;
-  }
-
-  // Once the opening %% is confirmed, we must never nok().
-  // Concrete flow constructs that nok() after entering tokens
-  // corrupt the event stream and crash subtokenize's SpliceBuffer.
-  function afterOpen(code: Code): State | undefined {
-    if (code === null) {
-      effects.exit("comment");
-      return ok(code);
-    }
-
-    if (isLineEnding(code)) {
-      return effects.attempt(
-        nonLazyContinuation,
-        beforeContentChunk,
-        afterLazy,
-      )(code);
-    }
-
-    effects.enter("commentContent");
-    return contentChunk(code);
+    return beforeContentChunk;
   }
 
   function beforeContentChunk(code: Code): State | undefined {
@@ -228,7 +257,11 @@ function tokenizeFlow(
     }
 
     if (code === PERCENT) {
-      return effects.attempt(flowClose, closeAfter, startContent)(code);
+      return effects.attempt(
+        flowClose,
+        closeAfterLineStart,
+        startContent,
+      )(code);
     }
 
     effects.enter("commentContent");
@@ -249,7 +282,11 @@ function tokenizeFlow(
     }
 
     if (code === PERCENT) {
-      return effects.attempt(flowClose, closeAfter, contentConsume)(code);
+      return effects.attempt(
+        flowClose,
+        closeAfterMidLine,
+        contentConsume,
+      )(code);
     }
 
     if (isLineEnding(code)) {
@@ -275,12 +312,47 @@ function tokenizeFlow(
     return contentChunk;
   }
 
-  function closeAfter(code: Code): State | undefined {
+  /**
+   * Obsidian ends a block comment at its closing `%%` wherever that falls and
+   * reparses the rest of the line as a new block. Flow owns whole lines, so this
+   * construct cannot stop mid-line, and the two reachable approximations are not
+   * equally good — which one is right depends on where the closer sits.
+   *
+   * **Mid-line closer** (`line %% nested %% line`): reject, and the line becomes
+   * paragraph content where the *text* tokenizer handles `%%…%%` inline. That
+   * reproduces Obsidian's split exactly, including leaving the tail visible.
+   *
+   * **Closer starting its line** (`%% [^a]: def`): reject and the opener's lines
+   * fall back to a paragraph, but this very construct then re-fires on the closer
+   * line — whose own line holds no second `%%` — opening a fresh comment that runs
+   * to end of file and swallows the remainder of the note. Absorbing the closer's
+   * line instead keeps every later block alive.
+   */
+  function closeAfterLineStart(code: Code): State | undefined {
+    if (code === null || isLineEnding(code)) {
+      effects.exit("comment");
+      return ok(code);
+    }
+    effects.enter("commentContent");
+    return absorbCloserLine(code);
+  }
+
+  function absorbCloserLine(code: Code): State | undefined {
+    if (code === null || isLineEnding(code)) {
+      effects.exit("commentContent");
+      effects.exit("comment");
+      return ok(code);
+    }
+    effects.consume(code);
+    return absorbCloserLine;
+  }
+
+  function closeAfterMidLine(code: Code): State | undefined {
+    if (code !== null && !isLineEnding(code)) return nok(code);
     effects.exit("comment");
     return ok(code);
   }
 
-  // Lazy continuation: close the comment cleanly instead of nok().
   function afterLazy(code: Code): State | undefined {
     effects.exit("comment");
     return ok(code);

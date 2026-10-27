@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": [
+      "node",
+      "@wdio/globals/types",
+      "@wdio/mocha-framework",
+      "wdio-obsidian-service"
+    ]
+  },
+  "include": ["test/parity", "wdio.conf.mts", "src", "types"],
+  "exclude": ["dist", "node_modules"]
+}

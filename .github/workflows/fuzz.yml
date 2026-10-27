@@ -1,0 +1,134 @@
+name: Differential fuzz
+
+# The corpus can only contain what someone thought to ask, and the generated
+# layers cross each construct against each context — exhaustive two-way
+# coverage, blind to anything needing three constructs to interact. This sweeps
+# randomly composed documents against real Obsidian to reach those.
+#
+# Generation is deterministic, so a failure is a seed rather than a snapshot:
+# `generate(n)` reproduces the exact document on any machine, and promoting it
+# into the permanent corpus is a copy and paste. A run therefore never commits
+# anything — it reports seeds.
+
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+    inputs:
+      from:
+        description: "First seed; defaults to a random base so runs do not repeat"
+        required: false
+      count:
+        description: "How many seeds to sweep"
+        required: false
+        default: "500"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: npm
+
+      - run: npm ci
+
+      - name: Cache Obsidian downloads
+        uses: actions/cache@v4
+        with:
+          path: .obsidian-cache
+          key: obsidian-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: obsidian-cache-${{ runner.os }}-
+
+      - name: Start virtual display
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q xvfb herbstluftwm x11-utils
+          echo "DISPLAY=:99" >> "$GITHUB_ENV"
+          Xvfb :99 -screen 0 1280x1024x24 +extension GLX -noreset &
+          for _ in $(seq 1 40); do xdpyinfo -display :99 >/dev/null 2>&1 && break; sleep 0.25; done
+          herbstluftwm &
+          sleep 2
+
+      # A fresh base each night, so successive runs explore new ground rather
+      # than re-confirming the same seeds. The chosen base is echoed into the
+      # summary and the issue, which is what makes the run reproducible.
+      - name: Choose a seed range
+        id: range
+        run: |
+          FROM="${{ inputs.from }}"
+          if [ -z "$FROM" ]; then FROM=$(( (RANDOM << 15 | RANDOM) % 100000000 )); fi
+          COUNT="${{ inputs.count || '500' }}"
+          echo "from=$FROM" >> "$GITHUB_OUTPUT"
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "Sweeping seeds $FROM..$((FROM + COUNT - 1))" >> "$GITHUB_STEP_SUMMARY"
+
+      # The sweep records, compares, shrinks every failure and groups by the
+      # reduced form, so the report is a list of causes rather than of seeds.
+      # Shrinking is what makes it readable: raw failures do not group, since a
+      # generated document carries six to eight constructs and its signature is
+      # nearly unique, while a reduced one is a couple of dozen characters.
+      - name: Sweep, shrink and group
+        id: check
+        run: |
+          set +e
+          npx tsx --conditions=development test/parity/fuzz/sweep.ts \
+            "${{ steps.range.outputs.from }}" "${{ steps.range.outputs.count }}" \
+            | tee fuzz-report.txt
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+          { echo '```'; cat fuzz-report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the recording for triage
+        if: steps.check.outputs.status != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-${{ steps.range.outputs.from }}
+          path: fuzz-report.txt
+
+      - name: Open an issue naming the seeds
+        if: steps.check.outputs.status != '0' && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('node:fs');
+            const report = fs.readFileSync('fuzz-report.txt', 'utf8').slice(0, 55000);
+            const from = '${{ steps.range.outputs.from }}';
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Differential fuzz: disagreements from seed base ${from}`,
+              body: [
+                'A nightly fuzz sweep disagreed with Obsidian.',
+                '',
+                'Generation is deterministic, so every seed below reproduces exactly:',
+                '',
+                '```bash',
+                'npx tsx --conditions=development test/parity/fuzz/sweep.ts \\',
+                `  ${from} ${{ steps.range.outputs.count }}`,
+                '```',
+                '',
+                'Each form below is already minimal and can be pasted straight',
+                'into `SEEDS` in `test/parity/corpus.ts`, where it is recorded and',
+                'triaged like any other case.',
+                '',
+                '<details><summary>Report</summary>',
+                '',
+                '```',
+                report,
+                '```',
+                '</details>',
+              ].join('\n'),
+            });
+
+      - name: Fail the run when anything disagreed
+        if: steps.check.outputs.status != '0'
+        run: exit 1

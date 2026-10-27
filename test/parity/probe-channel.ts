@@ -1,0 +1,530 @@
+/**
+ * The file-driven channel to a running Obsidian, in the referee's own answer format.
+ *
+ * `ask.mts` talks to the app through `obsidian eval`, which MEASURABLY LOSES THE FOOTNOTE
+ * FIELDS: asked `use[^1]` / blank / `[^1]: def` three times it returns `["sections"]` every
+ * time, where this channel returns `["footnoteRefs", "footnotes", "sections"]`. So the CLI is
+ * not a thinner version of this one, it is a lossy one, and nothing that needs footnote facts
+ * should use it. See `README.md`.
+ *
+ * The `parity-probe` plugin serves a request file and writes a response file, so a batch costs
+ * about a second with no size ceiling, no base64, and no polling an eval's 5-15ms result
+ * window.
+ *
+ * TWO THINGS THIS DELIBERATELY REFUSES TO PAPER OVER:
+ *
+ * A `null` cache THROWS. Obsidian returns nothing when its metadata worker is wedged, and
+ * reading that as an empty answer means "Obsidian indexes nothing in this document" -- the
+ * failure shape these notes carry three instances of. A caller that wants to tolerate it has
+ * to say so.
+ *
+ * `footnoteRefs` is DEFINITION-GATED: it lists only references whose name has a definition, and
+ * omits the key entirely when none do. So references are read from an AUGMENTED copy of each
+ * document -- one synthesised definition per referenced name, which is the trick `ask.mts
+ * --synth` exists for -- while definitions are read from the document as written. Both copies
+ * ride in the same batch, because a batch with no ceiling makes the doubling free.
+ */
+import fs from "node:fs";
+import path from "node:path";
+
+const DIR = "/tmp/parity-probe";
+const REQUEST = path.join(DIR, "request.json");
+const RESPONSE = path.join(DIR, "response.json");
+
+/** `[name, startLine, startColumn, lastLine]`, zero-based, as the referee records it. */
+export type Def = readonly [string, number, number, number];
+/** `[name, line, column]`, zero-based. */
+export type Ref = readonly [string, number, number];
+
+export interface Answer {
+  readonly defs: readonly Def[];
+  readonly refs: readonly Ref[];
+  /**
+   * Whether the augmentation that makes `refs` readable actually took effect.
+   *
+   * Appending `[^x]: synthesised` fails on a document that SWALLOWS its tail. An unclosed `%%`
+   * is the measured case: `%% x` / blank / `[^1]: def` / blank / `use[^1] use[^2] use[^3]` has
+   * the comment eat every appended definition, so no name is defined, so the definition-gated
+   * `footnoteRefs` comes back EMPTY -- which reads as "Obsidian indexes no reference here" when
+   * it means "the probe never fired". Two of forty documents in the channel's validation sweep,
+   * both unclosed comments, and the referee has four references recorded for each.
+   *
+   * So `refs` is only an answer when this is true. It is computed by checking that every name
+   * the augmentation synthesised actually appears in the augmented copy's `footnotes`, rather
+   * than by pattern-matching the source for constructs that might swallow a tail.
+   */
+  readonly refsTrustworthy: boolean;
+  /**
+   * Obsidian's ROOT code-block line ranges, zero-based and inclusive.
+   *
+   * The same quantity the referee records as `code`, and it is a SLICE OF `sections` rather
+   * than a separate recording -- verified against live 1.14.4 on five documents when that
+   * field was adopted, where `code` equalled `sections.filter(type === "code")` every time.
+   * `sections` is root-level by construction, which is the restriction.
+   *
+   * Added because this channel could not see the dimension at all, so `referee-shrink --live`
+   * was blind to every document that diverges only on block geometry -- 108 of them, the
+   * largest bucket being 43 where we read prose and Obsidian reads code. A shrinker whose
+   * signature cannot see the divergence reduces the document to something that no longer
+   * exhibits it, which is indistinguishable from the family having no minimal form.
+   */
+  readonly code: readonly (readonly [number, number])[];
+  /**
+   * Obsidian's own LIST ITEMS: each one's span and its parent index.
+   *
+   * `[startLine, startCol, endLine, endCol, parent]`, raw as the cache reports them.
+   *
+   * `parent` is a LINE NUMBER and not an index, which is easy to get wrong because the two
+   * coincide on the obvious two-line example: `- a` / `  - b` reports the nested item's parent
+   * as 0, which is both its parent's line and its parent's index. `normalize.ts` has the real
+   * encoding with seven probes behind it -- a nested item carries its parent's line, and a
+   * ROOT item carries the negative of the line its list begins on, with a list on line 0
+   * reported as -1 rather than -0. Read that docstring before comparing this field.
+   *
+   * The raw cache has carried this all along and this channel dropped it, declaring only
+   * `footnotes`, `footnoteRefs` and `sections`. `compute.test.ts` compares a listItems COUNT
+   * against a ceiling, so the field was known; what was missing is the span and the nesting in
+   * the live channel, where every grid and sweep is built.
+   *
+   * It is the quantity eleven rules in one session turned on. An item's content column, its
+   * ownership threshold, what a separator does, whether a line belongs to the item -- all of it
+   * is "how far does this item reach", and the only oracle for that was the position of a
+   * definition that happened to sit inside it.
+   */
+  readonly listItems: readonly (readonly [
+    number,
+    number,
+    number,
+    number,
+    number,
+  ])[];
+}
+
+/** A point as the cache reports it: line and column zero-based, and the offset. */
+export interface Point {
+  readonly line: number;
+  readonly col: number;
+  readonly offset: number;
+}
+/** A span as the cache reports it. */
+export interface Span {
+  readonly start: Point;
+  readonly end: Point;
+}
+interface Positioned {
+  readonly id?: string;
+  readonly position?: Span;
+}
+/** A footnote fact with its full position, in the document's own coordinates. */
+export interface Placed {
+  readonly id: string;
+  readonly position: Span;
+}
+export interface Cache {
+  readonly footnotes?: readonly Positioned[];
+  readonly footnoteRefs?: readonly Positioned[];
+  readonly sections?: readonly {
+    readonly type: string;
+    readonly position: { readonly start: Point; readonly end: Point };
+  }[];
+  readonly listItems?: readonly {
+    readonly position: { readonly start: Point; readonly end: Point };
+    readonly parent: number;
+  }[];
+}
+interface Reply {
+  readonly id: string;
+  readonly cache: Cache | null;
+  readonly threw?: string;
+  readonly dom?: { readonly blockCode?: readonly BlockCode[] } | null;
+  readonly domThrew?: string;
+}
+
+/**
+ * Every dimension the live channel answers.
+ *
+ * `satisfies ReadonlyArray<keyof Answer>` checks that each entry IS a field and NOT that every
+ * field is listed, which is the weakness `PROJECTION_KEYS` has and the reason `referenceLinks`
+ * sat recorded-but-uncompared for months. The assignment below closes it: adding a field to
+ * `Answer` without listing it here fails to COMPILE.
+ *
+ * `overview.ts` then maps each entry to the instrument that reads it, as a `Record`, so a listed
+ * field with no reader also fails to compile. That is the invariant this session broke twice --
+ * `code`, `listItems` and `blockCode` were each added and read by nothing, and `listItems` sat
+ * unread in the raw cache for the whole effort.
+ */
+export const LIVE_ANSWER_KEYS = [
+  "defs",
+  "refs",
+  "refsTrustworthy",
+  "code",
+  "listItems",
+] as const satisfies ReadonlyArray<keyof Answer>;
+
+type UnlistedAnswerKey = Exclude<
+  keyof Answer,
+  (typeof LIVE_ANSWER_KEYS)[number]
+>;
+const _everyAnswerKeyListed: UnlistedAnswerKey extends never
+  ? true
+  : UnlistedAnswerKey = true;
+void _everyAnswerKeyListed;
+
+/** A rendered `pre > code` with its ancestor tag chain, joined by `>`. */
+export interface BlockCode {
+  readonly path: string;
+  readonly text: string;
+}
+
+const REFERENCE = /\[\^([^\]\s]+)\]/gu;
+
+/**
+ * A definition for EVERY referenced name, not only the textually-undefined ones.
+ *
+ * Copied in behaviour from `ask.mts`, including the reason it does not skip names that look
+ * defined: `> %%` / `[^3]: Text` carries a label and Obsidian defines NOTHING, because the
+ * unclosed comment buries it, so a scan that skips those augments exactly the document that
+ * needed it least usefully. A duplicate definition is harmless -- the first wins.
+ */
+export function referencedNames(markdown: string): string[] {
+  const names: string[] = [];
+  for (const hit of markdown.matchAll(REFERENCE)) {
+    if (!names.includes(hit[1]!)) names.push(hit[1]!);
+  }
+  return names;
+}
+
+export function augment(markdown: string): string {
+  const names = referencedNames(markdown);
+  if (names.length === 0) return markdown;
+  const tail = names.map((name) => `[^${name}]: synthesised`).join("\n\n");
+  return `${markdown.endsWith("\n") ? markdown : `${markdown}\n`}\n${tail}\n`;
+}
+
+/**
+ * A leading frontmatter block, including its closing fence.
+ *
+ * The inner group is OPTIONAL because empty frontmatter is real and was the document that
+ * exposed this: `---` / `---` / `> [!my note]-` has nothing between the fences, and a mandatory
+ * `[\s\S]*?\r?\n` cannot match it. An UNTERMINATED `---` deliberately does not match, since it
+ * is a thematic break rather than frontmatter, and prefixing above it is correct.
+ */
+const FRONTMATTER_BLOCK = /^---\r?\n(?:[\s\S]*?\r?\n)?---\r?\n/u;
+
+/**
+ * The same augmentation PREFIXED, which an unclosed tail construct cannot swallow.
+ *
+ * `augment` appends, so `%%` or an unterminated fence buries the synthesised definitions and the
+ * names it was meant to define stay undefined -- which is exactly the state `refsTrustworthy`
+ * reports, 97 documents of the diverging set. Measured on 41 of them, prefixing recovers 41.
+ *
+ * Returns the line shift, because every position in the answer is now that many lines late.
+ */
+function augmentPrefix(markdown: string): { text: string; lines: number } {
+  const names = referencedNames(markdown);
+  if (names.length === 0) return { text: markdown, lines: 0 };
+  const head = names.map((name) => `[^${name}]: synthesised`).join("\n\n");
+  // AFTER any frontmatter, never above it: `---` must be on line 0 to be frontmatter at all, so
+  // prefixing above it turns the block into a thematic break and answers for a different
+  // document. Inserting below keeps the frontmatter intact and is still above every construct
+  // that could swallow a tail.
+  const block = FRONTMATTER_BLOCK.exec(markdown)?.[0] ?? "";
+  const text = `${block}${head}\n\n${markdown.slice(block.length)}`;
+  return { text, lines: text.split("\n").length - markdown.split("\n").length };
+}
+
+/**
+ * Written to a temp name and RENAMED, because the plugin polls every 400ms.
+ *
+ * `writeFileSync` is not atomic, so a batch can be read while half-written: the plugin's
+ * `JSON.parse` throws, it answers with an error object, and the caller sees an exchange that
+ * produced nothing. Seen twice, on 64- and 18-probe batches, both succeeding on retry -- the
+ * signature of a race rather than a size limit. The RESPONSE already used rename for exactly
+ * this; the request did not.
+ *
+ * Five consecutive exchanges pass either way, so this is not proven by reproduction. It is the
+ * same discipline the response side already has, on the same reasoning, and costs one rename.
+ */
+function writeRequest(markdowns: readonly string[], dom = false): void {
+  fs.writeFileSync(
+    `${REQUEST}.part`,
+    JSON.stringify(
+      markdowns.map((markdown, at) => ({ id: String(at), markdown, dom })),
+    ),
+  );
+  fs.renameSync(`${REQUEST}.part`, REQUEST);
+}
+
+const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+/** One round trip. Stale responses are removed FIRST, or a previous batch answers this one. */
+async function exchange(
+  markdowns: readonly string[],
+  timeoutMs: number,
+): Promise<Reply[]> {
+  fs.mkdirSync(DIR, { recursive: true });
+  fs.rmSync(RESPONSE, { force: true });
+  fs.rmSync(`${RESPONSE}.part`, { force: true });
+  writeRequest(markdowns);
+
+  const until = Date.now() + timeoutMs;
+  while (Date.now() < until) {
+    await sleep(120);
+    if (!fs.existsSync(RESPONSE)) continue;
+    const read: unknown = JSON.parse(fs.readFileSync(RESPONSE, "utf8"));
+    if (!Array.isArray(read)) {
+      throw new Error(`probe-channel: plugin reported ${JSON.stringify(read)}`);
+    }
+    return read as Reply[];
+  }
+  throw new Error(
+    `probe-channel: no response in ${timeoutMs}ms. Is Obsidian running with parity-probe enabled?`,
+  );
+}
+
+/**
+ * The RAW caches, synchronously, for callers whose shape predates this channel.
+ *
+ * `compose.mts` projects the cache itself through `theirs()` rather than reading footnote facts,
+ * and its `askBatch` is synchronous three call-frames down. It also DIED on the CLI channel: 256
+ * sequences in one `code=` argument is about 6KB and `execFileSync` fails outright, which is the
+ * batch ceiling this transport exists to remove -- so a sweep that once caught a same-day
+ * regression was simply unrunnable.
+ *
+ * The sleep is `Atomics.wait` on a SharedArrayBuffer, which is the only true blocking sleep in
+ * Node. Spinning on `Date.now()` would peg a core for the whole exchange, and making the chain
+ * async would rewrite three functions to change a transport.
+ */
+export function askRawSync(
+  markdowns: readonly string[],
+  timeoutMs = 300_000,
+): (Cache | null)[] {
+  return askRepliesSync(markdowns, false, timeoutMs).map(
+    (reply) => reply?.cache ?? null,
+  );
+}
+
+/**
+ * Obsidian's rendered block code for each document, through the FILE channel.
+ *
+ * `ask-dom.ts` reaches the same projection over `obsidian eval`, which returns NOTHING on
+ * failure and so reads as a real empty answer. That is why this exists: `blockCode` is the only
+ * oracle for block structure inside a container -- `sections` is root-level by construction --
+ * so it cannot sit on an intermittent transport.
+ */
+export function askBlockCode(
+  markdowns: readonly string[],
+  timeoutMs = 300_000,
+): BlockCode[][] {
+  return askRepliesSync(markdowns, true, timeoutMs).map((reply) => {
+    if (reply?.domThrew !== undefined) {
+      throw new Error(`probe-channel: render threw ${reply.domThrew}`);
+    }
+    return [...(reply?.dom?.blockCode ?? [])];
+  });
+}
+
+function askRepliesSync(
+  markdowns: readonly string[],
+  dom: boolean,
+  timeoutMs: number,
+): (Reply | undefined)[] {
+  if (markdowns.length === 0) return [];
+  fs.mkdirSync(DIR, { recursive: true });
+  fs.rmSync(RESPONSE, { force: true });
+  fs.rmSync(`${RESPONSE}.part`, { force: true });
+  writeRequest(markdowns, dom);
+
+  const gate = new Int32Array(new SharedArrayBuffer(4));
+  const until = Date.now() + timeoutMs;
+  while (Date.now() < until) {
+    Atomics.wait(gate, 0, 0, 120);
+    if (!fs.existsSync(RESPONSE)) continue;
+    const read: unknown = JSON.parse(fs.readFileSync(RESPONSE, "utf8"));
+    if (!Array.isArray(read)) {
+      throw new Error(`probe-channel: plugin reported ${JSON.stringify(read)}`);
+    }
+    const replies = read as Reply[];
+    if (replies.length !== markdowns.length) {
+      throw new Error(
+        `probe-channel: asked ${markdowns.length} and got ${replies.length}`,
+      );
+    }
+    const byId = new Map(replies.map((reply) => [reply.id, reply]));
+    return markdowns.map((_, at) => byId.get(String(at)));
+  }
+  throw new Error(
+    `probe-channel: no response in ${timeoutMs}ms. Is Obsidian running with parity-probe enabled?`,
+  );
+}
+
+/**
+ * Ask Obsidian about each document, keeping every position in full.
+ *
+ * `plain` is the cache of the document as written, which definitions and every other field are
+ * read from; `refs` comes from its augmented copy, for the gating reason in the module
+ * docstring, placed back into the document's own lines and offsets. Both halves of every pair
+ * must come back or this throws: a short reply means the plugin answered a different batch.
+ */
+export async function askFull(
+  markdowns: readonly string[],
+  timeoutMs = 300_000,
+): Promise<FullAnswer[]> {
+  if (markdowns.length === 0) return [];
+  const paired = markdowns.flatMap((markdown) => [markdown, augment(markdown)]);
+  const replies = await exchange(paired, timeoutMs);
+  if (replies.length !== paired.length) {
+    throw new Error(
+      `probe-channel: asked ${paired.length} and got ${replies.length}`,
+    );
+  }
+
+  const byId = new Map(replies.map((reply) => [reply.id, reply]));
+  const out: FullAnswer[] = [];
+  for (let at = 0; at < markdowns.length; at++) {
+    const plain = byId.get(String(at * 2));
+    const synth = byId.get(String(at * 2 + 1));
+    for (const [which, reply] of [
+      ["plain", plain],
+      ["augmented", synth],
+    ] as const) {
+      if (!reply) throw new Error(`probe-channel: no ${which} reply for ${at}`);
+      if (reply.cache === null) {
+        throw new Error(
+          `probe-channel: NULL cache for the ${which} copy of document ${at}` +
+            `${reply.threw ? ` (threw: ${reply.threw})` : ""}. Obsidian declined; ` +
+            `clear app.metadataCache.workerResolve and retry.`,
+        );
+      }
+    }
+    const wanted = referencedNames(markdowns[at]!);
+    const defined = new Set(
+      (synth!.cache!.footnotes ?? []).map((entry) => entry.id?.toLowerCase()),
+    );
+    out.push({
+      plain: plain!.cache!,
+      refs: placed(synth!.cache!.footnoteRefs, 0, 0),
+      refsTrustworthy: wanted.every((name) => defined.has(name.toLowerCase())),
+    });
+  }
+
+  const retry = out.flatMap((answer, at) =>
+    answer.refsTrustworthy ? [] : [at],
+  );
+  if (retry.length === 0) return out;
+
+  const prefixed = retry.map((at) => augmentPrefix(markdowns[at]!));
+  const second = await exchange(
+    prefixed.map((form) => form.text),
+    timeoutMs,
+  );
+  const secondById = new Map(second.map((reply) => [reply.id, reply]));
+  for (const [which, at] of retry.entries()) {
+    const reply = secondById.get(String(which));
+    const form = prefixed[which]!;
+    if (!reply?.cache) continue;
+    const defined = new Set(
+      (reply.cache.footnotes ?? []).map((entry) => entry.id?.toLowerCase()),
+    );
+    const wanted = referencedNames(markdowns[at]!);
+    if (!wanted.every((name) => defined.has(name.toLowerCase()))) continue;
+    out[at] = {
+      ...out[at]!,
+      // The synthesised block is whole lines, so a column never moves; a line moves by the
+      // lines it added and an offset by the characters.
+      refs: placed(
+        reply.cache.footnoteRefs,
+        form.lines,
+        form.text.length - markdowns[at]!.length,
+      ),
+      refsTrustworthy: true,
+    };
+  }
+  return out;
+}
+
+/** The cache's facts with a name and a position, moved back by an inserted block's size. */
+function placed(
+  entries: readonly Positioned[] | undefined,
+  lines: number,
+  chars: number,
+): Placed[] {
+  const back = (point: Point): Point => ({
+    line: point.line - lines,
+    col: point.col,
+    offset: point.offset - chars,
+  });
+  return (entries ?? []).flatMap((entry): Placed[] =>
+    entry.id === undefined ||
+    !entry.position ||
+    entry.position.start.line < lines
+      ? []
+      : [
+          {
+            id: entry.id,
+            position: {
+              start: back(entry.position.start),
+              end: back(entry.position.end),
+            },
+          },
+        ],
+  );
+}
+
+export interface FullAnswer {
+  /** The cache of the document as written. */
+  readonly plain: Cache;
+  /** References, read from the augmented copy and placed back into the document's terms. */
+  readonly refs: readonly Placed[];
+  /** As `Answer.refsTrustworthy`. */
+  readonly refsTrustworthy: boolean;
+}
+
+/**
+ * Ask Obsidian about each document, as `{defs, refs}`: `askFull`, reduced to the tuples the
+ * referee's answers store.
+ */
+export async function ask(
+  markdowns: readonly string[],
+  timeoutMs = 300_000,
+): Promise<Answer[]> {
+  return (await askFull(markdowns, timeoutMs)).map(
+    ({ plain, refs, refsTrustworthy }) => ({
+      defs: (plain.footnotes ?? []).flatMap((entry): Def[] =>
+        entry.id === undefined || !entry.position
+          ? []
+          : [
+              [
+                entry.id,
+                entry.position.start.line,
+                entry.position.start.col,
+                entry.position.end.line,
+              ],
+            ],
+      ),
+      refs: refs.map((entry): Ref => [
+        entry.id,
+        entry.position.start.line,
+        entry.position.start.col,
+      ]),
+      refsTrustworthy,
+      listItems: (plain.listItems ?? []).map(
+        (entry) =>
+          [
+            entry.position.start.line,
+            entry.position.start.col,
+            entry.position.end.line,
+            entry.position.end.col,
+            entry.parent,
+          ] as const,
+      ),
+      code: (plain.sections ?? []).flatMap(
+        (entry): (readonly [number, number])[] =>
+          entry.type === "code"
+            ? [[entry.position.start.line, entry.position.end.line] as const]
+            : [],
+      ),
+    }),
+  );
+}

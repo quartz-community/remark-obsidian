@@ -1,1 +1,29 @@
 dist
+package-lock.json
+flake.lock
+
+# Machine-written by `npm run parity:record`; reformatting it would create diff
+# noise and make the parity drift detector fire on formatting rather than behaviour.
+test/parity/goldens
+
+# Owned by Obsidian, which rewrites these on its own schedule.
+test-vault/.obsidian
+
+# Vendored verbatim from `obsidian-footnotes`, which is still active. Kept
+# byte-identical so a diff against upstream shows recorded answers changing and
+# nothing else.
+test/parity/referee-answers
+
+# Machine-written by `record-referee-spans.mts` beside those answers, for the same reason as
+# the goldens: a re-recording should diff as changed spans, not as reformatting.
+test/parity/referee-spans.json
+
+# Vendored remark-parse 8 and friends, kept in upstream's own style so a diff against the
+# published files shows only the recorded changes (src/rp8/vendor/README.md).
+src/rp8/vendor/remark-parse
+src/rp8/vendor/remark-footnotes
+src/rp8/vendor/remark-math
+src/rp8/vendor/parse-entities
+src/rp8/vendor/entities-v1.ts
+src/rp8/list.ts
+src/rp8/remove-indentation.ts
