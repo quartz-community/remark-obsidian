@@ -547,7 +547,7 @@ has no coverage there, not that it agrees. Footnotes are in **neither** spec: GF
 ## Gates — what "done" means
 
 ```bash
-npm test          # 505 tests / 24 files. Contains the contract gate.
+npm test          # 506 tests / 24 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -663,36 +663,34 @@ several indentation depths: assert the matcher's count before believing a "no ow
 
 Nothing here blocks a release; each is recorded with what is known.
 
-1. **`strict` loses a code span before a `$$` opened after a nested marker:**
+**Closed during the release: `mathMidlineTransform` flattened the paragraph before its `$$`.**
+Moving the split point of a `$$` that ends a line inside a container, it rebuilt the paragraph
+as one `text` node sliced from the source, so every construct before the `$$` came back as raw
+characters: under `* p ⟨code span⟩ end.` / `···2) $$` / `⇥$$`, stock `remark-math` keeps the code
+span and `strict` lost it, and emphasis, wikilinks and tags went the same way. It now cuts the
+existing children at the `$$`. The pass fires on 7 of 10,967 corpus, spec and referee documents
+and moves no measured figure (fingerprints of 4,147 documents under 17 configurations
+byte-identical; recorded cases, referee and spec unchanged), because the one firing document
+holding a construct before the `$$` (`fuzz#2570`) keeps the same footnote facts either way. So
+the gate is a unit test in `remark-obsidian.test.ts`, which fails on the old pass.
 
-   ```
-   * p `c` end.
-      2) $$
-   ⇥$$
-   ```
-
-   gives a paragraph whose first line is plain TEXT, with the backticks raw. Stock
-   `remark-parse` + `remark-gfm` + `remark-math` keeps the `inlineCode`, so the loss is ours.
-   The `math=""` sibling after the paragraph is upstream's (stock has it too). With `2) x` in
-   place of `2) $$` we agree with stock. Found during the 2.0 release; not yet owned.
-
-2. **Two `strict` cases left by decision:** an unbalanced `[[[a]]` inside a link label, which
+1. **Two `strict` cases left by decision:** an unbalanced `[[[a]]` inside a link label, which
    breaks the link's bracket count in micromark; and a `$$` line interrupting a lazily continued
    definition in a list item.
-3. **micromark itself departs from CommonMark** on `> a` / `2. x`: it starts a list where the
+2. **micromark itself departs from CommonMark** on `> a` / `2. x`: it starts a list where the
    spec (and Obsidian) continue the quote's paragraph, since `2.` cannot interrupt one. A
    question about stock `remark-parse`, not this package; `strict.test.ts` cannot see it.
-4. **The referee's 14** — nothing fixable left in `legacy`. 10 are Obsidian cache misplacements
+3. **The referee's 14** — nothing fixable left in `legacy`. 10 are Obsidian cache misplacements
    where our position is the true one (must not fix); 4 carry references only the corrected
    answers have, inside code or an unclosed fence (`reproducers.json#852` is the one 1.x got
    right).
-5. **The positioned oracle's 8** — all Obsidian's cache: 2 P1, a garbled embed inside an
+4. **The positioned oracle's 8** — all Obsidian's cache: 2 P1, a garbled embed inside an
    unclosed `%%`, two phantom block ids past the text, one embed ordering, and an empty item
    whose own rendering nests the next one as we do.
-6. **`normalize.ts`** carries compensations for micromark's offsets. Only rp8 trees reach it now
+5. **`normalize.ts`** carries compensations for micromark's offsets. Only rp8 trees reach it now
    (every gate runs the `legacy` profiles), and two compensations already had to be generalised
    because they broke rp8 positions that were right. Simplifying it is safe but unmeasured.
-7. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,
+6. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,
    `pass-owner*.mts`, `pass-order*.mts` and their kin attribute behaviour to micromark passes
    `legacy` no longer runs. Port to `strict` or delete; do not trust their `legacy` output.
 
@@ -741,5 +739,6 @@ Nothing here blocks a release; each is recorded with what is known.
 - Fix forward; do not rewrite history. The one exception was deliberate: 2.0 replaced the
   micromark-era history on `main` with a single commit on `v1.1.0`, with the old history kept
   under the `archive/*` tags.
-- `test/parity/README.md` is ~12,300 lines, write-only, and read by nothing — **do not add to
-  it**.
+- `test/parity/README.md` is the harness's operating manual: how to record, what is compared,
+  how to triage. Keep it operational; measurements and refusals belong here. Its 1.x version, a
+  12,300-line lab notebook, is under `archive/main-pre-2.0`.

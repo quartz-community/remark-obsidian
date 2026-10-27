@@ -203,36 +203,22 @@ reference exactly, and 1032 of the 1122 corpus cases agree with Obsidian:
 
 ## Bearing on `@quartz-community/remark-obsidian`
 
-Recorded here because it sets which of the above we intend to match.
+Recorded here because it sets which of the above the package matches, and under which preset.
 
-**Groups A through E are reproduced**, behind the `legacyEmphasis` option, which is
-on by default. The package's contract is to parse a document the way Obsidian
-parses it, and emphasis is not an area where a consumer can absorb a difference:
-a vault rendered by Quartz has to break its lines and bold its words where Obsidian
-does, or the published page is not the note. Leaving these divergent was also not
-the neutral choice it first appears — it silently produced different emphasis from
-the app for any unbalanced run, which is most of Group B.
+**`legacy` reproduces all seven groups by construction.** Since 2.0 it parses with
+remark-parse 8 itself — the parser these divergences come from, vendored — plus Obsidian's own
+readers, so Groups A through F are not emulated but inherited, including the emphasis cases
+whose output is not summarisable (see [Common root cause](#common-root-cause)). A vault rendered
+by Quartz has to break its lines and bold its words where Obsidian does, or the published page
+is not the note.
 
-The implementation is a verbatim port of the two legacy tokenizers rather than a
-reimplementation of their observable behaviour, for the reason given under
-[Common root cause](#common-root-cause): the output is not summarisable, so
-anything short of the original algorithm would match the easy cases and quietly
-miss the rest. `legacyEmphasis: false` restores micromark's CommonMark attention
-for consumers that want spec behaviour.
+**`strict` follows the specs for Groups A through F**, which are CommonMark and GFM constructs:
+`*a**` is emphasis followed by `*`, and `- [ ] 1.` keeps `1.` as the task's text.
 
-Group F is likewise mirrored, being narrow and specific to Obsidian's own task
-handling.
+**Group G is mirrored under both presets.** It concerns Obsidian's own delimiters, which neither
+spec defines, and `strict` reads Obsidian's syntax as Obsidian does: `[[target\]]` is a link to
+`target\`, `==text\==` a highlight and `%%text\%%` a comment, while `$x\$` stays literal.
+Whether Obsidian should change is for its team; whether this package reproduces today's
+Obsidian is not, since a note whose `[[target\]]` resolves in the app has to resolve here too.
 
-**Group G's escape handling is mirrored as well**, including the asymmetry. The
-earlier plan was to wait for the team, on the reasoning that the inline-math
-exception suggests the behaviour is unintended — but that conflates two separate
-questions. Whether Obsidian should change is for the team; whether this package
-reproduces today's Obsidian is not, and the answer is the same as everywhere else
-in compat mode. A note whose `[[target\]]` resolves in the app has to resolve
-here too, however the app came to decide that. Reporting it and reproducing it
-are independent, and both are now done.
-
-What remains `report-upstream` is the narrower set this package does not yet
-reproduce for implementation reasons rather than policy: over-long opening runs
-for highlights and display math (`====text==`, `$$$$x^2$$`). Those four keep
-their pinned output so the divergence cannot drift silently.
+The over-long opening runs once kept as `report-upstream` (`====text==`, `$$$$x^2$$`) now match.
