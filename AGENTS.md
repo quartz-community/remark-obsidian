@@ -674,6 +674,15 @@ byte-identical; recorded cases, referee and spec unchanged), because the one fir
 holding a construct before the `$$` (`fuzz#2570`) keeps the same footnote facts either way. So
 the gate is a unit test in `remark-obsidian.test.ts`, which fails on the old pass.
 
+**Closed after 2.0.1: three `strict` passes wrote `math.value` without its render hint.**
+`mdast-util-math` builds `data.hChildren` at parse time and HTML renders from it, never from
+`value`, so `mathMidlineTransform`, `mathFenceTransform` and the reading pass's placeholder restore
+left trees that looked right and HTML that did not (`1. Hello $$` / `   Math` / `   $$` rendered
+an empty block): 86 strict documents of 10,991, none under `legacy`. Write a formula through
+`setMathValue` (`math-value.ts`), never by assigning `value`. `invariants.test.ts` asserts hint ==
+value under BOTH presets; every other gate there runs the legacy profiles, which is why the
+parity corpus never saw it.
+
 1. **Two `strict` cases left by decision:** an unbalanced `[[[a]]` inside a link label, which
    breaks the link's bracket count in micromark; and a `$$` line interrupting a lazily continued
    definition in a list item.
