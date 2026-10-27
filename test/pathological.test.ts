@@ -54,15 +54,13 @@ const SIZES: Readonly<Record<string, number>> = {
  */
 const UPSTREAM: Readonly<Record<string, string>> = {
   "nested-blockquotes":
-    "Bare chain throws `Maximum call stack size exceeded` after 2334ms; ours 2344ms. Container recursion depth, not our transforms.",
+    "remark-parse 8 recurses per quote and throws `Maximum call stack size exceeded` within a second; the bare micromark chain throws too, after 2.3s.",
   "callout-nest":
-    "The same shape once the marker is reached: bare throws after 348ms, ours 358ms.",
+    "The same shape once the marker is reached: remark-parse 8 throws within a second.",
   "delimiter-run":
-    "Bare chain exceeds the budget too — the emphasis resolver's quadratic delimiter stack, long documented against cmark.",
-  "cdata-repeat":
-    "Bare chain exceeds the budget too. cmark issue 299, quadratic inline HTML scanning.",
+    "remark-parse 8 throws `Maximum call stack size exceeded` within a second; the bare micromark chain exceeds the budget -- the emphasis resolver's quadratic delimiter stack, long documented against cmark.",
   "list-dash-sandwich":
-    "cmark issue 373. Bare chain throws `Maximum call stack size exceeded` after 12751ms; ours 14738ms.",
+    "cmark issue 373. remark-parse 8 throws `Maximum call stack size exceeded` within a second; the bare micromark chain after 12.8s.",
 };
 
 /**
@@ -89,6 +87,8 @@ const gated = Object.keys(SIZES).filter(
  * `legacy` parses with remark-parse 8 and passes them.
  */
 const STRICT_UPSTREAM: Readonly<Record<string, string>> = {
+  "cdata-repeat":
+    "Bare remark-parse + remark-gfm exceeds the budget: cmark issue 299, quadratic inline HTML scanning. remark-parse 8 takes 243ms, so `legacy` is gated on it.",
   "backtick-increasing":
     "Bare remark-parse + remark-gfm takes 2.0s at 500, 16.2s at 1,000 and 130s at 2,000: micromark's code-span scan, cubic on runs of growing length.",
 };
@@ -118,8 +118,11 @@ describe("pathological input", () => {
 
   it("keeps the exclusions to the ones documented above", () => {
     expect(Object.keys(OURS_QUADRATIC).sort()).toEqual([]);
-    expect(Object.keys(UPSTREAM).length).toBe(5);
-    expect(Object.keys(STRICT_UPSTREAM)).toEqual(["backtick-increasing"]);
+    expect(Object.keys(UPSTREAM).length).toBe(4);
+    expect(Object.keys(STRICT_UPSTREAM).sort()).toEqual([
+      "backtick-increasing",
+      "cdata-repeat",
+    ]);
   });
 
   for (const shape of gated) {
@@ -128,6 +131,28 @@ describe("pathological input", () => {
       { timeout: BUDGET_MS + 15_000 },
       async () => {
         expect(await parseOnce(shape, "legacy")).toBeGreaterThanOrEqual(0);
+      },
+    );
+  }
+
+  // The four `UPSTREAM` shapes are no hang under `legacy`: remark-parse 8 overflows its stack
+  // within a second, so a pathological note fails fast instead of stalling a build. Asserted
+  // here so that a change turning a fast failure into a hang cannot pass unseen.
+  for (const shape of Object.keys(UPSTREAM)) {
+    it(
+      `terminates on ${shape} at ${SIZES[shape]} under legacy`,
+      { timeout: BUDGET_MS + 15_000 },
+      async () => {
+        const outcome = await parseOnce(shape, "legacy").then(
+          () => "parsed",
+          (error: { killed?: boolean; stderr?: string }) =>
+            error.killed
+              ? "timed out"
+              : /Maximum call stack size exceeded/u.test(error.stderr ?? "")
+                ? "threw"
+                : `failed: ${error.stderr ?? ""}`,
+        );
+        expect(["parsed", "threw"]).toContain(outcome);
       },
     );
   }
