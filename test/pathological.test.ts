@@ -36,6 +36,7 @@ const SIZES: Readonly<Record<string, number>> = {
   "tag-run": 20_000,
   "table-pipes": 5_000,
   "footnote-refs": 20_000,
+  "bracket-close-run": 30_000,
   "block-ref-run": 20_000,
   "autolink-open": 20_000,
   "autolink-email": 5_000,
@@ -83,6 +84,33 @@ const gated = Object.keys(SIZES).filter(
   (shape) => !(shape in UPSTREAM) && !(shape in OURS_QUADRATIC),
 );
 
+/**
+ * Shapes the stock micromark chain fails on, beyond `UPSTREAM`, which `strict` parses with.
+ * `legacy` parses with remark-parse 8 and passes them.
+ */
+const STRICT_UPSTREAM: Readonly<Record<string, string>> = {
+  "backtick-increasing":
+    "Bare remark-parse + remark-gfm takes 2.0s at 500, 16.2s at 1,000 and 130s at 2,000: micromark's code-span scan, cubic on runs of growing length.",
+};
+
+const strictGated = gated.filter((shape) => !(shape in STRICT_UPSTREAM));
+
+async function parseOnce(shape: string, preset: "legacy" | "strict") {
+  const { stdout } = await run(
+    "npx",
+    [
+      "tsx",
+      "--conditions=development",
+      runner,
+      shape,
+      String(SIZES[shape]),
+      preset,
+    ],
+    { timeout: BUDGET_MS, cwd: path.join(here, "..") },
+  );
+  return Number(stdout);
+}
+
 describe("pathological input", () => {
   it("accounts for every shape", () => {
     expect(Object.keys(SIZES).sort()).toEqual(Object.keys(SHAPES).sort());
@@ -91,6 +119,7 @@ describe("pathological input", () => {
   it("keeps the exclusions to the ones documented above", () => {
     expect(Object.keys(OURS_QUADRATIC).sort()).toEqual([]);
     expect(Object.keys(UPSTREAM).length).toBe(5);
+    expect(Object.keys(STRICT_UPSTREAM)).toEqual(["backtick-increasing"]);
   });
 
   for (const shape of gated) {
@@ -98,18 +127,17 @@ describe("pathological input", () => {
       `parses ${shape} at ${SIZES[shape]} without wedging`,
       { timeout: BUDGET_MS + 15_000 },
       async () => {
-        const { stdout } = await run(
-          "npx",
-          [
-            "tsx",
-            "--conditions=development",
-            runner,
-            shape,
-            String(SIZES[shape]),
-          ],
-          { timeout: BUDGET_MS, cwd: path.join(here, "..") },
-        );
-        expect(Number(stdout)).toBeGreaterThanOrEqual(0);
+        expect(await parseOnce(shape, "legacy")).toBeGreaterThanOrEqual(0);
+      },
+    );
+  }
+
+  for (const shape of strictGated) {
+    it(
+      `parses ${shape} at ${SIZES[shape]} under strict without wedging`,
+      { timeout: BUDGET_MS + 15_000 },
+      async () => {
+        expect(await parseOnce(shape, "strict")).toBeGreaterThanOrEqual(0);
       },
     );
   }

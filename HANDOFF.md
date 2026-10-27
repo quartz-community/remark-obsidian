@@ -46,11 +46,12 @@ performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
    - **The strict triage -- DONE.** Every recorded case strict misses is classified (AGENTS.md
      § 2.0): 509 left, 475 of them the spec read by the spec, 27 tab arithmetic, 5 deferred.
      `strict-syntax.test.ts` holds 377 probes.
-   - **`strict` has no pathological coverage.** `test/pathological.test.ts` runs only the default
-     preset. Two quadratic shapes are known there, both shared with stock `remark-gfm`: footnote
-     definitions in list items (micromark's document initializer; 8,000 items take ~14 s either
-     way) and a run of `]` (the vendored `tokenizePotentialGfmFootnoteCall` walks back over every
-     event on each `]`; bounding the walk by the label limit is the obvious repair, unmeasured).
+   - **`strict`'s pathological coverage -- DONE.** `test/pathological.test.ts` runs every shape
+     under both presets; strict excludes `backtick-increasing`, which stock micromark takes 130 s
+     on. A run of `]` was quadratic in the vendored footnote reader (32,000 in 23 s) and is
+     linear (344 ms); `pointAt` indexes line starts once per source. What remains superlinear
+     under strict is micromark's own `resolveAllText` and a list of footnote definitions, both
+     shared with stock.
    - **micromark itself departs from CommonMark** on `> a` / `2. x`: it starts a list where the
      spec (and Obsidian) continue the quote's paragraph, since `2.` cannot interrupt one. A
      question about stock `remark-parse`, not this package; `strict.test.ts` cannot see it.

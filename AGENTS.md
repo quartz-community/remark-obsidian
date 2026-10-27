@@ -349,6 +349,31 @@ The five deferred:
   micromark;
 - a `$$` line interrupting a lazily continued definition in a list item.
 
+**`strict` is in the pathological suite now, and two quadratics are gone.** The suite ran only
+the default preset. Every shape now runs under both presets, except that strict skips
+`backtick-increasing`: stock micromark takes 130 s on it at 2,000.
+
+- **A run of `]`.** The vendored footnote reader's `tokenizePotentialGfmFootnoteCall` walked
+  back over every earlier event on each `]`, looking for the `![` of a possible `![^x]`.
+  Upstream's loop is the same. A label holds at most 999 characters, so the walk now stops
+  that far back. 32,000 `x]` went from 23.6 s to 344 ms (stock: 22.7 s), and
+  `bracket-close-run` gates it; with the old walk it takes 49 s.
+- **`pointAt`.** It counted line endings from offset 0 on every call; it now binary-searches a
+  line table kept per source.
+
+Proof for both: 0 of 66,618 tree and raw-parse fingerprints changed (strict, strict with the
+Quartz profile, legacy; corpus, spec, referee and generated `![^x]` shapes from 1 to 1,500
+characters). Each fingerprint check needed its own known-positive control, and two kinds of
+check proved blind:
+
+- **The final tree hides the footnote walk.** A 10-character bound changed no final tree,
+  because the defined-label reference pass restores the call. Only the raw parse saw it (40
+  changed).
+- **The final tree also hides `pointAt`.** A column off by one changed no tree at all, because
+  `normalizePointsTransform` rebuilds every line and column from offsets. It was checked by a
+  direct differential instead: 200,472 (source, offset) pairs, alternating sources to exercise
+  the cache.
+
 **Its gates**, beyond the suite above:
 
 - `test/rp8-vendored.test.ts` -- vendored == published rp8, byte-identical trees on every corpus

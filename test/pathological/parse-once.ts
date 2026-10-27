@@ -14,7 +14,7 @@ import { SHAPES } from "./shapes.js";
  * timer — vitest's included — can interrupt it. Only a parent that can kill
  * the process is a real watchdog.
  */
-const [name, size] = process.argv.slice(2);
+const [name, size, preset = "legacy"] = process.argv.slice(2);
 const build = name ? SHAPES[name] : undefined;
 if (!build || !size) {
   console.error(`usage: parse-once <shape> <size>`);
@@ -28,7 +28,7 @@ const processor = unified()
   // gfm's strikethrough claimed every `~`, so `legacy-delete.ts` never ran and the
   // delimiter-run shape was not measuring this package's tokenizer at all.
   .use(remarkGfm)
-  .use(remarkObsidian)
+  .use(remarkObsidian, { preset: preset as "legacy" | "strict" })
   .use(remarkBreaks);
 
 const started = performance.now();

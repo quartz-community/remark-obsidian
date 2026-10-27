@@ -82,25 +82,47 @@ import { visit } from "unist-util-visit";
 /**
  * One point, for a pass that splices a node and knows only its offset.
  *
- * Scans from the start of the document, so it suits the handful of nodes a
- * splice creates rather than a whole tree -- `normalizePointsTransform` indexes
- * the line starts once for that.
+ * A binary search over the source's line starts, which are indexed once per source.
  */
 export function pointAt(
   source: string,
   offset: number,
 ): { line: number; column: number; offset: number } {
-  let line = 1;
-  let bol = 0;
-  for (let index = 0; index < offset; index++) {
-    // A lone CR ends a line too, which splitting on `\n` cannot see -- see
-    // `normalizePointsTransform` below for what that cost.
-    if (source[index] === "\r" && source[index + 1] === "\n") continue;
-    if (source[index] !== "\n" && source[index] !== "\r") continue;
-    line += 1;
-    bol = index + 1;
+  const starts = lineStartsOf(source);
+  // The last line starting at or before the offset.
+  let low = 0;
+  let high = starts.length - 1;
+  while (low < high) {
+    const middle = (low + high + 1) >> 1;
+    if (starts[middle]! <= offset) low = middle;
+    else high = middle - 1;
   }
-  return { line, column: offset - bol + 1, offset };
+  return { line: low + 1, column: offset - starts[low]! + 1, offset };
+}
+
+/**
+ * Where each line of `source` starts, kept for the last source asked about.
+ *
+ * `pointAt` used to count line endings from offset 0 on every call, and the passes call it per
+ * node, so a long paragraph of unplaced inline nodes was quadratic: 16,000 `x]#t` spent a
+ * second in `restoreInlinePositionsTransform` alone. One table per source makes each call a
+ * binary search. A lone CR ends a line too, which splitting on `\n` cannot see -- see
+ * `normalizePointsTransform` below for what that cost -- and a CRLF ends it once.
+ */
+let cachedSource: string | undefined;
+let cachedStarts: number[] = [0];
+
+function lineStartsOf(source: string): number[] {
+  if (source === cachedSource) return cachedStarts;
+  const starts = [0];
+  for (let index = 0; index < source.length; index++) {
+    if (source[index] === "\r" && source[index + 1] === "\n") continue;
+    if (source[index] === "\n" || source[index] === "\r")
+      starts.push(index + 1);
+  }
+  cachedSource = source;
+  cachedStarts = starts;
+  return starts;
 }
 
 /**

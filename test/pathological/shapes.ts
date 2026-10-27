@@ -40,6 +40,12 @@ export const SHAPES: Readonly<Record<string, (n: number) => string>> = {
   "tag-run": (n) => "#a/".repeat(n),
   "table-pipes": (n) => `|${"a|".repeat(n)}\n|${"-|".repeat(n)}\n`,
   "footnote-refs": (n) => "[^a]".repeat(n),
+  /**
+   * Closing brackets with no opener. The footnote reader walked back over every earlier event
+   * on each `]` looking for the `![` of a possible `![^x]`, so 32,000 of them took 23 s under
+   * `strict`; it now stops a label's length back. Stock `remark-gfm` still does the walk.
+   */
+  "bracket-close-run": (n) => "x] ".repeat(n),
   "block-ref-run": (n) => "a ^b\n".repeat(n),
   /**
    * `<` is common enough that an unbounded lookahead from it is ruinous: the

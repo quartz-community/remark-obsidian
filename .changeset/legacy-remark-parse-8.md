@@ -72,4 +72,6 @@ point on every recorded case, and `$$` display math is written back as display m
 exponentially — a 205-character line took over four minutes to parse — and quadratic
 expressions in two of its helpers. The vendored copy replaces them with linear equivalents,
 proven identical on every recorded document and on millions of generated inputs, and the
-legacy reader stays linear on every pathological input the test suite covers.
+legacy reader stays linear on every pathological input the test suite covers. `strict` is gated
+on the same inputs, and a run of `]` — which made `remark-gfm`'s footnote reader quadratic,
+32,000 of them taking 23 seconds — is linear there.

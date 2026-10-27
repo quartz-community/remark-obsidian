@@ -86,7 +86,15 @@ export function obsidianFootnoteSyntax(): Extension {
   };
 }
 
-/** Upstream's, unchanged: a `[^x]` that a link label started. */
+/**
+ * Upstream's, but for one bound: a `[^x]` that a link label started.
+ *
+ * On every `]` this walks back through the events for the `![` that might have opened
+ * `![^x]`, stopping only at another label or link. Upstream's walk is unbounded, so text holding
+ * many `]` and no `[` read every earlier event each time -- quadratic, 2,000 `x]` taking 229 ms
+ * and 8,000 taking 4.8 s. A label holds at most 999 characters, so a start ending further back
+ * than that can never yield a defined name, and the walk stops there.
+ */
 function tokenizePotentialGfmFootnoteCall(
   this: TokenizeContext,
   effects: Parameters<Tokenizer>[0],
@@ -97,9 +105,12 @@ function tokenizePotentialGfmFootnoteCall(
   let index = self.events.length;
   const names = defined(self);
   let labelStart: (Token & { _balanced?: boolean }) | undefined;
+  // `^` plus the longest label, between the `![` and this `]`.
+  const reach = self.now().offset - (constants.linkReferenceSizeMax + 1);
 
   while (index--) {
     const token = self.events[index]![1];
+    if (token.end.offset < reach) break;
     if (token.type === types.labelImage) {
       labelStart = token;
       break;
