@@ -193,9 +193,9 @@ byte-identical raced the capture. Re-record and it comes back.
 ## When goldens drift
 
 The scheduled workflow (`.github/workflows/parity.yml`) never commits. It records against
-`latest` with the full Reading View cross-check, uploads the goldens as an artifact and opens an
-issue, because a golden change is a behaviour change and needs a human to decide which side
-moved:
+`latest` with the seed-layer Reading View cross-check, as a local recording does, uploads the
+goldens as an artifact and opens an issue, because a golden change is a behaviour change and
+needs a human to decide which side moved:
 
 - **Obsidian changed.** Update the goldens and re-triage the affected cases.
 - **We regressed.** Fix the code; leave the goldens alone.
@@ -217,8 +217,9 @@ rendered them with it. That failed the cross-check on five cases outside the kno
 (`probe/table-pipes/body-row-unclosed`, `probe/table-pipes/short-delimiter-closed`,
 `table/code-pipe`, `table/math-pipe`, `context/table-cell/wikilink-alias`) and "corrected" two
 inside it (`math/in-table-pipe`, `wikilink/table-unescaped`) to text our parse does not give.
-The CI run of 2026-10-26 failed on the same five. Do not commit goldens from a full sweep
-without checking those two.
+The CI run of 2026-10-26 failed on the same five. So the weekly job runs the seed-layer check,
+and the full sweep is a manual audit (the workflow's `fullProxyCheck` input). Do not commit
+goldens from a full sweep without checking those two cases.
 
 ## Reading-view cross-check
 

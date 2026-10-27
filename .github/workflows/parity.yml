@@ -14,6 +14,11 @@ on:
         description: "Obsidian app version; defaults to the latest public release"
         required: false
         default: latest
+      fullProxyCheck:
+        description: "Cross-check the WHOLE corpus through Reading View (an audit; see test/parity/README.md)"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -64,14 +69,14 @@ jobs:
       - name: Record goldens
         env:
           OBSIDIAN_APP_VERSION: ${{ inputs.appVersion || 'latest' }}
-          # The whole-corpus Reading-View cross-check, which `test/parity/README.md` says to run
-          # "when the goldens are re-recorded against a new Obsidian" -- which is exactly this
-          # job, and nothing was enforcing it. The detached renderer is a PROXY for reading
-          # mode, so an unfaithful capture pins the gate to behaviour Obsidian does not produce:
-          # that is how a golden recording detached-renderer output survived several attempts to
-          # find a parsing rule for it, because there was none. Seed-layer only is the default
-          # at ~80s; the full sweep is ~7 minutes, which is free in a weekly job.
-          PARITY_FULL_PROXY_CHECK: "1"
+          # The scheduled run cross-checks the seed layer and every known proxy divergence
+          # through Reading View, as a local recording does. The WHOLE-corpus sweep is a manual
+          # audit (the `fullProxyCheck` input) and does not pass reliably: Reading View shows a
+          # table row's surplus cells or not depending on what it rendered earlier in the
+          # session. Both full sweeps run so far (CI 2026-10-26, locally 2026-10-27) failed on
+          # the same five such cases, and the local one rewrote two known cases' goldens to
+          # text our parse does not give. test/parity/README.md has the record.
+          PARITY_FULL_PROXY_CHECK: ${{ inputs.fullProxyCheck && '1' || '' }}
         run: npm run parity:record
 
       # Every recording stamps a fresh `recordedAt`, so a run where Obsidian answered exactly
