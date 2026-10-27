@@ -193,9 +193,14 @@ export interface RemarkObsidianOptions {
   highlights?: boolean;
   comments?: boolean;
   tags?: boolean;
+  /**
+   * Read any one character between a task's brackets as a checkbox, completed unless it is a
+   * space: `- [-]`, `- [?]` and `- [>]` are tasks, with the character kept as `data.taskChar`.
+   * Obsidian documents this ("You can use any character inside the brackets to mark it as
+   * complete"), so it is on under both presets; off, only GFM's `[ ]` and `[x]` are boxes.
+   */
   customTaskChars?: boolean;
   math?: boolean;
-  taskReparse?: boolean;
   /**
    * Parse a leading `---` block as YAML frontmatter. On by default because
    * Obsidian always does, and leaving it off is not neutral: the `---` becomes a
@@ -298,9 +303,11 @@ export interface RemarkObsidianOptions {
  * link-label divergences are bugs it inherited from `remark-parse@8` and has not
  * fixed, and reproducing them off-platform helps nobody.
  *
- * `legacy` parses with remark-parse 8, the parser Obsidian forks; `strict` parses with
- * micromark, as `remark-parse` does. The feature options below work under both, and an
- * explicit one always wins over the preset's value for it.
+ * In short, `strict` is what Obsidian INTENDS -- the CommonMark, GFM and LaTeX it says it
+ * supports, plus the syntax it documents adding -- and `legacy` is what it DELIVERS. `legacy`
+ * parses with remark-parse 8, the parser Obsidian forks; `strict` parses with micromark, as
+ * `remark-parse` does. The feature options below work under both, and an explicit one always
+ * wins over the preset's value for it.
  */
 export type RemarkObsidianPreset = "legacy" | "strict";
 
@@ -309,17 +316,17 @@ export type RemarkObsidianFlags = Required<
   Omit<RemarkObsidianOptions, "preset">
 >;
 
+/**
+ * Where `strict` differs from `legacy` in a feature option: behaviour Obsidian DELIVERS that the
+ * standards it claims -- CommonMark, GFM and LaTeX -- do not describe. Obsidian's documented
+ * syntax (task boxes with any character, wikilinks, callouts, ...) stays on.
+ */
 const STRICT_OVERRIDES: Partial<RemarkObsidianFlags> = {
-  // Obsidian's reading view re-parses a task line, so `- [ ] 1.` nests where
-  // CommonMark leaves two flat items.
-  taskReparse: false,
   // GFM leaves an undefined `[^x]` literal; stripping its delimiters is Obsidian
   // rendering, not parsing.
   bareFootnoteRefs: false,
   // A soft line ending is not a break in CommonMark.
   positionedBreaks: false,
-  // GFM admits only `[ ]` and `[x]`.
-  customTaskChars: false,
 };
 
 /**
@@ -342,6 +349,10 @@ const LEGACY_FLAGS = [
   "legacyLinkDestinations",
   "legacyTables",
   "labelPrecedence",
+  // Re-reading a task's text as blocks (`- [ ] 1.` nests a list) and demoting an unclosed `$$`
+  // opened in a container to text: what Obsidian delivers, which no standard it claims says.
+  // Released never, so removed as an option like the rest.
+  "taskReparse",
 ] as const;
 
 /** The resolved options, with the preset's internal legacy switches. */
@@ -360,7 +371,6 @@ const defaultOptions: RemarkObsidianFlags = {
   tags: true,
   customTaskChars: true,
   math: true,
-  taskReparse: true,
   frontmatter: true,
   keepComments: true,
   parseComments: true,

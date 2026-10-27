@@ -14,6 +14,10 @@ references now agree on 6,828 of 6,844 documents (from 6,307), and node position
 Obsidian's: every recorded section and heading start and end matches, against 97% and 94%
 before.
 
+**`strict` is what Obsidian intends:** the CommonMark, GFM and LaTeX it says it supports, plus
+the syntax it documents — including task boxes holding any character (`- [-]`, `- [?]`), which
+Obsidian documents as checkboxes and `strict` now reads the same way.
+
 **Tree shapes that changed in `legacy`,** each to what Obsidian reports:
 
 - A block's position starts at its line, indentation included (` ### foo` starts at column 1).

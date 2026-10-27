@@ -34,10 +34,11 @@ import { GFM_SPEC_EXTENSIONS } from "./gfm.js";
 /**
  * Obsidian syntax is ON in strict by design, so these are correct rather than tolerated.
  *
- * The README's split is explicit: strict keeps Obsidian's SYNTAX (wikilinks, embeds, callouts,
- * tags, `%%`, `==`, `$`, frontmatter) and drops only the divergences Obsidian inherited from
- * `remark-parse@8`. A CommonMark example that happens to contain `#hashtag` or `[[` therefore
- * SHOULD parse differently.
+ * The README's split is explicit: strict is what Obsidian INTENDS -- the CommonMark, GFM and LaTeX
+ * it says it supports, plus the syntax it documents adding (wikilinks, embeds, callouts, tags,
+ * `%%`, `==`, `$`, frontmatter, task boxes holding any character) -- and drops what it merely
+ * delivers. A spec example that happens to contain `#hashtag` or `[[` therefore SHOULD parse
+ * differently.
  */
 const BY_DESIGN: readonly string[] = [
   "commonmark/atx-headings/64", // +1tag -1text          `#hashtag`
@@ -47,6 +48,11 @@ const BY_DESIGN: readonly string[] = [
   "commonmark/links/559", // +1wikilink -4text -1linkReference -1emphasis
   "commonmark/images/590", // +2wikilink -1text
   "commonmark/raw-html/619", // +1text +1tag
+  // `data.taskChar` on every box, nothing else: Obsidian documents ANY character between a task's
+  // brackets as a checkbox, so strict reads boxes that way and records which character it was.
+  // `checked` and the structure are GFM's own.
+  "gfm/disabled/279", // +data.taskChar
+  "gfm/disabled/280", // +data.taskChar
 ];
 
 /**

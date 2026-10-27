@@ -79,12 +79,20 @@ Both have known-positive controls. Re-run them after ANY change under `src/rp8`.
 
 ## Two modes, two audiences
 
-|                                                                                                                   | `legacy`                                                   | `strict`                  |
-| ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------- |
-| Obsidian syntax (wikilinks, embeds, callouts, tags, `%%`, `==`, `$`, frontmatter)                                 | on                                                         | **on**                    |
-| Obsidian's inherited rp8 divergences (emphasis, lists, entities, autolinks, code spans, html blocks, link labels) | on                                                         | **off**                   |
-| consumer                                                                                                          | Obsidian plugins (`obsidian-linter`, `obsidian-footnotes`) | **Quartz**                |
-| requires                                                                                                          | exact tokens **and exact positions**                       | CommonMark/GFM compliance |
+|                                                                                                                                         | `legacy`                                                   | `strict`                  |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------- |
+| Obsidian's DOCUMENTED syntax (wikilinks, embeds, callouts, tags, `%%`, `==`, `$`, frontmatter, any-character task boxes)                | on                                                         | **on**                    |
+| What Obsidian DELIVERS beyond its standards (emphasis, lists, entities, autolinks, code spans, html blocks, link labels, task re-parse) | on                                                         | **off**                   |
+| consumer                                                                                                                                | Obsidian plugins (`obsidian-linter`, `obsidian-footnotes`) | **Quartz**                |
+| requires                                                                                                                                | exact tokens **and exact positions**                       | CommonMark/GFM compliance |
+
+**The definition (the user's, 2026-10-27): `strict` is what Obsidian INTENDS, `legacy` what it
+DELIVERS.** Obsidian's help says it "supports CommonMark, GitHub Flavored Markdown, and LaTeX" and
+documents its additions (Obsidian Flavored Markdown, the syntax page: "You can use any character
+inside the brackets to mark it as complete"). So `strict` = those standards + documented syntax,
+and anything Obsidian does that neither describes belongs to `legacy` only. That decided
+`customTaskChars` (on in both) and `taskReparse` (removed: never released, and both of its passes
+-- the task-line reparse and the unclosed-`$$` demotion -- are delivered, not intended).
 
 `legacy` is the current default. Positions are a hard constraint for it — plugin consumers index
 by them, so a correct token at a wrong offset is a failure.
@@ -93,8 +101,9 @@ by them, so a correct token at a wrong offset is a failure.
 says nothing about strict — `strict.test.ts` is the gate that does, differentially against stock
 `remark-parse` + `remark-gfm` over **676 examples**: the 652 CommonMark spec examples
 (`commonmark.ts`) plus the 24 tagged GFM extension examples (`gfm.ts`). It opened at **32
-divergences, 26 in node types**, and stands at **8**: seven are Obsidian syntax appearing by
-design, and one is `raw-html/626`, already a recorded refusal. Unlike legacy, strict has a
+divergences, 26 in node types**, and stands at **10**: nine are Obsidian's documented syntax appearing by design (the two
+GFM task-list examples since `strict` reads any-character task boxes, adding `data.taskChar`), and
+one is `raw-html/626`, already a recorded refusal. Unlike legacy, strict has a
 _closed_ oracle — published specs with known answers — which is why it terminated.
 
 Every one of the 27 closed was a legacy pass running **unconditionally**, with no option for
