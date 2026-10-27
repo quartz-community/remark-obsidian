@@ -29,8 +29,11 @@ lists, where it adds `data.taskChar`.
   `2.` line continues a definition's text, while a table, a link reference definition or a
   setext underline ends it. A label may hold `[` and a backslash escapes nothing in it. A `[^`
   label that is not a footnote's is plain text, not a link reference definition.
-- **A `%%` comment** ends at its closing `%%`, takes the lines below it when left open in a quote
-  or list item, and cannot open inside a footnote definition.
+- **A `%%` comment** ends at its closing `%%`, and the text after it takes the lines below it.
+  An opener on a lazy line of a quote or list item ends that container; left open in one, a
+  comment takes the lines below it. It cannot open inside a footnote definition.
+- **A callout's title line stands alone:** the line under it starts a fresh block, and text after
+  the marker is read as blocks, so a definition there is found by its references.
 - **A highlight crossing emphasis** goes to whichever opened first, as in Reading view:
   `**a==b**c==` is bold, `==a**b==c**` highlighted.
 - **Inside `^[ … ]`** a footnote reference is text, and **a `#` right after a `]`** that closed a

@@ -45,7 +45,7 @@ import {
   footnoteReferenceToMarkdown,
 } from "./lib/mdast/footnote-reference-to-markdown.js";
 import { customTaskCharTransform } from "./lib/task-char.js";
-import { footnoteReadingTransform } from "./lib/footnote-reading.js";
+import { obsidianReadingTransform } from "./lib/obsidian-reading.js";
 import { mathDisplayTransform } from "./lib/math-display.js";
 import { mathFenceTransform } from "./lib/math-fence.js";
 import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
@@ -393,7 +393,7 @@ export default function remarkObsidian(
 
   // Footnotes are in neither CommonMark nor GFM's spec, so `strict` reads them as Obsidian does
   // where that departs from `remark-gfm`: a label's characters here, where a definition starts
-  // and ends in `footnoteReadingTransform`. Only when `remark-gfm`'s footnotes are registered --
+  // and ends in `obsidianReadingTransform`. Only when `remark-gfm`'s footnotes are registered --
   // without them there are no footnotes to read, and these tokens would have no handler.
   if (hasGfmFootnotes(data.micromarkExtensions)) {
     data.micromarkExtensions.push(obsidianFootnoteSyntax());
@@ -410,11 +410,11 @@ export default function remarkObsidian(
   // parser merely DELIVERS is `legacy`'s, which parses with that parser instead.
   const transform = (tree: Root, file: unknown): void => {
     // First, because it re-parses the whole document: every pass below sees the result.
-    footnoteReadingTransform(
+    obsidianReadingTransform(
       tree,
       String(file),
       (markdown) => self.parse(markdown),
-      { callouts: opts.callouts },
+      { callouts: opts.callouts, comments: opts.comments },
     );
     if (opts.comments && !opts.keepComments) {
       visit(
@@ -508,7 +508,17 @@ export default function remarkObsidian(
     });
     // A label four columns into a definition, with no blank line, is the definition's text.
     definitionNestedLabelTransform(tree, String(file));
-    if (opts.bareFootnoteRefs) bareFootnoteRefTransform(tree, String(file));
+    if (opts.bareFootnoteRefs) {
+      bareFootnoteRefTransform(tree, String(file));
+    } else {
+      // Every definition a pass built from a re-parsed fragment, found the way GFM finds one:
+      // micromark resolved references before those definitions existed.
+      const defined = new Set<string>();
+      visit(tree, "footnoteDefinition", (node) => {
+        defined.add(node.identifier.toLowerCase());
+      });
+      bareFootnoteRefTransform(tree, String(file), { defined });
+    }
     // An unclosed `$$` directly under a definition in a list item is the definition's.
     definitionMathAbsorbTransform(tree, String(file));
     // A definition's text ends before a column-0 label or block opener.

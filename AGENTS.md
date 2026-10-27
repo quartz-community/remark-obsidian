@@ -107,7 +107,7 @@ Two of Obsidian's behaviours are deliberately NOT followed: the 1,024-character 
 The label rules (3) live in a vendored `micromark-extension-gfm-footnote`
 (`src/lib/syntax/footnote.ts`), whose constructs are renamed and replace upstream's through
 `disable`. The rest cannot go in the construct: micromark does not tell a container start
-whether it interrupts a paragraph on a LAZY line. So `footnoteReadingTransform` re-parses an
+whether it interrupts a paragraph on a LAZY line. So `obsidianReadingTransform` re-parses an
 EDITED copy with the same line structure, using two edits:
 
 - swap one character (the label's `:`, the marker's `.`/`)`) for a private-use placeholder,
@@ -196,6 +196,34 @@ span, so `highlight.ts` now simulates CommonMark's pairing on the runs micromark
 flagged. If a closer inside the body reaches an opener from before the `==`, the highlight
 declines. Against the 370 recorded `==` cases `strict` now matches 362, and GFM's strikethrough
 rules applied to `==` would match none that it misses.
+
+**The syntax audit: probe each Obsidian rule area live, then gate it.** Grouping the corpus's
+537 `strict` mismatches by family mostly yields CommonMark constructs `strict` reads by the spec on
+purpose (`fuzz/highlight`'s 64 are setext under list items), so the corpus cannot separate the
+extension cases. Instead, each rule area of the upstream rules document is probed against the
+live app, and the facts are compared through `computeOurs` on lines. That is
+`goldens/strict-syntax.json` plus `strict-syntax.test.ts`, 93 probes so far. Two traps cost runs:
+
+- Obsidian's `sections` carry `element`/`text` entries for the rendered footnote list, which no
+  tree holds, so `legacy` "missed" every probe until they were dropped.
+- `ask.mts` must run without `npx`.
+
+- **Comments (their F1-F6):**
+  - **F4:** an opener on a LAZY line of a quote or list item ends the container. micromark either
+    absorbed it into the paragraph or opened a comment inside the container.
+  - **F2:** the closer's tail takes lazy lines.
+  - **Whitespace:** the shape decides, not the width. Spaces alone or a leading tab make an opener
+    (`\t%%` and `····%%` end a quote as root code), while one to three spaces and then a tab make
+    no opener (`>·x` / `·\t%%` / `[^1]: def` is one quote that defines nothing).
+  - 37 + 15 probes, all agreeing; referee definitions +18 / −0.
+- **Callouts (A1-A5):**
+  - **A2:** the title line stands alone. A blank quote line goes in after it, spelled with the
+    NEXT line's prefix (`\t> >` and `·····> >` can name the same containers at different
+    widths), unless that line is lazy.
+  - **A4:** text after the marker was already re-read as blocks, but the definitions those re-reads
+    build were invisible to references micromark had resolved earlier. So under `strict`
+    `bareFootnoteRefTransform` runs in a defined-labels-only mode.
+  - 41 probes, all agreeing; referee references +14, definitions +2 / −1 (tab arithmetic).
 
 **Its gates**, beyond the suite above:
 

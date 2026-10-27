@@ -265,6 +265,20 @@ export const ORACLES: readonly Oracle[] = [
     test: "strict-footnotes.test.ts",
   },
   {
+    name: "strict Obsidian syntax vs Obsidian",
+    command: "npm test",
+    gate: "absolute",
+    compares: [
+      "sections, footnotes, references, links, embeds, tags, headings and block ids, on lines, against the metadata cache's answers for probes of each Obsidian syntax area (goldens/strict-syntax.json)",
+    ],
+    blind: [
+      "columns: strict promises no positions",
+      "areas not yet probed, and documents nobody probed",
+      "Obsidian releases after 1.15.0, which answered these probes",
+    ],
+    test: "strict-syntax.test.ts",
+  },
+  {
     name: "recorded contradictions",
     command:
       "TOP=24 tsx test/parity/fuzz/contradictions.ts to see the shapes behind a failure",

@@ -547,8 +547,21 @@ function insideAutolink(parent: unknown, source: string): boolean {
   return at !== undefined && source[at] === "<";
 }
 
-export function bareFootnoteRefTransform(tree: Root, source = ""): void {
-  if (source !== "") {
+export function bareFootnoteRefTransform(
+  tree: Root,
+  source = "",
+  options: {
+    /**
+     * Convert only references to these identifiers, as GFM would have: `strict`'s use, where a
+     * reference nothing defines stays literal, but a definition that a pass built from a
+     * re-parsed fragment -- a callout's title line, a comment's tail -- still has to be found.
+     * micromark resolved every reference before those definitions existed.
+     */
+    readonly defined?: ReadonlySet<string>;
+  } = {},
+): void {
+  const only = options.defined;
+  if (source !== "" && only === undefined) {
     bracketLabelReferences(tree, source);
     rejoinSplitReferences(tree, source);
   }
@@ -665,6 +678,7 @@ export function bareFootnoteRefTransform(tree: Root, source = ""): void {
             .replace(/\\(?=[!-/:-@[-`{-~])/gu, "\\")
         : name;
       const identifier = written.toLowerCase();
+      if (only !== undefined && !only.has(identifier)) continue;
       pushText(cursor, match.index);
       parts.push(
         positioned(

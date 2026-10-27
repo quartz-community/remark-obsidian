@@ -106,16 +106,22 @@ export function commentTailTransform(
 }
 
 /**
- * A definition recovered from the tail keeps reading the line below it.
+ * A tail keeps reading the line below it, as text written normally would.
  *
  * The tail is parsed on its own, so it ends where the line does, but Obsidian
- * treats it as a definition written normally — `%%\nhidden\n%%[^1]: def` followed
- * by `text` is one definition holding both lines. Without this the second line
- * stays a paragraph and renders in the body, where Obsidian shows nothing.
+ * treats it as ordinary Markdown: `%%\nhidden\n%%[^1]: def` followed by `text` is
+ * one definition holding both lines, and `%%` / `x` / `%% after` / `lazy` one
+ * paragraph -- "text after the closer starts a paragraph that takes lazy lines"
+ * (their F2). Without this the line below stays a paragraph of its own.
  */
 function absorbLazyLine(tree: Root, index: number, source: string): void {
   const definition = tree.children[index];
-  if (definition?.type !== "footnoteDefinition") return;
+  if (
+    definition?.type !== "footnoteDefinition" &&
+    definition?.type !== "paragraph"
+  ) {
+    return;
+  }
 
   const next = tree.children[index + 1];
   if (next?.type !== "paragraph") return;
@@ -125,7 +131,10 @@ function absorbLazyLine(tree: Root, index: number, source: string): void {
   if (end === undefined || start === undefined) return;
   if (source.slice(end, start) !== "\n") return;
 
-  const host = definition.children[definition.children.length - 1];
+  const host =
+    definition.type === "paragraph"
+      ? definition
+      : definition.children[definition.children.length - 1];
   if (host?.type !== "paragraph") return;
 
   // The guard above proves the gap is exactly one newline, so it spans `end` to
@@ -134,7 +143,7 @@ function absorbLazyLine(tree: Root, index: number, source: string): void {
     span<Text>({ type: "text", value: "\n" } as Text, source, end, start),
     ...next.children,
   );
-  for (const node of [host, definition]) {
+  for (const node of new Set([host, definition])) {
     if (node.position && next.position?.end) {
       node.position.end = { ...next.position.end };
     }

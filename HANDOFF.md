@@ -21,7 +21,7 @@ were Obsidian syntax bare rp8 lacks; and `strict` simply stays on micromark. The
 | structural invariant violations      |                      10 |                     **0** |
 | slowest gated pathological shape     | 7.4 s (`footnote-refs`) | 985 ms (`unclosed-links`) |
 
-Suite 464 passed / 3 skipped, lint, both typechecks, format and build green. Commits on
+Suite 467 passed / 3 skipped, lint, both typechecks, format and build green. Commits on
 `rp8-legacy-prototype`: `6aa9bfa` prototype, `d73c42a` wiring, `6ba3e8e` vendoring and
 performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
 
@@ -40,12 +40,9 @@ performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
      emphasis goes to whichever opened first, as in Reading view (Live Preview differs).
    - **The removed passes -- DONE.** 13 of 22 came back after measuring each against Obsidian;
      the rest are recorded as refused or inert (AGENTS.md § 2.0).
-   - **NEXT, the syntax extensions.** 14 footnote losses are one comment rule: Obsidian reads an
-     indented `%%` line (`> x` / `    %%`) as an opener that ends the paragraph, and the comment
-     extension does not.
-   - **The syntax extensions** (`legacyHighlightQueue`, the callout and comment grammars, tags,
-     inline footnotes) were tuned against Obsidian, which the extension rule now endorses; re-check
-     each against the live app rather than assume.
+   - **The syntax audit -- comments and callouts DONE** (`strict-syntax.test.ts`, 93 probes).
+     NEXT: wikilinks and embeds (D1), frontmatter (D2), block ids (D4), inline footnotes (E3),
+     math (M1-M2), tags. Probe each rule area live, fix, append to `goldens/strict-syntax.json`.
    - **micromark itself departs from CommonMark** on `> a` / `2. x`: it starts a list where the
      spec (and Obsidian) continue the quote's paragraph, since `2.` cannot interrupt one. A
      question about stock `remark-parse`, not this package; `strict.test.ts` cannot see it.

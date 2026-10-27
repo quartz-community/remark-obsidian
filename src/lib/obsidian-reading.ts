@@ -24,6 +24,18 @@ import { MARKER as CALLOUT_MARKER } from "./callout.js";
  *    no footnote to Obsidian and no link reference definition either -- two plain paragraphs --
  *    where CommonMark, given the line once GFM's footnote reader declines it, defines a link.
  *
+ * 5. **A `%%` opener is never a lazy line of a container** (their F4). A line that, after any
+ *    spaces, opens a comment -- `%%` and nothing holding another `%` -- under a paragraph in a
+ *    quote or list item, without the container's own prefix, ends the container: `> q` / `%%`
+ *    is a quote and then a comment, and indented four or more it is root code (their F5), so
+ *    `> x` / `····%%` / `[^1]: def` defines. Not under a definition, where `%%` is lazy text
+ *    (their D5).
+ *
+ * 6. **A callout's title line stands alone** (their A2). The line under it starts a fresh block,
+ *    so `> [!note]` / `>     code[^2]` is quoted code and `> [!note]` / `> 2. [^1]: def` a list:
+ *    a blank quote line goes in after the title, where the next line carries the quote's own
+ *    prefix. A LAZY next line stays the body paragraph's, as Obsidian has it.
+ *
  * Not followed, by decision: the 1,024-character window in which remark-footnotes looks for what
  * ends a definition (an implementation limit), and the column 0 Obsidian reports for an indented
  * root definition (a position, which `strict` does not promise).
@@ -40,11 +52,11 @@ import { MARKER as CALLOUT_MARKER } from "./callout.js";
  *
  * Repeats until nothing applies, since one edit can expose the next (`2.` then `3.`).
  */
-export function footnoteReadingTransform(
+export function obsidianReadingTransform(
   tree: Root,
   source: string,
   parse: (markdown: string) => Root,
-  options: { readonly callouts: boolean },
+  options: { readonly callouts: boolean; readonly comments: boolean },
 ): void {
   if (PLACEHOLDER_IN.test(source)) return;
   const lines = lineTable(source);
@@ -127,6 +139,25 @@ function lineTable(source: string): Lines {
 }
 
 const SETEXT_UNDERLINE = /^(?:=+|-+)$/u;
+/** Their F1: after any spaces `%%`, and no other `%` anywhere on the line. */
+const COMMENT_OPENER = /^%%[^%]*$/u;
+/**
+ * The whitespace in front of a lazy opener that still makes it one: spaces alone, or a leading
+ * tab. One to three spaces and THEN a tab is no opener -- the line stays lazy text, so
+ * `> x` / `·⇥%%` / `[^1]: def` is one quote and defines nothing -- while `⇥%%`, `⇥·%%` and
+ * `····%%` end the quote as root code (live, 1.15.0).
+ */
+const OPENER_INDENT = /^(?:\t[ \t]*| *)$/u;
+
+/** Whether a line opens a comment once its container's `>` markers are read off. */
+function opensComment(text: string): { lead: string } | undefined {
+  const lead = /^[> \t]*/u.exec(text)![0];
+  if (!COMMENT_OPENER.test(text.slice(lead.length))) return undefined;
+  return OPENER_INDENT.test(lead.slice(lead.lastIndexOf(">") + 1))
+    ? { lead }
+    : undefined;
+}
+const CONTAINERS = new Set(["blockquote", "listItem", "footnoteDefinition"]);
 const CONTAINER_PREFIX = /^[> \t]*$/u;
 const LINK_DEFINITION_HINT = /^ {0,3}\[(?!\^)[^\]]+\]:/u;
 
@@ -135,9 +166,11 @@ function detect(
   source: string,
   lines: Lines,
   parse: (markdown: string) => Root,
-  options: { readonly callouts: boolean },
+  options: { readonly callouts: boolean; readonly comments: boolean },
 ): Edit[] {
   const edits: Edit[] = [];
+  /** Rule 5's splits, applied alone: ending a container changes which paragraphs are open. */
+  const splits: Edit[] = [];
   /** Paragraphs with no definition among their ancestors, by the line they end on. */
   const openParagraphEnds = new Map<number, Paragraph[]>();
   /** Which of those open with a callout title, since callouts are built later. */
@@ -158,10 +191,28 @@ function detect(
     item: Node | undefined,
     hostLine: number,
     parent?: Parent,
+    container?: string,
   ): void => {
+    if (
+      options.comments &&
+      !inDefinition &&
+      (container === "blockquote" || container === "listItem")
+    ) {
+      // A paragraph that absorbed the opener as lazy text, or a comment micromark opened on the
+      // lazy line itself, inside the container.
+      const split =
+        node.type === "paragraph"
+          ? lazyCommentOpener(node as Paragraph, lines)
+          : node.type === "comment" && parent && parent.children[0] !== node
+            ? lazyCommentNode(node, parent, lines)
+            : undefined;
+      if (split) splits.push(split);
+    }
     if (node.type === "paragraph" && !inDefinition && node.position) {
       if (options.callouts && isCalloutTitle(node as Paragraph, parent)) {
         calloutTitles.add(node as Paragraph);
+        const split = calloutBodySplit(node as Paragraph, lines);
+        if (split) splits.push(split);
       }
       const end = node.position.end.line;
       openParagraphEnds.set(end, [
@@ -196,10 +247,12 @@ function detect(
         node.type === "listItem" ? node : item,
         node.type === "root" ? 0 : (node.position?.start.line ?? 0),
         node as Parent,
+        CONTAINERS.has(node.type) ? node.type : container,
       );
     }
   };
   walk(tree, false, undefined, 0);
+  if (splits.length > 0) return splits;
 
   for (const { node: definition, item, hostLine } of definitions) {
     const position = definition.position;
@@ -337,6 +390,108 @@ function titleLeavesLabel(
       before.position?.end.line === body.length - 1
     )
   );
+}
+
+/** Columns, with a tab advancing to the next multiple of four. */
+function columns(text: string): number {
+  let column = 0;
+  for (const character of text)
+    column = character === "\t" ? column + 4 - (column % 4) : column + 1;
+  return column;
+}
+
+/**
+ * A blank line before the first `%%` opener that sits on a LAZY line of `paragraph`, which is in
+ * a quote or list item: one carrying fewer `>` than the paragraph's own first line, or indented
+ * short of where its content starts.
+ */
+function lazyCommentOpener(
+  paragraph: Paragraph,
+  lines: Lines,
+): Edit | undefined {
+  const position = paragraph.position;
+  if (!position || position.start.offset === undefined) return undefined;
+  const first = position.start.line;
+  const prefix = (lines.text[first - 1] ?? "").slice(
+    0,
+    position.start.offset - (lines.starts[first - 1] ?? 0),
+  );
+  const quotes = prefix.split(">").length - 1;
+  const width = columns(prefix);
+  for (let line = first + 1; line <= position.end.line; line += 1) {
+    const opener = opensComment(lines.text[line - 1] ?? "");
+    if (!opener) continue;
+    const { lead } = opener;
+    const lazy = lead.split(">").length - 1 < quotes || columns(lead) < width;
+    if (!lazy) continue;
+    const offset = lines.starts[line - 1];
+    return offset === undefined
+      ? undefined
+      : { kind: "split", offset, text: "" };
+  }
+  return undefined;
+}
+
+/** The prefix a container's lines carry, read off its first child's line: `>` count and width. */
+function containerPrefix(
+  container: Parent,
+  lines: Lines,
+): { quotes: number; width: number } | undefined {
+  const start = container.children[0]?.position?.start;
+  if (!start || start.offset === undefined) return undefined;
+  const prefix = (lines.text[start.line - 1] ?? "").slice(
+    0,
+    start.offset - (lines.starts[start.line - 1] ?? 0),
+  );
+  return { quotes: prefix.split(">").length - 1, width: columns(prefix) };
+}
+
+/** A blank quote line after a callout's title, when the line under it is quoted like it. */
+function calloutBodySplit(title: Paragraph, lines: Lines): Edit | undefined {
+  const position = title.position;
+  if (!position || position.start.offset === undefined) return undefined;
+  const first = position.start.line;
+  if (position.end.line === first) return undefined;
+  const titlePrefix = (lines.text[first - 1] ?? "").slice(
+    0,
+    position.start.offset - (lines.starts[first - 1] ?? 0),
+  );
+  const next = lines.text[first] ?? "";
+  const lead = /^[> \t]*/u.exec(next)![0];
+  // Quoted as deeply as the title, or the line is lazy and the body paragraph keeps it.
+  const depth = titlePrefix.split(">").length - 1;
+  if (lead.split(">").length - 1 < depth) return undefined;
+  const offset = lines.starts[first];
+  if (offset === undefined) return undefined;
+  // The blank line carries the NEXT line's own spelling of the containers, up to the title's
+  // `>`: `\t> >` and `·····> >` can name the same containers at different widths, and copying
+  // the title's ended the list item around them.
+  let cut = 0;
+  for (let seen = 0; cut < lead.length && seen < depth; cut += 1) {
+    if (lead[cut] === ">") seen += 1;
+  }
+  return { kind: "split", offset, text: lead.slice(0, cut) };
+}
+
+/** A blank line before a comment that opened on a LAZY line of its container. */
+function lazyCommentNode(
+  comment: Node,
+  container: Parent,
+  lines: Lines,
+): Edit | undefined {
+  const line = comment.position?.start.line;
+  const expected = containerPrefix(container, lines);
+  if (line === undefined || !expected) return undefined;
+  const opener = opensComment(lines.text[line - 1] ?? "");
+  if (!opener) return undefined;
+  const { lead } = opener;
+  const lazy =
+    lead.split(">").length - 1 < expected.quotes ||
+    columns(lead) < expected.width;
+  const offset = lines.starts[line - 1];
+  return lazy && offset !== undefined
+    ? { kind: "split", offset, text: "" }
+    : undefined;
 }
 
 /** The offset of the `:` after a definition's label, checked against the source. */
