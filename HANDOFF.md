@@ -21,20 +21,22 @@ were Obsidian syntax bare rp8 lacks; and `strict` simply stays on micromark. The
 | structural invariant violations      |                      10 |                     **0** |
 | slowest gated pathological shape     | 7.4 s (`footnote-refs`) | 985 ms (`unclosed-links`) |
 
-Suite 464 passed / 3 skipped, lint, both typechecks, format and build green. Commits on
+Suite 463 passed / 3 skipped, lint, both typechecks, format and build green. Commits on
 `rp8-legacy-prototype`: `6aa9bfa` prototype, `d73c42a` wiring, `6ba3e8e` vendoring and
 performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
 
 ## What is left
 
-1. **Dead code.** Every micromark construct and pass reachable only through the 14 internal
-   `legacy*` switches is now unreachable: `legacy` never runs micromark and `strict` turns them
-   all off. (They were never released as options -- no published tarball carries them -- so the
-   options were removed outright.) Removing it is pure deletion, gated by `strict.test.ts` (whose output cannot
-   change) and the suite. It is most of `src/lib` and would shrink the 726 KB bundle.
-2. **`strict`'s unconditional passes.** 57 passes run under both presets; 51 own no spec example.
-   They existed to match Obsidian, which `legacy` no longer needs them for. Each is now a
-   question for `strict.test.ts` alone: keep, gate, or remove.
+1. **Dead code -- DONE.** The 41 modules reachable only through the internal `legacy*` and
+   `taskReparse` switches are deleted, 8,716 lines, along with the switches themselves. The
+   output is byte-identical on 70,499 fingerprints with a known-positive control (AGENTS.md
+   § 2.0), and the bundle drops from 755,021 to 564,319 bytes.
+2. **`strict`'s passes.** The transform now runs under `strict` alone, since `legacy` returns
+   before it. 40 of its passes run unconditionally and 35 sit behind a feature option, most of
+   them in the `bareFootnoteRefs` block, which `strict` turns off. They existed to match Obsidian, which `legacy` no
+   longer needs them for, so each is a question for `strict.test.ts` and the intends/delivers
+   rule: keep, gate, or remove. Some do nothing at all now: `adjacentIndentedCodeTransform`
+   moves none of the 70,499 fingerprints when stood down.
 3. **The 16 referee documents.** 4 are P1/P2 (must not fix); 2 carry references on lines past the
    text's end (artifacts of the corrected answers); 4 carry references only the corrected answers
    have, inside code or an unclosed fence (`reproducers.json#852` is the one 1.x got right); 6
@@ -47,7 +49,8 @@ performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
 6. **Instruments.** `pass-owner*`, `ablate*`, `mechanism.mts` and their kin attribute behaviour to
    micromark passes `legacy` no longer runs.
 7. **Release.** 419 pending changesets, almost all micromark-era fixes, will land in the 2.0
-   changelog beside `legacy-remark-parse-8.md`; curate them. The goldens were last recorded
+   changelog beside `legacy-remark-parse-8.md`; curate them. Some now describe deleted code,
+   e.g. `legacy-container-lazy-and-link-destinations.md` and `task-reparse-children-start.md`. The goldens were last recorded
    against Obsidian 1.14.5.
 8. **rp8 and the four upstream pathological exceptions** (`nested-blockquotes`, `delimiter-run`,
    `list-dash-sandwich`, `callout-nest`) exceed 60 s on both parsers. Not a regression, and not

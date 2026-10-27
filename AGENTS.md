@@ -51,10 +51,14 @@ highlights, tags, positioned soft breaks, and the speed-ups), `src/rp8/adapt.ts`
 this package's node types), `src/rp8/list.ts` (rp8's list reader with the two B3/B8 changes),
 `src/rp8/vendor/` (rp8, remark-footnotes 2, remark-math 3, parse-entities 2 -- see its README for
 every change made after conversion). `remarkObsidian` installs the reader as `this.parser` under
-`legacy`, so it must be `.use()`d after `remark-parse`. The 14 `legacy*` switches are internal,
-set from the preset (all on for `legacy`, all off for `strict`): no release ever carried them as
-options -- checked against every published tarball -- so they were removed rather than
-deprecated.
+`legacy`, so it must be `.use()`d after `remark-parse`. The 14 `legacy*` options and
+`taskReparse` are GONE, along with the 41 modules only they reached: micromark's legacy
+constructs and the passes that emulated rp8. No release ever carried them, which was checked
+against every published tarball, so nothing was deprecated. `strict` turned all of them off, so
+the deletion is byte-identical. 4,147 documents under `strict`, `strict` with each option
+flipped, and `legacy` gave 70,499 tree-and-stringify fingerprints, and none moved. Standing
+down `calloutTransform` moves 119 documents per configuration, which is the known-positive
+control. Where the micromark-era record below names one of those passes, it is history.
 
 **Its gates**, beyond the suite above:
 

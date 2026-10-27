@@ -14,16 +14,6 @@ import { highlightSyntax } from "./lib/syntax/highlight.js";
 import { commentSyntax } from "./lib/syntax/comment.js";
 import { tagSyntax } from "./lib/syntax/tag.js";
 import { inlineFootnoteSyntax } from "./lib/syntax/inline-footnote.js";
-import { legacyEmphasisSyntax } from "./lib/syntax/legacy-emphasis.js";
-import { legacyDeleteSyntax } from "./lib/syntax/legacy-delete.js";
-import { legacyAutolinkSyntax } from "./lib/syntax/legacy-autolink.js";
-import { legacyCodeTextSyntax } from "./lib/syntax/legacy-code-text.js";
-import { legacyBlockQuoteSyntax } from "./lib/syntax/legacy-block-quote.js";
-import { legacyCodeFencedSyntax } from "./lib/syntax/legacy-code-fenced.js";
-import { legacyFootnoteDefinitionSyntax } from "./lib/syntax/legacy-footnote-definition.js";
-import { legacyIndentedCodeSyntax } from "./lib/syntax/legacy-indented-code.js";
-import { legacyListSyntax } from "./lib/syntax/legacy-list.js";
-import { legacyEntitySyntax } from "./lib/syntax/legacy-entity.js";
 
 import { wikilinkFromMarkdown } from "./lib/mdast/wikilink.js";
 import { highlightFromMarkdown } from "./lib/mdast/highlight.js";
@@ -41,24 +31,14 @@ import { footnoteReferenceToMarkdown } from "./lib/mdast/footnote-reference-to-m
 import { customTaskCharTransform } from "./lib/task-char.js";
 import { mathDisplayTransform } from "./lib/math-display.js";
 import { mathFenceTransform } from "./lib/math-fence.js";
-import { taskReparseTransform } from "./lib/task-reparse.js";
 import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 import { refBeforeLabelTransform } from "./lib/ref-before-label.js";
 import { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
 import { inlineFootnoteInertTransform } from "./lib/inline-footnote-inert.js";
 import { inlineRefoldTransform } from "./lib/inline-refold.js";
-import {
-  containerLazyTransform,
-  listEmptyItemTransform,
-} from "./lib/container-lazy.js";
 import { quoteMergeTransform } from "./lib/quote-merge.js";
 import { listMergeTransform } from "./lib/list-merge.js";
-import { indentTabTransform } from "./lib/indent-tab.js";
-import { listEmptyNestTransform } from "./lib/list-empty-nest.js";
 import { listItemExtentTransform } from "./lib/list-item-extent.js";
-import { listTabTransform } from "./lib/list-tab.js";
-import { listTabStraddleTransform } from "./lib/list-tab-straddle.js";
-import { quoteTabTransform } from "./lib/quote-tab.js";
 import { paragraphMergeTransform } from "./lib/paragraph-merge.js";
 import { normalizePointsTransform } from "./lib/normalize-points.js";
 import { breakPositionsTransform } from "./lib/break-positions.js";
@@ -71,7 +51,6 @@ import { definitionSpaceTabSeparatorTransform } from "./lib/definition-space-tab
 import { definitionTabPastItemTransform } from "./lib/definition-tab-past-item.js";
 import { markerTabDefinitionTransform } from "./lib/marker-tab-definition.js";
 import { quotedFenceLazyTransform } from "./lib/quoted-fence-lazy.js";
-import { quoteLazyIndentedCodeTransform } from "./lib/quote-lazy-indented-code.js";
 import { quotedTabCodeTransform } from "./lib/quoted-tab-code.js";
 import { quoteCommentLazyTransform } from "./lib/quote-comment-lazy.js";
 import {
@@ -85,26 +64,10 @@ import { itemFenceCloserTransform } from "./lib/item-fence-closer.js";
 import { mathOutlivesTransform } from "./lib/math-outlives.js";
 import { mathMidlineTransform } from "./lib/math-midline.js";
 import { listUnderDefinitionTransform } from "./lib/list-under-definition.js";
-import { tableRowStyleTransform } from "./lib/table-row-style.js";
-import { tablePipeStyleTransform } from "./lib/table-pipe-style.js";
 import { calloutTitleInterruptTransform } from "./lib/callout-title-interrupt.js";
-import { tableLabelRowTransform } from "./lib/table-label-row.js";
-import { tableIndentedRowTransform } from "./lib/table-indented-row.js";
-import { tableShortDelimiterTransform } from "./lib/table-short-delimiter.js";
-import {
-  htmlSetextTransform,
-  multilineSetextTransform,
-  setextUnderlineTransform,
-} from "./lib/setext-underline.js";
 import { footnoteLabelTransform } from "./lib/footnote-label.js";
-import { tableInterruptTransform } from "./lib/table-interrupt.js";
-import { containerSetextTransform } from "./lib/container-setext.js";
-import { lazySetextTransform } from "./lib/lazy-setext.js";
 import { bareCheckboxTransform } from "./lib/bare-checkbox.js";
 import { blankFootnoteLabelTransform } from "./lib/blank-footnote-label.js";
-import { mathUnclosedContainerTransform } from "./lib/math-unclosed-container.js";
-import { thematicBreakTabTransform } from "./lib/thematic-break-tab.js";
-import { labelPrecedenceTransform } from "./lib/label-precedence.js";
 import { setextDefinitionTransform } from "./lib/setext-definition.js";
 import { itemHtmlExtentTransform } from "./lib/item-html-extent.js";
 import { shortCommentTransform } from "./lib/short-comment.js";
@@ -112,38 +75,23 @@ import { definitionBlankTailTransform } from "./lib/definition-blank-tail.js";
 import { definitionBlankTitleTransform } from "./lib/definition-blank-title.js";
 import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
 import { blankLabelReferenceTransform } from "./lib/blank-label-reference.js";
-import { paddedLabelReferenceTransform } from "./lib/padded-label-reference.js";
-import { textareaNotRawTransform } from "./lib/textarea-not-raw.js";
-import { closingPreInterruptSyntax } from "./lib/syntax/closing-pre-interrupt.js";
-import { labelOpenerWikilinkTransform } from "./lib/label-opener-wikilink.js";
 import { autolinkLiteralExtentTransform } from "./lib/autolink-literal-extent.js";
 import { definitionColumnTransform } from "./lib/definition-column.js";
 import { definitionEndBeforeLabelTransform } from "./lib/definition-end-before-label.js";
 import { definitionDeindentCodeTransform } from "./lib/definition-deindent-code.js";
-import { definitionSetextTransform } from "./lib/definition-setext.js";
-import { listDeepContinuationTransform } from "./lib/list-deep-continuation.js";
 import { invisibleBlankLineTransform } from "./lib/invisible-blank-line.js";
-import { angleDestinationEscapeTransform } from "./lib/angle-destination-escape.js";
 import { doubledFootnoteOpenerTransform } from "./lib/doubled-footnote-opener.js";
 import { restoreInlinePositionsTransform } from "./lib/restore-inline-positions.js";
 import { tagAfterCloserTransform } from "./lib/tag-after-closer.js";
 import { autolinkLiteralToMarkdown } from "./lib/mdast/autolink-literal-to-markdown.js";
 import { htmlTailToMarkdown } from "./lib/mdast/html-tail-to-markdown.js";
-import { linkNbspTitleTransform } from "./lib/link-nbsp-title.js";
 import { linkReferenceToMarkdown } from "./lib/mdast/link-reference-to-markdown.js";
 import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
 import { frontmatterExactOpenerTransform } from "./lib/frontmatter-exact-opener.js";
 import { definitionNestedLabelTransform } from "./lib/definition-nested-label.js";
-import { tablePipelessRowTransform } from "./lib/table-pipeless-row.js";
-import { labelSwallowsDefinitionTransform } from "./lib/label-swallows-definition.js";
 import { quoteDefinitionAbsorbTransform } from "./lib/quote-definition-absorb.js";
 import { placeDefinitionReferenceTransform } from "./lib/place-definition-reference.js";
 import { lrdFootnoteTransform } from "./lib/lrd-footnote.js";
-import {
-  legacyDefinitionPromoteTransform,
-  legacyDefinitionTransform,
-} from "./lib/legacy-definition.js";
-import { quoteIndentedCodeTransform } from "./lib/quote-indented-code.js";
 import { itemDotThresholdTransform } from "./lib/item-dot-threshold.js";
 import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 import { calloutTransform } from "./lib/callout.js";
@@ -329,36 +277,6 @@ const STRICT_OVERRIDES: Partial<RemarkObsidianFlags> = {
   positionedBreaks: false,
 };
 
-/**
- * The micromark path's switches for remark-parse 8's reading, one per part it emulated. Not
- * options: never released, and removed before they were, since `legacy` parses with
- * remark-parse 8 itself. Set from the preset alone -- all on for `legacy`, all off for `strict`.
- */
-const LEGACY_FLAGS = [
-  "legacyEmphasis",
-  "legacyStrikethrough",
-  "legacyEntities",
-  "legacyAutolinks",
-  "legacyCodeSpans",
-  "legacyLists",
-  "legacyHtmlBlocks",
-  "legacySetext",
-  "legacyLinkDefinitions",
-  "legacyTabs",
-  "legacyContainerLazy",
-  "legacyLinkDestinations",
-  "legacyTables",
-  "labelPrecedence",
-  // Re-reading a task's text as blocks (`- [ ] 1.` nests a list) and demoting an unclosed `$$`
-  // opened in a container to text: what Obsidian delivers, which no standard it claims says.
-  // Released never, so removed as an option like the rest.
-  "taskReparse",
-] as const;
-
-/** The resolved options, with the preset's internal legacy switches. */
-type Flags = RemarkObsidianFlags &
-  Record<(typeof LEGACY_FLAGS)[number], boolean>;
-
 const PRESETS: Record<RemarkObsidianPreset, Partial<RemarkObsidianFlags>> = {
   legacy: {},
   strict: STRICT_OVERRIDES,
@@ -407,14 +325,11 @@ export default function remarkObsidian(
   userOpts?: RemarkObsidianOptions,
 ): undefined | ((tree: Root, file: any) => void) {
   const preset = userOpts?.preset ?? "legacy";
-  const opts = {
+  const opts: RemarkObsidianFlags = {
     ...defaultOptions,
     ...PRESETS[preset],
     ...userOpts,
-    ...Object.fromEntries(
-      LEGACY_FLAGS.map((flag) => [flag, preset === "legacy"]),
-    ),
-  } as Flags;
+  };
   // @ts-expect-error - unified `this` context
   const self = this as Processor<Root>;
   const data = self.data();
@@ -488,52 +403,6 @@ export default function remarkObsidian(
     data.toMarkdownExtensions.push(displayAwareMathToMarkdown());
   }
 
-  if (opts.legacyEmphasis) {
-    data.micromarkExtensions.push(legacyEmphasisSyntax());
-  }
-
-  if (opts.legacyStrikethrough) {
-    data.micromarkExtensions.push(legacyDeleteSyntax());
-  }
-
-  if (opts.legacyEntities) {
-    data.micromarkExtensions.push(legacyEntitySyntax());
-  }
-
-  if (opts.legacyAutolinks) {
-    data.micromarkExtensions.push(legacyAutolinkSyntax());
-  }
-
-  if (opts.legacyLists) {
-    data.micromarkExtensions.push(legacyListSyntax());
-    // Beside the list, and gated with it because the rule is about the two meeting: a non-1
-    // ordered marker opens nothing, so the quote absorbs the line instead. Added rather than
-    // disabling stock, exactly as the list above is -- micromark tries the constructs for a
-    // code in order and the one that OPENS a container owns its continuation.
-    data.micromarkExtensions.push(legacyBlockQuoteSyntax());
-    // ONE RAW TAB IS ONE INDENT, in the three places that have to agree about it: the quote
-    // leaves the tab unspent, flow reads it as a whole indent, and a definition's continuation
-    // accepts it so a tab line under a definition continues it instead of becoming code.
-    // Measured apart, the first two alone traded 28 documents for 32. The definition construct
-    // has to be built from whatever gfm registered, so it reads the array rather than returning
-    // a fresh extension, and it is pushed LAST so its opener is the one already in use.
-    data.micromarkExtensions.push(legacyIndentedCodeSyntax());
-    const legacyDefinition = legacyFootnoteDefinitionSyntax(
-      data.micromarkExtensions,
-    );
-    if (legacyDefinition) data.micromarkExtensions.push(legacyDefinition);
-    // Beside the quote because the rule is about the two MEETING: a fence inside a blockquote
-    // runs to its QUOTED closer, so the quote absorbs the lines between rather than closing.
-    data.micromarkExtensions.push(legacyCodeFencedSyntax());
-  }
-  if (opts.legacyCodeSpans) {
-    data.micromarkExtensions.push(legacyCodeTextSyntax());
-  }
-
-  if (opts.legacyHtmlBlocks) {
-    data.micromarkExtensions.push(closingPreInterruptSyntax());
-  }
-
   if (opts.customTaskChars) {
     data.toMarkdownExtensions.push(taskCharToMarkdown());
   }
@@ -549,7 +418,6 @@ export default function remarkObsidian(
     opts.comments ||
     opts.customTaskChars ||
     opts.math ||
-    opts.taskReparse ||
     opts.bareFootnoteRefs ||
     opts.callouts;
   if (!needsTransform) return undefined;
@@ -621,24 +489,7 @@ export default function remarkObsidian(
     lrdFootnoteTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
-    // After the footnote recovery above, so a `[^x]:` label is already out of
-    // the way and only real link reference definitions are re-decided.
-    if (opts.legacyLinkDefinitions) {
-      legacyDefinitionTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-      legacyDefinitionPromoteTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-    }
     shortCommentTransform(tree);
-    // Before anything reads the block structure: a swallowed `<textarea>` hides whole
-    // blocks, so splitting it has to happen while the tree is still being shaped.
-    if (opts.legacyHtmlBlocks) {
-      textareaNotRawTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-    }
     if (opts.customTaskChars) {
       customTaskCharTransform(tree, String(file));
     }
@@ -658,11 +509,6 @@ export default function remarkObsidian(
     definitionIndentedCodeTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
-    if (opts.legacyTabs) {
-      quoteIndentedCodeTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-    }
     // Beside the pass above, which handles the same shape when the marker sits on the code's
     // own line. A single-digit `1.` marker moves the item's CODE THRESHOLD out by one, the
     // same adjustment `definition-column.ts` already applies to the column.
@@ -683,34 +529,13 @@ export default function remarkObsidian(
     definitionLazySplitTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
-    if (opts.legacyContainerLazy) containerLazyTransform(tree, String(file));
-    // Directly after the absorb above, which is what makes the lazy paragraph a SIBLING of
-    // the item's html in the first place. Placed with the other html passes it was INERT:
-    // the pair does not exist yet there, and it is not gated on `math` either, which an
-    // earlier placement inside that branch silently was.
+    // Not with the other html passes, where it measured INERT, and not gated on `math`,
+    // which an earlier placement inside that branch silently was.
     itemHtmlExtentTransform(tree, String(file));
-    // The complement of the pass above: that one needs no blank line, this one
-    // needs exactly the blank line it rejects.
-    if (opts.legacyContainerLazy)
-      listEmptyItemTransform(tree, String(file), (markdown) =>
-        reparse(markdown),
-      );
-    // After it, because that pass has already put any trailing block in the sibling
-    // item and this only has to move the item. Legacy reading only.
-    if (opts.legacyLists) listEmptyNestTransform(tree, String(file));
     quoteMergeTransform(tree, String(file));
-    // Beside the quote merge and for the same reason, but it must follow
-    // `containerLazyTransform`: that pass absorbs a column-zero definition into the list
-    // above it, and the adjacency this repairs only exists afterwards. Their B10 -- a label
-    // between two items is the first item's lazy text, so the list never ended.
+    // Beside the quote merge and for the same reason. Their B10 -- a label between two items
+    // is the first item's lazy text, so the list never ended.
     listMergeTransform(tree, String(file));
-    // After the quote passes have settled the block, since this reads its lines.
-    if (opts.legacyTabs) {
-      quoteTabTransform(tree, String(file));
-      listTabTransform(tree, String(file));
-    }
-    // Beside the tab rule above, and like it only under the legacy list reading.
-    if (opts.legacyLists) listTabStraddleTransform(tree, String(file));
     // After the quote passes have settled the block, since this reads the
     // quote's own extent, and before the footnote passes that would bind a
     // definition it swallows.
@@ -724,18 +549,9 @@ export default function remarkObsidian(
     if (opts.comments) itemCommentLazyTransform(tree, String(file));
     quotedFenceLazyTransform(tree, String(file));
     definitionTabAfterQuoteTransform(tree, String(file));
-    // Beside the tab-separator passes above: the definition this REMOVES is one the earlier
-    // passes may have just placed, so it runs after them rather than before.
+    // Beside the tab-separator pass above: the definition this REMOVES is one an earlier
+    // pass may have just placed, so it runs after rather than before.
     definitionSpaceTabSeparatorTransform(tree, String(file));
-    // Beside the two above, and before every footnote pass: the lines this turns into code
-    // must stop looking like definitions and references BEFORE anything indexes them.
-    if (opts.legacyTabs) {
-      quoteLazyIndentedCodeTransform(tree, String(file), (markdown) =>
-        reparse(markdown),
-      );
-      // Before the footnote passes, so a definition this recovers is one they see.
-      indentTabTransform(tree, String(file), (markdown) => reparse(markdown));
-    }
     // Unconditional, unlike the continuation pass above it: a definition whose
     // first line opened nothing to continue leaves its next line behind whether
     // comments are on or not.
@@ -752,45 +568,6 @@ export default function remarkObsidian(
     mathOutlivesTransform(tree, String(file));
     mathMidlineTransform(tree, String(file));
     listUnderDefinitionTransform(tree, String(file));
-    if (opts.legacyTables) {
-      tableRowStyleTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-      // Before the short-delimiter pass: a table whose rows disagree on the
-      // leading pipe is not a table at all, so there is nothing to widen.
-      tablePipeStyleTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-      tableShortDelimiterTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-    }
-    // Placed after the three table passes so the table it folds a label row into has
-    // settled its shape, and `pass-order.mts` reports that claim as UNEXERCISED: running
-    // this pass first is byte-identical over the whole corpus. micromark builds the table
-    // before any transform runs, so the node it needs always exists; the ordering only
-    // matters for a table whose shape one of those passes changes in a way that moves the
-    // label row, which no recorded case does. Kept here because it is the safe position and
-    // the claim is now honest about its evidence.
-    if (opts.legacyTables) {
-      tableLabelRowTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-    }
-    // After every table pass, so the table is in its final shape before an indented body row
-    // is taken off it. Their rules document's C2: a row indented by even one space does not
-    // start with a pipe, so it is not a row and the table ends before it.
-    if (opts.legacyTables) {
-      tableIndentedRowTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-      // The converse of the pass above, which is why they sit together: an
-      // indented row ENDS a piped table and CONTINUES a pipeless one. Gated here
-      // because GFM reads the line as indented code, so the two presets differ.
-      tablePipelessRowTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-    }
     // After the callout passes, and this one IS exercised -- `pass-order.mts` reports a
     // different tree when it runs first. It reads `calloutTitle`, which does not exist
     // until `calloutTransform` has built it, so at the top it finds nothing and the
@@ -798,86 +575,23 @@ export default function remarkObsidian(
     calloutTitleInterruptTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
-    // Before the interrupt fold: demoting the heading is what lets a definition
-    // on the next line continue it as prose.
-    // Before the demoting pass, which only looks at headings that already
-    // exist: inside a container there is none yet.
-    // Before the setext passes: a break cancelled by a tab is a list from here on,
-    // and nothing downstream should still see a `thematicBreak` there.
-    // Before the lazy passes: a line of invisible whitespace closed the block above
-    // it, so nothing may absorb it afterwards.
+    // Before the absorbing passes below: a line of invisible whitespace closed the block
+    // above it, so nothing may absorb it afterwards.
     invisibleBlankLineTransform(tree, String(file));
-    // Before the lazy passes: a deeply indented continuation belongs to the item,
-    // so the block structure has to settle before anything absorbs siblings.
-    if (opts.legacyContainerLazy) {
-      listDeepContinuationTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-    }
-    // Before anything reads definitions: a definition directly under a setext
-    // underline is not a definition at all, it is the heading's own line.
-    if (opts.legacySetext) definitionSetextTransform(tree, String(file));
     // Before everything that reads offsets: gfm's autolink literal splices nodes
     // with no position at all, and a pass without offsets correctly stands aside.
     restoreInlinePositionsTransform(tree, String(file));
     // Before the bracket passes: a `[^` that beat an inline footnote is a reference,
     // and the passes below ask the tree which construct owns each bracket.
     doubledFootnoteOpenerTransform(tree, String(file));
-    // Before the bracket passes: a link the tokenizer never built is still a link,
-    // and the passes below ask the tree which construct owns each bracket.
-    if (opts.legacyLinkDestinations)
-      angleDestinationEscapeTransform(tree, String(file));
     // Before the bracket passes: a bare URL swallowing a `](` means the brackets
     // after it never belonged to a label at all.
     autolinkLiteralExtentTransform(tree, String(file));
-    if (opts.labelPrecedence) {
-      // Before label precedence: that pass asks the tree which construct owns a
-      // bracket, so the wikilink has to be demoted first or it still owns it.
-      labelOpenerWikilinkTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-      labelPrecedenceTransform(tree, String(file), (markdown) =>
-        reparse(markdown),
-      );
-    }
-    if (opts.legacyTabs) thematicBreakTabTransform(tree, String(file));
-    // Before `containerSetextTransform`: that pass rebuilds a two-line container
-    // paragraph in place, and the lazy line has to leave first or it folds into a
-    // heading inside the quote instead of one at root.
-    // Before both setext passes: a bare checkbox has to stop being a task marker
-    // first, or the underline folds a heading whose content excludes the `[ ]`
-    // Obsidian still shows.
     blankFootnoteLabelTransform(tree, String(file));
     bareCheckboxTransform(tree, String(file));
-    if (opts.legacySetext) {
-      lazySetextTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-      containerSetextTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-      setextUnderlineTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-      // After the paragraph-based setext passes: this one claims an underline the
-      // html block swallowed, which those never see.
-      htmlSetextTransform(tree, String(file));
-    }
-    // NOT gated, and it sits BETWEEN two setext passes deliberately: the order is
-    // load-bearing here, so the guard is split around it rather than hoisting it.
     footnoteLabelTransform(tree, String(file), (markdown) =>
       self.parse(markdown),
     );
-    if (opts.legacySetext) {
-      multilineSetextTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-    }
-    if (opts.legacyTables) {
-      tableInterruptTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-    }
     if (opts.bareFootnoteRefs) {
       // Must precede the bare-reference pass: it re-inserts a `[^n]:` label that
       // the bare pass then reduces, as Obsidian shows it.
@@ -917,11 +631,6 @@ export default function remarkObsidian(
       // places. An unplaced node is invisible to the oracle, so a reference we found
       // is otherwise reported as missing.
       placeDefinitionReferenceTransform(tree, String(file));
-      // After it, not before: this leaves the swallowed label behind as text, and
-      // the pass above would re-read that text as a bare reference Obsidian does
-      // not report -- the revival that measured two earlier fixes inert.
-      if (opts.legacyLinkDefinitions)
-        labelSwallowsDefinitionTransform(tree, String(file));
       // AFTER the bare-reference pass, which is what CREATES the nodes this demotes. Placed
       // before it the pass was completely inert -- the references it looks for did not exist
       // yet -- with its own ordering comment claiming the opposite.
@@ -951,14 +660,6 @@ export default function remarkObsidian(
       }
     }
     paragraphMergeTransform(tree, String(file));
-    if (opts.taskReparse) {
-      taskReparseTransform(tree, String(file), reparse);
-      // After the task reparse, not before it. Three passes can open the block this
-      // undoes -- micromark itself, `mathMidlineTransform`, and this reparse, which
-      // re-reads a task body as block markdown and makes `- [ ] $$y^` math all over
-      // again. Running earlier demoted it and was silently reverted.
-      mathUnclosedContainerTransform(tree, String(file));
-    }
     // Presence of the table means it was recorded, so it is started even for a
     // document holding no container at all.
     if (opts.lineOffsets) ensureLineOffsets(tree);
@@ -1018,25 +719,15 @@ export default function remarkObsidian(
     // After every pass that reads a newline out of a text value, and before points
     // are normalised from the offsets it sets.
     if (opts.positionedBreaks) breakPositionsTransform(tree, String(file));
-    // Late, and order-free: it only ever rewrites a `link`'s own `url` and `title`,
-    // which nothing else here reads. `pass-order.mts` confirms it -- identical output at
-    // both extremes of the chain.
-    if (opts.legacyLinkDestinations) linkNbspTitleTransform(tree);
     // After every pass that can rewrite a paragraph's span, since it matches on one.
     blankLabelReferenceTransform(tree, String(file));
-    // Directly after, because that pass CREATES references and this one demotes them: a
-    // demotion placed earlier is undone, which is how `night:ct`'s fix measured inert.
-    if (opts.legacyLinkDefinitions) {
-      paddedLabelReferenceTransform(tree, String(file));
-    }
     // After every pass that can move a list item's end, and before points are rebuilt.
     // The overlap it repairs comes from `remark-math`; its own file carries the controls.
     listItemExtentTransform(tree);
     // After every pass that can CREATE a root code node, since it merges adjacent ones and a
     // pass running later could leave a fresh pair unmerged. Ungated: micromark splits a run of
     // indented lines below a quote-with-heading, and CommonMark and Obsidian AGREE it is one
-    // block, so this is not a preset divergence like `legacyLists` but a correction both
-    // targets want.
+    // block, so this is not a preset divergence but a correction both targets want.
     adjacentIndentedCodeTransform(tree, String(file));
     // Last, so every pass above only has to keep its offsets honest. This comment was
     // orphaned two passes above, where it read as a claim about `linkNbspTitle`; the
@@ -1063,15 +754,15 @@ export default function remarkObsidian(
    *
    * Fragments do *not* only ever shrink, which this used to claim. A pass that
    * locates a body by matching a marker hands back the text it was given when the
-   * match fails -- `taskReparseTransform` does exactly that for a nested item whose
-   * paragraph already starts past its own marker -- and the chain then re-enters
-   * itself on identical input. 55 of 4000 generated documents overflowed the stack
-   * that way, 37 frames deep, and a crash is worse than any divergence.
+   * match fails -- the removed `taskReparseTransform` did exactly that for a nested
+   * item whose paragraph already started past its own marker -- and the chain then
+   * re-enters itself on identical input. 55 of 4000 generated documents overflowed
+   * the stack that way, 37 frames deep, and a crash is worse than any divergence.
    *
    * So the depth is bounded rather than assumed. At the bound the fragment is still
    * parsed, just not transformed, which keeps it well-formed while cutting the
-   * cycle. Bounding it here covers all 19 passes that take a reparse callback
-   * instead of each of them guarding separately.
+   * cycle. Bounding it here covers every pass that takes `reparse` instead of each
+   * of them guarding separately.
    */
   let depth = 0;
   const reparse = (markdown: string): Root => {
@@ -1105,10 +796,8 @@ export { commentToMarkdown } from "./lib/mdast/comment-to-markdown.js";
 export { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 export { customTaskCharTransform } from "./lib/task-char.js";
 export { mathDisplayTransform } from "./lib/math-display.js";
-export { taskReparseTransform } from "./lib/task-reparse.js";
 export { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
 export { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
-export { containerLazyTransform } from "./lib/container-lazy.js";
 export { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 export { calloutTransform } from "./lib/callout.js";
 export { commentHoistTransform } from "./lib/comment-hoist.js";

@@ -14,7 +14,6 @@ import {
 } from "../src/lib/comment-region.js";
 import { isLegacyDefinition } from "../src/lib/legacy-definition.js";
 import { legacyHighlightQueue } from "../src/lib/syntax/highlight.js";
-import { legacyEmailAutolink } from "../src/lib/syntax/legacy-autolink.js";
 
 function parse(md: string, opts?: RemarkObsidianOptions) {
   return unified().use(remarkParse).use(remarkObsidian, opts).parse(md);
@@ -2183,17 +2182,6 @@ describe("legacy autolinks", () => {
     const urls = off("<foo\\+@bar.example.com>");
     expect(urls).toContain("mailto:foo+@bar.example.com");
     expect(urls.every((url) => !url.includes("\\"))).toBe(true);
-  });
-
-  it("stands aside unless it owns the case", () => {
-    // Nothing to add without a backslash, and `mailto:` is already right by the
-    // protocol route, which keeps the prefix in the text as Obsidian does.
-    expect(legacyEmailAutolink("<a@b.test>")).toBeNull();
-    expect(legacyEmailAutolink("<mailto:a\\+@e.test>")).toBeNull();
-    expect(legacyEmailAutolink("<a\\>b>")).toBeNull();
-    expect(legacyEmailAutolink("<@b.test>")).toBeNull();
-    expect(legacyEmailAutolink("<a\\@>")).toBeNull();
-    expect(legacyEmailAutolink("<a\\b@c.test>")).toBe("a\\b@c.test");
   });
 });
 
