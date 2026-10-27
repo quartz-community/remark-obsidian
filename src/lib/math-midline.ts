@@ -2,12 +2,8 @@ import type { Paragraph, PhrasingContent, Root, RootContent } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 import { mapLines } from "./line-map.js";
+import { setMathValue } from "./math-value.js";
 import { pointAt } from "./normalize-points.js";
-
-/** `math` comes from `mdast-util-math`, which `mdast` itself does not declare. */
-interface MathNode {
-  value: string;
-}
 
 const CONTAINERS = new Set(["blockquote", "listItem", "footnoteDefinition"]);
 
@@ -38,7 +34,7 @@ export function mathMidlineTransform(tree: Root, source: string): void {
       const block = parent.children[index];
       const math = parent.children[index + 1];
       if (math?.type !== "math") continue;
-      if ((math as unknown as MathNode).value !== "") continue;
+      if ((math as unknown as { value: string }).value !== "") continue;
 
       // The opener can sit one level further in. A definition inside a quote
       // holds the paragraph while the empty `math` is the definition's
@@ -73,9 +69,23 @@ export function mathMidlineTransform(tree: Root, source: string): void {
 
       const kept = phrasingBefore(paragraph as Paragraph, openerStart, source);
       if (!kept) continue;
-      const body = lines.slice(opener + 1).join("\n");
+      // `mapLines` strips a quote's `>` but not a list item's indentation, so `1. tail $$` /
+      // `   x` left the formula as `   x`. Each body line drops the spaces up to the content
+      // column, where the paragraph itself starts, net of the prefix already stripped -- as
+      // `remark-math` does for a block written on its own lines in the same item.
+      const content = (paragraph.position?.start?.column ?? 1) - 1;
+      const body = lines
+        .slice(opener + 1)
+        .map((text, at) => {
+          const from = map.starts[opener + 1 + at]!;
+          const prefix = from - (source.lastIndexOf("\n", from - 1) + 1);
+          let strip = 0;
+          while (strip < content - prefix && text[strip] === " ") strip++;
+          return text.slice(strip);
+        })
+        .join("\n");
 
-      (math as unknown as MathNode).value = body;
+      setMathValue(math, body);
       if (math.position) {
         math.position.start = {
           line: map.lines[opener]!,

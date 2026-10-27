@@ -1,6 +1,7 @@
 import type { Root } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
+import { setMathValue } from "./math-value.js";
 
 const DOLLAR = "$";
 
@@ -119,7 +120,7 @@ export function mathFenceTransform(tree: Root, source: string): void {
       if (closes) break;
     }
 
-    math.value = body.join("\n");
+    setMathValue(math, body.join("\n"));
     // `remark-math@3` has no info string, and the opener's remainder is now part
     // of the body. Leaving it behind as well makes the serialiser write
     // `$$x^2\nx^2\n$$`, duplicating the formula on every formatting pass.

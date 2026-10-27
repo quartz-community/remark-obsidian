@@ -746,6 +746,33 @@ describe("remark-obsidian", () => {
       expect(findNodes(quoted, "tag").length).toBe(1);
       expect(findNodes(quoted, "math").map((n) => n.value)).toEqual(["x"]);
     });
+
+    it("renders the formula it opens, under both presets", async () => {
+      // `mdast-util-to-hast` renders from `data.hChildren`, which the pass used to leave empty
+      // while it filled `value`: under strict the block came out as an empty `<code>`.
+      const render = async (md: string, preset: "legacy" | "strict") =>
+        String(
+          await unified()
+            .use(remarkParse)
+            .use(remarkObsidian, { preset })
+            .use(remarkRehype)
+            .use(rehypeStringify)
+            .process(md),
+        );
+      for (const preset of ["legacy", "strict"] as const) {
+        for (const md of [
+          "1. Hello $$\n   Math\n   $$\n2.\n",
+          "> Hello $$\n> Math\n> $$\n",
+        ]) {
+          expect(await render(md, preset)).toMatch(/math-display">\s*Math\s*</);
+        }
+      }
+      // The list item's indentation is the container's, not the formula's.
+      const listed = processWithGfm("1. Hello $$\n   Math\n   $$\n2.\n", {
+        preset: "strict",
+      });
+      expect(findNodes(listed, "math").map((n) => n.value)).toEqual(["Math"]);
+    });
   });
 
   describe("display math delimiter width", () => {

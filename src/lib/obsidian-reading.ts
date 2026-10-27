@@ -147,6 +147,24 @@ const RESTORE = new Map(
   ]),
 );
 const PLACEHOLDER_IN = /[\uE000-\uE005]/u;
+
+/** Restore the placeholders in the text of a node's `data.hChildren` hast hint. */
+function restoreHints(nodes: readonly unknown[]): void {
+  for (const node of nodes) {
+    const hast = node as {
+      type?: string;
+      value?: unknown;
+      children?: unknown[];
+    };
+    if (hast.type === "text" && typeof hast.value === "string") {
+      hast.value = hast.value.replace(
+        PLACEHOLDER_ALL,
+        (c) => RESTORE.get(c) ?? c,
+      );
+    }
+    if (Array.isArray(hast.children)) restoreHints(hast.children);
+  }
+}
 const PLACEHOLDER_ALL = /[\uE000-\uE005]/gu;
 
 interface ReadingOptions {
@@ -1085,6 +1103,12 @@ function mapBack(tree: Root, edited: Edited, lines: Lines): void {
         );
       }
     }
+    // `mdast-util-math` copies a formula into `data.hChildren` at parse time, and HTML renders
+    // from that copy, so it holds the placeholders too: `x $$ m` / `[^1]: def $$` rendered
+    // `[^1] def`.
+    const hints = (record.data as { hChildren?: unknown[] } | undefined)
+      ?.hChildren;
+    if (hints) restoreHints(hints);
     for (const child of (node as Partial<Parent>).children ?? []) visit(child);
   };
   visit(tree);

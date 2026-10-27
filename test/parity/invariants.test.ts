@@ -2,10 +2,15 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { assert } from "mdast-util-assert";
+import remarkGfm from "remark-gfm";
+import remarkParse from "remark-parse";
+import { unified } from "unified";
+import { visit } from "unist-util-visit";
 import { describe, expect, it } from "vitest";
 
 import { violationsOf } from "./invariant-checks.js";
 
+import remarkObsidian from "../../src/index.js";
 import { parseOurs, PROFILES } from "./chain.js";
 import type { GoldenCase } from "./types.js";
 
@@ -275,6 +280,65 @@ describe("tree invariants", () => {
         if (bad.length > 0) offenders.push(`${id} [${profile}] ${bad[0]}`);
       }
     }
+    expect(offenders).toEqual([]);
+  });
+
+  /**
+   * A formula renders from `data.hChildren`, which `mdast-util-math` builds at parse time;
+   * `mdast-util-to-hast` never reads `value`. A pass that rewrote `value` alone left a tree that
+   * looked right and HTML that showed the old formula: under `strict`, `1. Hello $$` / `   Math`
+   * / `   $$` rendered an empty block. Three writers did it -- `mathMidlineTransform`,
+   * `mathFenceTransform`, and the reading pass's placeholder restore -- in 86 strict documents
+   * of the corpus, spec and referee, and none under `legacy`.
+   *
+   * Both presets, because every other gate here runs the `legacy` profiles and so never saw it.
+   */
+  it("renders the formula every math node holds, under both presets", () => {
+    const hinted = (node: { data?: { hChildren?: unknown[] } }) => {
+      const text = (hast: unknown): string => {
+        const self = hast as {
+          type?: string;
+          value?: string;
+          children?: unknown[];
+        };
+        return self.type === "text"
+          ? (self.value ?? "")
+          : (self.children ?? []).map(text).join("");
+      };
+      return node.data?.hChildren?.map(text).join("");
+    };
+    const offenders: string[] = [];
+    let checked = 0;
+    for (const preset of ["legacy", "strict"] as const) {
+      const processor = unified()
+        .use(remarkParse)
+        .use(remarkGfm)
+        .use(remarkObsidian, {
+          ...PROFILES["quartz-default"].remarkObsidian,
+          preset,
+        });
+      for (const [id, entry] of Object.entries(golden.cases)) {
+        const tree = processor.runSync(
+          processor.parse(entry.markdown),
+          entry.markdown,
+        );
+        visit(tree, (node) => {
+          if (node.type !== "math" && node.type !== "inlineMath") return;
+          checked++;
+          const math = node as unknown as {
+            value: string;
+            data?: { hChildren?: unknown[] };
+          };
+          const hint = hinted(math);
+          if (hint !== undefined && hint !== math.value) {
+            offenders.push(
+              `${id} [${preset}] ${node.type}: ${JSON.stringify(hint)}`,
+            );
+          }
+        });
+      }
+    }
+    expect(checked).toBeGreaterThan(400);
     expect(offenders).toEqual([]);
   });
 });
