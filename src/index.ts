@@ -355,14 +355,11 @@ export default function remarkObsidian(
     return undefined;
   }
 
-  const needsTransform =
-    opts.comments ||
-    opts.customTaskChars ||
-    opts.math ||
-    opts.bareFootnoteRefs ||
-    opts.callouts;
-  if (!needsTransform) return undefined;
-
+  // Always returned under `strict`. It used to be skipped when `comments`, `customTaskChars`,
+  // `math`, `callouts` and `bareFootnoteRefs` were all off, which silently dropped passes that
+  // depend on none of them: `positionedBreaks`, `lineOffsets`, the frontmatter repairs and the
+  // position passes.
+  //
   // `strict` is what Obsidian INTENDS: CommonMark, GFM and LaTeX, plus the syntax Obsidian
   // documents. Each pass below implements that syntax, repairs an extension that falls short of
   // it, keeps positions honest, or carries out an option the caller turned on. What Obsidian's

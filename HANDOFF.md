@@ -21,7 +21,7 @@ were Obsidian syntax bare rp8 lacks; and `strict` simply stays on micromark. The
 | structural invariant violations      |                      10 |                     **0** |
 | slowest gated pathological shape     | 7.4 s (`footnote-refs`) | 985 ms (`unclosed-links`) |
 
-Suite 453 passed / 3 skipped, lint, both typechecks, format and build green. Commits on
+Suite 455 passed / 3 skipped, lint, both typechecks, format and build green. Commits on
 `rp8-legacy-prototype`: `6aa9bfa` prototype, `d73c42a` wiring, `6ba3e8e` vendoring and
 performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
 
@@ -33,9 +33,8 @@ performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
    § 2.0), and the bundle drops from 755,021 to 564,319 bytes.
 2. **`strict`'s passes -- DONE.** 76 call sites → 17, by the intends/delivers rule; AGENTS.md
    § 2.0 has the measurement. Left open, all smaller:
-   - `needsTransform` skips the whole chain when `comments`, `customTaskChars`, `math`,
-     `callouts` and `bareFootnoteRefs` are all off, so `positionedBreaks`, `lineOffsets` and
-     the frontmatter repairs silently do nothing then. Predates 2.0; a behaviour change.
+   - ~~`needsTransform` skipped the whole chain when the five options it checked were off~~ --
+     fixed: the chain always runs under `strict`.
    - A `%%` closer's tail inside a QUOTE stays hidden in the comment: `commentTail` repairs it
      at root only (`hunt/label-after-comment-closer-mangled/3`).
    - The syntax extensions `strict` keeps were tuned against Obsidian too -- the highlight

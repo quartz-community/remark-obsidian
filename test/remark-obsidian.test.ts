@@ -3124,3 +3124,31 @@ describe("a kept comment inside a list item", () => {
     });
   }
 });
+
+describe("strict with every option the transform was once gated on off", () => {
+  // The transform used to be skipped outright when these were all off, which silently dropped
+  // passes that depend on none of them.
+  const off = {
+    preset: "strict",
+    comments: false,
+    customTaskChars: false,
+    math: false,
+    callouts: false,
+  } as const;
+
+  it("still converts a soft line ending when positionedBreaks is on", () => {
+    const md = "a\nb\n";
+    expect(
+      findNodes(
+        processWithGfm(md, { ...off, positionedBreaks: true }),
+        "break",
+      ),
+    ).toHaveLength(1);
+    expect(findNodes(processWithGfm(md, off), "break")).toHaveLength(0);
+  });
+
+  it("still declines a `--- ` opener as frontmatter", () => {
+    const tree = processWithGfm("--- \ntitle: x\n---\n", off);
+    expect(findNodes(tree, "yaml")).toHaveLength(0);
+  });
+});
