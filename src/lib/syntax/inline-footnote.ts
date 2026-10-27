@@ -42,16 +42,17 @@ export function inlineFootnoteSyntax(): Extension {
   };
 }
 
-/** A line ending continues the body only when the next line is not lazy. */
-const nonLazyContinuation: Construct = {
+/**
+ * A line ending inside the body, which continues it onto the next line -- a lazy one too:
+ * `- ^[i` / `e]` is one footnote in Obsidian, the second line a lazy continuation of the item.
+ */
+const bodyLineEnding: Construct = {
   partial: true,
-  tokenize: function tokenizeNonLazy(
-    this: TokenizeContext,
+  tokenize: function tokenizeBodyLineEnding(
     effects: Effects,
     ok: State,
     nok: State,
   ): State {
-    const self = this;
     return start;
 
     function start(code: Code): State | undefined {
@@ -59,11 +60,7 @@ const nonLazyContinuation: Construct = {
       effects.enter(types.lineEnding);
       effects.consume(code);
       effects.exit(types.lineEnding);
-      return lineStart;
-    }
-
-    function lineStart(code: Code): State | undefined {
-      return self.parser.lazy[self.now().line] ? nok(code) : ok(code);
+      return ok;
     }
   },
 };
@@ -148,7 +145,7 @@ function tokenize(
       return closeHere(code);
     }
     if (isLineEnding(code)) {
-      return effects.attempt(nonLazyContinuation, atBoundary, nok)(code);
+      return effects.attempt(bodyLineEnding, atBoundary, nok)(code);
     }
     effects.enter("inlineFootnoteContent", { contentType: "text" });
     return content(code);
@@ -162,7 +159,7 @@ function tokenize(
 
     if (isLineEnding(code)) {
       effects.exit("inlineFootnoteContent");
-      return effects.attempt(nonLazyContinuation, atBoundary, nok)(code);
+      return effects.attempt(bodyLineEnding, atBoundary, nok)(code);
     }
 
     if (code === BACKSLASH) {

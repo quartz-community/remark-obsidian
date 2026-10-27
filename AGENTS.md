@@ -261,6 +261,94 @@ traps cost runs:
   referee definitions 5,227 → **5,261** (+35 / −1: 22 task box, 13 frontmatter); references
   1,497 → **1,500** (+3 / −0). The one loss is `broad#327`, the `>⇥` exclusion above.
 
+**The strict triage: every recorded case `strict` misses, classified.** Under the strict preset
+536 of the 3,471 recorded cases missed. Three features sorted most of them: whether strict's tree
+equals stock `remark-parse` + `remark-gfm`'s with positions ignored (positions differ because
+`remark-breaks` leaves stock's inline nodes unplaced), whether it holds an Obsidian node, and
+which projection keys diverge. A case whose tree is stock's and whose divergence touches no
+Obsidian syntax is the spec read by the spec. The rest were read one by one.
+
+Fixed, each settled against the live app first:
+
+- **An unclosed `%%` or bare `$$` in a quote or list item keeps the lazy lines below it** (rule
+  7 in `obsidian-reading.ts`). A fourth edit, `prefix`, gives each such line its container's
+  prefix. It stops at a blank line or a line that interrupts: a heading, a setext pair, indented
+  or fenced code, a thematic break, HTML, a bullet or `1.` item, another `%%` or `$$`. Labels,
+  `2.` items and table rows stay -- 33 + 24 probes.
+- **An unclosed `$$y` inside a quote, list item or task is text**, at root it is math; a callout
+  title's `$$` is title text.
+- **A `%%` line directly under a definition's text is more of that text (D5), at any indent.**
+  micromark opened a comment there whose closing `%%` then buried every block below.
+- **`[[` straight after a bracket pair is no wikilink** (`a [x][[w]] b`), except after a
+  footnote label, the second half of `[x][]`, or a pair holding another bracket.
+  `brackets.ts` now holds the bracket scanning `tagAgainstText` used alone.
+- **An inline footnote continues over a lazy line**, a **`%%` closer's tail is read as blocks
+  inside a quote or list item too**, and **`---⇥` opens no frontmatter**.
+- **The text projection stopped hiding what follows a quote that ends in an unclosed comment.**
+  It was built for a micromark-era tree. Removing it moved four `probe/quote-comment-deep`
+  cases from `replicate` to `match` in LEGACY too (contract 3,465 → 3,469), changing no other
+  case.
+
+The reading pass now applies its edits in four tiers, one tier per round. In order:
+
+1. Splits and unboxes.
+2. Rules 1-3.
+3. Rule 7's prefixes.
+4. D5.
+
+Each was forced by a measured loss:
+
+- A prefix applied beside rule 2 pulled a label into a definition when the `10.` list it was
+  read off dissolved the same round.
+- D5 applied beside rule 1 kept a definition rule 1 was about to dissolve.
+- D5 beside a prefix kept one the prefix had just taken into a comment.
+
+Edits are filtered by `seen` before a tier is chosen, since a prefix, like an unbox, is read
+off the source.
+
+Against `5dc63bb`, strict:
+
+- spec examples: unchanged at 8;
+- recorded cases: 2,935 → **2,962** (+27 / −0);
+- referee definitions: 5,261 → **5,328** (+71 / −4);
+- referee references: 1,500 → **1,513** (+13 / −0).
+
+Of the four lost: three are tab-spelled quotes (`>⇥>⇥$$`, `>⇥[^ä]:`), where Obsidian's tab
+arithmetic makes no block. The fourth is CommonMark continuing a definition's paragraph over an
+indented line, once its `%%` is prose. All four agreed before only because strict swallowed the
+rest of the note.
+
+**The 509 left:**
+
+| count | why                                                      |
+| ----: | -------------------------------------------------------- |
+|   475 | CommonMark/GFM structure read by the spec (see below)    |
+|    27 | tab arithmetic, which is legacy's                        |
+|     1 | micromark itself (`2.` interrupting a quote's paragraph) |
+|     1 | Obsidian rendering one math span six times               |
+|     5 | deferred, each a decision or a deep change               |
+
+The 475 cover:
+
+- setext and thematic breaks (159);
+- trees identical to stock (272);
+- lazy lines after a closed fence, a closed comment or a callout title;
+- GFM tables (pipeless rows, interrupting a paragraph, cell counts);
+- link reference definitions;
+- empty list items;
+- GFM autolink extent and strikethrough escapes;
+- bracket precedence where following Obsidian would undo a CommonMark link;
+- emphasis in callout titles.
+
+The five deferred:
+
+- `[^1](u)` as a link;
+- `[text][^9]` as a reference;
+- a label holding a pipe as a table row;
+- an unbalanced `[[[a]]` inside a link label, which breaks the link's bracket count in
+  micromark;
+- a `$$` line interrupting a lazily continued definition in a list item.
+
 **Its gates**, beyond the suite above:
 
 - `test/rp8-vendored.test.ts` -- vendored == published rp8, byte-identical trees on every corpus

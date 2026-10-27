@@ -29,9 +29,11 @@ lists, where it adds `data.taskChar`.
   `2.` line continues a definition's text, while a table, a link reference definition or a
   setext underline ends it. A label may hold `[` and a backslash escapes nothing in it. A `[^`
   label that is not a footnote's is plain text, not a link reference definition.
-- **A `%%` comment** ends at its closing `%%`, and the text after it takes the lines below it.
-  An opener on a lazy line of a quote or list item ends that container; left open in one, a
-  comment takes the lines below it. It cannot open inside a footnote definition.
+- **A `%%` comment** ends at its closing `%%`, and the text after it takes the lines below it,
+  in a quote or list item too. An opener on a lazy line of a quote or list item ends that
+  container. Left open in one, a comment takes the lazy lines below it, up to a blank line or a
+  line that starts a block. A `%%` line directly under a footnote definition's text is more of
+  that text.
 - **A callout's title line stands alone:** the line under it starts a fresh block, and text after
   the marker is read as blocks, so a definition there is found by its references.
 - **A highlight crossing emphasis** goes to whichever opened first, as in Reading view:
@@ -44,8 +46,12 @@ lists, where it adds `data.taskChar`.
   `- [ ] [^1]: note`.
 - **A frontmatter closer with text after it** still closes the frontmatter, and the text is read
   as Markdown: `---[^1]: note` defines.
+- **A `---` opener followed by spaces or a tab** opens no frontmatter.
 - **`$$`** delimits display math as in LaTeX, including `$$x^2` on one line and a closing `$$`
-  at the end of a line.
+  at the end of a line. Left open in a quote or list item, a bare `$$` takes the lazy lines
+  below it, while `$$y` there is text. A `$$` after a callout's marker is the title's text.
+- **`[[` straight after a bracket pair** is no wikilink: `a [x][[w]] b` holds none.
+- **An inline footnote** continues over a lazy line.
 
 **Tree shapes that changed in `legacy`,** each to what Obsidian reports:
 

@@ -538,40 +538,18 @@ export function mdastText(
    */
   const unclosedComment = (candidate: Node): boolean => {
     if (source === undefined) return false;
-    // Through the last child, because the hiding propagates outwards. At one level
-    // `> %%` absorbs its lazy line and `- %%` leaves the comment as a direct sibling,
-    // both already handled; at two, `> > %%` over `em*` leaves `em*` beside the inner
-    // *blockquote* rather than beside the comment. A container whose last descendant
-    // is an unclosed comment is itself unclosed for this purpose.
+    // The comment itself only: the hiding does NOT propagate out of its container.
+    //
+    // It once did for a quote, because a micromark-era tree left `> > %%`'s lazy `em*` BESIDE
+    // the inner quote, where only propagation could hide it. Both parsers now take a lazy line
+    // into the comment, so propagation only ever reached what follows the quote -- and Obsidian
+    // shows that: `> %%` / `[^note]: Definition` / blank / `use[^note]` renders `usenote`, and
+    // `> > %%` / `## Footnotes` / `[^x]: a` renders the heading. Dropping it moved the four
+    // `probe/quote-comment-deep` cases from `replicate` to `match` and changed no other case.
+    // A list never propagated, measured: `1.⇥%%` / `⟨2sp⟩[^3]: It` / blank / `use[^3]` renders
+    // `use3`.
     if (candidate.type !== "comment") {
-      // ...but the hiding does NOT escape a LIST, which is measured rather than assumed.
-      //
-      // `1.⇥%%` / `⟨2sp⟩[^3]: It` / blank / `use[^3]` renders `use3` in Obsidian: the trailing
-      // paragraph survives, with the label shown literally because nothing defines it any
-      // more. A nested quote is the opposite -- `> > %%` over `em*` hides what follows -- which
-      // is the case this recursion was built for, and generalising it to every container type
-      // was only invisible while no pass put a definition INSIDE an item-hosted comment.
-      // `itemCommentLazyTransform` does, which made the item's last child the comment and hid
-      // the rest of the note: the three `probe/item-comment/*` cases went from `use⟨fn⟩` to the
-      // empty string, with `meta.footnotes` already correct.
-      //
-      // So a quote propagates and a list does not. The asymmetry is the same one recorded four
-      // times over for absorption -- `setext`, `indented`, `math` and `html` are taken by a
-      // list and kept at root by a quote -- and it is read off the node type for the same
-      // reason.
-      //
-      // A footnote DEFINITION is a container the same way (F2: an unclosed comment "runs to the
-      // end of its container"). `[^1]: one` / `%%` / blank / `use[^1]` renders `use⟨fn⟩`, and
-      // `fuzz:20261003-711` has Obsidian reading that `%%` as a comment inside the definition.
-      if (
-        candidate.type === "list" ||
-        candidate.type === "listItem" ||
-        candidate.type === "footnoteDefinition"
-      )
-        return false;
-      const kids = (candidate as { children?: Node[] }).children;
-      const last = kids?.[kids.length - 1];
-      return last !== undefined && unclosedComment(last);
+      return false;
     }
     const from = candidate.position?.start?.offset;
     const to = candidate.position?.end?.offset;

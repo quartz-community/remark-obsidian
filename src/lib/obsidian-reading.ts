@@ -85,11 +85,15 @@ export function obsidianReadingTransform(
     const detected = detect(tree, source, view, parse, options);
     const unseen = (list: readonly Edit[]): Edit[] =>
       list.filter((edit) => !seen.has(`${edit.kind}@${String(edit.offset)}`));
-    // Edits that change which paragraphs are open go first and alone; the rest are read off the
-    // tree they leave. Filtered before choosing, since an unbox is read off the source and is
-    // found again in every round after its own.
+    // Edits that change which paragraphs are open go first and alone; then rules 1-3, read off
+    // the tree they leave; then rule 7's lazy lines, which need that structure settled; and last
+    // a `%%` under a definition's text, which is only that once no lazy line has taken the label.
+    // Filtered before choosing, since an unbox or a prefix is read off the source and is found
+    // again in every round after its own.
     let found = unseen(detected.alone);
     if (found.length === 0) found = unseen(detected.edits);
+    if (found.length === 0) found = unseen(detected.late);
+    if (found.length === 0) found = unseen(detected.settled);
     if (found.length === 0) return;
     for (const edit of found) seen.add(`${edit.kind}@${String(edit.offset)}`);
     edits.push(...found);
@@ -122,6 +126,8 @@ const PLACEHOLDERS: Readonly<Record<string, string>> = {
   ":": "\uE000",
   ".": "\uE001",
   ")": "\uE002",
+  "%": "\uE003",
+  $: "\uE004",
 };
 const RESTORE = new Map(
   Object.entries(PLACEHOLDERS).map(([char, placeholder]) => [
@@ -129,8 +135,8 @@ const RESTORE = new Map(
     char,
   ]),
 );
-const PLACEHOLDER_IN = /[\uE000-\uE002]/u;
-const PLACEHOLDER_ALL = /[\uE000-\uE002]/gu;
+const PLACEHOLDER_IN = /[\uE000-\uE004]/u;
+const PLACEHOLDER_ALL = /[\uE000-\uE004]/gu;
 
 interface ReadingOptions {
   readonly callouts: boolean;
@@ -142,6 +148,7 @@ interface ReadingOptions {
 type Edit =
   | { readonly kind: "neutralize"; readonly offset: number }
   | { readonly kind: "split"; readonly offset: number; readonly text: string }
+  | { readonly kind: "prefix"; readonly offset: number; readonly text: string }
   | {
       readonly kind: "unbox";
       readonly offset: number;
@@ -198,8 +205,17 @@ function detect(
   lines: Lines,
   parse: (markdown: string) => Root,
   options: ReadingOptions,
-): { readonly alone: Edit[]; readonly edits: Edit[] } {
+): {
+  readonly alone: Edit[];
+  readonly edits: Edit[];
+  readonly late: Edit[];
+  readonly settled: Edit[];
+} {
   const edits: Edit[] = [];
+  /** Rule 7's prefixes, read off the structure the edits above leave. */
+  const late: Edit[] = [];
+  /** D5's `%%` under a definition, read off the structure the prefixes leave. */
+  const settled: Edit[] = [];
   /**
    * Edits applied alone, since each changes which paragraphs are open: rule 5's splits end a
    * container, and rule 4's unboxes take the task's paragraph away from under the next line.
@@ -258,6 +274,16 @@ function detect(
       const unbox = taskBox(node as ListItem, source, options.tasks);
       if (unbox) alone.push(unbox);
     }
+    if (
+      !inDefinition &&
+      (container === "blockquote" || container === "listItem") &&
+      (node.type === "math" || (options.comments && node.type === "comment"))
+    ) {
+      if (!closesMidline(node, parent)) {
+        late.push(...keptLazyLines(node, source, lines, parse));
+      }
+      if (node.type === "math") edits.push(...containedMathOpener(node, lines));
+    }
     if (node.type === "list" && (node as List).ordered && node.position) {
       const start = node.position.start.line;
       listStarts.set(start, [
@@ -278,6 +304,9 @@ function detect(
     }
     const children = (node as Partial<Parent>).children;
     if (!children) return;
+    if (options.comments && node.type === "footnoteDefinition") {
+      settled.push(...lazyCommentUnderDefinition(node as Parent, lines));
+    }
     for (const child of children) {
       walk(
         child,
@@ -375,7 +404,7 @@ function detect(
     }
   }
 
-  return { alone, edits };
+  return { alone, edits, late, settled };
 }
 
 /** A list marker, a task box and the space after it, then a footnote label. */
@@ -399,6 +428,185 @@ function taskBox(
   if (gfm ? typeof item.checked !== "boolean" : !tasks) return undefined;
   const offset = start + whole.indexOf(box);
   return { kind: "unbox", offset, length: box.length, checked: char !== " " };
+}
+
+/** What a lazy line can be and still not end the container: Obsidian reads these as interrupting. */
+const INTERRUPTERS = new Set([
+  "heading",
+  "code",
+  "thematicBreak",
+  "html",
+  "math",
+  "comment",
+  "blockquote",
+]);
+
+/** Whether a lazy line ends a container rather than continuing it, as a block that interrupts. */
+function interrupts(
+  text: string,
+  next: string | undefined,
+  parse: (markdown: string) => Root,
+): boolean {
+  const first = parse(text).children[0];
+  if (!first) return true;
+  if (INTERRUPTERS.has(first.type)) return true;
+  if (first.type === "list") {
+    const list = first as List;
+    return !list.ordered || list.start === 1;
+  }
+  if (next === undefined || next.trim() === "") return false;
+  const pair = parse(`${text}\n${next}`).children[0];
+  return pair?.type === "heading" && pair.position?.end.line === 2;
+}
+
+/** A container prefix made only of `>`, whitespace and list markers. */
+const CONTAINER_LEAD = /^(?:[> \t]|[*+-](?=[ \t])|\d{1,9}[.)](?=[ \t]))*$/u;
+
+/**
+ * Rule 7: the lazy lines an UNCLOSED `%%` comment or bare `$$` block keeps in its quote or list
+ * item. Each is read as though it carried the container's prefix, until a blank line or a line
+ * that interrupts -- a heading, a setext pair, code, a thematic break, HTML, a bullet or `1.`
+ * item, or another `%%` or `$$`. Labels, `2.` items and table rows stay.
+ */
+function keptLazyLines(
+  node: Node,
+  source: string,
+  lines: Lines,
+  parse: (markdown: string) => Root,
+): Edit[] {
+  const position = node.position;
+  if (!position || position.start.offset === undefined) return [];
+  if (position.end.offset === undefined) return [];
+  const first = position.start.line;
+  const lineStart = lines.starts[first - 1] ?? 0;
+  const lead = (lines.text[first - 1] ?? "").slice(
+    0,
+    position.start.offset - lineStart,
+  );
+  if (!CONTAINER_LEAD.test(lead)) return [];
+  const opener = (lines.text[first - 1] ?? "").slice(lead.length);
+  const marker = node.type === "math" ? "$$" : "%%";
+  if (
+    node.type === "math"
+      ? opener.trim() !== marker
+      : !COMMENT_OPENER.test(opener)
+  ) {
+    return [];
+  }
+  if (
+    source
+      .slice(position.start.offset + 2, position.end.offset)
+      .includes(marker)
+  ) {
+    return [];
+  }
+  // A node ending at a line's start finished on the line before; one ending on a blank line
+  // ended its container there, and nothing below is lazy.
+  const last =
+    position.end.column === 1 ? position.end.line - 1 : position.end.line;
+  if ((lines.text[last - 1] ?? "").trim() === "") return [];
+  const quotes = lead.split(">").length - 1;
+  const width = columns(lead);
+  const prefix = lead.replace(/[*+-]|\d{1,9}[.)]/gu, (m) =>
+    " ".repeat(m.length),
+  );
+  const edits: Edit[] = [];
+  for (let line = last + 1; line <= lines.text.length; line += 1) {
+    const text = lines.text[line - 1] ?? "";
+    if (text.trim() === "") break;
+    const own = /^[> \t]*/u.exec(text)![0];
+    const lazy = own.split(">").length - 1 < quotes || columns(own) < width;
+    if (!lazy) continue;
+    if (interrupts(text, lines.text[line], parse)) break;
+    const offset = lines.starts[line - 1];
+    if (offset !== undefined)
+      edits.push({ kind: "prefix", offset, text: prefix });
+  }
+  return edits;
+}
+
+/**
+ * Whether a `math` node is the closing `$$` of a display span opened mid-paragraph above it
+ * (`Hello $$` / `Math` / `$$`), which micromark reads as an opener before the midline pass runs.
+ */
+function closesMidline(node: Node, parent: Parent | undefined): boolean {
+  if (node.type !== "math" || !parent) return false;
+  const index = parent.children.indexOf(node as Content);
+  const before = parent.children[index - 1];
+  if (before?.type !== "paragraph") return false;
+  if (before.position?.end.line !== (node.position?.start.line ?? 0) - 1) {
+    return false;
+  }
+  let text = "";
+  visitText(before, (value) => {
+    text += value;
+  });
+  return (text.match(/\$\$/gu)?.length ?? 0) % 2 === 1;
+}
+
+function visitText(node: Node, onText: (value: string) => void): void {
+  if (node.type === "text")
+    onText((node as unknown as { value: string }).value);
+  for (const child of (node as Partial<Parent>).children ?? []) {
+    visitText(child, onText);
+  }
+}
+
+/**
+ * An unclosed `$$` with text after it on its own line is no math inside a quote or list item:
+ * `- $$y` and `> $$y^2` are text. At root it is, to the end of the note.
+ */
+function containedMathOpener(node: Node, lines: Lines): Edit[] {
+  const position = node.position;
+  if (!position || position.start.offset === undefined) return [];
+  const first = position.start.line;
+  const start = position.start.offset - (lines.starts[first - 1] ?? 0);
+  const opener = (lines.text[first - 1] ?? "").slice(start);
+  if (!opener.startsWith("$$") || opener.slice(2).trim() === "") return [];
+  for (let line = first; line <= position.end.line; line += 1) {
+    const text = (
+      line === first ? opener.slice(2) : (lines.text[line - 1] ?? "")
+    ).trimEnd();
+    if (text.endsWith("$$")) return [];
+  }
+  return [
+    { kind: "neutralize", offset: position.start.offset },
+    { kind: "neutralize", offset: position.start.offset + 1 },
+  ];
+}
+
+/**
+ * A `%%` line directly under a definition's text is more of that text (their D5), however it
+ * is indented: `[^1]: one` / `%%` / `hidden` / `%%` / `[^2]: two` is two definitions. micromark
+ * opens a comment there, as the definition's last child, and the comment ends with the line --
+ * so `hidden` falls out to root and the second `%%` buries every block below it.
+ */
+function lazyCommentUnderDefinition(definition: Parent, lines: Lines): Edit[] {
+  const comment = definition.children.at(-1);
+  const paragraph = definition.children.at(-2);
+  if (
+    comment?.type !== ("comment" as string) ||
+    paragraph?.type !== "paragraph"
+  ) {
+    return [];
+  }
+  const offset = comment.position?.start.offset;
+  const line = paragraph.position?.end.line;
+  if (offset === undefined || line === undefined) return [];
+  if (comment.position?.start.line !== line + 1) return [];
+  // Only where the line keeps the definition's containers: a `%%` on a LAZY line of a quote or
+  // list item ends it instead (their F4), so `>[^1]: def` / `%%` is a quote, then a comment.
+  const start = definition.position?.start;
+  if (!start || start.offset === undefined) return [];
+  const lead = (lines.text[start.line - 1] ?? "").slice(
+    0,
+    start.offset - (lines.starts[start.line - 1] ?? 0),
+  );
+  const own = /^[> \t]*/u.exec(lines.text[line] ?? "")![0];
+  const lazy =
+    own.split(">").length - 1 < lead.split(">").length - 1 ||
+    columns(own) < columns(lead);
+  return lazy ? [] : [{ kind: "neutralize", offset }];
 }
 
 /** A paragraph opening a quote with a callout marker: a callout's title, before callouts exist. */
@@ -650,13 +858,17 @@ function startsBlock(
 
 interface Edited {
   readonly text: string;
-  /** Each removed task box: where its item's content now starts in the edited text. */
-  readonly deletions: ReadonlyArray<{
+  /**
+   * Each change inside a line, in order: a removed task box (`removed`, with the item's
+   * `checked`) or an inserted container prefix (`inserted`), at its offset in the edited text.
+   */
+  readonly inline: ReadonlyArray<{
     readonly at: number;
-    readonly length: number;
-    /** The edited line (1-based) it was removed from. */
+    readonly removed: number;
+    readonly inserted: number;
+    /** The edited line (1-based) it is on. */
     readonly line: number;
-    readonly checked: boolean;
+    readonly checked?: boolean;
   }>;
   /**
    * Each inserted line: where it sits in the edited text, how long it is, and the original line
@@ -674,57 +886,82 @@ function applyEdits(
   lines: Lines,
   edits: readonly Edit[],
 ): Edited {
-  const sorted = [...edits].sort((a, b) => a.offset - b.offset);
+  // A split goes in before a prefix at the same line start: the blank line comes first.
+  const order = { split: 0, prefix: 1, neutralize: 2, unbox: 2 } as const;
+  const sorted = [...edits].sort(
+    (a, b) => a.offset - b.offset || order[a.kind] - order[b.kind],
+  );
   let text = "";
   let cursor = 0;
+  let line = 1;
+  const append = (part: string): void => {
+    for (const char of part) if (char === "\n") line += 1;
+    text += part;
+  };
   const insertions: Array<{ at: number; length: number; before: number }> = [];
-  const deletions: Array<{
+  const inline: Array<{
     at: number;
-    length: number;
+    removed: number;
+    inserted: number;
     line: number;
-    checked: boolean;
+    checked?: boolean;
   }> = [];
   for (const edit of sorted) {
-    text += source.slice(cursor, edit.offset);
+    append(source.slice(cursor, edit.offset));
     cursor = edit.offset;
     if (edit.kind === "unbox") {
-      deletions.push({
+      inline.push({
         at: text.length,
-        length: edit.length,
-        line: lineOfOffset(text, text.length) + 1,
+        removed: edit.length,
+        inserted: 0,
+        line,
         checked: edit.checked,
       });
       cursor += edit.length;
+    } else if (edit.kind === "prefix") {
+      inline.push({
+        at: text.length,
+        removed: 0,
+        inserted: edit.text.length,
+        line,
+      });
+      append(edit.text);
     } else if (edit.kind === "neutralize") {
-      text += PLACEHOLDERS[source[edit.offset]!] ?? source[edit.offset]!;
+      append(PLACEHOLDERS[source[edit.offset]!] ?? source[edit.offset]!);
       cursor += 1;
     } else {
-      const line = `${edit.text}\n`;
+      const blank = `${edit.text}\n`;
       insertions.push({
         at: text.length,
-        length: line.length,
+        length: blank.length,
         before: lines.starts.indexOf(edit.offset) + 1,
       });
-      text += line;
+      append(blank);
     }
   }
-  text += source.slice(cursor);
-  return { text, insertions, deletions };
+  append(source.slice(cursor));
+  return { text, insertions, inline };
 }
 
 /** Positions and values back into the source's own terms. */
 function mapBack(tree: Root, edited: Edited, lines: Lines): void {
-  const { insertions, deletions } = edited;
+  const { insertions, inline } = edited;
 
   const point = (p: Point, end: boolean): void => {
     if (p.offset === undefined) return;
-    // A removed box comes back before whatever starts where it was, and after whatever ends there.
+    // A removed box comes back before whatever starts where it was, and after whatever ends
+    // there; an inserted prefix goes away, and a point inside it moves to where it went in.
     let restored = 0;
     let widened = 0;
-    for (const deletion of deletions) {
-      if (p.offset < deletion.at || (end && p.offset === deletion.at)) break;
-      restored += deletion.length;
-      if (p.line === deletion.line) widened += deletion.length;
+    for (const edit of inline) {
+      if (p.offset < edit.at) break;
+      let change = edit.removed;
+      if (edit.removed > 0 && end && p.offset === edit.at) break;
+      if (edit.inserted > 0) {
+        change = -Math.min(edit.inserted, p.offset - edit.at);
+      }
+      restored += change;
+      if (p.line === edit.line) widened += change;
     }
     let shift = 0;
     let moved = 0;
@@ -757,8 +994,8 @@ function mapBack(tree: Root, edited: Edited, lines: Lines): void {
     if (node.type === "listItem") {
       // Still in edited terms: an item whose content starts where a box was removed held it.
       const at = (node as ListItem).children[0]?.position?.start.offset;
-      const box = deletions.find((deletion) => deletion.at === at);
-      if (box) (node as ListItem).checked = box.checked;
+      const box = inline.find((edit) => edit.removed > 0 && edit.at === at);
+      if (box?.checked !== undefined) (node as ListItem).checked = box.checked;
     }
     if (node.position) {
       point(node.position.start, false);
@@ -781,6 +1018,13 @@ function mapBack(tree: Root, edited: Edited, lines: Lines): void {
   const offsets = (
     tree.data as { lineOffsets?: Record<number, number> } | undefined
   )?.lineOffsets;
+  // A line given a container prefix has that much less container in the source.
+  for (const edit of inline) {
+    const width = offsets?.[edit.line];
+    if (edit.inserted > 0 && width !== undefined) {
+      offsets![edit.line] = Math.max(0, width - edit.inserted);
+    }
+  }
   if (offsets && insertions.length > 0) {
     // Lines in the edited text: the inserted ones drop, the rest move up past them.
     const inserted = insertions.map(

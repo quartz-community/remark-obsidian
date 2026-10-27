@@ -1,6 +1,6 @@
 import type { Root } from "mdast";
 
-const OPENER = /^---[ ]+(?:\n|$)/u;
+const OPENER = /^---[ \t]+(?:\n|$)/u;
 
 /**
  * Frontmatter opens only on an EXACT `---` first line.
@@ -19,11 +19,11 @@ const OPENER = /^---[ ]+(?:\n|$)/u;
  *     `---`    frontmatter, read as YAML
  *     `---\r`  frontmatter -- a carriage return still opens it
  *
- * So the test is SPACES ONLY. A `\s`-based one would have taken out the two
+ * So the test is SPACES AND TABS. A `\s`-based one would have taken out the two
  * `hunt/crlf-protection` cases, which are triaged `match` and depend on `---\r`
- * opening frontmatter. Tabs are excluded too, and deliberately: Obsidian does not
- * make `---\t` a thematic break either, which is a second divergence underneath
- * this one and wants a different repair than the reparse below.
+ * opening frontmatter. `---\t` opens nothing either; Obsidian then reads it as no
+ * thematic break, where CommonMark does, and this pass gives CommonMark's reading --
+ * it runs under `strict` only, `legacy` parsing with Obsidian's own parser.
  *
  * Of 12 corpus documents whose first line is `---` plus trailing whitespace, 10
  * are space-only, 1 is a tab and 1 is a carriage return.

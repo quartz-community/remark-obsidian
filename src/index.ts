@@ -17,6 +17,7 @@ import { definitionNestedLabelTransform } from "./lib/definition-nested-label.js
 import { definitionMathAbsorbTransform } from "./lib/definition-math-absorb.js";
 import { definitionEndBeforeLabelTransform } from "./lib/definition-end-before-label.js";
 import { tagAgainstTextTransform } from "./lib/tag-against-text.js";
+import { wikilinkAfterLabelTransform } from "./lib/wikilink-after-label.js";
 import { inlineFootnoteInertTransform } from "./lib/inline-footnote-inert.js";
 
 import "./lib/types.js";
@@ -525,6 +526,9 @@ export default function remarkObsidian(
     });
     // A label four columns into a definition, with no blank line, is the definition's text.
     definitionNestedLabelTransform(tree, String(file));
+    // A `[[` straight after a bracket pair is no wikilink: `a [x][[w]] b` holds none. Before the
+    // reference passes, which find the `[^9]` such a demoted `[[^9]]` still holds.
+    if (opts.wikilinks) wikilinkAfterLabelTransform(tree, String(file));
     if (opts.bareFootnoteRefs) {
       bareFootnoteRefTransform(tree, String(file));
     } else {

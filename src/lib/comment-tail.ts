@@ -1,4 +1,5 @@
-import type { Root, RootContent, Text } from "mdast";
+import type { Parent, Root, RootContent, Text } from "mdast";
+import { visit } from "unist-util-visit";
 import type { Comment } from "./types.js";
 import { span } from "./normalize-points.js";
 
@@ -14,14 +15,31 @@ import { span } from "./normalize-points.js";
  * This puts the block structure back without rewriting the source: the comment is
  * trimmed to its closer and the tail is parsed on its own and spliced in after it.
  * Positions therefore stay true to the document the author wrote.
+ *
+ * Inside a quote or list item too: `> %%` / `> hidden` / `> %% [^1]: freed` defines `1`.
  */
 export function commentTailTransform(
   tree: Root,
   source: string,
   reparse: (markdown: string) => Root,
 ): void {
-  for (let index = tree.children.length - 1; index >= 0; index--) {
-    const node = tree.children[index];
+  const parents: Parent[] = [tree];
+  visit(tree, (node) => {
+    if (node.type === "blockquote" || node.type === "listItem") {
+      parents.push(node as Parent);
+    }
+  });
+  for (const parent of parents) splitTails(parent, source, reparse);
+}
+
+function splitTails(
+  parent: Parent,
+  source: string,
+  reparse: (markdown: string) => Root,
+): void {
+  const children = parent.children as RootContent[];
+  for (let index = children.length - 1; index >= 0; index--) {
+    const node = children[index];
     if (!node || node.type !== "comment") continue;
 
     const start = node.position?.start?.offset;
@@ -91,7 +109,12 @@ export function commentTailTransform(
     }
 
     const comment = node as Comment;
-    comment.value = raw.slice(2, closer);
+    // Cut the value at the same closer. It is the comment's own text, without the `>` or the
+    // indent a container's lines carry, so its closing line is its last.
+    const value = comment.value;
+    const last = value.lastIndexOf("\n") + 1;
+    const cut = value.indexOf("%%", last);
+    comment.value = cut >= 0 ? value.slice(0, cut) : raw.slice(2, closer);
     if (comment.position?.end) {
       comment.position.end = {
         ...comment.position.end,
@@ -100,8 +123,8 @@ export function commentTailTransform(
       };
     }
 
-    tree.children.splice(index + 1, 0, ...(parsed.children as RootContent[]));
-    absorbLazyLine(tree, index + parsed.children.length, source);
+    children.splice(index + 1, 0, ...(parsed.children as RootContent[]));
+    absorbLazyLine(children, index + parsed.children.length, source);
   }
 }
 
@@ -114,8 +137,12 @@ export function commentTailTransform(
  * paragraph -- "text after the closer starts a paragraph that takes lazy lines"
  * (their F2). Without this the line below stays a paragraph of its own.
  */
-function absorbLazyLine(tree: Root, index: number, source: string): void {
-  const definition = tree.children[index];
+function absorbLazyLine(
+  children: RootContent[],
+  index: number,
+  source: string,
+): void {
+  const definition = children[index];
   if (
     definition?.type !== "footnoteDefinition" &&
     definition?.type !== "paragraph"
@@ -123,7 +150,7 @@ function absorbLazyLine(tree: Root, index: number, source: string): void {
     return;
   }
 
-  const next = tree.children[index + 1];
+  const next = children[index + 1];
   if (next?.type !== "paragraph") return;
 
   const end = definition.position?.end?.offset;
@@ -148,5 +175,5 @@ function absorbLazyLine(tree: Root, index: number, source: string): void {
       node.position.end = { ...next.position.end };
     }
   }
-  tree.children.splice(index + 1, 1);
+  children.splice(index + 1, 1);
 }

@@ -71409,8 +71409,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "An unclosed `%%` opened inside a QUOTE is bounded by that quote in Obsidian and runs to the end of the note here, so the `use[^note]` line below the blank is swallowed and our `text` projection is empty against Obsidian's. The footnote facts are right -- this family is why `quote-comment-lazy.ts` exists and the referee gained six documents -- and the EXTENT for the text projection is a separate gap: `root` and `closed` in this same family match, so it is specific to a quote-opened opener. Live preview reads the same `%%` to the end of the document, so the bound is reading-mode-specific and `lp-extent.mts` records the divergence."
+      "triage": "match"
     },
     "probe/quote-comment-deep/shallow": {
       "id": "probe/quote-comment-deep/shallow",
@@ -71463,8 +71462,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "An unclosed `%%` opened inside a QUOTE is bounded by that quote in Obsidian and runs to the end of the note here, so the `use[^note]` line below the blank is swallowed and our `text` projection is empty against Obsidian's. The footnote facts are right -- this family is why `quote-comment-lazy.ts` exists and the referee gained six documents -- and the EXTENT for the text projection is a separate gap: `root` and `closed` in this same family match, so it is specific to a quote-opened opener. Live preview reads the same `%%` to the end of the document, so the bound is reading-mode-specific and `lp-extent.mts` records the divergence."
+      "triage": "match"
     },
     "probe/quote-comment-deep/root": {
       "id": "probe/quote-comment-deep/root",
@@ -71655,8 +71653,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "An unclosed `%%` opened inside a QUOTE is bounded by that quote in Obsidian and runs to the end of the note here, so the `use[^note]` line below the blank is swallowed and our `text` projection is empty against Obsidian's. The footnote facts are right -- this family is why `quote-comment-lazy.ts` exists and the referee gained six documents -- and the EXTENT for the text projection is a separate gap: `root` and `closed` in this same family match, so it is specific to a quote-opened opener. Live preview reads the same `%%` to the end of the document, so the bound is reading-mode-specific and `lp-extent.mts` records the divergence."
+      "triage": "match"
     },
     "probe/quote-comment-deep/heading": {
       "id": "probe/quote-comment-deep/heading",
@@ -71741,8 +71738,7 @@
           "frontmatterLinks": []
         }
       },
-      "triage": "replicate",
-      "note": "An unclosed `%%` opened inside a QUOTE is bounded by that quote in Obsidian and runs to the end of the note here, so the `use[^note]` line below the blank is swallowed and our `text` projection is empty against Obsidian's. The footnote facts are right -- this family is why `quote-comment-lazy.ts` exists and the referee gained six documents -- and the EXTENT for the text projection is a separate gap: `root` and `closed` in this same family match, so it is specific to a quote-opened opener. Live preview reads the same `%%` to the end of the document, so the bound is reading-mode-specific and `lp-extent.mts` records the divergence."
+      "triage": "match"
     },
     "probe/def-setext-dash/bare": {
       "id": "probe/def-setext-dash/bare",

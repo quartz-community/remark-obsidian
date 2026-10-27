@@ -144,6 +144,9 @@ function moveStartTo(node: Node, source: string, offset: number, line: number) {
  * at all, because the remainder is a footnote definition and a definition is
  * relocated out of the callout rather than shown as its heading. So the test
  * is what the remainder parses as, and only a lone paragraph becomes a title.
+ *
+ * A `$$` there is the title's text too: `> [!note] $$y` and `> [!note] $$` render no math,
+ * where the remainder alone parses as a display block.
  */
 function titleLineIsBlock(
   remainder: string,
@@ -152,7 +155,10 @@ function titleLineIsBlock(
   if (remainder.trim() === "") return undefined;
   const parsed = reparse(remainder);
   const only = parsed.children[0];
-  if (parsed.children.length === 1 && only?.type === "paragraph") {
+  if (
+    parsed.children.length === 1 &&
+    (only?.type === "paragraph" || only?.type === ("math" as string))
+  ) {
     return undefined;
   }
   return parsed.children as RootContent[];

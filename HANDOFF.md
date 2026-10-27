@@ -43,6 +43,9 @@ performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
    - **The syntax audit -- DONE** (`strict-syntax.test.ts`, 282 probes over every rule area:
      comments, callouts, wikilinks and embeds, frontmatter, block ids, inline footnotes, math,
      tags, task boxes). Four exclusions, each a CommonMark or tab-arithmetic reading.
+   - **The strict triage -- DONE.** Every recorded case strict misses is classified (AGENTS.md
+     § 2.0): 509 left, 475 of them the spec read by the spec, 27 tab arithmetic, 5 deferred.
+     `strict-syntax.test.ts` holds 377 probes.
    - **`strict` has no pathological coverage.** `test/pathological.test.ts` runs only the default
      preset. Two quadratic shapes are known there, both shared with stock `remark-gfm`: footnote
      definitions in list items (micromark's document initializer; 8,000 items take ~14 s either
