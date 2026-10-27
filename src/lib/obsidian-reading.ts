@@ -48,22 +48,32 @@ import { MARKER as CALLOUT_MARKER } from "./callout.js";
  *    a blank quote line goes in after the title, where the next line carries the quote's own
  *    prefix. A LAZY next line stays the body paragraph's, as Obsidian has it.
  *
+ * 7. **An unclosed `%%` or bare `$$` keeps its container's lazy lines.** In a quote or list
+ *    item the lines below it read as though they carried the container's prefix, up to a blank
+ *    line or a line that would interrupt; a `%%` line directly under a definition's text is
+ *    that text (their D5); and an unclosed `$$y` inside a container is no math.
+ *
+ * 8. **`[^x](u)` is a link** whenever an inline link forms there, defined label or not.
+ *
+ * 9. **A label line holding a `|` under a pipeless table is a row**, not a definition.
+ *
  * Not followed, by decision: the 1,024-character window in which remark-footnotes looks for what
  * ends a definition (an implementation limit), and the column 0 Obsidian reports for an indented
  * root definition (a position, which `strict` does not promise).
  *
  * The rules are applied by re-parsing the document from an EDITED copy that has the same line
- * structure, then mapping positions back. Three edits suffice, and none touches what micromark
+ * structure, then mapping positions back. Four edits suffice, and none touches what micromark
  * decides about anything else:
  *
- * - **neutralize** swaps one character for a private-use placeholder -- the `:` after a label, or
- *   the `.` or `)` of an ordered marker -- so the line is ordinary text; the character is
- *   restored in every value afterwards;
+ * - **neutralize** swaps one character for a private-use placeholder -- the `:` after a label,
+ *   the `.` or `)` of an ordered marker, a `%`, a `$` or a label's `^` -- so it is ordinary
+ *   text; the character is restored in every value afterwards;
  * - **split** inserts one blank line, carrying the container prefix (`>`) where there is one, so
  *   the definition ends before the line that follows it;
  * - **unbox** removes a task box and the space after it, so the label opens the item's content;
  *   the item's `checked` is restored afterwards, and the box's character read back from the
- *   source as for any other task.
+ *   source as for any other task;
+ * - **prefix** gives a lazy line its container's prefix (rule 7).
  *
  * Repeats until nothing applies, since one edit can expose the next (`2.` then `3.`).
  */
@@ -128,6 +138,7 @@ const PLACEHOLDERS: Readonly<Record<string, string>> = {
   ")": "\uE002",
   "%": "\uE003",
   $: "\uE004",
+  "^": "\uE005",
 };
 const RESTORE = new Map(
   Object.entries(PLACEHOLDERS).map(([char, placeholder]) => [
@@ -135,8 +146,8 @@ const RESTORE = new Map(
     char,
   ]),
 );
-const PLACEHOLDER_IN = /[\uE000-\uE004]/u;
-const PLACEHOLDER_ALL = /[\uE000-\uE004]/gu;
+const PLACEHOLDER_IN = /[\uE000-\uE005]/u;
+const PLACEHOLDER_ALL = /[\uE000-\uE005]/gu;
 
 interface ReadingOptions {
   readonly callouts: boolean;
@@ -283,6 +294,16 @@ function detect(
         late.push(...keptLazyLines(node, source, lines, parse));
       }
       if (node.type === "math") edits.push(...containedMathOpener(node, lines));
+    }
+    if (node.type === "footnoteReference" && parent) {
+      const caret = linkedReference(node, parent, source);
+      if (caret !== undefined)
+        edits.push({ kind: "neutralize", offset: caret });
+    }
+    if (node.type === "footnoteDefinition" && parent) {
+      const colon = labelRowUnderTable(node as Parent, parent, source, lines);
+      if (colon !== undefined)
+        edits.push({ kind: "neutralize", offset: colon });
     }
     if (node.type === "list" && (node as List).ordered && node.position) {
       const start = node.position.start.line;
@@ -607,6 +628,59 @@ function lazyCommentUnderDefinition(definition: Parent, lines: Lines): Edit[] {
     own.split(">").length - 1 < lead.split(">").length - 1 ||
     columns(own) < columns(lead);
   return lazy ? [] : [{ kind: "neutralize", offset }];
+}
+
+/**
+ * Rule 8: `[^x](u)` is a link to `u`, defined label or not. Obsidian reads the label and the
+ * destination as an inline link wherever one forms -- an angle-bracket destination, a title
+ * and an empty `()` too -- where GFM's footnote call claims a defined `[^x]` first. The `^` is
+ * swapped so micromark sees CommonMark's link; where none forms (`[^1](x`, `[^1](a b)`) the
+ * text stays, and the defined-label reference pass reads the reference back, as Obsidian has
+ * it.
+ */
+function linkedReference(
+  reference: Node,
+  parent: Parent,
+  source: string,
+): number | undefined {
+  const index = parent.children.indexOf(reference as Content);
+  const next = parent.children[index + 1];
+  const start = reference.position?.start.offset;
+  const end = reference.position?.end.offset;
+  if (start === undefined || end === undefined) return undefined;
+  if (next?.position?.start.offset !== end || source[end] !== "(") {
+    return undefined;
+  }
+  return source.slice(start, start + 2) === "[^" ? start + 1 : undefined;
+}
+
+/**
+ * Rule 9: a label line holding a `|`, directly under a table written without pipes at the ends
+ * of its rows, is another row. GFM lets a footnote definition start there and cut the table
+ * short; Obsidian keeps the line in the table -- in a quote and a list item too -- as it keeps
+ * a label under a paragraph in the paragraph (rule 1). Under a table written WITH pipes the
+ * line is a definition to both.
+ */
+function labelRowUnderTable(
+  definition: Parent,
+  parent: Parent,
+  source: string,
+  lines: Lines,
+): number | undefined {
+  const index = parent.children.indexOf(definition as Content);
+  const table = parent.children[index - 1];
+  const at = table?.position?.start.offset;
+  const line = definition.position?.start.line;
+  if (table?.type !== "table" || at === undefined || line === undefined) {
+    return undefined;
+  }
+  if (table.position?.end.line !== line - 1) return undefined;
+  if (source[at] === "|") return undefined;
+  const colon = labelColon(definition, source);
+  if (colon === undefined) return undefined;
+  const lineEnd =
+    (lines.starts[line - 1] ?? 0) + (lines.text[line - 1] ?? "").length;
+  return source.slice(colon, lineEnd).includes("|") ? colon : undefined;
 }
 
 /** A paragraph opening a quote with a callout marker: a callout's title, before callouts exist. */

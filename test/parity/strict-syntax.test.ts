@@ -83,7 +83,7 @@ const disagreeing = (probe: Probe): string[] => {
 
 describe("strict Obsidian syntax against Obsidian", () => {
   it("records every probe", () => {
-    expect(golden.cases.length).toBe(377);
+    expect(golden.cases.length).toBe(406);
   });
 
   it("reads every probe the way Obsidian does", () => {

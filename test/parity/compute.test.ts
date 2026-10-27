@@ -760,7 +760,14 @@ describe("positioned oracle", () => {
     // Found by `goldmark-obsidian`'s block-id suite, whose other two disagreements with us
     // were real and are now fixed -- a code-span closer frees the caret, and a `code` child
     // holds no identifier.
-    blocks: 3,
+    //
+    // 3 -> 2: CLOSED by scanning per list item. An item whose first paragraph ends in its
+    // identifier registers it, from its marker to the end of its own content; the line scan
+    // keeps the forms that reads (escaped, wrapped, on a line of its own) outside such an
+    // item. Settled against 1.15.0 on ten list shapes, all ten reproduced. The package was
+    // never wrong here: the tree carries no block id, and the rendered output already
+    // matched -- only this projection did not.
+    blocks: 2,
     // 71, of which 44 are span-only and they do NOT share one rule -- measured, after
     // "Obsidian ends an item at its last content character and we run on to the next
     // line start" was recorded here from two examples. It holds for 34. The other 10
@@ -961,7 +968,6 @@ describe("positioned oracle", () => {
     "hunt/continuation-masked-under-foreign-label/2:footnoteRefs",
     "hunt/inline-footnote-double-parse/0:blocks",
     "hunt/inline-footnote-double-parse/1:blocks",
-    "probe/block-nest/both-ids:blocks",
     "probe/empty-container/nested-list:listItems",
   ];
 

@@ -7389,6 +7389,627 @@
     "headings": [],
     "blocks": []
    }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "caret link defined",
+   "markdown": "[^1](u)\n\n[^1]: one\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "1@2-2"
+    ],
+    "footnoteRefs": [],
+    "links": [
+     "u@0-0"
+    ],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": [
+     "1@0-0"
+    ]
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "caret link unclosed",
+   "markdown": "[^1](x\n\n[^1]: one\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "1@2-2"
+    ],
+    "footnoteRefs": [
+     "1@0"
+    ],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "caret link angle",
+   "markdown": "[^1](<u>)\n\n[^1]: one\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "1@2-2"
+    ],
+    "footnoteRefs": [],
+    "links": [
+     "u@0-0"
+    ],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": [
+     "1@0-0"
+    ]
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "caret link space",
+   "markdown": "[^1] (u)\n\n[^1]: one\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "1@2-2"
+    ],
+    "footnoteRefs": [
+     "1@0"
+    ],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "caret link title",
+   "markdown": "[^1](u \"t\")\n\n[^1]: one\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "1@2-2"
+    ],
+    "footnoteRefs": [],
+    "links": [
+     "u@0-0"
+    ],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": [
+     "1@0-0"
+    ]
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "caret link empty dest",
+   "markdown": "[^1]()\n\n[^1]: one\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "1@2-2"
+    ],
+    "footnoteRefs": [],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": [
+     "1@0-0"
+    ]
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "caret link mid word",
+   "markdown": "a[^1](u)b\n\n[^1]: one\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "1@2-2"
+    ],
+    "footnoteRefs": [],
+    "links": [
+     "u@0-0"
+    ],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": [
+     "1@0-0"
+    ]
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "caret image defined",
+   "markdown": "![^1](u)\n\n[^1]: one\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "1@2-2"
+    ],
+    "footnoteRefs": [],
+    "links": [],
+    "embeds": [
+     "u@0-0"
+    ],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "caret link bad dest",
+   "markdown": "[^1](a b)\n\n[^1]: one\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "1@2-2"
+    ],
+    "footnoteRefs": [
+     "1@0"
+    ],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "caret link then ref",
+   "markdown": "[^1](u) and [^1]\n\n[^1]: one\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "1@2-2"
+    ],
+    "footnoteRefs": [
+     "1@0"
+    ],
+    "links": [
+     "u@0-0"
+    ],
+    "embeds": [],
+    "tags": [],
+    "headings": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "ref after label",
+   "markdown": "a [text][^9] b\n\n[^9]: nine\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "9@2-2"
+    ],
+    "footnoteRefs": [],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "ref after label space",
+   "markdown": "a [text] [^9] b\n\n[^9]: nine\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "9@2-2"
+    ],
+    "footnoteRefs": [
+     "9@0"
+    ],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "ref after footnote",
+   "markdown": "a [^8][^9] b\n\n[^8]: eight\n\n[^9]: nine\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "footnoteDefinition@4-4",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "8@2-2",
+     "9@4-4"
+    ],
+    "footnoteRefs": [
+     "8@0",
+     "9@0"
+    ],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "ref after collapsed",
+   "markdown": "a [x][][^9] b\n\n[^9]: nine\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "9@2-2"
+    ],
+    "footnoteRefs": [
+     "9@0"
+    ],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "ref after literal close",
+   "markdown": "a x][^9] b\n\n[^9]: nine\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "9@2-2"
+    ],
+    "footnoteRefs": [
+     "9@0"
+    ],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "ref after nested pair",
+   "markdown": "a [a [b] c][^9] b\n\n[^9]: nine\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "9@2-2"
+    ],
+    "footnoteRefs": [],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "ref after image label",
+   "markdown": "a ![x][^9] b\n\n[^9]: nine\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "9@2-2"
+    ],
+    "footnoteRefs": [],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "ref after empty pair",
+   "markdown": "a [][^9] b\n\n[^9]: nine\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "9@2-2"
+    ],
+    "footnoteRefs": [],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "ref after defined label",
+   "markdown": "a [x][^9] b\n\n[x]: /u\n\n[^9]: nine\n",
+   "obsidian": {
+    "sections": [
+     "definition@2-2",
+     "footnoteDefinition@4-4",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "9@4-4"
+    ],
+    "footnoteRefs": [],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "ref after full ref",
+   "markdown": "a [x][y][^9] b\n\n[^9]: nine\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "9@2-2"
+    ],
+    "footnoteRefs": [
+     "9@0"
+    ],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "ref after link",
+   "markdown": "a [x](u)[^9] b\n\n[^9]: nine\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@0-0"
+    ],
+    "footnotes": [
+     "9@2-2"
+    ],
+    "footnoteRefs": [
+     "9@0"
+    ],
+    "links": [
+     "u@0-0"
+    ],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "pipeless label pipe",
+   "markdown": "a | b\n--- | ---\n[^1]: x | y\n\nuse[^1]\n",
+   "obsidian": {
+    "sections": [
+     "paragraph@4-4",
+     "table@0-2"
+    ],
+    "footnotes": [],
+    "footnoteRefs": [],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "pipeless row then label pipe",
+   "markdown": "a | b\n--- | ---\nc | d\n[^1]: x | y\n\nuse[^1]\n",
+   "obsidian": {
+    "sections": [
+     "paragraph@5-5",
+     "table@0-3"
+    ],
+    "footnotes": [],
+    "footnoteRefs": [],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "pipeless label no pipe",
+   "markdown": "a | b\n--- | ---\n[^1]: x\n\nuse[^1]\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@4-4",
+     "table@0-1"
+    ],
+    "footnotes": [
+     "1@2-2"
+    ],
+    "footnoteRefs": [
+     "1@4"
+    ],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "piped label pipe",
+   "markdown": "| a | b |\n| --- | --- |\n[^1]: x | y\n\nuse[^1]\n",
+   "obsidian": {
+    "sections": [
+     "footnoteDefinition@2-2",
+     "paragraph@4-4",
+     "table@0-1"
+    ],
+    "footnotes": [
+     "1@2-2"
+    ],
+    "footnoteRefs": [
+     "1@4"
+    ],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "pipeless label pipe tight",
+   "markdown": "a | b\n--- | ---\n[^1]:x|y\n\nuse[^1]\n",
+   "obsidian": {
+    "sections": [
+     "paragraph@4-4",
+     "table@0-2"
+    ],
+    "footnotes": [],
+    "footnoteRefs": [],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "pipeless label pipe in item",
+   "markdown": "- a | b\n  --- | ---\n  [^1]: x | y\n\nuse[^1]\n",
+   "obsidian": {
+    "sections": [
+     "list@0-2",
+     "paragraph@4-4"
+    ],
+    "footnotes": [],
+    "footnoteRefs": [],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "pipeless label pipe quoted",
+   "markdown": "> a | b\n> --- | ---\n> [^1]: x | y\n\nuse[^1]\n",
+   "obsidian": {
+    "sections": [
+     "blockquote@0-2",
+     "paragraph@4-4"
+    ],
+    "footnotes": [],
+    "footnoteRefs": [],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   }
+  },
+  {
+   "area": "footnote precedence",
+   "name": "pipeless label leading pipe",
+   "markdown": "a | b\n--- | ---\n| [^1]: x | y\n\nuse[^1]\n",
+   "obsidian": {
+    "sections": [
+     "paragraph@2-2",
+     "paragraph@4-4",
+     "table@0-1"
+    ],
+    "footnotes": [],
+    "footnoteRefs": [],
+    "links": [],
+    "embeds": [],
+    "tags": [],
+    "headings": [],
+    "blocks": []
+   },
+   "excluded": "GFM table formation: under a pipeless table GFM keeps `| [^1]: x | y` as a row, where Obsidian's pipe-style rule ends the table and makes a paragraph. The label is no definition to either."
   }
  ]
 }

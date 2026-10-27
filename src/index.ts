@@ -18,6 +18,7 @@ import { definitionMathAbsorbTransform } from "./lib/definition-math-absorb.js";
 import { definitionEndBeforeLabelTransform } from "./lib/definition-end-before-label.js";
 import { tagAgainstTextTransform } from "./lib/tag-against-text.js";
 import { wikilinkAfterLabelTransform } from "./lib/wikilink-after-label.js";
+import { footnoteAfterLabelTransform } from "./lib/footnote-after-label.js";
 import { inlineFootnoteInertTransform } from "./lib/inline-footnote-inert.js";
 
 import "./lib/types.js";
@@ -540,6 +541,9 @@ export default function remarkObsidian(
       });
       bareFootnoteRefTransform(tree, String(file), { defined });
     }
+    // A `[^x]` straight after a bracket pair is no footnote reference: `a [text][^9] b` holds
+    // none. After the reference passes above, which would read it back from the text.
+    footnoteAfterLabelTransform(tree, String(file));
     // An unclosed `$$` directly under a definition in a list item is the definition's.
     definitionMathAbsorbTransform(tree, String(file));
     // A definition's text ends before a column-0 label or block opener.

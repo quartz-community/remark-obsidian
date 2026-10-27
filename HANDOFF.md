@@ -12,8 +12,8 @@ were Obsidian syntax bare rp8 lacks; and `strict` simply stays on micromark. The
 |                                      |         1.x (micromark) |                 2.0 (rp8) |
 | ------------------------------------ | ----------------------: | ------------------------: |
 | referee (6,844 documents)            |                   6,307 |                 **6,830** |
-| contract gate, `match` cases         |                   3,447 |                 **3,465** |
-| positioned-oracle divergences        |                      20 |                     **9** |
+| contract gate, `match` cases         |                   3,447 |                 **3,469** |
+| positioned-oracle divergences        |                      20 |                     **8** |
 | RAW positions vs `compute`: sections |                   97.4% |                  **100%** |
 | RAW positions: headings / list items |            94.2 / 82.2% |                 100/92.4% |
 | round-trips that never settle        |                       0 |                     **0** |
@@ -44,8 +44,9 @@ performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
      comments, callouts, wikilinks and embeds, frontmatter, block ids, inline footnotes, math,
      tags, task boxes). Four exclusions, each a CommonMark or tab-arithmetic reading.
    - **The strict triage -- DONE.** Every recorded case strict misses is classified (AGENTS.md
-     § 2.0): 509 left, 475 of them the spec read by the spec, 27 tab arithmetic, 5 deferred.
-     `strict-syntax.test.ts` holds 377 probes.
+     § 2.0): 506 left, 475 of them the spec read by the spec and 27 tab arithmetic. Of the 5
+     deferred, 3 are since fixed and 2 left by decision. `strict-syntax.test.ts` holds 406
+     probes.
    - **`strict`'s pathological coverage -- DONE.** `test/pathological.test.ts` runs every shape
      under both presets; strict excludes `backtick-increasing`, which stock micromark takes 130 s
      on. A run of `]` was quadratic in the vendored footnote reader (32,000 in 23 s) and is
@@ -66,7 +67,13 @@ performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
      excluded (6,828 → 6,830).
    - **Spans DONE:** every agreeing document agrees on full spans too (start offset, end line,
      end column, end offset), and inline footnotes agree 869 of 869 (`referee-spans.json`).
-4. **The positioned oracle's 9** -- all pre-existing in 1.x; none new.
+4. **The positioned oracle's 8 -- nothing fixable left.** All of them are Obsidian's cache:
+   - 2 are P1;
+   - 1 is a garbled embed inside an unclosed `%%`;
+   - 2 are phantom block ids past the text;
+   - 1 is embed ordering;
+   - 1 is an empty item, which its own rendering nests as we do;
+   - the last is closed in the projection (block ids per list item, 9 → 8).
 5. **`normalize.ts`** carries compensations for micromark's offsets. Only rp8 trees reach it now
    (every gate runs the `legacy` profiles), and two compensations already had to be generalised
    because they broke rp8 positions that were right. Simplifying it is safe but unmeasured.

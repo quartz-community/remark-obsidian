@@ -404,14 +404,47 @@ The 475 cover:
 - bracket precedence where following Obsidian would undo a CommonMark link;
 - emphasis in callout titles.
 
-The five deferred:
+The five deferred, then decided with the user. Three were Obsidian rules worth following, each
+settled live with its boundary first:
 
-- `[^1](u)` as a link;
-- `[text][^9]` as a reference;
-- a label holding a pipe as a table row;
+- **`[^x](u)` is a link** wherever an inline link forms -- an angle-bracket destination, a
+  title, an empty `()` -- defined label or not (rule 8 of the reading pass). `[^1](x`,
+  `[^1](a b)` and `[^1] (u)` stay references.
+- **`[^x]` straight after a bracket pair is no reference** (`footnoteAfterLabelTransform`):
+  `[text][^9]`, `![x][^9]`, `[][^9]` and `[a [b] c][^9]` hold none. Link text may hold
+  balanced brackets, which is where it differs from the wikilink rule. It still forms after
+  a footnote label, after the second half of `[x][]` or `[x][y]`, and after a link. With
+  `[x]: /u` defined, CommonMark still makes `[x]` a link where Obsidian does not; that half is
+  the spec's.
+- **A label line holding a `|` under a pipeless table is a row** (rule 9), in a quote or list
+  item too. Under a table with leading pipes it defines, as GFM has it.
+
+Together: recorded cases 2,962 → **2,965** (+3 / −0), referee definitions 5,328 → **5,333**
+(+5 / −0), references 1,513 → **1,520** (+7 / −0), spec unchanged; `strict-syntax.test.ts` holds
+406 probes (control: 16 fail without the change). `reference-in-link/shortcut` also needed the
+text projection's `dropLabelOpeners` narrowed to labels that are malformed or unclosed. A
+remark-parse 8 tree never holds a well-formed `[a][b]` as text, so legacy is untouched (3,469
+either way).
+
+Left as they are, by decision:
+
 - an unbalanced `[[[a]]` inside a link label, which breaks the link's bracket count in
   micromark;
 - a `$$` line interrupting a lazily continued definition in a list item.
+
+**Two of legacy's nine positioned divergences, re-read under rp8, were not output gaps:**
+
+- **Block ids per list item.** `- Item ^one` / `  - Sub ^two` lost `one` in the projection,
+  which read a list as one run and kept only its last identifier, while the package rendered
+  both right. Asked of 1.15.0 on ten list shapes: an item registers the identifier ending its
+  first paragraph, from its marker to the end of its own content. Projected per item:
+  `blocks` 3 → 2, all ten reproduced.
+- **An empty item, then an indented one** (`-` / blank / `  -`). Obsidian RENDERS the second
+  nested inside the first, as we do; only its cache calls it a separate root list. A cache
+  defect, left.
+
+That leaves 8: 2 P1, a garbled embed in an unclosed `%%`, two phantom block ids past the text,
+one embed ordering, and those two.
 
 **`strict` is in the pathological suite now, and two quadratics are gone.** The suite ran only
 the default preset. Every shape now runs under both presets, except that strict skips

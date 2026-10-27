@@ -368,6 +368,13 @@ function dropLabelOpeners(value: string): string {
       else if (character === "]" && depth > 0) depth -= 1;
     }
     if (depth > 0) continue;
+    // Only a label that is not one: a WELL-FORMED label after the closer is a full reference
+    // nothing defines, and renders whole -- `a [text][^9] b` shows `[text][^9]`. A tree from
+    // remark-parse 8 never holds that as text, since its reader makes a reference node of
+    // every such pair; a CommonMark tree does, so the rule has to say which labels it means.
+    const end = out.indexOf("]", at + 1);
+    const inner = out.indexOf("[", at + 1);
+    if (end !== -1 && (inner === -1 || inner > end)) continue;
     out = out.slice(0, at) + out.slice(at + 1);
   }
   return out;
@@ -2383,6 +2390,56 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     // re-deriving it from the line would have to re-answer which `<` runs are html blocks,
     // which `legacy-html-blocks` and `textarea-not-raw.ts` exist for.
     if (child.type === "html") continue;
+    // A list at root registers an identifier PER ITEM, which the line scan below cannot: it
+    // reads a block as one run and keeps the identifier ending it, so `- Item ^one` /
+    // `  - Sub ^two` lost `one`, and `- a ^x` / `- b ^y` reported `y` spanning both items.
+    // Asked of 1.15.0 across ten shapes: an item whose FIRST paragraph ends in `^id`
+    // registers it, from the item's marker to the end of its own content short of a nested
+    // list -- `- a ^x` / blank / `  para ^p` is `x@0:0-2:9` and no `p`; a continuation line
+    // after the identifier registers nothing; and inside a quote the quote is the block,
+    // which the scan below already reads.
+    //
+    // The scan still runs, for the identifiers this does not read -- escaped (`- \[^1`),
+    // wrapped (`1. ==^blk==`) and on a line of their own (`- a` / blank / `  ^id`) -- except
+    // inside an item registered here, which holds one identifier.
+    const registered: Array<readonly [number, number]> = [];
+    if (child.type === "list") {
+      const listIds = (list: Node): void => {
+        for (const item of (list as ParentNode).children) {
+          if (item.type !== "listItem" || !item.position) continue;
+          const kids = (item as ParentNode).children;
+          const first = kids[0];
+          const own = kids
+            .filter((kid) => (kid.type as string) !== "list")
+            .at(-1);
+          const from = first?.position?.start?.offset;
+          const to = first?.position?.end?.offset;
+          if (
+            first?.type === "paragraph" &&
+            from !== undefined &&
+            to !== undefined &&
+            own?.position
+          ) {
+            const match = /(?:^|\s)\^([A-Za-z0-9-]+)[ \t]*$/u.exec(
+              source.slice(from, to),
+            );
+            if (match) {
+              blocks.push(
+                `${match[1]}@${atPoint(item.position.start)}-${atPoint(own.position.end)}`,
+              );
+              registered.push([
+                item.position.start.offset!,
+                own.position.end.offset!,
+              ]);
+            }
+          }
+          for (const kid of kids) {
+            if ((kid.type as string) === "list") listIds(kid);
+          }
+        }
+      };
+      listIds(child);
+    }
     const from = child.position?.start?.offset;
     const to = child.position?.end?.offset;
     if (from === undefined || to === undefined) continue;
@@ -2593,6 +2650,8 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
         span = `${found.item.position!.start.line - 1}:${found.column}-${atPoint(found.item.position!.end)}`;
       }
     }
+    const idAt = lineStart + id.index;
+    if (registered.some(([from, to]) => from <= idAt && idAt <= to)) continue;
     blocks.push(`${id.name}@${span}`);
   }
 

@@ -107,3 +107,25 @@ export function pairBefore(
   }
   return undefined;
 }
+
+/**
+ * The `[` opening the bracket run that the `]` at `close` ends, counting nested pairs -- link
+ * text may hold balanced brackets, so `[a [b] c]` is one run -- or `undefined`.
+ */
+export function balancedOpen(
+  source: string,
+  close: number,
+  floor: number,
+): number | undefined {
+  let depth = 0;
+  const end = Math.max(floor - 1, close - LABEL_LIMIT);
+  for (let index = close - 1; index > end; index--) {
+    const found = bracket(source, index);
+    if (found === "]") depth++;
+    else if (found === "[") {
+      if (depth === 0) return index;
+      depth--;
+    }
+  }
+  return undefined;
+}
