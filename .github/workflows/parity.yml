@@ -44,15 +44,22 @@ jobs:
       # Reading mode renders off requestAnimationFrame, which Chromium starves for
       # unmapped windows. Xvfb alone is not enough; a window manager must map and
       # focus the window or every capture comes back empty.
+      #
+      # `$GITHUB_ENV` reaches only LATER steps, so the window manager started here needs
+      # DISPLAY exported in this one. Without it herbstluftwm logged `XOpenDisplay() failed`
+      # on 2026-10-26 and the whole recording ran with no window manager.
       - name: Start virtual display
         run: |
           sudo apt-get update -q
           sudo apt-get install -y -q xvfb herbstluftwm x11-utils
-          echo "DISPLAY=:99" >> "$GITHUB_ENV"
+          export DISPLAY=:99
+          echo "DISPLAY=$DISPLAY" >> "$GITHUB_ENV"
           Xvfb :99 -screen 0 1280x1024x24 +extension GLX -noreset &
           for _ in $(seq 1 40); do xdpyinfo -display :99 >/dev/null 2>&1 && break; sleep 0.25; done
           herbstluftwm &
           sleep 2
+          # Fail here rather than record without one, which is what went unnoticed.
+          pgrep -x herbstluftwm >/dev/null || { echo "herbstluftwm is not running"; exit 1; }
 
       - name: Record goldens
         env:
@@ -67,9 +74,15 @@ jobs:
           PARITY_FULL_PROXY_CHECK: "1"
         run: npm run parity:record
 
+      # Every recording stamps a fresh `recordedAt`, so a run where Obsidian answered exactly
+      # as before still differs from the committed file by that one line. Restore the
+      # committed file when nothing else changed, or this reports drift every week.
       - name: Check for drift
         id: drift
         run: |
+          if npx tsx test/parity/goldens-unchanged.mts; then
+            git checkout -- test/parity/goldens/obsidian.json
+          fi
           if git diff --quiet -- test/parity/goldens; then
             echo "drift=false" >> "$GITHUB_OUTPUT"
           else

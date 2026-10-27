@@ -200,8 +200,25 @@ moved:
 - **Obsidian changed.** Update the goldens and re-triage the affected cases.
 - **We regressed.** Fix the code; leave the goldens alone.
 
-Recording is deterministic apart from `recordedAt`. Obsidian mints a random suffix for footnote
-anchors on every render, which is normalised out of the stored HTML for exactly this reason.
+Recording is deterministic apart from `recordedAt`, which every recording stamps afresh. So the
+job asks `goldens-unchanged.mts` first and restores the committed file when nothing else
+moved; otherwise every week would read as drift. Obsidian also mints a random suffix for
+footnote anchors on every render, which is normalised out of the stored HTML for the same reason.
+
+The job needs a running window manager as well as `Xvfb`, and fails its display step without
+one; until 2.0 it started one without a display and recorded with none.
+
+**Reading View's surplus table cells depend on what it rendered before.** A row an unescaped
+pipe splits into more cells than the header declares (`| [[Note|Alias]] |` under `| --- |`) is
+the `SURPLUS_TABLE_CELLS` family in `oracle.e2e.ts`. On 2026-10-27, same app (1.14.5), same
+machine, same window manager: the seed-layer check rendered those cases without their surplus
+cells, agreeing with the detached renderer, while the full sweep (`PARITY_FULL_PROXY_CHECK=1`)
+rendered them with it. That failed the cross-check on five cases outside the known list
+(`probe/table-pipes/body-row-unclosed`, `probe/table-pipes/short-delimiter-closed`,
+`table/code-pipe`, `table/math-pipe`, `context/table-cell/wikilink-alias`) and "corrected" two
+inside it (`math/in-table-pipe`, `wikilink/table-unescaped`) to text our parse does not give.
+The CI run of 2026-10-26 failed on the same five. Do not commit goldens from a full sweep
+without checking those two.
 
 ## Reading-view cross-check
 
@@ -299,6 +316,7 @@ The corpus and the referee measure `legacy`. `strict` has its own:
 | `regressions.mts`                 | Documents we break that stock `remark-parse` gets right |
 | `classify.ts`                     | Shared loading, position identity and sampling          |
 | `probe-ledger.mts`                | Records live probe answers for `probes.test.ts`         |
+| `goldens-unchanged.mts`           | Whether a recording changed anything but `recordedAt`   |
 | `compose.mts`, `compose.ts`       | Construct sequences against Obsidian                    |
 | `invariants.test.ts`              | Structural invariants on the tree itself                |
 | `roundtrip.test.ts`               | Formatting reaches a fixed point                        |
