@@ -1,3 +1,10 @@
+## 2.0.1
+
+### Patch Changes
+
+- 7e7bedd: Shorten the package description to fit npm's 255-character limit, which cut the 2.0.0 one off
+  mid-word.
+
 ## 2.0.0
 
 ### Major Changes
