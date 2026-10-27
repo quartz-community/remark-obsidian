@@ -22,11 +22,11 @@ included:
 .use(remarkObsidian, { preset: "strict" })  // CommonMark/GFM/LaTeX + Obsidian's syntax
 ```
 
-|                                                                                                                                         | `legacy` (default) | `strict` |
-| --------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | -------- |
-| Obsidian's documented syntax — wikilinks, embeds, callouts, tags, `%%`, `==`, `$`, frontmatter, task boxes holding any character        | on                 | **on**   |
-| What Obsidian delivers beyond the standards — emphasis, lists, entities, autolinks, code spans, html blocks, link labels, task re-parse | on                 | **off**  |
-| Its rendering — an undefined `[^x]` shown without its brackets, a line ending shown as a break                                          | on                 | **off**  |
+|                                                                                                                                                                                                             | `legacy` (default) | `strict` |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | -------- |
+| Obsidian's documented syntax — wikilinks, embeds, callouts, tags, `%%`, `==`, `$`, frontmatter, task boxes holding any character                                                                            | on                 | **on**   |
+| What Obsidian delivers beyond the standards — emphasis, lists, entities, autolinks, code spans, html blocks, link labels, task re-parse, where footnote definitions and `%%` comments end inside containers | on                 | **off**  |
+| Its rendering — an undefined `[^x]` shown without its brackets, a line ending shown as a break                                                                                                              | on                 | **off**  |
 
 **Use `legacy`** for an Obsidian plugin, or for Quartz rendering a vault: the point
 is that the output matches what the author saw in the app. It parses with

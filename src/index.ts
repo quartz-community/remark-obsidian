@@ -32,85 +32,26 @@ import { customTaskCharTransform } from "./lib/task-char.js";
 import { mathDisplayTransform } from "./lib/math-display.js";
 import { mathFenceTransform } from "./lib/math-fence.js";
 import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
-import { refBeforeLabelTransform } from "./lib/ref-before-label.js";
-import { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
-import { inlineFootnoteInertTransform } from "./lib/inline-footnote-inert.js";
-import { inlineRefoldTransform } from "./lib/inline-refold.js";
-import { quoteMergeTransform } from "./lib/quote-merge.js";
-import { listMergeTransform } from "./lib/list-merge.js";
 import { listItemExtentTransform } from "./lib/list-item-extent.js";
-import { paragraphMergeTransform } from "./lib/paragraph-merge.js";
 import { normalizePointsTransform } from "./lib/normalize-points.js";
 import { breakPositionsTransform } from "./lib/break-positions.js";
 import { commentParseTransform } from "./lib/comment-parse.js";
-import { commentDefinitionColumnTransform } from "./lib/comment-definition-column.js";
-import { commentQuoteExtentTransform } from "./lib/comment-quote-extent.js";
-import { itemCommentLazyTransform } from "./lib/item-comment-lazy.js";
-import { definitionTabAfterQuoteTransform } from "./lib/definition-tab-after-quote.js";
-import { definitionSpaceTabSeparatorTransform } from "./lib/definition-space-tab-separator.js";
-import { definitionTabPastItemTransform } from "./lib/definition-tab-past-item.js";
-import { markerTabDefinitionTransform } from "./lib/marker-tab-definition.js";
-import { quotedFenceLazyTransform } from "./lib/quoted-fence-lazy.js";
-import { quotedTabCodeTransform } from "./lib/quoted-tab-code.js";
-import { quoteCommentLazyTransform } from "./lib/quote-comment-lazy.js";
 import {
   ensureLineOffsets,
   lineOffsetsFromMarkdown,
 } from "./lib/mdast/line-offsets.js";
-import { definitionTabTransform } from "./lib/definition-tab.js";
-import { definitionTrimTransform } from "./lib/definition-trim.js";
-import { fenceOutlivesTransform } from "./lib/fence-outlives.js";
-import { itemFenceCloserTransform } from "./lib/item-fence-closer.js";
-import { mathOutlivesTransform } from "./lib/math-outlives.js";
 import { mathMidlineTransform } from "./lib/math-midline.js";
-import { listUnderDefinitionTransform } from "./lib/list-under-definition.js";
 import { calloutTitleInterruptTransform } from "./lib/callout-title-interrupt.js";
-import { footnoteLabelTransform } from "./lib/footnote-label.js";
-import { bareCheckboxTransform } from "./lib/bare-checkbox.js";
-import { blankFootnoteLabelTransform } from "./lib/blank-footnote-label.js";
-import { setextDefinitionTransform } from "./lib/setext-definition.js";
-import { itemHtmlExtentTransform } from "./lib/item-html-extent.js";
-import { shortCommentTransform } from "./lib/short-comment.js";
-import { definitionBlankTailTransform } from "./lib/definition-blank-tail.js";
-import { definitionBlankTitleTransform } from "./lib/definition-blank-title.js";
-import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
-import { blankLabelReferenceTransform } from "./lib/blank-label-reference.js";
-import { autolinkLiteralExtentTransform } from "./lib/autolink-literal-extent.js";
-import { definitionColumnTransform } from "./lib/definition-column.js";
-import { definitionEndBeforeLabelTransform } from "./lib/definition-end-before-label.js";
-import { definitionDeindentCodeTransform } from "./lib/definition-deindent-code.js";
-import { invisibleBlankLineTransform } from "./lib/invisible-blank-line.js";
-import { doubledFootnoteOpenerTransform } from "./lib/doubled-footnote-opener.js";
 import { restoreInlinePositionsTransform } from "./lib/restore-inline-positions.js";
-import { tagAfterCloserTransform } from "./lib/tag-after-closer.js";
 import { autolinkLiteralToMarkdown } from "./lib/mdast/autolink-literal-to-markdown.js";
 import { htmlTailToMarkdown } from "./lib/mdast/html-tail-to-markdown.js";
 import { linkReferenceToMarkdown } from "./lib/mdast/link-reference-to-markdown.js";
 import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
 import { frontmatterExactOpenerTransform } from "./lib/frontmatter-exact-opener.js";
-import { definitionNestedLabelTransform } from "./lib/definition-nested-label.js";
-import { quoteDefinitionAbsorbTransform } from "./lib/quote-definition-absorb.js";
-import { placeDefinitionReferenceTransform } from "./lib/place-definition-reference.js";
-import { lrdFootnoteTransform } from "./lib/lrd-footnote.js";
-import { itemDotThresholdTransform } from "./lib/item-dot-threshold.js";
-import { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 import { calloutTransform } from "./lib/callout.js";
 import { adjacentIndentedCodeTransform } from "./lib/adjacent-indented-code.js";
-import { definitionIndentedCodeTransform } from "./lib/definition-indented-code.js";
-import { definitionLazySplitTransform } from "./lib/definition-lazy-split.js";
-import { mathListExtentTransform } from "./lib/math-list-extent.js";
-import { definitionMathAbsorbTransform } from "./lib/definition-math-absorb.js";
-import { commentHoistTransform } from "./lib/comment-hoist.js";
 import { commentTailTransform } from "./lib/comment-tail.js";
-import { commentDefinitionExtentTransform } from "./lib/comment-definition-extent.js";
-import { commentInDefinitionTransform } from "./lib/comment-in-definition.js";
-import { commentRegionTransform } from "./lib/comment-region.js";
-import {
-  definitionContinuationTransform,
-  definitionAbsorbedItemTransform,
-  definitionLazyTransform,
-  definitionWindowTransform,
-} from "./lib/definition-continuation.js";
+import { definitionContinuationTransform } from "./lib/definition-continuation.js";
 import { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 
 import { math as mathSyntax } from "micromark-extension-math";
@@ -422,6 +363,10 @@ export default function remarkObsidian(
     opts.callouts;
   if (!needsTransform) return undefined;
 
+  // `strict` is what Obsidian INTENDS: CommonMark, GFM and LaTeX, plus the syntax Obsidian
+  // documents. Each pass below implements that syntax, repairs an extension that falls short of
+  // it, keeps positions honest, or carries out an option the caller turned on. What Obsidian's
+  // parser merely DELIVERS is `legacy`'s, which parses with that parser instead.
   const transform = (tree: Root, file: unknown): void => {
     if (opts.comments && !opts.keepComments) {
       visit(
@@ -436,27 +381,13 @@ export default function remarkObsidian(
         },
       );
     } else if (opts.comments) {
-      commentHoistTransform(tree, String(file));
+      // A comment ends at its closing `%%`, so what follows the closer on that line is
+      // visible: the block construct owns the whole closing line, and left alone it hides
+      // the tail inside the comment.
       commentTailTransform(tree, String(file), reparse);
-      // After the hoist and tail passes, so a mis-paired region is a top-level
-      // comment node by the time its signature is looked for.
-      commentRegionTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-      // After the region pass: a definition split off a `%%` closer was never
-      // seen by the footnote parser, so its indented continuation is still a
-      // sibling at this point.
+      // After the tail pass: a definition split off a `%%` closer was never seen by the
+      // footnote parser, so its indented continuation is still a sibling at this point.
       definitionContinuationTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-      // After the continuation pass, so a definition that already grew is the
-      // one a stray `%%` gets folded back into.
-      // Before the pass that turns such a comment back into prose, which is
-      // what would otherwise leave nothing here to clamp.
-      commentDefinitionExtentTransform(tree, String(file), (markdown) =>
-        reparse(markdown),
-      );
-      commentInDefinitionTransform(tree, String(file), (markdown) =>
         self.parse(markdown),
       );
       visit(tree, "comment", (node: any) => {
@@ -467,199 +398,41 @@ export default function remarkObsidian(
         };
       });
     }
-    // First, because it rewrites the whole document: a closing fence with a
-    // tail means there is no frontmatter in the tree yet at all.
+    // The frontmatter extension's two defects, where CommonMark and Obsidian agree on the
+    // reading: a fence that never closes is not frontmatter, and neither is a `--- ` opener.
     if (opts.frontmatter) {
-      frontmatterTailTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-      // The other half of the same extension defect: a fence that never closes,
-      // where a tail is a fence that closes awkwardly. Mutually exclusive with the
-      // pass above, which is why either order works.
       frontmatterUnclosedTransform(tree, String(file), (markdown) =>
         self.parse(markdown),
       );
-      // Last of the three: the two above rewrite a document whose frontmatter is
-      // malformed at the CLOSING fence, and this one needs to see whatever yaml
-      // node survives them to decide the OPENING fence should never have opened.
+      // After the pass above, which can rewrite the document this one inspects.
       frontmatterExactOpenerTransform(tree, String(file), (markdown) =>
         self.parse(markdown),
       );
     }
-    lrdFootnoteTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
-    shortCommentTransform(tree);
     if (opts.customTaskChars) {
       customTaskCharTransform(tree, String(file));
     }
     if (opts.math) {
-      // Before the display pass, which only annotates: this decides what the
-      // formula is.
+      // LaTeX's `$$` delimiters, which the math extension reads as a code fence: the text after
+      // an opening `$$` is formula rather than an info string, and a `$$` ending a content
+      // line closes the block. Before the display pass, which only annotates.
       mathFenceTransform(tree, String(file));
       mathDisplayTransform(tree, String(file));
+      // The same delimiters opening display math at the end of a paragraph line.
+      mathMidlineTransform(tree, String(file));
     }
     if (opts.callouts) {
       calloutTransform(tree, String(file), (markdown) => self.parse(markdown));
+      // After it, since it reads the `calloutTitle` that pass builds: the title is its own
+      // line, so the body below it starts fresh and `2.` there opens a list.
+      calloutTitleInterruptTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
     }
-    // Beside the quote one, which carries the same rule for a quote, callout or list-item
-    // host. This one's host is a LINK reference definition, and the scoping that matters is
-    // what it excludes: a `footnoteDefinition`'s indented line is its own content, which 42
-    // corpus cases depend on.
-    definitionIndentedCodeTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
-    // Beside the pass above, which handles the same shape when the marker sits on the code's
-    // own line. A single-digit `1.` marker moves the item's CODE THRESHOLD out by one, the
-    // same adjustment `definition-column.ts` already applies to the column.
-    itemDotThresholdTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
-    // Before the absorption, which is what keeps it small: the unclosed `$$` is still a root
-    // SIBLING of the list here, so bounding it lets the existing pass absorb a correctly
-    // ended node. After absorption it would mean splitting a node inside a `listItem`.
-    mathListExtentTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
-    // Beside the pass above and for the same reason: the continuation line is still INSIDE
-    // the definition here, where no guard in the absorption can see it. Splitting first lets
-    // that chain decide the tail by its own node type, which it already does correctly for
-    // all 80 cells of the absorption matrix -- a list takes indented code, a quote does not,
-    // a comment is taken by nothing.
-    definitionLazySplitTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
-    // Not with the other html passes, where it measured INERT, and not gated on `math`,
-    // which an earlier placement inside that branch silently was.
-    itemHtmlExtentTransform(tree, String(file));
-    quoteMergeTransform(tree, String(file));
-    // Beside the quote merge and for the same reason. Their B10 -- a label between two items
-    // is the first item's lazy text, so the list never ended.
-    listMergeTransform(tree, String(file));
-    // After the quote passes have settled the block, since this reads the
-    // quote's own extent, and before the footnote passes that would bind a
-    // definition it swallows.
-    if (opts.comments) commentQuoteExtentTransform(tree, String(file));
-    // Beside the pass above, which cannot reach a comment that is the quote's LAST child --
-    // which is exactly what a depth-2 opener produces, because the lazy line stays at root.
-    if (opts.comments) quoteCommentLazyTransform(tree, String(file));
-    // Beside the quote half, after it: the two cannot both claim one opener -- that pass
-    // needs the comment to be its container's LAST child and this one needs a sibling after
-    // it -- so the order is for reading rather than for correctness.
-    if (opts.comments) itemCommentLazyTransform(tree, String(file));
-    quotedFenceLazyTransform(tree, String(file));
-    definitionTabAfterQuoteTransform(tree, String(file));
-    // Beside the tab-separator pass above: the definition this REMOVES is one an earlier
-    // pass may have just placed, so it runs after rather than before.
-    definitionSpaceTabSeparatorTransform(tree, String(file));
-    // Unconditional, unlike the continuation pass above it: a definition whose
-    // first line opened nothing to continue leaves its next line behind whether
-    // comments are on or not.
-    definitionLazyTransform(tree, String(file));
-    // Immediately after, because it finishes that pass's job for the lines the definition's own
-    // continuation already absorbed: there is no sibling paragraph left for it to nest.
-    definitionAbsorbedItemTransform(tree);
-    // After the lazy absorb, so the window sees the definition at its full extent.
-    definitionWindowTransform(tree, String(file));
-    definitionTabTransform(tree, String(file));
-    // Before the bare-reference pass: a `[^1]` the fence swallows is code, and
-    // code is literal, so it must stop looking like a reference first.
-    fenceOutlivesTransform(tree, String(file));
-    mathOutlivesTransform(tree, String(file));
-    mathMidlineTransform(tree, String(file));
-    listUnderDefinitionTransform(tree, String(file));
-    // After the callout passes, and this one IS exercised -- `pass-order.mts` reports a
-    // different tree when it runs first. It reads `calloutTitle`, which does not exist
-    // until `calloutTransform` has built it, so at the top it finds nothing and the
-    // ordered item below a title stays a paragraph.
-    calloutTitleInterruptTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
-    // Before the absorbing passes below: a line of invisible whitespace closed the block
-    // above it, so nothing may absorb it afterwards.
-    invisibleBlankLineTransform(tree, String(file));
     // Before everything that reads offsets: gfm's autolink literal splices nodes
     // with no position at all, and a pass without offsets correctly stands aside.
     restoreInlinePositionsTransform(tree, String(file));
-    // Before the bracket passes: a `[^` that beat an inline footnote is a reference,
-    // and the passes below ask the tree which construct owns each bracket.
-    doubledFootnoteOpenerTransform(tree, String(file));
-    // Before the bracket passes: a bare URL swallowing a `](` means the brackets
-    // after it never belonged to a label at all.
-    autolinkLiteralExtentTransform(tree, String(file));
-    blankFootnoteLabelTransform(tree, String(file));
-    bareCheckboxTransform(tree, String(file));
-    footnoteLabelTransform(tree, String(file), (markdown) =>
-      self.parse(markdown),
-    );
-    if (opts.bareFootnoteRefs) {
-      // Must precede the bare-reference pass: it re-inserts a `[^n]:` label that
-      // the bare pass then reduces, as Obsidian shows it.
-      // Order matters: a definition that is really lazy continuation must be
-      // merged away first, or the table split fires on a definition that is
-      // about to stop being one. A table cannot interrupt a paragraph either.
-      footnoteInterruptTransform(tree, String(file));
-      footnoteTableSplitTransform(tree, String(file), reparse);
-      // After the interrupt fold, or a definition about to be merged into the
-      // paragraph above it would be turned into a heading instead.
-      setextDefinitionTransform(tree, String(file), reparse);
-      // Before the bare-reference pass, so a label this re-tokenizes is still
-      // literal text and gets converted with every other one.
-      // A plain parse, not the whole pipeline: the transforms splice nodes
-      // without positions, and the positions are what let the real characters
-      // be read back over the flattened copy.
-      inlineRefoldTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-      // Again, because the refold can produce a math node that the first run never
-      // saw: `_$$y^2` / `y^2$$_` only becomes one span once the paragraph is
-      // re-tokenized here, hundreds of lines after the classification pass. Safe to
-      // repeat -- it keys on the real source at the node's span and only ever sets
-      // fields, so re-running it on an already-classified tree changes nothing.
-      mathDisplayTransform(tree, String(file));
-      // Before it, because it undoes the node that hides the text that pass scans: a
-      // `[^1][^2]` arrives as ONE `linkReference` swallowing both pairs, so there is no plain
-      // text left for the bare-reference pass to find.
-      refBeforeLabelTransform(tree, String(file));
-      // Before the bare-reference pass, which is what INDEXES the label this leaves
-      // behind in the parent's text: Obsidian declines the nested definition but
-      // reports a reference at its position in 16 of 17 measured cases. The mirror
-      // of the padded-label pass, which demotes and so has to run after.
-      definitionNestedLabelTransform(tree, String(file));
-      bareFootnoteRefTransform(tree, String(file));
-      // After it, because it is the pass that splices the unplaced references this
-      // places. An unplaced node is invisible to the oracle, so a reference we found
-      // is otherwise reported as missing.
-      placeDefinitionReferenceTransform(tree, String(file));
-      // AFTER the bare-reference pass, which is what CREATES the nodes this demotes. Placed
-      // before it the pass was completely inert -- the references it looks for did not exist
-      // yet -- with its own ordering comment claiming the opposite.
-      quotedTabCodeTransform(tree, String(file));
-      // Before the column pass, because it decides whether there is a definition to give a
-      // column to at all: B3's minimum moves the indented-code threshold with the content
-      // column, so a label four past the lowered floor is code and Obsidian reports none.
-      // Before the threshold pass and the column pass: it changes which lines the definition
-      // owns, and both of those read the definition's own extent.
-      definitionMathAbsorbTransform(tree, String(file));
-      definitionDeindentCodeTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-      // Last of the footnote passes, so it sees every definition in its final place.
-      definitionColumnTransform(tree, String(file));
-      // After the column pass, which reads a definition's own extent. This only pulls an END
-      // back, so running it earlier would hand every later pass a shorter definition than the
-      // one it was measured against.
-      definitionEndBeforeLabelTransform(tree, String(file));
-      // After the reference passes, because the tree is what can say whether the `]`
-      // before a tag closed a construct or was ordinary text.
-      tagAfterCloserTransform(tree);
-      // After the bare pass, so a reference it revives inside an inline note is
-      // demoted too.
-      if (opts.inlineFootnotes) {
-        inlineFootnoteInertTransform(tree);
-      }
-    }
-    paragraphMergeTransform(tree, String(file));
+    if (opts.bareFootnoteRefs) bareFootnoteRefTransform(tree, String(file));
     // Presence of the table means it was recorded, so it is started even for a
     // document holding no container at all.
     if (opts.lineOffsets) ensureLineOffsets(tree);
@@ -667,76 +440,18 @@ export default function remarkObsidian(
     // body is parsed from the span the comment finally claims.
     if (opts.keepComments && opts.parseComments) {
       commentParseTransform(tree, String(file), reparse);
-      // Directly after, because that pass is where the defect comes from: it re-parses the
-      // body through this chain, `definitionColumnTransform` clamps a whitespace-prefixed
-      // definition to a block the FRAGMENT does not contain, and the node lands at its line
-      // start. Obsidian indexes the label at its bracket.
-      commentDefinitionColumnTransform(tree, String(file));
-      // AGAIN, because the comment parse above revives what the earlier run demoted. A `%%`
-      // nested in an inline footnote has its body re-parsed through this chain, which rebuilds
-      // a `footnoteReference` inside the `footnote` node -- so `a^[x %% [^1] %% y] w[^2]` ends
-      // up indexing `[^1]` after `inlineFootnoteInertTransform` had already made it literal.
-      //
-      // Two rules claim that character range and the live oracle settles which wins, with a
-      // control pair: `^[x %% [^1] %% y]` reports only `[^2]`, `^[x [^1] y]` reports only
-      // `[^2]` with no comment present, and `%% [^1] %%` alone DOES report `[^1]`. So E3's
-      // inertness beats the comment rule, and the comment rule applies outside an inline
-      // footnote only.
-      if (opts.inlineFootnotes) inlineFootnoteInertTransform(tree);
     }
-    // LATE, and the position is the whole of why it works. Early in the chain an item whose
-    // fence was broken by a column-zero line still holds that line as its own child -- a
-    // `blockquote`, say -- so the item's last child is not the fence's `code` and the pass
-    // declines. By here the absorption passes have folded those away and the shape is the one
-    // the probes describe: the item ending in a `code`, and a root `code` whose first line is
-    // the matching closer.
-    // `reparse`, not `self.parse`: the remainder holds bare references like `use[^1]`, and a
-    // plain parse leaves those as literal text -- GFM only builds a `footnoteReference` for a
-    // name that is defined, and `bareFootnoteRefTransform` is what converts the rest.
-    itemFenceCloserTransform(tree, String(file), (markdown) =>
-      reparse(markdown),
-    );
-    // After every pass that can extend a definition, and before points are
-    // normalised from the offsets this corrects.
-    definitionTrimTransform(tree, String(file));
-    // Strictly after the trim: that pass pulls a definition back off an interior
-    // blank, this one extends it over a trailing blank, and an earlier placement was
-    // silently undone by it.
-    definitionBlankTailTransform(tree, String(file));
-    // After the blank-tail pass, which settles where a definition ends, and before points are
-    // normalised from the offsets this moves. Their D6 -- a title may start after a blank
-    // line, and the reference inside it is then dead.
-    definitionBlankTitleTransform(tree, String(file));
-    // LATE, with the other passes that settle a definition's extent. Beside its quote-hosted
-    // sibling -- early, next to the comment and fence absorptions -- this is completely inert:
-    // the definitions it removes have not been created yet there. Measured both ways.
-    definitionTabPastItemTransform(tree, String(file));
-    // Beside it, and late for the same reason: it CREATES a definition out of a code node, so
-    // every pass that could still move or extend one has run.
-    markerTabDefinitionTransform(tree, String(file), (markdown) =>
-      reparse(markdown),
-    );
     // After every pass that reads a newline out of a text value, and before points
     // are normalised from the offsets it sets.
     if (opts.positionedBreaks) breakPositionsTransform(tree, String(file));
-    // After every pass that can rewrite a paragraph's span, since it matches on one.
-    blankLabelReferenceTransform(tree, String(file));
     // After every pass that can move a list item's end, and before points are rebuilt.
     // The overlap it repairs comes from `remark-math`; its own file carries the controls.
     listItemExtentTransform(tree);
     // After every pass that can CREATE a root code node, since it merges adjacent ones and a
-    // pass running later could leave a fresh pair unmerged. Ungated: micromark splits a run of
-    // indented lines below a quote-with-heading, and CommonMark and Obsidian AGREE it is one
-    // block, so this is not a preset divergence but a correction both targets want.
+    // pass running later could leave a fresh pair unmerged. micromark splits a run of indented
+    // lines below a quote-with-heading, and CommonMark makes it one block.
     adjacentIndentedCodeTransform(tree, String(file));
-    // Last, so every pass above only has to keep its offsets honest. This comment was
-    // orphaned two passes above, where it read as a claim about `linkNbspTitle`; the
-    // ordering audit is what surfaced it, since the detector attributes a comment to the
-    // call below it and found this pass undocumented.
-    // LATE, because the shape it needs does not exist earlier: at the
-    // definition-continuation position the blockquote does not yet hold the
-    // definition and its sibling, and the pass saw zero candidates there.
-    quoteDefinitionAbsorbTransform(tree, String(file));
+    // Last, so every pass above only has to keep its offsets honest.
     normalizePointsTransform(tree, String(file));
   };
 
@@ -797,10 +512,7 @@ export { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 export { customTaskCharTransform } from "./lib/task-char.js";
 export { mathDisplayTransform } from "./lib/math-display.js";
 export { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
-export { footnoteInterruptTransform } from "./lib/footnote-interrupt.js";
-export { footnoteTableSplitTransform } from "./lib/footnote-table-split.js";
 export { calloutTransform } from "./lib/callout.js";
-export { commentHoistTransform } from "./lib/comment-hoist.js";
 export { commentTailTransform } from "./lib/comment-tail.js";
 export { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 

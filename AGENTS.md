@@ -60,6 +60,27 @@ flipped, and `legacy` gave 70,499 tree-and-stringify fingerprints, and none move
 down `calloutTransform` moves 119 documents per configuration, which is the known-positive
 control. Where the micromark-era record below names one of those passes, it is history.
 
+**`strict` runs 17 passes, not 76.** Each call site was stood down alone over the 676 spec
+examples and the corpus, under `strict` and under `strict` + `bareFootnoteRefs`. None was needed
+for a spec example. Three worked AGAINST the spec: `definitionColumn` (`link-reference-definitions/193`),
+and `shortComment` with `commentRegion` (`raw-html/626`, which closed with them, emptying
+strict's LEAK list). A kept pass does one of four things:
+
+- implements documented syntax: callouts and their title line, any-character task boxes,
+  `$$` display math as LaTeX delimits it, a comment ending at its closer;
+- repairs an extension where CommonMark and Obsidian agree: frontmatter, remark-math's item
+  extents, micromark's split indented code;
+- keeps positions;
+- carries out an option the caller turned on (`bareFootnoteRefs`, `positionedBreaks`,
+  `parseComments`).
+
+The other 59 imitated what Obsidian's parser delivers, and went with 57 modules and `score.mts`.
+That instrument scored candidate micromark passes against the referee. The new chain equals the
+old one with those 59 stood down on 66,352 document-and-configuration pairs; leaving one
+(`definitionLazy`) on moves 219, which is the control. `legacy` is byte-identical. An
+audit of the removed passes' own examples found four of them DELETING user text under `strict`, and two breaking its own options: one emitted undefined
+`footnoteReference`s and one emitted `break`s.
+
 **Its gates**, beyond the suite above:
 
 - `test/rp8-vendored.test.ts` -- vendored == published rp8, byte-identical trees on every corpus

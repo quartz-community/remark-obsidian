@@ -21,7 +21,7 @@ were Obsidian syntax bare rp8 lacks; and `strict` simply stays on micromark. The
 | structural invariant violations      |                      10 |                     **0** |
 | slowest gated pathological shape     | 7.4 s (`footnote-refs`) | 985 ms (`unclosed-links`) |
 
-Suite 463 passed / 3 skipped, lint, both typechecks, format and build green. Commits on
+Suite 453 passed / 3 skipped, lint, both typechecks, format and build green. Commits on
 `rp8-legacy-prototype`: `6aa9bfa` prototype, `d73c42a` wiring, `6ba3e8e` vendoring and
 performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
 
@@ -31,12 +31,17 @@ performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
    `taskReparse` switches are deleted, 8,716 lines, along with the switches themselves. The
    output is byte-identical on 70,499 fingerprints with a known-positive control (AGENTS.md
    § 2.0), and the bundle drops from 755,021 to 564,319 bytes.
-2. **`strict`'s passes.** The transform now runs under `strict` alone, since `legacy` returns
-   before it. 40 of its passes run unconditionally and 35 sit behind a feature option, most of
-   them in the `bareFootnoteRefs` block, which `strict` turns off. They existed to match Obsidian, which `legacy` no
-   longer needs them for, so each is a question for `strict.test.ts` and the intends/delivers
-   rule: keep, gate, or remove. Some do nothing at all now: `adjacentIndentedCodeTransform`
-   moves none of the 70,499 fingerprints when stood down.
+2. **`strict`'s passes -- DONE.** 76 call sites → 17, by the intends/delivers rule; AGENTS.md
+   § 2.0 has the measurement. Left open, all smaller:
+   - `needsTransform` skips the whole chain when `comments`, `customTaskChars`, `math`,
+     `callouts` and `bareFootnoteRefs` are all off, so `positionedBreaks`, `lineOffsets` and
+     the frontmatter repairs silently do nothing then. Predates 2.0; a behaviour change.
+   - A `%%` closer's tail inside a QUOTE stays hidden in the comment: `commentTail` repairs it
+     at root only (`hunt/label-after-comment-closer-mangled/3`).
+   - The syntax extensions `strict` keeps were tuned against Obsidian too -- the highlight
+     scan (`legacyHighlightQueue`, shared with the rp8 reader), the callout and comment
+     grammars, tags, inline footnotes. Whether each rule is documented or merely delivered is
+     the same question one level down.
 3. **The 16 referee documents.** 4 are P1/P2 (must not fix); 2 carry references on lines past the
    text's end (artifacts of the corrected answers); 4 carry references only the corrected answers
    have, inside code or an unclosed fence (`reproducers.json#852` is the one 1.x got right); 6

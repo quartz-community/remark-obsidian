@@ -3,7 +3,8 @@
 ---
 
 `preset: "legacy"` — the default — now parses with remark-parse 8, the parser Obsidian itself
-forks, instead of correcting micromark towards it. `preset: "strict"` is unchanged.
+forks, instead of correcting micromark towards it. `preset: "strict"` parses with micromark, as
+`remark-parse` does.
 
 The parser is vendored and bundled; nothing new is installed. The result is still ordinary
 mdast with this package's node types (`wikilink`, `highlight`, `tag`, `comment`, `callout`,
@@ -16,7 +17,12 @@ before.
 
 **`strict` is what Obsidian intends:** the CommonMark, GFM and LaTeX it says it supports, plus
 the syntax it documents — including task boxes holding any character (`- [-]`, `- [?]`), which
-Obsidian documents as checkboxes and `strict` now reads the same way.
+Obsidian documents as checkboxes and `strict` now reads the same way. It no longer imitates what
+Obsidian's parser merely does: where a footnote definition or a `%%` comment ends inside a quote
+or list, tab arithmetic, and the other quirks are `legacy`'s alone. Its tree now matches
+`remark-parse` and `remark-gfm` on every CommonMark and GFM spec example except the seven that
+hold Obsidian syntax and the two task lists, where it adds `data.taskChar`. A `%%` comment still ends at its closing `%%`, and `$$` still delimits display
+math as in LaTeX, including `$$x^2` on one line and a closing `$$` at the end of a line.
 
 **Tree shapes that changed in `legacy`,** each to what Obsidian reports:
 

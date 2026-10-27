@@ -72,34 +72,21 @@ const BY_DESIGN: readonly string[] = [
 const POSITION_ONLY: readonly string[] = [];
 
 /**
- * Structural divergences with no Obsidian node type involved. ONE LEFT, AND IT IS REFUSED.
+ * Structural divergences with no Obsidian node type involved. EMPTY, and kept so it can refill.
  *
  * Each entry here produces a different tree shape than stock remark for input containing no
- * Obsidian syntax, which means Quartz would render it wrongly. The list opened at 19 and every
- * actionable one is closed: each was a legacy pass running UNCONDITIONALLY, with no option for
- * `strict` to clear, and five options now gate them.
+ * Obsidian syntax, which means Quartz would render it wrongly. The list opened at 19, each entry a
+ * pass imitating Obsidian's parser with no option for `strict` to clear. Most closed when options
+ * gated them, and those passes went with the micromark `legacy` path in 2.0.
  *
- *   legacySetext            6  setext underlines, plus `link-reference-definitions/216`
- *   legacyLinkDefinitions   6  `link-ref-defs/196`, `200`, `202`, `210`, `links/546`, `552`
- *   legacyTabs              3  `tabs/2`, `tabs/11`, `block-quotes/238`
- *   legacyContainerLazy     1  `list-items/257`
- *   legacyLinkDestinations  1  `links/493`
- *
- * Every owner was DERIVED by disabling one unconditional pass at a time and reading which spec
- * examples began to agree -- 57 probed, 6 owning anything, 51 owning nothing. Guessing would have
- * mis-scoped it twice: `block-quotes/238` is owned JOINTLY by two passes and by neither alone,
- * and `definitionSetextTransform` was initially left out of `legacySetext` on the reasoning that
- * the other five "closed every measured divergence" -- it owns `216`, which was then attributed
- * to an unknown cause.
- *
- * `raw-html/626` remains. It is already recorded as a refused case in `hygiene.test.ts`: the
- * conversion that would close it makes `remark-stringify` escape the `<`, and re-parsing that
- * escape grows another backslash on every pass, so one parity case does not buy a formatter that
- * corrupts the author's file.
+ * The last, `raw-html/626`, closed when `strict` stopped running passes for what Obsidian merely
+ * delivers. Two of them read `<!-->` the way CommonMark did before 0.31 -- `shortComment` made it
+ * text and `commentRegion` paired it with a later `-->` -- where stock reads one complete comment.
+ * It had been refused because the conversion that closed it made `remark-stringify` grow a
+ * backslash on every format; without the passes `strict` emits stock's `html` node, which writes
+ * back byte-identical from the first pass.
  */
-const LEAK: readonly string[] = [
-  "commonmark/raw-html/626", // -1html   already refused, see hygiene.test.ts
-];
+const LEAK: readonly string[] = [];
 
 /**
  * GFM extension divergences. EMPTY, and the corpus exists because it could not be empty before.
@@ -177,6 +164,6 @@ describe("strict preset", () => {
     );
     // A bare count, asserted so that shrinking the backlog is a deliberate edit here rather than
     // something that silently stops being measured.
-    expect(LEAK.length).toBe(1);
+    expect(LEAK.length).toBe(0);
   });
 });
