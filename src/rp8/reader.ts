@@ -308,9 +308,10 @@ function highlights(tables: any): void {
 const TAG_CHAR = /[\p{L}\p{M}\p{Emoji}\p{N}_\-/]/u;
 
 /**
- * `#tag`. The locator offers only a `#` after whitespace or another `#`, and the reader runs
- * wherever the inline loop stands -- which is also right after any construct, so
- * `a**b**#next` tags while `foo#next` does not.
+ * `#tag`. The locator offers only a `#` after whitespace, and the reader runs wherever the
+ * inline loop stands -- which is also right after any construct, so `a**b**#next` tags while
+ * `foo#next` does not. Not after another `#`: Obsidian reads no tag in `##tag` or `x##tag`, and
+ * only `#a` in `#a##b`; `#a#b` still holds two, the second straight after a construct.
  */
 function tags(tables: any): void {
   const tag: Tokenizer = function (eat, value, silent) {
@@ -336,7 +337,7 @@ function tags(tables: any): void {
       at = value.indexOf("#", at + 1)
     ) {
       const before = value.charAt(at - 1);
-      if (at === 0 || before === "#" || /\s/u.test(before)) return at;
+      if (at === 0 || /\s/u.test(before)) return at;
     }
     return -1;
   };

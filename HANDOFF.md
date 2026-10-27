@@ -40,9 +40,14 @@ performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
      emphasis goes to whichever opened first, as in Reading view (Live Preview differs).
    - **The removed passes -- DONE.** 13 of 22 came back after measuring each against Obsidian;
      the rest are recorded as refused or inert (AGENTS.md § 2.0).
-   - **The syntax audit -- comments and callouts DONE** (`strict-syntax.test.ts`, 93 probes).
-     NEXT: wikilinks and embeds (D1), frontmatter (D2), block ids (D4), inline footnotes (E3),
-     math (M1-M2), tags. Probe each rule area live, fix, append to `goldens/strict-syntax.json`.
+   - **The syntax audit -- DONE** (`strict-syntax.test.ts`, 282 probes over every rule area:
+     comments, callouts, wikilinks and embeds, frontmatter, block ids, inline footnotes, math,
+     tags, task boxes). Four exclusions, each a CommonMark or tab-arithmetic reading.
+   - **`strict` has no pathological coverage.** `test/pathological.test.ts` runs only the default
+     preset. Two quadratic shapes are known there, both shared with stock `remark-gfm`: footnote
+     definitions in list items (micromark's document initializer; 8,000 items take ~14 s either
+     way) and a run of `]` (the vendored `tokenizePotentialGfmFootnoteCall` walks back over every
+     event on each `]`; bounding the walk by the label limit is the obvious repair, unmeasured).
    - **micromark itself departs from CommonMark** on `> a` / `2. x`: it starts a list where the
      spec (and Obsidian) continue the quote's paragraph, since `2.` cannot interrupt one. A
      question about stock `remark-parse`, not this package; `strict.test.ts` cannot see it.

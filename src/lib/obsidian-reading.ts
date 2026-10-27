@@ -1,4 +1,12 @@
-import type { Content, List, Node, Paragraph, Parent, Root } from "mdast";
+import type {
+  Content,
+  List,
+  ListItem,
+  Node,
+  Paragraph,
+  Parent,
+  Root,
+} from "mdast";
 import type { Point } from "unist";
 import { MARKER as CALLOUT_MARKER } from "./callout.js";
 
@@ -31,6 +39,10 @@ import { MARKER as CALLOUT_MARKER } from "./callout.js";
  *    `> x` / `····%%` / `[^1]: def` defines. Not under a definition, where `%%` is lazy text
  *    (their D5).
  *
+ * 4. **A label can follow a task box.** `- [ ] [^1]: def` is a task item holding a definition,
+ *    whatever the box holds and whether a space or a tab follows it -- where GFM, which finds the
+ *    box inside the item's first paragraph, leaves the label as that paragraph's text.
+ *
  * 6. **A callout's title line stands alone** (their A2). The line under it starts a fresh block,
  *    so `> [!note]` / `>     code[^2]` is quoted code and `> [!note]` / `> 2. [^1]: def` a list:
  *    a blank quote line goes in after the title, where the next line carries the quote's own
@@ -41,14 +53,17 @@ import { MARKER as CALLOUT_MARKER } from "./callout.js";
  * root definition (a position, which `strict` does not promise).
  *
  * The rules are applied by re-parsing the document from an EDITED copy that has the same line
- * structure, then mapping positions back. Two edits suffice, and neither touches what micromark
+ * structure, then mapping positions back. Three edits suffice, and none touches what micromark
  * decides about anything else:
  *
  * - **neutralize** swaps one character for a private-use placeholder -- the `:` after a label, or
  *   the `.` or `)` of an ordered marker -- so the line is ordinary text; the character is
  *   restored in every value afterwards;
  * - **split** inserts one blank line, carrying the container prefix (`>`) where there is one, so
- *   the definition ends before the line that follows it.
+ *   the definition ends before the line that follows it;
+ * - **unbox** removes a task box and the space after it, so the label opens the item's content;
+ *   the item's `checked` is restored afterwards, and the box's character read back from the
+ *   source as for any other task.
  *
  * Repeats until nothing applies, since one edit can expose the next (`2.` then `3.`).
  */
@@ -56,7 +71,7 @@ export function obsidianReadingTransform(
   tree: Root,
   source: string,
   parse: (markdown: string) => Root,
-  options: { readonly callouts: boolean; readonly comments: boolean },
+  options: ReadingOptions,
 ): void {
   if (PLACEHOLDER_IN.test(source)) return;
   const lines = lineTable(source);
@@ -67,13 +82,16 @@ export function obsidianReadingTransform(
     // What detection reads: the source with this round's characters swapped, so a label already
     // turned into text reads as text. Same length, so every offset and line still holds.
     const view = lineTable(neutralized(source, edits));
-    const found = detect(tree, source, view, parse, options).filter((edit) => {
-      const key = `${edit.kind}@${String(edit.offset)}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
+    const detected = detect(tree, source, view, parse, options);
+    const unseen = (list: readonly Edit[]): Edit[] =>
+      list.filter((edit) => !seen.has(`${edit.kind}@${String(edit.offset)}`));
+    // Edits that change which paragraphs are open go first and alone; the rest are read off the
+    // tree they leave. Filtered before choosing, since an unbox is read off the source and is
+    // found again in every round after its own.
+    let found = unseen(detected.alone);
+    if (found.length === 0) found = unseen(detected.edits);
     if (found.length === 0) return;
+    for (const edit of found) seen.add(`${edit.kind}@${String(edit.offset)}`);
     edits.push(...found);
 
     const edited = applyEdits(source, lines, edits);
@@ -114,9 +132,22 @@ const RESTORE = new Map(
 const PLACEHOLDER_IN = /[\uE000-\uE002]/u;
 const PLACEHOLDER_ALL = /[\uE000-\uE002]/gu;
 
+interface ReadingOptions {
+  readonly callouts: boolean;
+  readonly comments: boolean;
+  /** Whether a box holding any character is a task's, as `customTaskChars` reads it. */
+  readonly tasks: boolean;
+}
+
 type Edit =
   | { readonly kind: "neutralize"; readonly offset: number }
-  | { readonly kind: "split"; readonly offset: number; readonly text: string };
+  | { readonly kind: "split"; readonly offset: number; readonly text: string }
+  | {
+      readonly kind: "unbox";
+      readonly offset: number;
+      readonly length: number;
+      readonly checked: boolean;
+    };
 
 interface Lines {
   /** Offset of each line's first character; index 0 is line 1. */
@@ -166,11 +197,14 @@ function detect(
   source: string,
   lines: Lines,
   parse: (markdown: string) => Root,
-  options: { readonly callouts: boolean; readonly comments: boolean },
-): Edit[] {
+  options: ReadingOptions,
+): { readonly alone: Edit[]; readonly edits: Edit[] } {
   const edits: Edit[] = [];
-  /** Rule 5's splits, applied alone: ending a container changes which paragraphs are open. */
-  const splits: Edit[] = [];
+  /**
+   * Edits applied alone, since each changes which paragraphs are open: rule 5's splits end a
+   * container, and rule 4's unboxes take the task's paragraph away from under the next line.
+   */
+  const alone: Edit[] = [];
   /** Paragraphs with no definition among their ancestors, by the line they end on. */
   const openParagraphEnds = new Map<number, Paragraph[]>();
   /** Which of those open with a callout title, since callouts are built later. */
@@ -206,19 +240,23 @@ function detect(
           : node.type === "comment" && parent && parent.children[0] !== node
             ? lazyCommentNode(node, parent, lines)
             : undefined;
-      if (split) splits.push(split);
+      if (split) alone.push(split);
     }
     if (node.type === "paragraph" && !inDefinition && node.position) {
       if (options.callouts && isCalloutTitle(node as Paragraph, parent)) {
         calloutTitles.add(node as Paragraph);
         const split = calloutBodySplit(node as Paragraph, lines);
-        if (split) splits.push(split);
+        if (split) alone.push(split);
       }
       const end = node.position.end.line;
       openParagraphEnds.set(end, [
         ...(openParagraphEnds.get(end) ?? []),
         node as Paragraph,
       ]);
+    }
+    if (node.type === "listItem") {
+      const unbox = taskBox(node as ListItem, source, options.tasks);
+      if (unbox) alone.push(unbox);
     }
     if (node.type === "list" && (node as List).ordered && node.position) {
       const start = node.position.start.line;
@@ -252,7 +290,6 @@ function detect(
     }
   };
   walk(tree, false, undefined, 0);
-  if (splits.length > 0) return splits;
 
   for (const { node: definition, item, hostLine } of definitions) {
     const position = definition.position;
@@ -338,7 +375,30 @@ function detect(
     }
   }
 
-  return edits;
+  return { alone, edits };
+}
+
+/** A list marker, a task box and the space after it, then a footnote label. */
+const BOX_BEFORE_LABEL =
+  /^(?:[*+-]|\d{1,9}[.)])[ \t]+(\[([^\]\r\n])\][ \t]+)\[\^[^\]\s]+\]:/u;
+
+/** Rule 4: the box opening a task item whose content is a footnote label. */
+function taskBox(
+  item: ListItem,
+  source: string,
+  tasks: boolean,
+): Edit | undefined {
+  const start = item.position?.start.offset;
+  if (start === undefined) return undefined;
+  const match = BOX_BEFORE_LABEL.exec(source.slice(start, start + 1024));
+  if (!match) return undefined;
+  const [whole, box, char] = match as unknown as [string, string, string];
+  // GFM's own boxes only where GFM found them, so a pipeline without its task reader gets no
+  // task; any other character only where `customTaskChars` reads it as one.
+  const gfm = char === " " || char === "x" || char === "X";
+  if (gfm ? typeof item.checked !== "boolean" : !tasks) return undefined;
+  const offset = start + whole.indexOf(box);
+  return { kind: "unbox", offset, length: box.length, checked: char !== " " };
 }
 
 /** A paragraph opening a quote with a callout marker: a callout's title, before callouts exist. */
@@ -590,6 +650,14 @@ function startsBlock(
 
 interface Edited {
   readonly text: string;
+  /** Each removed task box: where its item's content now starts in the edited text. */
+  readonly deletions: ReadonlyArray<{
+    readonly at: number;
+    readonly length: number;
+    /** The edited line (1-based) it was removed from. */
+    readonly line: number;
+    readonly checked: boolean;
+  }>;
   /**
    * Each inserted line: where it sits in the edited text, how long it is, and the original line
    * (1-based) it was inserted before.
@@ -610,10 +678,24 @@ function applyEdits(
   let text = "";
   let cursor = 0;
   const insertions: Array<{ at: number; length: number; before: number }> = [];
+  const deletions: Array<{
+    at: number;
+    length: number;
+    line: number;
+    checked: boolean;
+  }> = [];
   for (const edit of sorted) {
     text += source.slice(cursor, edit.offset);
     cursor = edit.offset;
-    if (edit.kind === "neutralize") {
+    if (edit.kind === "unbox") {
+      deletions.push({
+        at: text.length,
+        length: edit.length,
+        line: lineOfOffset(text, text.length) + 1,
+        checked: edit.checked,
+      });
+      cursor += edit.length;
+    } else if (edit.kind === "neutralize") {
       text += PLACEHOLDERS[source[edit.offset]!] ?? source[edit.offset]!;
       cursor += 1;
     } else {
@@ -627,15 +709,23 @@ function applyEdits(
     }
   }
   text += source.slice(cursor);
-  return { text, insertions };
+  return { text, insertions, deletions };
 }
 
 /** Positions and values back into the source's own terms. */
 function mapBack(tree: Root, edited: Edited, lines: Lines): void {
-  const { insertions } = edited;
+  const { insertions, deletions } = edited;
 
   const point = (p: Point, end: boolean): void => {
     if (p.offset === undefined) return;
+    // A removed box comes back before whatever starts where it was, and after whatever ends there.
+    let restored = 0;
+    let widened = 0;
+    for (const deletion of deletions) {
+      if (p.offset < deletion.at || (end && p.offset === deletion.at)) break;
+      restored += deletion.length;
+      if (p.line === deletion.line) widened += deletion.length;
+    }
     let shift = 0;
     let moved = 0;
     for (const insertion of insertions) {
@@ -658,11 +748,18 @@ function mapBack(tree: Root, edited: Edited, lines: Lines): void {
       }
       break;
     }
-    p.offset -= shift;
+    p.offset += restored - shift;
+    p.column += widened;
     p.line -= moved;
   };
 
   const visit = (node: Node): void => {
+    if (node.type === "listItem") {
+      // Still in edited terms: an item whose content starts where a box was removed held it.
+      const at = (node as ListItem).children[0]?.position?.start.offset;
+      const box = deletions.find((deletion) => deletion.at === at);
+      if (box) (node as ListItem).checked = box.checked;
+    }
     if (node.position) {
       point(node.position.start, false);
       point(node.position.end, true);

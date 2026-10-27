@@ -36,8 +36,14 @@ lists, where it adds `data.taskChar`.
   the marker is read as blocks, so a definition there is found by its references.
 - **A highlight crossing emphasis** goes to whichever opened first, as in Reading view:
   `**a==b**c==` is bold, `==a**b==c**` highlighted.
-- **Inside `^[ … ]`** a footnote reference is text, and **a `#` right after a `]`** that closed a
-  construct is no tag.
+- **Inside `^[ … ]`** a footnote reference is text.
+- **A tag starts** at a line's start, after whitespace, or right after a construct -- a bracket
+  pair counting as one whether or not it is defined, so `[x]#tag` holds a tag. Against literal
+  text it does not: `a*#tag`, `&amp;#tag`, `x]#tag` and `##tag` hold none.
+- **A footnote label after a task box** is a definition inside the task item:
+  `- [ ] [^1]: note`.
+- **A frontmatter closer with text after it** still closes the frontmatter, and the text is read
+  as Markdown: `---[^1]: note` defines.
 - **`$$`** delimits display math as in LaTeX, including `$$x^2` on one line and a closing `$$`
   at the end of a line.
 
@@ -50,6 +56,7 @@ lists, where it adds `data.taskChar`.
 - `$$ … $$` inside a quote or list item is display `inlineMath` whose value keeps its line
   endings.
 - `root.data.lineOffsets` is remark-parse 8's own table (a task box now counts).
+- A `#` after another `#` starts no tag: `##tag` holds none, and `#a##b` only `#a`.
 - `processor.parse()` alone returns the finished tree; nothing is left for `run()`.
 
 **Formatting is stable.** Parsing and writing back with `remark-stringify` now reaches a fixed

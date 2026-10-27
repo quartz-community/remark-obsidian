@@ -3217,3 +3217,97 @@ describe("strict: a reference opener before an inline footnote", () => {
     expect(types("x[^[^1] y\n", { bareFootnoteRefs: true })).toBe("1:0");
   });
 });
+
+describe("where a tag starts", () => {
+  // Asked of Obsidian 1.15.0: a tag starts at the start of a line, after whitespace, or where a
+  // construct has just ended -- a bracket pair counting as one whether or not it is defined.
+  const tags = (markdown: string, preset: "legacy" | "strict") =>
+    findNodes(processWithGfm(markdown, { preset }), "tag").map(
+      (node: any) => node.value,
+    );
+
+  const cases: ReadonlyArray<readonly [string, string[]]> = [
+    ["##tag\n", []],
+    ["x##tag\n", []],
+    ["#a##b\n", ["a"]],
+    ["#a#b\n", ["a", "b"]],
+    ["a*#tag\n", []],
+    ["a~~#tag\n", []],
+    ["&amp;#tag\n", []],
+    ["\\*#tag\n", ["tag"]],
+    ["[x\\]#tag\n", ["tag"]],
+    ["[x]#tag\n", ["tag"]],
+    ["[x][]#tag\n", ["tag"]],
+    ["[]#tag\n", []],
+    ["x]#tag\n", []],
+    ["[x]]#tag\n", []],
+    ["[a [b] c]#tag\n", []],
+    ["[#tag]\n", ["tag"]],
+    ["[#tag\n", []],
+  ];
+
+  for (const preset of ["legacy", "strict"] as const) {
+    it(`reads every case as Obsidian does under ${preset}`, () => {
+      expect(cases.map(([markdown]) => tags(markdown, preset))).toEqual(
+        cases.map(([, expected]) => expected),
+      );
+    });
+  }
+});
+
+describe("strict: a footnote label after a task box", () => {
+  const read = (markdown: string, options = {}) => {
+    const tree = processWithGfm(markdown, { preset: "strict", ...options });
+    const [item] = findNodes(tree, "listItem");
+    const [definition] = findNodes(tree, "footnoteDefinition");
+    return { item, definition };
+  };
+
+  it("is a definition inside the task item, which keeps its box", () => {
+    const { item, definition } = read("- [x] [^2]: two\n\nuse[^2]\n");
+    expect(item.checked).toBe(true);
+    expect(item.data.taskChar).toBe("x");
+    expect(definition.label).toBe("2");
+    expect(definition.position.start).toEqual({
+      line: 1,
+      column: 7,
+      offset: 6,
+    });
+    expect(read("- [ ] [^2]: two\n").item.checked).toBe(false);
+  });
+
+  it("holds for any character in the box while custom task characters are on", () => {
+    const { item, definition } = read("- [-] [^2]: two\n");
+    expect(item.checked).toBe(true);
+    expect(item.data.taskChar).toBe("-");
+    expect(definition?.label).toBe("2");
+    expect(
+      read("- [-] [^2]: two\n", { customTaskChars: false }).definition,
+    ).toBeUndefined();
+  });
+
+  it("ends there, so a label on the next line is a definition of its own", () => {
+    const tree = processWithGfm(
+      "- [ ] [^2]: two\n  [^3]: three\n\nuse[^2][^3]\n",
+      { preset: "strict" },
+    );
+    expect(
+      findNodes(tree, "footnoteDefinition").map((node: any) => node.label),
+    ).toEqual(["2", "3"]);
+  });
+});
+
+describe("strict: a frontmatter closer with a tail", () => {
+  it("closes the frontmatter and reads the rest of its line as Markdown", () => {
+    const tree: any = processWithGfm("---\na: 1\n---[^2]: two\n\nuse[^2]\n", {
+      preset: "strict",
+    });
+    expect(tree.children.map((node: any) => node.type)).toEqual([
+      "yaml",
+      "footnoteDefinition",
+      "paragraph",
+    ]);
+    expect((tree.children[0] as any).value).toBe("a: 1");
+    expect(findNodes(tree, "footnoteReference")).toHaveLength(1);
+  });
+});

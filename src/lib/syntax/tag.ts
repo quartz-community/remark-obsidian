@@ -107,10 +107,14 @@ function tokenize(
     const last = context.events[context.events.length - 1];
     const afterConstruct =
       !!last && last[0] === "exit" && last[1].type !== "data";
+    // A second `#` is not one of them: `##tag`, `x##tag` and `#a##b`'s `#b` are no tags.
+    // A `]` may be: Obsidian tags after every bracket pair, defined or not (`[x]#t`), where
+    // micromark has made data of an undefined one. Which `]` closes a pair is a question of
+    // the whole label, so the tree settles it (`tagAgainstTextTransform`).
     const allowedStart =
       previous === null ||
       isWhitespace(previous) ||
-      previous === HASH ||
+      previous === codes.rightSquareBracket ||
       afterConstruct;
     if (!allowedStart) return nok(code);
     // A `#` directly inside `[[` or `![[` is a heading fragment, not a tag, so

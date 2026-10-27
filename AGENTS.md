@@ -159,7 +159,7 @@ profiles switched to `strict`), and the referee's definitions and references.
 They are: `commentHoist`, `commentDefinitionExtent`, `commentInDefinition`, `quoteCommentLazy`,
 `itemCommentLazy`, `definitionLazySplit`, `definitionLazy`, `doubledFootnoteOpener`,
 `definitionNestedLabel`, `definitionMathAbsorb`, `definitionEndBeforeLabel`, `tagAfterCloser`
-and `inlineFootnoteInert`. The 8 losses:
+(since widened into `tagAgainstText`, below) and `inlineFootnoteInert`. The 8 losses:
 
 - 4 definition END lines, in `%%`/definition shapes (`fuzz#174`, `#1199`) and around a callout
   inside a definition (`broad#241`, `probes#605`) -- the tail the 1.x record already carries;
@@ -202,7 +202,8 @@ rules applied to `==` would match none that it misses.
 purpose (`fuzz/highlight`'s 64 are setext under list items), so the corpus cannot separate the
 extension cases. Instead, each rule area of the upstream rules document is probed against the
 live app, and the facts are compared through `computeOurs` on lines. That is
-`goldens/strict-syntax.json` plus `strict-syntax.test.ts`, 93 probes so far. Two traps cost runs:
+`goldens/strict-syntax.json` plus `strict-syntax.test.ts`, 282 probes over every rule area. Two
+traps cost runs:
 
 - Obsidian's `sections` carry `element`/`text` entries for the rendered footnote list, which no
   tree holds, so `legacy` "missed" every probe until they were dropped.
@@ -224,6 +225,41 @@ live app, and the facts are compared through `computeOurs` on lines. That is
     build were invisible to references micromark had resolved earlier. So under `strict`
     `bareFootnoteRefTransform` runs in a defined-labels-only mode.
   - 41 probes, all agreeing; referee references +14, definitions +2 / −1 (tab arithmetic).
+- **Wikilinks and embeds (D1, D7), block ids (D4), inline footnotes (E3), math (M1-M2):** 26, 11,
+  10 and 13 probes, all agreeing on arrival.
+- **Frontmatter (D2):**
+  - A closing fence with a TAIL closes it, and the tail is Markdown (`---[^2]: two` defines).
+    `frontmatterTail` was cut in the 76 → 17 cut and never re-measured with the passes above;
+    frontmatter is Obsidian's syntax, so it is back.
+  - All three frontmatter repairs re-parse everything below the fence, so they now run straight
+    after the reading pass and re-parse THROUGH it. They used to run after the `%%` passes, whose
+    work below the fence they then dropped.
+  - 13 probes; one excluded, where ` ---` below `a: 1` is a setext underline under CommonMark.
+- **Tags:**
+  - A tag starts at a line's start, after whitespace, or where a construct has just ended, and
+    a bracket pair counts as one whether or not anything defines it (`[x]#t`, `[ ]#t`, `[#t]`).
+    It does not start against literal text: after a second `#` (`##tag`, `#a##b` -- `legacy`
+    too), an unpaired `*`, `_` or `~`, an entity, or a `]` no pair closes (`x]#t`, `[x]]#t`).
+    `tagAfterCloser` became `tagAgainstText`, and spec example `raw-html/619` now agrees with
+    stock (by-design divergences 9 → 8).
+  - The tokenizer cannot see which `*` pairs or which `]` closes a label, so it allows the `#`
+    after any construct or `]` and the tree decides. A bracket inside another construct is that
+    construct's, so the bracket scan stops at any sibling but text and emphasis-like wrappers.
+  - 89 probes; one excluded: an UNDEFINED `[^…` is text under `strict`, so a wikilink inside it
+    forms where Obsidian reads the reference first.
+- **Task boxes (footnote rule 4, found while probing frontmatter):**
+  - A footnote label after a task box is a definition inside the item, for any box character
+    and a space or tab after it. GFM finds the box inside the item's first paragraph, which
+    leaves the label as text. A third edit, `unbox`, removes the box before the re-parse and
+    restores `checked` afterwards.
+  - 27 probes; two excluded, `>⇥- [ ] [^2]: two`, where Obsidian defines nothing (tab
+    arithmetic).
+  - **Trap:** an edit read off the SOURCE is found again in every round. Filtering it out by
+    `seen` only AFTER choosing "applied alone" left the round empty, so the loop stopped before
+    rule 1 ever ran -- `broad#272` defined a label inside `%%` until the filter moved first.
+- Against `c197860`: spec divergences 9 → **8**; Reading-view cases 2,928 → **2,935** (+7 / −0);
+  referee definitions 5,227 → **5,261** (+35 / −1: 22 task box, 13 frontmatter); references
+  1,497 → **1,500** (+3 / −0). The one loss is `broad#327`, the `>⇥` exclusion above.
 
 **Its gates**, beyond the suite above:
 

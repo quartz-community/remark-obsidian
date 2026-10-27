@@ -16,7 +16,7 @@ import { doubledFootnoteOpenerTransform } from "./lib/doubled-footnote-opener.js
 import { definitionNestedLabelTransform } from "./lib/definition-nested-label.js";
 import { definitionMathAbsorbTransform } from "./lib/definition-math-absorb.js";
 import { definitionEndBeforeLabelTransform } from "./lib/definition-end-before-label.js";
-import { tagAfterCloserTransform } from "./lib/tag-after-closer.js";
+import { tagAgainstTextTransform } from "./lib/tag-against-text.js";
 import { inlineFootnoteInertTransform } from "./lib/inline-footnote-inert.js";
 
 import "./lib/types.js";
@@ -63,6 +63,7 @@ import { restoreInlinePositionsTransform } from "./lib/restore-inline-positions.
 import { autolinkLiteralToMarkdown } from "./lib/mdast/autolink-literal-to-markdown.js";
 import { htmlTailToMarkdown } from "./lib/mdast/html-tail-to-markdown.js";
 import { linkReferenceToMarkdown } from "./lib/mdast/link-reference-to-markdown.js";
+import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
 import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
 import { frontmatterExactOpenerTransform } from "./lib/frontmatter-exact-opener.js";
 import { calloutTransform } from "./lib/callout.js";
@@ -409,13 +410,40 @@ export default function remarkObsidian(
   // it, keeps positions honest, or carries out an option the caller turned on. What Obsidian's
   // parser merely DELIVERS is `legacy`'s, which parses with that parser instead.
   const transform = (tree: Root, file: unknown): void => {
+    const reading = {
+      callouts: opts.callouts,
+      comments: opts.comments,
+      tasks: opts.customTaskChars,
+    };
+    const read = (markdown: string): Root => {
+      const fragment = self.parse(markdown);
+      obsidianReadingTransform(
+        fragment,
+        markdown,
+        (text) => self.parse(text),
+        reading,
+      );
+      return fragment;
+    };
     // First, because it re-parses the whole document: every pass below sees the result.
     obsidianReadingTransform(
       tree,
       String(file),
       (markdown) => self.parse(markdown),
-      { callouts: opts.callouts, comments: opts.comments },
+      reading,
     );
+    // The frontmatter extension's three defects. A closing fence with a tail closes it, a fence
+    // that never closes is no frontmatter, and neither is a `--- ` opener -- the first because
+    // frontmatter is Obsidian's, the other two where CommonMark and Obsidian agree. Each re-parses
+    // everything below the fence, so it runs before every other pass and reads that part the
+    // way the pass above read the rest.
+    if (opts.frontmatter) {
+      frontmatterTailTransform(tree, String(file), read);
+      // Mutually exclusive with the pass above, which is why either order works.
+      frontmatterUnclosedTransform(tree, String(file), read);
+      // After the pass above, which can rewrite the document this one inspects.
+      frontmatterExactOpenerTransform(tree, String(file), read);
+    }
     if (opts.comments && !opts.keepComments) {
       visit(
         tree,
@@ -457,17 +485,6 @@ export default function remarkObsidian(
           hChildren: [],
         };
       });
-    }
-    // The frontmatter extension's two defects, where CommonMark and Obsidian agree on the
-    // reading: a fence that never closes is not frontmatter, and neither is a `--- ` opener.
-    if (opts.frontmatter) {
-      frontmatterUnclosedTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
-      // After the pass above, which can rewrite the document this one inspects.
-      frontmatterExactOpenerTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
     }
     if (opts.customTaskChars) {
       customTaskCharTransform(tree, String(file));
@@ -523,8 +540,8 @@ export default function remarkObsidian(
     definitionMathAbsorbTransform(tree, String(file));
     // A definition's text ends before a column-0 label or block opener.
     definitionEndBeforeLabelTransform(tree, String(file));
-    // A `#` directly after a `]` that closed a construct is no tag.
-    tagAfterCloserTransform(tree);
+    // A `#` against literal text is no tag: `a*#t`, `&amp;#t` and `x]#t` hold none.
+    tagAgainstTextTransform(tree, String(file));
     // Everything inside `^[ … ]` is dead text, references included.
     if (opts.inlineFootnotes) inlineFootnoteInertTransform(tree);
     // Presence of the table means it was recorded, so it is started even for a

@@ -47,7 +47,6 @@ const BY_DESIGN: readonly string[] = [
   "commonmark/links/548", // +2wikilink
   "commonmark/links/559", // +1wikilink -4text -1linkReference -1emphasis
   "commonmark/images/590", // +2wikilink -1text
-  "commonmark/raw-html/619", // +1text +1tag
   // `data.taskChar` on every box, nothing else: Obsidian documents ANY character between a task's
   // brackets as a checkbox, so strict reads boxes that way and records which character it was.
   // `checked` and the structure are GFM's own.
