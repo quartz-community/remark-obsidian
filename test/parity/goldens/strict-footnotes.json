@@ -1,0 +1,1003 @@
+{
+  "obsidian": "1.15.0",
+  "recordedAt": "2026-10-27",
+  "source": "test/parity/ask.mts --file, metadataCache.computeMetadataAsync",
+  "note": "Footnote facts Obsidian reports for probes of each footnote rule strict follows. Lines and columns are 0-based; a definition is label@line:column-endLine. footnoteRefs is definition-gated, so every probe defines what it references.",
+  "cases": [
+    {
+      "name": "E2 basic",
+      "markdown": "[^1]: def\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@2:3"
+      ]
+    },
+    {
+      "name": "E2 no space after colon",
+      "markdown": "[^1]:def\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@2:3"
+      ]
+    },
+    {
+      "name": "E2 3-space indent",
+      "markdown": "   [^1]: def\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@2:3"
+      ],
+      "excluded": "position: Obsidian reports column 0 for an indented root definition; strict promises no positions and keeps the label column (decision, 2026-10-27)"
+    },
+    {
+      "name": "E2 4-space indent",
+      "markdown": "    [^1]: def\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "E2 empty label",
+      "markdown": "[^]: x\n\nuse[^]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "E2 label with space",
+      "markdown": "[^a b]: x\n\nuse[^a b]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "E2 lazy continuation",
+      "markdown": "[^1]: a\nb\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-1"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "E2 4sp after blank",
+      "markdown": "[^1]: a\n\n    b\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-2"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "E2 tab after blank",
+      "markdown": "[^1]: a\n\n\tb\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-2"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "E2 8sp after blank",
+      "markdown": "[^1]: a\n\n        code\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-2"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "E2 col-0 after blank",
+      "markdown": "[^1]: a\n\nb\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "E2 nested 4sp label",
+      "markdown": "[^1]: def\n\n    [^2]: two\n\nuse[^1] [^2]\n",
+      "defs": [
+        "1@0:0-2",
+        "2@2:4-2"
+      ],
+      "refs": [
+        "1@4:3",
+        "2@4:8"
+      ]
+    },
+    {
+      "name": "E2 two labels one line",
+      "markdown": "[^1]: [^2]: x\n\nuse[^1] [^2]\n",
+      "defs": [
+        "1@0:0-0",
+        "2@0:6-0"
+      ],
+      "refs": [
+        "1@2:3",
+        "2@2:8"
+      ]
+    },
+    {
+      "name": "E2 empty label line",
+      "markdown": "[^1]:\nx[^3]\n\n[^3]: t\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0",
+        "3@3:0-3"
+      ],
+      "refs": [
+        "1@5:3",
+        "3@1:1"
+      ]
+    },
+    {
+      "name": "E2 label line is a list",
+      "markdown": "[^1]: 2. Aufl.\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@2:3"
+      ]
+    },
+    {
+      "name": "E1 heading",
+      "markdown": "[^1]: a\n# h\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "E1 dash line",
+      "markdown": "[^1]: a\n---\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "E1 star break",
+      "markdown": "[^1]: a\n***\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "E1 fence",
+      "markdown": "[^1]: a\n```\ncode\n```\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@5:3"
+      ]
+    },
+    {
+      "name": "E1 bullet",
+      "markdown": "[^1]: a\n- x\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "E1 ordered 1",
+      "markdown": "[^1]: a\n1. x\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "E1 ordered 2",
+      "markdown": "[^1]: a\n2. x\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-1"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "E1 quote",
+      "markdown": "[^1]: a\n> q\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "E1 another label",
+      "markdown": "[^1]: a\n[^2]: b\n\nuse[^1] [^2]\n",
+      "defs": [
+        "1@0:0-0",
+        "2@1:0-1"
+      ],
+      "refs": [
+        "1@3:3",
+        "2@3:8"
+      ]
+    },
+    {
+      "name": "E1 link definition",
+      "markdown": "[^1]: a\n[x]: /u\n\nuse[^1] [x]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "E1 html block",
+      "markdown": "[^1]: a\n<div>\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "E1 table",
+      "markdown": "[^1]: a\n| a | b |\n| - | - |\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "E1 atx without space",
+      "markdown": "[^1]: a\n#H\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-1"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "G1 label under paragraph",
+      "markdown": "para\n[^1]: def\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "G1 label under ref line",
+      "markdown": "text[^1] and[^2]\n[^2]\n[^1]: d\n\n[^2]: two\n",
+      "defs": [
+        "2@4:0-4"
+      ],
+      "refs": [
+        "2@0:12",
+        "2@1:0"
+      ]
+    },
+    {
+      "name": "B4 label under item",
+      "markdown": "- item\n[^1]: def\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "B4 label under quote",
+      "markdown": "> quote\n[^1]: def\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "container item",
+      "markdown": "- [^1]: def\n\nuse[^1]\n",
+      "defs": [
+        "1@0:2-0"
+      ],
+      "refs": [
+        "1@2:3"
+      ]
+    },
+    {
+      "name": "container quote",
+      "markdown": "> [^1]: def\n\nuse[^1]\n",
+      "defs": [
+        "1@0:2-0"
+      ],
+      "refs": [
+        "1@2:3"
+      ]
+    },
+    {
+      "name": "E2 quote then label then quote",
+      "markdown": "> Quote one.\n>\n[^1]: def\n> Quote two.\n\nuse[^1]\n",
+      "defs": [
+        "1@2:0-3"
+      ],
+      "refs": [
+        "1@5:3"
+      ],
+      "excluded": "blockquote laziness, not a footnote rule: Obsidian continues a quote over plain text after its empty `>` line too; strict follows CommonMark"
+    },
+    {
+      "name": "E2 indented quote lazy",
+      "markdown": "[^a]: Smith\n\n    > The tide rose.\n    See also Jones.\n\nuse[^a]\n",
+      "defs": [
+        "a@0:0-3"
+      ],
+      "refs": [
+        "a@5:3"
+      ]
+    },
+    {
+      "name": "E5 name with [",
+      "markdown": "a[^x[y]\n\n[^x[y]: d\n",
+      "defs": [
+        "x[y@2:0-2"
+      ],
+      "refs": [
+        "x[y@0:1"
+      ]
+    },
+    {
+      "name": "E5 name starting [",
+      "markdown": "a[^[x]\n\n[^[x]: d\n",
+      "defs": [
+        "[x@2:0-2"
+      ],
+      "refs": [
+        "[x@0:1"
+      ]
+    },
+    {
+      "name": "E5 name with ^",
+      "markdown": "a[^^x]\n\n[^^x]: d\n",
+      "defs": [
+        "^x@2:0-2"
+      ],
+      "refs": [
+        "^x@0:1"
+      ]
+    },
+    {
+      "name": "escaped ] in label",
+      "markdown": "a[^a\\]b]\n\n[^a\\]b]: d\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "case-insensitive",
+      "markdown": "use[^A]\n\n[^a]: d\n",
+      "defs": [
+        "a@2:0-2"
+      ],
+      "refs": [
+        "a@0:3"
+      ]
+    },
+    {
+      "name": "duplicate definition",
+      "markdown": "use[^1]\n\n[^1]: first\n\n[^1]: second\n",
+      "defs": [
+        "1@2:0-2",
+        "1@4:0-4"
+      ],
+      "refs": [
+        "1@0:3"
+      ]
+    },
+    {
+      "name": "ref then colon mid-line",
+      "markdown": "x [^1]: y\n\n[^1]: d\n",
+      "defs": [
+        "1@2:0-2"
+      ],
+      "refs": [
+        "1@0:2"
+      ]
+    },
+    {
+      "name": "ref at line start",
+      "markdown": "[^1] here\n\n[^1]: d\n",
+      "defs": [
+        "1@2:0-2"
+      ],
+      "refs": [
+        "1@0:0"
+      ]
+    },
+    {
+      "name": "space before colon",
+      "markdown": "[^1] : d\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "unicode label",
+      "markdown": "use[^ä]\n\n[^ä]: d\n",
+      "defs": [
+        "ä@2:0-2"
+      ],
+      "refs": [
+        "ä@0:3"
+      ]
+    },
+    {
+      "name": "ref in link text",
+      "markdown": "[a[^1]](u)\n\n[^1]: d\n",
+      "defs": [
+        "1@2:0-2"
+      ],
+      "refs": [
+        "1@0:2"
+      ]
+    },
+    {
+      "name": "E4 heading past 1024",
+      "markdown": "[^1]: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n# h\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-1"
+      ],
+      "refs": [
+        "1@3:3"
+      ],
+      "excluded": "the 1,024-character window remark-footnotes looks for an ender in: an implementation limit, not followed (decision, 2026-10-27)"
+    },
+    {
+      "name": "r1 + lazy line",
+      "markdown": "para\n[^1]: def\nlazy\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "r1 + blank + indented",
+      "markdown": "para\n[^1]: def\n\n    more\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "r1 3sp label",
+      "markdown": "para\n   [^1]: def\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "r1 indented under item",
+      "markdown": "- item\n  [^1]: def\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "r1 quoted under quote",
+      "markdown": "> quote\n> [^1]: def\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "r1 label after in-item label",
+      "markdown": "- [^1]: a\n[^2]: b\n\nuse[^1][^2]\n",
+      "defs": [
+        "1@0:2-0",
+        "2@1:0-1"
+      ],
+      "refs": [
+        "1@3:3",
+        "2@3:7"
+      ]
+    },
+    {
+      "name": "r1 label after quote in def",
+      "markdown": "[^1]: > q\n[^2]: b\n\nuse[^1][^2]\n",
+      "defs": [
+        "1@0:0-0",
+        "2@1:0-1"
+      ],
+      "refs": [
+        "1@3:3",
+        "2@3:7"
+      ]
+    },
+    {
+      "name": "r1 after heading",
+      "markdown": "# h\n[^1]: def\n\nuse[^1]\n",
+      "defs": [
+        "1@1:0-1"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "r1 after table",
+      "markdown": "| a |\n| - |\n[^1]: def\n\nuse[^1]\n",
+      "defs": [
+        "1@2:0-2"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "r1 after fence",
+      "markdown": "```\nx\n```\n[^1]: def\n\nuse[^1]\n",
+      "defs": [
+        "1@3:0-3"
+      ],
+      "refs": [
+        "1@5:3"
+      ]
+    },
+    {
+      "name": "r1 after html",
+      "markdown": "<div>\n</div>\n[^1]: def\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "r1 then setext",
+      "markdown": "para\n[^1]: def\n===\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "r2c ordered 2)",
+      "markdown": "[^1]: a\n2) x\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-1"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "r2c after two lines",
+      "markdown": "[^1]: a\nb\n2. x\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-2"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "r2c in item",
+      "markdown": "- [^1]: a\n2. x\n\nuse[^1]\n",
+      "defs": [
+        "1@0:2-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "r2c after blank",
+      "markdown": "[^1]: a\n\n2. x\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "r2e equals",
+      "markdown": "[^1]: a\n===\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "r2e two lines dashes",
+      "markdown": "[^1]: a\nb\n---\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "r2e indented dashes",
+      "markdown": "[^1]: a\n  ---\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "r2e spaced break",
+      "markdown": "[^1]: a\n- - -\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "r2e quoted",
+      "markdown": "> [^1]: a\n> ---\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "r2e in item",
+      "markdown": "- [^1]: a\n  ---\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "r2e after blank",
+      "markdown": "[^1]: a\n\n---\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "r2a table after two lines",
+      "markdown": "[^1]: a\nb\n| a | b |\n| - | - |\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-1"
+      ],
+      "refs": [
+        "1@5:3"
+      ]
+    },
+    {
+      "name": "r2a table in item (lazy)",
+      "markdown": "- [^1]: a\n| a | b |\n| - | - |\n\nuse[^1]\n",
+      "defs": [
+        "1@0:2-0"
+      ],
+      "refs": [
+        "1@4:3"
+      ],
+      "excluded": "a lazy line inside a list item: Obsidian ends the definition and keeps the table in the item, which a blank line cannot express; left to GFM"
+    },
+    {
+      "name": "r2a table quoted",
+      "markdown": "> [^1]: a\n> | a | b |\n> | - | - |\n\nuse[^1]\n",
+      "defs": [
+        "1@0:2-0"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "r2a header only",
+      "markdown": "[^1]: a\n| a | b |\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-1"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "r2b after two lines",
+      "markdown": "[^1]: a\nb\n[x]: /u\n\nuse[^1] [x]\n",
+      "defs": [
+        "1@0:0-1"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "r2b in item (lazy)",
+      "markdown": "- [^1]: a\n[x]: /u\n\nuse[^1] [x]\n",
+      "defs": [
+        "1@0:2-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ],
+      "excluded": "a lazy line inside a list item: as above, for a link reference definition"
+    },
+    {
+      "name": "r2b quoted",
+      "markdown": "> [^1]: a\n> [x]: /u\n\nuse[^1] [x]\n",
+      "defs": [
+        "1@0:2-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "r2d quote after blank",
+      "markdown": "> Quote one.\n\n[^1]: def\n> Quote two.\n\nuse[^1]\n",
+      "defs": [
+        "1@2:0-2"
+      ],
+      "refs": [
+        "1@5:3"
+      ]
+    },
+    {
+      "name": "r2d two-line def then quote",
+      "markdown": "[^1]: def\nmore\n> Quote two.\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-1"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "r2c quoted 2.",
+      "markdown": "> [^1]: a\n> 2. x\n\nuse[^1]\n",
+      "defs": [
+        "1@0:2-1"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "r2c lazy 2. under quoted def",
+      "markdown": "> [^1]: a\n2. x\n\nuse[^1]\n",
+      "defs": [
+        "1@0:2-1"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "r2c ordered item then 2.",
+      "markdown": "1. [^1]: a\n2. x\n\nuse[^1]\n",
+      "defs": [
+        "1@0:3-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "r2e two lines equals",
+      "markdown": "[^1]: a\nb\n===\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "r2e 1sp equals",
+      "markdown": "[^1]: a\n ===\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-1"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "r2e 3sp dashes",
+      "markdown": "[^1]: a\n   ---\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "r2e single =",
+      "markdown": "[^1]: a\n=\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "r2e single -",
+      "markdown": "[^1]: a\n-\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "r2e dashes after continuation",
+      "markdown": "[^1]: a\n\n    b\n---\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-2"
+      ],
+      "refs": [
+        "1@5:3"
+      ]
+    },
+    {
+      "name": "r2e dashes trailing spaces",
+      "markdown": "[^1]: a\n---  \n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "r1 4sp under paragraph",
+      "markdown": "para\n    [^1]: def\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "r1 nested item paragraph",
+      "markdown": "- a\n  - b\n[^1]: def\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    },
+    {
+      "name": "r2a table then text",
+      "markdown": "[^1]: a\n| a | b |\n| - | - |\n| c | d |\nmore\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@6:3"
+      ]
+    },
+    {
+      "name": "r2b two link defs",
+      "markdown": "[^1]: a\n[x]: /u\n[y]: /v\n\nuse[^1] [x] [y]\n",
+      "defs": [
+        "1@0:0-0"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "r2e three lines dashes",
+      "markdown": "[^1]: a\nb\nc\n---\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-1"
+      ],
+      "refs": [
+        "1@5:3"
+      ]
+    },
+    {
+      "name": "r2e three lines equals",
+      "markdown": "[^1]: a\nb\nc\n===\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-1"
+      ],
+      "refs": [
+        "1@5:3"
+      ]
+    },
+    {
+      "name": "r2e quoted two lines",
+      "markdown": "> [^1]: a\n> b\n> ---\n\nuse[^1]\n",
+      "defs": [
+        "1@0:2-0"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "r2a table after continuation",
+      "markdown": "[^1]: a\n\n    b\n| x | y |\n| - | - |\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-2"
+      ],
+      "refs": [
+        "1@6:3"
+      ]
+    },
+    {
+      "name": "r2b link def after continuation",
+      "markdown": "[^1]: a\n\n    b\n[x]: /u\n\nuse[^1] [x]\n",
+      "defs": [
+        "1@0:0-2"
+      ],
+      "refs": [
+        "1@5:3"
+      ]
+    },
+    {
+      "name": "r1 label after lazy line",
+      "markdown": "[^1]: a\nb\n[^2]: c\n\nuse[^1][^2]\n",
+      "defs": [
+        "1@0:0-1",
+        "2@2:0-2"
+      ],
+      "refs": [
+        "1@4:3",
+        "2@4:7"
+      ]
+    },
+    {
+      "name": "r2c 2. then 3.",
+      "markdown": "[^1]: a\n2. x\n3. y\n\nuse[^1]\n",
+      "defs": [
+        "1@0:0-2"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "NEW list item interrupts paragraph",
+      "markdown": "para\n- [^1]: def\n\nuse[^1]\n",
+      "defs": [
+        "1@1:2-1"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "NEW quote interrupts paragraph",
+      "markdown": "para\n> [^1]: def\n\nuse[^1]\n",
+      "defs": [
+        "1@1:2-1"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "NEW table in item (indented)",
+      "markdown": "- [^1]: a\n  | a | b |\n  | - | - |\n\nuse[^1]\n",
+      "defs": [
+        "1@0:2-0"
+      ],
+      "refs": [
+        "1@4:3"
+      ]
+    },
+    {
+      "name": "NEW link def in item (indented)",
+      "markdown": "- [^1]: a\n  [x]: /u\n\nuse[^1] [x]\n",
+      "defs": [
+        "1@0:2-0"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "NEW 2. in quote-in-item def",
+      "markdown": "- > [^1]: a\n  2. x\n\nuse[^1]\n",
+      "defs": [
+        "1@0:4-1"
+      ],
+      "refs": [
+        "1@3:3"
+      ]
+    },
+    {
+      "name": "NEW empty bullet then text",
+      "markdown": "[^1]: a\n-\nb\n\nuse[^1]\n",
+      "defs": [],
+      "refs": []
+    }
+  ]
+}

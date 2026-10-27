@@ -18,7 +18,7 @@ import { mapLines, shiftByMap } from "./line-map.js";
 // `[^\]\n]` rather than `[^\]]`: the type may not span a line ending. Allowing it
 // made `> [!n` / `note]` a callout of type `n\nnote`, where Obsidian reads an
 // unclosed `[!` as ordinary prose and reports the text `[!n note]`.
-const MARKER = /^\[!([^\]\n]+)\]([-+]?)(?=[ \t\n]|$)[ \t]?/;
+export const MARKER = /^\[!([^\]\n]+)\]([-+]?)(?=[ \t\n]|$)[ \t]?/;
 
 /**
  * A marker binds to `>` plus at most one space. `>  [!note]` is a quote, not

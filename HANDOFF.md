@@ -31,16 +31,26 @@ performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
    `taskReparse` switches are deleted, 8,716 lines, along with the switches themselves. The
    output is byte-identical on 70,499 fingerprints with a known-positive control (AGENTS.md
    § 2.0), and the bundle drops from 755,021 to 564,319 bytes.
-2. **`strict`'s passes -- DONE.** 76 call sites → 17, by the intends/delivers rule; AGENTS.md
-   § 2.0 has the measurement. Left open, all smaller:
-   - ~~`needsTransform` skipped the whole chain when the five options it checked were off~~ --
-     fixed: the chain always runs under `strict`.
-   - A `%%` closer's tail inside a QUOTE stays hidden in the comment: `commentTail` repairs it
-     at root only (`hunt/label-after-comment-closer-mangled/3`).
-   - The syntax extensions `strict` keeps were tuned against Obsidian too -- the highlight
-     scan (`legacyHighlightQueue`, shared with the rp8 reader), the callout and comment
-     grammars, tags, inline footnotes. Whether each rule is documented or merely delivered is
-     the same question one level down.
+2. **`strict` under the extension rule** (AGENTS.md § 2.0, "How to decide a case"). Obsidian
+   syntax follows Obsidian even inside a CommonMark construct; everything else follows the spec.
+   - **Footnotes -- DONE.** Read as Obsidian reads them, measured and gated
+     (`strict-footnotes.test.ts`); referee definitions 3,936 → 4,967.
+   - **Highlights -- settled, keep.** GFM's strikethrough rules for `==` would move 13 recorded
+     cases, Obsidian siding with the current extension in 12. The 13th is a defect to fix:
+     `**a==b**c==` highlights `b**c`, and Obsidian lets the strong win.
+   - **The other removed passes, NEXT.** Those governing an Obsidian extension inside a
+     container should come back where they move `strict` toward Obsidian without touching a
+     spec example: the `%%` comment passes, `inlineFootnoteInert`, `doubledFootnoteOpener`,
+     `tagAfterCloser`, `quotedTabCode` and the math container passes. Measure each against its
+     probes; do not restore from git blind -- four of the removed passes deleted text under
+     `strict`. The 14 `%%` footnote losses above are this item, and so is a `%%` closer's tail
+     staying hidden inside a QUOTE (`hunt/label-after-comment-closer-mangled/3`).
+   - **The syntax extensions** (`legacyHighlightQueue`, the callout and comment grammars, tags,
+     inline footnotes) were tuned against Obsidian, which the extension rule now endorses; re-check
+     each against the live app rather than assume.
+   - **micromark itself departs from CommonMark** on `> a` / `2. x`: it starts a list where the
+     spec (and Obsidian) continue the quote's paragraph, since `2.` cannot interrupt one. A
+     question about stock `remark-parse`, not this package; `strict.test.ts` cannot see it.
 3. **The 16 referee documents.** 4 are P1/P2 (must not fix); 2 carry references on lines past the
    text's end (artifacts of the corrected answers); 4 carry references only the corrected answers
    have, inside code or an unclosed fence (`reproducers.json#852` is the one 1.x got right); 6

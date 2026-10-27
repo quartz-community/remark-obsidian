@@ -14,6 +14,7 @@ import { highlightSyntax } from "./lib/syntax/highlight.js";
 import { commentSyntax } from "./lib/syntax/comment.js";
 import { tagSyntax } from "./lib/syntax/tag.js";
 import { inlineFootnoteSyntax } from "./lib/syntax/inline-footnote.js";
+import { obsidianFootnoteSyntax } from "./lib/syntax/footnote.js";
 
 import { wikilinkFromMarkdown } from "./lib/mdast/wikilink.js";
 import { highlightFromMarkdown } from "./lib/mdast/highlight.js";
@@ -27,8 +28,12 @@ import { calloutToMarkdown } from "./lib/mdast/callout-to-markdown.js";
 import { commentToMarkdown } from "./lib/mdast/comment-to-markdown.js";
 import { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 import { inlineFootnoteToMarkdown } from "./lib/mdast/inline-footnote-to-markdown.js";
-import { footnoteReferenceToMarkdown } from "./lib/mdast/footnote-reference-to-markdown.js";
+import {
+  footnoteDefinitionToMarkdown,
+  footnoteReferenceToMarkdown,
+} from "./lib/mdast/footnote-reference-to-markdown.js";
 import { customTaskCharTransform } from "./lib/task-char.js";
+import { footnoteReadingTransform } from "./lib/footnote-reading.js";
 import { mathDisplayTransform } from "./lib/math-display.js";
 import { mathFenceTransform } from "./lib/math-fence.js";
 import { bareFootnoteRefTransform } from "./lib/footnote-bare.js";
@@ -262,6 +267,21 @@ function displayAwareMathToMarkdown(): ToMarkdownOptions {
   return { ...single, handlers: { ...single.handlers, inlineMath } };
 }
 
+/** Whether `remark-gfm` (or `micromark-extension-gfm-footnote`) is among the extensions. */
+function hasGfmFootnotes(extensions: ReadonlyArray<unknown>): boolean {
+  return extensions.flat().some((extension) => {
+    const document = (extension as { document?: Record<number, unknown> })
+      .document;
+    return [document?.[91]]
+      .flat()
+      .some(
+        (construct) =>
+          (construct as { name?: string } | undefined)?.name ===
+          "gfmFootnoteDefinition",
+      );
+  });
+}
+
 export default function remarkObsidian(
   userOpts?: RemarkObsidianOptions,
 ): undefined | ((tree: Root, file: any) => void) {
@@ -306,6 +326,7 @@ export default function remarkObsidian(
     // the default handler escapes a `[` in one, and re-parsing that escape yields a
     // different label every pass.
     data.toMarkdownExtensions.push(footnoteReferenceToMarkdown());
+    data.toMarkdownExtensions.push(footnoteDefinitionToMarkdown());
   }
   if (opts.wikilinks) {
     data.micromarkExtensions.push(wikilinkSyntax());
@@ -355,6 +376,14 @@ export default function remarkObsidian(
     return undefined;
   }
 
+  // Footnotes are in neither CommonMark nor GFM's spec, so `strict` reads them as Obsidian does
+  // where that departs from `remark-gfm`: a label's characters here, where a definition starts
+  // and ends in `footnoteReadingTransform`. Only when `remark-gfm`'s footnotes are registered --
+  // without them there are no footnotes to read, and these tokens would have no handler.
+  if (hasGfmFootnotes(data.micromarkExtensions)) {
+    data.micromarkExtensions.push(obsidianFootnoteSyntax());
+  }
+
   // Always returned under `strict`. It used to be skipped when `comments`, `customTaskChars`,
   // `math`, `callouts` and `bareFootnoteRefs` were all off, which silently dropped passes that
   // depend on none of them: `positionedBreaks`, `lineOffsets`, the frontmatter repairs and the
@@ -365,6 +394,13 @@ export default function remarkObsidian(
   // it, keeps positions honest, or carries out an option the caller turned on. What Obsidian's
   // parser merely DELIVERS is `legacy`'s, which parses with that parser instead.
   const transform = (tree: Root, file: unknown): void => {
+    // First, because it re-parses the whole document: every pass below sees the result.
+    footnoteReadingTransform(
+      tree,
+      String(file),
+      (markdown) => self.parse(markdown),
+      { callouts: opts.callouts },
+    );
     if (opts.comments && !opts.keepComments) {
       visit(
         tree,

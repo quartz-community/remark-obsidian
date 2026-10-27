@@ -81,6 +81,64 @@ old one with those 59 stood down on 66,352 document-and-configuration pairs; lea
 audit of the removed passes' own examples found four of them DELETING user text under `strict`, and two breaking its own options: one emitted undefined
 `footnoteReference`s and one emitted `break`s.
 
+**How to decide a case (user, 2026-10-27).** Where the docs are silent, `legacy` follows
+Obsidian's behaviour and `strict` follows CommonMark/GFM. The exception is behaviour of an
+Obsidian EXTENSION that disagrees with them, where `strict` follows Obsidian too. Where the docs
+and the behaviour disagree, the behaviour wins: the docs go stale. So a CommonMark/GFM construct
+(lists, quotes, tables, link definitions, tabs) is the spec's under `strict`, and Obsidian syntax
+is Obsidian's even inside one.
+
+**Footnotes under `strict` read as Obsidian reads them.** They are in neither spec: GFM froze in
+2019, before GitHub shipped them. Obsidian's syntax table lists them, but it lists GFM's
+strikethrough and task lists too, so it cannot decide what counts as Obsidian's own. 48 live
+probes measured how close Obsidian is to `remark-gfm`: 34 identical, and every difference came
+from remark-footnotes 2. Three rule differences followed, plus one that GFM causes:
+
+1. a label directly under a paragraph is that paragraph's text;
+2. a `2.` line continues a definition, while a table, a link definition or a flush setext
+   underline ends it;
+3. a label may hold `[`, and a backslash escapes nothing in it;
+4. a `[^` label that is not a footnote's is text, never a CommonMark link definition (GFM makes
+   one).
+
+Two of Obsidian's behaviours are deliberately NOT followed: the 1,024-character ender window
+(an implementation limit) and column 0 for an indented root definition (a position).
+
+The label rules (3) live in a vendored `micromark-extension-gfm-footnote`
+(`src/lib/syntax/footnote.ts`), whose constructs are renamed and replace upstream's through
+`disable`. The rest cannot go in the construct: micromark does not tell a container start
+whether it interrupts a paragraph on a LAZY line. So `footnoteReadingTransform` re-parses an
+EDITED copy with the same line structure, using two edits:
+
+- swap one character (the label's `:`, the marker's `.`/`)`) for a private-use placeholder,
+  restored in every value afterwards;
+- insert a blank line (with a `>` prefix when quoted), mapping positions back.
+
+That leaves every other construct to micromark. A callout title is exempt from rule 1 when the
+callout's body, read with the label after it, leaves the label a definition. The title is still
+a paragraph at that point, since callouts are built later.
+
+Measured: `goldens/strict-footnotes.json` pins the 107 probes Obsidian answered, and
+`strict-footnotes.test.ts` asserts 102 agree and the 5 recorded exclusions still differ. The
+known-positive control: with the rules off, 44 fail. On the referee corpus `strict`'s definitions
+agree in 3,936 → **4,967** documents (+1,074 / −43). All 43 losses are constructs `strict` reads
+by the spec on purpose:
+
+- 9 tables GFM forms, plus 7 where such a table then ends a definition;
+- 6 with a tab after `>`;
+- 6 list or setext differences;
+- 1 link label;
+- 14 `%%` cases, waiting on the comment re-measurement.
+
+Traps this cost:
+
+- **The Write tool turned `\uE000` escapes into literal private-use characters**, invisible in
+  the file. Re-escape them with a script.
+- **mdast's `definition.label` is DECODED** (`[^a\]b]` reports `^a]b`), so locate a label's
+  `]` in the source, not by its length.
+- **A container that a blank line continues ENDS on the inserted line**, which must map to the
+  end of the line above, not the start of the one below.
+
 **Its gates**, beyond the suite above:
 
 - `test/rp8-vendored.test.ts` -- vendored == published rp8, byte-identical trees on every corpus

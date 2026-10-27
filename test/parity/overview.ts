@@ -250,6 +250,21 @@ export const ORACLES: readonly Oracle[] = [
     test: "strict.test.ts",
   },
   {
+    name: "strict footnotes vs Obsidian",
+    command: "npm test",
+    gate: "absolute",
+    compares: [
+      "footnote definitions (label, line, column, end line) and defined references, against the answers live Obsidian gave for 107 probes of every footnote rule (goldens/strict-footnotes.json)",
+      "the 5 recorded exclusions, which must keep departing",
+    ],
+    blind: [
+      "documents nobody probed -- the referee corpus measures strict's definitions only as an instrument",
+      "everything but footnotes: the rest of strict is the spec's, measured by strict.test.ts",
+      "Obsidian releases after 1.15.0, which answered these probes",
+    ],
+    test: "strict-footnotes.test.ts",
+  },
+  {
     name: "recorded contradictions",
     command:
       "TOP=24 tsx test/parity/fuzz/contradictions.ts to see the shapes behind a failure",

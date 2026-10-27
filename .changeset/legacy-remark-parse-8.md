@@ -17,12 +17,21 @@ before.
 
 **`strict` is what Obsidian intends:** the CommonMark, GFM and LaTeX it says it supports, plus
 the syntax it documents — including task boxes holding any character (`- [-]`, `- [?]`), which
-Obsidian documents as checkboxes and `strict` now reads the same way. It no longer imitates what
-Obsidian's parser merely does: where a footnote definition or a `%%` comment ends inside a quote
-or list, tab arithmetic, and the other quirks are `legacy`'s alone. Its tree now matches
-`remark-parse` and `remark-gfm` on every CommonMark and GFM spec example except the seven that
-hold Obsidian syntax and the two task lists, where it adds `data.taskChar`. A `%%` comment still ends at its closing `%%`, and `$$` still delimits display
-math as in LaTeX, including `$$x^2` on one line and a closing `$$` at the end of a line.
+Obsidian documents as checkboxes and `strict` now reads the same way. Where those standards are
+silent about Obsidian's own syntax, `strict` reads it as Obsidian does; everything else Obsidian's
+parser merely does — tab arithmetic, where a `%%` comment ends inside a quote or list, and the
+other quirks — is `legacy`'s alone. Its tree matches `remark-parse` and `remark-gfm` on every
+CommonMark and GFM spec example except the seven that hold Obsidian syntax and the two task
+lists, where it adds `data.taskChar`.
+
+- **Footnotes** are in neither spec, so `strict` reads them as Obsidian does where `remark-gfm`
+  differs. A label directly under a paragraph is more of that paragraph, not a definition. A
+  `2.` line continues a definition's text, while a table, a link reference definition or a
+  setext underline ends it. A label may hold `[` and a backslash escapes nothing in it. A `[^`
+  label that is not a footnote's is plain text, not a link reference definition.
+- **A `%%` comment** ends at its closing `%%`.
+- **`$$`** delimits display math as in LaTeX, including `$$x^2` on one line and a closing `$$`
+  at the end of a line.
 
 **Tree shapes that changed in `legacy`,** each to what Obsidian reports:
 
