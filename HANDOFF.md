@@ -11,7 +11,7 @@ were Obsidian syntax bare rp8 lacks; and `strict` simply stays on micromark. The
 
 |                                      |         1.x (micromark) |                 2.0 (rp8) |
 | ------------------------------------ | ----------------------: | ------------------------: |
-| referee (6,844 documents)            |                   6,307 |                 **6,828** |
+| referee (6,844 documents)            |                   6,307 |                 **6,830** |
 | contract gate, `match` cases         |                   3,447 |                 **3,465** |
 | positioned-oracle divergences        |                      20 |                     **9** |
 | RAW positions vs `compute`: sections |                   97.4% |                  **100%** |
@@ -55,14 +55,17 @@ performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
    - **micromark itself departs from CommonMark** on `> a` / `2. x`: it starts a list where the
      spec (and Obsidian) continue the quote's paragraph, since `2.` cannot interrupt one. A
      question about stock `remark-parse`, not this package; `strict.test.ts` cannot see it.
-3. **The 16 referee documents -- nothing fixable left.**
+3. **The 14 referee documents -- nothing fixable left.**
    - 10 are Obsidian cache misplacements where our position is the true one, all must not fix:
      the 4 P1/P2 recorded before, plus 5 more P2 and a P1-like frontmatter tail. These were the
      six "columns", mislabelled as BOM and RTL names; settled live with controls (AGENTS.md
      § 2.0).
-   - 2 carry references on lines past the text's end (artifacts of the corrected answers).
    - 4 carry references only the corrected answers have, inside code or an unclosed fence
      (`reproducers.json#852` is the one 1.x got right).
+   - The 2 that carried references on lines past the text's end are recording artifacts, now
+     excluded (6,828 → 6,830).
+   - **Spans DONE:** every agreeing document agrees on full spans too (start offset, end line,
+     end column, end offset), and inline footnotes agree 869 of 869 (`referee-spans.json`).
 4. **The positioned oracle's 9** -- all pre-existing in 1.x; none new.
 5. **`normalize.ts`** carries compensations for micromark's offsets. Only rp8 trees reach it now
    (every gate runs the `legacy` profiles), and two compensations already had to be generalised

@@ -163,6 +163,8 @@ export const ORACLES: readonly Oracle[] = [
       "footnote definitions",
       "footnote references",
       "ROOT-LEVEL CODE BLOCK ranges -- recorded on 883 of the 6818 documents and read by nothing until now",
+      "FULL SPANS of every definition and reference in an agreeing document -- start offset, end line, end column and end offset -- from referee-spans.json, recorded beside the vendored answers",
+      "INLINE FOOTNOTES, `[inline<n>` with the span of the body, which the vendored answers never recorded",
     ],
     blind: [
       "section geometry EXCEPT code sections: the container-comment rule scored 0 of 6818 on definitions, and that was read as the oracle being blind to geometry entirely -- which the `code` field disproves for 883 documents",
@@ -173,6 +175,19 @@ export const ORACLES: readonly Oracle[] = [
     ],
     ungated:
       "the corpus is a sibling project's test data on its own release cycle, so an exact figure would fail CI when THEY change it, and a floor would be the kind of bound `roundtrip` was converted away from",
+  },
+  {
+    name: "referee spans alignment",
+    command: "npm test",
+    gate: "absolute",
+    compares: [
+      "referee-spans.json holds every vendored referee row, aligned with its definitions and references",
+      "every recorded span agrees with its vendored tuple, every artifact is a reference on a line holding no text, and only the two recorded facts are unplaced",
+    ],
+    blind: [
+      "whether the spans are RIGHT -- they are the live cache's, recorded by record-referee-spans.mts; this only asserts they still belong to the answers beside them",
+    ],
+    test: "referee-spans.test.ts",
   },
   {
     name: "tree invariants",

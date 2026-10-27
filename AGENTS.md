@@ -33,15 +33,43 @@ The RAW row is the one to remember: `normalize.ts` compensates for micromark's o
 places (heading and paragraph starts, empty item ends), so the positioned oracle UNDERSTATED how
 far the micromark tree's own positions were from Obsidian's. rp8's are Obsidian's.
 
-Of the 16 referee documents left:
+Of the 14 referee documents left:
 
 - **10 are Obsidian cache misplacements, where our position is the character's**, so they must
   not be fixed:
   - the 4 P1/P2 documents already recorded;
   - 5 more P2 (`broad#124`, `#147`, `#189`, `#290`, `#299`);
   - one P1-like frontmatter tail (`overnight#132`).
-- **2 are correction artifacts** (references on lines past the text's end).
 - **4 carry references only the CORRECTED answers have** (inside code / an unclosed fence).
+
+There were 16. The other 2 held references on lines with no text; `referee-spans.json` names
+those 3 references as recording artifacts and the referee now excludes them (6,828 → 6,830).
+
+**The referee compares full spans now, and every one agrees.** `record-referee-spans.mts`
+re-asked the live cache (1.15.0) for all 6,844 documents, which takes about 15 seconds, and
+kept what the vendored tuples drop: start offset, end line, end column and end offset. It keeps
+them in `referee-spans.json` BESIDE the vendored files, which stay upstream's and untouched.
+
+- **The recording reproduced the vendored answers exactly:** 5,278 of 5,278 definitions and
+  18,704 of 18,709 references by name, line, column and end line.
+  - 3 references are the artifacts above.
+  - 2 are `fuzz#1239`, whose vendored answer is upstream's corrected list, left unplaced.
+- **Over the 6,830 agreeing documents:** 5,258 definition spans and 18,628 reference spans
+  agree, all of them. A known-positive control (every reference's end offset shifted by one)
+  flags all 18,628.
+- **Inline footnotes, a new dimension:** 869 of 869 documents agree, 971 of 971 `[inline<n>`
+  spans. They opened at 807. Both causes were the projection, `computeOurs`, not the parser:
+  - It skipped a `%%` comment's subtree, so an inline footnote inside one was never reported
+    (48 cases). The cache indexes them, as it indexes references there.
+  - It numbered an inline footnote by every reference before it, where the cache numbers each
+    footnote once, at its first reference. Settled live with a control: `a[^1] b[^1] ^[x]`
+    names `[inline1` and `a[^1] b[^2] ^[x]` `[inline2`.
+- **Gate:** `referee-spans.test.ts` holds the file to the vendored rows, so a re-sync without a
+  re-recording fails there.
+- **The recorder:** `ask()` became `askFull()`, which keeps every position, plus the reduction
+  to tuples; `ask()` is byte-identical over all 6,844 documents.
+- **The text projection** also stopped hiding what follows a quote ending in an unclosed
+  comment (moving four `probe/quote-comment-deep` cases to `match`).
 
 **The six "column" documents were mislabelled, and all six are the cache, not us.** They had
 been recorded as "BOM, two RTL names, a frontmatter closer, two off by one to three". None
@@ -69,9 +97,9 @@ which is the space inside `[ ]`; the label starts at 9. A plain reference in a c
 (`--- x[^2]`) is placed right, so it is the task item inside the tail that the cache measures
 without the `---`.
 
-So legacy is at every agreement the oracle can grant: it agrees on all 6,828 documents whose
-answer is neither a cache defect nor a correction artifact. Reproducing the defects would cost a
-true position each, and the shift has no derivable rule.
+So legacy is at every agreement the oracle can grant: it agrees on all 6,830 documents whose
+answer is neither a cache defect (10) nor one only the corrected answers hold (4).
+Reproducing the defects would cost a true position each, and the shift has no derivable rule.
 
 **Markdown inside HTML is CommonMark in Obsidian too**, so both presets read it the same way.
 Obsidian's developers give performance as the reason for its HTML handling, which makes it

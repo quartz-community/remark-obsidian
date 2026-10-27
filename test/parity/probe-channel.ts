@@ -100,14 +100,25 @@ export interface Answer {
   ])[];
 }
 
-interface Point {
+/** A point as the cache reports it: line and column zero-based, and the offset. */
+export interface Point {
   readonly line: number;
   readonly col: number;
   readonly offset: number;
 }
+/** A span as the cache reports it. */
+export interface Span {
+  readonly start: Point;
+  readonly end: Point;
+}
 interface Positioned {
   readonly id?: string;
-  readonly position?: { readonly start: Point; readonly end: Point };
+  readonly position?: Span;
+}
+/** A footnote fact with its full position, in the document's own coordinates. */
+export interface Placed {
+  readonly id: string;
+  readonly position: Span;
 }
 export interface Cache {
   readonly footnotes?: readonly Positioned[];
@@ -349,16 +360,17 @@ function askRepliesSync(
 }
 
 /**
- * Ask Obsidian about each document, as `{defs, refs}`.
+ * Ask Obsidian about each document, keeping every position in full.
  *
- * Definitions come from the document as written and references from its augmented copy, for the
- * gating reason in the module docstring. Both halves of every pair must come back or this
- * throws: a short reply means the plugin answered a different batch.
+ * `plain` is the cache of the document as written, which definitions and every other field are
+ * read from; `refs` comes from its augmented copy, for the gating reason in the module
+ * docstring, placed back into the document's own lines and offsets. Both halves of every pair
+ * must come back or this throws: a short reply means the plugin answered a different batch.
  */
-export async function ask(
+export async function askFull(
   markdowns: readonly string[],
   timeoutMs = 300_000,
-): Promise<Answer[]> {
+): Promise<FullAnswer[]> {
   if (markdowns.length === 0) return [];
   const paired = markdowns.flatMap((markdown) => [markdown, augment(markdown)]);
   const replies = await exchange(paired, timeoutMs);
@@ -369,7 +381,7 @@ export async function ask(
   }
 
   const byId = new Map(replies.map((reply) => [reply.id, reply]));
-  const out: Answer[] = [];
+  const out: FullAnswer[] = [];
   for (let at = 0; at < markdowns.length; at++) {
     const plain = byId.get(String(at * 2));
     const synth = byId.get(String(at * 2 + 1));
@@ -391,40 +403,9 @@ export async function ask(
       (synth!.cache!.footnotes ?? []).map((entry) => entry.id?.toLowerCase()),
     );
     out.push({
-      defs: (plain!.cache!.footnotes ?? []).flatMap((entry): Def[] =>
-        entry.id === undefined || !entry.position
-          ? []
-          : [
-              [
-                entry.id,
-                entry.position.start.line,
-                entry.position.start.col,
-                entry.position.end.line,
-              ],
-            ],
-      ),
-      refs: (synth!.cache!.footnoteRefs ?? []).flatMap((entry): Ref[] =>
-        entry.id === undefined || !entry.position
-          ? []
-          : [[entry.id, entry.position.start.line, entry.position.start.col]],
-      ),
+      plain: plain!.cache!,
+      refs: placed(synth!.cache!.footnoteRefs, 0, 0),
       refsTrustworthy: wanted.every((name) => defined.has(name.toLowerCase())),
-      listItems: (plain!.cache!.listItems ?? []).map(
-        (entry) =>
-          [
-            entry.position.start.line,
-            entry.position.start.col,
-            entry.position.end.line,
-            entry.position.end.col,
-            entry.parent,
-          ] as const,
-      ),
-      code: (plain!.cache!.sections ?? []).flatMap(
-        (entry): (readonly [number, number])[] =>
-          entry.type === "code"
-            ? [[entry.position.start.line, entry.position.end.line] as const]
-            : [],
-      ),
     });
   }
 
@@ -441,7 +422,7 @@ export async function ask(
   const secondById = new Map(second.map((reply) => [reply.id, reply]));
   for (const [which, at] of retry.entries()) {
     const reply = secondById.get(String(which));
-    const shift = prefixed[which]!.lines;
+    const form = prefixed[which]!;
     if (!reply?.cache) continue;
     const defined = new Set(
       (reply.cache.footnotes ?? []).map((entry) => entry.id?.toLowerCase()),
@@ -450,21 +431,100 @@ export async function ask(
     if (!wanted.every((name) => defined.has(name.toLowerCase()))) continue;
     out[at] = {
       ...out[at]!,
-      refs: (reply.cache.footnoteRefs ?? []).flatMap((entry): Ref[] =>
-        entry.id === undefined ||
-        !entry.position ||
-        entry.position.start.line < shift
-          ? []
-          : [
-              [
-                entry.id,
-                entry.position.start.line - shift,
-                entry.position.start.col,
-              ],
-            ],
+      // The synthesised block is whole lines, so a column never moves; a line moves by the
+      // lines it added and an offset by the characters.
+      refs: placed(
+        reply.cache.footnoteRefs,
+        form.lines,
+        form.text.length - markdowns[at]!.length,
       ),
       refsTrustworthy: true,
     };
   }
   return out;
+}
+
+/** The cache's facts with a name and a position, moved back by an inserted block's size. */
+function placed(
+  entries: readonly Positioned[] | undefined,
+  lines: number,
+  chars: number,
+): Placed[] {
+  const back = (point: Point): Point => ({
+    line: point.line - lines,
+    col: point.col,
+    offset: point.offset - chars,
+  });
+  return (entries ?? []).flatMap((entry): Placed[] =>
+    entry.id === undefined ||
+    !entry.position ||
+    entry.position.start.line < lines
+      ? []
+      : [
+          {
+            id: entry.id,
+            position: {
+              start: back(entry.position.start),
+              end: back(entry.position.end),
+            },
+          },
+        ],
+  );
+}
+
+export interface FullAnswer {
+  /** The cache of the document as written. */
+  readonly plain: Cache;
+  /** References, read from the augmented copy and placed back into the document's terms. */
+  readonly refs: readonly Placed[];
+  /** As `Answer.refsTrustworthy`. */
+  readonly refsTrustworthy: boolean;
+}
+
+/**
+ * Ask Obsidian about each document, as `{defs, refs}`: `askFull`, reduced to the tuples the
+ * referee's answers store.
+ */
+export async function ask(
+  markdowns: readonly string[],
+  timeoutMs = 300_000,
+): Promise<Answer[]> {
+  return (await askFull(markdowns, timeoutMs)).map(
+    ({ plain, refs, refsTrustworthy }) => ({
+      defs: (plain.footnotes ?? []).flatMap((entry): Def[] =>
+        entry.id === undefined || !entry.position
+          ? []
+          : [
+              [
+                entry.id,
+                entry.position.start.line,
+                entry.position.start.col,
+                entry.position.end.line,
+              ],
+            ],
+      ),
+      refs: refs.map((entry): Ref => [
+        entry.id,
+        entry.position.start.line,
+        entry.position.start.col,
+      ]),
+      refsTrustworthy,
+      listItems: (plain.listItems ?? []).map(
+        (entry) =>
+          [
+            entry.position.start.line,
+            entry.position.start.col,
+            entry.position.end.line,
+            entry.position.end.col,
+            entry.parent,
+          ] as const,
+      ),
+      code: (plain.sections ?? []).flatMap(
+        (entry): (readonly [number, number])[] =>
+          entry.type === "code"
+            ? [[entry.position.start.line, entry.position.end.line] as const]
+            : [],
+      ),
+    }),
+  );
 }

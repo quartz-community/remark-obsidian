@@ -20,10 +20,21 @@
  * `--conditions=development` matters for the reason it does everywhere else
  * here: without it micromark's assertions are off and a real invariant violation
  * passes silently.
+ *
+ * **Full spans** come from `referee-spans.json`, which `record-referee-spans.mts` takes from
+ * the live cache and keeps BESIDE the vendored answers, keyed by row id and aligned with each
+ * row's `defs` and `refs`. Every agreeing document's facts are then compared in full -- start
+ * offset, end line, end column and end offset -- and so are Obsidian's inline footnotes, which
+ * the vendored answers never recorded. The same file names the vendored references that sit
+ * on a line holding no text: recording artifacts, excluded from both sides and counted.
  */
 import fs from "node:fs";
 import path from "node:path";
-import { refereeFactsWithTree } from "./referee-facts.js";
+import {
+  refereeFactsWithTree,
+  type Inline,
+  type Span,
+} from "./referee-facts.js";
 import { REFEREE_ANSWERS } from "./classify.js";
 
 interface Point {
@@ -56,6 +67,31 @@ interface Entry {
 }
 
 const dir = process.env.PARITY_REFEREE_DIR ?? REFEREE_ANSWERS;
+
+/**
+ * Full positions for the same answers, recorded by `record-referee-spans.mts` and kept BESIDE
+ * the vendored files: each row's `defs` and `refs` with both ends and offsets, `null` where the
+ * recording did not reproduce the vendored fact, the vendored references that sit on a line
+ * holding no text (`artifacts`), and Obsidian's inline footnotes. Keyed by id, so a corpus it
+ * was not recorded for simply finds nothing.
+ */
+interface DocumentSpans {
+  readonly defs?: ReadonlyArray<Span | null>;
+  readonly refs?: ReadonlyArray<Span | null>;
+  readonly artifacts?: readonly number[];
+  readonly inline?: readonly Inline[];
+}
+const spansFile = path.join(
+  path.dirname(REFEREE_ANSWERS),
+  "referee-spans.json",
+);
+const recorded: Record<string, DocumentSpans> = fs.existsSync(spansFile)
+  ? (
+      JSON.parse(fs.readFileSync(spansFile, "utf8")) as {
+        documents: Record<string, DocumentSpans>;
+      }
+    ).documents
+  : {};
 
 if (!fs.existsSync(dir)) {
   console.log(`referee: no corpus at ${dir}`);
@@ -127,6 +163,27 @@ let defsWanted = 0;
 let defsMatched = 0;
 let refsWanted = 0;
 let refsMatched = 0;
+/**
+ * SPANS: every agreeing document's facts compared in full -- start offset, end line, end
+ * column and end offset, beside the start line and column the tuples already hold.
+ */
+let artifactsExcluded = 0;
+let spanDocuments = 0;
+let spanDocumentsAgree = 0;
+const spanCounts = { defs: [0, 0], refs: [0, 0] };
+const spanFields = new Map<string, number>();
+const SPAN_FIELDS = [
+  "line",
+  "column",
+  "offset",
+  "end line",
+  "end column",
+  "end offset",
+];
+let inlineDocuments = 0;
+let inlineDocumentsAgree = 0;
+let inlineWanted = 0;
+let inlineMatched = 0;
 const codeKinds = new Map<string, number>();
 const kinds = new Map<string, number>();
 const bump = (kind: string) => kinds.set(kind, (kinds.get(kind) ?? 0) + 1);
@@ -198,9 +255,32 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
     Array.isArray(raw) ? raw : Object.values(raw as Record<string, unknown>)
   ) as Entry[];
 
-  for (const [at, entry] of entries.entries()) {
+  for (const [at, raw] of entries.entries()) {
     total++;
     const key = `${file}#${at}`;
+    // A reference the recording made on a line holding no text is an artifact of its
+    // augmentation, not an answer: no reference can sit there. Dropped with its span.
+    const spans = recorded[raw.id];
+    // An empty list is left out of the file, so a recorded document reads one as `[]`; a
+    // document the file does not hold, or holds for a different row, has no spans at all.
+    const recordedDefs =
+      spans && (spans.defs ?? []).length === raw.defs.length
+        ? (spans.defs ?? [])
+        : undefined;
+    const recordedRefs =
+      spans && (spans.refs ?? []).length === raw.refs.length
+        ? (spans.refs ?? [])
+        : undefined;
+    const drop = new Set(recordedRefs ? (spans?.artifacts ?? []) : []);
+    artifactsExcluded += drop.size;
+    const entry: Entry = {
+      ...raw,
+      refs: raw.refs.filter((_, index) => !drop.has(index)),
+    };
+    const wantSpans = {
+      defs: recordedDefs,
+      refs: recordedRefs?.filter((_, index) => !drop.has(index)),
+    };
     let got;
     try {
       got = refereeFactsWithTree(entry.text);
@@ -292,9 +372,53 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
     refsWanted += entry.refs.length;
     refsMatched += overlap(entry.refs, got.refs);
 
+    // INLINE footnotes, which the vendored answers never recorded: ordered and exact.
+    const wantInline = spans?.inline ?? [];
+    if (wantInline.length > 0 || got.inline.length > 0) {
+      inlineDocuments++;
+      if (JSON.stringify(wantInline) === JSON.stringify(got.inline)) {
+        inlineDocumentsAgree++;
+      }
+      inlineWanted += wantInline.length;
+      inlineMatched += overlap(wantInline, got.inline);
+    }
+
     if (defsMatch && refsMatch) {
       agree++;
       if (wantIds) agreed.push(key);
+      // Where the tuples agree, the facts pair up in order, so each recorded span is compared
+      // with ours. Empty names are dropped from both sides, as `same()` drops them.
+      if (wantSpans.defs !== undefined && wantSpans.refs !== undefined) {
+        spanDocuments++;
+        let whole = true;
+        for (const kind of ["defs", "refs"] as const) {
+          const theirs = entry[kind].flatMap((row, index) =>
+            row[0] === "" ? [] : [wantSpans[kind]![index]],
+          );
+          const ours = got[kind].flatMap((row, index) =>
+            row[0] === ""
+              ? []
+              : [got[kind === "defs" ? "defSpans" : "refSpans"][index]],
+          );
+          theirs.forEach((span, index) => {
+            if (span === null || span === undefined) return;
+            const mine = ours[index];
+            spanCounts[kind][1]++;
+            if (JSON.stringify(span) === JSON.stringify(mine)) {
+              spanCounts[kind][0]++;
+              return;
+            }
+            whole = false;
+            span.forEach((value, field) => {
+              if (mine?.[field] !== value) {
+                const name = `${kind === "defs" ? "definition" : "reference"} ${SPAN_FIELDS[field]}`;
+                spanFields.set(name, (spanFields.get(name) ?? 0) + 1);
+              }
+            });
+          });
+        }
+        if (whole) spanDocumentsAgree++;
+      }
       continue;
     }
     // Names first: finding a different *set* is a parse disagreement, while the
@@ -405,6 +529,28 @@ if (!wantIds) {
     console.log(`    references       ${pc(refsMatched, refsWanted)}`);
   }
   console.log(`  nodes spliced without a position: ${unplaced}`);
+  console.log(
+    `  recording artifacts excluded: ${artifactsExcluded} references on lines holding no text`,
+  );
+  {
+    const pc = (a: number, b: number) =>
+      `${a}/${b} (${b === 0 ? "-" : ((100 * a) / b).toFixed(2)}%)`;
+    console.log(
+      `\nspans (referee-spans.json), over the agreeing documents: start offset, end line,` +
+        `\nend column and end offset, beside the line and column above` +
+        `\n  documents agreeing on every span: ${pc(spanDocumentsAgree, spanDocuments)}` +
+        `\n  definitions      ${pc(spanCounts.defs[0]!, spanCounts.defs[1]!)}` +
+        `\n  references       ${pc(spanCounts.refs[0]!, spanCounts.refs[1]!)}`,
+    );
+    for (const [field, count] of [...spanFields].sort((a, b) => b[1] - a[1])) {
+      console.log(`  ${String(count).padStart(5)}  ${field} differs`);
+    }
+    console.log(
+      `\ninline footnotes ([inline<n>, which the vendored answers never recorded):` +
+        `\n  documents agreeing: ${pc(inlineDocumentsAgree, inlineDocuments)}` +
+        `\n  assertions matched: ${pc(inlineMatched, inlineWanted)}`,
+    );
+  }
   console.log(
     `\ncode blocks (root level), a dimension nothing read until now:` +
       `\n  ${codeAgree}/${withCode} agree (${((100 * codeAgree) / withCode).toFixed(1)}%)`,

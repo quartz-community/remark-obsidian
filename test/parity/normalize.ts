@@ -1809,10 +1809,16 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
    * pin each half: `a[^1] and ^[x]` with `[^1]` defined names the inline
    * `[inline1`, while `a[^nodef] and ^[x]` names it `[inline0`; and
    * `^[a] b[^1] ^[c]` names them `[inline0` and `[inline2`, the reference
-   * between taking 1. So the counter numbers the markers Obsidian will
-   * render -- exactly the set `footnoteRefs` records, plus the inline ones.
+   * between taking 1.
+   *
+   * ONCE PER FOOTNOTE, at its first reference, as rendered footnotes are numbered: `a[^1]
+   * b[^1] ^[x]` names it `[inline1` and `a[^1] b[^2] ^[x]` `[inline2` (live, 1.15.0). The
+   * four probes above never repeat a label, so they could not tell the two apart; counting
+   * every reference named 12 of the referee's 971 inline footnotes one or two too high, and
+   * counting once names all 971.
    */
   let markerIndex = 0;
+  const numbered = new Set<string>();
 
   visit(tree, (node: Node, _index, parent) => {
     if (node.type === "footnote") {
@@ -1876,7 +1882,10 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       // reference is a marker, so only it advances the counter.
       if (defined.has(id)) {
         footnoteRefs.push(`${id}@${atPoint(node.position.start)}`);
-        markerIndex++;
+        if (!numbered.has(id)) {
+          numbered.add(id);
+          markerIndex++;
+        }
       }
       return;
     }
@@ -1893,15 +1902,54 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     // walk. Requiring them meant one could fall through and have its children
     // counted -- a definition inside a `%%` comment reported as defining, which
     // is the opposite of the rule.
+    //
+    // An inline footnote inside one is indexed too, as `[inline<n>` -- 48 of the referee's
+    // recorded inline footnotes sit in a comment -- and both kinds are markers, so they number
+    // the ones after them. Taken from the comment's own `footnote` nodes, outermost only, and
+    // in document order with the references; a label inside one is dead, as everywhere else
+    // (inline-footnote inertness beats `%%`, settled live).
     if (node.type === "comment") {
       const from = node.position?.start?.offset;
       const to = node.position?.end?.offset;
       if (from === undefined || to === undefined) return SKIP;
+      const inline: Array<{ start: number; end: number }> = [];
+      visit(node, "footnote", (note: Node) => {
+        const start = note.position?.start?.offset;
+        const end = note.position?.end?.offset;
+        if (start !== undefined && end !== undefined)
+          inline.push({ start, end });
+        return SKIP;
+      });
+      const marks: Array<{
+        at: number;
+        ref?: string;
+        note?: { start: number; end: number };
+      }> = inline.map((note) => ({ at: note.start, note }));
       const slice = source.slice(from, to);
       for (const match of slice.matchAll(/\[\^([^[\]\s]+)\]/gu)) {
-        const id = match[1]!.toLowerCase();
-        if (defined.has(id)) {
-          footnoteRefs.push(`${id}@${atOffset(from + match.index)}`);
+        const at = from + match.index;
+        if (inline.some((note) => note.start <= at && at < note.end)) continue;
+        marks.push({ at, ref: match[1]!.toLowerCase() });
+      }
+      marks.sort((a, b) => a.at - b.at);
+      for (const mark of marks) {
+        if (mark.ref !== undefined) {
+          if (defined.has(mark.ref)) {
+            footnoteRefs.push(`${mark.ref}@${atOffset(mark.at)}`);
+            if (!numbered.has(mark.ref)) {
+              numbered.add(mark.ref);
+              markerIndex++;
+            }
+          }
+          continue;
+        }
+        const { start, end } = mark.note!;
+        const name = `[inline${markerIndex}`;
+        markerIndex++;
+        if (source.slice(start + 2, end - 1) === "") {
+          footnoteRefs.push(`@${atOffset(start)}`);
+        } else {
+          footnotes.push(`${name}@${atOffset(start + 2)}-${atOffset(end - 1)}`);
         }
       }
       return SKIP;

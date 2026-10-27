@@ -14,6 +14,10 @@ test-vault/.obsidian
 # nothing else.
 test/parity/referee-answers
 
+# Machine-written by `record-referee-spans.mts` beside those answers, for the same reason as
+# the goldens: a re-recording should diff as changed spans, not as reformatting.
+test/parity/referee-spans.json
+
 # Vendored remark-parse 8 and friends, kept in upstream's own style so a diff against the
 # published files shows only the recorded changes (src/rp8/vendor/README.md).
 src/rp8/vendor/remark-parse
