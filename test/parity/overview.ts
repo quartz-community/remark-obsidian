@@ -255,7 +255,7 @@ export const ORACLES: readonly Oracle[] = [
     gate: "absolute",
     compares: [
       "footnote definitions (label, line, column, end line) and defined references, against the answers live Obsidian gave for 107 probes of every footnote rule (goldens/strict-footnotes.json)",
-      "the 5 recorded exclusions, which must keep departing",
+      "the 4 recorded exclusions, which must keep departing",
     ],
     blind: [
       "documents nobody probed -- the referee corpus measures strict's definitions only as an instrument",

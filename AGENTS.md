@@ -119,7 +119,8 @@ callout's body, read with the label after it, leaves the label a definition. The
 a paragraph at that point, since callouts are built later.
 
 Measured: `goldens/strict-footnotes.json` pins the 107 probes Obsidian answered, and
-`strict-footnotes.test.ts` asserts 102 agree and the 5 recorded exclusions still differ. The
+`strict-footnotes.test.ts` asserts 103 agree and the 4 recorded exclusions still differ (the
+fifth closed when `definitionEndBeforeLabel` came back). The
 known-positive control: with the rules off, 44 fail. On the referee corpus `strict`'s definitions
 agree in 3,936 → **4,967** documents (+1,074 / −43). All 43 losses are constructs `strict` reads
 by the spec on purpose:
@@ -128,7 +129,9 @@ by the spec on purpose:
 - 6 with a tab after `>`;
 - 6 list or setext differences;
 - 1 link label;
-- 14 `%%` cases, waiting on the comment re-measurement.
+- 14 `%%` cases. Obsidian's reader treats an indented `%%` line (`> x` / `    %%`) as a comment
+  opener that ends the paragraph; the comment EXTENSION does not. The restored comment passes do
+  not reach it, so it belongs to the extension audit (HANDOFF).
 
 Traps this cost:
 
@@ -138,6 +141,61 @@ Traps this cost:
   `]` in the source, not by its length.
 - **A container that a blank line continues ENDS on the inserted line**, which must map to the
   end of the line above, not the start of the one below.
+
+**The removed passes, re-measured under the extension rule.** The 76 → 17 cut followed
+CommonMark/GFM everywhere; the extension rule says Obsidian syntax follows Obsidian even inside a
+container. So the 22 removed passes that touch Obsidian syntax were restored in an EXPERIMENT
+worktree and switched on one at a time, then in cumulative sets. They were scored against four
+measures: the 676 spec examples, the 3,471 recorded Reading-view cases (`compareCase` with the
+profiles switched to `strict`), and the referee's definitions and references.
+
+13 came back, measured together against the 17-pass chain:
+
+- spec examples: unchanged;
+- Reading-view cases: 2,902 → **2,928** (+25, plus 1 from the highlight fix below);
+- referee definitions: 4,967 → **5,208** (+247 / −6);
+- referee references: 1,465 → **1,483** (+20 / −2).
+
+They are: `commentHoist`, `commentDefinitionExtent`, `commentInDefinition`, `quoteCommentLazy`,
+`itemCommentLazy`, `definitionLazySplit`, `definitionLazy`, `doubledFootnoteOpener`,
+`definitionNestedLabel`, `definitionMathAbsorb`, `definitionEndBeforeLabel`, `tagAfterCloser`
+and `inlineFootnoteInert`. The 8 losses:
+
+- 4 definition END lines, in `%%`/definition shapes (`fuzz#174`, `#1199`) and around a callout
+  inside a definition (`broad#241`, `probes#605`) -- the tail the 1.x record already carries;
+- 2 more, a `$$` under a definition behind a TAB-separated list marker (`fuzz#247`, `#909`);
+- 2 references, a label inside a `%%` inside a definition (`pins#115`, `#116`).
+
+Three of them changed on the way back:
+
+- **`definitionMathAbsorb` only takes a `$$` directly under the definition.** All 22 gains had
+  no blank line between them; 5 of its 7 losses did. That condition took it from +22 / −7 to
+  +22 / −2.
+- **`doubledFootnoteOpener` makes a reference only to a DEFINED label** unless
+  `bareFootnoteRefs` is on. Otherwise it leaves the text literal, as GFM does.
+- **`commentInDefinition` builds a soft line ending as TEXT**, not a `break`. It had made every
+  folded line a hard break under `strict`.
+
+Refused, with numbers:
+
+- **`commentRegion`**: its `<!--` half breaks `raw-html/626`. Its `%%` half alone is a coin flip
+  on definitions, +11 / −10, on top of the rest.
+- **`mathListExtent`**: +2 / −3.
+- **`quotedTabCode`**: references −1.
+- **Inert under `strict`:** `definitionAbsorbedItem` (even after `definitionLazy`),
+  `commentQuoteExtent`, `commentDefinitionColumn`, `mathOutlives`, `refBeforeLabel` and
+  `quoteDefinitionAbsorb`.
+
+`definitionWindowTransform` (the 1,024-character window) and `definitionAbsorbedItemTransform`
+were deleted from `definition-continuation.ts`, which had kept them as unused exports.
+
+**A highlight crossing emphasis goes to whichever opened first** -- Reading view's rule, recorded
+on 1.14.5 and asked of 1.15.0. Live Preview styles both, which the user saw first; no tree can
+hold two crossing spans. micromark pairs emphasis only after the highlight construct has taken its
+span, so `highlight.ts` now simulates CommonMark's pairing on the runs micromark has already
+flagged. If a closer inside the body reaches an opener from before the `==`, the highlight
+declines. Against the 370 recorded `==` cases `strict` now matches 362, and GFM's strikethrough
+rules applied to `==` would match none that it misses.
 
 **Its gates**, beyond the suite above:
 

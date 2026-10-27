@@ -6,6 +6,18 @@ import { parseLegacy8 } from "./rp8/adapt.js";
 import type { Root } from "mdast";
 import type { Processor } from "unified";
 import { visit } from "unist-util-visit";
+import { commentHoistTransform } from "./lib/comment-hoist.js";
+import { commentDefinitionExtentTransform } from "./lib/comment-definition-extent.js";
+import { commentInDefinitionTransform } from "./lib/comment-in-definition.js";
+import { definitionLazySplitTransform } from "./lib/definition-lazy-split.js";
+import { quoteCommentLazyTransform } from "./lib/quote-comment-lazy.js";
+import { itemCommentLazyTransform } from "./lib/item-comment-lazy.js";
+import { doubledFootnoteOpenerTransform } from "./lib/doubled-footnote-opener.js";
+import { definitionNestedLabelTransform } from "./lib/definition-nested-label.js";
+import { definitionMathAbsorbTransform } from "./lib/definition-math-absorb.js";
+import { definitionEndBeforeLabelTransform } from "./lib/definition-end-before-label.js";
+import { tagAfterCloserTransform } from "./lib/tag-after-closer.js";
+import { inlineFootnoteInertTransform } from "./lib/inline-footnote-inert.js";
 
 import "./lib/types.js";
 
@@ -56,7 +68,10 @@ import { frontmatterExactOpenerTransform } from "./lib/frontmatter-exact-opener.
 import { calloutTransform } from "./lib/callout.js";
 import { adjacentIndentedCodeTransform } from "./lib/adjacent-indented-code.js";
 import { commentTailTransform } from "./lib/comment-tail.js";
-import { definitionContinuationTransform } from "./lib/definition-continuation.js";
+import {
+  definitionContinuationTransform,
+  definitionLazyTransform,
+} from "./lib/definition-continuation.js";
 import { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
 
 import { math as mathSyntax } from "micromark-extension-math";
@@ -417,10 +432,22 @@ export default function remarkObsidian(
       // A comment ends at its closing `%%`, so what follows the closer on that line is
       // visible: the block construct owns the whole closing line, and left alone it hides
       // the tail inside the comment.
+      // A multi-line `%%` comment that opens its paragraph is a block of its own, as Obsidian
+      // reports it.
+      commentHoistTransform(tree, String(file));
       commentTailTransform(tree, String(file), reparse);
       // After the tail pass: a definition split off a `%%` closer was never seen by the
       // footnote parser, so its indented continuation is still a sibling at this point.
       definitionContinuationTransform(tree, String(file), (markdown) =>
+        self.parse(markdown),
+      );
+      // Where a `%%` inside a footnote definition ends, and that a `%%` there cannot open a block
+      // comment: Obsidian recognises the definition first. A pair -- the first clamps what the
+      // second turns back into prose.
+      commentDefinitionExtentTransform(tree, String(file), (markdown) =>
+        reparse(markdown),
+      );
+      commentInDefinitionTransform(tree, String(file), (markdown) =>
         self.parse(markdown),
       );
       visit(tree, "comment", (node: any) => {
@@ -462,10 +489,34 @@ export default function remarkObsidian(
         self.parse(markdown),
       );
     }
+    // Obsidian's own syntax inside CommonMark's containers, which `strict` follows: a footnote
+    // definition's lazy continuation under a container splits off as root blocks, an unclosed
+    // `%%` in a quote or list item takes the lines below it, and a paragraph directly under an
+    // empty definition is that definition's.
+    definitionLazySplitTransform(tree, String(file), (markdown) =>
+      self.parse(markdown),
+    );
+    if (opts.comments) quoteCommentLazyTransform(tree, String(file));
+    if (opts.comments) itemCommentLazyTransform(tree, String(file));
+    definitionLazyTransform(tree, String(file));
     // Before everything that reads offsets: gfm's autolink literal splices nodes
     // with no position at all, and a pass without offsets correctly stands aside.
     restoreInlinePositionsTransform(tree, String(file));
+    // `[^` before an inline footnote's `^[` is a reference opener, and wins.
+    doubledFootnoteOpenerTransform(tree, String(file), {
+      bareFootnoteRefs: opts.bareFootnoteRefs,
+    });
+    // A label four columns into a definition, with no blank line, is the definition's text.
+    definitionNestedLabelTransform(tree, String(file));
     if (opts.bareFootnoteRefs) bareFootnoteRefTransform(tree, String(file));
+    // An unclosed `$$` directly under a definition in a list item is the definition's.
+    definitionMathAbsorbTransform(tree, String(file));
+    // A definition's text ends before a column-0 label or block opener.
+    definitionEndBeforeLabelTransform(tree, String(file));
+    // A `#` directly after a `]` that closed a construct is no tag.
+    tagAfterCloserTransform(tree);
+    // Everything inside `^[ … ]` is dead text, references included.
+    if (opts.inlineFootnotes) inlineFootnoteInertTransform(tree);
     // Presence of the table means it was recorded, so it is started even for a
     // document holding no container at all.
     if (opts.lineOffsets) ensureLineOffsets(tree);
@@ -473,6 +524,9 @@ export default function remarkObsidian(
     // body is parsed from the span the comment finally claims.
     if (opts.keepComments && opts.parseComments) {
       commentParseTransform(tree, String(file), reparse);
+      // Again, because parsing a comment's body revives a reference inside an inline footnote:
+      // `a^[x %% [^1] %% y]` -- inertness beats the comment rule, settled live.
+      if (opts.inlineFootnotes) inlineFootnoteInertTransform(tree);
     }
     // After every pass that reads a newline out of a text value, and before points
     // are normalised from the offsets it sets.

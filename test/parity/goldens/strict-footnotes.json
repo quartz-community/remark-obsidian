@@ -714,8 +714,7 @@
       ],
       "refs": [
         "1@3:3"
-      ],
-      "excluded": "a lazy line inside a list item: as above, for a link reference definition"
+      ]
     },
     {
       "name": "r2b quoted",

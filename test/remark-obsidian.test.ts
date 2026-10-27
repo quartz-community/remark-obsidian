@@ -3152,3 +3152,68 @@ describe("strict with every option the transform was once gated on off", () => {
     expect(findNodes(tree, "yaml")).toHaveLength(0);
   });
 });
+
+/** A node's text, without depending on `mdast-util-to-string`, which is not a direct dependency. */
+const plain = (node: any): string =>
+  typeof node.value === "string"
+    ? node.value
+    : (node.children ?? []).map(plain).join("");
+
+describe("strict: a highlight crossing emphasis", () => {
+  // Obsidian's Reading view lets whichever construct opens first take its span (1.14.5
+  // recorded, 1.15.0 asked). Live Preview styles both, which no tree can hold.
+  const shape = (markdown: string) => {
+    const tree = processWithGfm(markdown, { preset: "strict" });
+    const out: string[] = [];
+    visit(tree, (node: any) => {
+      if (
+        node.type === "strong" ||
+        node.type === "emphasis" ||
+        node.type === "highlight"
+      ) {
+        out.push(`${node.type}:${plain(node)}`);
+      }
+    });
+    return out;
+  };
+
+  it("lets emphasis that opened first win", () => {
+    expect(shape("**a==b**c==\n")).toEqual(["strong:a==b"]);
+    expect(shape("*a==b*c==\n")).toEqual(["emphasis:a==b"]);
+  });
+
+  it("lets a highlight that opened first win", () => {
+    expect(shape("==a**b==c**\n")).toEqual(["highlight:a**b"]);
+  });
+
+  it("still nests either way round", () => {
+    expect(shape("**a ==b== c**\n")).toEqual(["strong:a b c", "highlight:b"]);
+    expect(shape("==*b*==\n")).toEqual(["highlight:b", "emphasis:b"]);
+  });
+});
+
+describe("strict: a reference opener before an inline footnote", () => {
+  const types = (markdown: string, options = {}) => {
+    const tree = processWithGfm(markdown, { preset: "strict", ...options });
+    return (
+      findNodes(tree, "footnoteReference").length +
+      ":" +
+      findNodes(tree, "footnote").length
+    );
+  };
+
+  it("is a reference when its label is defined", () => {
+    expect(types("x[^[^1] y\n\n[^[^1]: d\n")).toBe("1:0");
+  });
+
+  it("is literal text when nothing defines it, as GFM keeps an undefined reference", () => {
+    expect(types("x[^[^1] y\n")).toBe("0:0");
+    expect(plain(processWithGfm("x[^[^1] y\n", { preset: "strict" }))).toBe(
+      "x[^[^1] y",
+    );
+  });
+
+  it("is a reference anyway when bare references are on", () => {
+    expect(types("x[^[^1] y\n", { bareFootnoteRefs: true })).toBe("1:0");
+  });
+});

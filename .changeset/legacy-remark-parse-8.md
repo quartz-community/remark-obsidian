@@ -18,9 +18,9 @@ before.
 **`strict` is what Obsidian intends:** the CommonMark, GFM and LaTeX it says it supports, plus
 the syntax it documents — including task boxes holding any character (`- [-]`, `- [?]`), which
 Obsidian documents as checkboxes and `strict` now reads the same way. Where those standards are
-silent about Obsidian's own syntax, `strict` reads it as Obsidian does; everything else Obsidian's
-parser merely does — tab arithmetic, where a `%%` comment ends inside a quote or list, and the
-other quirks — is `legacy`'s alone. Its tree matches `remark-parse` and `remark-gfm` on every
+silent about Obsidian's own syntax, `strict` reads it as Obsidian does, inside quotes and lists
+too; everything else Obsidian's parser merely does — tab arithmetic, lazy-line and list quirks —
+is `legacy`'s alone. Its tree matches `remark-parse` and `remark-gfm` on every
 CommonMark and GFM spec example except the seven that hold Obsidian syntax and the two task
 lists, where it adds `data.taskChar`.
 
@@ -29,7 +29,12 @@ lists, where it adds `data.taskChar`.
   `2.` line continues a definition's text, while a table, a link reference definition or a
   setext underline ends it. A label may hold `[` and a backslash escapes nothing in it. A `[^`
   label that is not a footnote's is plain text, not a link reference definition.
-- **A `%%` comment** ends at its closing `%%`.
+- **A `%%` comment** ends at its closing `%%`, takes the lines below it when left open in a quote
+  or list item, and cannot open inside a footnote definition.
+- **A highlight crossing emphasis** goes to whichever opened first, as in Reading view:
+  `**a==b**c==` is bold, `==a**b==c**` highlighted.
+- **Inside `^[ … ]`** a footnote reference is text, and **a `#` right after a `]`** that closed a
+  construct is no tag.
 - **`$$`** delimits display math as in LaTeX, including `$$x^2` on one line and a closing `$$`
   at the end of a line.
 

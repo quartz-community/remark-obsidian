@@ -21,7 +21,7 @@ were Obsidian syntax bare rp8 lacks; and `strict` simply stays on micromark. The
 | structural invariant violations      |                      10 |                     **0** |
 | slowest gated pathological shape     | 7.4 s (`footnote-refs`) | 985 ms (`unclosed-links`) |
 
-Suite 455 passed / 3 skipped, lint, both typechecks, format and build green. Commits on
+Suite 464 passed / 3 skipped, lint, both typechecks, format and build green. Commits on
 `rp8-legacy-prototype`: `6aa9bfa` prototype, `d73c42a` wiring, `6ba3e8e` vendoring and
 performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
 
@@ -35,16 +35,14 @@ performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
    syntax follows Obsidian even inside a CommonMark construct; everything else follows the spec.
    - **Footnotes -- DONE.** Read as Obsidian reads them, measured and gated
      (`strict-footnotes.test.ts`); referee definitions 3,936 → 4,967.
-   - **Highlights -- settled, keep.** GFM's strikethrough rules for `==` would move 13 recorded
-     cases, Obsidian siding with the current extension in 12. The 13th is a defect to fix:
-     `**a==b**c==` highlights `b**c`, and Obsidian lets the strong win.
-   - **The other removed passes, NEXT.** Those governing an Obsidian extension inside a
-     container should come back where they move `strict` toward Obsidian without touching a
-     spec example: the `%%` comment passes, `inlineFootnoteInert`, `doubledFootnoteOpener`,
-     `tagAfterCloser`, `quotedTabCode` and the math container passes. Measure each against its
-     probes; do not restore from git blind -- four of the removed passes deleted text under
-     `strict`. The 14 `%%` footnote losses above are this item, and so is a `%%` closer's tail
-     staying hidden inside a QUOTE (`hunt/label-after-comment-closer-mangled/3`).
+   - **Highlights -- DONE.** GFM's strikethrough rules for `==` would have moved 13 recorded cases,
+     with Obsidian siding with the current extension in 12. The 13th was fixed: a highlight crossing
+     emphasis goes to whichever opened first, as in Reading view (Live Preview differs).
+   - **The removed passes -- DONE.** 13 of 22 came back after measuring each against Obsidian;
+     the rest are recorded as refused or inert (AGENTS.md § 2.0).
+   - **NEXT, the syntax extensions.** 14 footnote losses are one comment rule: Obsidian reads an
+     indented `%%` line (`> x` / `    %%`) as an opener that ends the paragraph, and the comment
+     extension does not.
    - **The syntax extensions** (`legacyHighlightQueue`, the callout and comment grammars, tags,
      inline footnotes) were tuned against Obsidian, which the extension rule now endorses; re-check
      each against the live app rather than assume.

@@ -103,6 +103,7 @@ const highlight: Construct = {
     ok: State,
     nok: State,
   ): State {
+    const self = this;
     const characters: string[] = [];
     const scan = createChunkScan(characters, createQueueBound());
     const TEXT_TOKEN = "highlightText" as const;
@@ -159,6 +160,7 @@ const highlight: Construct = {
     function decide(code: Code): State | undefined {
       const found = legacyHighlightQueue(characters.join(""));
       if (found === null) return nok(code);
+      if (emphasisClosesInside(self, found)) return nok(code);
 
       queue = found;
       effects.enter("highlight");
@@ -189,6 +191,96 @@ const highlight: Construct = {
     }
   },
 };
+
+type Group = 1 | 2 | undefined;
+
+/** micromark's `classifyCharacter`: whitespace 1, punctuation 2, anything else neither. */
+function group(character: string | undefined): Group {
+  if (character === undefined || /\s/u.test(character)) return 1;
+  if (/\p{P}|\p{S}/u.test(character)) return 2;
+  return undefined;
+}
+
+interface Run {
+  readonly marker: string;
+  size: number;
+  readonly open: boolean;
+  readonly close: boolean;
+}
+
+/** micromark's own flanking rule for an attention run (`attention.js`). */
+function flank(marker: string, size: number, before: Group, after: Group): Run {
+  const open = !after || (after === 2 && Boolean(before));
+  const close = !before || (before === 2 && Boolean(after));
+  return {
+    marker,
+    size,
+    open: marker === "*" ? open : open && (Boolean(before) || !close),
+    close: marker === "*" ? close : close && (Boolean(after) || !open),
+  };
+}
+
+/**
+ * Whether emphasis opened BEFORE this `==` would close inside its body.
+ *
+ * Obsidian's reader (remark-parse 8) tokenizes left to right, so whichever construct opens first
+ * consumes its span: `**a==b**c==` is strong `a==b` and no highlight, `==a**b==c**` a highlight
+ * `a**b` and no strong (Reading view, 1.14.5 recorded and 1.15.0 asked). micromark pairs emphasis
+ * only after this construct has taken its span, so without this check the highlight won both.
+ *
+ * Simulated with CommonMark's pairing on the runs micromark has already marked: the runs before
+ * the `==` pair among themselves first, then the body's runs -- with the `==` read as the plain
+ * punctuation they would be without a highlight -- close the nearest opener. A body closer that
+ * reaches an opener from before the `==` crosses it. Undecidable cases (the rule of three) are
+ * left to the highlight, as before.
+ */
+function emphasisClosesInside(self: TokenizeContext, body: string): boolean {
+  const stack: Array<{ run: Run; outer: boolean }> = [];
+  const take = (run: Run, outer: boolean): boolean => {
+    if (run.close) {
+      for (let at = stack.length - 1; at >= 0 && run.size > 0; at -= 1) {
+        const entry = stack[at]!;
+        if (entry.run.marker !== run.marker) continue;
+        if (entry.outer && !outer) return true;
+        const used = Math.min(entry.run.size, run.size);
+        entry.run.size -= used;
+        run.size -= used;
+        if (entry.run.size === 0) stack.splice(at, 1);
+      }
+    }
+    if (run.open && run.size > 0) stack.push({ run, outer });
+    return false;
+  };
+
+  for (const [kind, token] of self.events) {
+    if (kind !== "enter" || token.type !== "attentionSequence") continue;
+    const text = self.sliceSerialize(token);
+    const flags = token as typeof token & { _open?: boolean; _close?: boolean };
+    take(
+      {
+        marker: text[0]!,
+        size: text.length,
+        open: Boolean(flags._open),
+        close: Boolean(flags._close),
+      },
+      true,
+    );
+  }
+  if (!stack.some((entry) => entry.outer)) return false;
+
+  for (const match of body.matchAll(/\*+|_+/gu)) {
+    const start = match.index;
+    const end = start + match[0].length;
+    const run = flank(
+      match[0][0]!,
+      match[0].length,
+      group(start > 0 ? body[start - 1] : MARKER),
+      group(end < body.length ? body[end] : MARKER),
+    );
+    if (take(run, false)) return true;
+  }
+  return false;
+}
 
 export function highlightSyntax(): Extension {
   return { text: { [EQUALS]: highlight } };
