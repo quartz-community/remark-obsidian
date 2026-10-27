@@ -683,6 +683,15 @@ an empty block): 86 strict documents of 10,991, none under `legacy`. Write a for
 value under BOTH presets; every other gate there runs the legacy profiles, which is why the
 parity corpus never saw it.
 
+**Closed after 2.0.1: tag characters follow Obsidian's own rule** (issue #1's closing note,
+`#§section`). Both presets used a class of letters, marks, emoji and digits; Obsidian ends a tag
+only at whitespace, ASCII punctuation other than `/ _ -`, and U+2000-U+206F / U+2E00-U+2E7F.
+Swept live (1.15.0) over 163 characters, every block boundary included: the old class agreed on
+97 (legacy) and 85 (strict), the new one on all 163. `src/lib/tag-char.ts` is the one predicate
+both presets call. No recorded document exercises it -- old and new tag output are identical
+over all 10,991 corpus, spec and referee documents under both presets -- so the gate is the
+unit test "reads a tag's characters as Obsidian does", which fails on the old class.
+
 1. **Two `strict` cases left by decision:** an unbalanced `[[[a]]` inside a link label, which
    breaks the link's bracket count in micromark; and a `$$` line interrupting a lazily continued
    definition in a list item.

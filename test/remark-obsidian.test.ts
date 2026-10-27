@@ -1716,6 +1716,38 @@ describe("remark-obsidian", () => {
     expect(afterSpaceNode.value).toBe("tag");
   });
 
+  it("reads a tag's characters as Obsidian does, under both presets", () => {
+    // Asked of Obsidian 1.15.0. A tag runs through anything but whitespace, ASCII punctuation
+    // other than `/ _ -`, and the General and Supplemental Punctuation blocks -- so `§`, `€`,
+    // arrows and CJK punctuation continue it, `’` and `…` end it, and a ZWJ emoji sequence ends
+    // at its first joiner. Issue #1: an astral emoji, `#📚`, starts one. No recorded document
+    // holds any of these, so this is their only gate.
+    const cases: Array<[string, string[]]> = [
+      ["#📚/status/finished", ["📚/status/finished"]],
+      ["#🗓️/2024/01/07", ["🗓️/2024/01/07"]],
+      ["#§section x", ["§section"]],
+      ["#a€b x", ["a€b"]],
+      ["#a→b x", ["a→b"]],
+      ["#a「b」 x", ["a「b」"]],
+      ["#a，b x", ["a，b"]],
+      ["#a’b x", ["a"]],
+      ["#a…b x", ["a"]],
+      ["#👨‍👩‍👧 x", ["👨"]],
+      ["#/a x", ["/a"]],
+      ["#٠١ x", ["٠١"]],
+      ["#123 x", []],
+    ];
+    for (const preset of ["legacy", "strict"] as const) {
+      for (const [md, expected] of cases) {
+        const tree = processWithGfm(md, { preset });
+        expect(
+          findNodes(tree, "tag").map((node) => node.value),
+          `${preset} ${md}`,
+        ).toEqual(expected);
+      }
+    }
+  });
+
   it("parses tags immediately followed by wikilink on next line", () => {
     // Regression: tag followed by wikilink without blank line caused
     // "Invalid code point -4" because isTagChar didn't guard against

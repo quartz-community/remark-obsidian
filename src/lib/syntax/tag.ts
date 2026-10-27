@@ -7,13 +7,10 @@ import type {
 } from "micromark-util-types";
 import { codes } from "micromark-util-symbol";
 
+import { isTagCharacter } from "../tag-char.js";
+
 const HASH = 35;
 const SLASH = 47;
-const DASH = 45;
-const UNDERSCORE = 95;
-const ASTERISK = 42;
-
-const tagCharRegex = /[\p{L}\p{M}\p{Emoji}]/u;
 
 /** The `[` and `![` tokens, which open a label rather than close a construct. */
 const LABEL_OPENERS = new Set(["labelLink", "labelImage"]);
@@ -64,15 +61,11 @@ function isWhitespace(code: Code): boolean {
 
 function isTagChar(code: Code): boolean {
   if (code === null || code < 0) return false;
-  if (code >= 48 && code <= 57) return true;
-  if (code === DASH || code === UNDERSCORE) return true;
-  // `#` and `*` are emoji keycap bases, so `\p{Emoji}` matches them. Without this
-  // `#tag#tag` reads as the single tag `tag#tag`; Obsidian yields two.
-  if (code === HASH || code === ASTERISK) return false;
-  // micromark yields UTF-16 code units, so an emoji arrives as two surrogates and
-  // neither half matches a unicode property escape. Test them by range instead.
+  // micromark yields UTF-16 code units, so an astral character -- most emoji -- arrives as two
+  // surrogates, neither a character on its own. No character that ends a tag is astral, so
+  // either half continues it (issue #1: `#📚/status/finished`).
   if (code >= 0xd800 && code <= 0xdfff) return true;
-  return tagCharRegex.test(String.fromCodePoint(code));
+  return isTagCharacter(String.fromCharCode(code));
 }
 
 function isNonDigit(code: Code): boolean {

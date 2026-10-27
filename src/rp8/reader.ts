@@ -14,6 +14,7 @@ import listTokenizer from "./list.js";
 import remarkFootnotes2 from "./vendor/remark-footnotes/index.js";
 import remarkMath3 from "./vendor/remark-math/index.js";
 import Parser8 from "./vendor/remark-parse/parser.js";
+import { isTagCharacter } from "../lib/tag-char.js";
 
 export interface Point8 {
   line: number;
@@ -305,8 +306,6 @@ function highlights(tables: any): void {
   );
 }
 
-const TAG_CHAR = /[\p{L}\p{M}\p{Emoji}\p{N}_\-/]/u;
-
 /**
  * `#tag`. The locator offers only a `#` after whitespace, and the reader runs wherever the
  * inline loop stands -- which is also right after any construct, so `a**b**#next` tags while
@@ -319,7 +318,7 @@ function tags(tables: any): void {
     let end = 1;
     let nonDigit = false;
     for (const ch of value.slice(1)) {
-      if (ch === "#" || ch === "*" || !TAG_CHAR.test(ch)) break;
+      if (!isTagCharacter(ch)) break;
       if (!/[0-9]/u.test(ch)) nonDigit = true;
       end += ch.length;
     }
