@@ -24,7 +24,7 @@ vendored here except the four P1/P2 documents. Ported, it measured:
 |                                      | micromark (1.x) |   rp8 (2.0) |
 | ------------------------------------ | --------------: | ----------: |
 | referee                              |           6,307 |   **6,828** |
-| contract gate, `match` cases         |   3,447 / 3,447 | 3,451/3,451 |
+| contract gate, `match` cases         |   3,447 / 3,447 | 3,465/3,465 |
 | positioned oracle divergences        |              20 |       **9** |
 | RAW positions vs `compute`: sections |           97.4% |    **100%** |
 | RAW positions: headings / list items |    94.2 / 82.2% | 100 / 92.4% |
@@ -36,6 +36,15 @@ far the micromark tree's own positions were from Obsidian's. rp8's are Obsidian'
 Of the 16 referee documents left: 4 are P1/P2 (must not fix), 2 are correction artifacts
 (references on lines past the text's end), 4 carry references only the CORRECTED answers have
 (inside code / an unclosed fence), 6 are columns (BOM, RTL names, a frontmatter closer).
+
+**Markdown inside HTML is CommonMark in Obsidian too**, so both presets read it the same way.
+Obsidian's developers give performance as the reason for its HTML handling, which makes it
+`legacy` territory by the intends/delivers rule; it happens to coincide with CommonMark. The 14
+`probe/html-markdown/*` seed cases pin it: inline vs block tags, blank lines inside and around
+the block, a quote, a list item, `markdown="1"`. Reading View agreed with the detached capture
+on all 14. The one case that diverged was the projection: the recorder counts every DOM `<mark>`,
+`<strong>` and `<em>`, raw HTML included, so `normalize.ts` now projects a raw inline element
+from the sibling run between its tags.
 
 **Where it lives.** `src/rp8/reader.ts` (Obsidian's readers, ported with attribution, plus
 highlights, tags, positioned soft breaks, and the speed-ups), `src/rp8/adapt.ts` (rp8's tree to

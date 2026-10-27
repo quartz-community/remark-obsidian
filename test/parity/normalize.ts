@@ -467,6 +467,46 @@ function stripTags(raw: string): string {
   return out;
 }
 
+/** An opening or closing raw tag for an element the recorder projects. */
+const RAW_PHRASING_TAG = /^<(\/?)(mark|strong|em)(?:[\t\n ][^>]*)?>$/iu;
+
+/**
+ * The element a raw inline `<mark>`, `<strong>` or `<em>` tag opens.
+ *
+ * Inline html arrives as one node per tag, so the element is the run of siblings
+ * between the opening tag and its matching close, wrapped in a parent so the text
+ * walkers can read it. `undefined` when `children[index]` opens none, or when
+ * nothing closes it: the browser would close it at the end of the block, and no
+ * recorded case says so.
+ */
+function rawPhrasingElement(
+  index: number,
+  children: readonly Node[],
+): { tag: string; node: Node } | undefined {
+  const open = RAW_PHRASING_TAG.exec(
+    (children[index] as ValueNode).value ?? "",
+  );
+  if (!open || open[1] === "/") return undefined;
+  const tag = open[2]!.toLowerCase();
+  let depth = 0;
+  for (let at = index + 1; at < children.length; at += 1) {
+    const sibling = children[at]!;
+    if (sibling.type !== "html") continue;
+    const match = RAW_PHRASING_TAG.exec((sibling as ValueNode).value);
+    if (!match || match[2]!.toLowerCase() !== tag) continue;
+    if (match[1] !== "/") depth += 1;
+    else if (depth > 0) depth -= 1;
+    else {
+      const node = {
+        type: "paragraph",
+        children: children.slice(index + 1, at),
+      };
+      return { tag, node: node as Node };
+    }
+  }
+  return undefined;
+}
+
 /** From mdast, not HTML: `wikilink`/`tag` have no hast handler and vanish when rendered. */
 export function mdastText(
   tree: Node,
@@ -1045,7 +1085,7 @@ export function projectMdast(
   const highlights: string[] = [];
   const emphasis: string[] = [];
 
-  visit(tree, (node: Node) => {
+  visit(tree, (node: Node, index, parent) => {
     // Nothing inside a `%%` comment renders, so nothing inside one reaches a
     // *rendered* projection. The body is parsed into children now, and without
     // this a wikilink or a tag written inside a comment would be collected as
@@ -1144,6 +1184,24 @@ export function projectMdast(
     }
     if (node.type === "tag") {
       tags.push((node as ValueNode).value);
+      return;
+    }
+    // A raw `<mark>`, `<strong>` or `<em>` is an element in the DOM like any
+    // other, so the recorder's `querySelectorAll` counts it:
+    // `probe/html-markdown/item-inline-and-block` reports `- <mark>*e*</mark>` as
+    // the highlight `e`. Read at the opening tag, which is where the element sits
+    // in document order.
+    if (node.type === "html" && parent && index !== undefined) {
+      const element = rawPhrasingElement(
+        index,
+        (parent as { children: Node[] }).children,
+      );
+      if (element && !inFootnote.has(node)) {
+        if (element.tag === "mark")
+          highlights.push(textOf(element.node, defined));
+        else
+          emphasis.push(`${element.tag}:${mdastText(element.node, defined)}`);
+      }
       return;
     }
     if (node.type === "highlight") {

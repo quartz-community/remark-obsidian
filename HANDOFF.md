@@ -12,7 +12,7 @@ were Obsidian syntax bare rp8 lacks; and `strict` simply stays on micromark. The
 |                                      |         1.x (micromark) |                 2.0 (rp8) |
 | ------------------------------------ | ----------------------: | ------------------------: |
 | referee (6,844 documents)            |                   6,307 |                 **6,828** |
-| contract gate, `match` cases         |                   3,447 |                 **3,451** |
+| contract gate, `match` cases         |                   3,447 |                 **3,465** |
 | positioned-oracle divergences        |                      20 |                     **9** |
 | RAW positions vs `compute`: sections |                   97.4% |                  **100%** |
 | RAW positions: headings / list items |            94.2 / 82.2% |                 100/92.4% |
@@ -21,7 +21,7 @@ were Obsidian syntax bare rp8 lacks; and `strict` simply stays on micromark. The
 | structural invariant violations      |                      10 |                     **0** |
 | slowest gated pathological shape     | 7.4 s (`footnote-refs`) | 985 ms (`unclosed-links`) |
 
-Suite 465 passed / 3 skipped, lint, both typechecks, format and build green. Commits on
+Suite 464 passed / 3 skipped, lint, both typechecks, format and build green. Commits on
 `rp8-legacy-prototype`: `6aa9bfa` prototype, `d73c42a` wiring, `6ba3e8e` vendoring and
 performance, `b1ac5d0` the API change, round-trip and re-pinned ceilings.
 

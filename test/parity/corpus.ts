@@ -822,6 +822,44 @@ const SEEDS: ReadonlyArray<readonly [string, string]> = [
     "<div>\n**not bold**\n[[not a wikilink]]\n#not-a-tag\n</div>\n",
   ],
   ["html/span-inline", "<span>**not bold** [[link]]</span>\n"],
+  // MARKDOWN INSIDE HTML. Obsidian documents that it "does not render Markdown syntax inside HTML
+  // elements" for performance (its developers confirm the reason). Probed live on 1.15.0, it means
+  // CommonMark's own html-block rule and nothing more: inline elements render their Markdown, a
+  // block-level tag keeps everything up to the next blank line raw, and Markdown after that blank
+  // line renders. So `legacy` (Obsidian) and `strict` (CommonMark) agree on all fourteen; these pin
+  // both, including the shapes where the two rules would part if they ever did.
+  ["probe/html-markdown/span-inline", "<span>**b**</span>\n"],
+  ["probe/html-markdown/div-same-line", "<div>**b**</div>\n"],
+  ["probe/html-markdown/div-lines", "<div>\n**b**\n</div>\n"],
+  ["probe/html-markdown/div-blank-lines", "<div>\n\n**b**\n\n</div>\n"],
+  [
+    "probe/html-markdown/details-blank-lines",
+    "<details>\n<summary>S</summary>\n\n**b**\n\n</details>\n",
+  ],
+  ["probe/html-markdown/p-same-line", "<p>**b**</p>\n"],
+  [
+    "probe/html-markdown/table-cell",
+    "<table><tr><td>**b**</td></tr></table>\n",
+  ],
+  ["probe/html-markdown/span-alone-on-lines", "<span>\n**b**\n</span>\n"],
+  [
+    "probe/html-markdown/quote-div-blank-lines",
+    "> <div>\n>\n> **b**\n>\n> </div>\n",
+  ],
+  [
+    "probe/html-markdown/item-inline-and-block",
+    "- <mark>*e*</mark> and <div>**b**</div>\n",
+  ],
+  ["probe/html-markdown/div-interrupts-paragraph", "a\n<div>\n**b**\n</div>\n"],
+  [
+    "probe/html-markdown/div-blank-line-ends-block",
+    "<div>\n**a**\n\n**b**\n</div>\n",
+  ],
+  ["probe/html-markdown/center-blank-lines", "<center>\n\n*c*\n\n</center>\n"],
+  [
+    "probe/html-markdown/markdown-attribute",
+    '<div markdown="1">\n**b**\n</div>\n',
+  ],
 
   [
     "frontmatter/basic",
