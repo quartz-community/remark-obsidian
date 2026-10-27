@@ -1,3 +1,28 @@
+## 2.0.2
+
+### Patch Changes
+
+- a2037e0: Render the formula of a `$$` block opened at the end of a line inside a quote or list item under
+  `strict`.
+
+  `1. Hello $$` / `   Math` / `   $$` held `Math` in the tree but rendered an empty
+  `<pre><code class="language-math math-display">`: HTML renders from the `data.hChildren` that
+  `mdast-util-math` builds at parse time, and the pass that filled in the formula left that hint
+  empty. Two more passes had the same omission -- `$$` / `Math$$` rendered `Math$$`, and a formula
+  holding a `:` or `.` next to a footnote label could render without it -- 86 documents of the
+  test corpora in all, none under `legacy`. A list item's indentation is also no longer kept in
+  the formula (`   Math` is now `Math`).
+
+- df14872: Read a tag's characters as Obsidian does, under both presets.
+
+  A tag now runs through anything but whitespace, ASCII punctuation other than `/`, `_` and `-`,
+  and the General and Supplemental Punctuation blocks (U+2000-U+206F, U+2E00-U+2E7F). So `§`,
+  currency signs, arrows, maths symbols and CJK and full-width punctuation continue a tag --
+  `#§section`, `#a€b` and `#a「b」` are each one tag -- while `’`, `…` and `—` end one. Tags
+  had been limited to letters, marks, emoji and digits, which missed 66 of 163 characters asked
+  of Obsidian. Tags that begin with an emoji outside the BMP (`#📚/status/finished`) tokenize, as
+  they already did since 2.0.0.
+
 ## 2.0.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@quartz-community/remark-obsidian",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Remark plugin that parses Markdown as Obsidian does: wikilinks, embeds, callouts, highlights, tags, comments, math and footnotes. Presets: legacy (Obsidian's own parser and positions) or strict (CommonMark and GFM).",
   "type": "module",
   "license": "MIT",
