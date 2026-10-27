@@ -545,6 +545,9 @@ in this file.
 ### `ask.mts` specifically
 
 - Needs **Obsidian running with a vault open**.
+- **Run it as `node --import tsx --conditions=development test/parity/ask.mts`, not through
+  `npx tsx`.** Under `npx` it reports `Obsidian is not answering (got "")` while the same
+  `obsidian eval` answers from a shell and from plain Node (2026-10-27, cause not isolated).
 - **Never `2>/dev/null`.** It writes two load-bearing warnings to stderr: that `footnoteRefs` is
   definition-gated, and that the oracle runs **1.15.0** while goldens pin **1.14.4** — so do not
   settle a rule against the goldens with it.
