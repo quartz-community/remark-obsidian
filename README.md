@@ -42,8 +42,40 @@ remark-parse 8 and never fixed. `strict` keeps the standards and Obsidian's docu
 syntax, and parses with micromark, as `remark-parse` does.
 
 Add the plugin **after** `remark-parse`: under `legacy` it replaces the processor's
-parser, and a `remark-parse` added later would put micromark back. The feature
-options (`wikilinks`, `comments`, `math`, `callouts`, …) work under both presets.
+parser, and a `remark-parse` added later would put micromark back. Under `legacy`, other
+plugins' micromark syntax extensions (`remark-directive`, `remark-frontmatter`, …) are
+therefore not consulted, though their transforms still run; use `strict` if you rely on one.
+
+### Options
+
+Every option is a boolean, works under both presets, and wins over the preset's value for it.
+
+| option              | default                               | what it does                                                                                                                                 |
+| ------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `preset`            | `"legacy"`                            | `"legacy"` or `"strict"`, as above                                                                                                           |
+| `wikilinks`         | on                                    | `[[target#heading\|alias]]` and `![[embed]]` as `wikilink` nodes                                                                             |
+| `highlights`        | on                                    | `==text==` as `highlight`                                                                                                                    |
+| `tags`              | on                                    | `#tag` as `tag`                                                                                                                              |
+| `math`              | on                                    | `$inline$` and `$$display$$`                                                                                                                 |
+| `comments`          | on                                    | `%%comment%%`                                                                                                                                |
+| `keepComments`      | on                                    | keep a comment as a `comment` node rather than deleting it; it renders as an empty `<obsidian-comment>`, which `rehype-obsidian` removes     |
+| `parseComments`     | on                                    | parse a kept comment's body into its `children`, so a reference inside one is a `footnoteReference`                                          |
+| `callouts`          | on                                    | `> [!type] Title` as a `callout` holding a `calloutTitle`                                                                                    |
+| `inlineFootnotes`   | on                                    | `^[note]` as a `footnote`                                                                                                                    |
+| `customTaskChars`   | on                                    | any one character in a task box is a checkbox (`- [-]`), kept as `data.taskChar`                                                             |
+| `frontmatter`       | on                                    | a leading `---` block as a `yaml` node                                                                                                       |
+| `bareFootnoteRefs`  | on under `legacy`, off under `strict` | Obsidian renders an undefined `[^x]` as `x`; the node stays a `footnoteReference`, and `rehype-obsidian` drops the delimiters when rendering |
+| `positionedBreaks`  | on under `legacy`, off under `strict` | a soft line ending becomes a positioned `break`, as `remark-breaks` would make it                                                            |
+| `lineOffsets`       | on                                    | `root.data.lineOffsets`: how many columns each line's containers consume                                                                     |
+| `escapedLineBreaks` | off                                   | write a `break` back as a trailing backslash rather than a newline, for a chain without `remark-breaks`                                      |
+
+### Upgrading from 1.x
+
+2.0 is a major release, and [the changelog](CHANGELOG.md) lists every change. In short: add the
+plugin after `remark-parse`, and expect the new node types (`callout`, `calloutTitle`,
+`footnote`, `yaml`, kept `comment`s) and the positioned `break`s that the options above turn on
+by default. Turn off any you do not want; `keepComments: false` restores 1.x's deleted
+comments. Nothing was removed from the API.
 
 ### Obsidian parity
 
