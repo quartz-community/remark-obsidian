@@ -29,18 +29,18 @@ import type { GoldenCase } from "./types.js";
  * display-math entries (`probe/math-indent/one-space-empty-body`, `probe/math-retry/five-*`,
  * `probe/math-space/space-body-trailing-period`, `token/display-math/{doubled-open,nested,
  * whitespace-body}`) -- `$$` inline math is now written with a `$$` fence, so it stays display.
+ * The writer fixes from the invariant fuzz took it to 3, closing
+ * `commonmark/emphasis-and-strong-emphasis/450`, `hunt/fix-lazy-setext-chain-not-idempotent/1`
+ * and `probe/straddle-fold/paragraph-merge`.
  */
 const UNSTABLE: readonly string[] = [
   "commonmark/emphasis-and-strong-emphasis/417",
-  "commonmark/emphasis-and-strong-emphasis/450",
   "emphasis/nest-underscore-outer",
   // NEW with remark-parse 8, and it settles on the second pass. `1. [![[[[a#h]]]]](u)` is a link
   // only because the raw `]]` after the wikilink `[[[a#h]]` balances the brackets remark-parse
   // 8's link scan counted inside it; the writer escapes that `]]` (correct for CommonMark), the
   // count no longer closes, and the second read is text -- which then holds.
   "fuzz/embed/13",
-  "hunt/fix-lazy-setext-chain-not-idempotent/1",
-  "probe/straddle-fold/paragraph-merge",
 ];
 
 const goldenPath = path.join(

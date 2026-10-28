@@ -1,6 +1,6 @@
 import type { FootnoteReference, Root, Text } from "mdast";
 import type { Node } from "unist";
-import { visit } from "unist-util-visit";
+import { SKIP, visit } from "unist-util-visit";
 import { characterEntitiesLegacy } from "character-entities-legacy";
 import { decodeNamedCharacterReference } from "decode-named-character-reference";
 import { decodeString } from "micromark-util-decode-string";
@@ -411,6 +411,7 @@ function balancedClose(source: string, open: number): number {
  */
 function bracketLabelReferences(tree: Root, source: string): void {
   visit(tree, (node: Node) => {
+    if (insideAutolink(node, source)) return SKIP;
     const parent = node as Partial<ParentNode>;
     const children = parent.children;
     if (!Array.isArray(children)) return;
@@ -566,15 +567,19 @@ function inClosedComment(source: string, offset: number | undefined): boolean {
   return false;
 }
 
-function insideAutolink(parent: unknown, source: string): boolean {
+export function insideAutolink(parent: unknown, source: string): boolean {
   const node = parent as
     | { type?: string; position?: { start?: { offset?: number } } }
     | null
     | undefined;
   if (node?.type !== "link") return false;
 
+  // `<…>` or a GFM literal (`https://…`, `www.…`): anything but `[text](url)`. A literal's
+  // address runs over `[^1]` as remark-parse 8 reads it too, and splitting a reference out of
+  // one left a link no writer could spell as an autolink -- written `[…](…)` it grew on every
+  // format (found by `fuzz/invariant-sweep.ts`).
   const at = node.position?.start?.offset;
-  return at !== undefined && source[at] === "<";
+  return at !== undefined && source[at] !== "[";
 }
 
 export function bareFootnoteRefTransform(

@@ -43,13 +43,19 @@ export function calloutToMarkdown(): Options {
         const fold =
           node.collapsed === true ? "-" : node.collapsed === false ? "+" : "";
         // Phrasing needs the surrounding `before`/`after` as well as the
-        // tracker's position, which `current()` alone does not carry.
-        const title = titleNode
-          ? state.containerPhrasing(titleNode, {
-              ...info,
-              ...tracker.current(),
-            })
-          : "";
+        // tracker's position, which `current()` alone does not carry. It also
+        // needs the `phrasing` construct entered, as the paragraph handler does:
+        // every escape the writer keys on it was skipped, so `*em\\*` and
+        // `\\[[b]]` in a title came back as emphasis and a wikilink.
+        let title = "";
+        if (titleNode) {
+          const exitPhrasing = state.enter("phrasing");
+          title = state.containerPhrasing(titleNode, {
+            ...info,
+            ...tracker.current(),
+          });
+          exitPhrasing();
+        }
         const head = `[!${node.calloutType}]${fold}${title ? ` ${title}` : ""}`;
 
         const rest =
@@ -74,7 +80,10 @@ export function calloutToMarkdown(): Options {
         state: State,
         info: Info,
       ) {
-        return state.containerPhrasing(node, info);
+        const exit = state.enter("phrasing");
+        const value = state.containerPhrasing(node, info);
+        exit();
+        return value;
       },
     },
   };

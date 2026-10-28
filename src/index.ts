@@ -66,6 +66,7 @@ import { restoreInlinePositionsTransform } from "./lib/restore-inline-positions.
 import { autolinkLiteralToMarkdown } from "./lib/mdast/autolink-literal-to-markdown.js";
 import { htmlTailToMarkdown } from "./lib/mdast/html-tail-to-markdown.js";
 import { linkReferenceToMarkdown } from "./lib/mdast/link-reference-to-markdown.js";
+import { legacyEmphasisToMarkdown } from "./lib/mdast/legacy-emphasis-to-markdown.js";
 import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
 import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
 import { frontmatterExactOpenerTransform } from "./lib/frontmatter-exact-opener.js";
@@ -77,6 +78,7 @@ import {
   definitionLazyTransform,
 } from "./lib/definition-continuation.js";
 import { taskCharToMarkdown } from "./lib/mdast/task-char-to-markdown.js";
+import { textToMarkdown } from "./lib/mdast/text-to-markdown.js";
 
 import { math as mathSyntax } from "micromark-extension-math";
 import { mathTextSyntax } from "./lib/syntax/math-text.js";
@@ -282,7 +284,25 @@ function displayAwareMathToMarkdown(): ToMarkdownOptions {
     const isDisplay =
       (node as { data?: { display?: boolean } }).data?.display === true;
     const fence = isDisplay ? "$$" : "$";
+    // Empty, a formula is only ever read from `$$$$`: `$$` alone is text under both presets.
+    if (node.value === "") return "$$$$";
+    // A single `$` before or after whitespace neither opens nor closes, so a formula padded with
+    // whitespace -- read from `$$⇥x$$` -- needs the double fence back. Not one holding a line
+    // ending, which `$` delimits (below): `$$` and a line ending open a display block.
+    if (
+      fence === "$" &&
+      /^\s|\s$/u.test(node.value) &&
+      !/[$\r\n]/u.test(node.value)
+    ) {
+      return `$$${node.value}$$`;
+    }
     if (escapedFenceOnly(node.value, fence)) return fence + node.value + fence;
+    // A line ending inside the formula is written as one, not as the space the upstream writer
+    // turns it into: a formula opening on a line ending (`$` / `x$`) came back padded, `$ x$`,
+    // which remark-parse 8 reads as no math at all (found by `fuzz/invariant-sweep.ts`).
+    if (/[\r\n]/u.test(node.value) && !node.value.includes("$")) {
+      return fence + node.value + fence;
+    }
     return (isDisplay ? display : inline)(node, parent, state, info);
   }) as typeof inline;
   (inlineMath as { peek?: unknown }).peek = (inline as { peek?: unknown }).peek;
@@ -291,7 +311,8 @@ function displayAwareMathToMarkdown(): ToMarkdownOptions {
 
 /**
  * Whether a formula's own `fence` can delimit it again: every run of `$` in it as long as the
- * fence is escaped, and nothing at its edges could join the fence.
+ * fence is escaped (or, for `$`, follows whitespace), and nothing at its edges could join the
+ * fence.
  *
  * `mdast-util-math` lengthens the fence past the longest `$` run in the value, escaped or not.
  * But `$$a\$$b$$` parsed as one formula BECAUSE its `\$$` is escaped, and neither preset reads
@@ -310,7 +331,10 @@ function escapedFenceOnly(value: string, fence: string): boolean {
     at !== -1;
     at = value.indexOf(fence, at + 1)
   ) {
-    if (value[at - 1] !== "\\") return false;
+    if (value[at - 1] === "\\") continue;
+    // A single `$` after whitespace cannot close the formula either: `$a\$ $b$` is one.
+    if (fence === "$" && /\s/u.test(value[at - 1] ?? "")) continue;
+    return false;
   }
   return true;
 }
@@ -351,6 +375,7 @@ export default function remarkObsidian(
   data.toMarkdownExtensions.push(linkReferenceToMarkdown());
   data.toMarkdownExtensions.push(autolinkLiteralToMarkdown());
   data.toMarkdownExtensions.push(htmlTailToMarkdown());
+  data.toMarkdownExtensions.push(textToMarkdown(opts.tags));
   // Obsidian (remark-parse 8) reads `<<https://x>` as one autolink whose address starts with
   // `<`; CommonMark reads a `<` and then the autolink. Escaping a `<` written right before
   // another keeps both readings, so formatting reaches a fixed point under either.
@@ -420,6 +445,7 @@ export default function remarkObsidian(
   // `legacy` parses with remark-parse 8, the parser Obsidian forks, rather than correcting
   // micromark towards it. Only the micromark extensions' `toMarkdown` halves above matter then.
   if (preset === "legacy") {
+    data.toMarkdownExtensions.push(legacyEmphasisToMarkdown());
     self.parser = (document: string) => parseLegacy8(document, opts);
     return undefined;
   }

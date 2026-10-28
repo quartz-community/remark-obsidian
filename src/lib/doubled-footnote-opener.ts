@@ -1,6 +1,7 @@
 import type { Root, RootContent, Text } from "mdast";
 import type { Node } from "unist";
-import { visit } from "unist-util-visit";
+import { SKIP, visit } from "unist-util-visit";
+import { insideAutolink } from "./footnote-bare.js";
 import { decodeString } from "micromark-util-decode-string";
 
 interface ParentNode extends Node {
@@ -46,6 +47,8 @@ export function doubledFootnoteOpenerTransform(
   });
 
   visit(tree, (node: Node) => {
+    // An autolink's address holds no reference, as in `bareFootnoteRefTransform`.
+    if (insideAutolink(node, source)) return SKIP;
     const parent = node as Partial<ParentNode>;
     if (!Array.isArray(parent.children)) return;
     const kids: RootContent[] = parent.children;

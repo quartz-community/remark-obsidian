@@ -388,12 +388,90 @@ export function calloutTransform(
       );
       const bodyBlock = reparse(bodyMap.text).children[0];
       if (titleBlock?.type !== "paragraph" || bodyBlock?.type !== "paragraph") {
-        return undefined;
+        let reread: Node[] | undefined;
+        if (bodyBlock?.type === "paragraph") {
+          for (const child of bodyBlock.children) shiftByMap(child, bodyMap, 0);
+          reread = bodyBlock.children as Node[];
+        }
+        return splitAtLineEnd(breakAtSource, bodyFrom, reread);
       }
 
       for (const child of titleBlock.children) shiftOnto(child, from, 1);
       for (const child of bodyBlock.children) shiftByMap(child, bodyMap, 0);
       return { title: titleBlock.children, body: bodyBlock.children };
+    }
+
+    /**
+     * The paragraph's own children, cut where the title line ends.
+     *
+     * For when a half read alone is no paragraph: lazy lines `<x` / `===` under
+     * the title parse alone as a setext heading, though as lazy lines they
+     * cannot be one, and the whole paragraph stayed the title (found by
+     * `fuzz/invariant-sweep.ts`). The children were read as one paragraph,
+     * which is how those lines read in place. A text node across the line end
+     * is cut at its first newline. Any other node across it -- a formula
+     * opened by a `$$` in the title, `> [!note] $$a` / `b$$` -- is the title's
+     * text up to the line end, as the title's `$$` is in Obsidian, and the body
+     * is `reread`, the body read alone, when that is a paragraph.
+     */
+    function splitAtLineEnd(
+      lineEnd: number,
+      bodyFrom: number,
+      reread: Node[] | undefined,
+    ): { title: Node[]; body: Node[] } | undefined {
+      const title: Node[] = [];
+      const body: Node[] = [];
+      for (const child of paragraph.children as Node[]) {
+        const span = (child as Positioned).position;
+        if (span?.start.offset === undefined || span.end.offset === undefined) {
+          return undefined;
+        }
+        if (span.end.offset <= lineEnd) title.push(child);
+        else if (span.start.offset > lineEnd) body.push(child);
+        else if (child.type === "text") {
+          const value = (child as Text).value;
+          const cut = value.indexOf("\n");
+          if (cut === -1) return undefined;
+          if (cut > 0) {
+            title.push({
+              type: "text",
+              value: value.slice(0, cut),
+              position: {
+                start: { ...span.start },
+                end: {
+                  line: span.start.line,
+                  column: span.start.column + cut,
+                  offset: span.start.offset + cut,
+                },
+              },
+            } as Text);
+          }
+          const rest = { ...(child as Text), value: value.slice(cut + 1) };
+          rest.position = { start: { ...span.start }, end: { ...span.end } };
+          moveStartTo(rest, source, bodyFrom, span.start.line + 1);
+          if (rest.value !== "") body.push(rest);
+        } else if (reread) {
+          title.push({
+            type: "text",
+            value: source.slice(span.start.offset, lineEnd),
+            position: {
+              start: { ...span.start },
+              end: {
+                line: span.start.line,
+                column: span.start.column + lineEnd - span.start.offset,
+                offset: lineEnd,
+              },
+            },
+          } as Text);
+          return {
+            title: title.filter(
+              (node) => node.type !== "text" || (node as Text).value !== "",
+            ),
+            body: reread,
+          };
+        } else return undefined;
+      }
+      return body.length > 0 ? { title, body } : undefined;
     }
 
     let titleNodes: Node[];

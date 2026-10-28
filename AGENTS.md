@@ -657,6 +657,35 @@ ending); tag characters; task boxes as one UTF-16 unit; NFC on link targets; U+2
 wikilink; footnote labels lowercased rather than case-folded (strict). Plus harness defects in
 `computeOurs` (task character, link display under NFC) and UPSTREAM.md item 9.
 
+**Formatting's words, closed after 2.0.2** (31 of 600 per-push seeds to 1; 64 to 2 of seeds
+600-2,000, no new kind). Each cause, with its fix:
+
+- **Callout titles:** the handler called `containerPhrasing` without entering `phrasing`, so every
+  `inConstruct: "phrasing"` escape was skipped there.
+- **Escapes the writer drops or adds** (`text-to-markdown.ts`, registered for every option set):
+  - `mdast-util-to-markdown` drops an escape conditioned on a character it escapes itself, so `#`
+    after an escape or a character reference is checked in the written text, scanned left to
+    right so `\\` is one unit.
+  - Its attention encoder (2.2) turns an edge space into `&#x20;` without looking at a backslash
+    before it.
+  - remark-parse 8 itself (published, too) reads `&#x20;&,` as two spaces.
+- **Obsidian scans raw characters** where CommonMark honours escapes:
+  - a highlight's closer, so a `=` touching it is `&#x3D;`;
+  - an inline footnote's bracket balance, rebalanced after writing.
+- **remark-parse 8 cannot close `*\*em\**`**, so `legacy` writes an emphasis ending in `*` with
+  `_`, through the writer's own `attention` hook (marker order only), which keeps its pairing
+  check.
+- **`strict` parse defects the format exposed:**
+  - a callout title whose body re-read alone is no paragraph kept the whole paragraph;
+  - `bareFootnoteRefs` split a reference out of a literal URL, which no writer can spell as an
+    autolink.
+- **The instrument:** `wordsOf` read a `break` as nothing, so `s` + break + `[l` was one word, and
+  read a comment's words twice (value and children) with no boundary.
+
+Unchanged by identity: referee 6,830, spec divergences 8, strict recorded cases 2,965, strict
+referee definitions 5,333 and references 1,520. `roundtrip.test.ts`'s unsettled set went from 6
+to 3.
+
 **Traps:** `fmt`-style probes that look a configuration up by name silently run `legacy` for a
 JSON one; a "words" metric must not count node boundaries, and cannot see a loss the PARSE made
 (the inline-footnote line ending needed its own assertion); the Write tool turned `\u` escapes
@@ -762,10 +791,13 @@ unit test "reads a tag's characters as Obsidian does", which fails on the old cl
 5. **`normalize.ts`** carries compensations for micromark's offsets. Only rp8 trees reach it now
    (every gate runs the `legacy` profiles), and two compensations already had to be generalised
    because they broke rp8 positions that were right. Simplifying it is safe but unmeasured.
-6. **Formatting still changes words** in 87 of 600 per-push seeds (listed exactly in
-   `fuzz-invariants.test.ts`): an escape or character reference the writer adds starting or
-   ending a tag (`](#tag` -> `]\(#tag`, `&#x20;#tag`), CommonMark emphasis spellings remark-parse 8
-   reads otherwise (`*\*em\**`), setext underlines; and `$a\$ $b$` is written as display math.
+6. **Formatting still changes words** in 1 of 600 per-push seeds (373, `strict`), down from 31
+   (87 seed-and-configuration pairs):
+   `> [!note] $$y^2` / `y^2$$ ` / `===`, a title formula across its line end over a lazy setext
+   underline, which `legacy` reads as a heading outside the callout. Beyond the gate range, in
+   seeds 600-2,000: two `strict` bracket shapes, a label holding `[` (`[^_[^1]_]`) and a
+   wikilink inside an undefined `[^` that forms or not depending on what precedes it
+   (`[^[[a|b]]]`).
 7. **The fuzz triage's open three** (above): the line ending after paragraph `$$…$$`,
    footnote bodies in the projection (order, and which render), and a block id ending an
    emphasis span or a table cell.

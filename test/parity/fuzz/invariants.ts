@@ -201,14 +201,22 @@ export async function invariantViolations(
 }
 
 /**
- * The tree's literal text as words: every node `value` in order, joined with nothing so node
- * boundaries do not count, then split on whitespace -- which still tells `a b` from `ab`.
+ * The tree's literal text as words: every node `value` in order (a `break` as a line ending),
+ * joined with nothing so node boundaries do not count, then split on whitespace -- which still
+ * tells `a b` from `ab`.
  */
 function wordsOf(tree: Node): string[] {
   const parts: string[] = [];
   visit(tree, (node: Node) => {
     const value = (node as { value?: unknown }).value;
+    // A comment holding parsed children carries its words twice, in `value` and in them, with
+    // no boundary between: `note` + `note` read as one word, `note\n` + `note` as two.
+    const parsed = ((node as { children?: unknown[] }).children ?? []).length;
+    if (node.type === "comment" && parsed > 0) return;
     if (typeof value === "string" && node.type !== "yaml") parts.push(value);
+    // A line break is whitespace: without this `s`, a break and `[l` read as one word, so a
+    // break written back as a line ending (`&#xA;` at an emphasis edge) changed "the words".
+    else if (node.type === "break") parts.push("\n");
   });
   return parts.join("").split(/\s+/u).filter(Boolean);
 }
