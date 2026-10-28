@@ -26,6 +26,8 @@ const isComment = (node: unknown): node is CommentNode =>
 const ENDS_CONTAINER =
   /^ {0,3}(?:#{1,6}(?:[ \t]|$)|```|~~~|[-*+][ \t]|\d{1,9}[.)][ \t])/u;
 
+const SETEXT_UNDERLINE = /^ {0,3}(?:=+|-+)[ \t]*$/u;
+
 /**
  * An unclosed `%%` opened inside a quote at depth TWO OR MORE swallows the lines below it.
  *
@@ -171,6 +173,12 @@ function containerBound(source: string, from: number): number {
     const line = source.slice(at, end);
     if (line.trim() === "" || ENDS_CONTAINER.test(line)) return at - 1;
     if (nl === -1) return source.length;
+    // A lazy line over a setext underline is a heading at root, which ends the quote above:
+    // `> > %%note` / `note%%` / `---` is a comment and a heading `note%%`, as `legacy` reads it
+    // and Obsidian renders it (found by `fuzz/invariant-sweep.ts`).
+    const belowEnd = source.indexOf("\n", nl + 1);
+    const below = source.slice(nl + 1, belowEnd === -1 ? undefined : belowEnd);
+    if (!/^[ \t]*>/u.test(line) && SETEXT_UNDERLINE.test(below)) return at - 1;
     at = nl + 1;
   }
   return trimmed(source, from);

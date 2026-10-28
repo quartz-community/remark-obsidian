@@ -26,8 +26,15 @@ import type { Break, Parents } from "mdast";
 export function breakToMarkdown(escaped = false): Options {
   return {
     handlers: {
-      break(_node: Break, _parent: Parents | undefined, _state: State): string {
-        return escaped ? "\\\n" : "\n";
+      break(node: Break, parent: Parents | undefined, _state: State): string {
+        // Except where a break opens emphasis or strong: the writer encodes an edge line
+        // ending as `&#xA;`, after which a tag cannot start, so `**` / `#a/b …**` lost its tag
+        // (found by `fuzz/invariant-sweep.ts`). A backslash is no whitespace and is left alone,
+        // and remark-parse 8 reads `**\` / `#a/b**` as the same strong.
+        const opens =
+          (parent?.type === "emphasis" || parent?.type === "strong") &&
+          parent.children[0] === node;
+        return escaped || opens ? "\\\n" : "\n";
       },
     },
   };

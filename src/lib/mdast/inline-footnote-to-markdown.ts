@@ -41,7 +41,7 @@ export function inlineFootnoteToMarkdown(): Options {
  * are left open the last escaped `]` are written bare. Not inside a code span, whose brackets
  * the reader does not count, so content holding one is left as it is.
  */
-function balanceBrackets(content: string): string {
+export function balanceBrackets(content: string): string {
   if (content.includes("`")) return content;
   const units = content.match(/\\[\s\S]|[\s\S]/gu) ?? [];
   let open = 0;

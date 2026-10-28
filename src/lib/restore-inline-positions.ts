@@ -16,6 +16,47 @@ function written(node: RootContent): string | undefined {
 }
 
 /**
+ * Where `text` is written in `source`, from `cursor` on, as `[start, end)`.
+ *
+ * A text spanning lines has lost each continuation line's indentation and quote prefix, which
+ * the source still holds, so a line ending matches those too, and an escape's backslash is
+ * optional before any ASCII punctuation. Without that, `x` / `····[^https://e.test/p]`
+ * stayed unplaced and its reference was never rejoined, though the same label on one line was
+ * (found by `fuzz/invariant-sweep.ts`).
+ */
+function locate(
+  source: string,
+  text: string,
+  cursor: number,
+  tolerant: boolean,
+): [number, number] | undefined {
+  const at = source.indexOf(text, cursor);
+  if (at !== -1) return [at, at + text.length];
+  // Not an autolink literal's text: it is decoded (`<foo\+@bar.example.com>`), and placing it
+  // moved a spec example away from stock, which leaves it unplaced.
+  if (!tolerant) return undefined;
+  // ASCII punctuation may have been escaped in the source: `!\[\[i` holds the text `![[i`.
+  const pattern = new RegExp(
+    text
+      .split("\n")
+      .map((line) =>
+        [...line]
+          .map((character) =>
+            /[!-/:-@[-`{-~]/u.test(character)
+              ? `\\\\?${character.replace(/[.*+?^${}()|[\]\\]/u, "\\$&")}`
+              : character,
+          )
+          .join(""),
+      )
+      .join("\\n[ \\t]*(?:>[ \\t]?)*"),
+    "gu",
+  );
+  pattern.lastIndex = cursor;
+  const match = pattern.exec(source);
+  return match ? [match.index, match.index + match[0].length] : undefined;
+}
+
+/**
  * Give a position back to the nodes `mdast-util-find-and-replace` splices without one.
  *
  * `mdast-util-gfm-autolink-literal` builds a `https://` link through
@@ -65,10 +106,10 @@ export function restoreInlinePositionsTransform(
       }
       const text = written(child);
       if (text === undefined || text === "") return;
-      const at = source.indexOf(text, cursor);
-      if (at === -1 || at + text.length > to) return;
-      spans.push([at, at + text.length]);
-      cursor = at + text.length;
+      const found = locate(source, text, cursor, child.type === "text");
+      if (found === undefined || found[1] > to) return;
+      spans.push(found);
+      cursor = found[1];
     }
 
     parent.children.forEach((child, index) => {

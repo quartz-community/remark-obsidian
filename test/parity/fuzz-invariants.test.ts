@@ -132,6 +132,43 @@ describe("invariant fuzz", () => {
       "strict",
     ],
     ["& after a reference", "  *_\n  $x^2$, &amp;, \n", "all-off"],
+    [
+      "escaped text after a reference in a table",
+      "| a | b |\n| --- | --- |\n| > > ==mark== **strong**]($x^2$]($$y^2$$ > > [^https://e.test/p]\t![[i.png|100x200]] _under\\_~~del~~ | c |\n",
+      "quartz-strict",
+    ],
+    [
+      "reference in a literal URL on a lazy line",
+      "![[i\n    [^https://e.test/p]\n",
+      "quartz-strict",
+    ],
+    [
+      "wikilink brackets in link text",
+      "> > [[[[target]]](link](u)\n",
+      "legacy",
+    ],
+    ["emphasis against strong", "> _under_**strong****~~del~~\n", "legacy"],
+    [
+      "strong ending in a break and a tag",
+      "[^1]: > $~~del~~$]([link\\](u)](strong**\n    > #a/b. $$**strong**$$\n",
+      "legacy",
+    ],
+    ["emphasis around strong around emphasis", "_***strong***_\n", "legacy"],
+    ["formula line read as an underline", "> $x\n====\n> $[l\n", "strict"],
+    [
+      "formula with an escaped dollar over an underline",
+      "> $x^2\\$\n====\n> $[l\n",
+      "strict",
+    ],
+    ["footnote label holding * in emphasis", "  _[^*em*]_\n", "legacy"],
+    ["strong ending in a tag", "1. __under_**#a/b**\n", "strict"],
+    ["embed brackets in link text", "blk]]\t[![[[^1]]]](u)\n", "legacy"],
+    ["comment over a lazy setext pair", "> > %%note\nnote%% \n---\n", "strict"],
+    [
+      "text %% after a comment",
+      "> > [[a#\n word, %%note%%%%\n3]]%%\n",
+      "strict",
+    ],
   ])("still holds: %s (%j under %s)", async (_name, markdown, config) => {
     expect(await invariantViolations(markdown, CONFIGS[config]!)).toEqual([]);
   });
@@ -167,6 +204,57 @@ describe("invariant fuzz", () => {
       notes++;
     });
     expect(notes).toBe(1);
+  });
+
+  // A comment's body is read with its container's prefixes stripped, every level of them. One
+  // level was stripped, so two quotes deep the body held a quote of its own; the words are the
+  // same either way, so the property is asked of the tree.
+  it.each([
+    ["> > %%a\n> > b%%\n", "a\nb"],
+    ["> > x\n y %%a\n> > b%%\n", "a\nb"],
+  ])(
+    "reads a comment two quotes deep without a quote inside (%j)",
+    (markdown, body) => {
+      const processor = unified()
+        .use(remarkParse)
+        .use(remarkGfm)
+        .use(remarkObsidian, { preset: "strict" });
+      const tree = processor.runSync(processor.parse(markdown), markdown);
+      const comments: Node[] = [];
+      visit(tree, "comment", (node: Node) => {
+        comments.push(node);
+      });
+      const inner: string[] = [];
+      visit(comments[0]!, (node: Node) => {
+        if (node.type === "blockquote") inner.push("blockquote");
+        if (node.type === "text")
+          inner.push((node as unknown as { value: string }).value);
+      });
+      expect(inner.join("")).toBe(body);
+    },
+  );
+
+  // Recorded live (1.15.0): Obsidian indexes a defined `[^2]` written inside a comment, on a
+  // label line under text too. The body is parsed after the reference passes, so strict left it
+  // as text until the comment's references were resolved on their own.
+  it("resolves a defined reference inside a comment, under strict", () => {
+    const processor = unified()
+      .use(remarkParse)
+      .use(remarkGfm)
+      .use(remarkObsidian, { preset: "strict" });
+    for (const markdown of [
+      "%%\nabc\n[^2]: x\n%%\n\n[^2]: def\n",
+      "> > %%\n> > Morewordsend.\n> > [^2]: body text\n\n[^2]: def\n",
+    ]) {
+      const tree = processor.runSync(processor.parse(markdown), markdown);
+      let inside = 0;
+      visit(tree, "comment", (comment: Node) => {
+        visit(comment, "footnoteReference", () => {
+          inside++;
+        });
+      });
+      expect(inside, markdown).toBe(1);
+    }
   });
 
   it("keeps the line ending inside an inline footnote", () => {

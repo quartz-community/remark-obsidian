@@ -1,4 +1,6 @@
 const QUOTE_PREFIX = /^[ \t]*>[ \t]?/u;
+/** A line's leading run of quote markers. */
+const LEADING_QUOTES = /^(?:[ \t]*>[ \t]?)*/u;
 
 export interface LineMap {
   /** The block's content with any container prefix removed, ready to re-parse. */
@@ -27,17 +29,35 @@ export function mapLines(
   start: number,
   end: number,
   startLine: number,
+  /** How many quote levels prefix each line, when the caller knows; else read off line one. */
+  quoteDepth?: number,
 ): LineMap {
   const raw = source.slice(start, end).split("\n");
   const text: string[] = [];
   const starts: number[] = [];
   const lines: number[] = [];
   let offset = start;
+  // As many quote levels as the first line's own prefix holds, and at least one, as this
+  // stripped before. One alone left a `>` on every line of a block two quotes deep, so
+  // `> > %%a` / `> > b%%` read its body as `a` and a quote holding `b` (found by
+  // `fuzz/invariant-sweep.ts`).
+  const lineStart = source.lastIndexOf("\n", start - 1) + 1;
+  const ownPrefix =
+    LEADING_QUOTES.exec(source.slice(lineStart, start))?.[0] ?? "";
+  const depth =
+    quoteDepth ?? Math.max(1, (ownPrefix.match(/>/gu) ?? []).length);
 
   for (let index = 0; index < raw.length; index++) {
     const line = raw[index]!;
     // The first line starts where the node does, already past any marker.
-    const prefix = index === 0 ? "" : (QUOTE_PREFIX.exec(line)?.[0] ?? "");
+    let prefix = "";
+    if (index > 0) {
+      for (let level = 0; level < depth; level++) {
+        const next = QUOTE_PREFIX.exec(line.slice(prefix.length))?.[0];
+        if (!next) break;
+        prefix += next;
+      }
+    }
     starts.push(offset + prefix.length);
     lines.push(startLine + index);
     text.push(line.slice(prefix.length));

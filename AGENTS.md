@@ -547,7 +547,7 @@ has no coverage there, not that it agrees. Footnotes are in **neither** spec: GF
 ## Gates — what "done" means
 
 ```bash
-npm test          # 551 tests / 27 files. Contains the contract gate.
+npm test          # 567 tests / 27 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -711,6 +711,41 @@ Unchanged by identity: referee 6,830, spec divergences 8, strict recorded cases 
 referee definitions 5,333 and references 1,520. `roundtrip.test.ts`'s unsettled set went from 6
 to 3.
 
+**Seeds 2,000-5,000 closed after that** (15 failing seeds, 14 shapes; 0-5,000 now clean):
+
+- **`mapLines` stripped one quote level** from every continuation line, at any depth. A comment
+  two quotes deep read a quote into its body.
+  - It now strips the first line's own depth, or the caller's. `comment-parse` passes the
+    count of ancestor quotes, since a comment opened on a LAZY line has no prefix to count.
+  - The words were the same either way, so the gate asks the tree directly.
+- **`quoteCommentLazy`** swallowed a lazy line over a setext underline. Obsidian (and legacy)
+  read that pair as a heading at root.
+- **Defined references inside comment bodies (strict)** were text: the body is parsed after
+  the reference passes. Recorded live, Obsidian indexes `%%` / `abc` / `[^2]: x` / `%%` once `2` is
+  defined. Each comment is now run through `bareFootnoteRefTransform`, against definitions
+  outside comments. Strict referee references 1,520 -> 1,523 (+7 / -4):
+  - three losses (`reproducers.json#603`, `#604`, `#613`) define no `2`, so it is text under
+    strict by design, and agreed only through the phantom quote above;
+  - one (`fuzz-20261003.json#1391`) is CommonMark laziness that legacy reads as indented code.
+- **`attentionToMarkdown`** (replaces `legacyEmphasisToMarkdown`) orders emphasis and strong
+  markers. A tag at the end takes `*` only, since a tag eats `_`. Under legacy:
+  - a strong whose only child is emphasis is pinned to `***x***`;
+  - attention straight before more attention, emphasis ending in `*`, and a footnote label
+    holding `*` take `_` first.
+- **Legacy link text** is written with its raw brackets balanced (`balanceBrackets`, shared with
+  inline footnotes). That also settled round-trip case `fuzz/embed/13`.
+- **A break opening emphasis or strong** is written `\` + newline. The edge `&#xA;` the
+  writer used otherwise blocks a following tag.
+- **A formula line that is a setext underline or thematic break** is joined to the line above.
+  The first regex for this was polynomial; the lint caught it.
+- **`restoreInlinePositions`** matches a text across continuation prefixes and escapes. Escapes
+  only for `text` nodes: allowing them in an autolink literal's decoded text placed
+  `<foo\+@bar.example.com>`, which stock leaves unplaced (spec `autolinks/606`).
+- **`guardAmpersands`** generalises the `&` rule (any reference, or a line's leading
+  whitespace, arms it). A `%%` straight after a comment is escaped: the writer drops that escape
+  itself, the comment's closer matching the same pattern.
+- **`wordsOf` separates blocks**, so a fence's text and the next paragraph's are not one word.
+
 **Traps:** `fmt`-style probes that look a configuration up by name silently run `legacy` for a
 JSON one; a "words" metric must not count node boundaries, and cannot see a loss the PARSE made
 (the inline-footnote line ending needed its own assertion); the Write tool turned `\u` escapes
@@ -816,14 +851,8 @@ unit test "reads a tag's characters as Obsidian does", which fails on the old cl
 5. **`normalize.ts`** carries compensations for micromark's offsets. Only rp8 trees reach it now
    (every gate runs the `legacy` profiles), and two compensations already had to be generalised
    because they broke rp8 positions that were right. Simplifying it is safe but unmeasured.
-6. **Formatting still changes words beyond the per-push range.** Seeds 0-2,000 are clean under
-   every configuration. Seeds 2,000-5,000 hold 15 failing seeds, 14 distinct shapes, untriaged. They include:
-   - `_***strong***_` and `> _under_**strong****~~del~~`: nested emphasis spellings (legacy);
-   - `> > %%note` / `note%% `: a comment closed on a lazy line (strict);
-   - `1. __under_**#a/b**`;
-   - ` ``` ` / `<htt` / ` ``` ` / ` #a/`: a tag after a fence;
-   - `![[i` / `    [^https://e.test/p]` (quartz-strict);
-   - and bracket-heavy link, embed and footnote mixes.
+6. **The invariant fuzz holds over seeds 0-5,000** under every configuration (see "Fuzzing").
+   Beyond that, untested; the nightly sweep draws 5,000 fresh seeds.
 7. **The fuzz triage's leftovers:** self-embeds (out of scope), and `[^1]: - [ ] [` /
    `^[[^1]]]`, where Obsidian's renderer and its cache disagree.
 8. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,

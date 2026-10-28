@@ -1,4 +1,5 @@
 import { defaultHandlers } from "mdast-util-to-markdown";
+import { balanceBrackets } from "./inline-footnote-to-markdown.js";
 import type { Handle, Options, State } from "mdast-util-to-markdown";
 import type { Link, Parents } from "mdast";
 
@@ -128,7 +129,9 @@ function soleText(node: Link): string | undefined {
  * is checked against `atext` and the domain against its label rules; anything else
  * delegates to the default handler untouched.
  */
-export function autolinkLiteralToMarkdown(): Options {
+export function autolinkLiteralToMarkdown(
+  options: { readonly legacy?: boolean } = {},
+): Options {
   return {
     handlers: {
       link(node: Link, parent: Parents | undefined, state: State, info) {
@@ -146,8 +149,37 @@ export function autolinkLiteralToMarkdown(): Options {
         ) {
           return text;
         }
-        return (defaultHandlers.link as Handle)(node, parent, state, info);
+        const written = (defaultHandlers.link as Handle)(
+          node,
+          parent,
+          state,
+          info,
+        );
+        return options.legacy ? balanceLabel(node, state, written) : written;
       },
     },
   };
+}
+
+/**
+ * `legacy` only: the link text with its raw brackets balanced, as remark-parse 8 finds the text's
+ * end. It counts raw brackets and steps over escaped ones, and the writer escapes brackets in text
+ * but not the ones a wikilink writes, so `[[[[target]]](link](u)` came back as
+ * `[[[[target]]\](link](u)`, whose text never closes (found by `fuzz/invariant-sweep.ts`). The text
+ * is written again on its own, as the default handler writes it, to find it in the output.
+ */
+function balanceLabel(node: Link, state: State, written: string): string {
+  if (!written.startsWith("[")) return written;
+  const exitLink = state.enter("link");
+  const exitLabel = state.enter("label");
+  const label = state.containerPhrasing(node, {
+    before: "[",
+    after: "]",
+    now: { line: 1, column: 1 },
+    lineShift: 0,
+  });
+  exitLabel();
+  exitLink();
+  if (!written.startsWith(`[${label}]`)) return written;
+  return `[${balanceBrackets(label)}${written.slice(label.length + 1)}`;
 }

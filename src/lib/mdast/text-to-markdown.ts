@@ -34,6 +34,13 @@ export function textToMarkdown(tags: boolean): Options {
         // the escape moves to the `^` instead, or the pair becomes an inline footnote.
         const siblings = parent?.children ?? [];
         const next = siblings[siblings.indexOf(node as never) + 1];
+        // A `%%` straight after a comment: the writer's own `%` rule drops its escape there, the
+        // comment's closing `%` being the same pattern, so `%%note%%` then the text `%%` / `x%%`
+        // came back as a second comment (found by `fuzz/invariant-sweep.ts`).
+        const previous = siblings[siblings.indexOf(node as never) - 1];
+        if (previous?.type === "comment" && written.startsWith("%%")) {
+          written = `\\${written}`;
+        }
         // A `^` before a footnote reference would open an inline footnote over it: `^[^blk]`.
         if (
           next?.type === "footnoteReference" &&

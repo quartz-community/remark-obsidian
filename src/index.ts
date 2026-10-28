@@ -5,7 +5,7 @@ import type { Options as ToMarkdownOptions } from "mdast-util-to-markdown";
 import { parseLegacy8 } from "./rp8/adapt.js";
 import type { Root } from "mdast";
 import type { Processor } from "unified";
-import { visit } from "unist-util-visit";
+import { SKIP, visit } from "unist-util-visit";
 import { commentHoistTransform } from "./lib/comment-hoist.js";
 import { commentDefinitionExtentTransform } from "./lib/comment-definition-extent.js";
 import { commentInDefinitionTransform } from "./lib/comment-in-definition.js";
@@ -63,10 +63,10 @@ import {
 import { mathMidlineTransform } from "./lib/math-midline.js";
 import { calloutTitleInterruptTransform } from "./lib/callout-title-interrupt.js";
 import { restoreInlinePositionsTransform } from "./lib/restore-inline-positions.js";
+import { attentionToMarkdown } from "./lib/mdast/attention-to-markdown.js";
 import { autolinkLiteralToMarkdown } from "./lib/mdast/autolink-literal-to-markdown.js";
 import { htmlTailToMarkdown } from "./lib/mdast/html-tail-to-markdown.js";
 import { linkReferenceToMarkdown } from "./lib/mdast/link-reference-to-markdown.js";
-import { legacyEmphasisToMarkdown } from "./lib/mdast/legacy-emphasis-to-markdown.js";
 import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
 import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
 import { frontmatterExactOpenerTransform } from "./lib/frontmatter-exact-opener.js";
@@ -296,12 +296,20 @@ function displayAwareMathToMarkdown(): ToMarkdownOptions {
     ) {
       return `$$${node.value}$$`;
     }
-    if (escapedFenceOnly(node.value, fence)) return fence + node.value + fence;
+    // A line inside the formula that would read as a setext underline or a thematic break once
+    // written under a quote's prefix: the lazy `====` in `> $x` / `====` / `> $[l` became one
+    // (found by `fuzz/invariant-sweep.ts`). That line is joined to the one above with a space,
+    // as the upstream writer writes every line ending; the rest keep theirs.
+    const value = node.value.replace(
+      /(?:\r\n?|\n)(?=[ \t]{0,3}(?:=+[ \t]*|-+[ \t]*|[*_-](?:[ \t]*[*_-]){2,}[ \t]*)(?:[\r\n]|$))/gu,
+      " ",
+    );
+    if (escapedFenceOnly(value, fence)) return fence + value + fence;
     // A line ending inside the formula is written as one, not as the space the upstream writer
     // turns it into: a formula opening on a line ending (`$` / `x$`) came back padded, `$ x$`,
     // which remark-parse 8 reads as no math at all (found by `fuzz/invariant-sweep.ts`).
-    if (/[\r\n]/u.test(node.value) && !node.value.includes("$")) {
-      return fence + node.value + fence;
+    if (/[\r\n]/u.test(value) && !value.includes("$")) {
+      return fence + value + fence;
     }
     return (isDisplay ? display : inline)(node, parent, state, info);
   }) as typeof inline;
@@ -373,9 +381,14 @@ export default function remarkObsidian(
   // No option: a shortcut reference written back as its own label is correct for every
   // consumer, and the upstream branch it replaces can duplicate the label.
   data.toMarkdownExtensions.push(linkReferenceToMarkdown());
-  data.toMarkdownExtensions.push(autolinkLiteralToMarkdown());
+  data.toMarkdownExtensions.push(
+    autolinkLiteralToMarkdown({ legacy: preset === "legacy" }),
+  );
   data.toMarkdownExtensions.push(htmlTailToMarkdown());
   data.toMarkdownExtensions.push(textToMarkdown(opts.tags));
+  data.toMarkdownExtensions.push(
+    attentionToMarkdown({ legacy: preset === "legacy" }),
+  );
   // Obsidian (remark-parse 8) reads `<<https://x>` as one autolink whose address starts with
   // `<`; CommonMark reads a `<` and then the autolink. Escaping a `<` written right before
   // another keeps both readings, so formatting reaches a fixed point under either.
@@ -445,7 +458,6 @@ export default function remarkObsidian(
   // `legacy` parses with remark-parse 8, the parser Obsidian forks, rather than correcting
   // micromark towards it. Only the micromark extensions' `toMarkdown` halves above matter then.
   if (preset === "legacy") {
-    data.toMarkdownExtensions.push(legacyEmphasisToMarkdown());
     self.parser = (document: string) => parseLegacy8(document, opts);
     return undefined;
   }
@@ -615,6 +627,27 @@ export default function remarkObsidian(
     // body is parsed from the span the comment finally claims.
     if (opts.keepComments && opts.parseComments) {
       commentParseTransform(tree, String(file), reparse);
+      // The references in a comment's body, resolved as the rest of the document's were: the
+      // body is parsed alone, after the passes above, so `%%` / `abc` / `[^2]: x` / `%%` held
+      // `[^2]` as text where Obsidian indexes it (recorded live). Against definitions outside
+      // comments, since one inside a comment defines nothing.
+      const outsideComments = new Set<string>();
+      visit(tree, (node) => {
+        if (node.type === ("comment" as never)) return SKIP;
+        if (node.type === "footnoteDefinition") {
+          outsideComments.add(node.identifier.toLowerCase());
+        }
+        return undefined;
+      });
+      visit(tree, (node) => {
+        if (node.type !== ("comment" as never)) return undefined;
+        bareFootnoteRefTransform(
+          node as unknown as Root,
+          String(file),
+          opts.bareFootnoteRefs ? {} : { defined: outsideComments },
+        );
+        return SKIP;
+      });
       // Again, because parsing a comment's body revives a reference inside an inline footnote:
       // `a^[x %% [^1] %% y]` -- inertness beats the comment rule, settled live.
       if (opts.inlineFootnotes) inlineFootnoteInertTransform(tree);

@@ -44,6 +44,20 @@ export function commentParseTransform(
 ): void {
   if (source === "") return;
 
+  // How many quotes hold each comment. A comment opened on a LAZY line has no prefix on its
+  // first line to count, so `> > a` / ` b %%x` / `> > y%%` stripped one `>` from `y` and read
+  // a quote into the body (found by `fuzz/invariant-sweep.ts`).
+  const depthOf = new Map<Node, number>();
+  const walk = (node: Node, depth: number): void => {
+    const inner =
+      node.type === "blockquote" || node.type === "callout" ? depth + 1 : depth;
+    for (const child of (node as { children?: Node[] }).children ?? []) {
+      if (child.type === "comment") depthOf.set(child, inner);
+      walk(child, inner);
+    }
+  };
+  walk(tree, 0);
+
   visit(tree, "comment", (node: Node, _index, parent) => {
     const comment = node as Comment;
     const start = node.position?.start?.offset;
@@ -62,7 +76,14 @@ export function commentParseTransform(
     const to = closed ? end - MARKER.length : end;
     if (to <= from) return;
 
-    const map = mapLines(source, from, to, startLine);
+    const depth = depthOf.get(node);
+    const map = mapLines(
+      source,
+      from,
+      to,
+      startLine,
+      depth ? depth : undefined,
+    );
     const fragment = reparse(map.text);
     for (const child of fragment.children) shiftByMap(child, map, 0);
 

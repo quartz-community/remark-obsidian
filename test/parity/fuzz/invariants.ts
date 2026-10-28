@@ -205,10 +205,31 @@ export async function invariantViolations(
  * joined with nothing so node boundaries do not count, then split on whitespace -- which still
  * tells `a b` from `ab`.
  */
+/** Block nodes, whose contents never run into a neighbour's. */
+const BLOCKS = new Set([
+  "paragraph",
+  "heading",
+  "code",
+  "math",
+  "html",
+  "blockquote",
+  "callout",
+  "calloutTitle",
+  "list",
+  "listItem",
+  "table",
+  "tableCell",
+  "footnoteDefinition",
+  "thematicBreak",
+]);
+
 function wordsOf(tree: Node): string[] {
   const parts: string[] = [];
   visit(tree, (node: Node) => {
     const value = (node as { value?: unknown }).value;
+    // Blocks are separate words: a fence's `<htt` then a paragraph's `a/` read as `<htta/` once
+    // the whitespace text between them (a leading space formatting drops) was gone.
+    if (BLOCKS.has(node.type)) parts.push("\n");
     // A comment holding parsed children carries its words twice, in `value` and in them, with
     // no boundary between: `note` + `note` read as one word, `note\n` + `note` as two.
     const parsed = ((node as { children?: unknown[] }).children ?? []).length;
