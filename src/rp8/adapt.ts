@@ -161,14 +161,27 @@ function wikilink(raw: string): { type: "wikilink"; [key: string]: unknown } {
   node.path = node.path.replace(/\u00a0/g, " ");
   node.heading = node.heading.replace(/\u00a0/g, " ");
   const resolved = parts.heading ? "heading" : parts.path ? "path" : undefined;
-  if (resolved && node[resolved].endsWith("\\"))
+  let stripped: "path" | "heading" | undefined;
+  if (resolved && node[resolved].endsWith("\\")) {
     node[resolved] = node[resolved].slice(0, -1);
+    stripped = resolved;
+  }
   const value = embedded
     ? node.path
     : parts.alias
       ? node.alias
       : [written, ...writtenHeading.split("#")].filter(Boolean).join(" > ");
-  return { type: "wikilink", value, embedded, ...node };
+  return {
+    type: "wikilink",
+    value,
+    embedded,
+    ...node,
+    // Kept for the writer, which builds from the parts (see `mdast/wikilink.ts`).
+    // Only before `]]`, not before an alias's `|`, which is a cell's pipe escape.
+    ...(stripped && !parts.alias
+      ? { data: { strippedBackslash: stripped } }
+      : {}),
+  };
 }
 
 const MATH_DISPLAY = (value: string) => ({

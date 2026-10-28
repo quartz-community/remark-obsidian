@@ -277,12 +277,41 @@ function displayAwareMathToMarkdown(): ToMarkdownOptions {
   const double = mathToMarkdown({ singleDollarTextMath: false });
   const inline = single.handlers!.inlineMath!;
   const display = double.handlers!.inlineMath!;
-  const inlineMath = ((node, parent, state, info) =>
-    ((node as { data?: { display?: boolean } }).data?.display === true
-      ? display
-      : inline)(node, parent, state, info)) as typeof inline;
+  const inlineMath = ((node, parent, state, info) => {
+    const isDisplay =
+      (node as { data?: { display?: boolean } }).data?.display === true;
+    const fence = isDisplay ? "$$" : "$";
+    if (escapedFenceOnly(node.value, fence)) return fence + node.value + fence;
+    return (isDisplay ? display : inline)(node, parent, state, info);
+  }) as typeof inline;
   (inlineMath as { peek?: unknown }).peek = (inline as { peek?: unknown }).peek;
   return { ...single, handlers: { ...single.handlers, inlineMath } };
+}
+
+/**
+ * Whether a formula's own `fence` can delimit it again: every run of `$` in it as long as the
+ * fence is escaped, and nothing at its edges could join the fence.
+ *
+ * `mdast-util-math` lengthens the fence past the longest `$` run in the value, escaped or not.
+ * But `$$a\$$b$$` parsed as one formula BECAUSE its `\$$` is escaped, and neither preset reads
+ * a `$$$` fence -- so the writer's `$$$a\$$b$$$` came back as `$$` + `$a\$$b`, gained five
+ * characters on every format and never settled (found by `fuzz/invariant-sweep.ts`). For inline
+ * math the same miscount wrote `$a\$ $b$` as display math. Such a value is written back with
+ * the fence it was read with.
+ */
+function escapedFenceOnly(value: string, fence: string): boolean {
+  if (!value.includes("$")) return false;
+  if (value.startsWith("$") || value.endsWith("$") || value.endsWith("\\")) {
+    return false;
+  }
+  for (
+    let at = value.indexOf(fence);
+    at !== -1;
+    at = value.indexOf(fence, at + 1)
+  ) {
+    if (value[at - 1] !== "\\") return false;
+  }
+  return true;
 }
 
 /** Whether `remark-gfm` (or `micromark-extension-gfm-footnote`) is among the extensions. */

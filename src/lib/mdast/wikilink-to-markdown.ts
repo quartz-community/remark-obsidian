@@ -16,7 +16,16 @@ export function wikilinkToMarkdown(): Options {
         state: State,
       ): string {
         const prefix = node.embedded ? "!" : "";
-        const heading = node.heading ? `#${node.heading}` : "";
+        // The backslash before `]]` that resolving dropped from a part (`[[target\]]` links to
+        // `target`) is the author's, so it goes back where it was.
+        const stripped = (
+          node.data as { strippedBackslash?: string } | undefined
+        )?.strippedBackslash;
+        const path = stripped === "path" ? `${node.path}\\` : node.path;
+        const heading =
+          node.heading || stripped === "heading"
+            ? `#${node.heading}${stripped === "heading" ? "\\" : ""}`
+            : "";
         const alias = node.alias ? `|${node.alias}` : "";
         // An entirely empty wikilink needs its space back. `[[ ]]` parses as a wikilink
         // whose path is the empty string -- the inner text is trimmed as a whole -- but
@@ -25,9 +34,9 @@ export function wikilinkToMarkdown(): Options {
         // grows again every time. Five corpus documents never converged on this, and the
         // space is also what the author actually wrote.
         const body =
-          node.path === "" && heading === "" && alias === ""
+          path === "" && heading === "" && alias === ""
             ? " "
-            : `${node.path}${heading}${alias}`;
+            : `${path}${heading}${alias}`;
         const written = `${prefix}[[${body}]]`;
 
         // A table cell ends at the first unescaped pipe, and this handler

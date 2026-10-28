@@ -3,6 +3,7 @@ import type { Node } from "unist";
 import { visit } from "unist-util-visit";
 import { characterEntitiesLegacy } from "character-entities-legacy";
 import { decodeNamedCharacterReference } from "decode-named-character-reference";
+import { decodeString } from "micromark-util-decode-string";
 
 /**
  * ASCII whitespace only, written out because `\s` is wider than the rule.
@@ -505,7 +506,7 @@ function bracketLabelReferences(tree: Root, source: string): void {
       if (tailEnd > close + 1) {
         replacement.push({
           type: "text",
-          value: source.slice(close + 1, tailEnd),
+          value: tailAfter(children[last], close + 1, tailEnd, source),
           position: {
             start: { line: 0, column: 1, offset: close + 1 },
             end: { line: 0, column: 1, offset: tailEnd },
@@ -517,6 +518,35 @@ function bracketLabelReferences(tree: Root, source: string): void {
       index += replacement.length - 1;
     }
   });
+}
+
+/**
+ * The text of a covered sibling from source offset `from` on, as the tree holds it.
+ *
+ * A raw slice of the source kept what the parser had removed -- an escape's backslash and a
+ * container's continuation indent -- so `1. <br>, [^\\[[target]]]` / `   \\===` left `]]` +
+ * `\n   \\===`, which the writer escaped and re-indented on every format, growing without bound
+ * under Quartz's options (found by `fuzz/invariant-sweep.ts`). The sibling's own value already
+ * has them removed; `alignToSource` says where in it `from` falls. A sibling that is not text,
+ * or does not align, falls back to the slice decoded as micromark decodes text.
+ */
+function tailAfter(
+  sibling: Node | undefined,
+  from: number,
+  to: number,
+  source: string,
+): string {
+  const text = sibling as Text | undefined;
+  const start = text?.position?.start?.offset;
+  const end = text?.position?.end?.offset;
+  if (text?.type === "text" && start !== undefined && end !== undefined) {
+    const aligned = alignToSource(source.slice(start, end), text.value);
+    if (aligned) {
+      const index = aligned.at.findIndex((offset) => start + offset >= from);
+      if (index !== -1) return text.value.slice(index);
+    }
+  }
+  return decodeString(source.slice(from, to));
 }
 
 function inClosedComment(source: string, offset: number | undefined): boolean {

@@ -1,6 +1,7 @@
 import type { Root, RootContent, Text } from "mdast";
 import type { Node } from "unist";
 import { visit } from "unist-util-visit";
+import { decodeString } from "micromark-util-decode-string";
 
 interface ParentNode extends Node {
   children: RootContent[];
@@ -66,12 +67,19 @@ export function doubledFootnoteOpenerTransform(
       const closeAt = source.indexOf("]", labelFrom);
       if (closeAt === -1 || closeAt >= limit) continue;
       const label = source.slice(labelFrom, closeAt);
-      if (label === "") continue;
+      // A footnote label holds no whitespace (`[^a b]` is text), so one reaching past a line
+      // ending is no reference. Taking it anyway sliced the next line's container prefix into
+      // the label, and every format wrote that prefix out again: `> [^[[a` / `> b]]]` inside a
+      // definition gained a `>` per pass (found by `fuzz/invariant-sweep.ts`).
+      if (label === "" || /\s/u.test(label)) continue;
       if (!options.bareFootnoteRefs && !defined.has(label.toLowerCase())) {
         // No reference, and no inline footnote either: the `^[` it swallowed is text again.
         kids.splice(index, 1, {
           type: "text",
-          value: source.slice(openAt + 1, noteEnd),
+          // Decoded, as micromark decodes text: a raw slice kept escapes' backslashes, which
+          // the writer escaped again on every format, doubling them -- `# [^[[link](u)]` under
+          // Quartz's options grew without bound (found by `fuzz/invariant-sweep.ts`).
+          value: decodeString(source.slice(openAt + 1, noteEnd)),
           position: {
             start: { line: 0, column: 1, offset: openAt + 1 },
             end: { line: 0, column: 1, offset: noteEnd },
@@ -102,7 +110,7 @@ export function doubledFootnoteOpenerTransform(
       if (noteEnd > closeAt + 1) {
         replacement.push({
           type: "text",
-          value: source.slice(closeAt + 1, noteEnd),
+          value: decodeString(source.slice(closeAt + 1, noteEnd)),
           position: {
             start: { line: 0, column: 1, offset: closeAt + 1 },
             end: { line: 0, column: 1, offset: noteEnd },

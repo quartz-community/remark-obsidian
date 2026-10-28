@@ -2009,7 +2009,14 @@ describe("remark-obsidian", () => {
       // the plugin's tree transform that strips comments
       const processor = unified()
         .use(remarkParse)
-        .use(remarkObsidian, { comments: false, customTaskChars: false })
+        // `strict`: the comment syntax is registered by hand below as a micromark extension,
+        // and under `legacy` the parser is remark-parse 8, which reads none -- the text would
+        // stay text, and a literal `%%` is now escaped on the way out.
+        .use(remarkObsidian, {
+          preset: "strict",
+          comments: false,
+          customTaskChars: false,
+        })
         .use(remarkStringify);
 
       const data = processor.data();
@@ -2029,7 +2036,14 @@ describe("remark-obsidian", () => {
     it("preserves line endings in multiline comment values", async () => {
       const processor = unified()
         .use(remarkParse)
-        .use(remarkObsidian, { comments: false, customTaskChars: false })
+        // `strict`: the comment syntax is registered by hand below as a micromark extension,
+        // and under `legacy` the parser is remark-parse 8, which reads none -- the text would
+        // stay text, and a literal `%%` is now escaped on the way out.
+        .use(remarkObsidian, {
+          preset: "strict",
+          comments: false,
+          customTaskChars: false,
+        })
         .use(remarkStringify);
 
       const data = processor.data();

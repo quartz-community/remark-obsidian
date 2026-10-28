@@ -133,6 +133,13 @@ export function wikilinkFromMarkdown(): Extension {
             : undefined;
         if (resolved !== undefined && String(node[resolved]).endsWith("\\")) {
           node[resolved] = String(node[resolved]).slice(0, -1);
+          // Kept for the writer, which builds from the parts: without it `[[target\]]` was
+          // written `[[target]]`, a different document (found by `fuzz/invariant-sweep.ts`).
+          // Only when the backslash stood before `]]`: before an alias's `|` it is the table
+          // escape of `| [[Note\|Alias]] |`, which the writer adds back itself in a cell.
+          if (!parts.alias) {
+            node.data = { ...node.data, strippedBackslash: resolved };
+          }
         }
 
         // An alias that was *written* wins even when it is empty, which is why
