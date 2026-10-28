@@ -6,6 +6,7 @@ import type { Parents } from "mdast";
 // not, which is why the build broke where the typecheck did not.
 import type {} from "mdast-util-gfm-table";
 import type { Wikilink } from "../types.js";
+import { type SpelledTarget, writtenPart } from "../wikilink-target.js";
 
 export function wikilinkToMarkdown(): Options {
   return {
@@ -18,13 +19,18 @@ export function wikilinkToMarkdown(): Options {
         const prefix = node.embedded ? "!" : "";
         // The backslash before `]]` that resolving dropped from a part (`[[target\]]` links to
         // `target`) is the author's, so it goes back where it was.
-        const stripped = (
-          node.data as { strippedBackslash?: string } | undefined
-        )?.strippedBackslash;
-        const path = stripped === "path" ? `${node.path}\\` : node.path;
+        // And a part resolving rewrote (a no-break space, NFC) is written as the author spelled it.
+        const data = node.data as
+          ({ strippedBackslash?: string } & SpelledTarget) | undefined;
+        const stripped = data?.strippedBackslash;
+        const path = writtenPart(
+          node.path,
+          data?.spelledPath,
+          stripped === "path",
+        );
         const heading =
           node.heading || stripped === "heading"
-            ? `#${node.heading}${stripped === "heading" ? "\\" : ""}`
+            ? `#${writtenPart(node.heading, data?.spelledHeading, stripped === "heading")}`
             : "";
         const alias = node.alias ? `|${node.alias}` : "";
         // An entirely empty wikilink needs its space back. `[[ ]]` parses as a wikilink

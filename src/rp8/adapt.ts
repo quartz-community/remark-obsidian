@@ -10,6 +10,7 @@ import { decodeString } from "micromark-util-decode-string";
 import { normalizeIdentifier } from "micromark-util-normalize-identifier";
 
 import { mathDisplayTransform } from "../lib/math-display.js";
+import { resolveTarget, spelledTarget } from "../lib/wikilink-target.js";
 import {
   parse8WithOffsets,
   type Features,
@@ -115,7 +116,10 @@ function text(doc: string, from: number, to: number): Node8 {
   };
 }
 
-const UNESCAPE = /\\([#\]])/g;
+// Only `\#`. Obsidian keeps a backslash before `]` in a target or heading: `[[a\]b]]` links to
+// `a\]b` and `[[link\](u)]]` to `link\](u)` (recorded live, 1.15.0; the nightly differential
+// fuzz found it). A trailing backslash, `[[a\]]]`, is the one it drops, handled below.
+const UNESCAPE = /\\(#)/g;
 
 /**
  * `[[path#heading|alias]]`, split as `syntax/wikilink.ts` splits it and finished as
@@ -160,8 +164,9 @@ function wikilink(raw: string): { type: "wikilink"; [key: string]: unknown } {
   const writtenHeading = node.heading;
   // Resolved NFC, as Obsidian resolves it: `[[cafe\u0301]]` links to `caf\u00e9`, and `a#cafe\u0301` to
   // the composed heading. Only the resolved parts: `value` keeps what the author typed.
-  node.path = node.path.replace(/\u00a0/g, " ").normalize("NFC");
-  node.heading = node.heading.replace(/\u00a0/g, " ").normalize("NFC");
+  node.path = resolveTarget(node.path);
+  node.heading = resolveTarget(node.heading);
+  const spelled = spelledTarget(written, writtenHeading, node);
   const resolved = parts.heading ? "heading" : parts.path ? "path" : undefined;
   let stripped: "path" | "heading" | undefined;
   if (resolved && node[resolved].endsWith("\\")) {
@@ -181,8 +186,10 @@ function wikilink(raw: string): { type: "wikilink"; [key: string]: unknown } {
     // Kept for the writer, which builds from the parts (see `mdast/wikilink.ts`).
     // Only before `]]`, not before an alias's `|`, which is a cell's pipe escape.
     ...(stripped && !parts.alias
-      ? { data: { strippedBackslash: stripped } }
-      : {}),
+      ? { data: { strippedBackslash: stripped, ...spelled } }
+      : spelled
+        ? { data: spelled }
+        : {}),
   };
 }
 

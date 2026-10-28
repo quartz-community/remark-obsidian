@@ -21,7 +21,7 @@ import { candidates } from "./shrink.js";
  * into families. Needs no Obsidian. A million seeds take about 42 minutes on 16 cores.
  *
  *   npx tsx --conditions=development test/parity/fuzz/census.ts <from> <count> --out <dir> \
- *     [--workers <n>] [--baseline <dir|file>] [--update-baseline <file>]
+ *     [--workers <n>] [--baseline <dir|file>] [--update-baseline <file>] [--reset-baseline <file>]
  *
  * Where `invariant-sweep.ts` reports one document per violation, this sizes the problem: every
  * failing (seed, violation) is shrunk once, under the first configuration it fails, and the
@@ -34,7 +34,9 @@ import { candidates } from "./shrink.js";
  * fixed and the seeds failing that did not before, and exits 1 on any new one. The baseline is a
  * run's directory or a `findings.json`, such as the committed `goldens/census-baseline.json`;
  * `--update-baseline <file>` rewrites that file from this run, and refuses while any seed is
- * new, so it only ever records progress. A census re-run
+ * new, so it only ever records progress. `--reset-baseline <file>` writes it regardless, for the
+one case where a new seed is not a regression: the invariant set itself grew. A seed counts as
+new when it fails a violation the baseline does not record for it. A census re-run
  * after a round of fixes caught 691 regressions no other gate saw (AGENTS.md, "Fuzzing").
  */
 
@@ -209,7 +211,8 @@ async function main() {
   };
   const out = option("--out");
   const baseline = option("--baseline");
-  const updateBaseline = option("--update-baseline");
+  const reset = option("--reset-baseline");
+  const updateBaseline = option("--update-baseline") ?? reset;
   const workers = Number(option("--workers") ?? os.availableParallelism());
   const from = Number(args[0]);
   const count = Number(args[1]);
@@ -222,7 +225,7 @@ async function main() {
     workers <= 0
   ) {
     process.stderr.write(
-      "usage: census <from> <count> --out <dir> [--workers <n>] [--baseline <dir|file>] [--update-baseline <file>]\n",
+      "usage: census <from> <count> --out <dir> [--workers <n>] [--baseline <dir|file>] [--update-baseline <file>] [--reset-baseline <file>]\n",
     );
     process.exit(2);
   }
@@ -344,30 +347,36 @@ async function main() {
     `${JSON.stringify(ranked, null, 1)}\n`,
   );
 
-  // 4. Against a baseline, by seed.
+  // 4. Against a baseline, by seed and violation: a seed the baseline records for one kind
+  // (`format: changes the tree`) that now fails another (`changes the words`) is new.
   let fresh: number[] = [];
   let fixed: number[] = [];
   if (baseline) {
     // Only the baseline's seeds inside this run's range: a wider baseline would count every
     // seed beyond it as fixed.
-    const before = new Set(
-      (
-        JSON.parse(
-          fs.readFileSync(
-            fs.statSync(baseline).isDirectory()
-              ? path.join(baseline, "findings.json")
-              : baseline,
-            "utf8",
-          ),
-        ) as Finding[]
-      )
-        .map((finding) => finding.seed)
-        .filter((seed) => seed >= from && seed < from + count),
-    );
-    fresh = [...seeds]
-      .filter((seed) => !before.has(seed))
-      .sort((a, b) => a - b);
-    fixed = [...before]
+    const before = new Map<number, Set<string>>();
+    for (const finding of JSON.parse(
+      fs.readFileSync(
+        fs.statSync(baseline).isDirectory()
+          ? path.join(baseline, "findings.json")
+          : baseline,
+        "utf8",
+      ),
+    ) as Finding[]) {
+      if (finding.seed < from || finding.seed >= from + count) continue;
+      const known = before.get(finding.seed) ?? new Set<string>();
+      for (const kind of finding.kinds) known.add(kind);
+      before.set(finding.seed, known);
+    }
+    const now = new Set<number>();
+    for (const finding of findings) {
+      const known = before.get(finding.seed);
+      if (!known || finding.kinds.some((kind) => !known.has(kind))) {
+        now.add(finding.seed);
+      }
+    }
+    fresh = [...now].sort((a, b) => a - b);
+    fixed = [...before.keys()]
       .filter((seed) => !seeds.has(seed))
       .sort((a, b) => a - b);
   }
@@ -420,7 +429,7 @@ async function main() {
   // Queued writes, and no exit: a pipe can lose what process.exit discards (AGENTS.md).
   // A baseline only moves forward: written when nothing failed that the old one passed.
   if (updateBaseline) {
-    if (fresh.length > 0) {
+    if (fresh.length > 0 && !reset) {
       log(
         `not updating ${updateBaseline}: ${fresh.length} seeds fail that the baseline passed`,
       );
@@ -432,7 +441,7 @@ async function main() {
       log(`baseline written: ${updateBaseline} (${sorted.length} pairs)`);
     }
   }
-  process.exitCode = baseline && fresh.length > 0 ? 1 : 0;
+  process.exitCode = baseline && fresh.length > 0 && !reset ? 1 : 0;
 }
 
 await main();

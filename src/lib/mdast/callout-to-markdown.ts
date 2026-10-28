@@ -19,6 +19,21 @@ const prefix = (line: string, _index: number, blank: boolean): string =>
  * follows on the next line, not after a blank one, so the two stay in the same
  * quote and the title does not re-parse as a paragraph of its own.
  */
+/**
+ * Blocks never written on an empty title's line, nor after a space there. A fence written there
+ * never settled and indented code cannot be written there at all; a `%%` comment there took the
+ * next comment's opener as its closer and grew a comment every format
+ * (`probe/straddle/callout-comment`). Written below a bare marker, both read back as body.
+ */
+const NOT_ON_TITLE_LINE = new Set(["code", "comment"]);
+
+/**
+ * Blocks written below an empty title, after its space. `strict` reads the title line alone, so
+ * a paragraph over lines written there lost its inline footnote, highlight, emphasis or code
+ * span to the line break (`> [!note] ^[in` / `> inline]`, 7 seeds of the million-seed census).
+ */
+const BELOW_TITLE_LINE = new Set(["paragraph"]);
+
 export function calloutToMarkdown(): Options {
   return {
     handlers: {
@@ -56,7 +71,17 @@ export function calloutToMarkdown(): Options {
           });
           exitPhrasing();
         }
-        const head = `[!${node.calloutType}]${fold}${title ? ` ${title}` : ""}`;
+        // A title node with nothing in it is a title written empty -- whitespace after the marker,
+        // or a block on the title line (`> [!note] [^1]: def`) -- which displays nothing, where
+        // no title displays the type. Its space is kept, or the next format read no title at all
+        // (about 60 corpus documents failed "formatting keeps the tree" on that).
+        const head = `[!${node.calloutType}]${fold}${
+          title
+            ? ` ${title}`
+            : titleNode && !NOT_ON_TITLE_LINE.has(body[0]?.type ?? "")
+              ? " "
+              : ""
+        }`;
 
         const rest =
           body.length > 0
@@ -66,8 +91,24 @@ export function calloutToMarkdown(): Options {
               )
             : "";
 
+        // An empty title over a definition was the definition written ON the title line, and that
+        // is the one spelling both presets read back as it: remark-parse 8 makes no title of a
+        // marker and a space alone.
+        // Any block that stood there: both presets mark a title line holding a block with a title
+        // node that has no children (`> [!note] <br>` too). Not code or a comment: see
+        // `NOT_ON_TITLE_LINE`.
+        const onTitleLine =
+          titleNode !== undefined &&
+          titleNode.children.length === 0 &&
+          body.length > 0 &&
+          !NOT_ON_TITLE_LINE.has(body[0]?.type ?? "") &&
+          !BELOW_TITLE_LINE.has(body[0]?.type ?? "");
         const value = state.indentLines(
-          rest === "" ? head : `${head}\n${rest}`,
+          rest === ""
+            ? head
+            : onTitleLine
+              ? `${head}${rest}`
+              : `${head}\n${rest}`,
           prefix,
         );
         exit();

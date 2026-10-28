@@ -195,7 +195,19 @@ export function attentionToMarkdown(options: {
         node,
         state,
       );
-      if (lastLeaf(node)?.type === "tag") return { ...result, markers: ["*"] };
+      if (lastLeaf(node)?.type === "tag") {
+        // Emphasis whose only child is emphasis takes `_` outside, or the two `*` runs read as
+        // strong: `*_#tag_*` came back `**#tag**` (about 40 seeds of the million-seed census,
+        // under "formatting keeps the tree"). `_*#tag*_` reads as written under both presets.
+        const only = node.children.length === 1 ? node.children[0] : undefined;
+        return {
+          ...result,
+          markers:
+            node.type === "emphasis" && only?.type === "emphasis"
+              ? ["_", "*"]
+              : ["*"],
+        };
+      }
       if (!options.legacy) {
         // `strict`: emphasis holding emphasis or strong at any depth, or a highlight, takes `_`
         // outside. `*~~*em*~~*` and `*==\*\*strong==*` paired otherwise once strikethrough and

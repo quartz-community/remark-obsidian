@@ -6,7 +6,11 @@ import { parentOf } from "./attention-to-markdown.js";
  * The text writer, registered whatever is on: its backslash repair applies to every document,
  * and the rest only where a `tag` can follow (`tags`).
  */
-export function textToMarkdown(tags: boolean, highlights = false): Options {
+export function textToMarkdown(
+  tags: boolean,
+  highlights = false,
+  legacy = false,
+): Options {
   return {
     handlers: {
       // `tagToMarkdown`'s `unsafe` rule cannot reach a `#` right after a character the writer
@@ -17,18 +21,23 @@ export function textToMarkdown(tags: boolean, highlights = false): Options {
       // or a character reference, is escaped too.
       text(node, parent, state, info) {
         // Matched left to right, so the second backslash of `\\\\` is never read as an escape.
-        let written = defaultHandlers
-          .text(node, parent, state, info)
-          .replace(
-            /(\\[!-/:-@[-`{-~]|&#?[\da-z]+;)(#(?=\S))?/giu,
-            (_, construct: string, hash?: string) =>
-              construct + (hash ? (tags ? "\\#" : hash) : ""),
-          )
+        let written = escapeHashRuns(
+          defaultHandlers.text(node, parent, state, info),
+          tags,
+        )
           // A literal backslash ending the text before whitespace: the writer may encode that
           // whitespace at an emphasis edge as `&#x20;`, and the backslash would then escape its
           // `&` (`*em**\\n \\ *` came back holding `#x20` as a tag). Escaped, it reads the same.
           .replace(/(?<!\\)((?:\\\\)*)\\(\s+)$/u, "$1\\\\$2");
-        written = guardAmpersands(written);
+        const siblingsOf = parent?.children ?? [];
+        const afterBreak =
+          siblingsOf[siblingsOf.indexOf(node as never) - 1]?.type === "break";
+        // `legacy` only: to micromark, as to CommonMark, a no-break space is no blank line, and
+        // under `strict` the reference `bareFootnoteRefs` finds before it did not survive the
+        // encoding (`[^https://e.test/p]` over `⍽`).
+        written = guardAmpersands(
+          legacy ? guardBlankLines(written, afterBreak, info.after) : written,
+        );
         // Not in a link's text that is its own address, an autolink literal: a URL's `=` is no
         // highlight, and escaped it put a backslash into the address (691 seeds of the second
         // million-seed census, `https://e.test/p====m`).
@@ -125,6 +134,36 @@ export function textToMarkdown(tags: boolean, highlights = false): Options {
       },
     },
   };
+}
+
+/**
+ * A line of the text that holds only whitespace, some of it not a space or a tab, with its first
+ * such character written as a reference. remark-parse 8 trims a line with JavaScript's `\s`, so
+ * a line of a no-break space alone is a blank line to it and ends the paragraph: `1]` over
+ * `····⍽` (U+00A0) held a break and a no-break space, kept by the indent the writer drops, and
+ * came back as two paragraphs (about 460 seeds of the million-seed census). A line the text
+ * shares with what is written before or after it is left alone, and so is its first line unless a
+ * break ends the line above: a callout title's `⍽` is no line of its own, and `&#xA0;` there
+ * read as no title at all.
+ */
+function guardBlankLines(
+  written: string,
+  afterBreak: boolean,
+  after: string,
+): string {
+  const lines = written.split("\n");
+  return lines
+    .map((line, index) => {
+      if (index === 0 && !afterBreak) return line;
+      if (index === lines.length - 1 && after !== "\n" && after !== "") {
+        return line;
+      }
+      if (!/^\s+$/u.test(line) || /^[ \t]+$/u.test(line)) return line;
+      const at = line.search(/[^ \t]/u);
+      const code = line.codePointAt(at)!;
+      return `${line.slice(0, at)}&#x${code.toString(16).toUpperCase()};${line.slice(at + String.fromCodePoint(code).length)}`;
+    })
+    .join("\n");
 }
 
 /**
@@ -244,4 +283,23 @@ function guardTildes(
     if (touches) units[at] = "&#x7E;";
   });
   return units.join("");
+}
+
+/**
+ * A bare `#` before a non-space, straight after an escape or a character reference, escaped
+ * too -- until none is left. Each `#` escaped is an escape the next one follows, so a run comes
+ * out alternating in one pass: the writer's `\\###\\###anim` became `\\#\\##\\#\\##anim`, whose last
+ * `#` started a tag (found by the stricter round-trip check, "formatting keeps the tree").
+ * Matched left to right, so the second backslash of `\\\\` is never read as an escape.
+ */
+function escapeHashRuns(written: string, tags: boolean): string {
+  if (!tags) return written;
+  for (let previous = ""; previous !== written;) {
+    previous = written;
+    written = written.replace(
+      /(\\[!-/:-@[-`{-~]|&#?[\da-z]+;)(#(?=\S))?/giu,
+      (_, construct: string, hash?: string) => construct + (hash ? "\\#" : ""),
+    );
+  }
+  return written;
 }

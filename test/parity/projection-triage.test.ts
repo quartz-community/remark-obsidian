@@ -14,9 +14,12 @@ import type { GoldenCase } from "./types.js";
  *   - an identifier ending any text inside a wrapper or a table cell renders stripped;
  *   - footnote bodies render after the text, inline notes first, then definitions in reference
  *     order;
- *   - the line ending after display math is dropped unless only indentation precedes the `$$`.
- * 40 of the 69 recorded documents here diverged before the projection learned those rules (the
- * rest are controls recorded beside them), and every one matches now. Left out: six
+ *   - the line ending after display math is dropped (later refined, below).
+ * 40 of the first 69 recorded documents diverged before the projection learned those rules (the
+ * rest are controls recorded beside them), and every one matches now. Ten more came from the
+ * nightly differential fuzz: a backslash before `]` stays in a wikilink's target (`[[a\\]b]]`
+ * links to `a\\]b`), and the line ending after display math survives exactly when the next line
+ * starts with whitespace. Left out: six
  * self-embeds (out of scope, as `fuzz/sweep.ts` skips them) and `[^1]: - [ ] [` / `^[[^1]]]`,
  * where Obsidian's renderer reads a reference its own `metadataCache` does not.
  */
@@ -29,7 +32,7 @@ const golden = JSON.parse(
 
 describe("projection triage", () => {
   it("records every case", () => {
-    expect(Object.keys(golden.cases)).toHaveLength(69);
+    expect(Object.keys(golden.cases)).toHaveLength(79);
   });
 
   it("matches every recorded document", () => {

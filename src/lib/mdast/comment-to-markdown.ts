@@ -19,17 +19,12 @@ export function commentToMarkdown(): Options {
     unsafe: [{ character: "%", after: "%", inConstruct: "phrasing" }],
     handlers: {
       comment(node: Comment, parent: Parents | undefined) {
-        // A block comment straight under a paragraph, written on one line, joins that paragraph
-        // as an inline comment (`1. a` / `   %%note%%`). Its closer on a line of its own makes
-        // the opener line interrupt, as the source did (found by `fuzz/invariant-sweep.ts`).
-        const siblings = (parent?.children ?? []) as Array<{ type: string }>;
-        const previous = siblings[siblings.indexOf(node as never) - 1];
-        if (
-          parent &&
-          FLOW.has(parent.type) &&
-          previous?.type === "paragraph" &&
-          !node.value.includes("\n")
-        ) {
+        // A block comment written on one line reads as a paragraph holding an inline comment:
+        // straight under a paragraph it joins that one (`1. a` / `   %%note%%`, found by
+        // `fuzz/invariant-sweep.ts`), and anywhere else it becomes a paragraph of its own (about
+        // 40 corpus documents failed "formatting keeps the tree" on that). Its closer on a line
+        // of its own keeps it a block, as the source had it.
+        if (parent && FLOW.has(parent.type) && !node.value.includes("\n")) {
           return `%%${node.value}\n%%`;
         }
         return `%%${node.value}%%`;

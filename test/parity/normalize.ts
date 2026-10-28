@@ -633,25 +633,17 @@ export function mdastText(
         // display math therefore takes the plain placeholder, which is identical once
         // the marker is stripped and leaves the line ending to speak for itself.
         //
-        // Not only column 1, though: what keeps the separator is indentation alone before the
-        // `$$` on its line. `a $$y^2$$` over `b`, `1. $$y^2$$` and `> > $$y^2$$` all read
-        // `⟨math⟩b` (recorded live, 1.15.0, and 13 documents of the differential fuzz's
-        // triage), so the line's prefix is read off the source when there is one.
-        {
-          const display =
-            (node as unknown as { data?: { display?: boolean } }).data
-              ?.display === true;
-          const at = node.position?.start?.offset;
-          const indented =
-            source !== undefined && at !== undefined
-              ? /^[ \t]+$/u.test(
-                  source.slice(source.lastIndexOf("\n", at - 1) + 1, at),
-                )
-              : node.position?.start?.column !== 1;
-          parts.push(
-            display && !indented ? DISPLAY_INLINE_MATH : "\u27e8math\u27e9",
-          );
-        }
+        // Not only column 1, and not the indentation before the `$$` either: what keeps the
+        // separator is the NEXT line starting with whitespace, read at the line break below.
+        // Recorded live (1.15.0): `a $$x$$` over `··b` and `$$x$$` over `·b` read `⟨math⟩ b`,
+        // while `··$$x$$` over `b` and `a` / `·$$x$$` / `===` read `⟨math⟩b` and `⟨math⟩===`.
+        // The earlier "indented display keeps it" cases were indented on both lines.
+        parts.push(
+          (node as unknown as { data?: { display?: boolean } }).data
+            ?.display === true
+            ? DISPLAY_INLINE_MATH
+            : "\u27e8math\u27e9",
+        );
         return;
       case "math":
         parts.push("\u27e8math\u27e9 ");
@@ -755,14 +747,19 @@ export function mdastText(
         return;
       }
       case "break":
-        // Nothing after display math that began in column 1. `$$y^2$$` over `word`
-        // reads `⟨math⟩word` in Obsidian with no separator at all, where every other
-        // line ending in a paragraph reads as one -- the rendered math is a
-        // block-level element, so the `<br>` beside it contributes nothing to
-        // `textContent`. Indented display math is not that element and keeps its
-        // separator, which is why the marker is only pushed for column 1; the test
-        // here reads the marker rather than re-deciding it.
-        if (parts[parts.length - 1] === DISPLAY_INLINE_MATH) return;
+        // Nothing after display math, unless the next line starts with whitespace.
+        // `$$y^2$$` over `word` reads `⟨math⟩word` in Obsidian with no separator at all,
+        // where every other line ending in a paragraph reads as one -- the rendered math
+        // is a block-level element, so the `<br>` beside it contributes nothing to
+        // `textContent`. The next line's leading whitespace survives it (see the
+        // `inlineMath` case above).
+        if (parts[parts.length - 1] === DISPLAY_INLINE_MATH) {
+          const at = node.position?.start?.offset;
+          const lineEnd =
+            at === undefined ? -1 : (source?.indexOf("\n", at) ?? -1);
+          const next = lineEnd === -1 ? undefined : source?.[lineEnd + 1];
+          if (next !== " " && next !== "\t") return;
+        }
         parts.push("\n");
         return;
       // Obsidian resolves a relative image path against the vault and renders it

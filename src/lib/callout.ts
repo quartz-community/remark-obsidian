@@ -666,3 +666,34 @@ export function calloutTransform(
     callout.collapsed = fold === "-" ? true : fold === "+" ? false : null;
   });
 }
+
+/**
+ * Each callout's `title`, derived again from its title node once every pass has run.
+ *
+ * It is collected when the callout is built, and `strict` passes after that rewrite the title's
+ * children: an undefined `[^…` becomes text again, an inline footnote goes inert. So
+ * `> [!note] [^[[a|b]]] | w` held the title text `[^[[a|b]]] | w` while `title` still read
+ * `[[a|b]] | w` (found by "formatting keeps the tree"). Collected as the callout reader collects
+ * it: every node value in order, trimmed.
+ */
+export function syncCalloutTitlesTransform(tree: Root): void {
+  const collect = (nodes: readonly Node[]): string =>
+    nodes
+      .map((child) =>
+        "value" in child
+          ? String((child as { value: unknown }).value)
+          : collect(((child as ParentNode).children ?? []) as readonly Node[]),
+      )
+      .join("");
+  visit(tree, (node: Node) => {
+    if ((node as { type: string }).type !== "callout") return;
+    const titleNode = ((node as ParentNode).children ?? []).find(
+      (child) => (child as Node).type === "calloutTitle",
+    ) as ParentNode | undefined;
+    if (titleNode) {
+      (node as unknown as Callout).title = collect(
+        (titleNode.children ?? []) as readonly Node[],
+      ).trim();
+    }
+  });
+}

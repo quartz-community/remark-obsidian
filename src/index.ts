@@ -71,7 +71,7 @@ import { linkReferenceToMarkdown } from "./lib/mdast/link-reference-to-markdown.
 import { frontmatterTailTransform } from "./lib/frontmatter-tail.js";
 import { frontmatterUnclosedTransform } from "./lib/frontmatter-unclosed.js";
 import { frontmatterExactOpenerTransform } from "./lib/frontmatter-exact-opener.js";
-import { calloutTransform } from "./lib/callout.js";
+import { calloutTransform, syncCalloutTitlesTransform } from "./lib/callout.js";
 import { adjacentIndentedCodeTransform } from "./lib/adjacent-indented-code.js";
 import { commentTailTransform } from "./lib/comment-tail.js";
 import {
@@ -325,7 +325,12 @@ function displayAwareMathToMarkdown(): ToMarkdownOptions {
   // `fuzz/invariant-sweep.ts`), so it is written after an encoded space instead.
   const inlineMath = ((node, parent, state, info) => {
     const written = write(node, parent, state, info);
-    return info.before === "\n" && written.startsWith("$$")
+    // Only a formula over lines: one on a single line closes on it, so its `$$` opens no
+    // block, and the space was an extra text node (about 50 corpus documents). An empty one
+    // still needs it: `$$$$` at a line start opens a block (40 seeds of the million-seed census).
+    return info.before === "\n" &&
+      written.startsWith("$$") &&
+      (/[\r\n]/u.test(node.value) || node.value.trim() === "")
       ? `&#x20;${written}`
       : written;
   }) as typeof inline;
@@ -412,7 +417,9 @@ export default function remarkObsidian(
     autolinkLiteralToMarkdown({ strict: preset === "strict" }),
   );
   data.toMarkdownExtensions.push(htmlTailToMarkdown());
-  data.toMarkdownExtensions.push(textToMarkdown(opts.tags, opts.highlights));
+  data.toMarkdownExtensions.push(
+    textToMarkdown(opts.tags, opts.highlights, preset === "legacy"),
+  );
   data.toMarkdownExtensions.push(
     attentionToMarkdown({ legacy: preset === "legacy" }),
   );
@@ -478,9 +485,12 @@ export default function remarkObsidian(
     data.toMarkdownExtensions.push(displayAwareMathToMarkdown());
   }
 
-  if (opts.customTaskChars) {
-    data.toMarkdownExtensions.push(taskCharToMarkdown());
-  }
+  // Always: it writes a plain `[ ]` / `[x]` as GFM's writer does, and also boxes an item that
+  // starts with something other than a paragraph, which GFM's writer drops (`- [ ] # &`, under
+  // Quartz's options, where `customTaskChars` is off).
+  data.toMarkdownExtensions.push(
+    taskCharToMarkdown({ legacy: preset === "legacy" }),
+  );
 
   // `legacy` parses with remark-parse 8, the parser Obsidian forks, rather than correcting
   // micromark towards it. Only the micromark extensions' `toMarkdown` halves above matter then.
@@ -695,6 +705,8 @@ export default function remarkObsidian(
     // Last before positions: every pass above, re-parsed fragments included, built identifiers
     // the CommonMark way; Obsidian's are the label lowercased.
     footnoteIdentifierTransform(tree);
+    // After every pass that can rewrite a callout title's children.
+    if (opts.callouts) syncCalloutTitlesTransform(tree);
     normalizePointsTransform(tree, String(file));
   };
 

@@ -187,6 +187,13 @@ export async function invariantViolations(
         const after = parser.runSync(parser.parse(next), next);
         if (wordsOf(after).join(" ") !== wordsOf(tree).join(" ")) {
           found.push("format: changes the words");
+        } else if (
+          JSON.stringify(shapeOf(after)) !== JSON.stringify(shapeOf(tree))
+        ) {
+          // The words can survive while the structure does not: 2.0.2 wrote an inline footnote
+          // inside a definition so it closed at its first `]`, which moved text out of it and
+          // kept every word.
+          found.push("format: changes the tree");
         }
       }
       settled = next === text;
@@ -198,6 +205,104 @@ export async function invariantViolations(
   }
 
   return found;
+}
+
+/**
+ * The tree as formatting must keep it, with what renders the same set aside: positions and
+ * `data`; a list's or an item's looseness; an HTML block's trailing blank lines; a comment's
+ * parsed body, and whitespace at its ends (the writer closes an unclosed one); empty cells the
+ * writer adds to pad a short row, and a table's alignment; a line break as a node or as a line ending, and any run of
+ * whitespace in text, which renders as one space; a line ending inside inline code, which
+ * renders as a space, as does whitespace inside a formula; whitespace at a paragraph's or a
+ * heading's edges, through any emphasis there; and empty text. Measured on the 6,844 referee documents, these set aside
+ * 410 of legacy's 441 differences and 498 of strict's 545; what remained were defects.
+ */
+export function shapeOf(node: Node): unknown {
+  const {
+    position: _position,
+    data: _data,
+    spread: _spread,
+    ...rest
+  } = node as Node & Record<string, unknown>;
+  if (rest.type === "comment") {
+    return { type: "comment", value: String(rest.value ?? "").trim() };
+  }
+  if (rest.type === "html") {
+    return { type: "html", value: String(rest.value).trimEnd() };
+  }
+  if (rest.type === "inlineMath" || rest.type === "math") {
+    return { ...rest, value: String(rest.value).replace(/\s+/gu, " ").trim() };
+  }
+  if (rest.type === "inlineCode") {
+    return { ...rest, value: String(rest.value).replace(/\s*\n\s*/gu, " ") };
+  }
+  if (rest.type === "break") return { type: "text", value: " " };
+  const children = (rest.children as Node[] | undefined)?.slice();
+  if (!children) {
+    return rest.type === "text"
+      ? { type: "text", value: String(rest.value).replace(/\s+/gu, " ") }
+      : rest;
+  }
+  if (rest.type === "table") {
+    // No alignment: the upstream table writer widens the header to the longest row, so the
+    // array grows with it. The cells themselves are kept either way -- mdast holds a row's
+    // excess cells -- but the widened header then RENDERS the cells past the source's header,
+    // which GFM and Obsidian hid. A known upstream behaviour, recorded in AGENTS.md.
+    delete rest.align;
+  }
+  if (rest.type === "tableRow") {
+    while (
+      children.length > 0 &&
+      ((children.at(-1) as { children?: Node[] }).children ?? []).length === 0
+    ) {
+      children.pop();
+    }
+  }
+  const kids: Array<Record<string, unknown>> = [];
+  for (const child of children.map(shapeOf) as Array<Record<string, unknown>>) {
+    const last = kids.at(-1);
+    if (child.type === "text" && last?.type === "text") {
+      last.value = String(last.value) + String(child.value);
+    } else kids.push({ ...child });
+  }
+  for (const kid of kids) {
+    if (kid.type === "text")
+      kid.value = String(kid.value).replace(/\s+/gu, " ");
+  }
+  // A paragraph's or a heading's leading and trailing whitespace renders nothing.
+  // Through an opening or closing emphasis, strong or strikethrough too.
+  if (rest.type === "paragraph" || rest.type === "heading") {
+    const edge = (
+      list: Array<Record<string, unknown>>,
+      at: "start" | "end",
+    ): void => {
+      const kid = at === "start" ? list[0] : list.at(-1);
+      if (kid?.type === "text") {
+        kid.value =
+          at === "start"
+            ? String(kid.value).trimStart()
+            : String(kid.value).trimEnd();
+        if (kid.value === "") {
+          list.splice(at === "start" ? 0 : list.length - 1, 1);
+          edge(list, at);
+        }
+      } else if (
+        kid &&
+        (kid.type === "emphasis" ||
+          kid.type === "strong" ||
+          kid.type === "delete") &&
+        Array.isArray(kid.children)
+      ) {
+        edge(kid.children as Array<Record<string, unknown>>, at);
+      }
+    };
+    edge(kids, "start");
+    edge(kids, "end");
+  }
+  return {
+    ...rest,
+    children: kids.filter((kid) => kid.type !== "text" || kid.value !== ""),
+  };
 }
 
 /**
@@ -223,13 +328,30 @@ const BLOCKS = new Set([
   "thematicBreak",
 ]);
 
+/** Nodes whose children are blocks. */
+const FLOW_PARENTS = new Set([
+  "root",
+  "blockquote",
+  "callout",
+  "listItem",
+  "footnoteDefinition",
+]);
+
 function wordsOf(tree: Node): string[] {
   const parts: string[] = [];
-  visit(tree, (node: Node) => {
+  visit(tree, (node: Node, _index, parent: Node | undefined) => {
     const value = (node as { value?: unknown }).value;
     // Blocks are separate words: a fence's `<htt` then a paragraph's `a/` read as `<htta/` once
-    // the whitespace text between them (a leading space formatting drops) was gone.
-    if (BLOCKS.has(node.type)) parts.push("\n");
+    // the whitespace text between them (a leading space formatting drops) was gone. A comment
+    // is one when its parent holds blocks: `> > %%note` / `%%note` read `notenote`.
+    if (
+      BLOCKS.has(node.type) ||
+      (node.type === "comment" &&
+        parent !== undefined &&
+        FLOW_PARENTS.has(parent.type))
+    ) {
+      parts.push("\n");
+    }
     // A comment holding parsed children carries its words twice, in `value` and in them, with
     // no boundary between: `note` + `note` read as one word, `note\n` + `note` as two.
     const parsed = ((node as { children?: unknown[] }).children ?? []).length;

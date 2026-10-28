@@ -200,11 +200,11 @@ function tokenize(
     }
     // Obsidian does not let a backslash escape the closer, so `[[target\]]` is a
     // link to `target\` rather than literal text. The escape is already ignored
-    // for `|` just above; this keeps `]` consistent with it and with the app.
-    if (code === RIGHT_BRACKET) {
-      effects.exit("wikilinkPath");
-      return closeFirst(code);
-    }
+    // for `|` just above; this keeps `]` consistent with it and with the app. A
+    // `]` that no second one follows is content, as anywhere in the path:
+    // `[[a\]b]]` links to `a\]b` (recorded live, 1.15.0). Closing on it rejected
+    // the link.
+    if (code === RIGHT_BRACKET) return path(code);
     // Nor the fragment separator: `[[a\#b]]` is a link whose target is `a\` and
     // whose heading is `b`, so the backslash stays in the target and the `#`
     // splits anyway. Same rule as `|` and `]` above -- inside a wikilink a
@@ -317,10 +317,8 @@ function tokenize(
       effects.exit("wikilinkHeading");
       return aliasMarker(code);
     }
-    if (code === RIGHT_BRACKET) {
-      effects.exit("wikilinkHeading");
-      return closeFirst(code);
-    }
+    // As in the path: `[[a#b\]c]]` has the heading `b\]c`.
+    if (code === RIGHT_BRACKET) return heading(code);
     if (code === null || isLineEnding(code)) return nok(code);
     // A backslash is never an escape inside a wikilink, so it cannot shield the first
     // bracket of a `[[` either: `#page=3 \ \[[target]]` holds a doubled bracket in the

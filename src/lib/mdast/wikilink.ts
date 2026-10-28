@@ -1,4 +1,5 @@
 import type { Extension } from "mdast-util-from-markdown";
+import { resolveTarget, spelledTarget } from "../wikilink-target.js";
 
 /** Which parts the tokenizer actually produced, in the order they appear. */
 interface Parts {
@@ -7,7 +8,10 @@ interface Parts {
   alias: boolean;
 }
 
-const UNESCAPE = /\\([#\]])/g;
+// Only `\#`. Obsidian keeps a backslash before `]` in a target or heading: `[[a\]b]]` links to
+// `a\]b` and `[[link\](u)]]` to `link\](u)` (recorded live, 1.15.0; the nightly differential
+// fuzz found it). A trailing backslash, `[[a\]]]`, is the one it drops, handled below.
+const UNESCAPE = /\\(#)/g;
 
 /**
  * Obsidian trims a wikilink's inner text **once, as a whole**, and only then splits
@@ -121,8 +125,10 @@ export function wikilinkFromMarkdown(): Extension {
         // cannot quietly rewrite it.
         // Resolved NFC too, as Obsidian resolves it: `[[cafe\u0301]]` links to `caf\u00e9`
         // (found by `fuzz/charclass-sweep.ts`). `value` keeps what the author typed.
-        node.path = node.path.replace(/\u00a0/g, " ").normalize("NFC");
-        node.heading = node.heading.replace(/\u00a0/g, " ").normalize("NFC");
+        node.path = resolveTarget(node.path);
+        node.heading = resolveTarget(node.heading);
+        const spelled = spelledTarget(written, writtenHeading, node);
+        if (spelled) node.data = { ...node.data, ...spelled };
 
         // An alias is never stripped, even when it is the part touching the
         // closer: `[[a|b\]]` keeps its `b\`. Only a resolved target loses the

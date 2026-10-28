@@ -77,20 +77,65 @@ export function doubledFootnoteOpenerTransform(
       // definition gained a `>` per pass (found by `fuzz/invariant-sweep.ts`).
       if (label === "" || /\s/u.test(label)) continue;
       if (!options.bareFootnoteRefs && !defined.has(label.toLowerCase())) {
-        // No reference, and no inline footnote either: the `^[` it swallowed is text again.
-        kids.splice(index, 1, {
-          type: "text",
-          // Decoded, as micromark decodes text: a raw slice kept escapes' backslashes, which
-          // the writer escaped again on every format, doubling them -- `# [^[[link](u)]` under
-          // Quartz's options grew without bound (found by `fuzz/invariant-sweep.ts`).
-          value: decodeString(
-            paragraphSlice(source.slice(openAt + 1, noteEnd)),
-          ),
-          position: {
-            start: { line: 0, column: 1, offset: openAt + 1 },
-            end: { line: 0, column: 1, offset: noteEnd },
-          },
-        } as Text);
+        // No reference, and no inline footnote either: its `^[` and `]` are text again, and
+        // what it held stays as parsed. Rebuilt as one text slice of the source, it lost every
+        // construct inside: `[^[^<https://e.test>]]` kept the address as text, which GFM links
+        // when the formatted document is read back (about 260 seeds of the million-seed
+        // census, under "formatting keeps the tree").
+        // Only children that sit inside the brackets and hold no other note: a nested
+        // `[^[^[^1]]` or a label the inline scan placed across the `^[` keeps the text slice
+        // (423 + 51 seeds of the census that checked this).
+        const inner =
+          (kids[index] as { children?: RootContent[] }).children ?? [];
+        const contained = inner.every((child) => {
+          const from = child.position?.start?.offset;
+          const to = child.position?.end?.offset;
+          let note = false;
+          visit(child, (n: Node) => {
+            if (n.type === "footnote" || n.type === "footnoteReference") {
+              note = true;
+            }
+          });
+          return (
+            !note &&
+            from !== undefined &&
+            to !== undefined &&
+            from >= openAt + 3 &&
+            to <= noteEnd - 1
+          );
+        });
+        if (!contained) {
+          kids.splice(index, 1, {
+            type: "text",
+            // Decoded, as micromark decodes text: a raw slice kept escapes' backslashes, which
+            // the writer escaped again on every format, doubling them -- `# [^[[link](u)]`
+            // under Quartz's options grew without bound (found by `fuzz/invariant-sweep.ts`).
+            value: decodeString(
+              paragraphSlice(source.slice(openAt + 1, noteEnd)),
+            ),
+            position: {
+              start: { line: 0, column: 1, offset: openAt + 1 },
+              end: { line: 0, column: 1, offset: noteEnd },
+            },
+          } as Text);
+          continue;
+        }
+        const piece = (value: string, from: number, to: number): Text =>
+          ({
+            type: "text",
+            value,
+            position: {
+              start: { line: 0, column: 1, offset: from },
+              end: { line: 0, column: 1, offset: to },
+            },
+          }) as Text;
+        kids.splice(
+          index,
+          1,
+          piece("^[", openAt + 1, openAt + 3),
+          ...inner,
+          piece("]", noteEnd - 1, noteEnd),
+        );
         continue;
       }
 

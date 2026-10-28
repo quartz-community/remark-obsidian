@@ -547,7 +547,7 @@ has no coverage there, not that it agrees. Footnotes are in **neither** spec: GF
 ## Gates — what "done" means
 
 ```bash
-npm test          # 599 tests / 27 files. Contains the contract gate.
+npm test          # 618 tests / 27 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -639,8 +639,10 @@ embeds skipped): 428 of 448 agree, 20 causes. The 39 fall into five groups:
 - **Self-embeds:** Obsidian embeds the note into itself and renders its tags, math and tasks six
   times. Vault resolution, `out-of-scope` like `fuzz/embed/64`.
 - **`$$…$$` then a line ending:** Obsidian's renderer swallows it (`</span>http`, no `<br>`)
-  unless only indentation precedes the `$$` on its line: probed live, `a $$y^2$$` over `b`,
-  `1. $$y^2$$` and `> > $$y^2$$` all drop it. The tree keeps the line ending, since formatting
+  unless the NEXT line starts with whitespace: probed live, `a $$y^2$$` over `b`,
+  `1. $$y^2$$` and `> > $$y^2$$` all drop it, `$$x$$` over `·b` keeps it, and `··$$x$$` over `b`
+  drops it. The first rule, "indentation before the `$$`", held only because its cases were
+  indented on both lines; four documents of a later nightly run separated the two. The tree keeps the line ending, since formatting
   would otherwise write `$$y^2$$http`, so the projection drops it (it did, for column 1 only)
   and `rehype-obsidian`'s `displayMathBreaks` drops the `<br>`.
 - **Footnote bodies:** the renderer puts them after the text, inline notes first
@@ -656,8 +658,11 @@ embeds skipped): 428 of 448 agree, 20 causes. The 39 fall into five groups:
   after whitespace. `stripBlockIds` gained that pass (keeping the space before the `^`, which
   Obsidian keeps), and so did `rehype-obsidian`'s `block-references.ts`, whose old pattern also
   stripped `e^x`.
-- **Gate:** `projection-triage.test.ts` holds 69 recordings (the triage's minimal forms and the
-  probes), 40 of which diverged before. Recorded cases unchanged by identity (3,469).
+- **Wikilink targets keep a backslash before `]`** (a later nightly run): `[[a\]b]]` links to
+  `a\]b` in Obsidian, and both presets unescaped it. Only `\#` is unescaped now, and `strict`'s
+  wikilink construct reads `\]` as target text rather than a closer.
+- **Gate:** `projection-triage.test.ts` holds 79 recordings (the triage's minimal forms and the
+  probes), 46 of which diverged before. Recorded cases unchanged by identity (3,469).
 - **Stray `]`:** `dropLabelOpeners` dropped the `[` after any unmatched `]`; Obsidian drops it only
   after a `]` that closed a label (`[x][[w]]`). Fixed, contract unchanged.
 
@@ -877,6 +882,69 @@ the baseline.
 configuration) of seeds 0-999,999. `census.yml` runs the million weekly as eight 125,000-seed jobs,
 each compared to the baseline over its own range, and fails on any new seed.
 `--update-baseline` refuses to write while any seed is new, so the file only records progress.
+A seed is new when it fails a violation the baseline does not record for it, so a seed held for
+the tree check below still fails the gate if it starts changing the words.
+
+**Formatting keeps the tree, not only the words** (before 2.1). A new invariant,
+`format: changes the tree`, compares `shapeOf` of the parse before and after one format, where
+the words already agree. `shapeOf` sets aside what renders the same:
+
+- positions, `data`, list and item looseness;
+- an HTML block's trailing blank lines, a comment's parsed body and edge whitespace;
+- empty cells padding a short row, and a table's alignment;
+- a break against a line ending, whitespace runs in text, inline code and formulas;
+- whitespace at a paragraph's or heading's edges, through any emphasis there.
+
+Two of these are upstream's writer, not ours: `mdast-util-to-markdown` widens a table's header
+to its longest row, which RENDERS cells a short header hid, and writes `align` back as it likes.
+A first normalization truncated rows to the header and counted the revealed cells as a loss.
+
+Changing the invariant set needs a baseline RESET, the one case where a new seed is no
+regression: `census.ts --reset-baseline <file>` writes regardless. Read the run's new seeds by
+kind first. The first run of the new check found 3,405 new seeds, 81 of them on the OLD kinds,
+which were real regressions of this round (an empty `$$$$` lost its `&#x20;`, a paragraph written
+on a callout's empty title line). The second found 486 more on the old kinds, all from two
+fixes made in between; both were narrowed. The census is the gate for exactly this.
+
+Fixed, measured on the corpus first, then the census:
+
+- a task box over any block, or over nothing (`- [ ] `, about 780 seeds);
+- a wikilink target written as spelled: resolving maps a no-break space to a space and applies
+  NFC, and the writer built from the resolved parts (`[[*⍽*]]`, about 970 seeds). The spelling
+  rides in `data.spelledPath` / `spelledHeading` (`wikilink-target.ts`) and is written while it
+  still resolves to the part, so an edited target wins;
+- `legacy`: a line holding only a no-break space after a break is written `&#xA0;`, since
+  remark-parse 8 trims lines with JavaScript's `\s` and reads it as blank (about 460 seeds).
+  Not under `strict`, where the encoding broke a bare reference before it;
+- `strict`: an inline footnote that a `[^` dissolves keeps its children, unless they hold
+  another note or cross its brackets (`[^[^<https://e.test>]]` kept its autolink as text, about
+  260 seeds);
+- a flow comment stays a block; a `#` run escaped in full; a callout's empty title kept, and a
+  definition or HTML on it written there, code, comments and paragraphs below it; emphasis over
+  emphasis ending in a tag written `_*#tag*_`; a definition with several blocks in a list item
+  written at four columns (`legacy`); `strict` callout titles re-synced after the last pass.
+
+Measured: the referee corpus fails the tree check in 17 documents under each preset (first
+measured at 441 legacy and 545 strict, with a narrower normalization). The million seeds: old
+kinds 442 -> **438** failing seeds (5 fixed, 1 new: `561649`, whose minimal form fails at HEAD
+too), plus 2,543 seeds failing only the tree check, now the baseline (2,981 seeds, 8,579 pairs).
+Unchanged by identity: referee 6,830 (spans 6,830), contract 3,469, strict spec 8, recorded
+cases 2,965, definitions 5,333, references 1,523.
+
+Left, by family (seeds):
+
+| seeds | preset | family                                                                     |
+| ----: | ------ | -------------------------------------------------------------------------- |
+|   885 | legacy | a tag ending nested emphasis and strong swaps their order (`_**#a/b**_`)   |
+|   646 | both   | a whitespace formula inside a highlight gains an `&#x20;` text (`==$⍽$==`) |
+|   793 | both   | an empty callout title over code or a comment is lost, written below it    |
+|   110 | strict | a code span over a line ending with trailing space                         |
+|    99 | strict | a literal URL after `_#tag_` becomes a link once escapes are written       |
+|    15 | strict | a reference over a setext underline, and smaller tails                     |
+
+The callout row needs a live answer first: whether Obsidian renders `> [!note] ~~~` with the
+type's title or none decides which tree is right. The corpus also still changes the words in 70
+`strict` documents (72 before this round) and 2 `legacy` ones (7), none new.
 
 **Traps:** `fmt`-style probes that look a configuration up by name silently run `legacy` for a
 JSON one; a "words" metric must not count node boundaries, and cannot see a loss the PARSE made
@@ -983,8 +1051,8 @@ unit test "reads a tag's characters as Obsidian does", which fails on the old cl
 5. **`normalize.ts`** carries compensations for micromark's offsets. Only rp8 trees reach it now
    (every gate runs the `legacy` profiles), and two compensations already had to be generalised
    because they broke rp8 positions that were right. Simplifying it is safe but unmeasured.
-6. **The invariant fuzz holds over seeds 0-10,000** under every configuration (see "Fuzzing").
-   Beyond that, untested; the nightly sweep draws 5,000 fresh seeds.
+6. **The invariant fuzz holds over seeds 0-10,000** under every configuration (see "Fuzzing"),
+   bar the tree check's recorded families; the census baseline holds the rest of the million.
 7. **The fuzz triage's leftovers:** self-embeds (out of scope), and `[^1]: - [ ] [` /
    `^[[^1]]]`, where Obsidian's renderer and its cache disagree.
 8. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,

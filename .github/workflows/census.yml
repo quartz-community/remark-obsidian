@@ -14,6 +14,8 @@ name: Invariant census
 #     --update-baseline test/parity/goldens/census-baseline.json
 #
 # which refuses to write while any seed is new, so the baseline only ever records progress.
+# After a change to the invariants themselves, `--reset-baseline` writes it regardless; read the
+# new seeds by violation first (AGENTS.md, "Formatting keeps the tree").
 
 on:
   schedule:
