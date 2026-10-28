@@ -210,7 +210,9 @@ function tablePipeStyles(tables: any): void {
   } as Tokenizer;
 }
 
-const Wikilink = /^!?\[\[(?:(?!\[\[)[^\n])+?\]\]/;
+// U+2028 and U+2029 end a wikilink as a line ending does: Obsidian reads `[[a\u2028b]]` as no
+// link, while U+0085 stays inside one (found by `fuzz/charclass-sweep.ts`).
+const Wikilink = /^!?\[\[(?:(?!\[\[)[^\n\r\u2028\u2029])+?\]\]/;
 
 /** Wikilinks and embeds (D1). */
 function wikilinks(tables: any): void {

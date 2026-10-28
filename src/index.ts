@@ -40,6 +40,7 @@ import { breakToMarkdown } from "./lib/mdast/break-to-markdown.js";
 import { highlightToMarkdown } from "./lib/mdast/highlight-to-markdown.js";
 import { calloutToMarkdown } from "./lib/mdast/callout-to-markdown.js";
 import { commentToMarkdown } from "./lib/mdast/comment-to-markdown.js";
+import { footnoteIdentifierTransform } from "./lib/footnote-identifier.js";
 import { tagToMarkdown } from "./lib/mdast/tag-to-markdown.js";
 import { inlineFootnoteToMarkdown } from "./lib/mdast/inline-footnote-to-markdown.js";
 import {
@@ -603,6 +604,9 @@ export default function remarkObsidian(
     // lines below a quote-with-heading, and CommonMark makes it one block.
     adjacentIndentedCodeTransform(tree, String(file));
     // Last, so every pass above only has to keep its offsets honest.
+    // Last before positions: every pass above, re-parsed fragments included, built identifiers
+    // the CommonMark way; Obsidian's are the label lowercased.
+    footnoteIdentifierTransform(tree);
     normalizePointsTransform(tree, String(file));
   };
 

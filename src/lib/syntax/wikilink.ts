@@ -19,7 +19,11 @@ function isLineEnding(code: Code): boolean {
   return (
     code === codes.lineFeed ||
     code === codes.carriageReturn ||
-    code === codes.carriageReturnLineFeed
+    code === codes.carriageReturnLineFeed ||
+    // U+2028 and U+2029, which Obsidian also reads as ending a wikilink (found by
+    // `fuzz/charclass-sweep.ts`); micromark does not count them as line endings.
+    code === 0x2028 ||
+    code === 0x2029
   );
 }
 

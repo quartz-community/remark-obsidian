@@ -33,13 +33,16 @@ import type {
   Tokenizer,
 } from "micromark-util-types";
 
-/** `micromark-util-normalize-identifier`, inlined: it is not a direct dependency. */
+/**
+ * `micromark-util-normalize-identifier`, inlined, with Obsidian's case rule: a label is matched
+ * lowercased, not case-folded (`toLowerCase().toUpperCase()`), so `[^\u00dfb]` does not reach a
+ * `[^SSB]` definition, as it does not in Obsidian (found by `fuzz/charclass-sweep.ts`).
+ */
 function normalizeIdentifier(value: string): string {
   return value
     .replace(/[\t\n\r ]+/g, " ")
     .replace(/^ | $/g, "")
-    .toLowerCase()
-    .toUpperCase();
+    .toLowerCase();
 }
 
 interface Parser {

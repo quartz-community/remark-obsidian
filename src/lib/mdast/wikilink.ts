@@ -119,8 +119,10 @@ export function wikilinkFromMarkdown(): Extension {
         // embed of the note `* *`. Applied to the resolved target only -- `value`
         // and the source keep the character the author typed, so a formatter
         // cannot quietly rewrite it.
-        node.path = node.path.replace(/\u00a0/g, " ");
-        node.heading = node.heading.replace(/\u00a0/g, " ");
+        // Resolved NFC too, as Obsidian resolves it: `[[cafe\u0301]]` links to `caf\u00e9`
+        // (found by `fuzz/charclass-sweep.ts`). `value` keeps what the author typed.
+        node.path = node.path.replace(/\u00a0/g, " ").normalize("NFC");
+        node.heading = node.heading.replace(/\u00a0/g, " ").normalize("NFC");
 
         // An alias is never stripped, even when it is the part touching the
         // closer: `[[a|b\]]` keeps its `b\`. Only a resolved target loses the

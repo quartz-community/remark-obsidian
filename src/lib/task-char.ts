@@ -31,7 +31,10 @@ export function customTaskCharTransform(tree: Root, source?: string) {
     const firstText = firstChild.children?.[0];
     if (!firstText || firstText.type !== "text") return;
 
-    const match = firstText.value.match(/^\[([^\]])\]\s/);
+    // One UTF-16 unit, never a line terminator: Obsidian reads `- [\u2029] x` as no task, while
+    // a tab, U+0085 or `[` is one (found by `fuzz/charclass-sweep.ts`). An astral character
+    // is two units, so it fails here as it does in the app.
+    const match = firstText.value.match(/^\[([^\]\u2028\u2029])\]\s/);
     if (!match) return;
 
     const taskChar = match[1];

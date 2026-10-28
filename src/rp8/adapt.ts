@@ -158,8 +158,10 @@ function wikilink(raw: string): { type: "wikilink"; [key: string]: unknown } {
   if (last) node[last] = node[last].trimEnd();
   const written = node.path;
   const writtenHeading = node.heading;
-  node.path = node.path.replace(/\u00a0/g, " ");
-  node.heading = node.heading.replace(/\u00a0/g, " ");
+  // Resolved NFC, as Obsidian resolves it: `[[cafe\u0301]]` links to `caf\u00e9`, and `a#cafe\u0301` to
+  // the composed heading. Only the resolved parts: `value` keeps what the author typed.
+  node.path = node.path.replace(/\u00a0/g, " ").normalize("NFC");
+  node.heading = node.heading.replace(/\u00a0/g, " ").normalize("NFC");
   const resolved = parts.heading ? "heading" : parts.path ? "path" : undefined;
   let stripped: "path" | "heading" | undefined;
   if (resolved && node[resolved].endsWith("\\")) {
