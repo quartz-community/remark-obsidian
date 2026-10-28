@@ -547,7 +547,7 @@ has no coverage there, not that it agrees. Footnotes are in **neither** spec: GF
 ## Gates — what "done" means
 
 ```bash
-npm test          # 546 tests / 27 files. Contains the contract gate.
+npm test          # 551 tests / 27 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -693,6 +693,20 @@ wikilink; footnote labels lowercased rather than case-folded (strict). Plus harn
 - **The instrument:** `wordsOf` read a `break` as nothing, so `s` + break + `[l` was one word, and
   read a comment's words twice (value and children) with no boundary.
 
+The last three closed after, with the 600 gate's list emptied:
+
+- **Seed 373:** a title formula over a lazy `===`. When the body read alone is no paragraph, the
+  straddling node's rest is read inline and joins the body. Obsidian ends the quote there, but
+  it does so for a plain quote too, which makes it CommonMark laziness that `strict` reads by
+  the spec. Recorded live: `> a` / `b` / `===` gives a heading outside the quote.
+- **`[^_[^1]\_]` (quartz-strict):** `bracketLabelReferences` took only the text's LAST `[^`.
+- **`[^[[a|b]]]` after an unclosed `^[` (strict):** the inline-footnote scan's "no `]` remains"
+  memo was recorded at a paragraph's end but applied document-wide. So any unclosed `^[` killed
+  every later inline footnote: `^[a` / blank / `^[b]` held none.
+- **`&` after a character reference:** remark-parse 8 decodes a bare `&` before punctuation,
+  anywhere after a reference, as that reference (`&#65; x &,` reads `A x A,`).
+  `guardAmpersands` escapes it.
+
 Unchanged by identity: referee 6,830, spec divergences 8, strict recorded cases 2,965, strict
 referee definitions 5,333 and references 1,520. `roundtrip.test.ts`'s unsettled set went from 6
 to 3.
@@ -802,13 +816,14 @@ unit test "reads a tag's characters as Obsidian does", which fails on the old cl
 5. **`normalize.ts`** carries compensations for micromark's offsets. Only rp8 trees reach it now
    (every gate runs the `legacy` profiles), and two compensations already had to be generalised
    because they broke rp8 positions that were right. Simplifying it is safe but unmeasured.
-6. **Formatting still changes words** in 1 of 600 per-push seeds (373, `strict`), down from 31
-   (87 seed-and-configuration pairs):
-   `> [!note] $$y^2` / `y^2$$ ` / `===`, a title formula across its line end over a lazy setext
-   underline, which `legacy` reads as a heading outside the callout. Beyond the gate range, in
-   seeds 600-2,000: two `strict` bracket shapes, a label holding `[` (`[^_[^1]_]`) and a
-   wikilink inside an undefined `[^` that forms or not depending on what precedes it
-   (`[^[[a|b]]]`).
+6. **Formatting still changes words beyond the per-push range.** Seeds 0-2,000 are clean under
+   every configuration. Seeds 2,000-5,000 hold 15 failing seeds, 14 distinct shapes, untriaged. They include:
+   - `_***strong***_` and `> _under_**strong****~~del~~`: nested emphasis spellings (legacy);
+   - `> > %%note` / `note%% `: a comment closed on a lazy line (strict);
+   - `1. __under_**#a/b**`;
+   - ` ``` ` / `<htt` / ` ``` ` / ` #a/`: a tag after a fence;
+   - `![[i` / `    [^https://e.test/p]` (quartz-strict);
+   - and bracket-heavy link, embed and footnote mixes.
 7. **The fuzz triage's leftovers:** self-embeds (out of scope), and `[^1]: - [ ] [` /
    `^[[^1]]]`, where Obsidian's renderer and its cache disagree.
 8. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,

@@ -433,11 +433,24 @@ function bracketLabelReferences(tree: Root, source: string): void {
       // That shape is also what tells this apart from `[^[note]](url)`, where the
       // footnote is inside a *link* rather than beside a text node: there the outer
       // pair really is a link label and Obsidian agrees.
-      let at = value.lastIndexOf("[^");
-      if (at === -1) {
-        if (!value.endsWith("[")) continue;
-        if (children[index + 1]?.type !== "footnote") continue;
-        at = value.length - 1;
+      // Every `[^` in the text, last first: `[^_[^1]\_]` holds two, and the label is
+      // the OUTER one's, read to the first `]` (`_[^1`). Taking only the last read
+      // `1`, which holds no bracket, so the outer opener stayed text (found by
+      // `fuzz/invariant-sweep.ts`; legacy reads `_[^1`).
+      const candidates: number[] = [];
+      for (
+        let found = value.lastIndexOf("[^");
+        found !== -1;
+        found = found === 0 ? -1 : value.lastIndexOf("[^", found - 1)
+      ) {
+        candidates.push(found);
+      }
+      if (
+        candidates.length === 0 &&
+        value.endsWith("[") &&
+        children[index + 1]?.type === "footnote"
+      ) {
+        candidates.push(value.length - 1);
       }
       // Through the alignment, not by adding the index. A value and its source run
       // to different lengths wherever an escape or a character reference sits
@@ -446,23 +459,34 @@ function bracketLabelReferences(tree: Root, source: string): void {
       // and the `[^` guard below declined a case that should be claimed.
       const slice = source.slice(openerStart, openerEnd);
       const aligned = alignToSource(slice, value);
-      const markerAt =
-        aligned === null
-          ? openerStart + at
-          : openerStart + (aligned.at[at] ?? at);
-      if (source.slice(markerAt, markerAt + 2) !== "[^") continue;
-
-      const close = source.indexOf("]", markerAt + 2);
-      if (close === -1) continue;
-      const label = source.slice(markerAt + 2, close);
-      if (!label.includes("[")) continue;
-      if (label.includes("\n") || /^\s*$/u.test(label)) continue;
-      // A name may not hold ASCII whitespace: `a[^x [y] b` is no reference in
-      // Obsidian, where we claimed one named `x [y`. The test has to be ASCII
-      // rather than `\s`, because the referee's answers hold six names carrying
-      // U+00A0 or U+3000 that Obsidian DOES accept -- `\s` covers U+00A0 and
-      // would reject them. The sibling project states this as E5b.
-      if (/[ \t\v\f]/u.test(label)) continue;
+      let at = -1;
+      let markerAt = -1;
+      let close = -1;
+      let label = "";
+      for (const candidate of candidates) {
+        const marker =
+          aligned === null
+            ? openerStart + candidate
+            : openerStart + (aligned.at[candidate] ?? candidate);
+        if (source.slice(marker, marker + 2) !== "[^") continue;
+        const end = source.indexOf("]", marker + 2);
+        if (end === -1) continue;
+        const name = source.slice(marker + 2, end);
+        if (!name.includes("[")) continue;
+        if (name.includes("\n") || /^\s*$/u.test(name)) continue;
+        // A name may not hold ASCII whitespace: `a[^x [y] b` is no reference in
+        // Obsidian, where we claimed one named `x [y`. The test has to be ASCII
+        // rather than `\s`, because the referee's answers hold six names carrying
+        // U+00A0 or U+3000 that Obsidian DOES accept -- `\s` covers U+00A0 and
+        // would reject them. The sibling project states this as E5b.
+        if (/[ \t\v\f]/u.test(name)) continue;
+        at = candidate;
+        markerAt = marker;
+        close = end;
+        label = name;
+        break;
+      }
+      if (at === -1) continue;
 
       const outer = balancedClose(source, markerAt);
       if (outer !== -1) {

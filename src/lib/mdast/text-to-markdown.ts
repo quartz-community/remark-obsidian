@@ -25,11 +25,8 @@ export function textToMarkdown(tags: boolean): Options {
           // A literal backslash ending the text before whitespace: the writer may encode that
           // whitespace at an emphasis edge as `&#x20;`, and the backslash would then escape its
           // `&` (`*em**\\n \\ *` came back holding `#x20` as a tag). Escaped, it reads the same.
-          .replace(/(?<!\\)((?:\\\\)*)\\(\s+)$/u, "$1\\\\$2")
-          // A `&` after a line's leading whitespace, which the writer encodes as `&#x20;`: remark-parse 8
-          // reads `&#x20;&,` as two spaces and a comma, losing the `&` (published rp8 too), so
-          // ` &amp;, ` lost a word on format. Escaped, the `&` stays.
-          .replace(/^((?:&#x(?:20|9);|[ \t])+)&/gimu, "$1\\&");
+          .replace(/(?<!\\)((?:\\\\)*)\\(\s+)$/u, "$1\\\\$2");
+        written = guardAmpersands(written);
         // A tag after a bracket pair (`a [x]#t`) stands because the pair is a construct to
         // Obsidian, defined or not. The writer escapes every `[` in text, which breaks the pair
         // and the tag with it. A pair the tree holds as TEXT was undefined -- a defined one would
@@ -65,4 +62,28 @@ export function textToMarkdown(tags: boolean): Options {
       },
     },
   };
+}
+
+/**
+ * remark-parse 8 decodes a bare `&` followed by punctuation, anywhere after a character
+ * reference in the same text, as that reference's character: `&#65; x &,` reads `A x A,`
+ * (published rp8 too, so Obsidian's). The writer makes such references itself -- a line's
+ * leading whitespace becomes `&#x20;` -- so ` &amp;, ` and `  $x^2$, &amp;, ` lost their `&` on
+ * format (found by `fuzz/invariant-sweep.ts`). After a reference, or a line's leading whitespace,
+ * such an `&` is escaped. One before them, or before a letter, digit, `#`, `<` or whitespace,
+ * reads as itself and is left alone.
+ */
+function guardAmpersands(written: string): string {
+  let armed = false;
+  return written.replace(
+    /(&#?[\da-z]+;)|((?:^|\n)[ \t]+)|(\\[\s\S])|&(?=[^\s\da-z#<])/giu,
+    (match: string, reference?: string, leading?: string, escape?: string) => {
+      if (reference || leading) {
+        armed = true;
+        return match;
+      }
+      if (escape) return match;
+      return armed ? "\\&" : match;
+    },
+  );
 }

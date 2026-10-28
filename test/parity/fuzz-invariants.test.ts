@@ -27,13 +27,9 @@ const SEEDS = 600;
 /**
  * Seeds whose formatting still changes the words, and the configurations it does it under.
  * EXACT in both directions, like the other ceilings here: a new entry fails, and so does one
- * that stops failing, so a fix has to remove its seeds. 373 is the one left of 31: under
- * `strict`, `> [!note] $$y^2` / `y^2$$ ` / `===` puts a formula across the title's line end over
- * a lazy setext underline, which `legacy` (and Obsidian) read as a heading outside the callout.
+ * that stops failing, so a fix has to remove its seeds. Empty since seed 373 closed; it held 31.
  */
-const KNOWN: Readonly<Record<number, string>> = {
-  373: "strict quartz-strict",
-};
+const KNOWN: Readonly<Record<number, string>> = {};
 
 describe("invariant fuzz", () => {
   it(
@@ -124,6 +120,18 @@ describe("invariant fuzz", () => {
       " ^[in\n1. ^[^blk]\t\\[^1]\n",
       "quartz-strict",
     ],
+    [
+      "title formula over a lazy setext line",
+      "> [!note] $$y^2\ny^2$$ \n===\n",
+      "strict",
+    ],
+    ["label holding [ before an escape", "]]], [^_[^1]_]\n", "quartz-strict"],
+    [
+      "inline footnote after an unclosed one",
+      " ^[in\n#  \n[^[[a|b]]]\n",
+      "strict",
+    ],
+    ["& after a reference", "  *_\n  $x^2$, &amp;, \n", "all-off"],
   ])("still holds: %s (%j under %s)", async (_name, markdown, config) => {
     expect(await invariantViolations(markdown, CONFIGS[config]!)).toEqual([]);
   });
@@ -145,6 +153,22 @@ describe("invariant fuzz", () => {
 
   // Not a property the words check can see: the parse itself dropped the line ending, so the
   // tree had nothing to lose between passes. Asked of the tree directly instead.
+  // An unclosed `^[` used to cost every inline footnote after it, in the whole document: the
+  // scan's "no `]` remains" memo ended at its paragraph but applied to every later offset.
+  it("reads an inline footnote after an unclosed one in another paragraph", () => {
+    const processor = unified()
+      .use(remarkParse)
+      .use(remarkGfm)
+      .use(remarkObsidian, { preset: "strict" });
+    const markdown = "^[a\n\n^[b]\n";
+    const tree = processor.runSync(processor.parse(markdown), markdown);
+    let notes = 0;
+    visit(tree, "footnote", () => {
+      notes++;
+    });
+    expect(notes).toBe(1);
+  });
+
   it("keeps the line ending inside an inline footnote", () => {
     for (const preset of ["legacy", "strict"] as const) {
       const processor = unified()

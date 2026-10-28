@@ -66,8 +66,10 @@ const bodyLineEnding: Construct = {
 };
 
 interface CloserMemo {
-  /** Offset from which no `]` remains, so no opener can close. */
+  /** Offset from which no `]` remains, so no opener can close... */
   noCloserFrom?: number;
+  /** ...up to here, where that scan's input ended. */
+  noCloserTo?: number;
 }
 
 /**
@@ -84,6 +86,11 @@ interface CloserMemo {
  * raises the depth a single `]` cannot clear, and yet succeeds from the second
  * -- so a failure says nothing about later positions. The absence of any `]`
  * does, since a later opener searches a subset of the same region.
+ *
+ * The region ends where the scan's input did, which is the end of the PARAGRAPH:
+ * micromark reads text one paragraph at a time. Applied to every later offset,
+ * `^[a` cost each inline footnote after it in the whole document, so `^[a` /
+ * blank / `^[b]` held none (found by `fuzz/invariant-sweep.ts`).
  */
 function memoFor(parser: unknown): CloserMemo {
   const host = parser as { inlineFootnoteCloserMemo?: CloserMemo };
@@ -106,7 +113,11 @@ function tokenize(
 
   /** Exhausted the input; only a run that never met a `]` proves anything. */
   function exhausted(code: Code): State | undefined {
-    if (!sawBracket) memoFor(self.parser).noCloserFrom = openerAt;
+    if (!sawBracket) {
+      const memo = memoFor(self.parser);
+      memo.noCloserFrom = openerAt;
+      memo.noCloserTo = self.now().offset;
+    }
     return nok(code);
   }
 
@@ -114,7 +125,12 @@ function tokenize(
     if (code !== CARET) return nok(code);
     openerAt = self.now().offset ?? 0;
     const memo = memoFor(self.parser);
-    if (memo.noCloserFrom !== undefined && openerAt >= memo.noCloserFrom) {
+    if (
+      memo.noCloserFrom !== undefined &&
+      memo.noCloserTo !== undefined &&
+      openerAt >= memo.noCloserFrom &&
+      openerAt < memo.noCloserTo
+    ) {
       return nok(code);
     }
     sawBracket = false;

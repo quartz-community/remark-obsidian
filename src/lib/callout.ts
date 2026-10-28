@@ -411,9 +411,14 @@ export function calloutTransform(
      * which is how those lines read in place. A text node across the line end
      * is cut at its first newline. Any other node across it -- a formula
      * opened by a `$$` in the title, `> [!note] $$a` / `b$$` -- is the title's
-     * text up to the line end, as the title's `$$` is in Obsidian, and the body
-     * is `reread`, the body read alone, when that is a paragraph.
+     * text up to the line end, as the title's `$$` is in Obsidian. The body is
+     * then `reread`, the body read alone, when that is a paragraph. When it is
+     * not, the node's rest below is read inline on its own and joins the body
+     * ahead of the children after it, so a formula over `===` (fuzz seed 373)
+     * reads as `b` / `===` does.
      */
+    const nonEmpty = (node: Node): boolean =>
+      node.type !== "text" || (node as Text).value !== "";
     function splitAtLineEnd(
       lineEnd: number,
       bodyFrom: number,
@@ -450,8 +455,8 @@ export function calloutTransform(
           rest.position = { start: { ...span.start }, end: { ...span.end } };
           moveStartTo(rest, source, bodyFrom, span.start.line + 1);
           if (rest.value !== "") body.push(rest);
-        } else if (reread) {
-          title.push({
+        } else {
+          const titleText = {
             type: "text",
             value: source.slice(span.start.offset, lineEnd),
             position: {
@@ -462,16 +467,33 @@ export function calloutTransform(
                 offset: lineEnd,
               },
             },
-          } as Text);
-          return {
-            title: title.filter(
-              (node) => node.type !== "text" || (node as Text).value !== "",
-            ),
-            body: reread,
-          };
-        } else return undefined;
+          } as Text;
+          if (reread) {
+            return {
+              title: [...title, titleText].filter(nonEmpty),
+              body: reread,
+            };
+          }
+          // The body alone read as no paragraph: lazy `===` under it made a setext
+          // heading. Then the rest of the node, on the lines below, is read inline on
+          // its own -- the formula's closing half, once its opener is title text --
+          // ahead of the children after it.
+          const map = mapLines(
+            source,
+            bodyFrom,
+            span.end.offset,
+            source.slice(0, bodyFrom).split("\n").length,
+          );
+          const tail = reparse(map.text).children[0];
+          if (tail?.type !== "paragraph") return undefined;
+          for (const node of tail.children) shiftByMap(node, map, 0);
+          title.push(titleText);
+          body.push(...(tail.children as Node[]));
+        }
       }
-      return body.length > 0 ? { title, body } : undefined;
+      return body.length > 0
+        ? { title: title.filter(nonEmpty), body }
+        : undefined;
     }
 
     let titleNodes: Node[];
