@@ -617,6 +617,7 @@ looking exactly like an update. The gating only ever REMOVES references, which i
 |                                |                    | + nightly, 5,000 fresh seeds              |                                                         |
 | `fuzz/charclass-sweep.ts`      | Obsidian, recorded | per push (`charclass.test.ts`, golden)    | character rules the fixed grammar alphabet cannot reach |
 |                                |                    | + nightly, a fresh category sample        |                                                         |
+| `fuzz/census.ts`               | none -- properties | by hand, sharded; `--baseline` to compare | how many fail, in which families; regressions by seed   |
 
 **Until these fixes (after 2.0.2), the nightly job reported nothing, whatever it found.** It saved `status=$?` after
 `| tee`, which is tee's status, so the last nights' 43-56 failing seeds read as success; and it
@@ -766,8 +767,8 @@ references 1,523.
 **The million-seed census** (seeds 0-1,000,000, 16 shards, 42 minutes; shrink and grouping a few
 minutes more). 1,668 seeds failed (0.17%): 3,719 seed-and-configuration pairs, 1,722 minimal forms,
 146 clusters keyed by violation kind, preset and the node types formatting loses or gains. The
-instrument lives in the session scratchpad; the method is what matters: shard, shrink each
-(seed, kind) once, group by the node delta, not by the form (1,631 of 1,722 forms were unique).
+instrument is `fuzz/census.ts`: shard, shrink each (seed, kind) once, group by the node delta,
+not by the form (1,631 of 1,722 forms were unique). Re-run it with `--baseline` after fixing.
 
 Fixed, each family with a pin:
 

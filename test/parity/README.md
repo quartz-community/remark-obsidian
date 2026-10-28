@@ -297,7 +297,7 @@ The corpus and the referee measure `legacy`. `strict` has its own:
 
 ## Fuzzing
 
-Three sweeps, each seeing what the others cannot. All are deterministic from a seed, so a report
+Three sweeps, each seeing what the others cannot, and a census that runs the invariant one at scale. All are deterministic from a seed, so a report
 is reproducible.
 
 | sweep                     | needs Obsidian | per push                                              | nightly (`fuzz.yml`)     |
@@ -305,6 +305,20 @@ is reproducible.
 | `fuzz/sweep.ts`           | yes            | --                                                    | 500 random seeds         |
 | `fuzz/invariant-sweep.ts` | no             | `fuzz-invariants.test.ts`, seeds 0-599                | 5,000 random seeds       |
 | `fuzz/charclass-sweep.ts` | yes            | `charclass.test.ts`, against `goldens/charclass.json` | a fresh character sample |
+| `fuzz/census.ts`          | no             | --                                                    | -- (by hand)             |
+
+- **Census** runs the invariant fuzz over a large range, sharded across processes, then shrinks
+  every failure and clusters the minimal forms by violation, preset and the node types formatting
+  loses or gains. Run it before and after a round of fixes, the second time with `--baseline`:
+
+  ```bash
+  npx tsx --conditions=development test/parity/fuzz/census.ts 0 1000000 --out <dir>
+  npx tsx --conditions=development test/parity/fuzz/census.ts 0 1000000 --out <dir2> --baseline <dir>
+  ```
+
+  A million seeds take about 42 minutes on 16 cores (`--workers`, default every core). It writes
+  `findings.json`, `clusters.json` and `report.md`, and with `--baseline` exits 1 when a seed
+  fails that did not before.
 
 - **Differential** composes known fragments into documents, records them in Obsidian, compares
   and shrinks every failure to a minimal form. It compares through the Quartz profiles, so it
@@ -345,6 +359,7 @@ command the issue names; the differential and character sweeps need `nix develop
 | `goldens-unchanged.mts`                         | Whether a recording changed anything but `recordedAt`   |
 | `fuzz/invariants.ts`, `fuzz/invariant-sweep.ts` | The invariant fuzz and its sweep                        |
 | `fuzz/charclass.ts`, `fuzz/charclass-sweep.ts`  | The character-class sweep                               |
+| `fuzz/census.ts`                                | The invariant fuzz at scale: sweep, shrink, cluster     |
 | `fuzz-invariants.test.ts`, `charclass.test.ts`  | Their per-push gates                                    |
 | `compose.mts`, `compose.ts`                     | Construct sequences against Obsidian                    |
 | `invariants.test.ts`                            | Structural invariants on the tree itself                |
