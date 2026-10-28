@@ -1,0 +1,63 @@
+name: Invariant census
+
+# The invariant fuzz over seeds 0-999,999, held to a committed baseline: any seed that fails and
+# is not in `test/parity/goldens/census-baseline.json` fails the run. The per-push gate covers
+# 600 seeds and the nightly sweep 5,000 random ones; this is the check that caught 691 and then
+# 104 regressions no other gate saw (AGENTS.md, "Fuzzing").
+#
+# Eight jobs of 125,000 seeds each, since one 4-core runner would take about three hours.
+# Each compares only its own range against the baseline. After a round of fixes, refresh the
+# baseline locally with the full range (about 43 minutes on 16 cores):
+#
+#   npx tsx --conditions=development test/parity/fuzz/census.ts 0 1000000 --out <dir> \
+#     --baseline test/parity/goldens/census-baseline.json \
+#     --update-baseline test/parity/goldens/census-baseline.json
+#
+# which refuses to write while any seed is new, so the baseline only ever records progress.
+
+on:
+  schedule:
+    - cron: "0 3 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  census:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: npm
+
+      - run: npm ci
+
+      - name: Census
+        run: |
+          from=$(( ${{ matrix.shard }} * 125000 ))
+          npx tsx --conditions=development test/parity/fuzz/census.ts "$from" 125000 \
+            --out census --baseline test/parity/goldens/census-baseline.json
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Report
+        if: always()
+        run: |
+          if [ -f census/report.md ]; then cat census/report.md >> "$GITHUB_STEP_SUMMARY"; fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: census-${{ matrix.shard }}
+          path: census/
+          if-no-files-found: ignore

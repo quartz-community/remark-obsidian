@@ -21,7 +21,7 @@ import { candidates } from "./shrink.js";
  * into families. Needs no Obsidian. A million seeds take about 42 minutes on 16 cores.
  *
  *   npx tsx --conditions=development test/parity/fuzz/census.ts <from> <count> --out <dir> \
- *     [--workers <n>] [--baseline <dir>]
+ *     [--workers <n>] [--baseline <dir|file>] [--update-baseline <file>]
  *
  * Where `invariant-sweep.ts` reports one document per violation, this sizes the problem: every
  * failing (seed, violation) is shrunk once, under the first configuration it fails, and the
@@ -31,7 +31,10 @@ import { candidates } from "./shrink.js";
  * Writes into `<dir>`: `findings.json` (every failing seed and configuration), `clusters.json`
  * (each example with its own seed) and `report.md`, whose forms escape every character outside
  * printable ASCII. With `--baseline <dir>`, a previous run's directory, it also reports the seeds
- * fixed and the seeds failing that did not before, and exits 1 on any new one: a census re-run
+ * fixed and the seeds failing that did not before, and exits 1 on any new one. The baseline is a
+ * run's directory or a `findings.json`, such as the committed `goldens/census-baseline.json`;
+ * `--update-baseline <file>` rewrites that file from this run, and refuses while any seed is
+ * new, so it only ever records progress. A census re-run
  * after a round of fixes caught 691 regressions no other gate saw (AGENTS.md, "Fuzzing").
  */
 
@@ -206,6 +209,7 @@ async function main() {
   };
   const out = option("--out");
   const baseline = option("--baseline");
+  const updateBaseline = option("--update-baseline");
   const workers = Number(option("--workers") ?? os.availableParallelism());
   const from = Number(args[0]);
   const count = Number(args[1]);
@@ -218,7 +222,7 @@ async function main() {
     workers <= 0
   ) {
     process.stderr.write(
-      "usage: census <from> <count> --out <dir> [--workers <n>] [--baseline <dir>]\n",
+      "usage: census <from> <count> --out <dir> [--workers <n>] [--baseline <dir|file>] [--update-baseline <file>]\n",
     );
     process.exit(2);
   }
@@ -349,7 +353,12 @@ async function main() {
     const before = new Set(
       (
         JSON.parse(
-          fs.readFileSync(path.join(baseline, "findings.json"), "utf8"),
+          fs.readFileSync(
+            fs.statSync(baseline).isDirectory()
+              ? path.join(baseline, "findings.json")
+              : baseline,
+            "utf8",
+          ),
         ) as Finding[]
       )
         .map((finding) => finding.seed)
@@ -409,6 +418,20 @@ async function main() {
     `${lines.slice(0, baseline ? 6 + kinds.size : 4 + kinds.size).join("\n")}\n`,
   );
   // Queued writes, and no exit: a pipe can lose what process.exit discards (AGENTS.md).
+  // A baseline only moves forward: written when nothing failed that the old one passed.
+  if (updateBaseline) {
+    if (fresh.length > 0) {
+      log(
+        `not updating ${updateBaseline}: ${fresh.length} seeds fail that the baseline passed`,
+      );
+    } else {
+      const sorted = [...findings].sort(
+        (a, b) => a.seed - b.seed || a.config.localeCompare(b.config),
+      );
+      fs.writeFileSync(updateBaseline, `${JSON.stringify(sorted)}\n`);
+      log(`baseline written: ${updateBaseline} (${sorted.length} pairs)`);
+    }
+  }
   process.exitCode = baseline && fresh.length > 0 ? 1 : 0;
 }
 
