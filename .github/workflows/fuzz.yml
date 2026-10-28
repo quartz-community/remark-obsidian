@@ -49,15 +49,20 @@ jobs:
           key: obsidian-cache-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
           restore-keys: obsidian-cache-${{ runner.os }}-
 
+      # `$GITHUB_ENV` reaches only LATER steps, so the window manager started here needs DISPLAY
+      # exported in this one; without it every run logged `XOpenDisplay() failed` and recorded
+      # with no window manager. Fail here rather than record without one.
       - name: Start virtual display
         run: |
           sudo apt-get update -q
           sudo apt-get install -y -q xvfb herbstluftwm x11-utils
-          echo "DISPLAY=:99" >> "$GITHUB_ENV"
+          export DISPLAY=:99
+          echo "DISPLAY=$DISPLAY" >> "$GITHUB_ENV"
           Xvfb :99 -screen 0 1280x1024x24 +extension GLX -noreset &
           for _ in $(seq 1 40); do xdpyinfo -display :99 >/dev/null 2>&1 && break; sleep 0.25; done
           herbstluftwm &
           sleep 2
+          pgrep -x herbstluftwm >/dev/null || { echo "herbstluftwm is not running"; exit 1; }
 
       # A fresh base each night, so successive runs explore new ground rather
       # than re-confirming the same seeds. The chosen base is echoed into the
@@ -84,7 +89,9 @@ jobs:
           npx tsx --conditions=development test/parity/fuzz/sweep.ts \
             "${{ steps.range.outputs.from }}" "${{ steps.range.outputs.count }}" \
             | tee fuzz-report.txt
-          echo "status=$?" >> "$GITHUB_OUTPUT"
+          # The SWEEP's status, not tee's: `$?` after a pipeline is its last command's, which is
+          # always 0, so until 2.0 every disagreement read as success and nothing was reported.
+          echo "status=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
           { echo '```'; cat fuzz-report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Keep the recording for triage
@@ -102,11 +109,14 @@ jobs:
             const fs = require('node:fs');
             const report = fs.readFileSync('fuzz-report.txt', 'utf8').slice(0, 55000);
             const from = '${{ steps.range.outputs.from }}';
-            await github.rest.issues.create({
+            // One rolling issue, not one a night: each run comments on the open one.
+            const open = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Differential fuzz: disagreements from seed base ${from}`,
-              body: [
+              state: 'open',
+              labels: 'fuzz',
+            });
+            const body = [
                 'A nightly fuzz sweep disagreed with Obsidian.',
                 '',
                 'Generation is deterministic, so every seed below reproduces exactly:',
@@ -126,8 +136,23 @@ jobs:
                 report,
                 '```',
                 '</details>',
-              ].join('\n'),
-            });
+              ].join('\n');
+            if (open.data.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: open.data[0].number,
+                body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: 'Differential fuzz: disagreements with Obsidian',
+                body,
+                labels: ['fuzz'],
+              });
+            }
 
       - name: Fail the run when anything disagreed
         if: steps.check.outputs.status != '0'
