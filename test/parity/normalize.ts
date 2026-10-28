@@ -358,6 +358,10 @@ function dropLabelOpeners(value: string): string {
     // `[foo][ref[]` the `]` closes the only opener and the next `[` is a label's,
     // while in `[ref[][]` it closes an inner one and the outer is still waiting.
     let depth = 0;
+    // Whether the `]` right before closed an opener. A stray one closes nothing, and the `[`
+    // after it is shown: Obsidian renders `(u)]][[` and `*]][` as written, where `[x][[w]]`
+    // drops the `[` (found by the differential fuzz, 2026-10-28, 2 of 20 causes).
+    let closed = false;
     for (let scan = 0; scan < at; scan++) {
       const character = out[scan];
       if (character === "\\") {
@@ -365,9 +369,12 @@ function dropLabelOpeners(value: string): string {
         continue;
       }
       if (character === "[") depth += 1;
-      else if (character === "]" && depth > 0) depth -= 1;
+      else if (character === "]") {
+        closed = depth > 0;
+        if (closed) depth -= 1;
+      }
     }
-    if (depth > 0) continue;
+    if (depth > 0 || !closed) continue;
     // Only a label that is not one: a WELL-FORMED label after the closer is a full reference
     // nothing defines, and renders whole -- `a [text][^9] b` shows `[text][^9]`. A tree from
     // remark-parse 8 never holds that as text, since its reader makes a reference node of
@@ -2240,10 +2247,18 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     ) {
       slashes += 1;
     }
-    const heading =
-      slashes > 0 && !node.heading.endsWith("\\")
-        ? node.heading + "\\".repeat(slashes)
+    // The cache reports the resolved heading NFC (`a#cafe\u0301` resolves to the composed
+    // form) and DISPLAYS it as written, so the written spelling is kept wherever it is the same
+    // heading.
+    const writtenHeading = rawHeading.slice(0, rawHeading.length - slashes);
+    const headingText =
+      writtenHeading.normalize("NFC") === node.heading
+        ? writtenHeading
         : node.heading;
+    const heading =
+      slashes > 0 && !headingText.endsWith("\\")
+        ? headingText + "\\".repeat(slashes)
+        : headingText;
     // The same asymmetry one segment along: when the PATH is the last segment, a
     // trailing backslash in it survives into the display and not into the target.
     // `[[target\]]` resolves to `target` and displays `target\`, unanimously across the
@@ -2265,7 +2280,10 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
     // and taking the segment wholesale was refuted once on exactly that.
     const writtenPath = inner.split(/[#|]/u, 1)[0] ?? "";
     const resolvedPath =
-      writtenPath.replace(/[^\S ]/gu, " ") === node.path
+      writtenPath.replace(/[^\S ]/gu, " ").normalize("NFC") === node.path ||
+      // NBSP alone resolves as a space; other whitespace, U+2000 among them, only NFC's own
+      // mapping (U+2000 -> U+2002) -- and is displayed as written either way.
+      writtenPath.replace(/\u00a0/gu, " ").normalize("NFC") === node.path
         ? writtenPath
         : node.path;
     const shownPath =
@@ -2804,11 +2822,15 @@ export function computeOurs(tree: Root, source: string): ComputedMeta {
       // from the other side: `- [ ]` with its line ending there is not a task, and
       // `- [ ]x` with no separator is not one either -- Obsidian reports `-` for both.
       // So a task is a box delimited on both sides, not merely a bracket pair.
-      const marker = /^(?:[-*+]|\d{1,9}[.)])[ \t]*\[[^[]\][ \t]*$/u.test(
-        itemLine,
-      )
+      //
+      // The box holds ONE UTF-16 unit that is not a line terminator, which is `.` without
+      // the `u` flag: asked of the app, `- [[] x` is a task with `[`, a tab or U+0085 is one,
+      // and an astral character such as an emoji, U+2029 or two spaces is not. The `[`
+      // exclusion this used to carry is the trailing-whitespace rule's job: `1. [[]]` is
+      // no task because `]` follows the box. (Found by `fuzz/charclass-sweep.ts`.)
+      const marker = /^(?:[-*+]|\d{1,9}[.)])[ \t]*\[.\][ \t]*$/.test(itemLine)
         ? null
-        : /^(?:[-*+]|\d{1,9}[.)])\s*\[([^[])\](?=[ \t])/u.exec(
+        : /^(?:[-*+]|\d{1,9}[.)])\s*\[(.)\](?=[ \t])/.exec(
             source.slice(item.position.start.offset!),
           );
       // A ROOT item takes the same line-start clamp `sections` and `headings` already

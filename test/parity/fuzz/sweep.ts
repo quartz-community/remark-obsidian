@@ -32,11 +32,24 @@ const { cases, mathTex } = recordBatch(
   seeds.map((seed) => ({ id: `fuzz/${seed}`, markdown: generate(seed) })),
 );
 
+/**
+ * An embed with no target -- `![[ ]]`, `![[#heading]]` -- embeds the note into itself, and
+ * Obsidian then renders the note's tags, math and tasks once per level of the recursion (six in
+ * every recorded case). That is vault resolution, outside this package, and `fuzz/embed/64` is
+ * triaged `out-of-scope` for it; on 2026-10-28 it was 6 of the 19 causes a sweep reported.
+ */
+const SELF_EMBED = /!\[\[\s*(?:#[^\]]*)?\]\]/u;
+
 const failures = new Map<string, string>();
 let crashes = 0;
+let selfEmbeds = 0;
 for (const seed of seeds) {
   const golden = cases[`fuzz/${seed}`] as GoldenCase | undefined;
   if (!golden) continue;
+  if (SELF_EMBED.test(golden.markdown)) {
+    selfEmbeds += 1;
+    continue;
+  }
   const result = compareCase(golden, mathTex);
   if (result.matched) continue;
   if (result.crash) crashes += 1;
@@ -44,8 +57,9 @@ for (const seed of seeds) {
 }
 
 process.stderr.write(
-  `${seeds.length - failures.size}/${seeds.length} agree` +
+  `${seeds.length - selfEmbeds - failures.size}/${seeds.length - selfEmbeds} agree` +
     (crashes > 0 ? `, ${crashes} CRASHED` : "") +
+    (selfEmbeds > 0 ? `, ${selfEmbeds} self-embedding skipped` : "") +
     `\n`,
 );
 

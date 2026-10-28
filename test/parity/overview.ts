@@ -234,6 +234,20 @@ export const ORACLES: readonly Oracle[] = [
     test: "fuzz-invariants.test.ts",
   },
   {
+    name: "character classes",
+    command: "npm test",
+    gate: "absolute",
+    compares: [
+      "one character at a time in each construct's slot, against recorded metadataCache answers",
+      "tags, block ids, footnote labels, wikilink and embed targets, callout types, task boxes",
+    ],
+    blind: [
+      "characters outside the recorded sample, which the nightly sweep draws afresh",
+      "rendering: it compares the cache's facts, not the page",
+    ],
+    test: "charclass.test.ts",
+  },
+  {
     name: "positioned points",
     command: "npm test",
     gate: "ceiling",

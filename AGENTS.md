@@ -608,6 +608,60 @@ disagreement; overwriting the 46 would have replaced corrected answers with inco
 looking exactly like an update. The gating only ever REMOVES references, which is what makes
 "take the longer list" the right merge rule. Re-run `record-referee-spans.mts` after any re-sync.
 
+### Fuzzing: three sweeps, each blind where another sees
+
+| sweep                          | oracle             | where                                     | finds                                                   |
+| ------------------------------ | ------------------ | ----------------------------------------- | ------------------------------------------------------- |
+| `fuzz/sweep.ts` (differential) | Obsidian, recorded | nightly, 500 seeds                        | n-way construct interactions, `legacy` only, tree facts |
+| `fuzz/invariant-sweep.ts`      | none -- properties | per push (`fuzz-invariants.test.ts`, 600) | HTML, formatting, `strict`, every option set            |
+|                                |                    | + nightly, 5,000 fresh seeds              |                                                         |
+| `fuzz/charclass-sweep.ts`      | Obsidian, recorded | per push (`charclass.test.ts`, golden)    | character rules the fixed grammar alphabet cannot reach |
+|                                |                    | + nightly, a fresh category sample        |                                                         |
+
+**Until these fixes (after 2.0.2), the nightly job reported nothing, whatever it found.** It saved `status=$?` after
+`| tee`, which is tee's status, so the last nights' 43-56 failing seeds read as success; and it
+recorded without a window manager (DISPLAY written only to `$GITHUB_ENV`). Both are fixed, and
+reports go to one rolling issue labelled `fuzz`.
+
+**The differential sweep on 2.0, two rounds triaged against recordings of their minimal forms:**
+round 1 (seeds 50647153+500): 481 agree (457 before 2.0), 19 causes; round 2 (71234567+500, self-
+embeds skipped): 428 of 448 agree, 20 causes. The 39 fall into five groups:
+
+| group                                            |  r1 |  r2 | state                                  |
+| ------------------------------------------------ | --: | --: | -------------------------------------- |
+| self-embed (`![[ ]]`, `![[#tag]]`)               |   6 |   - | out of scope; the sweep now skips them |
+| line ending after `$$…$$` inside a paragraph     |   7 |   6 | open: fidelity cost                    |
+| footnote bodies in the projection                |   4 |  10 | open: harness                          |
+| block id ending an emphasis span or a table cell |   2 |   2 | open: `rehype-obsidian` rendering      |
+| a `[` after a stray `]` (`(u)]][[`, `*]][`)      |   - |   2 | closed: harness projection             |
+
+- **Self-embeds:** Obsidian embeds the note into itself and renders its tags, math and tasks six
+  times. Vault resolution, `out-of-scope` like `fuzz/embed/64`.
+- **`$$…$$` then a line ending:** Obsidian's renderer swallows it (`</span>http`, no `<br>`),
+  remark-math 3 does not, so `legacy` keeps a `break`. Matching it means deleting the `\n` from
+  the text, which formatting would write back as `$$y^2$$http`; left open.
+- **Footnote bodies:** Obsidian's DOM moves them to the end, so links, math and headings inside a
+  definition come after the main text, where `normalize.ts` projects source order (11). And it
+  renders an inline footnote inside an UNREFERENCED definition, and a definition referenced only
+  from an inline footnote inside itself, which our projection drops (3). Harness, open.
+- **Block ids:** `x **^blk** y` and `| a ^blk |` register (we agree) and render without the `^blk`;
+  `rehype-obsidian`'s block-reference pass only reads a `p`/`li`'s last text. Open.
+- **Stray `]`:** `dropLabelOpeners` dropped the `[` after any unmatched `]`; Obsidian drops it only
+  after a `]` that closed a label (`[x][[w]]`). Fixed, contract unchanged.
+
+**What the new sweeps found and closed**, every one confirmed against the recorded answers:
+math rendering other than its value (strict); formatting growing without bound (`$$a\$$b$$`, a
+label sliced across a container prefix, raw source slices keeping escapes and indents);
+formatting changing words (`\%%`, `\==`, `\#tag`, `[[target\]]`, an inline footnote's line
+ending); tag characters; task boxes as one UTF-16 unit; NFC on link targets; U+2028/U+2029 ending a
+wikilink; footnote labels lowercased rather than case-folded (strict). Plus harness defects in
+`computeOurs` (task character, link display under NFC) and UPSTREAM.md item 9.
+
+**Traps:** `fmt`-style probes that look a configuration up by name silently run `legacy` for a
+JSON one; a "words" metric must not count node boundaries, and cannot see a loss the PARSE made
+(the inline-footnote line ending needed its own assertion); the Write tool turned `\u` escapes
+into literal (and invisible) characters three times in this work.
+
 ### `ask.mts` specifically
 
 - Needs **Obsidian running with a vault open**.
@@ -708,7 +762,14 @@ unit test "reads a tag's characters as Obsidian does", which fails on the old cl
 5. **`normalize.ts`** carries compensations for micromark's offsets. Only rp8 trees reach it now
    (every gate runs the `legacy` profiles), and two compensations already had to be generalised
    because they broke rp8 positions that were right. Simplifying it is safe but unmeasured.
-6. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,
+6. **Formatting still changes words** in 87 of 600 per-push seeds (listed exactly in
+   `fuzz-invariants.test.ts`): an escape or character reference the writer adds starting or
+   ending a tag (`](#tag` -> `]\(#tag`, `&#x20;#tag`), CommonMark emphasis spellings remark-parse 8
+   reads otherwise (`*\*em\**`), setext underlines; and `$a\$ $b$` is written as display math.
+7. **The fuzz triage's open three** (above): the line ending after paragraph `$$…$$`,
+   footnote bodies in the projection (order, and which render), and a block id ending an
+   emphasis span or a table cell.
+8. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,
    `pass-owner*.mts`, `pass-order*.mts` and their kin attribute behaviour to micromark passes
    `legacy` no longer runs. Port to `strict` or delete; do not trust their `legacy` output.
 

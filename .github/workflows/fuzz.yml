@@ -91,6 +91,20 @@ jobs:
           echo "status=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
           { echo '```'; cat invariant-report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
+      # One character at a time in each construct whose reading depends on it -- tags, block
+      # ids, footnote labels, wikilink targets, callout types, task boxes -- against Obsidian,
+      # under both presets. The seed draws a fresh sample of every Unicode category each night;
+      # the fixed part (ASCII, whitespace, punctuation-block boundaries) is pinned per push in
+      # `charclass.test.ts`.
+      - name: Sweep character classes
+        id: charclass
+        run: |
+          set +e
+          npx tsx --conditions=development test/parity/fuzz/charclass-sweep.ts \
+            "${{ steps.range.outputs.from }}" | tee charclass-report.txt
+          echo "status=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+          { echo '```'; cat charclass-report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
       # The sweep records, compares, shrinks every failure and groups by the
       # reduced form, so the report is a list of causes rather than of seeds.
       # Shrinking is what makes it readable: raw failures do not group, since a
@@ -109,22 +123,24 @@ jobs:
           { echo '```'; cat fuzz-report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Keep the recording for triage
-        if: steps.check.outputs.status != '0' || steps.invariants.outputs.status != '0'
+        if: steps.check.outputs.status != '0' || steps.invariants.outputs.status != '0' || steps.charclass.outputs.status != '0'
         uses: actions/upload-artifact@v4
         with:
           name: fuzz-${{ steps.range.outputs.from }}
           path: |
             fuzz-report.txt
             invariant-report.txt
+            charclass-report.txt
 
       - name: Open an issue naming the seeds
-        if: (steps.check.outputs.status != '0' || steps.invariants.outputs.status != '0') && github.event_name == 'schedule'
+        if: (steps.check.outputs.status != '0' || steps.invariants.outputs.status != '0' || steps.charclass.outputs.status != '0') && github.event_name == 'schedule'
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('node:fs');
             const report = [
               fs.readFileSync('invariant-report.txt', 'utf8'),
+              fs.readFileSync('charclass-report.txt', 'utf8'),
               fs.readFileSync('fuzz-report.txt', 'utf8'),
             ].join('\n').slice(0, 55000);
             const from = '${{ steps.range.outputs.from }}';
@@ -136,7 +152,7 @@ jobs:
               labels: 'fuzz',
             });
             const body = [
-                'A nightly fuzz sweep broke an invariant or disagreed with Obsidian (the invariant report comes first).',
+                'A nightly fuzz sweep broke an invariant or disagreed with Obsidian (invariants, then character classes, then the differential sweep).',
                 '',
                 'Generation is deterministic, so every seed below reproduces exactly:',
                 '',
@@ -174,5 +190,5 @@ jobs:
             }
 
       - name: Fail the run when anything disagreed
-        if: steps.check.outputs.status != '0' || steps.invariants.outputs.status != '0'
+        if: steps.check.outputs.status != '0' || steps.invariants.outputs.status != '0' || steps.charclass.outputs.status != '0'
         run: exit 1

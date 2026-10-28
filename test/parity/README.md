@@ -295,37 +295,65 @@ The corpus and the referee measure `legacy`. `strict` has its own:
   compared on lines. Recorded exclusions carry their reason.
 - **`strict-footnotes.test.ts`** pins 107 live answers about footnotes.
 
+## Fuzzing
+
+Three sweeps, each seeing what the others cannot. All are deterministic from a seed, so a report
+is reproducible.
+
+| sweep                     | needs Obsidian | per push                                              | nightly (`fuzz.yml`)     |
+| ------------------------- | -------------- | ----------------------------------------------------- | ------------------------ |
+| `fuzz/sweep.ts`           | yes            | --                                                    | 500 random seeds         |
+| `fuzz/invariant-sweep.ts` | no             | `fuzz-invariants.test.ts`, seeds 0-599                | 5,000 random seeds       |
+| `fuzz/charclass-sweep.ts` | yes            | `charclass.test.ts`, against `goldens/charclass.json` | a fresh character sample |
+
+- **Differential** composes known fragments into documents, records them in Obsidian, compares
+  and shrinks every failure to a minimal form. It compares through the Quartz profiles, so it
+  sees `legacy` and the tree only; documents that embed the note into themselves are skipped.
+- **Invariant** needs no recording: mdast shape and content model, spans, math rendering its own
+  value, the rendered Quartz chain (comment markers, footnote links and numbering), formatting
+  reaching a fixed point and keeping the words -- under five configurations. `--ignore <kind>`
+  skips a kind already recorded.
+- **Character class** puts one character at a time into each construct whose reading depends on
+  it and compares the `metadataCache` facts under both presets. `--save <file>` writes the
+  answers; the committed golden is seed 0.
+
+All three report to one rolling issue labelled `fuzz`. To reproduce a nightly finding, run the
+command the issue names; the differential and character sweeps need `nix develop`.
+
 ## Files
 
-| File                              | Role                                                    |
-| --------------------------------- | ------------------------------------------------------- |
-| `corpus.ts`, `corpus-hunt.ts`     | Deterministic case generator                            |
-| `commonmark.ts`, `gfm.ts`         | The spec examples                                       |
-| `chain.ts`                        | Pinned Quartz pipeline, feature profiles, `parseOurs`   |
-| `normalize.ts`                    | Our projections, from mdast                             |
-| `types.ts`                        | Shared projection and golden shapes                     |
-| `compare.ts`                      | Diffing and gate policy                                 |
-| `oracle.e2e.ts`                   | Recorder; runs inside Obsidian                          |
-| `parity.test.ts`                  | The contract gate; no Obsidian required                 |
-| `compute.test.ts`                 | Positioned oracle and its ceilings                      |
-| `goldens/`                        | Recorded answers, version-stamped and triaged           |
-| `ask.mts`, `ask-dom.mts`          | Ask a running Obsidian about arbitrary markdown         |
-| `probe-channel.ts`                | The channel both use, and `askFull` for full positions  |
-| `referee.mts`, `referee-facts.ts` | The referee and our side of its facts                   |
-| `record-referee-spans.mts`        | Re-records `referee-spans.json`                         |
-| `referee-shrink.mts`              | Reduces a referee disagreement to a minimal form        |
-| `regressions.mts`                 | Documents we break that stock `remark-parse` gets right |
-| `classify.ts`                     | Shared loading, position identity and sampling          |
-| `probe-ledger.mts`                | Records live probe answers for `probes.test.ts`         |
-| `goldens-unchanged.mts`           | Whether a recording changed anything but `recordedAt`   |
-| `compose.mts`, `compose.ts`       | Construct sequences against Obsidian                    |
-| `invariants.test.ts`              | Structural invariants on the tree itself                |
-| `roundtrip.test.ts`               | Formatting reaches a fixed point                        |
-| `option-matrix.test.ts`           | Every option toggled, looking for crashes               |
-| `fuzz/sweep.ts`                   | The nightly fuzz sweep                                  |
-| `COMMONMARK-DIVERGENCES.md`       | Where Obsidian departs from CommonMark and GFM          |
-| `OPEN-QUESTIONS.md`               | Questions put to the Obsidian team, and their answers   |
-| `UPSTREAM.md`                     | Defects found in upstream packages and Obsidian         |
+| File                                            | Role                                                    |
+| ----------------------------------------------- | ------------------------------------------------------- |
+| `corpus.ts`, `corpus-hunt.ts`                   | Deterministic case generator                            |
+| `commonmark.ts`, `gfm.ts`                       | The spec examples                                       |
+| `chain.ts`                                      | Pinned Quartz pipeline, feature profiles, `parseOurs`   |
+| `normalize.ts`                                  | Our projections, from mdast                             |
+| `types.ts`                                      | Shared projection and golden shapes                     |
+| `compare.ts`                                    | Diffing and gate policy                                 |
+| `oracle.e2e.ts`                                 | Recorder; runs inside Obsidian                          |
+| `parity.test.ts`                                | The contract gate; no Obsidian required                 |
+| `compute.test.ts`                               | Positioned oracle and its ceilings                      |
+| `goldens/`                                      | Recorded answers, version-stamped and triaged           |
+| `ask.mts`, `ask-dom.mts`                        | Ask a running Obsidian about arbitrary markdown         |
+| `probe-channel.ts`                              | The channel both use, and `askFull` for full positions  |
+| `referee.mts`, `referee-facts.ts`               | The referee and our side of its facts                   |
+| `record-referee-spans.mts`                      | Re-records `referee-spans.json`                         |
+| `referee-shrink.mts`                            | Reduces a referee disagreement to a minimal form        |
+| `regressions.mts`                               | Documents we break that stock `remark-parse` gets right |
+| `classify.ts`                                   | Shared loading, position identity and sampling          |
+| `probe-ledger.mts`                              | Records live probe answers for `probes.test.ts`         |
+| `goldens-unchanged.mts`                         | Whether a recording changed anything but `recordedAt`   |
+| `fuzz/invariants.ts`, `fuzz/invariant-sweep.ts` | The invariant fuzz and its sweep                        |
+| `fuzz/charclass.ts`, `fuzz/charclass-sweep.ts`  | The character-class sweep                               |
+| `fuzz-invariants.test.ts`, `charclass.test.ts`  | Their per-push gates                                    |
+| `compose.mts`, `compose.ts`                     | Construct sequences against Obsidian                    |
+| `invariants.test.ts`                            | Structural invariants on the tree itself                |
+| `roundtrip.test.ts`                             | Formatting reaches a fixed point                        |
+| `option-matrix.test.ts`                         | Every option toggled, looking for crashes               |
+| `fuzz/sweep.ts`                                 | The nightly fuzz sweep                                  |
+| `COMMONMARK-DIVERGENCES.md`                     | Where Obsidian departs from CommonMark and GFM          |
+| `OPEN-QUESTIONS.md`                             | Questions put to the Obsidian team, and their answers   |
+| `UPSTREAM.md`                                   | Defects found in upstream packages and Obsidian         |
 
 Several instruments here — `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`, `pass-owner*.mts`,
 `pass-order*.mts` — attribute behaviour to micromark passes `legacy` no longer runs; see
