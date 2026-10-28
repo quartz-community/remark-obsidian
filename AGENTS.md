@@ -547,7 +547,7 @@ has no coverage there, not that it agrees. Footnotes are in **neither** spec: GF
 ## Gates — what "done" means
 
 ```bash
-npm test          # 506 tests / 24 files. Contains the contract gate.
+npm test          # 546 tests / 27 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -630,22 +630,33 @@ embeds skipped): 428 of 448 agree, 20 causes. The 39 fall into five groups:
 | group                                            |  r1 |  r2 | state                                  |
 | ------------------------------------------------ | --: | --: | -------------------------------------- |
 | self-embed (`![[ ]]`, `![[#tag]]`)               |   6 |   - | out of scope; the sweep now skips them |
-| line ending after `$$…$$` inside a paragraph     |   7 |   6 | open: fidelity cost                    |
-| footnote bodies in the projection                |   4 |  10 | open: harness                          |
-| block id ending an emphasis span or a table cell |   2 |   2 | open: `rehype-obsidian` rendering      |
+| line ending after `$$…$$` inside a paragraph     |   7 |   6 | closed: projection + `rehype-obsidian` |
+| footnote bodies in the projection                |   4 |  10 | closed: projection, but one (below)    |
+| block id ending an emphasis span or a table cell |   2 |   2 | closed: projection + `rehype-obsidian` |
 | a `[` after a stray `]` (`(u)]][[`, `*]][`)      |   - |   2 | closed: harness projection             |
 
 - **Self-embeds:** Obsidian embeds the note into itself and renders its tags, math and tasks six
   times. Vault resolution, `out-of-scope` like `fuzz/embed/64`.
-- **`$$…$$` then a line ending:** Obsidian's renderer swallows it (`</span>http`, no `<br>`),
-  remark-math 3 does not, so `legacy` keeps a `break`. Matching it means deleting the `\n` from
-  the text, which formatting would write back as `$$y^2$$http`; left open.
-- **Footnote bodies:** Obsidian's DOM moves them to the end, so links, math and headings inside a
-  definition come after the main text, where `normalize.ts` projects source order (11). And it
-  renders an inline footnote inside an UNREFERENCED definition, and a definition referenced only
-  from an inline footnote inside itself, which our projection drops (3). Harness, open.
-- **Block ids:** `x **^blk** y` and `| a ^blk |` register (we agree) and render without the `^blk`;
-  `rehype-obsidian`'s block-reference pass only reads a `p`/`li`'s last text. Open.
+- **`$$…$$` then a line ending:** Obsidian's renderer swallows it (`</span>http`, no `<br>`)
+  unless only indentation precedes the `$$` on its line: probed live, `a $$y^2$$` over `b`,
+  `1. $$y^2$$` and `> > $$y^2$$` all drop it. The tree keeps the line ending, since formatting
+  would otherwise write `$$y^2$$http`, so the projection drops it (it did, for column 1 only)
+  and `rehype-obsidian`'s `displayMathBreaks` drops the `<br>`.
+- **Footnote bodies:** the renderer puts them after the text, inline notes first
+  (`section.footnotes`), then definitions (`div.footnotes`) in reference order. The projection
+  does that for links, math, tags, headings and tasks. `metadataCache` keeps a definition where
+  it is written, so `meta.links` does not move. The inline notes inside an unreferenced
+  definition render their tags and math too. Left: `[^1]: - [ ] [` / `^[[^1]]]`, where the
+  renderer reads `[^1]` inside the inline note as a reference and so renders the definition,
+  while the cache, like our parse, reads no reference.
+- **Block ids:** recorded live over 29 shapes. Obsidian strips `^id` from the end of every text
+  inside a wrapper or a table cell, not only the block's last, and the last one names the block
+  (a cell's names the table). An id is `^` and letters, digits or `-`, at the text's start or
+  after whitespace. `stripBlockIds` gained that pass (keeping the space before the `^`, which
+  Obsidian keeps), and so did `rehype-obsidian`'s `block-references.ts`, whose old pattern also
+  stripped `e^x`.
+- **Gate:** `projection-triage.test.ts` holds 69 recordings (the triage's minimal forms and the
+  probes), 40 of which diverged before. Recorded cases unchanged by identity (3,469).
 - **Stray `]`:** `dropLabelOpeners` dropped the `[` after any unmatched `]`; Obsidian drops it only
   after a `]` that closed a label (`[x][[w]]`). Fixed, contract unchanged.
 
@@ -798,9 +809,8 @@ unit test "reads a tag's characters as Obsidian does", which fails on the old cl
    seeds 600-2,000: two `strict` bracket shapes, a label holding `[` (`[^_[^1]_]`) and a
    wikilink inside an undefined `[^` that forms or not depending on what precedes it
    (`[^[[a|b]]]`).
-7. **The fuzz triage's open three** (above): the line ending after paragraph `$$…$$`,
-   footnote bodies in the projection (order, and which render), and a block id ending an
-   emphasis span or a table cell.
+7. **The fuzz triage's leftovers:** self-embeds (out of scope), and `[^1]: - [ ] [` /
+   `^[[^1]]]`, where Obsidian's renderer and its cache disagree.
 8. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,
    `pass-owner*.mts`, `pass-order*.mts` and their kin attribute behaviour to micromark passes
    `legacy` no longer runs. Port to `strict` or delete; do not trust their `legacy` output.

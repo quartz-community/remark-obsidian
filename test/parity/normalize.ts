@@ -632,12 +632,26 @@ export function mdastText(
         // unindented cases drop the separator and both indented ones keep it. Indented
         // display math therefore takes the plain placeholder, which is identical once
         // the marker is stripped and leaves the line ending to speak for itself.
-        parts.push(
-          (node as unknown as { data?: { display?: boolean } }).data
-            ?.display === true && node.position?.start?.column === 1
-            ? DISPLAY_INLINE_MATH
-            : "\u27e8math\u27e9",
-        );
+        //
+        // Not only column 1, though: what keeps the separator is indentation alone before the
+        // `$$` on its line. `a $$y^2$$` over `b`, `1. $$y^2$$` and `> > $$y^2$$` all read
+        // `⟨math⟩b` (recorded live, 1.15.0, and 13 documents of the differential fuzz's
+        // triage), so the line's prefix is read off the source when there is one.
+        {
+          const display =
+            (node as unknown as { data?: { display?: boolean } }).data
+              ?.display === true;
+          const at = node.position?.start?.offset;
+          const indented =
+            source !== undefined && at !== undefined
+              ? /^[ \t]+$/u.test(
+                  source.slice(source.lastIndexOf("\n", at - 1) + 1, at),
+                )
+              : node.position?.start?.column !== 1;
+          parts.push(
+            display && !indented ? DISPLAY_INLINE_MATH : "\u27e8math\u27e9",
+          );
+        }
         return;
       case "math":
         parts.push("\u27e8math\u27e9 ");
@@ -1077,6 +1091,61 @@ export function projectMdast(
   const highlights: string[] = [];
   const emphasis: string[] = [];
 
+  /**
+   * Where the renderer puts what a footnote holds: after the text, inline notes first, then
+   * definitions. Recorded: `[^1]: x ^[y]` renders a `section.footnotes` of inline notes ahead
+   * of a `div.footnotes` of definitions, and `a[^1] b` / `[^1]: [l](u) c` / `d [m](v)` reports
+   * `v` before `u`. The triage of the differential fuzz found 11 documents with a definition
+   * before later text, which the comment on `relocated` above assumed never happens. A
+   * definition's place in its list is the order of its first reference.
+   */
+  const firstReference = new Map<string, number>();
+  visit(tree, "footnoteReference", (node: Node) => {
+    const id = String((node as unknown as { identifier: string }).identifier);
+    if (!firstReference.has(id)) firstReference.set(id, firstReference.size);
+  });
+  const definitionRank = new Map<Node, number>();
+  // Rendered projections only. `metadataCache` indexes a definition where it is written
+  // (`[^1]: [l](u)` before `[[a]]` reports `u` first), though it follows the renderer for an
+  // inline note's body.
+  visit(tree, "footnoteDefinition", (definition: Node) => {
+    if (!skipUnreferenced) return;
+    const rank = firstReference.get(
+      String((definition as unknown as { identifier: string }).identifier),
+    );
+    if (rank === undefined) return;
+    visit(definition, (inner: Node) => {
+      if (!inInlineNote.has(inner)) definitionRank.set(inner, rank);
+    });
+  });
+  const inline = {
+    links: relocated,
+    math: [] as MathItem[],
+    tags: [] as string[],
+    headings: [] as string[],
+    tasks: [] as TaskItem[],
+  };
+  const deferred = {
+    links: [] as { rank: number; item: LinkItem }[],
+    math: [] as { rank: number; item: MathItem }[],
+    tags: [] as { rank: number; item: string }[],
+    headings: [] as { rank: number; item: string }[],
+    tasks: [] as { rank: number; item: TaskItem }[],
+  };
+  const main = { links, math, tags, headings, tasks };
+  /** Collect `item` under `key` in the bucket `node` renders into. */
+  const place = <K extends keyof typeof main>(
+    node: Node,
+    key: K,
+    item: (typeof main)[K][number],
+  ): void => {
+    const rank = definitionRank.get(node);
+    if (inInlineNote.has(node)) (inline[key] as unknown[]).push(item);
+    else if (rank !== undefined)
+      (deferred[key] as { rank: number; item: unknown }[]).push({ rank, item });
+    else (main[key] as unknown[]).push(item);
+  };
+
   visit(tree, (node: Node, index, parent) => {
     // Nothing inside a `%%` comment renders, so nothing inside one reaches a
     // *rendered* projection. The body is parsed into children now, and without
@@ -1140,7 +1209,7 @@ export function projectMdast(
               .replace(/\]\]$/, "")
               .trim()
               .split("|")[0]!;
-      (inInlineNote.has(node) ? relocated : links).push({
+      place(node, "links", {
         path: node.path,
         heading: node.heading,
         embedded: node.embedded,
@@ -1153,10 +1222,7 @@ export function projectMdast(
     if (isType<ImageNode>(node, "image")) {
       const url = node.url ?? "";
       if (isVaultTarget(url)) {
-        (inInlineNote.has(node) ? relocated : links).push({
-          ...splitTarget(url),
-          embedded: true,
-        });
+        place(node, "links", { ...splitTarget(url), embedded: true });
       }
       return;
     }
@@ -1167,15 +1233,12 @@ export function projectMdast(
     if (isType<ImageNode>(node, "link")) {
       const url = node.url ?? "";
       if (isVaultTarget(url)) {
-        (inInlineNote.has(node) ? relocated : links).push({
-          ...splitTarget(url),
-          embedded: false,
-        });
+        place(node, "links", { ...splitTarget(url), embedded: false });
       }
       // Children still walk: a wikilink or tag can sit inside the label.
     }
     if (node.type === "tag") {
-      tags.push((node as ValueNode).value);
+      place(node, "tags", (node as ValueNode).value);
       return;
     }
     // A raw `<mark>`, `<strong>` or `<em>` is an element in the DOM like any
@@ -1209,20 +1272,26 @@ export function projectMdast(
       const display = Boolean(
         (node as { data?: { display?: boolean } }).data?.display,
       );
-      math.push({ display, tex: renderedTex((node as ValueNode).value) });
+      place(node, "math", {
+        display,
+        tex: renderedTex((node as ValueNode).value),
+      });
       return;
     }
     if (node.type === "math") {
-      math.push({ display: true, tex: renderedTex((node as ValueNode).value) });
+      place(node, "math", {
+        display: true,
+        tex: renderedTex((node as ValueNode).value),
+      });
       return;
     }
     if (isType<HeadingNode>(node, "heading")) {
-      headings.push(`${node.depth}:${headingName(node, source)}`);
+      place(node, "headings", `${node.depth}:${headingName(node, source)}`);
       return;
     }
     if (isType<ListItemNode>(node, "listItem")) {
       if (node.checked === null || node.checked === undefined) return;
-      tasks.push({
+      place(node, "tasks", {
         char: node.data?.taskChar ?? (node.checked ? "x" : " "),
         checked: node.checked,
       });
@@ -1237,13 +1306,28 @@ export function projectMdast(
   //
   // Collected in a second pass rather than by not skipping, because the definition's
   // *own* content must stay suppressed -- letting the walk through would report the
-  // `[a` the recording does not have. Only links, because that is the projection the
-  // relocation reaches; the text and emphasis projections read a clone with the
-  // footnotes section removed, so nothing there is expected either way.
+  // `[a` the recording does not have. Tags, math and tasks too (`[^1]:   ` / `u). ^[#tag]`
+  // renders the tag); the text and emphasis projections read a clone with the footnotes
+  // section removed, so nothing there is expected either way.
   for (const definition of skipped) {
     visit(definition, (node: Node) => {
       if (node.type !== "footnote") return;
       visit(node, (inner: Node) => {
+        if (inner.type === "tag") {
+          inline.tags.push((inner as ValueNode).value);
+          return;
+        }
+        if (inner.type === "inlineMath" || inner.type === "math") {
+          inline.math.push({
+            display:
+              inner.type === "math" ||
+              Boolean(
+                (inner as { data?: { display?: boolean } }).data?.display,
+              ),
+            tex: renderedTex((inner as ValueNode).value),
+          });
+          return;
+        }
         if (isType<WikilinkNode>(inner, "wikilink")) {
           relocated.push({
             path: inner.path,
@@ -1265,12 +1349,17 @@ export function projectMdast(
     });
   }
 
+  const after = <T>(rows: { rank: number; item: T }[]): T[] =>
+    rows
+      .map((row, at) => ({ ...row, at }))
+      .sort((a, b) => a.rank - b.rank || a.at - b.at)
+      .map((row) => row.item);
   return {
-    math,
-    links: [...links, ...relocated],
-    tags,
-    headings,
-    tasks,
+    math: [...math, ...inline.math, ...after(deferred.math)],
+    links: [...links, ...relocated, ...after(deferred.links)],
+    tags: [...tags, ...inline.tags, ...after(deferred.tags)],
+    headings: [...headings, ...inline.headings, ...after(deferred.headings)],
+    tasks: [...tasks, ...inline.tasks, ...after(deferred.tasks)],
     highlights,
     emphasis,
   };
@@ -1538,7 +1627,34 @@ function trailingIdHost(inner: Node[]):
   return undefined;
 }
 
+/**
+ * Identifiers ending a text node inside an inline wrapper or a table cell, wherever it sits.
+ *
+ * Obsidian's renderer strips `^id` from the end of every such text node, not only the block's
+ * last: `x **^blk** y` renders `x <strong></strong> y`, `x **^blk** ^two` empties the strong and
+ * drops `^two` (registering only `two`), and `| a ^blk |` renders `a ` in its cell, header row
+ * included (recorded live, 1.15.0). `stripBlockIds` below walks only the trailing wrapper chain,
+ * so `**^blk**, ![[i.png]]` and every table kept the text. Each node is stripped once, as there:
+ * the nodes taken here are returned so the trailing walk does not strip them a second time.
+ */
+function stripWrappedBlockIds(tree: Root): WeakSet<Node> {
+  const taken = new WeakSet<Node>();
+  visit(tree, (node: Node, _index, parent) => {
+    const host = (parent as Node | undefined)?.type;
+    if (node.type !== "text" || host === undefined) return;
+    if (!ID_WRAPPERS.has(host) && host !== "tableCell") return;
+    const value = (node as ValueNode).value;
+    const match = TRAILING_BLOCK_ID.exec(value);
+    if (!match) return;
+    // The whitespace before the `^` stays: `==a ^blk==` renders `a `.
+    (node as ValueNode).value = value.slice(0, value.lastIndexOf("^"));
+    taken.add(node);
+  });
+  return taken;
+}
+
 function stripBlockIds(tree: Root, source: string): Root {
+  const taken = stripWrappedBlockIds(tree);
   visit(tree, (node: Node) => {
     const parent = node as Partial<{ children: Node[] }>;
     if (!Array.isArray(parent.children)) return;
@@ -1586,7 +1702,7 @@ function stripBlockIds(tree: Root, source: string): Root {
       }
       if (!host) continue;
       const last = host.inner[host.inner.length - 1];
-      if (!last || last.type !== "text") continue;
+      if (!last || last.type !== "text" || taken.has(last)) continue;
       const value = (last as ValueNode).value;
 
       // A paragraph that is only an identifier is usually not a block at all --
@@ -1657,7 +1773,7 @@ function stripBlockIds(tree: Root, source: string): Root {
           value.slice(kept + (bracketed[1]?.length ?? 0));
         continue;
       }
-      (last as ValueNode).value = value.slice(0, match.index);
+      (last as ValueNode).value = value.slice(0, value.lastIndexOf("^"));
       // The emptied wrapper stays. Obsidian still reports an emphasis for
       // `*^blk*` -- an `em:` with no content -- and still reports the paragraph
       // section, so pruning it cost nine cases on `sections` and `emphasis` while

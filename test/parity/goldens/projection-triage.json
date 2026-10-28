@@ -1,0 +1,4170 @@
+{
+ "recordedAt": "2026-10-28",
+ "obsidian": "1.15.0",
+ "cases": {
+  "triage/probe/b1": {
+   "id": "triage/probe/b1",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x **^blk** y\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <strong></strong> y</p>",
+    "projections": {
+     "text": "x y",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:"
+     ],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x **^blk** y"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:12"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-0:12"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/b2": {
+   "id": "triage/probe/b2",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x **^blk**\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <strong></strong></p>",
+    "projections": {
+     "text": "x",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:"
+     ],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x **^blk**"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:10"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-0:10"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/b3": {
+   "id": "triage/probe/b3",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x *a ^blk*\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <em>a </em></p>",
+    "projections": {
+     "text": "x a",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "em:a"
+     ],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x *a ^blk*"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:10"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-0:10"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/b4": {
+   "id": "triage/probe/b4",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x ^blk\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x </p>",
+    "projections": {
+     "text": "x",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x ^blk"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:6"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-0:6"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/b5": {
+   "id": "triage/probe/b5",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| h |\n| - |\n| a ^blk |\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th dir=\"ltr\">h</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td dir=\"ltr\">a </td>\n</tr>\n</tbody>\n</table>",
+    "projections": {
+     "text": "h a",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| h |\n| - |\n| a ^blk |"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:10"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-2:10"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/b6": {
+   "id": "triage/probe/b6",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| a ^blk |\n| - |\n| b |\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th dir=\"ltr\">a </th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td dir=\"ltr\">b</td>\n</tr>\n</tbody>\n</table>",
+    "projections": {
+     "text": "a b",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| a ^blk |\n| - |\n| b |"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:5"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-2:5"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/b7": {
+   "id": "triage/probe/b7",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "- **^blk**\n",
+   "obsidian": {
+    "html": "<ul>\n<li dir=\"auto\"><strong></strong></li>\n</ul>",
+    "projections": {
+     "text": "",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:"
+     ],
+     "sections": [
+      {
+       "type": "list",
+       "text": "- **^blk**"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "list@0:0-0:10"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [
+      "-|parent:-1@0:0-0:10"
+     ],
+     "blocks": [
+      "blk@0:0-0:10"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/b8": {
+   "id": "triage/probe/b8",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x ==a ^blk==\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <mark data-highlight=\"\">a </mark></p>",
+    "projections": {
+     "text": "x a",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [
+      "a "
+     ],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x ==a ^blk=="
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:12"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-0:12"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/b9": {
+   "id": "triage/probe/b9",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x **^blk** ^two\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <strong></strong> </p>",
+    "projections": {
+     "text": "x",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:"
+     ],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x **^blk** ^two"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:15"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "two@0:0-0:15"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/b10": {
+   "id": "triage/probe/b10",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| h | i |\n| - | - |\n| a ^blk | b |\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th dir=\"ltr\">h</th>\n<th dir=\"ltr\">i</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td dir=\"ltr\">a </td>\n<td dir=\"ltr\">b</td>\n</tr>\n</tbody>\n</table>",
+    "projections": {
+     "text": "h i a b",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| h | i |\n| - | - |\n| a ^blk | b |"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:14"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-2:14"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/b11": {
+   "id": "triage/probe/b11",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x *^blk* y\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <em></em> y</p>",
+    "projections": {
+     "text": "x y",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "em:"
+     ],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x *^blk* y"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:10"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-0:10"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/b12": {
+   "id": "triage/probe/b12",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x **a ^blk** y\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <strong>a </strong> y</p>",
+    "projections": {
+     "text": "x a y",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:a"
+     ],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x **a ^blk** y"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:14"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-0:14"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/b13": {
+   "id": "triage/probe/b13",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x **a** ^blk\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <strong>a</strong> </p>",
+    "projections": {
+     "text": "x a",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:a"
+     ],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x **a** ^blk"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:12"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-0:12"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/b14": {
+   "id": "triage/probe/b14",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "> x **^blk**\n",
+   "obsidian": {
+    "html": "<blockquote dir=\"auto\">\n<p>x <strong></strong></p>\n</blockquote>",
+    "projections": {
+     "text": "x",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:"
+     ],
+     "sections": [
+      {
+       "type": "blockquote",
+       "text": "> x **^blk**"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "blockquote@0:0-0:12"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-0:12"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/m1": {
+   "id": "triage/probe/m1",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a $$y^2$$\nb\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a <span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>b</p>",
+    "projections": {
+     "text": "a ⟨math⟩b",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a $$y^2$$\nb"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:1"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/m2": {
+   "id": "triage/probe/m2",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "$$y^2$$\nb\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>b</p>",
+    "projections": {
+     "text": "⟨math⟩b",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "$$y^2$$\nb"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:1"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/m3": {
+   "id": "triage/probe/m3",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a $y$\nb\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a <span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"y\" class=\"TEX-N\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi></mjx-math></mjx-container></span><br>\nb</p>",
+    "projections": {
+     "text": "a ⟨math⟩ b",
+     "math": [
+      {
+       "display": false,
+       "tex": "y"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a $y$\nb"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:1"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/m4": {
+   "id": "triage/probe/m4",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a $$y^2$$ \nb\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a <span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>b</p>",
+    "projections": {
+     "text": "a ⟨math⟩b",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a $$y^2$$ \nb"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:1"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/m5": {
+   "id": "triage/probe/m5",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a $$y^2$$\n\nb\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a <span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span></p>\n<p dir=\"auto\">b</p>",
+    "projections": {
+     "text": "a ⟨math⟩ b",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a $$y^2$$"
+      },
+      {
+       "type": "paragraph",
+       "text": "b"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:9",
+      "paragraph@2:0-2:1"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/f1": {
+   "id": "triage/probe/f1",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a[^1] b\n\n[^1]: [l](u) c\n\nd [m](v)\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> b</p>\n<p dir=\"auto\">d <a class=\"internal-link\" data-href=\"v\" href=\"v\" target=\"_blank\" rel=\"noopener nofollow\">m</a></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p><a class=\"internal-link\" data-href=\"u\" href=\"u\" target=\"_blank\" rel=\"noopener nofollow\">l</a> c<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+    "projections": {
+     "text": "a⟨fn⟩ b d m",
+     "math": [],
+     "links": [
+      {
+       "path": "v",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "u",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a[^1] b"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: [l](u) c"
+      },
+      {
+       "type": "paragraph",
+       "text": "d [m](v)"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "u",
+      "v"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@2:0-2:14"
+     ],
+     "footnoteRefs": [
+      "1@0:1"
+     ],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:7",
+      "footnoteDefinition@2:0-2:14",
+      "paragraph@4:0-4:8",
+      "text@5:0-5:0",
+      "element@5:0-5:0"
+     ],
+     "links": [
+      "[l](u)=>u|l@2:6-2:12",
+      "[m](v)=>v|m@4:2-4:8"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/f2": {
+   "id": "triage/probe/f2",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a\n\n[^1]: x ^[in]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\">in<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "a",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: x ^[in]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@2:0-2:13",
+      "[inline0@2:10-2:12"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:1",
+      "footnoteDefinition@2:0-2:13",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/f3": {
+   "id": "triage/probe/f3",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]: x ^[y[^1]]\n",
+   "obsidian": {
+    "html": "\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\">y<sup id=\"fnref-1\"><a class=\"footnote-ref\" href=\"#fn-1\" target=\"_blank\" rel=\"noopener nofollow\">1</a></sup><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>\n<div class=\"footnotes\">\n<hr>\n<ol>\n<li id=\"fn-1\" dir=\"auto\">x <sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"[inline0\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup><a class=\"footnote-backref\" href=\"#fnref-1\" target=\"_blank\" rel=\"noopener nofollow\">↩</a></li>\n</ol>\n</div>",
+    "projections": {
+     "text": "",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: x ^[y[^1]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-0:16",
+      "[inline0@0:10-0:15"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-0:16",
+      "text@1:0-1:0",
+      "element@1:0-1:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/c1": {
+   "id": "triage/probe/c1",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x e^x\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x e^x</p>",
+    "projections": {
+     "text": "x e^x",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x e^x"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:5"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/c2": {
+   "id": "triage/probe/c2",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x *e^x*\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <em>e^x</em></p>",
+    "projections": {
+     "text": "x e^x",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "em:e^x"
+     ],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x *e^x*"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:7"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/c3": {
+   "id": "triage/probe/c3",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x ^blk **y**\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x ^blk <strong>y</strong></p>",
+    "projections": {
+     "text": "x ^blk y",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:y"
+     ],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x ^blk **y**"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:12"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/c4": {
+   "id": "triage/probe/c4",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x **a** b^c\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <strong>a</strong> b^c</p>",
+    "projections": {
+     "text": "x a b^c",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:a"
+     ],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x **a** b^c"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:11"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/c5": {
+   "id": "triage/probe/c5",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "- a\n  - b ^c\n",
+   "obsidian": {
+    "html": "<ul>\n<li dir=\"auto\">a\n<ul>\n<li dir=\"auto\">b </li>\n</ul>\n</li>\n</ul>",
+    "projections": {
+     "text": "a b",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "list",
+       "text": "- a\n  - b ^c"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "list@0:0-1:8"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [
+      "-|parent:-1@0:0-0:3",
+      "-|parent:0@1:2-1:8"
+     ],
+     "blocks": [
+      "c@1:2-1:8"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/c6": {
+   "id": "triage/probe/c6",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x `^blk`\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <code>^blk</code></p>",
+    "projections": {
+     "text": "x ^blk",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x `^blk`"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:8"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/c7": {
+   "id": "triage/probe/c7",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x *a*^blk\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <em>a</em></p>",
+    "projections": {
+     "text": "x a",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "em:a"
+     ],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x *a*^blk"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:9"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-0:9"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/c8": {
+   "id": "triage/probe/c8",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x ^a_b\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x ^a_b</p>",
+    "projections": {
+     "text": "x ^a_b",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x ^a_b"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:6"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/c9": {
+   "id": "triage/probe/c9",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x ^a.b\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x ^a.b</p>",
+    "projections": {
+     "text": "x ^a.b",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x ^a.b"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:6"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/c10": {
+   "id": "triage/probe/c10",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x [l](u) ^blk\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <a class=\"internal-link\" data-href=\"u\" href=\"u\" target=\"_blank\" rel=\"noopener nofollow\">l</a> </p>",
+    "projections": {
+     "text": "x l",
+     "math": [],
+     "links": [
+      {
+       "path": "u",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x [l](u) ^blk"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "u"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:13"
+     ],
+     "links": [
+      "[l](u)=>u|l@0:2-0:8"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-0:13"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/c11": {
+   "id": "triage/probe/c11",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x **^blk** y ^two\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <strong></strong> y </p>",
+    "projections": {
+     "text": "x y",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:"
+     ],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x **^blk** y ^two"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:17"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "two@0:0-0:17"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/c12": {
+   "id": "triage/probe/c12",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x ~~^blk~~\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <del></del></p>",
+    "projections": {
+     "text": "x",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x ~~^blk~~"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:10"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-0:10"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/c13": {
+   "id": "triage/probe/c13",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| a | **^blk** |\n| - | - |\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th dir=\"ltr\">a</th>\n<th dir=\"auto\"><strong></strong></th>\n</tr>\n</thead>\n</table>",
+    "projections": {
+     "text": "a",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:"
+     ],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| a | **^blk** |\n| - | - |"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-1:9"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-1:9"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/c14": {
+   "id": "triage/probe/c14",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x\n**^blk**\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x<br>\n<strong></strong></p>",
+    "projections": {
+     "text": "x",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:"
+     ],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x\n**^blk**"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:8"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-1:8"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/probe/c15": {
+   "id": "triage/probe/c15",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "- x\n\n  **^blk**\n",
+   "obsidian": {
+    "html": "<ul>\n<li dir=\"auto\">\n<p>x</p>\n<p><strong></strong></p>\n</li>\n</ul>",
+    "projections": {
+     "text": "x",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:"
+     ],
+     "sections": [
+      {
+       "type": "list",
+       "text": "- x\n\n  **^blk**"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "list@0:0-2:10"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [
+      "-|parent:-1@0:0-2:10"
+     ],
+     "blocks": [
+      "blk@0:0-2:10"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r1/0": {
+   "id": "triage/fuzz-r1/0",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "- **^blk** | ![[![[i.png|100x200]]\n",
+   "obsidian": {
+    "html": "<ul>\n<li dir=\"auto\"><strong></strong> | ![[<span height=\"200\" width=\"100\" alt=\"i.png\" src=\"i.png\" class=\"internal-embed is-loaded file-embed mod-empty-attachment\">“i.png” could not be found.</span></li>\n</ul>",
+    "projections": {
+     "text": "| ![[i.png",
+     "math": [],
+     "links": [
+      {
+       "path": "i.png",
+       "heading": "",
+       "embedded": true
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:"
+     ],
+     "sections": [
+      {
+       "type": "list",
+       "text": "- **^blk** | ![[![[i.png|100x200]]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [
+      "i.png"
+     ],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "list@0:0-0:34"
+     ],
+     "links": [],
+     "embeds": [
+      "![[i.png|100x200]]=>i.png|100x200@0:16-0:34"
+     ],
+     "tags": [],
+     "listItems": [
+      "-|parent:-1@0:0-0:34"
+     ],
+     "blocks": [
+      "blk@0:0-0:34"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r1/1": {
+   "id": "triage/fuzz-r1/1",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]: >\n    \\![[img.png]]\n\n1. [^1]].\n1. [[a|b]] \\ #a/\n",
+   "obsidian": {
+    "html": "<ol>\n<li dir=\"auto\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup>].</li>\n<li dir=\"auto\"><a data-tooltip-position=\"top\" aria-label=\"a\" data-href=\"a\" href=\"a\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">b</a> \\ <a href=\"#a/\" class=\"tag\" target=\"_blank\" rel=\"noopener nofollow\">#a/</a></li>\n</ol>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><blockquote dir=\"auto\">\n<p>!<a data-href=\"img.png\" href=\"img.png\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">img.png</a></p>\n</blockquote><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "⟨fn⟩]. b \\ #a/",
+     "math": [],
+     "links": [
+      {
+       "path": "a",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "img.png",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [
+      "a/"
+     ],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: >\n    \\![[img.png]]"
+      },
+      {
+       "type": "list",
+       "text": "1. [^1]].\n1. [[a|b]] \\ #a/"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "img.png",
+      "a"
+     ],
+     "embeds": [],
+     "tags": [
+      "a/"
+     ],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-1:17"
+     ],
+     "footnoteRefs": [
+      "1@3:3"
+     ],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-1:17",
+      "list@3:0-4:16",
+      "text@5:0-5:0",
+      "element@5:0-5:0"
+     ],
+     "links": [
+      "[[img.png]]=>img.png|img.png@1:6-1:17",
+      "[[a|b]]=>a|b@4:3-4:10"
+     ],
+     "embeds": [],
+     "tags": [
+      "#a/@4:13-4:16"
+     ],
+     "listItems": [
+      "-|parent:-3@3:0-3:9",
+      "-|parent:-3@4:0-4:16"
+     ],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r1/2": {
+   "id": "triage/fuzz-r1/2",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "(u)$$y^2$$\n![[i\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">(u)<span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>![[i</p>",
+    "projections": {
+     "text": "(u)⟨math⟩![[i",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "(u)$$y^2$$\n![[i"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:4"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r1/3": {
+   "id": "triage/fuzz-r1/3",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]: ![[img.png]]](==~~del~~==\n    $x^2\\$ \\ \\[^1]\t$$[^1]$$\n> > $$![[_under_]]$$\n",
+   "obsidian": {
+    "html": "<blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n<p><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"![[_under_]]\" display=\"true\" class=\"TEX-N\"><mjx-mo data-latex=\"!\"><mjx-c class=\"mjx-c21\">!</mjx-c></mjx-mo><mjx-mo data-latex=\"[\"><mjx-c class=\"mjx-c5B\">[</mjx-c></mjx-mo><mjx-msub data-latex=\"[_u\"><mjx-mo data-latex=\"[\"><mjx-c class=\"mjx-c5B\">[</mjx-c></mjx-mo><mjx-script style=\"vertical-align: -0.15em;\"><mjx-mi size=\"s\" data-latex=\"u\"><mjx-c class=\"mjx-c1D462\">𝑢</mjx-c></mjx-mi></mjx-script></mjx-msub><mjx-mi data-latex=\"n\"><mjx-c class=\"mjx-c1D45B\">𝑛</mjx-c></mjx-mi><mjx-mi data-latex=\"d\"><mjx-c class=\"mjx-c1D451\">𝑑</mjx-c></mjx-mi><mjx-mi data-latex=\"e\"><mjx-c class=\"mjx-c1D452\">𝑒</mjx-c></mjx-mi><mjx-msub data-latex=\"r_]\"><mjx-mi data-latex=\"r\"><mjx-c class=\"mjx-c1D45F\">𝑟</mjx-c></mjx-mi><mjx-script style=\"vertical-align: -0.177em;\"><mjx-mo size=\"s\" data-latex=\"]\"><mjx-c class=\"mjx-c5D\">]</mjx-c></mjx-mo></mjx-script></mjx-msub><mjx-mo data-latex=\"]\"><mjx-c class=\"mjx-c5D\">]</mjx-c></mjx-mo></mjx-math></mjx-container></span></p>\n</blockquote>\n</blockquote>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p><span alt=\"img.png\" src=\"img.png\" class=\"internal-embed is-loaded file-embed mod-empty-attachment\">“img.png” could not be found.</span>](<mark data-highlight=\"\"><del>del</del></mark><br>\n<span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"x^2\\$ \\ \\[^1]\t$\" class=\"TEX-N\"><mjx-msup data-latex=\"x^2\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.363em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup><mjx-mi data-latex=\"\\$\"><mjx-c class=\"mjx-c24\">$</mjx-c></mjx-mi><mjx-mtext data-latex=\"\\ \"><mjx-c class=\"mjx-cA0\">&nbsp;</mjx-c></mjx-mtext><mjx-msup data-latex=\"\\[^1\"><mjx-mtext data-latex=\"\\[\" style=\"color: red;\"><mjx-c class=\"mjx-c5C\" noic=\"true\" style=\"padding-top: 0.75em;\">\\</mjx-c><mjx-c class=\"mjx-c5B\" style=\"padding-top: 0.75em;\">[</mjx-c></mjx-mtext><mjx-script style=\"vertical-align: 0.477em;\"><mjx-mn size=\"s\" data-latex=\"1\"><mjx-c class=\"mjx-c31\">1</mjx-c></mjx-mn></mjx-script></mjx-msup><mjx-mo data-latex=\"]\"><mjx-c class=\"mjx-c5D\">]</mjx-c></mjx-mo><mjx-mo data-latex=\"$\"><mjx-c class=\"mjx-c24\">$</mjx-c></mjx-mo></mjx-math></mjx-container></span><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup>$$<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+    "projections": {
+     "text": "⟨math⟩",
+     "math": [
+      {
+       "display": true,
+       "tex": "![[_under_]]"
+      },
+      {
+       "display": false,
+       "tex": "x^2\\$ \\ \\[^1]\t$"
+      }
+     ],
+     "links": [
+      {
+       "path": "img.png",
+       "heading": "",
+       "embedded": true
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: ![[img.png]]](==~~del~~==\n    $x^2\\$ \\ \\[^1]\t$$[^1]$$"
+      },
+      {
+       "type": "blockquote",
+       "text": "> > $$![[_under_]]$$"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [
+      "img.png"
+     ],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-1:27"
+     ],
+     "footnoteRefs": [
+      "1@1:21"
+     ],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-1:27",
+      "blockquote@2:0-2:20",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [],
+     "embeds": [
+      "![[img.png]]=>img.png|img.png@0:6-0:18"
+     ],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r1/5": {
+   "id": "triage/fuzz-r1/5",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "rget | $$y^2$$\nhttp\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">rget | <span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>http</p>",
+    "projections": {
+     "text": "rget | ⟨math⟩http",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "rget | $$y^2$$\nhttp"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:4"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r1/6": {
+   "id": "triage/fuzz-r1/6",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "> > ==\n, $$y^2$$\n> > $x^\n",
+   "obsidian": {
+    "html": "<blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n<p>==<br>\n, <span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>$x^</p>\n</blockquote>\n</blockquote>",
+    "projections": {
+     "text": "== , ⟨math⟩$x^",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "blockquote",
+       "text": "> > ==\n, $$y^2$$\n> > $x^"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "blockquote@0:0-2:7"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r1/7": {
+   "id": "triage/fuzz-r1/7",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "1. $$y^2$$\n​\n",
+   "obsidian": {
+    "html": "<ol>\n<li dir=\"auto\"><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>​</li>\n</ol>",
+    "projections": {
+     "text": "⟨math⟩​",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "list",
+       "text": "1. $$y^2$$\n​"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "list@0:0-1:1"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [
+      "-|parent:-1@0:0-1:1"
+     ],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r1/10": {
+   "id": "triage/fuzz-r1/10",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "> > $$word$$ ![[i.pn\n> > $$y^2$$\n===\n",
+   "obsidian": {
+    "html": "<blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n<p><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"word\" display=\"true\" class=\"TEX-N\"><mjx-mi data-latex=\"w\"><mjx-c class=\"mjx-c1D464\">𝑤</mjx-c></mjx-mi><mjx-mi data-latex=\"o\"><mjx-c class=\"mjx-c1D45C\">𝑜</mjx-c></mjx-mi><mjx-mi data-latex=\"r\"><mjx-c class=\"mjx-c1D45F\">𝑟</mjx-c></mjx-mi><mjx-mi data-latex=\"d\"><mjx-c class=\"mjx-c1D451\">𝑑</mjx-c></mjx-mi></mjx-math></mjx-container></span> ![[i.pn<br>\n<span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>===</p>\n</blockquote>\n</blockquote>",
+    "projections": {
+     "text": "⟨math⟩ ![[i.pn ⟨math⟩===",
+     "math": [
+      {
+       "display": true,
+       "tex": "word"
+      },
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "blockquote",
+       "text": "> > $$word$$ ![[i.pn\n> > $$y^2$$\n==="
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "blockquote@0:0-2:3"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r1/11": {
+   "id": "triage/fuzz-r1/11",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]:  \n    [link](u) | [^1]\n- [ ] [[a#h]]\tword\n",
+   "obsidian": {
+    "html": "<ul class=\"contains-task-list\">\n<li data-task=\"\" class=\"task-list-item\" dir=\"auto\"><input type=\"checkbox\" class=\"task-list-item-checkbox\"><a data-href=\"a#h\" href=\"a#h\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a &gt; h</a>\tword</li>\n</ul>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p><a class=\"internal-link\" data-href=\"u\" href=\"u\" target=\"_blank\" rel=\"noopener nofollow\">link</a> | <sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+    "projections": {
+     "text": "a > h word",
+     "math": [],
+     "links": [
+      {
+       "path": "a",
+       "heading": "h",
+       "embedded": false
+      },
+      {
+       "path": "u",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [
+      {
+       "char": " ",
+       "checked": false
+      }
+     ],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]:  \n    [link](u) | [^1]"
+      },
+      {
+       "type": "list",
+       "text": "- [ ] [[a#h]]\tword"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "u",
+      "a#h"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-1:20"
+     ],
+     "footnoteRefs": [
+      "1@1:16"
+     ],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-1:20",
+      "list@2:0-2:18",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [
+      "[link](u)=>u|link@1:4-1:13",
+      "[[a#h]]=>a#h|a > h@2:6-2:13"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [
+      "\" \"|parent:-2@2:0-2:18"
+     ],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r1/12": {
+   "id": "triage/fuzz-r1/12",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]: # *$\ng_[^1]\n- [ \n===\n",
+   "obsidian": {
+    "html": "<ul>\n<li dir=\"auto\">\n<h1 data-heading=\"[\" dir=\"auto\">[</h1>\n</li>\n</ul>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><h1 data-heading=\"*$\" dir=\"auto\">*$</h1><p>g_<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+    "projections": {
+     "text": "[",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [
+      "1:[",
+      "1:*$"
+     ],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: # *$\ng_[^1]"
+      },
+      {
+       "type": "list",
+       "text": "- [ \n==="
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-1:6"
+     ],
+     "footnoteRefs": [
+      "1@1:2"
+     ],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-1:6",
+      "list@2:0-3:3",
+      "text@4:0-4:0",
+      "element@4:0-4:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [
+      "-|parent:-2@2:0-3:3"
+     ],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r1/15": {
+   "id": "triage/fuzz-r1/15",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "- [[\n    $$y^2$$. **^blk**, ​, ![[i.png|100]]\n",
+   "obsidian": {
+    "html": "<ul>\n<li dir=\"auto\">[[<br>\n<span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>. <strong></strong>, ​, <span width=\"100\" alt=\"i.png\" src=\"i.png\" class=\"internal-embed is-loaded file-embed mod-empty-attachment\">“i.png” could not be found.</span></li>\n</ul>",
+    "projections": {
+     "text": "[[ ⟨math⟩. , ​, i.png",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [
+      {
+       "path": "i.png",
+       "heading": "",
+       "embedded": true
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:"
+     ],
+     "sections": [
+      {
+       "type": "list",
+       "text": "- [[\n    $$y^2$$. **^blk**, ​, ![[i.png|100]]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [
+      "i.png"
+     ],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "list@0:0-1:40"
+     ],
+     "links": [],
+     "embeds": [
+      "![[i.png|100]]=>i.png|100@1:26-1:40"
+     ],
+     "tags": [],
+     "listItems": [
+      "-|parent:-1@0:0-1:40"
+     ],
+     "blocks": [
+      "blk@0:0-1:40"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r1/16": {
+   "id": "triage/fuzz-r1/16",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "> > $$y^2$$\n> > ​!\n",
+   "obsidian": {
+    "html": "<blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n<p><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>​!</p>\n</blockquote>\n</blockquote>",
+    "projections": {
+     "text": "⟨math⟩​!",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "blockquote",
+       "text": "> > $$y^2$$\n> > ​!"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "blockquote@0:0-1:6"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r1/17": {
+   "id": "triage/fuzz-r1/17",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "> [!n\n/b$$y^2$$\n> [!n\n",
+   "obsidian": {
+    "html": "<blockquote dir=\"auto\">\n<p>[!n<br>\n/b<span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>[!n</p>\n</blockquote>",
+    "projections": {
+     "text": "[!n /b⟨math⟩[!n",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "blockquote",
+       "text": "> [!n\n/b$$y^2$$\n> [!n"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "blockquote@0:0-2:5"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/0": {
+   "id": "triage/fuzz-r2/0",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "> [!not\n> [!note] *em*\t$$[[<br>]]$$\n===\n",
+   "obsidian": {
+    "html": "<blockquote dir=\"auto\">\n<p>[!not<br>\n[!note] <em>em</em>\t<span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"[[&lt;br&gt;]]\" display=\"true\" class=\"TEX-N\"><mjx-mo data-latex=\"[\"><mjx-c class=\"mjx-c5B\">[</mjx-c></mjx-mo><mjx-mo data-latex=\"[\"><mjx-c class=\"mjx-c5B\">[</mjx-c></mjx-mo><mjx-mo data-latex=\"&lt;\"><mjx-c class=\"mjx-c3C\">&lt;</mjx-c></mjx-mo><mjx-mi space=\"4\" data-latex=\"b\"><mjx-c class=\"mjx-c1D44F\">𝑏</mjx-c></mjx-mi><mjx-mi data-latex=\"r\"><mjx-c class=\"mjx-c1D45F\">𝑟</mjx-c></mjx-mi><mjx-mo space=\"4\" data-latex=\"&gt;\"><mjx-c class=\"mjx-c3E\">&gt;</mjx-c></mjx-mo><mjx-mo data-latex=\"]\"><mjx-c class=\"mjx-c5D\">]</mjx-c></mjx-mo><mjx-mo data-latex=\"]\"><mjx-c class=\"mjx-c5D\">]</mjx-c></mjx-mo></mjx-math></mjx-container></span>===</p>\n</blockquote>",
+    "projections": {
+     "text": "[!not [!note] em ⟨math⟩===",
+     "math": [
+      {
+       "display": true,
+       "tex": "[[<br>]]"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "em:em"
+     ],
+     "sections": [
+      {
+       "type": "blockquote",
+       "text": "> [!not\n> [!note] *em*\t$$[[<br>]]$$\n==="
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "blockquote@0:0-2:3"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/1": {
+   "id": "triage/fuzz-r2/1",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "<br>. $$y^2$$\n==mark=\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><br>. <span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>==mark=</p>",
+    "projections": {
+     "text": ". ⟨math⟩==mark=",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "<br>. $$y^2$$\n==mark="
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:7"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/2": {
+   "id": "triage/fuzz-r2/2",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "> > [^1], #\n\n[^1]: # ![[d\n\n``co\n---\n",
+   "obsidian": {
+    "html": "<blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n<p><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup>, #</p>\n</blockquote>\n</blockquote>\n<h2 data-heading=\"``co\" dir=\"auto\">``co</h2>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><h1 data-heading=\"![[d\" dir=\"auto\">![[d</h1><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "⟨fn⟩, # ``co",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [
+      "2:``co",
+      "1:![[d"
+     ],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "blockquote",
+       "text": "> > [^1], #"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: # ![[d"
+      },
+      {
+       "type": "heading",
+       "text": "``co\n---"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [
+      "2:``co"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@2:0-2:12"
+     ],
+     "footnoteRefs": [
+      "1@0:4"
+     ],
+     "headings": [
+      "2:``co@4:0"
+     ],
+     "sections": [
+      "blockquote@0:0-0:11",
+      "footnoteDefinition@2:0-2:12",
+      "heading@4:0-5:3",
+      "text@6:0-6:0",
+      "element@6:0-6:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/3": {
+   "id": "triage/fuzz-r2/3",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]: > [!note] **[[a#h]]\n- [[a#^blk]],\n[^1]\n",
+   "obsidian": {
+    "html": "<ul>\n<li dir=\"auto\"><a data-href=\"a#^blk\" href=\"a#^blk\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a &gt; ^blk</a>,<br>\n<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></li>\n</ul>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><div data-callout-metadata=\"\" data-callout-fold=\"\" data-callout=\"note\" class=\"callout\"><div class=\"callout-title\" dir=\"auto\"><div class=\"callout-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"svg-icon lucide-pencil\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"></path><path d=\"m15 5 4 4\"></path></svg></div><div class=\"callout-title-inner\">**<a data-href=\"a#h\" href=\"a#h\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a &gt; h</a></div></div></div><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "a > ^blk, ⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "a",
+       "heading": "^blk",
+       "embedded": false
+      },
+      {
+       "path": "a",
+       "heading": "h",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: > [!note] **[[a#h]]"
+      },
+      {
+       "type": "list",
+       "text": "- [[a#^blk]],\n[^1]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "a#h",
+      "a#^blk"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-0:25"
+     ],
+     "footnoteRefs": [
+      "1@2:0"
+     ],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-0:25",
+      "list@1:0-2:4",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [
+      "[[a#h]]=>a#h|a > h@0:18-0:25",
+      "[[a#^blk]]=>a#^blk|a > ^blk@1:2-1:12"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [
+      "-|parent:-1@1:0-2:4"
+     ],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/4": {
+   "id": "triage/fuzz-r2/4",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "> > $$![[&amp;]]$$\n> > ^[]\n",
+   "obsidian": {
+    "html": "<blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n<p><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"![[&amp;amp;]]\" display=\"true\" class=\"TEX-N\"><mjx-merror data-mjx-error=\"Misplaced &amp;\" title=\"Misplaced &amp;\"><mjx-mtext style=\"font-family: MJX-TEX-ZERO, serif;\"><mjx-utext variant=\"-explicitFont\" style=\"width: 4.438em;\">![[&amp;amp;]]</mjx-utext></mjx-mtext></mjx-merror></mjx-math></mjx-container></span><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n</blockquote>\n</blockquote>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "⟨math⟩⟨fn⟩",
+     "math": [
+      {
+       "display": true,
+       "tex": "![[&amp;]]"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "blockquote",
+       "text": "> > $$![[&amp;]]$$\n> > ^[]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      ""
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [
+      "@1:4"
+     ],
+     "headings": [],
+     "sections": [
+      "blockquote@0:0-1:7",
+      "text@2:0-2:0",
+      "element@2:0-2:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/5": {
+   "id": "triage/fuzz-r2/5",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "^blk$$**strong**$$\n==ma\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">^blk<span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"**strong**\" display=\"true\" class=\"TEX-N\"><mjx-mo data-latex=\"*\"><mjx-c class=\"mjx-c2217\">∗</mjx-c></mjx-mo><mjx-mo space=\"3\" data-latex=\"*\"><mjx-c class=\"mjx-c2217\">∗</mjx-c></mjx-mo><mjx-mi space=\"3\" data-latex=\"s\"><mjx-c class=\"mjx-c1D460\">𝑠</mjx-c></mjx-mi><mjx-mi data-latex=\"t\"><mjx-c class=\"mjx-c1D461\">𝑡</mjx-c></mjx-mi><mjx-mi data-latex=\"r\"><mjx-c class=\"mjx-c1D45F\">𝑟</mjx-c></mjx-mi><mjx-mi data-latex=\"o\"><mjx-c class=\"mjx-c1D45C\">𝑜</mjx-c></mjx-mi><mjx-mi data-latex=\"n\"><mjx-c class=\"mjx-c1D45B\">𝑛</mjx-c></mjx-mi><mjx-mi data-latex=\"g\"><mjx-c class=\"mjx-c1D454\">𝑔</mjx-c></mjx-mi><mjx-mo space=\"3\" data-latex=\"*\"><mjx-c class=\"mjx-c2217\">∗</mjx-c></mjx-mo><mjx-mo space=\"3\" data-latex=\"*\"><mjx-c class=\"mjx-c2217\">∗</mjx-c></mjx-mo></mjx-math></mjx-container></span>==ma</p>",
+    "projections": {
+     "text": "^blk⟨math⟩==ma",
+     "math": [
+      {
+       "display": true,
+       "tex": "**strong**"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "^blk$$**strong**$$\n==ma"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:4"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/6": {
+   "id": "triage/fuzz-r2/6",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]: # \n# [^1] \\ !\n",
+   "obsidian": {
+    "html": "<h1 data-heading=\"[^1] \\ !\" dir=\"auto\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> \\ !</h1>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><h1 data-heading=\"\" dir=\"auto\"></h1><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "⟨fn⟩ \\ !",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [
+      "1:[^1] \\ !",
+      "1:"
+     ],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: # "
+      },
+      {
+       "type": "heading",
+       "text": "# [^1] \\ !"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [
+      "1:[^1] \\ !"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-0:8"
+     ],
+     "footnoteRefs": [
+      "1@1:2"
+     ],
+     "headings": [
+      "1:[^1] \\ !@1:0"
+     ],
+     "sections": [
+      "footnoteDefinition@0:0-0:8",
+      "heading@1:0-1:10",
+      "text@2:0-2:0",
+      "element@2:0-2:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/7": {
+   "id": "triage/fuzz-r2/7",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| b |\n| --- |\n| > [!note] [[[[#tag]]]]]([[a#^blk]] ^blk | ![[==mark==]] | c |\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th dir=\"ltr\">b</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td dir=\"ltr\">&gt; [!note] [<a data-href=\"[#tag\" href=\"[#tag\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">[ &gt; tag</a>]]](<a data-href=\"a#^blk\" href=\"a#^blk\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a &gt; ^blk</a> </td>\n</tr>\n</tbody>\n</table>",
+    "projections": {
+     "text": "b > [!note] [[ > tag]]](a > ^blk",
+     "math": [],
+     "links": [
+      {
+       "path": "[",
+       "heading": "tag",
+       "embedded": false
+      },
+      {
+       "path": "a",
+       "heading": "^blk",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| b |\n| --- |\n| > [!note] [[[[#tag]]]]]([[a#^blk]] ^blk | ![[==mark==]] | c |"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "[#tag",
+      "a#^blk"
+     ],
+     "embeds": [
+      "==mark=="
+     ],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:63"
+     ],
+     "links": [
+      "[[[#tag]]=>[#tag|[ > tag@2:13-2:22",
+      "[[a#^blk]]=>a#^blk|a > ^blk@2:26-2:36"
+     ],
+     "embeds": [
+      "![[==mark==]]=>==mark==|==mark==@2:44-2:57"
+     ],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-2:63"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/8": {
+   "id": "triage/fuzz-r2/8",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| b |\n| --- |\n| - [ ] ![[img.png img.png]]  [link](u) %%%% - [ ] &amp; <https://e.test>^blk | c |\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th dir=\"ltr\">b</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td dir=\"ltr\">- [ ] <span alt=\"img.png img.png\" src=\"img.png img.png\" class=\"internal-embed is-loaded file-embed mod-empty-attachment\">“img.png img.png” could not be found.</span>  <a class=\"internal-link\" data-href=\"u\" href=\"u\" target=\"_blank\" rel=\"noopener nofollow\">link</a>  - [ ] &amp; <a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test\" target=\"_blank\">https://e.test</a></td>\n</tr>\n</tbody>\n</table>",
+    "projections": {
+     "text": "b - [ ] img.png img.png link - [ ] & https://e.test",
+     "math": [],
+     "links": [
+      {
+       "path": "img.png img.png",
+       "heading": "",
+       "embedded": true
+      },
+      {
+       "path": "u",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| b |\n| --- |\n| - [ ] ![[img.png img.png]]  [link](u) %%%% - [ ] &amp; <https://e.test>^blk | c |"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "u"
+     ],
+     "embeds": [
+      "img.png img.png"
+     ],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:83"
+     ],
+     "links": [
+      "[link](u)=>u|link@2:30-2:39"
+     ],
+     "embeds": [
+      "![[img.png img.png]]=>img.png img.png|img.png img.png@2:8-2:28"
+     ],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-2:83"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/9": {
+   "id": "triage/fuzz-r2/9",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "(u)]][[\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">(u)]][[</p>",
+    "projections": {
+     "text": "(u)]][[",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "(u)]][["
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:7"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/10": {
+   "id": "triage/fuzz-r2/10",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "> **strong**]($$y^2$$\n> _[%\n",
+   "obsidian": {
+    "html": "<blockquote dir=\"auto\">\n<p><strong>strong</strong>](<span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>_[%</p>\n</blockquote>",
+    "projections": {
+     "text": "strong](⟨math⟩_[%",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "strong:strong"
+     ],
+     "sections": [
+      {
+       "type": "blockquote",
+       "text": "> **strong**]($$y^2$$\n> _[%"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "blockquote@0:0-1:5"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/12": {
+   "id": "triage/fuzz-r2/12",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]:   \nu). ^[#tag]\n",
+   "obsidian": {
+    "html": "\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a href=\"#tag\" class=\"tag\" target=\"_blank\" rel=\"noopener nofollow\">#tag</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "",
+     "math": [],
+     "links": [],
+     "tags": [
+      "tag"
+     ],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]:   \nu). ^[#tag]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "tag"
+     ],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-1:11",
+      "[inline0@1:6-1:10"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-1:11",
+      "text@2:0-2:0",
+      "element@2:0-2:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "#tag@1:6-1:10"
+     ],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/13": {
+   "id": "triage/fuzz-r2/13",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]:\n    1. *em* | [link](u)]([^1]](https://e.test/p\n\n\\![[img.png]]]([[<\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">!<a data-href=\"img.png\" href=\"img.png\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">img.png</a>]([[&lt;</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><ol>\n<li dir=\"auto\"><em>em</em> | <a class=\"internal-link\" data-href=\"u\" href=\"u\" target=\"_blank\" rel=\"noopener nofollow\">link</a>](<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup>](<a rel=\"noopener nofollow\" class=\"external-link\" href=\"https://e.test/p\" target=\"_blank\">https://e.test/p</a></li>\n</ol><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "!img.png]([[<",
+     "math": [],
+     "links": [
+      {
+       "path": "img.png",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "u",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]:\n    1. *em* | [link](u)]([^1]](https://e.test/p"
+      },
+      {
+       "type": "paragraph",
+       "text": "\\![[img.png]]]([[<"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "u",
+      "img.png"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-1:47"
+     ],
+     "footnoteRefs": [
+      "1@1:25"
+     ],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-1:47",
+      "paragraph@3:0-3:18",
+      "text@4:0-4:0",
+      "element@4:0-4:0"
+     ],
+     "links": [
+      "[link](u)=>u|link@1:14-1:23",
+      "[[img.png]]=>img.png|img.png@3:2-3:13"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [
+      "-|parent:-1@1:4-1:47"
+     ],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/14": {
+   "id": "triage/fuzz-r2/14",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]: - [[a|b]][[#tag]]\n\n[[[]]]]\n- [ ] [^1]. ==ma\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><a data-href=\"[\" href=\"[\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">[</a>]]</p>\n<ul class=\"contains-task-list\">\n<li data-task=\"\" class=\"task-list-item\" dir=\"auto\"><input type=\"checkbox\" class=\"task-list-item-checkbox\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup>. ==ma</li>\n</ul>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><ul>\n<li dir=\"auto\"><a data-tooltip-position=\"top\" aria-label=\"a\" data-href=\"a\" href=\"a\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">b</a><a data-href=\"#tag\" href=\"#tag\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">tag</a></li>\n</ul><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "[]] ⟨fn⟩. ==ma",
+     "math": [],
+     "links": [
+      {
+       "path": "[",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "a",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "",
+       "heading": "tag",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [
+      {
+       "char": " ",
+       "checked": false
+      }
+     ],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: - [[a|b]][[#tag]]"
+      },
+      {
+       "type": "paragraph",
+       "text": "[[[]]]]"
+      },
+      {
+       "type": "list",
+       "text": "- [ ] [^1]. ==ma"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "a",
+      "#tag",
+      "["
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-0:23"
+     ],
+     "footnoteRefs": [
+      "1@3:6"
+     ],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-0:23",
+      "paragraph@2:0-2:7",
+      "list@3:0-3:16",
+      "text@4:0-4:0",
+      "element@4:0-4:0"
+     ],
+     "links": [
+      "[[a|b]]=>a|b@0:8-0:15",
+      "[[#tag]]=>#tag|tag@0:15-0:23",
+      "[[[]]=>[|[@2:0-2:5"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [
+      "-|parent:-1@0:6-0:23",
+      "\" \"|parent:-3@3:0-3:16"
+     ],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/15": {
+   "id": "triage/fuzz-r2/15",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]: ![[\n= | ^[#a/b]\n",
+   "obsidian": {
+    "html": "\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a href=\"#a/b\" class=\"tag\" target=\"_blank\" rel=\"noopener nofollow\">#a/b</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "",
+     "math": [],
+     "links": [],
+     "tags": [
+      "a/b"
+     ],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: ![[\n= | ^[#a/b]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "a/b"
+     ],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-1:11",
+      "[inline0@1:6-1:10"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-1:11",
+      "text@2:0-2:0",
+      "element@2:0-2:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "#a/b@1:6-1:10"
+     ],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/16": {
+   "id": "triage/fuzz-r2/16",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "*]][\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">*]][</p>",
+    "projections": {
+     "text": "*]][",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "*]]["
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:4"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/17": {
+   "id": "triage/fuzz-r2/17",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]: \n \\ [[a#h]]\n\n| - [ ] [^1] ![[i.png|100x200]] https\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">| - [ ] <sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> <span height=\"200\" width=\"100\" alt=\"i.png\" src=\"i.png\" class=\"internal-embed is-loaded file-embed mod-empty-attachment\">“i.png” could not be found.</span> https</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>\\ <a data-href=\"a#h\" href=\"a#h\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a &gt; h</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+    "projections": {
+     "text": "| - [ ] ⟨fn⟩ i.png https",
+     "math": [],
+     "links": [
+      {
+       "path": "i.png",
+       "heading": "",
+       "embedded": true
+      },
+      {
+       "path": "a",
+       "heading": "h",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: \n \\ [[a#h]]"
+      },
+      {
+       "type": "paragraph",
+       "text": "| - [ ] [^1] ![[i.png|100x200]] https"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "a#h"
+     ],
+     "embeds": [
+      "i.png"
+     ],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-1:10"
+     ],
+     "footnoteRefs": [
+      "1@3:8"
+     ],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-1:10",
+      "paragraph@3:0-3:37",
+      "text@4:0-4:0",
+      "element@4:0-4:0"
+     ],
+     "links": [
+      "[[a#h]]=>a#h|a > h@1:3-1:10"
+     ],
+     "embeds": [
+      "![[i.png|100x200]]=>i.png|100x200@3:13-3:31"
+     ],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/18": {
+   "id": "triage/fuzz-r2/18",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[link\n日本語. $$[[$x^2$]]$$\n===\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[link<br>\n日本語. <span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"[[$x^2$]]\" display=\"true\" class=\"TEX-N\"><mjx-mo data-latex=\"[\"><mjx-c class=\"mjx-c5B\">[</mjx-c></mjx-mo><mjx-mo data-latex=\"[\"><mjx-c class=\"mjx-c5B\">[</mjx-c></mjx-mo><mjx-mo data-latex=\"$\"><mjx-c class=\"mjx-c24\">$</mjx-c></mjx-mo><mjx-msup data-latex=\"x^2\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup><mjx-mo data-latex=\"$\"><mjx-c class=\"mjx-c24\">$</mjx-c></mjx-mo><mjx-mo data-latex=\"]\"><mjx-c class=\"mjx-c5D\">]</mjx-c></mjx-mo><mjx-mo data-latex=\"]\"><mjx-c class=\"mjx-c5D\">]</mjx-c></mjx-mo></mjx-math></mjx-container></span>===</p>",
+    "projections": {
+     "text": "[link 日本語. ⟨math⟩===",
+     "math": [
+      {
+       "display": true,
+       "tex": "[[$x^2$]]"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[link\n日本語. $$[[$x^2$]]$$\n==="
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-2:3"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/fuzz-r2/19": {
+   "id": "triage/fuzz-r2/19",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]: > > ![[i.png|100]],\n\n3]]. #a/b > [link link](u) | link](u) \\ [^1]. ^[inline | c |\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">3]]. <a href=\"#a/b\" class=\"tag\" target=\"_blank\" rel=\"noopener nofollow\">#a/b</a> &gt; <a class=\"internal-link\" data-href=\"u\" href=\"u\" target=\"_blank\" rel=\"noopener nofollow\">link link</a> | link](u) \\ <sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup>. ^[inline | c |</p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n<p><span width=\"100\" alt=\"i.png\" src=\"i.png\" class=\"internal-embed is-loaded file-embed mod-empty-attachment\">“i.png” could not be found.</span>,</p>\n</blockquote>\n</blockquote><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "3]]. #a/b > link link | link](u) \\ ⟨fn⟩. ^[inline | c |",
+     "math": [],
+     "links": [
+      {
+       "path": "u",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "i.png",
+       "heading": "",
+       "embedded": true
+      }
+     ],
+     "tags": [
+      "a/b"
+     ],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: > > ![[i.png|100]],"
+      },
+      {
+       "type": "paragraph",
+       "text": "3]]. #a/b > [link link](u) | link](u) \\ [^1]. ^[inline | c |"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "u"
+     ],
+     "embeds": [
+      "i.png"
+     ],
+     "tags": [
+      "a/b"
+     ],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-0:25"
+     ],
+     "footnoteRefs": [
+      "1@2:40"
+     ],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-0:25",
+      "paragraph@2:0-2:60",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [
+      "[link link](u)=>u|link link@2:12-2:26"
+     ],
+     "embeds": [
+      "![[i.png|100]]=>i.png|100@0:10-0:24"
+     ],
+     "tags": [
+      "#a/b@2:5-2:9"
+     ],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  }
+ }
+}

@@ -248,6 +248,19 @@ export const ORACLES: readonly Oracle[] = [
     test: "charclass.test.ts",
   },
   {
+    name: "projection triage",
+    command: "npm test",
+    gate: "absolute",
+    compares: [
+      "recorded minimal forms of the differential fuzz's triage, and live probes, every one matching",
+      "block ids inside wrappers and cells, footnote bodies' order, the line ending after `$$…$$`",
+    ],
+    blind: [
+      "anything but the 69 recorded documents; the nightly differential sweep finds the next ones",
+    ],
+    test: "projection-triage.test.ts",
+  },
+  {
     name: "positioned points",
     command: "npm test",
     gate: "ceiling",
