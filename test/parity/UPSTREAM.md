@@ -174,6 +174,31 @@ the trigger is content BEFORE the opener on the item's own line, not the math bl
 start. Repaired rather than only reported, unlike item 2 below, because this one appears in
 the tree this package ships.
 
+## 9. A whitespace-only line in a footnote definition's fence gains the indent on every pass
+
+**`micromark-extension-gfm-footnote`** with `mdast-util-to-markdown` 2, via bare
+`remark-parse` + `remark-gfm` + `remark-stringify`; found by `fuzz/invariant-sweep.ts`.
+
+Input, as a JSON string since the trailing spaces are the point:
+
+```
+"[^1]: \n    ~~~~\n    \n"
+```
+
+````
+pass 1: "[^1]: ```\n        \n    ```\n"
+pass 2: "[^1]: ```\n            \n    ```\n"
+pass 3: "[^1]: ```\n                \n    ```\n"
+````
+
+Four spaces per pass, unbounded. The definition's continuation does not consume the indent of
+a whitespace-only line, so the fenced code's `value` is `"    "` -- the container's indent read
+as content -- and the writer indents that line again. Reproduced with none of this package
+loaded; under `strict` it is inherited as-is. Rare in generated documents (2 seeds of 5,000).
+
+**No workaround yet.** Trimming whitespace-only lines in the code writer would touch every code
+block, which is author content.
+
 ## 6–8. Obsidian `metadataCache`
 
 These are recorded from the goldens rather than reproduced here, since they need the

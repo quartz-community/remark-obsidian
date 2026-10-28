@@ -81,3 +81,116 @@ export function violationsOf(markdown: string, tree: unknown): string[] {
   walk(tree, null);
   return found;
 }
+
+/**
+ * mdast's content model, which `mdast-util-assert` does not check.
+ *
+ * Upstream's assertion library was the obvious tool and it validates node SHAPE only --
+ * a missing `type`, a non-array `children`, a literal carrying children. Verified against
+ * controls rather than assumed: it ACCEPTS a `listItem` at the root, a `tableCell` under
+ * root, a `paragraph` nested in a `paragraph`, a `list` holding a paragraph, and a node whose
+ * type is `nonsense`. It is kept as a cheap shape gate, at 0 violations, because every pass
+ * here that builds a node by hand could break that; it is not a containment check.
+ *
+ * So this is the containment check. The content model it encodes is CommonMark's two classes
+ * plus this package's own nodes, and an unmodelled type is reported rather than ignored --
+ * a silent pass for a node nobody listed is how a table like this rots.
+ */
+const PHRASING = new Set([
+  "text",
+  "emphasis",
+  "strong",
+  "delete",
+  "inlineCode",
+  "break",
+  "link",
+  "image",
+  "linkReference",
+  "imageReference",
+  "footnoteReference",
+  "html",
+  "inlineMath",
+  "wikilink",
+  "tag",
+  "highlight",
+  "comment",
+  "footnote",
+  "blockId",
+]);
+const FLOW = new Set([
+  "paragraph",
+  "heading",
+  "thematicBreak",
+  "blockquote",
+  "list",
+  "table",
+  "html",
+  "code",
+  "definition",
+  "footnoteDefinition",
+  "math",
+  "yaml",
+  "toml",
+  "callout",
+  "comment",
+  "blockId",
+]);
+const CONTENT_MODEL: Record<string, Set<string> | "none"> = {
+  root: FLOW,
+  paragraph: PHRASING,
+  heading: PHRASING,
+  tableCell: PHRASING,
+  emphasis: PHRASING,
+  strong: PHRASING,
+  delete: PHRASING,
+  link: PHRASING,
+  linkReference: PHRASING,
+  highlight: PHRASING,
+  calloutTitle: PHRASING,
+  footnote: PHRASING,
+  wikilink: PHRASING,
+  tag: PHRASING,
+  list: new Set(["listItem"]),
+  table: new Set(["tableRow"]),
+  tableRow: new Set(["tableCell"]),
+  listItem: FLOW,
+  blockquote: FLOW,
+  footnoteDefinition: FLOW,
+  callout: new Set([...FLOW, "calloutTitle"]),
+  comment: new Set([...FLOW, ...PHRASING]),
+  image: "none",
+  text: "none",
+  inlineCode: "none",
+  code: "none",
+  break: "none",
+  thematicBreak: "none",
+  yaml: "none",
+  inlineMath: "none",
+  definition: "none",
+  imageReference: "none",
+  math: "none",
+  html: "none",
+  blockId: "none",
+  footnoteReference: "none",
+};
+
+export function containmentOf(tree: unknown): string[] {
+  const found: string[] = [];
+  const walk = (node: unknown): void => {
+    const self = node as { type?: string; children?: unknown[] };
+    const kids = (self.children ?? []) as Array<{ type?: string }>;
+    const rule = CONTENT_MODEL[self.type ?? ""];
+    if (rule === "none") {
+      if (kids.length > 0) found.push(`${self.type} should have NO children`);
+    } else if (rule) {
+      for (const kid of kids) {
+        if (!rule.has(kid.type ?? "")) found.push(`${self.type} > ${kid.type}`);
+      }
+    } else if (self.type) {
+      found.push(`UNMODELLED: ${self.type}`);
+    }
+    for (const kid of kids) walk(kid);
+  };
+  walk(tree);
+  return found;
+}

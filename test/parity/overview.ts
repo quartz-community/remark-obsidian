@@ -218,6 +218,22 @@ export const ORACLES: readonly Oracle[] = [
     test: "roundtrip.test.ts",
   },
   {
+    name: "invariant fuzz",
+    command: "npm test",
+    gate: "ceiling",
+    compares: [
+      "generated documents under every preset and option set: mdast shape, content model, spans",
+      "math rendering its own value, footnote links and numbering, comment markers",
+      "formatting reaching a fixed point and keeping the author's words",
+    ],
+    blind: [
+      "whether the tree matches OBSIDIAN -- it holds the tree to properties, not to answers",
+      "constructs the generator's fixed alphabet never emits",
+    ],
+    ceilingAt: "fuzz-invariants.test.ts",
+    test: "fuzz-invariants.test.ts",
+  },
+  {
     name: "positioned points",
     command: "npm test",
     gate: "ceiling",

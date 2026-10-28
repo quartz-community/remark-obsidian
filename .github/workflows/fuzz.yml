@@ -77,6 +77,20 @@ jobs:
           echo "count=$COUNT" >> "$GITHUB_OUTPUT"
           echo "Sweeping seeds $FROM..$((FROM + COUNT - 1))" >> "$GITHUB_STEP_SUMMARY"
 
+      # Properties that hold whatever Obsidian says -- tree shape, spans, math rendering its own
+      # value, footnote links, formatting that settles and keeps the words -- under every preset
+      # and option set. No recording, so 5,000 seeds take about a minute. The kind still open in
+      # bulk is ignored here; `fuzz-invariants.test.ts` holds its seeds exactly, on every push.
+      - name: Sweep invariants
+        id: invariants
+        run: |
+          set +e
+          npx tsx --conditions=development test/parity/fuzz/invariant-sweep.ts \
+            "${{ steps.range.outputs.from }}" 5000 --ignore "format: changes the words" \
+            | tee invariant-report.txt
+          echo "status=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+          { echo '```'; cat invariant-report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
       # The sweep records, compares, shrinks every failure and groups by the
       # reduced form, so the report is a list of causes rather than of seeds.
       # Shrinking is what makes it readable: raw failures do not group, since a
@@ -95,19 +109,24 @@ jobs:
           { echo '```'; cat fuzz-report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Keep the recording for triage
-        if: steps.check.outputs.status != '0'
+        if: steps.check.outputs.status != '0' || steps.invariants.outputs.status != '0'
         uses: actions/upload-artifact@v4
         with:
           name: fuzz-${{ steps.range.outputs.from }}
-          path: fuzz-report.txt
+          path: |
+            fuzz-report.txt
+            invariant-report.txt
 
       - name: Open an issue naming the seeds
-        if: steps.check.outputs.status != '0' && github.event_name == 'schedule'
+        if: (steps.check.outputs.status != '0' || steps.invariants.outputs.status != '0') && github.event_name == 'schedule'
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('node:fs');
-            const report = fs.readFileSync('fuzz-report.txt', 'utf8').slice(0, 55000);
+            const report = [
+              fs.readFileSync('invariant-report.txt', 'utf8'),
+              fs.readFileSync('fuzz-report.txt', 'utf8'),
+            ].join('\n').slice(0, 55000);
             const from = '${{ steps.range.outputs.from }}';
             // One rolling issue, not one a night: each run comments on the open one.
             const open = await github.rest.issues.listForRepo({
@@ -117,7 +136,7 @@ jobs:
               labels: 'fuzz',
             });
             const body = [
-                'A nightly fuzz sweep disagreed with Obsidian.',
+                'A nightly fuzz sweep broke an invariant or disagreed with Obsidian (the invariant report comes first).',
                 '',
                 'Generation is deterministic, so every seed below reproduces exactly:',
                 '',
@@ -155,5 +174,5 @@ jobs:
             }
 
       - name: Fail the run when anything disagreed
-        if: steps.check.outputs.status != '0'
+        if: steps.check.outputs.status != '0' || steps.invariants.outputs.status != '0'
         run: exit 1
