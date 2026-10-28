@@ -547,7 +547,7 @@ has no coverage there, not that it agrees. Footnotes are in **neither** spec: GF
 ## Gates — what "done" means
 
 ```bash
-npm test          # 567 tests / 27 files. Contains the contract gate.
+npm test          # 574 tests / 27 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -746,6 +746,23 @@ to 3.
   itself, the comment's closer matching the same pattern.
 - **`wordsOf` separates blocks**, so a fence's text and the next paragraph's are not one word.
 
+**Seeds 5,000-10,000** (6 failing seeds: 5 shapes, plus UPSTREAM.md item 9), all closed:
+
+- A `^` before a wikilink, link or link reference is escaped, not only before a reference.
+- A formula's trailing `$` after whitespace is one the reader stepped over, under both
+  presets, so `$` + value + `$` is written as read.
+- **`balanceBrackets`:** a raw `]` that would close early first pairs with an escaped `[`
+  before it. `[[![[]]]]` holds text `[` and an embed of `]`, and escaping the embed's `]` broke
+  it. Legacy link references are balanced too.
+- A `$$` formula after a line ending is written behind `&#x20;`. At a line start it opens a
+  block, and the source kept it inline only by indentation the writer drops.
+- Legacy emphasis that STARTS with attention takes `_` first (`_**[^1]**…_`).
+- **UPSTREAM.md item 9, worked around** (`footnote-code-blank-lines.ts`, strict): whitespace-only
+  code lines in a definition lose the definition's four columns, which gives legacy's value.
+
+Unchanged by identity: referee 6,830, spec 8, strict recorded cases 2,965, definitions 5,333,
+references 1,523.
+
 **Traps:** `fmt`-style probes that look a configuration up by name silently run `legacy` for a
 JSON one; a "words" metric must not count node boundaries, and cannot see a loss the PARSE made
 (the inline-footnote line ending needed its own assertion); the Write tool turned `\u` escapes
@@ -851,7 +868,7 @@ unit test "reads a tag's characters as Obsidian does", which fails on the old cl
 5. **`normalize.ts`** carries compensations for micromark's offsets. Only rp8 trees reach it now
    (every gate runs the `legacy` profiles), and two compensations already had to be generalised
    because they broke rp8 positions that were right. Simplifying it is safe but unmeasured.
-6. **The invariant fuzz holds over seeds 0-5,000** under every configuration (see "Fuzzing").
+6. **The invariant fuzz holds over seeds 0-10,000** under every configuration (see "Fuzzing").
    Beyond that, untested; the nightly sweep draws 5,000 fresh seeds.
 7. **The fuzz triage's leftovers:** self-embeds (out of scope), and `[^1]: - [ ] [` /
    `^[[^1]]]`, where Obsidian's renderer and its cache disagree.

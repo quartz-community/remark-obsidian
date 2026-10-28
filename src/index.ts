@@ -56,6 +56,7 @@ import { listItemExtentTransform } from "./lib/list-item-extent.js";
 import { normalizePointsTransform } from "./lib/normalize-points.js";
 import { breakPositionsTransform } from "./lib/break-positions.js";
 import { commentParseTransform } from "./lib/comment-parse.js";
+import { footnoteCodeBlankLinesTransform } from "./lib/footnote-code-blank-lines.js";
 import {
   ensureLineOffsets,
   lineOffsetsFromMarkdown,
@@ -280,7 +281,7 @@ function displayAwareMathToMarkdown(): ToMarkdownOptions {
   const double = mathToMarkdown({ singleDollarTextMath: false });
   const inline = single.handlers!.inlineMath!;
   const display = double.handlers!.inlineMath!;
-  const inlineMath = ((node, parent, state, info) => {
+  const write = ((node, parent, state, info) => {
     const isDisplay =
       (node as { data?: { display?: boolean } }).data?.display === true;
     const fence = isDisplay ? "$$" : "$";
@@ -313,6 +314,15 @@ function displayAwareMathToMarkdown(): ToMarkdownOptions {
     }
     return (isDisplay ? display : inline)(node, parent, state, info);
   }) as typeof inline;
+  // A `$$` at the start of a line opens a math block. A formula there was inline in the source
+  // only through indentation the writer drops (`![` / `········$$y^2` / `····y^2$$`, found by
+  // `fuzz/invariant-sweep.ts`), so it is written after an encoded space instead.
+  const inlineMath = ((node, parent, state, info) => {
+    const written = write(node, parent, state, info);
+    return info.before === "\n" && written.startsWith("$$")
+      ? `&#x20;${written}`
+      : written;
+  }) as typeof inline;
   (inlineMath as { peek?: unknown }).peek = (inline as { peek?: unknown }).peek;
   return { ...single, handlers: { ...single.handlers, inlineMath } };
 }
@@ -331,7 +341,16 @@ function displayAwareMathToMarkdown(): ToMarkdownOptions {
  */
 function escapedFenceOnly(value: string, fence: string): boolean {
   if (!value.includes("$")) return false;
-  if (value.startsWith("$") || value.endsWith("$") || value.endsWith("\\")) {
+  // A trailing `$` after whitespace is one the reader stepped over, as it steps over any `$`
+  // after whitespace (below): `$x^` / `mark==⇥$$y^2$$` holds `x^` / `mark==⇥$` under both
+  // presets, and written padded with `$$` it opened a display block in a list item (found by
+  // `fuzz/invariant-sweep.ts`).
+  const steppedOver = fence === "$" && /\s\$$/u.test(value);
+  if (
+    value.startsWith("$") ||
+    (value.endsWith("$") && !steppedOver) ||
+    value.endsWith("\\")
+  ) {
     return false;
   }
   for (
@@ -380,7 +399,9 @@ export default function remarkObsidian(
   data.toMarkdownExtensions ??= [];
   // No option: a shortcut reference written back as its own label is correct for every
   // consumer, and the upstream branch it replaces can duplicate the label.
-  data.toMarkdownExtensions.push(linkReferenceToMarkdown());
+  data.toMarkdownExtensions.push(
+    linkReferenceToMarkdown({ legacy: preset === "legacy" }),
+  );
   data.toMarkdownExtensions.push(
     autolinkLiteralToMarkdown({ legacy: preset === "legacy" }),
   );
@@ -658,6 +679,8 @@ export default function remarkObsidian(
     // After every pass that can move a list item's end, and before points are rebuilt.
     // The overlap it repairs comes from `remark-math`; its own file carries the controls.
     listItemExtentTransform(tree);
+    // remark-gfm's footnote definitions leave their indent on a whitespace-only line of code.
+    footnoteCodeBlankLinesTransform(tree);
     // After every pass that can CREATE a root code node, since it merges adjacent ones and a
     // pass running later could leave a fresh pair unmerged. micromark splits a run of indented
     // lines below a quote-with-heading, and CommonMark makes it one block.

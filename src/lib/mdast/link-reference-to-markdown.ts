@@ -1,4 +1,5 @@
 import { defaultHandlers } from "mdast-util-to-markdown";
+import { balanceLabel } from "./autolink-literal-to-markdown.js";
 import type { Options, State, Info } from "mdast-util-to-markdown";
 import type { LinkReference, Parents } from "mdast";
 
@@ -28,7 +29,9 @@ const BLANK = /^[ \t\n]+$/u;
  * are order-sensitive, so the only reliable way to leave upstream's behaviour untouched
  * is to call upstream.
  */
-export function linkReferenceToMarkdown(): Options {
+export function linkReferenceToMarkdown(
+  options: { readonly legacy?: boolean } = {},
+): Options {
   return {
     handlers: {
       linkReference(
@@ -46,7 +49,13 @@ export function linkReferenceToMarkdown(): Options {
           exit();
           return `[${label}]`;
         }
-        return defaultHandlers.linkReference(node, parent, state, info);
+        const written = defaultHandlers.linkReference(
+          node,
+          parent,
+          state,
+          info,
+        );
+        return options.legacy ? balanceLabel(node, state, written) : written;
       },
     },
   };

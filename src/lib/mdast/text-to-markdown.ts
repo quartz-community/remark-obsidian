@@ -41,11 +41,15 @@ export function textToMarkdown(tags: boolean): Options {
         if (previous?.type === "comment" && written.startsWith("%%")) {
           written = `\\${written}`;
         }
-        // A `^` before a footnote reference would open an inline footnote over it: `^[^blk]`.
-        if (
-          next?.type === "footnoteReference" &&
-          /(?<!\\)(?:\\\\)*\^$/u.test(written)
-        ) {
+        // A `^` before anything written with a leading `[` would open an inline footnote over
+        // it: `^[^blk]`, and `^[[[target\]]]` with a wikilink (found by `fuzz/invariant-sweep.ts`).
+        const bracketed =
+          next?.type === "footnoteReference" ||
+          next?.type === "link" ||
+          next?.type === "linkReference" ||
+          (next?.type === "wikilink" &&
+            !(next as { embedded?: boolean }).embedded);
+        if (bracketed && /(?<!\\)(?:\\\\)*\^$/u.test(written)) {
           written = `${written.slice(0, -1)}\\^`;
         }
         if (!tags) return written;

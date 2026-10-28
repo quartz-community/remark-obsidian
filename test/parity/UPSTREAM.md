@@ -196,8 +196,12 @@ a whitespace-only line, so the fenced code's `value` is `"    "` -- the containe
 as content -- and the writer indents that line again. Reproduced with none of this package
 loaded; under `strict` it is inherited as-is. Rare in generated documents (2 seeds of 5,000).
 
-**No workaround yet.** Trimming whitespace-only lines in the code writer would touch every code
-block, which is author content.
+**Worked around in `strict`** (`footnote-code-blank-lines.ts`), on the parse side rather than in
+the writer, which would touch every code block. Inside a footnote definition only, a
+whitespace-only line of code loses the definition's four columns, which is what micromark
+should have consumed. That gives the same `value` remark-parse 8 reads (`a` / `··` / `b` from
+`····a` / `······` / `····b`). Every other line, and every other container's indent, was
+already consumed correctly. The upstream defect stands.
 
 ## 6–8. Obsidian `metadataCache`
 

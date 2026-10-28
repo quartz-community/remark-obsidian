@@ -1,7 +1,7 @@
 import { defaultHandlers } from "mdast-util-to-markdown";
 import { balanceBrackets } from "./inline-footnote-to-markdown.js";
 import type { Handle, Options, State } from "mdast-util-to-markdown";
-import type { Link, Parents } from "mdast";
+import type { Link, LinkReference, Parents } from "mdast";
 
 const MAILTO = "mailto:";
 
@@ -168,9 +168,13 @@ export function autolinkLiteralToMarkdown(
  * `[[[[target]]\](link](u)`, whose text never closes (found by `fuzz/invariant-sweep.ts`). The text
  * is written again on its own, as the default handler writes it, to find it in the output.
  */
-function balanceLabel(node: Link, state: State, written: string): string {
+export function balanceLabel(
+  node: Link | LinkReference,
+  state: State,
+  written: string,
+): string {
   if (!written.startsWith("[")) return written;
-  const exitLink = state.enter("link");
+  const exitLink = state.enter(node.type);
   const exitLabel = state.enter("label");
   const label = state.containerPhrasing(node, {
     before: "[",

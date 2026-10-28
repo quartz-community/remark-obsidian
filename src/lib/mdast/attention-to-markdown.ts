@@ -40,7 +40,8 @@ function labelHoldsStar(node: Node): boolean {
  * - **A tag at the end** (both presets): a tag takes `_`, so `__#a/b__` lost its closer to the
  *   tag. Only `*` is offered.
  * - **`legacy`, emphasis ending in `*`:** remark-parse 8 does not close `*\*em\**`, so `_`
- *   comes first, also when nested attention ends it.
+ *   comes first, also when nested attention ends it -- or starts it, since `***[^1]**…*`
+ *   paired its opening run otherwise.
  * - **`legacy`, attention straight before more:** `*u***strong**` reads `*u` and a strong
  *   holding `*strong`; `_u_**strong**` reads as written.
  * - **`legacy`, a footnote label holding `*`:** `*[^*em*]*` closed on the label's `*`.
@@ -85,7 +86,9 @@ export function attentionToMarkdown(options: {
         return { ...result, markers: ["*"] };
       }
       if (
-        (node.type === "emphasis" && endsInStar(node.children.at(-1))) ||
+        (node.type === "emphasis" &&
+          (endsInStar(node.children.at(-1)) ||
+            isAttention(node.children[0]))) ||
         labelHoldsStar(node) ||
         beforeAttention.has(node)
       ) {

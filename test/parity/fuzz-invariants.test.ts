@@ -132,6 +132,29 @@ describe("invariant fuzz", () => {
       "strict",
     ],
     ["& after a reference", "  *_\n  $x^2$, &amp;, \n", "all-off"],
+    ["caret before a wikilink", "^[[[target\\]]]\n  [^1]\n", "strict"],
+    [
+      "formula ending in a stepped-over $",
+      "- [ ] $x^\nmark==\t$$y^2$$\n",
+      "legacy",
+    ],
+    ["embed of ] in reference text", "| [[![[]]]][^~~#tag~~] [l\n", "legacy"],
+    [
+      "formula starting a line",
+      "  ![\n        $$y^2\n    y^2$$ \\ ~~del\n",
+      "strict",
+    ],
+    [
+      "emphasis starting with strong",
+      "> %%[[target\\]]%% | _**[^1]**__[link](u)](u)_. 日本語\n",
+      "legacy",
+    ],
+    ["blank code line in a definition", "[^1]: \n    ~~~~\n    \n", "strict"],
+    [
+      "blank code line in a definition",
+      "[^1]: x\n\n    ```\n    a\n      \n    b\n    ```\n",
+      "quartz-strict",
+    ],
     [
       "escaped text after a reference in a table",
       "| a | b |\n| --- | --- |\n| > > ==mark== **strong**]($x^2$]($$y^2$$ > > [^https://e.test/p]\t![[i.png|100x200]] _under\\_~~del~~ | c |\n",
