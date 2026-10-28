@@ -1,4 +1,5 @@
 import type { Code, Root } from "mdast";
+import { setMathValue } from "./math-value.js";
 import { visit } from "unist-util-visit";
 
 /** The indent a footnote definition's continuation lines carry. */
@@ -20,7 +21,9 @@ function dedent(line: string, columns: number): string {
 }
 
 /**
- * Repairs the whitespace-only lines of code inside a footnote definition (`strict` only).
+ * Repairs the whitespace-only lines of code and display math inside a footnote definition
+ * (`strict` only). Math was the same defect, found by the million-seed census: 91 seeds that
+ * never settled, `[^1]: - $$` / `····`.
  *
  * `micromark-extension-gfm-footnote` does not consume a definition's indent on a whitespace-only
  * line, so that line's `value` keeps the container's four columns: `[^1]:` / `····~~~~` / `····`
@@ -31,14 +34,20 @@ function dedent(line: string, columns: number): string {
  */
 export function footnoteCodeBlankLinesTransform(tree: Root): void {
   visit(tree, "footnoteDefinition", (definition) => {
-    visit(definition, "code", (code: Code) => {
-      if (!/\n|^[ \t]+$/u.test(code.value)) return;
-      code.value = code.value
+    visit(definition, (node) => {
+      if (node.type !== "code" && node.type !== "math") return;
+      const block = node as Code | (Omit<Code, "type"> & { type: "math" });
+      if (!/\n|^[ \t]+$/u.test(block.value)) return;
+      const value = block.value
         .split("\n")
         .map((line) =>
           /^[ \t]+$/u.test(line) ? dedent(line, DEFINITION_INDENT) : line,
         )
         .join("\n");
+      if (value === block.value) return;
+      // A formula renders from its hint, not its `value`, so both are written together.
+      if (block.type === "math") setMathValue(block, value);
+      else block.value = value;
     });
   });
 }

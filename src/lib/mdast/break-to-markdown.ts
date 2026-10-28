@@ -34,7 +34,19 @@ export function breakToMarkdown(escaped = false): Options {
         const opens =
           (parent?.type === "emphasis" || parent?.type === "strong") &&
           parent.children[0] === node;
-        return escaped || opens ? "\\\n" : "\n";
+        const ending = escaped || opens ? "\\\n" : "\n";
+        // An empty strikethrough at a line start is written `~~~~`, a fence: remark-parse 8 reads
+        // `wor` / `········~~~~d` as one, and the line's indent is what kept it so (the
+        // million-seed census). It is written after an encoded space instead.
+        const siblings = (parent?.children ?? []) as Array<{
+          type: string;
+          children?: unknown[];
+        }>;
+        const next = siblings[siblings.indexOf(node as never) + 1];
+        if (next?.type === "delete" && (next.children ?? []).length === 0) {
+          return `${ending}&#x20;`;
+        }
+        return ending;
       },
     },
   };

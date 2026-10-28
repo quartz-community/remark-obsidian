@@ -406,7 +406,7 @@ export default function remarkObsidian(
     autolinkLiteralToMarkdown({ legacy: preset === "legacy" }),
   );
   data.toMarkdownExtensions.push(htmlTailToMarkdown());
-  data.toMarkdownExtensions.push(textToMarkdown(opts.tags));
+  data.toMarkdownExtensions.push(textToMarkdown(opts.tags, opts.highlights));
   data.toMarkdownExtensions.push(
     attentionToMarkdown({ legacy: preset === "legacy" }),
   );

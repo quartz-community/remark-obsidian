@@ -199,10 +199,22 @@ export function commentInDefinitionTransform(
     const last: unknown = definition.children[definition.children.length - 1];
     if (!isComment(last)) continue;
 
-    const host = definition.children.find(
-      (child): child is Paragraph => child.type === "paragraph",
-    );
-    if (!host) continue;
+    // The paragraph straight above the comment, one line ending away. Taking the FIRST paragraph
+    // folded `[^1]: a` / blank / `····b` / blank / `····%%note` into `a`, across a blank line and
+    // over `b`, so the paragraph's span overlapped `b`'s (the million-seed census); after a blank
+    // line the comment is a block of its own, as `legacy` reads it.
+    const above = definition.children[definition.children.length - 2];
+    if (above?.type !== "paragraph") continue;
+    const host = above as Paragraph;
+    const hostEnd = host.position?.end?.offset;
+    const commentStart = last.position?.start?.offset;
+    if (
+      hostEnd === undefined ||
+      commentStart === undefined ||
+      !/^\r?\n[ \t>]*$/u.test(source.slice(hostEnd, commentStart))
+    ) {
+      continue;
+    }
 
     // The comment is prose again, spelled as the source spelled it.
     const from = last.position?.start?.offset;

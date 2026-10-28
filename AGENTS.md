@@ -547,7 +547,7 @@ has no coverage there, not that it agrees. Footnotes are in **neither** spec: GF
 ## Gates — what "done" means
 
 ```bash
-npm test          # 574 tests / 27 files. Contains the contract gate.
+npm test          # 584 tests / 27 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -762,6 +762,57 @@ to 3.
 
 Unchanged by identity: referee 6,830, spec 8, strict recorded cases 2,965, definitions 5,333,
 references 1,523.
+
+**The million-seed census** (seeds 0-1,000,000, 16 shards, 42 minutes; shrink and grouping a few
+minutes more). 1,668 seeds failed (0.17%): 3,719 seed-and-configuration pairs, 1,722 minimal forms,
+146 clusters keyed by violation kind, preset and the node types formatting loses or gains. The
+instrument lives in the session scratchpad; the method is what matters: shard, shrink each
+(seed, kind) once, group by the node delta, not by the form (1,631 of 1,722 forms were unique).
+
+Fixed, each family with a pin:
+
+- **A, about 280 seeds (legacy):** emphasis holding a bare `*` -- in a formula, code, a wikilink,
+  a comment, a label, or nested emphasis anywhere (link text, highlights) -- takes `_` first
+  (`holdsStar` in `attention-to-markdown.ts`).
+- **B, 132 (both):** runs of `=`. The writer drops the escape on every second `=`, so
+  `\===\===` paired. `guardEqualsRuns` escapes each `=` followed by `=` and a non-space.
+- **D, 91 (strict):** UPSTREAM item 9 for `$$` blocks too: `footnote-code-blank-lines.ts`
+  covers math, writing through `setMathValue`.
+- **C, about 155 (legacy):** a line starting `~~~`. A text line gets `\~`, strikethrough text
+  starting with `~` gets its first `~` escaped, and an EMPTY strikethrough (`~~~~`, as
+  remark-parse 8 reads it) after a break gets `&#x20;`. GFM writes strikethrough through
+  attention, so wrapping its handler is inert; the break writer adds the space.
+- **E, 28 (strict), positions:**
+  - a callout body whose first child came from GFM's literal-URL transform had no span to
+    move to, so the body started at the quote marker, inside the title; it now starts at its
+    own line;
+  - `commentInDefinition` folded a comment into the definition's FIRST paragraph, across blank
+    lines and other paragraphs. It now takes only the paragraph straight above, one line
+    ending away.
+
+**A second census caught this round's regressions, and that is the reason to rerun one.**
+806 seeds were fixed, but 691 that passed before now failed, invisible to every other gate:
+
+- about 678: `guardEqualsRuns` escaped `=` inside an autolink literal's text, putting a
+  backslash into the address (`https://e.test/p====m`). It now skips a link's text that is its
+  own address;
+- 12: `holdsStar` read a comment's parsed children, though the comment is written verbatim,
+  and chose `_` over a `_` inside (`*%%_under_%%*`). Verbatim nodes count by their raw text only;
+- 3: `_` was also chosen where the content ends in `_`, or where something verbatim inside
+  holds one -- the mirror of `*\*em\**`.
+
+All 637 of the regressions' minimal forms pass now, and so do 753 of the first census's 1,631
+forms. A third census over the same million: 1,668 -> **861** failing seeds (807 fixed, **0**
+new), 3,719 -> 1,593 pairs; overlapping spans 56 -> 0, no fixed point 162 -> 88.
+
+Side effect, measured: `roundtrip.test.ts`'s unsettled list is empty. Its last two
+(`commonmark/emphasis-and-strong-emphasis/417`, `emphasis/nest-underscore-outer`) settle under
+A. Unchanged by identity: referee 6,830, spec 8, strict recorded cases 2,965, definitions 5,333,
+references 1,523.
+
+Left by decision, recorded rather than special-cased: nested emphasis stacks (`**_*em*_**`, 79
+seeds), wikilinks inside link text after `^` (`[[^![[img.png]]]](u)`, 77), and a tail of about
+130 small clusters.
 
 **Traps:** `fmt`-style probes that look a configuration up by name silently run `legacy` for a
 JSON one; a "words" metric must not count node boundaries, and cannot see a loss the PARSE made

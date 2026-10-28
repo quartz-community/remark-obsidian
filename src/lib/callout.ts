@@ -562,6 +562,23 @@ export function calloutTransform(
       const start = first?.position?.start;
       if (start?.offset !== undefined && paragraph.position) {
         paragraph.position.start = { ...start };
+      } else if (first && paragraph.position && titleFrom !== undefined) {
+        // A first child with no span -- an autolink literal's run, which the GFM transform
+        // splices without one -- leaves the body's own line to say where it starts. Kept at the
+        // marker, the paragraph overlapped the title (found by the million-seed census).
+        const lineEnd = source.indexOf("\n", titleFrom);
+        if (lineEnd !== -1) {
+          const bodyStart =
+            lineEnd +
+            1 +
+            (LINE_PREFIX.exec(source.slice(lineEnd + 1))?.[0].length ?? 0);
+          moveStartTo(
+            paragraph,
+            source,
+            bodyStart,
+            source.slice(0, bodyStart).split("\n").length,
+          );
+        }
       }
     }
 

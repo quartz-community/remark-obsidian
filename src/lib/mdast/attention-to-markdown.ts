@@ -23,13 +23,70 @@ function endsInStar(node: PhrasingContent | undefined): boolean {
   return node.type === "emphasis" || node.type === "strong";
 }
 
-/** Whether a footnote label under `node` holds a `*`, which the writer leaves bare. */
-function labelHoldsStar(node: Node): boolean {
-  if (node.type === "footnoteReference") {
-    return String((node as { label?: string }).label ?? "").includes("*");
+/** Nodes the writer writes verbatim, so a `*` in them stays bare. */
+const RAW = new Set([
+  "inlineMath",
+  "math",
+  "inlineCode",
+  "code",
+  "html",
+  "comment",
+  "wikilink",
+  "footnoteReference",
+]);
+
+/**
+ * Whether `node` holds a bare `*` once written, below its own markers: a verbatim construct with
+ * one in it (`_$a*b$_`, `_![[*em*]]_`, `_[^*em*]_`), or emphasis or strong anywhere inside,
+ * even within link text or a highlight (`_[*em*](u)_`, `_==*em*==_`). remark-parse 8 pairs an
+ * outer `*` with it.
+ */
+/** Whether `node` is text ending in `_`, which `_` cannot close after, as `*` cannot after `*`. */
+function endsInUnderscore(node: PhrasingContent | undefined): boolean {
+  return node?.type === "text" && node.value.endsWith("_");
+}
+
+/** Whether a verbatim construct under `node` holds `marker`, which no escape can protect. */
+function rawHolds(node: Node, marker: string): boolean {
+  for (const child of (node as { children?: Node[] }).children ?? []) {
+    if (RAW.has(child.type)) {
+      const own = child as {
+        value?: string;
+        label?: string;
+        path?: string;
+        alias?: string;
+      };
+      if (
+        [own.value, own.label, own.path, own.alias].join("").includes(marker)
+      ) {
+        return true;
+      }
+      continue;
+    }
+    if (rawHolds(child, marker)) return true;
   }
-  const children = (node as { children?: Node[] }).children ?? [];
-  return children.some(labelHoldsStar);
+  return false;
+}
+
+function holdsStar(node: Node): boolean {
+  for (const child of (node as { children?: Node[] }).children ?? []) {
+    if (child.type === "emphasis" || child.type === "strong") return true;
+    if (RAW.has(child.type)) {
+      const own = child as {
+        value?: string;
+        label?: string;
+        path?: string;
+        alias?: string;
+      };
+      const raw = [own.value, own.label, own.path, own.alias].join("");
+      if (raw.includes("*")) return true;
+      // Written verbatim, so only its own text counts: a comment's parsed children are not
+      // what is written (`*%%_under_%%*` took `_` from the emphasis inside, 12 seeds).
+      continue;
+    }
+    if (holdsStar(child)) return true;
+  }
+  return false;
 }
 
 /**
@@ -44,7 +101,9 @@ function labelHoldsStar(node: Node): boolean {
  *   paired its opening run otherwise.
  * - **`legacy`, attention straight before more:** `*u***strong**` reads `*u` and a strong
  *   holding `*strong`; `_u_**strong**` reads as written.
- * - **`legacy`, a footnote label holding `*`:** `*[^*em*]*` closed on the label's `*`.
+ * - **`legacy`, a bare `*` inside:** `*[^*em*]*` closed on the label's `*`, and so did a formula,
+ *   code, a wikilink or nested emphasis holding one -- about 280 seeds of the million-seed
+ *   census.
  * - **`legacy`, emphasis alone in a strong:** remark-parse 8 reads `***x***` as exactly that,
  *   where CommonMark reads emphasis around strong and the writer chose `___*x*___`, which
  *   remark-parse 8 reads otherwise. Both are pinned to `*`.
@@ -89,7 +148,11 @@ export function attentionToMarkdown(options: {
         (node.type === "emphasis" &&
           (endsInStar(node.children.at(-1)) ||
             isAttention(node.children[0]))) ||
-        labelHoldsStar(node) ||
+        // Not when something verbatim inside holds a `_` too: `_` would close on it as
+        // `*` would on a `*` (`*em` / `![[_under_]]` / `_under_. *`).
+        (holdsStar(node) &&
+          !rawHolds(node, "_") &&
+          !endsInUnderscore(node.children.at(-1))) ||
         beforeAttention.has(node)
       ) {
         return { ...result, markers: ["_", "*"] };

@@ -32,12 +32,11 @@ import type { GoldenCase } from "./types.js";
  * The writer fixes from the invariant fuzz took it to 3, closing
  * `commonmark/emphasis-and-strong-emphasis/450`, `hunt/fix-lazy-setext-chain-not-idempotent/1`
  * and `probe/straddle-fold/paragraph-merge`, then `fuzz/embed/13` once legacy link text was
- * written with its raw brackets balanced.
+ * written with its raw brackets balanced, and the last two (`commonmark/emphasis-and-strong-
+ * emphasis/417`, `emphasis/nest-underscore-outer`) once legacy emphasis holding nested
+ * emphasis was written with `_`. Every recorded input now settles on its first format.
  */
-const UNSTABLE: readonly string[] = [
-  "commonmark/emphasis-and-strong-emphasis/417",
-  "emphasis/nest-underscore-outer",
-];
+const UNSTABLE: readonly string[] = [];
 
 const goldenPath = path.join(
   path.dirname(fileURLToPath(import.meta.url)),

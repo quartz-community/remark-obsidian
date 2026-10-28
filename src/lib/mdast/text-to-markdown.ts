@@ -4,7 +4,7 @@ import { defaultHandlers, type Options } from "mdast-util-to-markdown";
  * The text writer, registered whatever is on: its backslash repair applies to every document,
  * and the rest only where a `tag` can follow (`tags`).
  */
-export function textToMarkdown(tags: boolean): Options {
+export function textToMarkdown(tags: boolean, highlights = false): Options {
   return {
     handlers: {
       // `tagToMarkdown`'s `unsafe` rule cannot reach a `#` right after a character the writer
@@ -27,6 +27,23 @@ export function textToMarkdown(tags: boolean): Options {
           // `&` (`*em**\\n \\ *` came back holding `#x20` as a tag). Escaped, it reads the same.
           .replace(/(?<!\\)((?:\\\\)*)\\(\s+)$/u, "$1\\\\$2");
         written = guardAmpersands(written);
+        // Not in a link's text that is its own address, an autolink literal: a URL's `=` is no
+        // highlight, and escaped it put a backslash into the address (691 seeds of the second
+        // million-seed census, `https://e.test/p====m`).
+        const ownAddress =
+          parent?.type === "link" &&
+          parent.children.length === 1 &&
+          (parent.url === node.value || parent.url === `mailto:${node.value}`);
+        if (highlights && !ownAddress) written = guardEqualsRuns(written);
+        // A `~~~` starting a line opens a fence once the line's indent is gone, and so does
+        // strikethrough whose text starts with `~` (`~~` + `~~del` at a line start): ~155 seeds
+        // of the million-seed census, `wor` / `········~~~~d` (legacy).
+        written = written.replace(/(^|\n)~(?=~~)/gu, "$1\\~");
+        const opensStrike =
+          parent?.type === "delete" &&
+          parent.children[0] === node &&
+          written.startsWith("~");
+        if (opensStrike) written = `\\${written}`;
         // A tag after a bracket pair (`a [x]#t`) stands because the pair is a construct to
         // Obsidian, defined or not. The writer escapes every `[` in text, which breaks the pair
         // and the tag with it. A pair the tree holds as TEXT was undefined -- a defined one would
@@ -97,4 +114,21 @@ function guardAmpersands(written: string): string {
       return armed ? "\\&" : match;
     },
   );
+}
+
+/**
+ * A run of `=` written so no pair in it opens a highlight. The writer escapes the first `=` of a
+ * pair but drops the escape on the next one, the character before it being escaped already, so
+ * `======` came back `\\===\\===`, whose `==` pairs opened a highlight (132 seeds of the
+ * million-seed census, under both presets). Every `=` with another `=` and then a non-space
+ * after it is escaped; the last pair of a run, before whitespace or the end, opens nothing.
+ */
+function guardEqualsRuns(written: string): string {
+  const units = written.match(/\\[\s\S]|[\s\S]/gu) ?? [];
+  for (let index = 0; index < units.length; index++) {
+    if (units[index] !== "=" || units[index + 1] !== "=") continue;
+    const after = units[index + 2];
+    if (after !== undefined && !/^\s$/u.test(after)) units[index] = "\\=";
+  }
+  return units.join("");
 }
