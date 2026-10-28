@@ -547,7 +547,7 @@ has no coverage there, not that it agrees. Footnotes are in **neither** spec: GF
 ## Gates — what "done" means
 
 ```bash
-npm test          # 592 tests / 27 files. Contains the contract gate.
+npm test          # 599 tests / 27 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -617,7 +617,7 @@ looking exactly like an update. The gating only ever REMOVES references, which i
 |                                |                    | + nightly, 5,000 fresh seeds              |                                                         |
 | `fuzz/charclass-sweep.ts`      | Obsidian, recorded | per push (`charclass.test.ts`, golden)    | character rules the fixed grammar alphabet cannot reach |
 |                                |                    | + nightly, a fresh category sample        |                                                         |
-| `fuzz/census.ts`               | none -- properties | by hand, sharded; `--baseline` to compare | how many fail, in which families; regressions by seed   |
+| `fuzz/census.ts`               | none -- properties | weekly (`census.yml`), held to a baseline | how many fail, in which families; regressions by seed   |
 
 **Until these fixes (after 2.0.2), the nightly job reported nothing, whatever it found.** It saved `status=$?` after
 `| tee`, which is tee's status, so the last nights' 43-56 failing seeds read as success; and it
@@ -856,6 +856,27 @@ re-check also read the wrong list element. `census.ts` now keeps each example's 
 every character outside printable ASCII in the report. The real bug: `guardAmpersands` exempted
 any `\s`, and to remark-parse 8 a no-break space is not whitespace, so `&` before one is escaped
 now. No evidence of state between documents was found.
+
+**Strict emphasis around strikethrough and highlights** (about 125 seeds). Emphasis holding
+emphasis, strong or a highlight at any depth now prefers `_` outside under `strict`:
+`*~~*em*~~*` and `*==\*\*strong==*` paired otherwise once strikethrough and highlights were
+read. A census against the sixth fixed 50 seeds and found 4 new ones, all `_` choices that
+could not hold. They led to one check, `underscoreUnsafe`, for both presets. `_` is unsafe
+there:
+
+- when something verbatim inside holds a `_`;
+- when the content ends in `_` at any depth (inside a highlight too);
+- after a tag, whose characters include `_`;
+- under `strict` only, when the content starts with `_` at any depth (remark-parse 8 reads
+  that one as written).
+
+Census against the sixth: 491 -> **442** failing seeds (0.04%), 49 fixed, 0 new; that run wrote
+the baseline.
+
+**The census is a standing gate now.** `goldens/census-baseline.json` holds every failing (seed,
+configuration) of seeds 0-999,999. `census.yml` runs the million weekly as eight 125,000-seed jobs,
+each compared to the baseline over its own range, and fails on any new seed.
+`--update-baseline` refuses to write while any seed is new, so the file only records progress.
 
 **Traps:** `fmt`-style probes that look a configuration up by name silently run `legacy` for a
 JSON one; a "words" metric must not count node boundaries, and cannot see a loss the PARSE made

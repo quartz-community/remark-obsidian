@@ -305,7 +305,7 @@ is reproducible.
 | `fuzz/sweep.ts`           | yes            | --                                                    | 500 random seeds         |
 | `fuzz/invariant-sweep.ts` | no             | `fuzz-invariants.test.ts`, seeds 0-599                | 5,000 random seeds       |
 | `fuzz/charclass-sweep.ts` | yes            | `charclass.test.ts`, against `goldens/charclass.json` | a fresh character sample |
-| `fuzz/census.ts`          | no             | --                                                    | -- (by hand)             |
+| `fuzz/census.ts`          | no             | --                                                    | weekly (`census.yml`)    |
 
 - **Census** runs the invariant fuzz over a large range, sharded across processes, then shrinks
   every failure and clusters the minimal forms by violation, preset and the node types formatting
@@ -319,6 +319,11 @@ is reproducible.
   A million seeds take about 42 minutes on 16 cores (`--workers`, default every core). It writes
   `findings.json`, `clusters.json` and `report.md`, and with `--baseline` exits 1 when a seed
   fails that did not before.
+
+  `goldens/census-baseline.json` is the committed baseline, and `census.yml` holds the million
+  seeds to it weekly in eight jobs of 125,000. After a round of fixes, rerun the full range
+  with `--baseline goldens/census-baseline.json --update-baseline goldens/census-baseline.json`.
+  That refuses to write while any seed is new, so the baseline only records progress.
 
 - **Differential** composes known fragments into documents, records them in Obsidian, compares
   and shrinks every failure to a minimal form. It compares through the Quartz profiles, so it

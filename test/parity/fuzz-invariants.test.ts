@@ -134,6 +134,24 @@ describe("invariant fuzz", () => {
     ["& after a reference", "  *_\n  $x^2$, &amp;, \n", "all-off"],
     ["& before a no-break space", "  &amp;\u00a0\n", "legacy"],
     [
+      "emphasis around strikethrough holding emphasis",
+      ". _~~*em*~~_\n",
+      "strict",
+    ],
+    ["emphasis around a highlight", "_==**strong==_\n", "strict"],
+    [
+      "emphasis holding emphasis after strikethrough",
+      "_~~_under__\n",
+      "strict",
+    ],
+    [
+      "_ against a highlight ending in _",
+      "]]] > *==under_==*[[[[a#\n",
+      "strict",
+    ],
+    ["_ against a highlight starting with _", "- *==__under_==*\n", "strict"],
+    ["_ straight after a tag", "1. #a/b_***em***_\n", "strict"],
+    [
       "footnote label over a quoted line",
       "> [^[[a#^blk]\n00]]\n",
       "quartz-strict",

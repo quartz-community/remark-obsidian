@@ -54,6 +54,52 @@ const RAW = new Set([
  * even within link text or a highlight (`_[*em*](u)_`, `_==*em*==_`). remark-parse 8 pairs an
  * outer `*` with it.
  */
+/** Whether emphasis, strong or a highlight sits anywhere under `node`. */
+function holdsAttentionOrHighlight(node: Node): boolean {
+  return ((node as { children?: Node[] }).children ?? []).some(
+    (child) =>
+      child.type === "emphasis" ||
+      child.type === "strong" ||
+      child.type === "highlight" ||
+      (!RAW.has(child.type) && holdsAttentionOrHighlight(child)),
+  );
+}
+
+/**
+ * Whether a `_` marker would not hold around `node`: something verbatim inside holds a `_`, the
+ * content ends in one at any depth (`*==under_==*` closed on it, inside the highlight), or a
+ * tag stands straight before it and would take the `_` as its own (`#a/b_***em***_`; 4 seeds of
+ * a million-seed census). Under `strict`, also content starting with one at any depth
+ * (`*==__under_==*`), which remark-parse 8 reads as written.
+ */
+function underscoreUnsafe(node: Emphasis | Strong, strict: boolean): boolean {
+  if (rawHolds(node, "_")) return true;
+  let last: Node | undefined = node.children.at(-1);
+  while (last && !RAW.has(last.type)) {
+    const inner: Node[] | undefined = (last as { children?: Node[] }).children;
+    if (!inner?.length) break;
+    last = inner.at(-1);
+  }
+  if (endsInUnderscore(last as PhrasingContent | undefined)) return true;
+  let first: Node | undefined = node.children[0];
+  while (strict && first && !RAW.has(first.type)) {
+    const inner: Node[] | undefined = (first as { children?: Node[] }).children;
+    if (!inner?.length) break;
+    first = inner[0];
+  }
+  if (
+    strict &&
+    first?.type === "text" &&
+    (first as unknown as { value: string }).value.startsWith("_")
+  ) {
+    return true;
+  }
+  const siblings = (parentOf.get(node) as { children?: Node[] } | undefined)
+    ?.children;
+  const before = siblings?.[siblings.indexOf(node) - 1];
+  return before?.type === "tag";
+}
+
 /** Whether `node` is text ending in `_`, which `_` cannot close after, as `*` cannot after `*`. */
 function endsInUnderscore(node: PhrasingContent | undefined): boolean {
   return node?.type === "text" && node.value.endsWith("_");
@@ -150,7 +196,20 @@ export function attentionToMarkdown(options: {
         state,
       );
       if (lastLeaf(node)?.type === "tag") return { ...result, markers: ["*"] };
-      if (!options.legacy) return result;
+      if (!options.legacy) {
+        // `strict`: emphasis holding emphasis or strong at any depth, or a highlight, takes `_`
+        // outside. `*~~*em*~~*` and `*==\*\*strong==*` paired otherwise once strikethrough and
+        // highlights were read (about 125 seeds of the million-seed census); `_~~*em*~~_` reads
+        // as written. Not where a `_` inside, verbatim or at the end, would close it.
+        if (
+          node.type === "emphasis" &&
+          holdsAttentionOrHighlight(node) &&
+          !underscoreUnsafe(node, true)
+        ) {
+          return { ...result, markers: ["_", "*"] };
+        }
+        return result;
+      }
       const only = node.children.length === 1 ? node.children[0] : undefined;
       if (pinned.has(node)) return { ...result, markers: ["*"] };
       if (node.type === "strong" && only?.type === "emphasis") {
@@ -163,9 +222,7 @@ export function attentionToMarkdown(options: {
             isAttention(node.children[0]))) ||
         // Not when something verbatim inside holds a `_` too: `_` would close on it as
         // `*` would on a `*` (`*em` / `![[_under_]]` / `_under_. *`).
-        (holdsStar(node) &&
-          !rawHolds(node, "_") &&
-          !endsInUnderscore(node.children.at(-1))) ||
+        (holdsStar(node) && !underscoreUnsafe(node, false)) ||
         beforeAttention.has(node)
       ) {
         return { ...result, markers: ["_", "*"] };
