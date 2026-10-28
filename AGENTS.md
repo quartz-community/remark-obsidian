@@ -846,6 +846,17 @@ A fifth census over the same million, against the third: **861 -> 499** failing 
 Left by decision, recorded rather than special-cased: nested emphasis stacks (`**_*em*_**`, 54
 seeds), callout titles over lazy setext lines (CommonMark laziness), and the small tail.
 
+**A suspected parse-history dependence that was not one.** ` &amp;` failed in a census worker
+and passed alone, which read as state shared between documents -- a real risk, since Quartz
+parses a vault in one process. Bisecting the worker's exact history showed a fixed result
+instead. The form held U+00A0 after `&amp;`, which the report printed as a space, and the "it
+passes alone" checks were run on a typed ASCII space. Two other false leads came from the census
+itself: it sorted a cluster's examples without its seed list, so seeds and forms misaligned. A
+re-check also read the wrong list element. `census.ts` now keeps each example's seed and escapes
+every character outside printable ASCII in the report. The real bug: `guardAmpersands` exempted
+any `\s`, and to remark-parse 8 a no-break space is not whitespace, so `&` before one is escaped
+now. No evidence of state between documents was found.
+
 **Traps:** `fmt`-style probes that look a configuration up by name silently run `legacy` for a
 JSON one; a "words" metric must not count node boundaries, and cannot see a loss the PARSE made
 (the inline-footnote line ending needed its own assertion); the Write tool turned `\u` escapes

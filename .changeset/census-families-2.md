@@ -14,3 +14,5 @@ More of the million-document fuzz's families, fixed.
 - **Formulas:** a `$$` formula holding a single backslash (`$$ \ $$`) reads back the same.
 - **Strikethrough (`legacy`):** a `~` against a strikethrough's delimiters no longer closes it
   early.
+- **`&` before a no-break space (`legacy`):** an `&` followed by a no-break space after a
+  character reference keeps its meaning when formatted.

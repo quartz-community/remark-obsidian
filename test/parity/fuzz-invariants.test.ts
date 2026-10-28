@@ -132,6 +132,7 @@ describe("invariant fuzz", () => {
       "strict",
     ],
     ["& after a reference", "  *_\n  $x^2$, &amp;, \n", "all-off"],
+    ["& before a no-break space", "  &amp;\u00a0\n", "legacy"],
     [
       "footnote label over a quoted line",
       "> [^[[a#^blk]\n00]]\n",

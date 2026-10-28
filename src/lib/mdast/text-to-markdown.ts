@@ -133,13 +133,14 @@ export function textToMarkdown(tags: boolean, highlights = false): Options {
  * (published rp8 too, so Obsidian's). The writer makes such references itself -- a line's
  * leading whitespace becomes `&#x20;` -- so ` &amp;, ` and `  $x^2$, &amp;, ` lost their `&` on
  * format (found by `fuzz/invariant-sweep.ts`). After a reference, or a line's leading whitespace,
- * such an `&` is escaped. One before them, or before a letter, digit, `#`, `<` or whitespace,
- * reads as itself and is left alone.
+ * such an `&` is escaped. One before them, or before a letter, digit, `#`, `<` or ASCII
+ * whitespace, reads as itself and is left alone. A no-break space is not whitespace to
+ * remark-parse 8 here: `  &amp;⍽` (U+00A0) lost its `&` (45 seeds of a million-seed census).
  */
 function guardAmpersands(written: string): string {
   let armed = false;
   return written.replace(
-    /(&#?[\da-z]+;)|((?:^|\n)[ \t]+)|(\\[\s\S])|&(?=[^\s\da-z#<])/giu,
+    /(&#?[\da-z]+;)|((?:^|\n)[ \t]+)|(\\[\s\S])|&(?=[^ \t\r\n\da-z#<])/giu,
     (match: string, reference?: string, leading?: string, escape?: string) => {
       if (reference || leading) {
         armed = true;

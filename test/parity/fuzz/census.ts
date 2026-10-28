@@ -29,10 +29,24 @@ import { candidates } from "./shrink.js";
  * Grouping by form alone is useless -- 1,631 of the first census's 1,722 forms were unique.
  *
  * Writes into `<dir>`: `findings.json` (every failing seed and configuration), `clusters.json`
- * and `report.md`. With `--baseline <dir>`, a previous run's directory, it also reports the seeds
+ * (each example with its own seed) and `report.md`, whose forms escape every character outside
+ * printable ASCII. With `--baseline <dir>`, a previous run's directory, it also reports the seeds
  * fixed and the seeds failing that did not before, and exits 1 on any new one: a census re-run
  * after a round of fixes caught 691 regressions no other gate saw (AGENTS.md, "Fuzzing").
  */
+
+/**
+ * A form as a JSON string with every character outside printable ASCII escaped. A no-break space
+ * printed as a space sent an investigation after state shared between documents that did not
+ * exist: `  &amp;\u00a0` read as `  &amp; `, which passed.
+ */
+function visible(form: string): string {
+  return JSON.stringify(form).replace(/[^\x20-\x7e]/gu, (character) =>
+    [...character]
+      .map((unit) => `\\u${unit.charCodeAt(0).toString(16).padStart(4, "0")}`)
+      .join(""),
+  );
+}
 
 /** Which preset a set of failing configurations implicates. */
 function presetOf(configs: readonly string[]): string {
@@ -287,6 +301,7 @@ async function main() {
       gained: string[];
       seeds: number[];
       examples: {
+        seed: number;
         minimal: string;
         formatted: string;
         configs: readonly string[];
@@ -307,6 +322,7 @@ async function main() {
     };
     cluster.seeds.push(finding.seed);
     cluster.examples.push({
+      seed: finding.seed,
       minimal: finding.minimal,
       formatted: delta.formatted,
       configs: finding.configs,
@@ -378,7 +394,7 @@ async function main() {
   );
   for (const cluster of ranked) {
     const kind = cluster.kind.replace(/\|/gu, "\\|");
-    const form = JSON.stringify(cluster.examples[0]!.minimal)
+    const form = visible(cluster.examples[0]!.minimal)
       .slice(0, 80)
       .replace(/\|/gu, "\\|")
       .replace(/`/gu, "'");
