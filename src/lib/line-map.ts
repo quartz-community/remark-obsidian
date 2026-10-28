@@ -99,3 +99,13 @@ export function shiftByMap(node: unknown, map: LineMap, from: number): void {
 
   for (const child of candidate.children ?? []) shiftByMap(child, map, from);
 }
+
+/**
+ * A source slice inside a paragraph, as the paragraph's text holds it: each continuation line's
+ * container prefix -- its indentation and quote markers -- removed, as the parser removes them.
+ * A text rebuilt from a raw slice kept them, so `> [^[[a` / `> 00]]` read back as `> 00]` and
+ * grew a `>` with every format (found by the million-seed census).
+ */
+export function paragraphSlice(slice: string): string {
+  return slice.replace(/(\r?\n)[ \t]*(?:>[ \t]?)*[ \t]*/gu, "$1");
+}

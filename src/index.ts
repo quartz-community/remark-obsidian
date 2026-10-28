@@ -306,6 +306,12 @@ function displayAwareMathToMarkdown(): ToMarkdownOptions {
       " ",
     );
     if (escapedFenceOnly(value, fence)) return fence + value + fence;
+    // A formula ending in a backslash would escape its own closer: `$$ \ $$` holds `\`, and
+    // written `$$\$$` it read back as `$` and text (about 60 seeds of the million-seed
+    // census). Padded, as the source was, it reads the same: both presets drop the padding.
+    if (fence === "$$" && /(?<!\\)(?:\\\\)*\\$/u.test(value)) {
+      return `$$ ${value} $$`;
+    }
     // A line ending inside the formula is written as one, not as the space the upstream writer
     // turns it into: a formula opening on a line ending (`$` / `x$`) came back padded, `$ x$`,
     // which remark-parse 8 reads as no math at all (found by `fuzz/invariant-sweep.ts`).
@@ -400,10 +406,10 @@ export default function remarkObsidian(
   // No option: a shortcut reference written back as its own label is correct for every
   // consumer, and the upstream branch it replaces can duplicate the label.
   data.toMarkdownExtensions.push(
-    linkReferenceToMarkdown({ legacy: preset === "legacy" }),
+    linkReferenceToMarkdown({ strict: preset === "strict" }),
   );
   data.toMarkdownExtensions.push(
-    autolinkLiteralToMarkdown({ legacy: preset === "legacy" }),
+    autolinkLiteralToMarkdown({ strict: preset === "strict" }),
   );
   data.toMarkdownExtensions.push(htmlTailToMarkdown());
   data.toMarkdownExtensions.push(textToMarkdown(opts.tags, opts.highlights));

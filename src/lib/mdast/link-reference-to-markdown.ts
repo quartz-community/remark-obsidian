@@ -30,7 +30,7 @@ const BLANK = /^[ \t\n]+$/u;
  * is to call upstream.
  */
 export function linkReferenceToMarkdown(
-  options: { readonly legacy?: boolean } = {},
+  options: { readonly strict?: boolean } = {},
 ): Options {
   return {
     handlers: {
@@ -55,7 +55,7 @@ export function linkReferenceToMarkdown(
           state,
           info,
         );
-        return options.legacy ? balanceLabel(node, state, written) : written;
+        return balanceLabel(node, state, written, options.strict);
       },
     },
   };

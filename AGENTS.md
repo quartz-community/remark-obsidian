@@ -547,7 +547,7 @@ has no coverage there, not that it agrees. Footnotes are in **neither** spec: GF
 ## Gates — what "done" means
 
 ```bash
-npm test          # 584 tests / 27 files. Contains the contract gate.
+npm test          # 592 tests / 27 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -811,9 +811,40 @@ Side effect, measured: `roundtrip.test.ts`'s unsettled list is empty. Its last t
 A. Unchanged by identity: referee 6,830, spec 8, strict recorded cases 2,965, definitions 5,333,
 references 1,523.
 
-Left by decision, recorded rather than special-cased: nested emphasis stacks (`**_*em*_**`, 79
-seeds), wikilinks inside link text after `^` (`[[^![[img.png]]]](u)`, 77), and a tail of about
-130 small clusters.
+**A second round on what was left** (897 seeds of the first census's forms still failing, 116
+clusters). Fixed:
+
+- **The `[^[[` family, ~250 seeds (strict):**
+  - **Text rebuilt from a raw source slice kept continuation prefixes** (`> 00]` after the
+    reference, growing a `>` per format). `paragraphSlice` (`line-map.ts`) strips them in
+    `doubledFootnoteOpener` and in `tailAfter`'s fallback.
+  - **Link-text balancing applies under `strict` too, but only to text made of text and
+    footnote references**, as in `[[^[[]]]](u)`. There an undefined footnote call is brackets
+    to micromark's link scan. A formula, a comment, a wikilink or a link inside is one construct
+    to micromark, whose brackets do not count. Two attempts counted them:
+    - unconditionally, which broke fuzz seed 46 in the per-push gate;
+    - with wikilinks masked out, which a fourth census showed broke 104 seeds (`[$$[^1\]$$](u)`,
+      `[%%[link\](u)%%](u)`, nested links).
+      Restricting the case, rather than masking every construct, is what holds.
+  - **A `#` opening a link's text** lost its escape to the link's `[`. The text writer now
+    escapes a `#` at its start after punctuation in `info.before`.
+  - **A bracket pair split over lines before a tag** (`[^1` / `1]#tag`): `pairClosesBeforeTag`
+    leaves the opening `[` bare.
+- **Tag after strong, ~50 (legacy):** whitespace opening emphasis or strong before a tag is
+  dropped, only where the emphasis starts its parent or follows whitespace (`parentOf`, recorded
+  by the attention root). Otherwise the tab is a word boundary, so `g**⇥#tag **` stays open.
+- **The mixed bucket, sub-grouped by word diff (215 seeds):**
+  - **~60, strikethrough closers:** a `~` touching a strikethrough's delimiters becomes
+    `&#x7E;`, since remark-parse 8 scans the closer on raw characters, as for highlights.
+  - **~60, a formula of a backslash** (`$$ \ $$`): it was written `$$\$$` and escaped its own
+    closer. Written padded now.
+  - **A wider `&` rule was built and reverted as inert:** every `&` form already passed at HEAD.
+
+A fifth census over the same million, against the third: **861 -> 499** failing seeds (0.05%),
+362 fixed, **0 new**; no fixed point 88 -> 37. The census tool's exit status is the gate.
+
+Left by decision, recorded rather than special-cased: nested emphasis stacks (`**_*em*_**`, 54
+seeds), callout titles over lazy setext lines (CommonMark laziness), and the small tail.
 
 **Traps:** `fmt`-style probes that look a configuration up by name silently run `legacy` for a
 JSON one; a "words" metric must not count node boundaries, and cannot see a loss the PARSE made

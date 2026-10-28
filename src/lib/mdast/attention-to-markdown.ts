@@ -7,6 +7,19 @@ type Attention = (
   state: Parameters<typeof defaultHandlers.emphasis.attention>[1],
 ) => ReturnType<typeof defaultHandlers.emphasis.attention>;
 
+/**
+ * Each node's parent, recorded when the root is written: a handler is given its node's parent
+ * but not that parent's, which the text writer needs to see what precedes an emphasis.
+ */
+export const parentOf = new WeakMap<Node, Node>();
+
+function recordParents(node: Node): void {
+  for (const child of (node as { children?: Node[] }).children ?? []) {
+    parentOf.set(child, node);
+    recordParents(child);
+  }
+}
+
 /** The last node an attention span's content ends in, through nested attention. */
 function lastLeaf(node: Emphasis | Strong): PhrasingContent | undefined {
   let last = node.children.at(-1);
@@ -162,6 +175,7 @@ export function attentionToMarkdown(options: {
     return handle;
   };
   const root = ((...args: Parameters<typeof defaultHandlers.root>) => {
+    recordParents(args[0]);
     if (options.legacy) markAdjacent(args[0]);
     return defaultHandlers.root(...args);
   }) as typeof defaultHandlers.root;

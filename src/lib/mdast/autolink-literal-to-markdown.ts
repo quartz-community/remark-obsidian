@@ -130,7 +130,7 @@ function soleText(node: Link): string | undefined {
  * delegates to the default handler untouched.
  */
 export function autolinkLiteralToMarkdown(
-  options: { readonly legacy?: boolean } = {},
+  options: { readonly strict?: boolean } = {},
 ): Options {
   return {
     handlers: {
@@ -155,25 +155,43 @@ export function autolinkLiteralToMarkdown(
           state,
           info,
         );
-        return options.legacy ? balanceLabel(node, state, written) : written;
+        return balanceLabel(node, state, written, options.strict);
       },
     },
   };
 }
 
 /**
- * `legacy` only: the link text with its raw brackets balanced, as remark-parse 8 finds the text's
- * end. It counts raw brackets and steps over escaped ones, and the writer escapes brackets in text
- * but not the ones a wikilink writes, so `[[[[target]]](link](u)` came back as
- * `[[[[target]]\](link](u)`, whose text never closes (found by `fuzz/invariant-sweep.ts`). The text
- * is written again on its own, as the default handler writes it, to find it in the output.
+ * The link text with its raw brackets balanced. remark-parse 8 finds the text's end by counting
+ * raw brackets and stepping over escaped ones, and CommonMark requires raw brackets in link text
+ * to balance, so under both presets a text the writer unbalanced lost its link. The writer
+ * escapes brackets in text but not the ones a wikilink or a footnote label writes:
+ * `[[[[target]]](link](u)` came back as `[[[[target]]\](link](u)` (legacy) and `[[^[[]]]](u)` as
+ * `[[^[[]\]\]](u)` (strict with bare references), whose text never closes (found by
+ * `fuzz/invariant-sweep.ts` and the million-seed census). A reference's text is the same
+ * (`[[![[]]]][^x]`). The text is written again on its own, as the default handler writes it, to
+ * find it in the output.
  */
 export function balanceLabel(
   node: Link | LinkReference,
   state: State,
   written: string,
+  strict = false,
 ): string {
   if (!written.startsWith("[")) return written;
+  // Under `strict`, only text made of text and footnote references, as in `[[^[[]]]](u)`, where
+  // an undefined call is brackets to micromark's link scan. A formula, a comment, a wikilink or
+  // a link inside is one construct to it, whose brackets do not count: balanced as raw text,
+  // `[^1 … [[[a#^blk]]](u)` and `[$$[^1\]$$](u)` lost their link (fuzz seed 46 and 104 seeds of
+  // a fourth census).
+  if (
+    strict &&
+    node.children.some(
+      (child) => child.type !== "text" && child.type !== "footnoteReference",
+    )
+  ) {
+    return written;
+  }
   const exitLink = state.enter(node.type);
   const exitLabel = state.enter("label");
   const label = state.containerPhrasing(node, {

@@ -4,6 +4,7 @@ import { SKIP, visit } from "unist-util-visit";
 import { characterEntitiesLegacy } from "character-entities-legacy";
 import { decodeNamedCharacterReference } from "decode-named-character-reference";
 import { decodeString } from "micromark-util-decode-string";
+import { paragraphSlice } from "./line-map.js";
 
 /**
  * ASCII whitespace only, written out because `\s` is wider than the rule.
@@ -571,7 +572,7 @@ function tailAfter(
       if (index !== -1) return text.value.slice(index);
     }
   }
-  return decodeString(source.slice(from, to));
+  return decodeString(paragraphSlice(source.slice(from, to)));
 }
 
 function inClosedComment(source: string, offset: number | undefined): boolean {

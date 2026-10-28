@@ -3,6 +3,7 @@ import type { Node } from "unist";
 import { SKIP, visit } from "unist-util-visit";
 import { insideAutolink } from "./footnote-bare.js";
 import { decodeString } from "micromark-util-decode-string";
+import { paragraphSlice } from "./line-map.js";
 
 interface ParentNode extends Node {
   children: RootContent[];
@@ -82,7 +83,9 @@ export function doubledFootnoteOpenerTransform(
           // Decoded, as micromark decodes text: a raw slice kept escapes' backslashes, which
           // the writer escaped again on every format, doubling them -- `# [^[[link](u)]` under
           // Quartz's options grew without bound (found by `fuzz/invariant-sweep.ts`).
-          value: decodeString(source.slice(openAt + 1, noteEnd)),
+          value: decodeString(
+            paragraphSlice(source.slice(openAt + 1, noteEnd)),
+          ),
           position: {
             start: { line: 0, column: 1, offset: openAt + 1 },
             end: { line: 0, column: 1, offset: noteEnd },
@@ -113,7 +116,9 @@ export function doubledFootnoteOpenerTransform(
       if (noteEnd > closeAt + 1) {
         replacement.push({
           type: "text",
-          value: decodeString(source.slice(closeAt + 1, noteEnd)),
+          value: decodeString(
+            paragraphSlice(source.slice(closeAt + 1, noteEnd)),
+          ),
           position: {
             start: { line: 0, column: 1, offset: closeAt + 1 },
             end: { line: 0, column: 1, offset: noteEnd },
