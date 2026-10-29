@@ -1,5 +1,5 @@
 ---
-"@quartz-community/remark-obsidian": patch
+"@quartz-community/remark-obsidian": minor
 ---
 
 Under `strict`, `%%` comments, footnote references and callout titles follow Obsidian 1.15.0
