@@ -32,7 +32,14 @@ export function wikilinkToMarkdown(): Options {
           node.heading || stripped === "heading"
             ? `#${writtenPart(node.heading, data?.spelledHeading, stripped === "heading")}`
             : "";
-        const alias = node.alias ? `|${node.alias}` : "";
+        // An alias written empty displays nothing, where none displays the target, so `[[a|]]`
+        // keeps its `|`: written `[[a]]` it displayed `a`. Only it leaves a link to a target with
+        // nothing to display.
+        const writtenEmpty =
+          !node.embedded &&
+          node.value === "" &&
+          (node.path !== "" || node.heading !== "");
+        const alias = node.alias || writtenEmpty ? `|${node.alias}` : "";
         // An entirely empty wikilink needs its space back. `[[ ]]` parses as a wikilink
         // whose path is the empty string -- the inner text is trimmed as a whole -- but
         // `[[]]` does not parse as one at all, so writing that spelling loses the

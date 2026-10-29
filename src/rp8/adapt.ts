@@ -337,6 +337,12 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
       const identifier = normalizeIdentifier(
         String(label ?? node.identifier),
       ).toLowerCase();
+      // The label as written, where decoding changed it, for the writer: written decoded,
+      // `[x][&amp;]` came back `[x][&]`, another identifier (`link-reference-to-markdown.ts`).
+      const spelled =
+        referenceType === "full" && decodeLabel(label) !== label
+          ? { data: { spelledLabel: label } }
+          : {};
       return [
         type === "imageReference"
           ? {
@@ -346,6 +352,7 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
               referenceType,
               alt,
               position,
+              ...spelled,
             }
           : {
               type,
@@ -354,6 +361,7 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
               referenceType,
               children: kids(),
               position,
+              ...spelled,
             },
       ];
     }

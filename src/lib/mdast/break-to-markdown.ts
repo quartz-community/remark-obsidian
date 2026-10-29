@@ -1,5 +1,8 @@
-import type { Options, State } from "mdast-util-to-markdown";
-import type { Break, Parents } from "mdast";
+import { defaultHandlers } from "mdast-util-to-markdown";
+import type { Info, Options, State } from "mdast-util-to-markdown";
+import type { Break, Heading, Parents } from "mdast";
+import { EXIT, visit } from "unist-util-visit";
+import { toString } from "mdast-util-to-string";
 
 /**
  * Write a line break as a newline rather than a trailing backslash.
@@ -26,6 +29,48 @@ import type { Break, Parents } from "mdast";
 export function breakToMarkdown(escaped = false): Options {
   return {
     handlers: {
+      // A heading over two lines must be setext, and the writer writes setext only when its text
+      // is non-empty: one of footnote references and a break holds no text by `toString`, so it
+      // was written `# [^1]` / `[^1]`, a heading and a paragraph (8 seeds of the million-seed
+      // census, under "formatting keeps the tree").
+      heading(
+        node: Heading,
+        parent: Parents | undefined,
+        state: State,
+        info: Info,
+      ) {
+        let lines = false;
+        visit(node, (child) => {
+          if (
+            child.type === "break" ||
+            /[\r\n]/u.test(
+              ((child as { value?: unknown }).value as string) ?? "",
+            )
+          ) {
+            lines = true;
+            return EXIT;
+          }
+          return undefined;
+        });
+        if (!lines || node.depth >= 3 || toString(node) !== "") {
+          return defaultHandlers.heading(node, parent, state, info);
+        }
+        // Upstream's setext branch, which its own test never reaches here.
+        const exit = state.enter("headingSetext");
+        const subexit = state.enter("phrasing");
+        const value = state.containerPhrasing(node, {
+          ...info,
+          before: "\n",
+          after: "\n",
+        });
+        subexit();
+        exit();
+        const lastLine =
+          Math.max(value.lastIndexOf("\r"), value.lastIndexOf("\n")) + 1;
+        return `${value}\n${(node.depth === 1 ? "=" : "-").repeat(
+          Math.max(value.length - lastLine, 3),
+        )}`;
+      },
       break(node: Break, parent: Parents | undefined, _state: State): string {
         // Except where a break opens emphasis or strong: the writer encodes an edge line
         // ending as `&#xA;`, after which a tag cannot start, so `**` / `#a/b …**` lost its tag

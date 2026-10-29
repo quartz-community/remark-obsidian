@@ -2056,9 +2056,14 @@ describe("remark-obsidian", () => {
       data.fromMarkdownExtensions.push(commentFromMarkdown());
       data.toMarkdownExtensions.push(commentToMarkdown());
 
-      expect(String(await processor.process("a%%b\nc%%"))).toBe("a%%b\nc%%\n");
-      expect(String(await processor.process("a%%b\nc\nd%%"))).toBe(
-        "a%%b\nc\nd%%\n",
+      // A comment opening a line spans lines; one opened mid-line closes on its own line or is
+      // text, as Obsidian renders `a%%b` / `c%%` (asked of 1.15.0).
+      expect(String(await processor.process("%%b\nc%%"))).toBe("%%b\nc%%\n");
+      expect(String(await processor.process("%%b\nc\nd%%"))).toBe(
+        "%%b\nc\nd%%\n",
+      );
+      expect(String(await processor.process("a%%b\nc%%"))).toBe(
+        "a\\%%b\nc\\%%\n",
       );
       expect(String(await processor.process("%%\nblock\ncomment\n%%"))).toBe(
         "%%\nblock\ncomment\n%%\n",

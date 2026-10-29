@@ -547,7 +547,7 @@ has no coverage there, not that it agrees. Footnotes are in **neither** spec: GF
 ## Gates — what "done" means
 
 ```bash
-npm test          # 618 tests / 27 files. Contains the contract gate.
+npm test          # 642 tests / 27 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -931,20 +931,56 @@ too), plus 2,543 seeds failing only the tree check, now the baseline (2,981 seed
 Unchanged by identity: referee 6,830 (spans 6,830), contract 3,469, strict spec 8, recorded
 cases 2,965, definitions 5,333, references 1,523.
 
-Left, by family (seeds):
+**The tree check's families, closed with Obsidian 1.15.0 live** (the next day). Asked first:
 
-| seeds | preset | family                                                                     |
-| ----: | ------ | -------------------------------------------------------------------------- |
-|   885 | legacy | a tag ending nested emphasis and strong swaps their order (`_**#a/b**_`)   |
-|   646 | both   | a whitespace formula inside a highlight gains an `&#x20;` text (`==$⍽$==`) |
-|   793 | both   | an empty callout title over code or a comment is lost, written below it    |
-|   110 | strict | a code span over a line ending with trailing space                         |
-|    99 | strict | a literal URL after `_#tag_` becomes a link once escapes are written       |
-|    15 | strict | a reference over a setext underline, and smaller tails                     |
+- `> [!note] ~~~` and `> [!note] &#x20;` display no title; `> [!note] ` over a block displays
+  the type. So an empty title over code, a comment or a paragraph is written `&#x20;`, and
+  `strict` reads that as an empty title, where it read none.
+- A code span keeps the spaces around a line ending (`x` / `··y` renders `x···y`): the check
+  now maps each line ending to one space instead of collapsing the run.
+- **An inline `%%` comment spans lines only when it opens a line with no other `%` on that
+  line**, remark-parse 8's own split between its block and inline readers. `a %%x` / `y%% b`,
+  `a` / `····%%note` / `note%%` and `%%%` / `[^1]: def` / `%%%` all render as text. `strict`
+  read comments across the line endings; `comment.ts`'s text construct now ends them there.
+- `[^1]: def` / `····[^2]: two`: Obsidian indexes no `[^2]`. A `strict` reference to a label no
+  definition holds (a pass dissolved it) is text again, unless `bareFootnoteRefs`.
 
-The callout row needs a live answer first: whether Obsidian renders `> [!note] ~~~` with the
-type's title or none decides which tree is right. The corpus also still changes the words in 70
-`strict` documents (72 before this round) and 2 `legacy` ones (7), none new.
+Fixed in the writer, each with a pin (21 fail at HEAD; the other 4 were the check's own
+normalization, HTML edges and code-span spaces):
+
+- a tag before attention whose content opens with punctuation, under `legacy`: upstream encodes
+  the tag's last letter (CommonMark flanking). The tag writer ends with U+2E7F, which no tag
+  holds, for the encoder to spend itself on, and the root writer removes it. Not under `strict`:
+  there the encoding is what lets `#tag*<https://e.test>*` open at all (4 census seeds said so);
+- emphasis nesting: `_**#a/b**_`, `*_**x**_*`, `**_*x*_**`, `*em*_**x**_`; emphasis after a tag
+  takes `*`; an escaped `_`, `-` or `/` after a tag stays escaped;
+- a highlight's content is written between its own `==`, so a formula there takes no `&#x20;`;
+  its first `=` is encoded only at a line start, where `===` is a setext underline;
+- `legacy` full references keep their label as written (`data.spelledLabel`); an empty wikilink
+  alias keeps its `|`; a heading of references over two lines is written setext, which
+  upstream skips when `toString` is empty;
+- a label colon after a line-opening reference is encoded, so a paragraph's `[^x]: y` line
+  stays text; a block comment ending in `%` closes on its own line.
+
+And in `strict`'s parse: GFM's literal autolinks run again over text the passes rebuilt (found
+by name among the processor's extensions, so only with GFM), folding a rebuilt `<url>`'s
+brackets into the link; positions are restored before the callout pass, whose title split gave
+up on GFM's unplaced nodes and kept a lazy `===` in the title; and `quoteCommentLazy`'s value
+is the body with prefixes stripped, ending at its closer.
+
+The words check reads a comment's VALUE, not its parsed children, which the tree check already
+sets aside (`- p` / `····%%` / `[^1]: def` read the same body as a definition, then as code).
+
+Measured: census 2,981 -> **419** failing seeds, 0 new (old kinds 442 -> 365, tree-only 2,543
+-> 54); referee corpus `strict` words 70 -> **0**, `legacy` 2 -> 0. Unchanged by identity:
+referee 6,830 (spans 6,830), contract 3,469, strict spec 8, recorded cases 2,965, definitions
+5,333, references 1,523. Two census runs in between caught regressions first: 547 seeds from
+an inline-comment indent written before the comment rule changed, and 4 from the tag marker
+under `strict`; both reverted.
+
+Left: nested emphasis and tags in rarer shapes, `$$` lines in list items, callout titles over
+lazy setext lines (CommonMark laziness), `[x` starting a `legacy` link definition, and the
+strict span findings on 9 corpus documents.
 
 **Traps:** `fmt`-style probes that look a configuration up by name silently run `legacy` for a
 JSON one; a "words" metric must not count node boundaries, and cannot see a loss the PARSE made

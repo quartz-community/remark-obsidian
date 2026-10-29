@@ -612,8 +612,10 @@ export function calloutTransform(
     // marker-bearing source line it reads like -- a first attempt matched a `]` that
     // is long gone, and only printing the value alongside a known-non-empty control
     // said so.)
-    const blankTitle =
-      title === "" && firstLine !== "" && firstLine.trim() === "";
+    // Not only whitespace as written: a character reference that decodes to it,
+    // `> [!note] &#x20;`, displays nothing too (asked of 1.15.0), and it is the spelling the
+    // writer uses for an empty title over a block it cannot put on the title line.
+    const blankTitle = title === "" && firstLine !== "";
 
     // A node that is not an empty text node is a title, whatever it collects to.
     // `> [!note] ^[]` is an empty *inline footnote*, which Obsidian shows as the

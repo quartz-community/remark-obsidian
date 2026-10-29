@@ -35,6 +35,9 @@ export function textToMarkdown(
         // `legacy` only: to micromark, as to CommonMark, a no-break space is no blank line, and
         // under `strict` the reference `bareFootnoteRefs` finds before it did not survive the
         // encoding (`[^https://e.test/p]` over `⍽`).
+        // A literal U+2E7F is the tag writer's end marker (`TAG_END`), so it is spelled as a
+        // reference the root writer does not remove.
+        written = written.replace(/\u2E7F/gu, "&#11903;");
         written = guardAmpersands(
           legacy ? guardBlankLines(written, afterBreak, info.after) : written,
         );
@@ -68,6 +71,29 @@ export function textToMarkdown(
         // came back as a second comment (found by `fuzz/invariant-sweep.ts`).
         const previous = siblings[siblings.indexOf(node as never) - 1];
         if (previous?.type === "comment" && written.startsWith("%%")) {
+          written = `\\${written}`;
+        }
+        // A reference opening a line, then `:`, is a definition's label once the line is written
+        // where a definition can start: a paragraph's text `body text` / `[^note]: Definition`
+        // (rule 1) came back as a second definition at the item's indent. Encoded, the colon
+        // keeps the line text and the reference a reference.
+        const beforeReference = siblings[
+          siblings.indexOf(node as never) - 2
+        ] as { type: string; value?: string } | undefined;
+        if (
+          previous?.type === "footnoteReference" &&
+          written.startsWith(":") &&
+          (beforeReference === undefined ||
+            beforeReference.type === "break" ||
+            (beforeReference.type === "text" &&
+              /\n[ \t]*$/u.test(beforeReference.value ?? "")))
+        ) {
+          written = `&#x3A;${written.slice(1)}`;
+        }
+        // Straight after a tag, a `_`, `-` or `/` would continue it: the source escaped it
+        // (`#tag\_under`), and the writer's own escape went with its `_` rule, which reads
+        // `#tag_under` as one word (about 12 seeds of the million-seed census).
+        if (previous?.type === "tag" && /^[_/-]/u.test(written)) {
           written = `\\${written}`;
         }
         // A `^` before anything written with a leading `[` would open an inline footnote over

@@ -1,5 +1,6 @@
 import type { Root, RootContent } from "mdast";
 import type { Node } from "unist";
+import { mapLines } from "./line-map.js";
 
 const MARKER = "%%";
 
@@ -120,7 +121,19 @@ export function quoteCommentLazyTransform(tree: Root, source: string): void {
     }
     if (swallowed.length === 0) continue;
 
-    comment.value = source.slice(from + MARKER.length, reach);
+    // The body as a reader sees it: container prefixes stripped, and only up to a closer on a
+    // lazy line below, which belongs to the comment. Sliced raw, the value held `> >` and the
+    // closer itself, and the writer wrote both back inside the quote, growing a quote per
+    // format (`fuzz#1502`, found by the stricter "formatting keeps the words").
+    const body = mapLines(
+      source,
+      from + MARKER.length,
+      reach,
+      source.slice(0, from).split("\n").length,
+      depth,
+    ).text;
+    const close = body.indexOf(MARKER);
+    comment.value = close === -1 ? body : body.slice(0, close);
     if (comment.position) comment.position.end = pointOf(source, reach);
     comment.children = swallowed;
 

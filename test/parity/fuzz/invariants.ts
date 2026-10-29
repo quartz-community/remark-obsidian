@@ -9,7 +9,7 @@ import remarkRehype from "remark-rehype";
 import remarkStringify from "remark-stringify";
 import { unified } from "unified";
 import type { Node } from "unist";
-import { visit } from "unist-util-visit";
+import { SKIP, visit } from "unist-util-visit";
 
 import remarkObsidian, {
   type RemarkObsidianOptions,
@@ -227,14 +227,19 @@ export function shapeOf(node: Node): unknown {
   if (rest.type === "comment") {
     return { type: "comment", value: String(rest.value ?? "").trim() };
   }
+  // Both ends: remark-parse 8 keeps a space of a definition's indent before `<br>`, which the
+  // writer drops, and whitespace around raw HTML renders as nothing.
   if (rest.type === "html") {
-    return { type: "html", value: String(rest.value).trimEnd() };
+    return { type: "html", value: String(rest.value).trim() };
   }
   if (rest.type === "inlineMath" || rest.type === "math") {
     return { ...rest, value: String(rest.value).replace(/\s+/gu, " ").trim() };
   }
   if (rest.type === "inlineCode") {
-    return { ...rest, value: String(rest.value).replace(/\s*\n\s*/gu, " ") };
+    // A line ending is one space, and the spaces around it stay: Obsidian renders `x` / `··y`
+    // as `x···y` (asked of 1.15.0), which is what the writer writes. Collapsing the run made the
+    // two differ (about 180 seeds).
+    return { ...rest, value: String(rest.value).replace(/\r\n|\r|\n/gu, " ") };
   }
   if (rest.type === "break") return { type: "text", value: " " };
   const children = (rest.children as Node[] | undefined)?.slice();
@@ -271,7 +276,13 @@ export function shapeOf(node: Node): unknown {
   }
   // A paragraph's or a heading's leading and trailing whitespace renders nothing.
   // Through an opening or closing emphasis, strong or strikethrough too.
-  if (rest.type === "paragraph" || rest.type === "heading") {
+  // A callout title too: `> [!note] &#x20;` and `> [!note] ~~~` both display no title at all
+  // (asked of 1.15.0), and the writer spells the second's empty title as the first.
+  if (
+    rest.type === "paragraph" ||
+    rest.type === "heading" ||
+    rest.type === "calloutTitle"
+  ) {
     const edge = (
       list: Array<Record<string, unknown>>,
       at: "start" | "end",
@@ -337,7 +348,7 @@ const FLOW_PARENTS = new Set([
   "footnoteDefinition",
 ]);
 
-function wordsOf(tree: Node): string[] {
+export function wordsOf(tree: Node): string[] {
   const parts: string[] = [];
   visit(tree, (node: Node, _index, parent: Node | undefined) => {
     const value = (node as { value?: unknown }).value;
@@ -352,10 +363,13 @@ function wordsOf(tree: Node): string[] {
     ) {
       parts.push("\n");
     }
-    // A comment holding parsed children carries its words twice, in `value` and in them, with
-    // no boundary between: `note` + `note` read as one word, `note\n` + `note` as two.
-    const parsed = ((node as { children?: unknown[] }).children ?? []).length;
-    if (node.type === "comment" && parsed > 0) return;
+    // A comment's words are its value, as written. Its parsed children say the same words twice
+    // and are a reading `shapeOf` sets aside: the same body read once as a definition and once
+    // as indented code (`- p` / `····%%` / `[^1]: def`) changed no word of the document.
+    if (node.type === "comment") {
+      parts.push(String(value ?? ""));
+      return SKIP;
+    }
     if (typeof value === "string" && node.type !== "yaml") parts.push(value);
     // A line break is whitespace: without this `s`, a break and `[l` read as one word, so a
     // break written back as a line ending (`&#xA;` at an emphasis edge) changed "the words".

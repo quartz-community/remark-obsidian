@@ -171,6 +171,58 @@ describe("invariant fuzz", () => {
     ["emphasis in emphasis ending in a tag", "*_#tag_*\n", "legacy"],
     ["no-break space as a callout title", "> [!note] \u00a0\n", "strict"],
     ["nested doubled footnote openers", "[^[^[^1]]\n", "strict"],
+    ["empty callout title over code", "> [!note] ~~~\n", "legacy"],
+    ["empty callout title over a comment", "> [!note] %%note\n", "strict"],
+    ["tag before emphasis opening with punctuation", "#tag*%%%%*\n", "legacy"],
+    ["html under a definition's indent", "[^1]:     <br>\n", "legacy"],
+    ["code span over an indented line", "  ``\n  **`!\n", "legacy"],
+    ["formula over lines opening a highlight", "==$$y^2\ny^2$$==\n", "legacy"],
+    [
+      "highlight opening with = at a line start",
+      "H\n  ===\n[^1]: ==a==\n",
+      "quartz-legacy",
+    ],
+    ["reference label with a character reference", "[x][&amp;]\n", "legacy"],
+    ["bare URL in a dissolved label", "[^[[https://e.test/p]]]\n", "strict"],
+    [
+      "callout title with a link over a lazy underline",
+      "> [!note] [link https://e.test/p\n===\n",
+      "strict",
+    ],
+    ["emphasis around strong ending in a tag", "_**#a/b**_\n", "legacy"],
+    ["emphasis around emphasis around strong", "*_**strong**_*\n", "legacy"],
+    ["strong around emphasis around emphasis", "**_*em*_**\n", "legacy"],
+    ["emphasis before emphasis around strong", "*em*_**strong**_\n", "legacy"],
+    ["emphasis after a tag", "#tag*_under_*\n", "legacy"],
+    ["escaped underscore after a tag", "#tag\\_u\n", "legacy"],
+    ["setext heading of references", "[^1]\n[^1]\n===\n", "quartz-strict"],
+    [
+      "indented percent line under a paragraph",
+      "a#^b\n    %%note\nnote%%\n",
+      "strict",
+    ],
+    ["empty wikilink alias", "x [[a|]] y\n", "legacy"],
+    [
+      "percent run around a label",
+      "%%%\n[^1]: def\n%%%\n\nuse[^1]\n",
+      "strict",
+    ],
+    [
+      "reference to a dissolved definition",
+      "[^1]: def\n    [^2]: two\n\nuse[^1] use[^2]\n",
+      "strict",
+    ],
+    [
+      "label line in a definition's paragraph",
+      "   * [^Note]: body text\n\t[^note]: Definition",
+      "strict",
+    ],
+    [
+      "comment two quotes deep closed on a lazy line",
+      "> > %%\nx\n> >\n> > y\n%%\n",
+      "strict",
+    ],
+    ["comment body ending in a percent", ">>%%\n%", "strict"],
     [
       "no-break space alone after a reference",
       "[^https://e.test/p]\n\u00a0\n",
@@ -330,7 +382,8 @@ describe("invariant fuzz", () => {
   // same either way, so the property is asked of the tree.
   it.each([
     ["> > %%a\n> > b%%\n", "a\nb"],
-    ["> > x\n y %%a\n> > b%%\n", "a\nb"],
+    // Over a lazy line. A comment opened mid-line no longer spans lines at all, as in Obsidian.
+    ["> > %%a\nb%%\n", "a\nb"],
   ])(
     "reads a comment two quotes deep without a quote inside (%j)",
     (markdown, body) => {

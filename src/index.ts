@@ -1,9 +1,10 @@
 /// <reference types="remark-parse" />
 /// <reference types="remark-stringify" />
 
+import { decodeString } from "micromark-util-decode-string";
 import type { Options as ToMarkdownOptions } from "mdast-util-to-markdown";
 import { parseLegacy8 } from "./rp8/adapt.js";
-import type { Root } from "mdast";
+import type { Root, RootContent } from "mdast";
 import type { Processor } from "unified";
 import { SKIP, visit } from "unist-util-visit";
 import { commentHoistTransform } from "./lib/comment-hoist.js";
@@ -392,6 +393,99 @@ function hasGfmFootnotes(extensions: ReadonlyArray<unknown>): boolean {
   });
 }
 
+/**
+ * A literal link the re-run above made inside rebuilt `<https://…>` text, its brackets taken in:
+ * that was an autolink, and kept as text the brackets were written `\<<https://…>>`, a pair more
+ * on every format (8 seeds of the million-seed census). Only links the re-run made.
+ */
+function foldAngleAutolinks(tree: Root, earlier: WeakSet<object>): void {
+  visit(tree, (node) => {
+    const kids = (node as { children?: RootContent[] }).children;
+    if (!Array.isArray(kids)) return;
+    for (let index = 1; index < kids.length - 1; index++) {
+      const link = kids[index];
+      const before = kids[index - 1];
+      const after = kids[index + 1];
+      if (
+        link?.type !== "link" ||
+        // Only a link the re-run made: GFM's own, from the parse, keeps its brackets as text
+        // where stock does (`<foo\+@bar.example.com>`, spec `autolinks/606`).
+        earlier.has(link) ||
+        before?.type !== "text" ||
+        after?.type !== "text" ||
+        !before.value.endsWith("<") ||
+        !after.value.startsWith(">") ||
+        link.position !== undefined
+      ) {
+        continue;
+      }
+      before.value = before.value.slice(0, -1);
+      after.value = after.value.slice(1);
+    }
+    (node as { children: RootContent[] }).children = kids.filter(
+      (kid) => kid.type !== "text" || kid.value !== "",
+    );
+  });
+}
+
+/**
+ * `mdast-util-gfm-autolink-literal`'s transform, where the processor registered it (through
+ * `remark-gfm`), found by name since this package does not depend on it.
+ */
+function gfmLiteralTransforms(
+  extensions: unknown,
+): Array<(tree: Root) => void> {
+  const found: Array<(tree: Root) => void> = [];
+  const walk = (value: unknown): void => {
+    if (Array.isArray(value)) {
+      value.forEach(walk);
+      return;
+    }
+    const transforms = (value as { transforms?: unknown } | null)?.transforms;
+    if (!Array.isArray(transforms)) return;
+    for (const transform of transforms) {
+      if (
+        typeof transform === "function" &&
+        transform.name === "transformGfmAutolinkLiterals" &&
+        !found.includes(transform as never)
+      ) {
+        found.push(transform as (tree: Root) => void);
+      }
+    }
+  };
+  walk(extensions);
+  return found;
+}
+
+/**
+ * Every footnote reference to a label no definition outside a comment holds, as the text it was
+ * written with. A comment's definitions define nothing, as in `commentParseTransform`'s pass.
+ */
+function undefinedReferencesTransform(tree: Root, source: string): void {
+  const defined = new Set<string>();
+  visit(tree, (node) => {
+    if (node.type === ("comment" as never)) return SKIP;
+    if (node.type === "footnoteDefinition") defined.add(node.identifier);
+    return undefined;
+  });
+  visit(tree, "footnoteReference", (node, index, parent) => {
+    if (parent === undefined || index === undefined) return undefined;
+    if (defined.has(node.identifier)) return undefined;
+    const from = node.position?.start?.offset;
+    const to = node.position?.end?.offset;
+    const value =
+      from !== undefined && to !== undefined
+        ? decodeString(source.slice(from, to))
+        : `[^${node.label ?? node.identifier}]`;
+    parent.children.splice(index, 1, {
+      type: "text",
+      value,
+      ...(node.position ? { position: node.position } : {}),
+    });
+    return index;
+  });
+}
+
 export default function remarkObsidian(
   userOpts?: RemarkObsidianOptions,
 ): undefined | ((tree: Root, file: any) => void) {
@@ -461,7 +555,9 @@ export default function remarkObsidian(
   if (opts.tags) {
     data.micromarkExtensions.push(tagSyntax());
     data.fromMarkdownExtensions.push(tagFromMarkdown());
-    data.toMarkdownExtensions.push(tagToMarkdown());
+    data.toMarkdownExtensions.push(
+      tagToMarkdown({ legacy: preset === "legacy" }),
+    );
   }
   // Callouts are a transform, not a syntax extension, so this is the only
   // half there is -- without it any tree holding one cannot be serialised.
@@ -606,6 +702,11 @@ export default function remarkObsidian(
       mathMidlineTransform(tree, String(file));
     }
     if (opts.callouts) {
+      // The title line is split by offsets, and GFM's autolink literals splice a link and the
+      // text around it with none: the split gave up and kept the whole paragraph as the title,
+      // a lazy `===` included (`> [!note] [link https://e.test` / `===`, 34 seeds of the
+      // million-seed census). Placed again below, for what later passes splice.
+      restoreInlinePositionsTransform(tree, String(file));
       calloutTransform(tree, String(file), (markdown) => self.parse(markdown));
       // After it, since it reads the `calloutTitle` that pass builds: the title is its own
       // line, so the body below it starts fresh and `2.` there opens a list.
@@ -689,6 +790,21 @@ export default function remarkObsidian(
       // `a^[x %% [^1] %% y]` -- inertness beats the comment rule, settled live.
       if (opts.inlineFootnotes) inlineFootnoteInertTransform(tree);
     }
+    // GFM's literal autolinks again, over text the passes above rebuilt after GFM had run: a
+    // raw slice (`[^[[https://e.test/p]]]`, a dissolved label) held a bare URL as text, which
+    // stock and Obsidian link and which every format linked on the way back (about 100 seeds
+    // of the million-seed census, under "formatting keeps the tree"). Only when the caller
+    // uses GFM: its own transform, found among the registered extensions.
+    const literals = gfmLiteralTransforms(data.fromMarkdownExtensions);
+    if (literals.length > 0) {
+      const earlier = new WeakSet<object>();
+      visit(tree, "link", (node) => {
+        earlier.add(node);
+      });
+      for (const literal of literals) literal(tree);
+      foldAngleAutolinks(tree, earlier);
+      restoreInlinePositionsTransform(tree, String(file));
+    }
     // After every pass that reads a newline out of a text value, and before points
     // are normalised from the offsets it sets.
     if (opts.positionedBreaks) breakPositionsTransform(tree, String(file));
@@ -705,6 +821,12 @@ export default function remarkObsidian(
     // Last before positions: every pass above, re-parsed fragments included, built identifiers
     // the CommonMark way; Obsidian's are the label lowercased.
     footnoteIdentifierTransform(tree);
+    // A reference whose definition a pass above dissolved is text again, as GFM has an undefined
+    // label: `[^1]: def` / `····[^2]: two` leaves `[^2]: two` as the definition's text, and
+    // `use[^2]` still referred to it. Obsidian indexes no `[^2]` there (asked of 1.15.0), and
+    // every format wrote it back as text (3 corpus documents, `probes#506` among them).
+    if (!opts.bareFootnoteRefs)
+      undefinedReferencesTransform(tree, String(file));
     // After every pass that can rewrite a callout title's children.
     if (opts.callouts) syncCalloutTitlesTransform(tree);
     normalizePointsTransform(tree, String(file));

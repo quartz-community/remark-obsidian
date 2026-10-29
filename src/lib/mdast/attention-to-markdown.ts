@@ -1,5 +1,6 @@
 import type { Emphasis, Node, PhrasingContent, Strong } from "mdast";
 import { defaultHandlers, type Options } from "mdast-util-to-markdown";
+import { removeTagEnds } from "./tag-to-markdown.js";
 
 type Handle = typeof defaultHandlers.emphasis | typeof defaultHandlers.strong;
 type Attention = (
@@ -18,6 +19,27 @@ function recordParents(node: Node): void {
     parentOf.set(child, node);
     recordParents(child);
   }
+}
+
+/** The sibling after `node`, by the parents recorded at the root. */
+function nextOf(node: Node): Node | undefined {
+  const siblings = (parentOf.get(node) as { children?: Node[] } | undefined)
+    ?.children;
+  return siblings?.[siblings.indexOf(node) + 1];
+}
+
+/**
+ * Whether `node` is emphasis opening with emphasis or strong, which takes `_` under `legacy`.
+ * Attention straight before it then keeps `*`: offered `_` first, `*em*_**strong**_` merged
+ * into `_em__**strong**`, and the writer moved the second to `*`, which read as strong around
+ * emphasis.
+ */
+function opensWithAttention(node: Node | undefined): boolean {
+  const first = (node as { children?: Node[] } | undefined)?.children?.[0];
+  return (
+    node?.type === "emphasis" &&
+    (first?.type === "emphasis" || first?.type === "strong")
+  );
 }
 
 /** The last node an attention span's content ends in, through nested attention. */
@@ -195,17 +217,23 @@ export function attentionToMarkdown(options: {
         node,
         state,
       );
+      // Straight after a tag, `_` would be the tag's: `#tag*_under_*` was written
+      // `#tag_*under*_`, a tag named `tag_`.
+      const siblings = (parentOf.get(node) as { children?: Node[] } | undefined)
+        ?.children;
+      if (siblings?.[siblings.indexOf(node) - 1]?.type === "tag") {
+        return { ...result, markers: ["*"] };
+      }
       if (lastLeaf(node)?.type === "tag") {
-        // Emphasis whose only child is emphasis takes `_` outside, or the two `*` runs read as
-        // strong: `*_#tag_*` came back `**#tag**` (about 40 seeds of the million-seed census,
-        // under "formatting keeps the tree"). `_*#tag*_` reads as written under both presets.
+        // Emphasis whose only child is emphasis or strong takes `_` outside, or the `*` runs
+        // merge: `*_#tag_*` came back `**#tag**`, and `_**#a/b**_` `***#a/b***`, which
+        // remark-parse 8 reads as strong around emphasis (about 70 seeds of the million-seed
+        // census, under "formatting keeps the tree"). Both read as written under both presets.
         const only = node.children.length === 1 ? node.children[0] : undefined;
         return {
           ...result,
           markers:
-            node.type === "emphasis" && only?.type === "emphasis"
-              ? ["_", "*"]
-              : ["*"],
+            node.type === "emphasis" && isAttention(only) ? ["_", "*"] : ["*"],
         };
       }
       if (!options.legacy) {
@@ -224,7 +252,24 @@ export function attentionToMarkdown(options: {
       }
       const only = node.children.length === 1 ? node.children[0] : undefined;
       if (pinned.has(node)) return { ...result, markers: ["*"] };
-      if (node.type === "strong" && only?.type === "emphasis") {
+      // Emphasis around emphasis that is itself around strong: the inner one takes `_` (below),
+      // so this one takes `*`. Offered `_` first, the two `_` read as strong and the writer moved
+      // the inner one to `*`, which wrote `*_**strong**_*` as `_***strong***_` (about 20 seeds).
+      if (
+        node.type === "emphasis" &&
+        only?.type === "emphasis" &&
+        only.children.length === 1 &&
+        only.children[0]?.type === "strong"
+      ) {
+        return { ...result, markers: ["*"] };
+      }
+      // Not when that emphasis holds attention alone: it takes `_` then, and pinned to `*`
+      // wrote `**_*em*_**` as `****em****`, which lost a word's markers.
+      if (
+        node.type === "strong" &&
+        only?.type === "emphasis" &&
+        !(only.children.length === 1 && isAttention(only.children[0]))
+      ) {
         pinned.add(only);
         return { ...result, markers: ["*"] };
       }
@@ -235,7 +280,7 @@ export function attentionToMarkdown(options: {
         // Not when something verbatim inside holds a `_` too: `_` would close on it as
         // `*` would on a `*` (`*em` / `![[_under_]]` / `_under_. *`).
         (holdsStar(node) && !underscoreUnsafe(node, false)) ||
-        beforeAttention.has(node)
+        (beforeAttention.has(node) && !opensWithAttention(nextOf(node)))
       ) {
         return { ...result, markers: ["_", "*"] };
       }
@@ -246,7 +291,7 @@ export function attentionToMarkdown(options: {
   const root = ((...args: Parameters<typeof defaultHandlers.root>) => {
     recordParents(args[0]);
     if (options.legacy) markAdjacent(args[0]);
-    return defaultHandlers.root(...args);
+    return removeTagEnds(defaultHandlers.root(...args));
   }) as typeof defaultHandlers.root;
   return {
     handlers: {

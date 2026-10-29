@@ -100,8 +100,34 @@ function tokenizeText(
 ): State {
   const closeFromContent = createClose(true);
   const closeFromBoundary = createClose(false);
+  // Obsidian's rule, as remark-parse 8's block and inline readers have it: a comment spans
+  // lines only when its `%%` opens a line and nothing else on that line is a `%`; any other
+  // closes on its own line or is text. `a %%x` / `y%% b`, `a` / `····%%note` / `note%%` and
+  // `%%%` / `[^1]: def` / `%%%` render as written (asked of 1.15.0), where this construct read
+  // comments across the line endings.
+  const opensLine = this.previous === null || isLineEnding(this.previous);
+  let firstLine = true;
+  let strayPercent = false;
 
   return start;
+
+  /** Whether the comment may go on past the line ending it has reached. */
+  function spansLines(): boolean {
+    if (!opensLine || (firstLine && strayPercent)) return false;
+    firstLine = false;
+    return true;
+  }
+
+  /** A `%` that closes nothing: on the opening line it keeps the comment to that line. */
+  function strayStart(code: Code): State | undefined {
+    if (firstLine) strayPercent = true;
+    return startContent(code);
+  }
+
+  function strayConsume(code: Code): State | undefined {
+    if (firstLine) strayPercent = true;
+    return contentConsume(code);
+  }
 
   function start(code: Code): State | undefined {
     if (code !== PERCENT) return nok(code);
@@ -122,11 +148,12 @@ function tokenizeText(
     if (code === null) return nok(code);
 
     if (isLineEnding(code)) {
+      if (!spansLines()) return nok(code);
       return effects.attempt(nonLazyContinuation, atContentBoundary, nok)(code);
     }
 
     if (code === PERCENT) {
-      return effects.attempt(closeFromBoundary, closeAfter, startContent)(code);
+      return effects.attempt(closeFromBoundary, closeAfter, strayStart)(code);
     }
 
     effects.enter("commentContent");
@@ -149,16 +176,12 @@ function tokenizeText(
 
     if (isLineEnding(code)) {
       effects.exit("commentContent");
-
+      if (!spansLines()) return nok(code);
       return effects.attempt(nonLazyContinuation, atContentBoundary, nok)(code);
     }
 
     if (code === PERCENT) {
-      return effects.attempt(
-        closeFromContent,
-        closeAfter,
-        contentConsume,
-      )(code);
+      return effects.attempt(closeFromContent, closeAfter, strayConsume)(code);
     }
 
     effects.consume(code);

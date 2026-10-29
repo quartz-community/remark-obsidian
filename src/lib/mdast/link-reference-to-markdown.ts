@@ -1,7 +1,8 @@
 import { defaultHandlers } from "mdast-util-to-markdown";
 import { balanceLabel } from "./autolink-literal-to-markdown.js";
 import type { Options, State, Info } from "mdast-util-to-markdown";
-import type { LinkReference, Parents } from "mdast";
+import type { ImageReference, LinkReference, Parents } from "mdast";
+import { decodeString } from "micromark-util-decode-string";
 
 /** A label that is whitespace and nothing else. */
 const BLANK = /^[ \t\n]+$/u;
@@ -29,6 +30,37 @@ const BLANK = /^[ \t\n]+$/u;
  * are order-sensitive, so the only reliable way to leave upstream's behaviour untouched
  * is to call upstream.
  */
+/** Stands in for a spelled label while upstream writes the rest of the reference. */
+const LABEL = "\uE00F";
+
+/**
+ * A full reference written with its label as the author spelled it, under `legacy`, where
+ * remark-parse 8's adapter keeps that spelling (`data.spelledLabel`). The label is decoded, as
+ * `mdast-util-from-markdown` reports it, but the identifier comes from the raw text, so writing
+ * the decoded label changed the identifier: `[x][&amp;]` came back `[x][&]`, and `[x][^*em\*]`
+ * `[x][^*em*]` (about 120 seeds of the million-seed census, under "formatting keeps the
+ * tree"). The raw spelling cannot go through `state.safe`, which escaped it again on every pass
+ * (`[ref\[]`), so upstream writes a placeholder and the spelling replaces it.
+ */
+function withSpelledLabel<T extends LinkReference | ImageReference>(
+  node: T,
+  write: (node: T) => string,
+): string {
+  const spelled = (node.data as { spelledLabel?: string } | undefined)
+    ?.spelledLabel;
+  if (
+    spelled === undefined ||
+    node.referenceType !== "full" ||
+    decodeString(spelled) !== node.label
+  ) {
+    return write(node);
+  }
+  const written = write({ ...node, label: LABEL });
+  return written.includes(LABEL)
+    ? written.replace(LABEL, () => spelled)
+    : write(node);
+}
+
 export function linkReferenceToMarkdown(
   options: { readonly strict?: boolean } = {},
 ): Options {
@@ -49,13 +81,20 @@ export function linkReferenceToMarkdown(
           exit();
           return `[${label}]`;
         }
-        const written = defaultHandlers.linkReference(
-          node,
-          parent,
-          state,
-          info,
+        const written = withSpelledLabel(node, (own) =>
+          defaultHandlers.linkReference(own, parent, state, info),
         );
         return balanceLabel(node, state, written, options.strict);
+      },
+      imageReference(
+        node: ImageReference,
+        parent: Parents | undefined,
+        state: State,
+        info: Info,
+      ) {
+        return withSpelledLabel(node, (own) =>
+          defaultHandlers.imageReference(own, parent, state, info),
+        );
       },
     },
   };
