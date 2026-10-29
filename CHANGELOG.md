@@ -1,3 +1,211 @@
+## 2.1.0
+
+### Minor Changes
+
+- b1f3a48: Under `strict`, `%%` comments, footnote references and callout titles follow Obsidian 1.15.0
+  more closely:
+
+  - A `%%` comment spans lines only when its `%%` opens a line with no other `%` on it, as in
+    Obsidian. `a %%x` / `y%% b` and `%%%` / `text` / `%%%` are now plain text, as Obsidian renders
+    them, not comments.
+  - A footnote reference whose definition another rule turned back into text is text too
+    (`[^1]: def` / `····[^2]: two` / `use[^2]`). Unchanged with `bareFootnoteRefs`.
+  - A bare URL in text rebuilt by Obsidian's footnote rules is linked, as GFM links it everywhere
+    else (`[^[[https://e.test]]]`).
+  - `> [!note] &#x20;` is an empty title, as Obsidian displays it, and a callout title holding a
+    bare URL no longer takes the lazy line below it.
+
+  Formatting keeps more documents as they were:
+
+  - An empty callout title over code, a comment or a paragraph is written `> [!note] &#x20;`, so
+    it stays empty instead of displaying the type.
+  - Under `legacy`, a tag straight before emphasis, strong or strikethrough keeps its last
+    character, which was written as a character reference (`#ta&#x67;*%%*`).
+  - Nested emphasis and strong keep their nesting (`_**#a/b**_`, `*_**x**_*`, `**_*x*_**`).
+  - A `_`, `-` or `/` escaped after a tag stays escaped; emphasis after a tag uses `*`.
+  - A formula opening a highlight no longer gains a space; a `=` opening one at a line start is
+    encoded.
+  - Under `legacy`, a full reference keeps its label as written (`[x][&amp;]`).
+  - An empty wikilink alias (`[[a|]]`) is kept.
+  - A heading of footnote references over two lines is written as setext.
+  - A block comment ending in `%` closes on its own line.
+  - A footnote label inside a paragraph keeps its `:` from making a definition.
+
+### Patch Changes
+
+- 72435b2: More of the million-document fuzz's families, fixed.
+
+  - **Labels holding a wikilink (`strict`):** a footnote label holding a wikilink across a quote's
+    continuation line (`> [^[[a#^blk]` / `> 00]]`) no longer gains a `>` on every format. A
+    footnote label holding `[[` inside link text keeps the link.
+  - **Tags:**
+    - A tag on a bracket pair split over lines (`[^1` / `1]#tag`) keeps its tag.
+    - The text `#tag` at the start of link text stays text.
+    - In `legacy`, whitespace opening bold before a tag no longer hides the tag.
+  - **Formulas:** a `$$` formula holding a single backslash (`$$ \ $$`) reads back the same.
+  - **Strikethrough (`legacy`):** a `~` against a strikethrough's delimiters no longer closes it
+    early.
+  - **`&` before a no-break space (`legacy`):** an `&` followed by a no-break space after a
+    character reference keeps its meaning when formatted.
+
+- 5efaf49: The largest families a million-document fuzz found, fixed.
+
+  - **Emphasis around a `*` (`legacy`):** emphasis around a formula, code, a wikilink, a comment,
+    a footnote label or nested emphasis holding a `*` (`_$a*b$_`, `_![[*em*]]_`, `_[*em*](u)_`)
+    is written with `_`. Written with `*`, remark-parse 8 closed it early.
+  - **Runs of `=`:** a run of three or more `=` (`======`, `# ========`) is written so no pair in
+    it opens a highlight, under both presets.
+  - **Footnote definitions (`strict`):** whitespace-only lines of a `$$` block inside a definition
+    no longer grow by four spaces on every format, as was already fixed for code.
+  - **Fence-like lines (`legacy`):** a line starting `~~~`, an empty strikethrough at a line start,
+    and strikethrough text starting with `~` are written so they cannot open a code fence once
+    the line's indent is gone.
+  - **Positions (`strict`):** a callout's body over a line holding a literal URL no longer starts
+    inside the title. A `%%` comment after a blank line in a footnote definition is a block of its
+    own, as `legacy` reads it, instead of being folded into the definition's first paragraph.
+
+- 0886397: Read four character rules as Obsidian does, found by sweeping one character at a time against
+  the app.
+
+  - A wikilink's or embed's resolved target is NFC-normalized, so `[[café]]` written with a
+    combining accent links to the composed `café`, as in Obsidian. What the link displays keeps the
+    author's spelling. Both presets.
+  - U+2028 and U+2029 end a wikilink, as a line ending does: a link whose target holds one is no link. U+0085
+    stays inside one. Both presets.
+  - A task box holds one UTF-16 unit that is not a line terminator: a box holding U+2029 is no task
+    under `strict` either (it already was not under `legacy`).
+  - Under `strict`, footnote labels match and are named lowercased, not case-folded:
+    `[^ßb]` no longer reaches a `[^SSB]` definition, and `[^aᾭb]` is named `aᾥb`.
+
+- e8a2b0b: Formatting a document keeps what it says, and stops.
+
+  Found by a new invariant fuzzer over generated documents under every preset and option set:
+
+  - `$$a\$$b$$` grew by five characters on every format, and `$a\$ $b$` turned into display
+    math: the math writer lengthened the fence past escaped `$` runs. A formula whose `$` runs
+    are all escaped is written back with the fence it was read with.
+  - `\%%note%%`, `\==mark==` (mid-line) and `\#tag` lost their escape when formatted, turning
+    text into a hidden comment, a highlight or a tag. They are escaped where they would form one.
+    `C#` and `page#section` are left alone.
+  - `[[target\]]` was written back as `[[target]]`. The backslash Obsidian drops when it resolves
+    the target now goes back where the author wrote it.
+  - Under `strict`, an inline footnote spanning lines (`^[a` / `b]`) lost its line ending, so
+    formatting joined the two words.
+  - Under `strict` with `bareFootnoteRefs` on, as Quartz passes it, three shapes grew without
+    bound: a footnote label reaching past a line ending (no longer a reference, since a label
+    holds no whitespace), and text after a reference rebuilt from the raw source, keeping an
+    escape's backslash or a list's indent.
+
+- 5ad6de4: Formatting now reads back as the same tree in many more documents, not only the same words:
+
+  - A wikilink target keeps a backslash before `]`, as Obsidian does: `[[a\]b]]` links to `a\]b`
+    under both presets, and `strict` no longer ends the link at the escaped bracket.
+  - A task box over a block other than a paragraph (a footnote definition, a heading, code) is
+    written back, where it was dropped.
+  - A callout whose title line holds a block (`> [!note] [^1]: def`) is written that way, so the
+    block stays on the title line; code, `%%` comments and paragraphs are written below the marker
+    instead.
+  - A wikilink target is written as the author spelled it: a no-break space in a target and
+    decomposed accents no longer come back normalized.
+  - An empty task item (`- [ ] `) keeps its box.
+  - A line holding only a no-break space after a line break is written `&#xA0;`, which
+    remark-parse 8 does not read as a blank line.
+  - Emphasis inside emphasis that ends in a tag is written `_*#tag*_`, not `**#tag**`.
+  - An empty `$$$$` formula at a line start keeps its `&#x20;` prefix.
+  - Under `strict`, an inline footnote that `[^` turns back into text keeps what it held:
+    `[^[^<https://e.test>]]` keeps its autolink instead of flattening it to text.
+  - A `%%` comment that is a block of its own stays one.
+  - Under `legacy`, a footnote definition with several blocks inside a list item keeps them all.
+  - A run of `#` after an escape is escaped in full, so `\######x` stays text.
+  - Under `strict`, a callout's `title` follows its title nodes after the reading pass.
+  - A single-line formula with content no longer gets an `&#x20;` prefix.
+
+- 04707ab: Formatting keeps a document's words in the shapes the invariant fuzzer still found. Of 31 of
+  600 generated documents whose words changed on format, one is left.
+
+  - **Callout titles kept no escapes.** `> [!note] *em\*` came back as emphasis, and `\[[b]]` as a
+    wikilink.
+  - **Tags:**
+    - A tag after a bracket pair (`a [x]#t`) or after leading whitespace (`[^1]:     #tag`) was
+      lost.
+    - `\\#t`, a tag after an escaped backslash, keeps its tag.
+  - **Highlights:** a `=` just before a highlight's closer is written as `&#x3D;`. Obsidian's
+    closer scan ignores escapes, so `==mark` / `=` closed one character early.
+  - **Inline footnotes:** a `]` inside one (`^[a\]b]`) and wikilink brackets inside one
+    (`^[[[[[target]]]]]`) no longer end it early or leave it open. A `^` before a footnote
+    reference is escaped so it does not open an inline footnote.
+  - **Emphasis (`legacy`):** an emphasis ending in `*` is written with `_`. remark-parse 8 cannot
+    close `*\*em\**`.
+  - **Block comments:** a comment straight under a paragraph is written with its closer on its own
+    line, so it stays a block.
+  - **Math:**
+    - A formula opening on a line ending, an empty formula (`$$$$`), a formula padded with
+      whitespace (`$$⇥x$$`), and `$a\$ $b$` are each written so they read back the same.
+    - A literal backslash before an encoded space, and a `&` after leading whitespace (which
+      remark-parse 8 drops after `&#x20;`), keep their characters.
+  - **`strict` parsing:**
+    - A callout title followed by lazy lines that read alone as a setext heading kept the whole
+      paragraph as its title. It now ends at its line, as in Obsidian.
+    - A formula opened by a title's `$$` stays title text.
+    - With `bareFootnoteRefs` on, no footnote reference is made inside a literal URL
+      (`https://e.test/p[^1]`), as under `legacy`.
+
+- 00234df: Formatting keeps a document's words in five more shapes, and settles despite an upstream bug.
+
+  - **Footnote definitions (`strict`):** a whitespace-only line of code inside a definition no
+    longer grows by four spaces on every format. `micromark-extension-gfm-footnote` leaves the
+    definition's indent on such a line; that indent now comes off, giving the value `legacy`
+    reads.
+  - **A `^` before a wikilink or link** is escaped, so `^[[…]]` does not re-read as an inline
+    footnote.
+  - **Formulas:**
+    - A formula ending in a `$` after whitespace, which the reader stepped over, is written as
+      read.
+    - A `$$` formula starting a line is written so it cannot open a math block.
+  - **`legacy`:** link reference text holding an embed of `]` keeps its brackets. Emphasis that
+    starts with strong is written with `_`, as remark-parse 8 pairs it.
+
+- 3a14d46: The rest of what the invariant fuzzer found in its first 5,000 seeds. Every one of them now
+  formats to the same words, under every preset and option set.
+
+  - **Comments (`strict`):**
+    - A comment two quotes deep, or opened on a lazy line, read part of its own body as a quote.
+    - An unclosed comment two quotes deep swallowed a lazy line and `---` that Obsidian reads as
+      a heading.
+    - A defined footnote reference inside a comment was left as text; Obsidian indexes it.
+  - **Emphasis spellings:**
+    - remark-parse 8 reads `_***x***_`, `_u_**strong**` and `_[^*em*]_` only as written. The
+      `legacy` writer now writes them so.
+    - A tag ending emphasis or strong no longer swallows a `_` closer, under either preset.
+  - **Link text (`legacy`):** wikilink brackets inside link text (`[[[[target]]](link](u)`) keep
+    the link.
+  - **Line breaks and formulas:**
+    - A line break that opens emphasis or strong is written with a backslash, so a tag after it
+      survives.
+    - A formula line that would read as a setext underline under a quote is joined to the line
+      above.
+  - **Literal URLs (`strict`):** a `[^https://…]` label on an indented continuation line is a
+    reference, as on one line.
+  - **Ampersands:** a `%%` straight after a comment, and an `&` after a character reference
+    anywhere in the text, keep their meaning when formatted.
+
+- 08fcf4a: Under `strict`, emphasis around strikethrough or a highlight is written so it reads back the
+  same: `_~~*em*~~_` and `_==**strong**==_` stay emphasis. A `_` marker is no longer chosen where
+  it would close early: after a tag, or where the content starts or ends with `_`.
+- 9e724eb: Three more shapes the invariant fuzzer found, closing its per-push list.
+
+  - **Inline footnotes after an unclosed one (`strict`):** an unclosed `^[` stopped every inline
+    footnote after it in the whole document from forming. `^[a`, a blank line, then `^[b]` held
+    none. A speed-up meant for one paragraph applied to every later offset.
+  - **Footnote labels (`strict` with `bareFootnoteRefs`):** a label holding `[` is read from its
+    first `[^`, as under `legacy`. `[^_[^1]\_]` is one reference named `_[^1`.
+  - **Callout titles (`strict`):** a formula opened in a callout's title and closed on a lazy line
+    above `===` no longer keeps the whole paragraph as the title.
+  - **`&` after a character reference:** remark-parse 8 reads a bare `&` before punctuation,
+    anywhere after a character reference, as that reference's character (`&#65; x &,` reads
+    `A x A,`). Formatting escapes such an `&`, including after the `&#x20;` it writes for a
+    line's leading spaces.
+
 ## 2.0.2
 
 ### Patch Changes
