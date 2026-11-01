@@ -225,7 +225,20 @@ export function shapeOf(node: Node): unknown {
     ...rest
   } = node as Node & Record<string, unknown>;
   if (rest.type === "comment") {
-    return { type: "comment", value: String(rest.value ?? "").trim() };
+    // And a line of whitespace alone is empty: hidden, it renders nothing, and the writer
+    // writes it so, since a container's indent grew on it every format.
+    return {
+      type: "comment",
+      value: String(rest.value ?? "")
+        .split("\n")
+        .map((line, index, lines) =>
+          index > 0 && index < lines.length - 1 && /^[ \t]+$/u.test(line)
+            ? ""
+            : line,
+        )
+        .join("\n")
+        .trim(),
+    };
   }
   // Both ends: remark-parse 8 keeps a space of a definition's indent before `<br>`, which the
   // writer drops, and whitespace around raw HTML renders as nothing.

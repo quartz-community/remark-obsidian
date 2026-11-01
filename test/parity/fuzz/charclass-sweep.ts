@@ -85,6 +85,10 @@ for (const entry of entries) {
     continue;
   }
   for (const preset of ["legacy", "strict"] as const) {
+    // CommonMark replaces U+0000 with U+FFFD before any construct reads it (spec 2.3, "for
+    // security reasons"), and micromark does so on input. Obsidian keeps it. `strict` is the
+    // spec here by design; the 2026-10-29 sweep reported it in every template.
+    if (preset === "strict" && entry.c === "\u0000") continue;
     const diff = disagreement(
       entry.template,
       obsidian,

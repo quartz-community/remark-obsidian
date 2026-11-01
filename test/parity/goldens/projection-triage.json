@@ -4732,6 +4732,1225 @@
     }
    },
    "triage": "unreviewed"
+  },
+  "triage/nightly/n-4": {
+   "id": "triage/nightly/n-4",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "]%% ^[inline\\][link\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">]%% ^[inline][link</p>",
+    "projections": {
+     "text": "]%% ^[inline][link",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "]%% ^[inline\\][link"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:19"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/n-5": {
+   "id": "triage/nightly/n-5",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "==$$x^2$$==\n==ma\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><mark data-highlight=\"\"><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"x^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"x^2\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span></mark><br>\n==ma</p>",
+    "projections": {
+     "text": "⟨math⟩ ==ma",
+     "math": [
+      {
+       "display": true,
+       "tex": "x^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [
+      "⟨math⟩"
+     ],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "==$$x^2$$==\n==ma"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:4"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/n-8": {
+   "id": "triage/nightly/n-8",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| b |\n| --- | --- |\n|   ![[img.png\\]]\t\\[[a#h]] | ^blk[[a#h\\]]   #a/b[[a#^b\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th dir=\"ltr\">b</th>\n<th dir=\"auto\"></th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td dir=\"ltr\"><span alt=\"img.png\\\" src=\"img.png\" class=\"internal-embed is-loaded file-embed mod-empty-attachment\">“img.png” could not be found.</span>\t[[a#h]]</td>\n<td dir=\"ltr\">^blk<a data-href=\"a#h\" href=\"a#h\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a &gt; h\\</a>   <a href=\"#a/b\" class=\"tag\" target=\"_blank\" rel=\"noopener nofollow\">#a/b</a>[[a#^b</td>\n</tr>\n</tbody>\n</table>",
+    "projections": {
+     "text": "b img.png [[a#h]] ^blka > h\\ #a/b[[a#^b",
+     "math": [],
+     "links": [
+      {
+       "path": "img.png",
+       "heading": "",
+       "embedded": true
+      },
+      {
+       "path": "a",
+       "heading": "h",
+       "embedded": false
+      }
+     ],
+     "tags": [
+      "a/b"
+     ],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| b |\n| --- | --- |\n|   ![[img.png\\]]\t\\[[a#h]] | ^blk[[a#h\\]]   #a/b[[a#^b"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "a#h"
+     ],
+     "embeds": [
+      "img.png"
+     ],
+     "tags": [
+      "a/b"
+     ],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:54"
+     ],
+     "links": [
+      "[[a#h\\]]=>a#h|a > h\\@2:33-2:41"
+     ],
+     "embeds": [
+      "![[img.png\\]]=>img.png|img.png\\@2:4-2:17"
+     ],
+     "tags": [
+      "#a/b@2:44-2:48"
+     ],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/n-9": {
+   "id": "triage/nightly/n-9",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "1. ![[\nimg.png]][^*em**]*\n",
+   "obsidian": {
+    "html": "<ol>\n<li dir=\"auto\">![[\nimg.png]][^*em**]*</li>\n</ol>",
+    "projections": {
+     "text": "![[ img.png]][^*em**]*",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "list",
+       "text": "1. ![[\nimg.png]][^*em**]*"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "list@0:0-1:18"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [
+      "-|parent:-1@0:0-1:18"
+     ],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/n-10": {
+   "id": "triage/nightly/n-10",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "- \\[^1]\n1] \\ ~~$$y^2$$~~\n===\n",
+   "obsidian": {
+    "html": "<ul>\n<li dir=\"auto\">[^1]<br>\n1] \\ <del><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span></del><br>\n===</li>\n</ul>",
+    "projections": {
+     "text": "[^1] 1] \\ ⟨math⟩ ===",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "list",
+       "text": "- \\[^1]\n1] \\ ~~$$y^2$$~~\n==="
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "list@0:0-2:3"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [
+      "-|parent:-1@0:0-2:3"
+     ],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/n-12": {
+   "id": "triage/nightly/n-12",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "> > https\n> > * **$$y^2$$*\n===\n",
+   "obsidian": {
+    "html": "<blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n<p>https</p>\n<ul>\n<li dir=\"auto\">\n<h1 data-heading=\"**$$y^2$$*\" dir=\"auto\">*<em><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span></em></h1>\n</li>\n</ul>\n</blockquote>\n</blockquote>",
+    "projections": {
+     "text": "https *⟨math⟩",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [
+      "1:**$$y^2$$*"
+     ],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "em:⟨math⟩"
+     ],
+     "sections": [
+      {
+       "type": "blockquote",
+       "text": "> > https\n> > * **$$y^2$$*\n==="
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "blockquote@0:0-2:3"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [
+      "-|parent:-1@1:4-2:3"
+     ],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-0": {
+   "id": "triage/nightly/np-0",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "> %%note\nx\n",
+   "obsidian": {
+    "html": "<blockquote dir=\"auto\">\n</blockquote>",
+    "projections": {
+     "text": "",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "blockquote",
+       "text": "> %%note\nx"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "blockquote@0:0-1:1"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-1": {
+   "id": "triage/nightly/np-1",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "> > %%note\nx\n",
+   "obsidian": {
+    "html": "<blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n</blockquote>\n</blockquote>",
+    "projections": {
+     "text": "",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "blockquote",
+       "text": "> > %%note\nx"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "blockquote@0:0-1:1"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-2": {
+   "id": "triage/nightly/np-2",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "> > %%note\nx ^[y]\n",
+   "obsidian": {
+    "html": "<blockquote dir=\"auto\">\n<blockquote dir=\"auto\">\n</blockquote>\n</blockquote>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\">y<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "blockquote",
+       "text": "> > %%note\nx ^[y]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline0@1:4-1:5"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "blockquote@0:0-1:6",
+      "text@2:0-2:0",
+      "element@2:0-2:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-3": {
+   "id": "triage/nightly/np-3",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "> %%note\nx ^[y]\n",
+   "obsidian": {
+    "html": "<blockquote dir=\"auto\">\n</blockquote>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\">y<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "blockquote",
+       "text": "> %%note\nx ^[y]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline0@1:4-1:5"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "blockquote@0:0-1:6",
+      "text@2:0-2:0",
+      "element@2:0-2:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-4": {
+   "id": "triage/nightly/np-4",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "![a][b]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">![a][b]</p>",
+    "projections": {
+     "text": "![a][b]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "![a][b]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:7"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-5": {
+   "id": "triage/nightly/np-5",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[a][b]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[a][b]</p>",
+    "projections": {
+     "text": "[a][b]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[a][b]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:6"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-6": {
+   "id": "triage/nightly/np-6",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "![[\nx]][^y]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">![[\nx]][^y]</p>",
+    "projections": {
+     "text": "![[ x]][^y]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "![[\nx]][^y]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:7"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-7": {
+   "id": "triage/nightly/np-7",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "![x][^y]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">![x][^y]</p>",
+    "projections": {
+     "text": "![x][^y]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "![x][^y]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:8"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-8": {
+   "id": "triage/nightly/np-8",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[x][^y]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[x][^y]</p>",
+    "projections": {
+     "text": "[x][^y]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[x][^y]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:7"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-9": {
+   "id": "triage/nightly/np-9",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a ^[i\\][b\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a ^[i][b</p>",
+    "projections": {
+     "text": "a ^[i][b",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a ^[i\\][b"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:9"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-10": {
+   "id": "triage/nightly/np-10",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "]%% x][b\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">]%% x][b</p>",
+    "projections": {
+     "text": "]%% x][b",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "]%% x][b"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:8"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-11": {
+   "id": "triage/nightly/np-11",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| a |\n| --- |\n| ^blk[[w]] |\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th dir=\"ltr\">a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td dir=\"ltr\">^blk<a data-href=\"w\" href=\"w\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">w</a></td>\n</tr>\n</tbody>\n</table>",
+    "projections": {
+     "text": "a ^blkw",
+     "math": [],
+     "links": [
+      {
+       "path": "w",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| a |\n| --- |\n| ^blk[[w]] |"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "w"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:13"
+     ],
+     "links": [
+      "[[w]]=>w|w@2:6-2:11"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-12": {
+   "id": "triage/nightly/np-12",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| a |\n| --- |\n| x ^blk |\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th dir=\"ltr\">a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td dir=\"ltr\">x </td>\n</tr>\n</tbody>\n</table>",
+    "projections": {
+     "text": "a x",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| a |\n| --- |\n| x ^blk |"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:10"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [
+      "blk@0:0-2:10"
+     ],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-13": {
+   "id": "triage/nightly/np-13",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x ^blk [[w]]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x ^blk <a data-href=\"w\" href=\"w\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">w</a></p>",
+    "projections": {
+     "text": "x ^blk w",
+     "math": [],
+     "links": [
+      {
+       "path": "w",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x ^blk [[w]]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "w"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:12"
+     ],
+     "links": [
+      "[[w]]=>w|w@0:7-0:12"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-14": {
+   "id": "triage/nightly/np-14",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "==$$x$$==\nb\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><mark data-highlight=\"\"><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"x\" display=\"true\" class=\"TEX-N\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi></mjx-math></mjx-container></span></mark><br>\nb</p>",
+    "projections": {
+     "text": "⟨math⟩ b",
+     "math": [
+      {
+       "display": true,
+       "tex": "x"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [
+      "⟨math⟩"
+     ],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "==$$x$$==\nb"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:1"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-15": {
+   "id": "triage/nightly/np-15",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "~~$$x$$~~\nb\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><del><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"x\" display=\"true\" class=\"TEX-N\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi></mjx-math></mjx-container></span></del><br>\nb</p>",
+    "projections": {
+     "text": "⟨math⟩ b",
+     "math": [
+      {
+       "display": true,
+       "tex": "x"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "~~$$x$$~~\nb"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:1"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly/np-16": {
+   "id": "triage/nightly/np-16",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "$$x$$\nb\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"x\" display=\"true\" class=\"TEX-N\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi></mjx-math></mjx-container></span>b</p>",
+    "projections": {
+     "text": "⟨math⟩b",
+     "math": [
+      {
+       "display": true,
+       "tex": "x"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "$$x$$\nb"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:1"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
   }
  }
 }

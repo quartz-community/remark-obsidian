@@ -19,7 +19,10 @@ import type { GoldenCase } from "./types.js";
  * rest are controls recorded beside them), and every one matches now. Ten more came from the
  * nightly differential fuzz: a backslash before `]` stays in a wikilink's target (`[[a\\]b]]`
  * links to `a\\]b`), and the line ending after display math survives exactly when the next line
- * starts with whitespace. Left out: six
+ * starts with whitespace. 23 more came from three later nightly runs and their probes (1.15.0): an
+ * escaped `]` opens no label, an undefined image reference renders as written, a block id is
+ * stripped only from text ending its wrapper or cell, and display math ending a wrapper keeps
+ * the line ending after it. Left out: six
  * self-embeds (out of scope, as `fuzz/sweep.ts` skips them) and `[^1]: - [ ] [` / `^[[^1]]]`,
  * where Obsidian's renderer reads a reference its own `metadataCache` does not.
  */
@@ -32,7 +35,7 @@ const golden = JSON.parse(
 
 describe("projection triage", () => {
   it("records every case", () => {
-    expect(Object.keys(golden.cases)).toHaveLength(79);
+    expect(Object.keys(golden.cases)).toHaveLength(102);
   });
 
   it("matches every recorded document", () => {

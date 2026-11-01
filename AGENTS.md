@@ -547,7 +547,7 @@ has no coverage there, not that it agrees. Footnotes are in **neither** spec: GF
 ## Gates — what "done" means
 
 ```bash
-npm test          # 642 tests / 27 files. Contains the contract gate.
+npm test          # 643 tests / 27 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -981,6 +981,35 @@ under `strict`; both reverted.
 Left: nested emphasis and tags in rarer shapes, `$$` lines in list items, callout titles over
 lazy setext lines (CommonMark laziness), `[x` starting a `legacy` link definition, and the
 strict span findings on 9 corpus documents.
+
+**The rolling `fuzz` issue (#9), three nights on 2.1.0** (2026-10-29 to -31; every run on
+`02a46f7`). The differential forms were re-recorded in one batch and compared with `main`:
+5 of 13 already matched (the issue body's four, from before the tree-check round, and one
+more). Settled by recording probes beside them (1.15.0), all in the projection or
+`rehype-obsidian`:
+
+- an escaped `]` opens no label (`a ^[i\][b` keeps its `[`): `dropLabelOpeners` aligns the
+  decoded value with its source slice to see the escape;
+- an undefined image reference renders as written (`![a][b]`), as a link reference already did;
+- a block id is stripped only from text that ENDS its wrapper or cell: `| ^blk[[w]] |`,
+  `| x ^blk *y* |` and `==a ^blk [[w]]==` keep it, `==a ^blk== b` does not. Also in
+  `rehype-obsidian`'s `block-references.ts`;
+- display math ending a highlight, strikethrough or emphasis keeps the line ending after the
+  wrapper (`==$$x$$==` over `b` reads `⟨math⟩ b`).
+
+`projection-triage.test.ts` holds 23 more recordings (102). Left, as Obsidian's rendering
+rather than its syntax: a wikilink inside a link's emphasis, whose nested anchors the browser
+splits into an empty `em`; a surplus table cell's math (`KNOWN_PROXY_DIVERGENCES` territory);
+and an inline footnote inside a hidden `%%` comment, which Obsidian still lists among the
+rendered footnotes.
+
+The invariant reports: `[^1]: 1.` / `····~~~~. <ma` was already fixed; a whitespace-only line in
+a comment inside a definition grew four spaces per format, so the comment writer writes such a
+line empty (the tree check reads it so too). Interior lines only: the census caught the first
+version emptying `e%%⇥%%h`'s whole one-line body into `%%%%` (240 seeds), and a last line's
+indent keeps `%%note` / `····%%no` one paragraph. Census after: 0 new, 2 fixed (419 -> 417). The charclass report: `strict` turns U+0000 into
+U+FFFD, as CommonMark section 2.3 requires before any construct runs, where Obsidian keeps it.
+`strict` is the spec there by design, and the sweep no longer reports it.
 
 **Traps:** `fmt`-style probes that look a configuration up by name silently run `legacy` for a
 JSON one; a "words" metric must not count node boundaries, and cannot see a loss the PARSE made

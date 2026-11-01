@@ -350,10 +350,16 @@ function bracketStillOpen(source: string, from: number, at: number): boolean {
  * let a formatter delete a bracket the author wrote, which is the same reasoning that
  * keeps a dangling footnote reference and a surplus table cell in the tree.
  */
-function dropLabelOpeners(value: string): string {
+function dropLabelOpeners(
+  value: string,
+  escaped: readonly boolean[] = [],
+): string {
   let out = value;
   for (let at = out.length - 1; at >= 1; at--) {
     if (out[at] !== "[" || out[at - 1] !== "]") continue;
+    // A `]` the source escaped closes nothing: `a ^[i\][b` renders `a ^[i][b` (recorded,
+    // 1.15.0; the differential fuzz, 2026-10-29). The value is decoded, so the source says.
+    if (escaped[at - 1]) continue;
     // Through the closer itself, so the depth read is the one *after* it: in
     // `[foo][ref[]` the `]` closes the only opener and the next `[` is a label's,
     // while in `[ref[][]` it closes an inner one and the outer is still waiting.
@@ -368,6 +374,7 @@ function dropLabelOpeners(value: string): string {
         scan += 1;
         continue;
       }
+      if (escaped[scan]) continue;
       if (character === "[") depth += 1;
       else if (character === "]") {
         closed = depth > 0;
@@ -385,6 +392,35 @@ function dropLabelOpeners(value: string): string {
     out = out.slice(0, at) + out.slice(at + 1);
   }
   return out;
+}
+
+/**
+ * Which characters of a text's value the source wrote as a backslash escape, found by walking
+ * value and source together. Empty where they do not align (a reference, a container prefix),
+ * so a caller falls back to reading every character as written.
+ */
+function escapedCharacters(
+  value: string,
+  slice: string | undefined,
+): boolean[] {
+  if (slice === undefined) return [];
+  const escaped: boolean[] = [];
+  let at = 0;
+  for (let index = 0; index < value.length; index++) {
+    if (
+      slice[at] === "\\" &&
+      slice[at + 1] === value[index] &&
+      /[!-/:-@[-`{-~]/u.test(value[index]!)
+    ) {
+      escaped[index] = true;
+      at += 2;
+    } else if (slice[at] === value[index]) {
+      at += 1;
+    } else {
+      return [];
+    }
+  }
+  return escaped;
 }
 
 /** Nodes whose children are a label, where a bracket is content and opens nothing. */
@@ -581,11 +617,24 @@ export function mdastText(
         // Not inside a link label, where nothing parses and both brackets stay:
         // `[foo [bar][ref]](u)` renders `foo [bar][ref]`, so the inner `[` is
         // content there rather than a label opener. Three cases measure it.
-        parts.push(
-          inLabel
-            ? (node as ValueNode).value
-            : dropLabelOpeners((node as ValueNode).value),
-        );
+        {
+          const from = node.position?.start?.offset;
+          const to = node.position?.end?.offset;
+          const value = (node as ValueNode).value;
+          parts.push(
+            inLabel
+              ? value
+              : dropLabelOpeners(
+                  value,
+                  escapedCharacters(
+                    value,
+                    from === undefined || to === undefined
+                      ? undefined
+                      : source?.slice(from, to),
+                  ),
+                ),
+          );
+        }
         return;
       // A code span is literal, so its brackets are content and no label opens in it.
       case "inlineCode":
@@ -730,6 +779,9 @@ export function mdastText(
       // Same class as a dangling footnote reference, which `rehype-obsidian`
       // already bares: the node stays in the tree so a formatter cannot delete the
       // author's brackets, and the drop belongs downstream.
+      // An image reference too: `![a][b]` with nothing defining `b` renders `![a][b]` (recorded,
+      // 1.15.0; the differential fuzz, 2026-10-31), where the tree's node projected nothing.
+      case "imageReference":
       case "linkReference": {
         const reference = node as unknown as { identifier: string };
         const from = node.position?.start?.offset;
@@ -787,6 +839,10 @@ export function mdastText(
         }
         const first = parts[mark];
         if (typeof first === "string") parts[mark] = stripColourMarker(first);
+        // As for any wrapper (below): the line ending follows the highlight, not its math.
+        if (parts[parts.length - 1] === DISPLAY_INLINE_MATH) {
+          parts[parts.length - 1] = "\u27e8math\u27e9";
+        }
         return;
       }
       case "callout": {
@@ -883,6 +939,17 @@ export function mdastText(
         // either. Our `sections` already agree with its `list@0:0-1:3`, so the
         // structure was right and only this projection was wrong.
         if (unclosedComment(child)) break;
+      }
+      // Display math ending a highlight, strikethrough or emphasis is not what the line
+      // ending follows: `==$$x$$==` over `b` reads `⟨math⟩ b` (recorded, 1.15.0; the
+      // differential fuzz, 2026-10-29/31). Only math straight before the `<br>` swallows it.
+      if (
+        inner &&
+        node.type !== "paragraph" &&
+        node.type !== "heading" &&
+        parts[parts.length - 1] === DISPLAY_INLINE_MATH
+      ) {
+        parts[parts.length - 1] = "\u27e8math\u27e9";
       }
     }
     if (!phrasing && BLOCK_TYPES.has(node.type)) parts.push(" ");
@@ -1640,6 +1707,11 @@ function stripWrappedBlockIds(tree: Root): WeakSet<Node> {
     const host = (parent as Node | undefined)?.type;
     if (node.type !== "text" || host === undefined) return;
     if (!ID_WRAPPERS.has(host) && host !== "tableCell") return;
+    // Only the host's last child: `| ^blk[[w]] |`, `| x ^blk *y* |` and `==a ^blk [[w]]==`
+    // keep their `^blk`, while `==a ^blk== b` strips it (recorded, 1.15.0; the differential
+    // fuzz, 2026-10-31).
+    const siblings = (parent as { children?: Node[] } | undefined)?.children;
+    if (siblings?.[siblings.length - 1] !== node) return;
     const value = (node as ValueNode).value;
     const match = TRAILING_BLOCK_ID.exec(value);
     if (!match) return;

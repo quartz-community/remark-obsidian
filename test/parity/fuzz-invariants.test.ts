@@ -171,6 +171,11 @@ describe("invariant fuzz", () => {
     ["emphasis in emphasis ending in a tag", "*_#tag_*\n", "legacy"],
     ["no-break space as a callout title", "> [!note] \u00a0\n", "strict"],
     ["nested doubled footnote openers", "[^[^[^1]]\n", "strict"],
+    [
+      "whitespace line in a comment in a definition",
+      "[^1]: \n      %%note\n    \n    %%\n",
+      "strict",
+    ],
     ["empty callout title over code", "> [!note] ~~~\n", "legacy"],
     ["empty callout title over a comment", "> [!note] %%note\n", "strict"],
     ["tag before emphasis opening with punctuation", "#tag*%%%%*\n", "legacy"],
