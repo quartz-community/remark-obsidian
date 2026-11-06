@@ -510,6 +510,32 @@ Both have known-positive controls. Re-run them after ANY change under `src/rp8`.
 - **The Write tool turns a `\uFEFF` escape into a literal BOM**, and prettier reformats `src/rp8`
   between edits -- re-read before anchoring a scripted edit.
 
+**`readsPastEnd`: a part's end, `legacy` only, and two traps in it.** A false signal is a silent
+misread of a long note, so it is held to one property: a part with its next line attached, ending
+where that line starts a top-level block, reads as that part of the whole note. 40,000 generated
+documents through the caller's own decision give 43,588 cuts, 0 misread, 419 saved; the corpus gives
+14,865, 0 misread, 6 saved.
+
+- **The next line is part of the property.** Read without it, `> q` / `2) b` is one quote with a
+  lazy line and the signal is `false`, while `> q` / `2) b` / `---` is a quote, a list, and a break:
+  the underline decides the lazy line, and the top level then reads it as a list. `[^1]: d` over the
+  same lines, and `2. b` / `===`, do the same. Without the next line and without this shape, 10,315
+  corpus documents and 150,000 generated from definition fragments give 15,024 and 150,672 cuts, 0
+  misread, but that generator has no such fragment.
+
+- **"Declined, and more text would complete one" is not enough.** `[foo]: /url` / blank / `'tit` /
+  blank holds a paragraph, and the part above `'tit` alone a definition, where the reader never
+  declined. All 20 differing whole-note cuts in the generated run are that shape. The corpus has 0.
+- **A tree scan cannot see every decline.** A footnote definition asks the reader at each line
+  (`[^1]: d` / `[`), silently, with no paragraph or table to find: 8 misreads in 40,000 with the
+  scan, 0 with the reader wrapped.
+- **Refused: a constant `false` under `strict`.** A CommonMark definition stops at a blank line
+  (no definition node moved), but 320 of 8,948 comparable cuts read differently anyway, such as a
+  fence outliving its list item. `false` would promise what it cannot, so the field is absent.
+- **Not covered, by decision:** frontmatter also reads past the end (197 corpus cuts misread if the
+  caller does not find the closer first). The caller can, cheaply, and a `---` first line with no
+  closer would otherwise make the whole note one part.
+
 ## Two presets, two audiences
 
 |                                                                                                                          | `legacy` (default)                                         | `strict`                    |

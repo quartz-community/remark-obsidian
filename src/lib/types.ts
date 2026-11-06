@@ -88,6 +88,11 @@ declare module "mdast" {
      * Only present when the `lineOffsets` option is on.
      */
     lineOffsets?: Record<number, number>;
+    /**
+     * Whether a top-level link definition would read differently with more lines after the end
+     * of this text. Only present when the `readsPastEnd` option is on, under `legacy`.
+     */
+    readsPastEnd?: boolean;
   }
 
   interface PhrasingContentMap {

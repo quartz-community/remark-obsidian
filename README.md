@@ -70,7 +70,8 @@ emphasis followed by `*` under `strict`, as in CommonMark.
 
 ## Options
 
-Every option is a boolean, works under both presets, and wins over the preset's value for it.
+Every option is a boolean, works under both presets (`readsPastEnd` is `legacy`'s alone), and wins
+over the preset's value for it.
 
 | option              | default                               | what it does                                                                                                                                 |
 | ------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -89,6 +90,7 @@ Every option is a boolean, works under both presets, and wins over the preset's 
 | `bareFootnoteRefs`  | on under `legacy`, off under `strict` | Obsidian renders an undefined `[^x]` as `x`; the node stays a `footnoteReference`, and `rehype-obsidian` drops the delimiters when rendering |
 | `positionedBreaks`  | on under `legacy`, off under `strict` | a soft line ending becomes a positioned `break`, as `remark-breaks` would make it                                                            |
 | `lineOffsets`       | on                                    | `root.data.lineOffsets`: how many columns each line's containers consume                                                                     |
+| `readsPastEnd`      | off                                   | `root.data.readsPastEnd`, `legacy` only: would a top-level link definition read differently with more lines after the end?                   |
 | `escapedLineBreaks` | off                                   | write a `break` back as a trailing backslash rather than a newline, for a chain without `remark-breaks`                                      |
 
 ## Upgrading from 1.x

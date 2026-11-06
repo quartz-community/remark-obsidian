@@ -6,11 +6,13 @@
  * Rondeau, Micha Brugger, Jason Qin, and contributors), `src/parsing/obsidian-markdown.ts`,
  * whose test suite asserts agreement with every recorded answer this package's referee reads
  * except four P1/P2 cache-bug documents. Each reader carries the rule letter it has in that
- * project's `docs/obsidian-reading-rules.md`. Left out: their speed-only wrappers and the
- * link-definition-at-end probe, which only matters when a note is parsed in parts.
+ * project's `docs/obsidian-reading-rules.md`. Left out: their speed-only wrappers. Their
+ * link-definition-at-end probe, which only matters when a note is parsed in parts, is
+ * `reads-past-end.ts`.
  */
 import { legacyHighlightQueue } from "../lib/syntax/highlight.js";
 import listTokenizer from "./list.js";
+import { readsPastEnd, watchDefinitionReader } from "./reads-past-end.js";
 import remarkFootnotes2 from "./vendor/remark-footnotes/index.js";
 import remarkMath3 from "./vendor/remark-math/index.js";
 import Parser8 from "./vendor/remark-parse/parser.js";
@@ -711,6 +713,7 @@ export interface Features {
   inlineFootnotes: boolean;
   customTaskChars: boolean;
   positionedBreaks: boolean;
+  readsPastEnd?: boolean;
 }
 
 /**
@@ -750,6 +753,7 @@ function buildParser(features: Features, fast: boolean): any {
   if (features.tags) tags(tables);
   if (features.positionedBreaks) softBreaks(tables);
   if (fast) speedUps(tables, features);
+  if (features.readsPastEnd) watchDefinitionReader(tables);
   return ObsidianParser;
 }
 
@@ -760,7 +764,7 @@ export function parse8WithOffsets(
   doc: string,
   features: Features,
   fast = true,
-): { tree: Node8; offsets: Record<number, number> } {
+): { tree: Node8; offsets: Record<number, number>; readsPastEnd?: boolean } {
   const key = JSON.stringify(features) + String(fast);
   let parserClass = parserClasses.get(key);
   if (parserClass === undefined) {
@@ -776,5 +780,8 @@ export function parse8WithOffsets(
   };
   const parser = new parserClass(doc, file);
   const tree = parser.parse() as Node8;
-  return { tree, offsets: { ...parser.offset } };
+  const offsets = { ...parser.offset };
+  return features.readsPastEnd
+    ? { tree, offsets, readsPastEnd: readsPastEnd(parser, tree) }
+    : { tree, offsets };
 }
