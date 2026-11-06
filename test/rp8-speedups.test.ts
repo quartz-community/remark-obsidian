@@ -10,10 +10,23 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { parse8WithOffsets, type Features } from "../src/rp8/reader.js";
 import { SHAPES } from "./pathological/shapes.js";
+
+// Pass through, counting: how often the plain text's decoder is asked.
+const asked = vi.hoisted(() => ({ decoder: 0 }));
+vi.mock("../src/rp8/vendor/parse-entities/index.js", async (original) => {
+  const stock = (await original<{ default: (...args: unknown[]) => unknown }>())
+    .default;
+  return {
+    default: (...args: unknown[]) => {
+      asked.decoder++;
+      return stock(...args);
+    },
+  };
+});
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
@@ -107,4 +120,43 @@ describe("legacy reader speed-ups", () => {
     }
     expect(differ).toEqual([]);
   }, 120_000);
+
+  it("read generated references and HTML openers exactly as the plain reader does", () => {
+    // What the small-input speed-ups turn on: `&` in its valid and broken forms, and a `<` behind
+    // spaces and tabs. No backtick, because `&#0`&/` already reads differently with the code
+    // locator's skip: it joins two stretches, and rp8 decodes a bare `&` after a reference in the
+    // same stretch as that reference.
+    const alphabet = "&&&#;xX0amp<<>!-/?\\ \t\n\u00a0[]*1".split("");
+    let seed = 0x2545f491;
+    const random = () => {
+      seed ^= seed << 13;
+      seed ^= seed >>> 17;
+      seed ^= seed << 5;
+      return (seed >>> 0) / 0x100000000;
+    };
+    const differ: string[] = [];
+    for (let n = 0; n < 30_000 && differ.length < 5; n++) {
+      let doc = "";
+      const length = 1 + Math.floor(random() * 40);
+      for (let i = 0; i < length; i++)
+        doc += alphabet[Math.floor(random() * alphabet.length)];
+      if (read(doc, true) !== read(doc, false))
+        differ.push(JSON.stringify(doc));
+    }
+    expect(differ).toEqual([]);
+  }, 120_000);
+
+  const askedOf = (reader: keyof typeof asked, doc: string, fast: boolean) => {
+    asked[reader] = 0;
+    read(doc, fast);
+    return asked[reader];
+  };
+
+  it("take text holding no `&` without the decoder", () => {
+    const doc = "Some words[^1] and *more* words\n\n- an item\n\n[^1]: a note";
+    // The plain reader's count is the control: this probe sees the decoder.
+    expect(askedOf("decoder", doc, false)).toBeGreaterThan(0);
+    expect(askedOf("decoder", doc, true)).toBe(0);
+    expect(askedOf("decoder", "fish &amp; chips", true)).toBeGreaterThan(0);
+  });
 });

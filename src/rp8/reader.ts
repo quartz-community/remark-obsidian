@@ -387,6 +387,11 @@ function softBreaks(tables: any): void {
  * - the code span's closer is "the first maximal backtick run of the opener's width after it",
  *   looked up in an index of the run's backtick runs; a found span is still read by the stock
  *   reader, whose scan is then bounded by the span it consumes.
+ *
+ * The rest cost time on any note rather than on a bad one, most on a note parsed in small parts.
+ * They are ported from `obsidian-footnotes`' `textLineByLine`:
+ *
+ * - plain text holding no `&` skips the entity decoder.
  */
 interface Frame {
   value: string;
@@ -557,6 +562,12 @@ function speedUps(tables: any, features: Features): void {
       if (at !== -1 && at - base < min) min = at - base;
     }
     const subvalue = value.slice(0, min);
+    // Every character reference starts with `&`, so without one the decoder would walk this
+    // stretch a character at a time and hand back the same single piece of text.
+    if (subvalue !== "" && !subvalue.includes("&")) {
+      eat(subvalue)({ type: "text", value: subvalue });
+      return undefined;
+    }
     this.decode(
       subvalue,
       eat.now(),
