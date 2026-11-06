@@ -15,8 +15,8 @@ import { describe, expect, it, vi } from "vitest";
 import { parse8WithOffsets, type Features } from "../src/rp8/reader.js";
 import { SHAPES } from "./pathological/shapes.js";
 
-// Pass through, counting: how often the plain text's decoder is asked.
-const asked = vi.hoisted(() => ({ decoder: 0 }));
+// Pass through, counting: how often the plain text's decoder and the HTML block reader are asked.
+const asked = vi.hoisted(() => ({ decoder: 0, html: 0 }));
 vi.mock("../src/rp8/vendor/parse-entities/index.js", async (original) => {
   const stock = (await original<{ default: (...args: unknown[]) => unknown }>())
     .default;
@@ -27,6 +27,22 @@ vi.mock("../src/rp8/vendor/parse-entities/index.js", async (original) => {
     },
   };
 });
+vi.mock(
+  "../src/rp8/vendor/remark-parse/tokenize/html-block.js",
+  async (original) => {
+    const stock = (
+      await original<{
+        default: (this: unknown, ...args: unknown[]) => unknown;
+      }>()
+    ).default;
+    return {
+      default(this: unknown, ...args: unknown[]) {
+        asked.html++;
+        return stock.call(this, ...args);
+      },
+    };
+  },
+);
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
@@ -158,5 +174,15 @@ describe("legacy reader speed-ups", () => {
     expect(askedOf("decoder", doc, false)).toBeGreaterThan(0);
     expect(askedOf("decoder", doc, true)).toBe(0);
     expect(askedOf("decoder", "fish &amp; chips", true)).toBeGreaterThan(0);
+  });
+
+  it("ask the HTML block reader only about a line whose text starts with `<`", () => {
+    const doc =
+      "One line\nand another\n\n- an item\n\n> a quote\n\n# a heading";
+    // The plain reader's count is the control: this probe sees the HTML block reader.
+    expect(askedOf("html", doc, false)).toBeGreaterThan(0);
+    expect(askedOf("html", doc, true)).toBe(0);
+    expect(askedOf("html", "<div>", true)).toBeGreaterThan(0);
+    expect(askedOf("html", " \t <div>", true)).toBeGreaterThan(0);
   });
 });

@@ -389,9 +389,11 @@ function softBreaks(tables: any): void {
  *   reader, whose scan is then bounded by the span it consumes.
  *
  * The rest cost time on any note rather than on a bad one, most on a note parsed in small parts.
- * They are ported from `obsidian-footnotes`' `textLineByLine`:
+ * They are ported from `obsidian-footnotes`' `textLineByLine` and `htmlBlockPrecheck`:
  *
- * - plain text holding no `&` skips the entity decoder.
+ * - plain text holding no `&` skips the entity decoder;
+ * - a block not starting with `<` skips the HTML block reader, which builds a `RegExp` from its
+ *   whole tag list on every call: at every block, and at every line of a paragraph.
  */
 interface Frame {
   value: string;
@@ -531,6 +533,16 @@ function speedUps(tables: any, features: Features): void {
       frames.pop();
     }
   };
+
+  const stockHtml: Tokenizer = tables.blockTokenizers.html;
+  // Exactly the stock reader's own first test, before it builds anything.
+  const html: Tokenizer = function (eat, value, silent) {
+    let at = 0;
+    while (value.charCodeAt(at) === 32 || value.charCodeAt(at) === 9) at++;
+    if (value.charCodeAt(at) !== 60) return undefined;
+    return stockHtml.call(this, eat, value, silent);
+  };
+  tables.blockTokenizers.html = html;
 
   const stockText: Tokenizer = tables.inlineTokenizers.text;
   // remark-parse 8's own text reader, with each locator's answer remembered per run.
