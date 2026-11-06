@@ -160,3 +160,52 @@ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
+
+## npm packages bundled into `dist`
+
+esbuild bundles these from `node_modules` into `dist/index.js`, at the versions
+`package-lock.json` pins. They are separate from the vendored `character-entities` 1.x and
+`micromark-extension-math` source above: `dist` holds both. Each is MIT:
+
+- `character-entities`, `character-entities-legacy`, `fault`, `mdast-util-to-string`,
+  `unist-util-is`, `unist-util-visit` -- Copyright (c) 2015 Titus Wormer <tituswormer@gmail.com>
+- `longest-streak` -- Copyright (c) 2015 Titus Wormer <mailto:tituswormer@gmail.com>
+- `unist-util-visit-parents` -- Copyright (c) 2016 Titus Wormer <tituswormer@gmail.com>
+- `mdast-util-phrasing` -- Copyright (c) 2017 Titus Wormer <tituswormer@gmail.com>;
+  Copyright (c) 2017 Victor Felder <victor@draft.li>
+- `mdast-util-frontmatter`, `mdast-util-math`, `micromark-extension-frontmatter`,
+  `micromark-extension-math` -- Copyright (c) 2020 Titus Wormer <tituswormer@gmail.com>
+- `devlop` -- Copyright (c) 2023 Titus Wormer <tituswormer@gmail.com>
+- `decode-named-character-reference`, `mdast-util-to-markdown`, `micromark-core-commonmark`,
+  `micromark-factory-space`, `micromark-util-character`,
+  `micromark-util-decode-numeric-character-reference`, `micromark-util-decode-string`,
+  `micromark-util-normalize-identifier`, `micromark-util-symbol` -- Copyright (c) Titus Wormer
+  <tituswormer@gmail.com>
+- `escape-string-regexp` -- Copyright (c) Sindre Sorhus <sindresorhus@gmail.com>
+  (https://sindresorhus.com)
+- `format` -- Copyright 2010 - 2014 Sami Samhuri <sami@samhuri.net> (from its `Readme.md`, which
+  links the MIT licence, as do `format.js`' header and `package.json`. The 0.2.2 tarball carries no
+  licence file; the upstream repository's `License.md`, added later, is MIT from the same holder)
+
+```
+(The MIT License)
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
