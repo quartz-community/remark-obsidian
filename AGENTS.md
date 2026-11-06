@@ -510,6 +510,21 @@ Both have known-positive controls. Re-run them after ANY change under `src/rp8`.
 - **The Write tool turns a `\uFEFF` escape into a literal BOM**, and prettier reformats `src/rp8`
   between edits -- re-read before anchoring a scripted edit.
 
+**Small inputs, measured on 930 parts of about 24 lines** (a generated 22,386-line note cut at
+blank lines, and 930 parts of package READMEs). The HTML block reader's `RegExp` was 18.8% of self
+time; the precheck alone gives 0.81 and 0.83 of base. Plain text without the decoder alone gives
+0.92 and 0.86. Together: 0.73 and 0.87, against the same build's 0.96 and 0.995.
+
+- **Refused: leaving out the tokenizer's per-eat check (`validateEat`).** 2% of self time, and no
+  gain beyond the control on top of the other two, on the parts or on one parse of the whole note.
+  The vendored tokenizer stays stock.
+- **What is left:** position bookkeeping in the tokenizer (`update`, `Position`, the loop itself,
+  about a quarter), garbage collection (10%), `mathDisplayTransform`'s tree walk (12%, inclusive),
+  and `tokenizeInline`'s per-run tables (5%).
+- **Trap:** on a busy machine, single processes of 12 rounds put a build against ITSELF at 0.73 and
+  at 1.29. Compare in one process, in random order, each part's minimum, and take the median
+  across many fresh processes.
+
 ## Two presets, two audiences
 
 |                                                                                                                          | `legacy` (default)                                         | `strict`                    |
