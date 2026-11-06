@@ -63,6 +63,7 @@ import {
   lineOffsetsFromMarkdown,
 } from "./lib/mdast/line-offsets.js";
 import { mathMidlineTransform } from "./lib/math-midline.js";
+import { calloutMarkerTransform } from "./lib/callout-marker.js";
 import { calloutTitleInterruptTransform } from "./lib/callout-title-interrupt.js";
 import { restoreInlinePositionsTransform } from "./lib/restore-inline-positions.js";
 import { attentionToMarkdown } from "./lib/mdast/attention-to-markdown.js";
@@ -869,7 +870,17 @@ export default function remarkObsidian(
     return fragment;
   };
 
-  return transform;
+  if (!opts.callouts) return transform;
+  // Around `transform`, not inside it: `reparse` runs it on fragments, whose positions the caller
+  // places back. `strict`'s offsets leave out a leading byte order mark, so this does too.
+  return (tree: Root, file: unknown): void => {
+    transform(tree, file);
+    const source = String(file);
+    calloutMarkerTransform(
+      tree,
+      source.charCodeAt(0) === 0xfeff ? source.slice(1) : source,
+    );
+  };
 }
 
 export { wikilinkSyntax } from "./lib/syntax/wikilink.js";
@@ -907,6 +918,7 @@ export type {
   Tag,
   InlineFootnote,
   Callout,
+  CalloutData,
   CalloutTitle,
 } from "./lib/types.js";
 export type { CollectWikilinksOptions } from "./lib/collect.js";

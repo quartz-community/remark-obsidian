@@ -9,6 +9,7 @@ import type { Root } from "mdast";
 import { decodeString } from "micromark-util-decode-string";
 import { normalizeIdentifier } from "micromark-util-normalize-identifier";
 
+import { calloutMarkerTransform } from "../lib/callout-marker.js";
 import { mathDisplayTransform } from "../lib/math-display.js";
 import { resolveTarget, spelledTarget } from "../lib/wikilink-target.js";
 import {
@@ -536,5 +537,6 @@ export function parseLegacy8(input: string, options: LegacyOptions): Root {
   if (options.lineOffsets) root.data = { lineOffsets: offsets };
   if (options.math) mathDisplayTransform(root as unknown as Root, doc);
   if (crlf.length > 0) restoreCrlf(root, crlf);
+  if (options.callouts) calloutMarkerTransform(root as unknown as Root, source);
   return root as unknown as Root;
 }
