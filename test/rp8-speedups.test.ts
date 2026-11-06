@@ -85,6 +85,86 @@ describe("legacy reader speed-ups", () => {
     expect(differ).toEqual([]);
   }, 120_000);
 
+  it("read highlight openers and their near-misses exactly as the plain reader does", () => {
+    // Runs of openers with no closer, against what might close one late in the run, or only
+    // look as if it does, in every wrapper that starts a run of its own.
+    const openers = [
+      "==a ",
+      "==a\n",
+      "==a\t",
+      "==a\u00a0",
+      "==a  \n",
+      "== a",
+      "=== ",
+      "==*a* ",
+      "a == ",
+    ];
+    const closers = [
+      "",
+      "b==",
+      "b==c",
+      "b===",
+      "b ==",
+      "b\n==",
+      "b\u00a0==",
+      "==",
+      "====",
+      "==b==",
+      "=",
+      "b\\==",
+    ];
+    const wrappers = [
+      ["", ""],
+      ["x ", ""],
+      ["*", "*"],
+      ["**", "**"],
+      ["~~", "~~"],
+      ["[", "](u)"],
+      ["^[", "]"],
+      ["%%", "%%"],
+      ["`", "`"],
+      ["> ", ""],
+      ["- ", ""],
+      ["[^1]: ", ""],
+    ] as const;
+    let highlighted = 0;
+    const differ: string[] = [];
+    for (const opener of openers)
+      for (const closer of closers)
+        for (const [before, after] of wrappers)
+          for (const n of [1, 2, 3, 7, 60]) {
+            const run = opener.repeat(n);
+            for (const doc of [
+              before + run + closer + after,
+              before + run + closer + " " + run + after,
+            ]) {
+              const fast = read(doc, true);
+              if (fast.includes('"type":"highlight"')) highlighted++;
+              if (fast !== read(doc, false)) differ.push(JSON.stringify(doc));
+            }
+          }
+    expect(differ).toEqual([]);
+    // Most of them hold a highlight somewhere, so this is not only the decline being compared.
+    expect(highlighted).toBeGreaterThan(5_000);
+  }, 120_000);
+
+  it("read every short run of `=`, whitespace and text exactly as the plain reader does", () => {
+    const alphabet = ["=", "a", " ", "\n"];
+    let docs = [""];
+    let highlighted = 0;
+    const differ: string[] = [];
+    for (let length = 1; length <= 7; length++) {
+      docs = docs.flatMap((doc) => alphabet.map((c) => doc + c));
+      for (const doc of docs) {
+        const fast = read(doc, true);
+        if (fast.includes('"type":"highlight"')) highlighted++;
+        if (fast !== read(doc, false)) differ.push(JSON.stringify(doc));
+      }
+    }
+    expect(differ).toEqual([]);
+    expect(highlighted).toBeGreaterThan(50);
+  }, 120_000);
+
   it("read generated documents exactly as the plain reader does", () => {
     // Every character a reader treats specially, so the early returns meet escaped openers,
     // backslash runs, nested and unmatched brackets, U+00A0, and code spans around them.

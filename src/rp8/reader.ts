@@ -658,6 +658,24 @@ function speedUps(tables: any, features: Features): void {
       );
     });
   }
+  // `==note==`: only a `==` with no whitespace straight before it closes, and not one on the
+  // opener itself, so a run with none ahead declines without reading the rest of the run.
+  if (features.highlights) {
+    precheck("highlight", (frame, base, value) => {
+      if (value.charCodeAt(0) !== 61 || value.charCodeAt(1) !== 61)
+        return false;
+      return (
+        nextWhere(
+          frame,
+          "highlight-closer",
+          (v, i) =>
+            v.charCodeAt(i) === 61 &&
+            v.charCodeAt(i + 1) === 61 &&
+            !isSpace(v, i - 1),
+        )[base + 3] === -1
+      );
+    });
+  }
   // `<scheme://...>` and `<user@host>`: the first space, `>`, `@` or `:/` decides the kind, and
   // the rest must reach a `>` before the next space.
   precheck("autoLink", (frame, base, value) => {

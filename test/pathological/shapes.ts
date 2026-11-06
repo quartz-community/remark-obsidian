@@ -33,6 +33,27 @@ export const SHAPES: Readonly<Record<string, (n: number) => string>> = {
   // no equivalent of and which carry most of our hand-written regexes.
   "wikilink-open": (n) => "[[".repeat(n) + "a",
   "highlight-run": (n) => "=".repeat(n) + "a" + "=".repeat(n),
+  /**
+   * A `==` straight after whitespace closes nothing, so the scan carries on past it, and every
+   * opener read to the end of the run, testing all it had read at each `==`. `highlight-space-run`
+   * is gated where each half of the fix is what holds it: without the closer table `legacy` takes
+   * 2.6 s at 8,000, 30 s at 32,000, and 121 s at 64,000, and without the memo `strict` takes 72 s
+   * at 16,000.
+   *
+   * `highlight-newline-run` doesn't hold the memo: at 8,000 without it, `strict` took 18 to 26 s,
+   * either side of the budget. Nor can it go much higher, whatever the scan does. Under `strict`
+   * this shape stays superlinear in micromark's `resolveAllText`, which splices once per merged
+   * run of `data` (10.9 s of a 12.2 s parse at 32,000), and `&&a\n` does the same with no plugin.
+   */
+  "highlight-space-run": (n) => "==a ".repeat(n),
+  "highlight-newline-run": (n) => "==a\n".repeat(n),
+  /**
+   * The near-miss: one closer at the end makes the first opener a highlight, so no memo can
+   * decline it and only the queue's own cost is left. Testing the whole content at each `==`
+   * takes 70 s at 256,000 under `legacy` and 130 s under `strict`; testing the one character takes
+   * 2.4 s and 4.0 s there.
+   */
+  "highlight-late-closer": (n) => "==a ".repeat(n) + "b==",
   "comment-open": (n) => "%%".repeat(n),
   "math-open": (n) => "$".repeat(n) + "a",
   "inline-footnote-open": (n) => "^[".repeat(n) + "a",
