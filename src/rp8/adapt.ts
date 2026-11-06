@@ -9,6 +9,7 @@ import type { Root } from "mdast";
 import { decodeString } from "micromark-util-decode-string";
 import { normalizeIdentifier } from "micromark-util-normalize-identifier";
 
+import { countByteOrderMark } from "../lib/byte-order-mark.js";
 import { mathDisplayTransform } from "../lib/math-display.js";
 import { resolveTarget, spelledTarget } from "../lib/wikilink-target.js";
 import {
@@ -24,6 +25,7 @@ export interface LegacyOptions extends Features {
   parseComments: boolean;
   lineOffsets: boolean;
   bareFootnoteRefs: boolean;
+  bomOffsets: boolean;
 }
 
 interface Context {
@@ -536,5 +538,7 @@ export function parseLegacy8(input: string, options: LegacyOptions): Root {
   if (options.lineOffsets) root.data = { lineOffsets: offsets };
   if (options.math) mathDisplayTransform(root as unknown as Root, doc);
   if (crlf.length > 0) restoreCrlf(root, crlf);
+  if (source !== input && options.bomOffsets)
+    countByteOrderMark(root as unknown as Root);
   return root as unknown as Root;
 }

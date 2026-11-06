@@ -55,6 +55,7 @@ const FLAGS = [
   "callouts",
   "positionedBreaks",
   "escapedLineBreaks",
+  "bomOffsets",
 ] as const;
 
 interface Outcome {

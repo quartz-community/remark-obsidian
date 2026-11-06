@@ -90,6 +90,7 @@ Every option is a boolean, works under both presets, and wins over the preset's 
 | `positionedBreaks`  | on under `legacy`, off under `strict` | a soft line ending becomes a positioned `break`, as `remark-breaks` would make it                                                            |
 | `lineOffsets`       | on                                    | `root.data.lineOffsets`: how many columns each line's containers consume                                                                     |
 | `escapedLineBreaks` | off                                   | write a `break` back as a trailing backslash rather than a newline, for a chain without `remark-breaks`                                      |
+| `bomOffsets`        | off                                   | count a leading byte order mark in positions, so an offset indexes the parsed string; off, they match Obsidian's cache, which leaves it out  |
 
 ## Upgrading from 1.x
 

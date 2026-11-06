@@ -63,6 +63,7 @@ import {
   lineOffsetsFromMarkdown,
 } from "./lib/mdast/line-offsets.js";
 import { mathMidlineTransform } from "./lib/math-midline.js";
+import { countByteOrderMark } from "./lib/byte-order-mark.js";
 import { calloutTitleInterruptTransform } from "./lib/callout-title-interrupt.js";
 import { restoreInlinePositionsTransform } from "./lib/restore-inline-positions.js";
 import { attentionToMarkdown } from "./lib/mdast/attention-to-markdown.js";
@@ -202,6 +203,15 @@ export interface RemarkObsidianOptions {
    * `remark-breaks` and a `break` really is a hard break.
    */
   escapedLineBreaks?: boolean;
+  /**
+   * Count a leading byte order mark in every position and in `data.lineOffsets`, so an offset
+   * indexes the string that was parsed, and read the rest as if the mark were not there.
+   *
+   * Off by default, because Obsidian's `metadataCache` leaves the mark out: its offsets and
+   * first-line columns are one short of the editor's, and off is what the parity gates measure.
+   * Turn it on to edit the string by position.
+   */
+  bomOffsets?: boolean;
 }
 
 /**
@@ -267,6 +277,7 @@ const defaultOptions: RemarkObsidianFlags = {
   callouts: true,
   positionedBreaks: true,
   escapedLineBreaks: false,
+  bomOffsets: false,
 };
 
 /**
@@ -869,7 +880,19 @@ export default function remarkObsidian(
     return fragment;
   };
 
-  return transform;
+  if (!opts.bomOffsets) return transform;
+  // Around `transform`, not inside it: `reparse` runs it on fragments, whose positions the
+  // caller places back. micromark reads past the mark without counting it, so the passes read
+  // the same text the offsets index, and only then does every point move.
+  return (tree: Root, file: unknown): void => {
+    const source = String(file);
+    if (source.charCodeAt(0) !== 0xfeff) {
+      transform(tree, file);
+      return;
+    }
+    transform(tree, source.slice(1));
+    countByteOrderMark(tree);
+  };
 }
 
 export { wikilinkSyntax } from "./lib/syntax/wikilink.js";
