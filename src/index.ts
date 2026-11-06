@@ -20,7 +20,10 @@ import { definitionEndBeforeLabelTransform } from "./lib/definition-end-before-l
 import { tagAgainstTextTransform } from "./lib/tag-against-text.js";
 import { wikilinkAfterLabelTransform } from "./lib/wikilink-after-label.js";
 import { footnoteAfterLabelTransform } from "./lib/footnote-after-label.js";
-import { inlineFootnoteInertTransform } from "./lib/inline-footnote-inert.js";
+import {
+  inlineFootnoteInertKeepTransform,
+  inlineFootnoteInertTransform,
+} from "./lib/inline-footnote-inert.js";
 
 import "./lib/types.js";
 
@@ -172,6 +175,17 @@ export interface RemarkObsidianOptions {
   /** Parse Obsidian's `^[body]` inline footnote, which GFM has no form for. */
   inlineFootnotes?: boolean;
   /**
+   * Keep a footnote reference inside an inline footnote as a `footnoteReference` with
+   * `data: { inert: true }`, rather than the text it reads as by default. Obsidian reads no
+   * reference there, so the node refers to nothing; it is for a consumer that needs to see one,
+   * a linter reserving a name, say, without re-scanning the text. Like `parseComments`, which
+   * does this for `%%`. Needs `inlineFootnotes`.
+   *
+   * For a chain that reads the tree. `mdast-util-to-hast` renders every `footnoteReference` as a
+   * live call, so a chain that renders should leave this off.
+   */
+  inertFootnoteRefs?: boolean;
+  /**
    * Promote `> [!type] Title` blockquotes into `callout` nodes. Obsidian reports
    * these as their own block type, so a blockquote here is a divergence rather
    * than a neutral choice.
@@ -264,6 +278,7 @@ const defaultOptions: RemarkObsidianFlags = {
   lineOffsets: true,
   bareFootnoteRefs: true,
   inlineFootnotes: true,
+  inertFootnoteRefs: false,
   callouts: true,
   positionedBreaks: true,
   escapedLineBreaks: false,
@@ -471,6 +486,7 @@ function undefinedReferencesTransform(tree: Root, source: string): void {
   visit(tree, "footnoteReference", (node, index, parent) => {
     if (parent === undefined || index === undefined) return undefined;
     if (defined.has(node.identifier)) return undefined;
+    if ((node.data as { inert?: boolean } | undefined)?.inert) return undefined;
     const from = node.position?.start?.offset;
     const to = node.position?.end?.offset;
     const value =
@@ -757,7 +773,9 @@ export default function remarkObsidian(
     // A `#` against literal text is no tag: `a*#t`, `&amp;#t` and `x]#t` hold none.
     tagAgainstTextTransform(tree, String(file));
     // Everything inside `^[ … ]` is dead text, references included.
-    if (opts.inlineFootnotes) inlineFootnoteInertTransform(tree);
+    if (opts.inlineFootnotes && !opts.inertFootnoteRefs) {
+      inlineFootnoteInertTransform(tree);
+    }
     // Presence of the table means it was recorded, so it is started even for a
     // document holding no container at all.
     if (opts.lineOffsets) ensureLineOffsets(tree);
@@ -788,7 +806,13 @@ export default function remarkObsidian(
       });
       // Again, because parsing a comment's body revives a reference inside an inline footnote:
       // `a^[x %% [^1] %% y]` -- inertness beats the comment rule, settled live.
-      if (opts.inlineFootnotes) inlineFootnoteInertTransform(tree);
+      if (opts.inlineFootnotes && !opts.inertFootnoteRefs) {
+        inlineFootnoteInertTransform(tree);
+      }
+    }
+    // Or kept as dead nodes, once the comments in an inline footnote have their bodies.
+    if (opts.inlineFootnotes && opts.inertFootnoteRefs) {
+      inlineFootnoteInertKeepTransform(tree, String(file));
     }
     // GFM's literal autolinks again, over text the passes above rebuilt after GFM had run: a
     // raw slice (`[^[[https://e.test/p]]]`, a dissolved label) held a bare URL as text, which

@@ -24,6 +24,7 @@ export interface LegacyOptions extends Features {
   parseComments: boolean;
   lineOffsets: boolean;
   bareFootnoteRefs: boolean;
+  inertFootnoteRefs: boolean;
 }
 
 interface Context {
@@ -228,6 +229,17 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
 
   switch (node.type) {
     case "footnoteReference":
+      if (inNote && ctx.options.inertFootnoteRefs) {
+        return [
+          {
+            type: "footnoteReference",
+            identifier: node.identifier,
+            label: node.label,
+            data: { inert: true },
+            position,
+          },
+        ];
+      }
       // E3: nothing inside an inline footnote is a reference.
       // Without `bareFootnoteRefs`, a reference nothing defines stays literal, as in GFM.
       if (

@@ -68,6 +68,11 @@ declare module "mdast" {
     taskChar?: string;
   }
 
+  interface FootnoteReferenceData {
+    /** `true` on a reference `inertFootnoteRefs` kept inside an inline footnote: it refers to nothing. */
+    inert?: true;
+  }
+
   interface RootContentMap {
     wikilink: Wikilink;
     highlight: Highlight;
