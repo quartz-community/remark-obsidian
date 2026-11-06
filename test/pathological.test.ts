@@ -14,14 +14,16 @@ const runner = path.join(here, "pathological", "parse-once.ts");
  * A ceiling, not a benchmark. Shared runners are far too noisy to gate on
  * milliseconds, so this asserts only that a parse *finishes* — which is what
  * separates a linear path from a quadratic one at these sizes. Every gated
- * shape completes well inside five seconds locally.
+ * shape completes well inside five seconds locally, except `nested-lists` under
+ * `legacy`, at 7 to 15 seconds by load: the reader is roughly cubic on it (1,000
+ * takes up to 19 seconds), so 800 is as deep as this budget can hold.
  */
 const BUDGET_MS = 20_000;
 
 const SIZES: Readonly<Record<string, number>> = {
   "nested-brackets": 10_000,
   "nested-blockquotes": 25_000,
-  "nested-lists": 500,
+  "nested-lists": 800,
   "unclosed-links": 15_000,
   "unclosed-comment": 50_000,
   "delimiter-run": 20_000,
@@ -95,6 +97,15 @@ const STRICT_UPSTREAM: Readonly<Record<string, string>> = {
 
 const strictGated = gated.filter((shape) => !(shape in STRICT_UPSTREAM));
 
+/**
+ * Where `strict` runs a shape smaller than `legacy`. Bare remark-parse + remark-gfm takes 9.3s
+ * on `nested-lists` at 500 and 27s at 800, past the budget before this package does anything.
+ */
+const STRICT_SIZES: Readonly<Record<string, number>> = { "nested-lists": 300 };
+
+const sizeOf = (shape: string, preset: "legacy" | "strict") =>
+  (preset === "strict" ? STRICT_SIZES[shape] : undefined) ?? SIZES[shape];
+
 async function parseOnce(shape: string, preset: "legacy" | "strict") {
   const { stdout } = await run(
     "npx",
@@ -103,7 +114,7 @@ async function parseOnce(shape: string, preset: "legacy" | "strict") {
       "--conditions=development",
       runner,
       shape,
-      String(SIZES[shape]),
+      String(sizeOf(shape, preset)),
       preset,
     ],
     { timeout: BUDGET_MS, cwd: path.join(here, "..") },
@@ -159,7 +170,7 @@ describe("pathological input", () => {
 
   for (const shape of strictGated) {
     it(
-      `parses ${shape} at ${SIZES[shape]} under strict without wedging`,
+      `parses ${shape} at ${sizeOf(shape, "strict")} under strict without wedging`,
       { timeout: BUDGET_MS + 15_000 },
       async () => {
         expect(await parseOnce(shape, "strict")).toBeGreaterThanOrEqual(0);
