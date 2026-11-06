@@ -544,6 +544,20 @@ CommonMark example: a pass that "owns no spec example" against CommonMark alone 
 has no coverage there, not that it agrees. Footnotes are in **neither** spec: GFM froze at
 `0.29-gfm` in 2019 and GitHub shipped footnotes in 2021 without specifying them.
 
+**`keepUndefinedReferences`: `legacy` only, and not for a chain that renders.** remark-parse 8 reads
+a reference whatever defines it and `convert` reverts it, so keeping one keeps the reader's own
+answer. Over 10,054 corpus documents, 396 of the 401 kept nodes hold at the same span in the note
+with that label defined; the other 5 are `[][`, whose empty label nothing can define.
+
+- **Refused: reading them back under `strict`.** micromark reads none, so a last pass read them
+  from its text. Of the 334 nodes it kept, 35 are references the note with that label defined does
+  not hold (`x ^[^[note] y`, `a [x][[w]] b`). Flattening them gave the default tree on every
+  document, so that gate cannot see this: it proves nothing moved, not that what was kept is one.
+- **Rendering moves.** 38 of the 344 documents holding a kept node render differently through
+  `remark-rehype`. It resolves by `identifier`, which trims where Obsidian does not (`[ a ]` over
+  `[a]: /url` becomes a link), and loses a `[` the reader took into a reference (`[a][ b` renders
+  `[a] b`). So `label` is what to look up, and the option's docs say to leave it off to render.
+
 ## Gates — what "done" means
 
 ```bash

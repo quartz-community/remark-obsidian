@@ -169,6 +169,25 @@ export interface RemarkObsidianOptions {
    * so this is a deliberate divergence from the spec in favour of matching the app.
    */
   bareFootnoteRefs?: boolean;
+  /**
+   * Keep a link or image reference whose label this parse found no definition for as a
+   * `linkReference` or `imageReference` with `data: { defined: false }`, rather than the text
+   * it reads as by default: `[a] b` holds a reference to `a`, not the text `[a] b`.
+   *
+   * For a consumer parsing part of a note, or a table cell alone, where the definition may be
+   * somewhere this parse never saw. Whether one is really a link is for the consumer to decide
+   * against the labels it knows, by `label` with case and runs of whitespace folded: Obsidian does
+   * not trim a label, so `[ a ]` is not `[a]`, where `identifier` trims.
+   *
+   * A chain that renders should leave it off. `mdast-util-to-hast` resolves by `identifier`, so
+   * `[ a ]` over `[a]: /url` becomes a link, and it loses a `[` the reader took into a reference
+   * (`[a][ b` renders `[a] b`).
+   *
+   * `legacy` only, and does nothing under `strict`. remark-parse 8 reads a reference whatever
+   * defines it. micromark reads none, and read back from the text, some are references the note
+   * with that label defined does not hold (`x ^[^[note] y`).
+   */
+  keepUndefinedReferences?: boolean;
   /** Parse Obsidian's `^[body]` inline footnote, which GFM has no form for. */
   inlineFootnotes?: boolean;
   /**
@@ -263,6 +282,7 @@ const defaultOptions: RemarkObsidianFlags = {
   parseComments: true,
   lineOffsets: true,
   bareFootnoteRefs: true,
+  keepUndefinedReferences: false,
   inlineFootnotes: true,
   callouts: true,
   positionedBreaks: true,
