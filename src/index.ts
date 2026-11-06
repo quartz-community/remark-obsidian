@@ -3,7 +3,7 @@
 
 import { decodeString } from "micromark-util-decode-string";
 import type { Options as ToMarkdownOptions } from "mdast-util-to-markdown";
-import { parseLegacy8 } from "./rp8/adapt.js";
+import { legacyDefaults, parseLegacy8 } from "./rp8/adapt.js";
 import type { Root, RootContent } from "mdast";
 import type { Processor } from "unified";
 import { SKIP, visit } from "unist-util-visit";
@@ -252,20 +252,7 @@ const PRESETS: Record<RemarkObsidianPreset, Partial<RemarkObsidianFlags>> = {
 };
 
 const defaultOptions: RemarkObsidianFlags = {
-  wikilinks: true,
-  highlights: true,
-  comments: true,
-  tags: true,
-  customTaskChars: true,
-  math: true,
-  frontmatter: true,
-  keepComments: true,
-  parseComments: true,
-  lineOffsets: true,
-  bareFootnoteRefs: true,
-  inlineFootnotes: true,
-  callouts: true,
-  positionedBreaks: true,
+  ...legacyDefaults,
   escapedLineBreaks: false,
 };
 

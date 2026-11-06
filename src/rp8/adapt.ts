@@ -26,6 +26,24 @@ export interface LegacyOptions extends Features {
   bareFootnoteRefs: boolean;
 }
 
+/** All on: what `legacy` reads with unless told otherwise. */
+export const legacyDefaults: LegacyOptions = {
+  wikilinks: true,
+  highlights: true,
+  comments: true,
+  tags: true,
+  customTaskChars: true,
+  math: true,
+  frontmatter: true,
+  keepComments: true,
+  parseComments: true,
+  lineOffsets: true,
+  bareFootnoteRefs: true,
+  inlineFootnotes: true,
+  callouts: true,
+  positionedBreaks: true,
+};
+
 interface Context {
   doc: string;
   definitions: Set<string>;

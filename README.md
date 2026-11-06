@@ -91,6 +91,24 @@ Every option is a boolean, works under both presets, and wins over the preset's 
 | `lineOffsets`       | on                                    | `root.data.lineOffsets`: how many columns each line's containers consume                                                                     |
 | `escapedLineBreaks` | off                                   | write a `break` back as a trailing backslash rather than a newline, for a chain without `remark-breaks`                                      |
 
+## Reading without a processor
+
+A consumer that only reads, such as an Obsidian plugin, can skip `unified` and everything the
+`legacy` preset does not run:
+
+```js
+import { parse } from "@quartz-community/remark-obsidian/legacy";
+
+const tree = parse("A [[note|link]], ==a highlight== and a #tag.\n");
+const part = parse(laterPartOfANote, { frontmatter: false });
+```
+
+`parse(text, options)` returns the tree `unified().use(remarkObsidian, options).parse(text)`
+returns, with the same defaults. It takes the options above except `preset` and
+`escapedLineBreaks`. The main entry holds both presets and every writer in one function, so a
+bundler cannot drop any of them from it; this entry reaches only the `legacy` reader, which took
+one plugin's minified bundle from 519,667 to 367,710 bytes.
+
 ## Upgrading from 1.x
 
 2.0 is a major release, and [the changelog](CHANGELOG.md) lists every change. In short: add the
