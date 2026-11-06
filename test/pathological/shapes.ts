@@ -35,6 +35,13 @@ export const SHAPES: Readonly<Record<string, (n: number) => string>> = {
   "highlight-run": (n) => "=".repeat(n) + "a" + "=".repeat(n),
   "comment-open": (n) => "%%".repeat(n),
   "math-open": (n) => "$".repeat(n) + "a",
+  /**
+   * A line of prices. No `$` here can close, since each follows a space, so every one searched
+   * to the end of the run in vain until the reader remembered that one had.
+   */
+  "math-prices": (n) => "$5 or $6 and ".repeat(n),
+  /** The same search in the `$$` reader, whose closer refuses a backslash before it. */
+  "math-double-escaped": (n) => "$$ a\\\\".repeat(n),
   "inline-footnote-open": (n) => "^[".repeat(n) + "a",
   "callout-nest": (n) => "> ".repeat(n) + "[!note] t",
   "tag-run": (n) => "#a/".repeat(n),
