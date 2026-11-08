@@ -42,6 +42,7 @@ const SIZES: Readonly<Record<string, number>> = {
   "math-open": 20_000,
   "math-prices": 30_000,
   "math-double-escaped": 150_000,
+  "math-unclosed-run": 64_000,
   "inline-footnote-open": 20_000,
   "callout-nest": 10_000,
   "tag-run": 20_000,

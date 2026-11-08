@@ -94,12 +94,26 @@ function hasUpstreamMathText(context: TokenizeContext): boolean {
   return list.some((construct) => construct?.name === "mathText");
 }
 
+/**
+ * Where, in each text, a single-dollar opener searched to the end without finding a closer.
+ *
+ * A later single-dollar opener in the same text fails the same way, so it is declined without
+ * searching again. The earlier search read every character after its opener, the later `$`
+ * included, and it can only have read that `$` as content -- refused by `afterSpace`, or escaped
+ * -- since any other `$` would have closed it. Either way it went on in the state the later search
+ * starts in (no escape pending, `afterSpace` false), over the same characters to the same end.
+ * Without this, `"$a ".repeat(n)` searched to the end from every `$` (13.6 s at 8,000).
+ */
+const noCloserFrom = new WeakMap<TokenizeContext, number>();
+
 function tokenizeMathText(
   this: TokenizeContext,
   effects: Effects,
   ok: State,
   nok: State,
 ): State {
+  const self = this;
+  let opener = 0;
   let sizeOpen = 0;
   let sizeClose = 0;
   let token: Token;
@@ -121,6 +135,7 @@ function tokenizeMathText(
 
   function start(code: Code): State | undefined {
     if (code !== DOLLAR) return nok(code);
+    opener = self.now().offset;
     effects.enter("mathText");
     effects.enter("mathTextSequence");
     return sequenceOpen(code);
@@ -155,12 +170,24 @@ function tokenizeMathText(
       return nok(code);
     }
 
+    if (sizeOpen === 1) {
+      const known = noCloserFrom.get(self);
+      if (known !== undefined && opener > known) return nok(code);
+    }
+
     effects.exit("mathTextSequence");
     return between(code);
   }
 
   function between(code: Code): State | undefined {
-    if (code === null) return nok(code);
+    if (code === null) {
+      if (sizeOpen === 1) {
+        const known = noCloserFrom.get(self);
+        if (known === undefined || opener < known)
+          noCloserFrom.set(self, opener);
+      }
+      return nok(code);
+    }
 
     if (code === DOLLAR) {
       // A single-dollar span may not close straight after a space or tab -- and a
