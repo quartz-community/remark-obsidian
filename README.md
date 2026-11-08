@@ -102,7 +102,7 @@ comments. Nothing was removed from the API.
 ## Obsidian parity
 
 This plugin targets the **reading-mode and `metadataCache` semantics of a specific public
-Obsidian release**, currently 1.14.5. A harness renders a generated corpus inside real Obsidian
+Obsidian release**, currently 1.15.0. A harness renders a generated corpus inside real Obsidian
 and compares the result against ours, so the claim is measured rather than asserted —
 including the divergences, which are enumerated rather than implied:
 
@@ -110,12 +110,13 @@ including the divergences, which are enumerated rather than implied:
   two are a rendering difference between Obsidian's own two renderers and an embed that
   resolves a note into itself.
 - **On 6,844 notes whose footnote answers Obsidian's cache recorded**, `legacy` agrees on 6,830,
-  down to every definition's and reference's exact start and end offsets. The 14 left are
-  places where the cache misplaces a fact or the answers' recording added one.
+  down to every definition's and reference's exact start and end offsets, as 1.15.0 reported
+  them. The 14 left are places where the cache misplaces a fact or the answers' recording added
+  one.
 - **`strict` matches `remark-parse` and `remark-gfm`** on every CommonMark and GFM spec example
   except eight: six that hold Obsidian syntax, and two task lists where it adds
   `data.taskChar`. It answers 513 live probes
-  about Obsidian's syntax and footnotes as Obsidian does, bar a few recorded exclusions.
+  about Obsidian's syntax and footnotes as Obsidian 1.15.0 does, bar a few recorded exclusions.
 
 ## Development
 
