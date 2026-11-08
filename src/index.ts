@@ -882,10 +882,10 @@ export default function remarkObsidian(
     return fragment;
   };
 
-  if (!opts.bomOffsets) return transform;
   // Around `transform`, not inside it: `reparse` runs it on fragments, whose positions the
-  // caller places back. micromark reads past the mark without counting it, so the passes read
-  // the same text the offsets index, and only then does every point move.
+  // caller places back. micromark reads past the mark without counting it, so the passes must
+  // read the text the offsets index -- whatever `bomOffsets` says, or the mark changes the
+  // reading -- and only then, if asked, does every point move.
   return (tree: Root, file: unknown): void => {
     const source = String(file);
     if (source.charCodeAt(0) !== 0xfeff) {
@@ -893,7 +893,7 @@ export default function remarkObsidian(
       return;
     }
     transform(tree, source.slice(1));
-    countByteOrderMark(tree);
+    if (opts.bomOffsets) countByteOrderMark(tree);
   };
 }
 
