@@ -57,6 +57,10 @@ export interface CalloutTitle extends Parent {
   type: "calloutTitle";
 }
 
+/**
+ * Where a callout's marker and title line sit. Offsets count as every position does: a leading
+ * byte order mark is left out, as Obsidian's cache leaves it out.
+ */
 export interface CalloutData extends Data {
   /** The marker as written, `[!type]` and its fold character. */
   marker?: Position;
