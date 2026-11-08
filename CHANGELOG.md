@@ -1,3 +1,12 @@
+## 2.1.1
+
+### Patch Changes
+
+- 9cd7ce4: Formatting keeps an empty strikethrough (`~~~~` mid-line, which Obsidian reads as one) with `mdast-util-gfm-strikethrough` 2.0.1, which writes strikethrough as attention and dropped it as empty.
+- fe0311f: A `%%` comment inside a footnote definition no longer grows indentation on a whitespace-only
+  line each time it is formatted.
+- 484b410: Declare `mdast-util-to-markdown` `^2.2.0` as a peer dependency. The Markdown writer this package adds to `remark-stringify` relies on `mdast-util-to-markdown` 2.2's attention handling; with 2.1.x in your tree (as `remark-stringify` 11 can resolve), serialising emphasis recursed until the stack overflowed. npm now installs 2.2 alongside this package, and `remark-stringify` uses it.
+
 ## 2.1.0
 
 ### Minor Changes
