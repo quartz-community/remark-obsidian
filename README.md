@@ -82,7 +82,7 @@ Every option is a boolean, works under both presets, and wins over the preset's 
 | `comments`          | on                                    | `%%comment%%`                                                                                                                                |
 | `keepComments`      | on                                    | keep a comment as a `comment` node rather than deleting it; it renders as an empty `<obsidian-comment>`, which `rehype-obsidian` removes     |
 | `parseComments`     | on                                    | parse a kept comment's body into its `children`, so a reference inside one is a `footnoteReference`                                          |
-| `callouts`          | on                                    | `> [!type] Title` as a `callout` holding a `calloutTitle`                                                                                    |
+| `callouts`          | on                                    | `> [!type] Title` as a `callout` holding a `calloutTitle`, with the marker's span in `data.marker` and its line's end in `data.lineEnd`      |
 | `inlineFootnotes`   | on                                    | `^[note]` as a `footnote`                                                                                                                    |
 | `customTaskChars`   | on                                    | any one character in a task box is a checkbox (`- [-]`), kept as `data.taskChar`                                                             |
 | `frontmatter`       | on                                    | a leading `---` block as a `yaml` node                                                                                                       |
@@ -120,7 +120,7 @@ comments. Nothing was removed from the API.
 ## Obsidian parity
 
 This plugin targets the **reading-mode and `metadataCache` semantics of a specific public
-Obsidian release**, currently 1.14.5. A harness renders a generated corpus inside real Obsidian
+Obsidian release**, currently 1.15.0. A harness renders a generated corpus inside real Obsidian
 and compares the result against ours, so the claim is measured rather than asserted —
 including the divergences, which are enumerated rather than implied:
 
@@ -128,12 +128,13 @@ including the divergences, which are enumerated rather than implied:
   two are a rendering difference between Obsidian's own two renderers and an embed that
   resolves a note into itself.
 - **On 6,844 notes whose footnote answers Obsidian's cache recorded**, `legacy` agrees on 6,830,
-  down to every definition's and reference's exact start and end offsets. The 14 left are
-  places where the cache misplaces a fact or the answers' recording added one.
+  down to every definition's and reference's exact start and end offsets, as 1.15.0 reported
+  them. The 14 left are places where the cache misplaces a fact or the answers' recording added
+  one.
 - **`strict` matches `remark-parse` and `remark-gfm`** on every CommonMark and GFM spec example
   except eight: six that hold Obsidian syntax, and two task lists where it adds
   `data.taskChar`. It answers 513 live probes
-  about Obsidian's syntax and footnotes as Obsidian does, bar a few recorded exclusions.
+  about Obsidian's syntax and footnotes as Obsidian 1.15.0 does, bar a few recorded exclusions.
 
 ## Development
 

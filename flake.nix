@@ -183,7 +183,14 @@
           NIX_LD_LIBRARY_PATH = nix-ld-libraries;
           NIX_LD = pkgs.lib.fileContents "${pkgs.stdenv.cc}/nix-support/dynamic-linker";
 
+          # A login shell's `LD_LIBRARY_PATH` reaches in here and overrides
+          # `NIX_LD_LIBRARY_PATH`: a system `glib` built for a newer glibc than
+          # the one pinned above made the downloaded chromedriver die with
+          # "GLIBC_2.43 not found" before any session started, which the
+          # recorder reports only as "Unable to connect". The downloaded
+          # binaries find everything they need through nix-ld.
           shellHook = ''
+            unset LD_LIBRARY_PATH
             echo "remark-obsidian development environment loaded"
             echo "Node.js version: $(node --version)"
             echo ""

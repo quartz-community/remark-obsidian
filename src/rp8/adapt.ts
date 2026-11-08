@@ -9,6 +9,7 @@ import type { Root } from "mdast";
 import { decodeString } from "micromark-util-decode-string";
 import { normalizeIdentifier } from "micromark-util-normalize-identifier";
 
+import { calloutMarkerTransform } from "../lib/callout-marker.js";
 import { mathDisplayTransform } from "../lib/math-display.js";
 import { resolveTarget, spelledTarget } from "../lib/wikilink-target.js";
 import {
@@ -229,20 +230,43 @@ const MATH_INLINE = (value: string) => ({
   hChildren: [{ type: "text", value }],
 });
 
-function convertAll(
-  nodes: Node8[] | undefined,
-  ctx: Context,
-  inNote: boolean,
-): Node8[] {
-  const out: Node8[] = [];
-  for (const node of nodes ?? []) out.push(...convert(node, ctx, inNote));
-  return out;
+/**
+ * `convert` over a whole tree, children first, on an explicit stack. A nested list costs two
+ * levels per nesting, and recursing here ran out of stack before the reader did. A comment's
+ * children are skipped when `convert` would drop them.
+ */
+function convertTree(root: Node8, ctx: Context): Node8 {
+  const { keepComments, parseComments } = ctx.options;
+  const stack = [{ node: root, inNote: false, next: 0, kids: [] as Node8[] }];
+  for (;;) {
+    const top = stack[stack.length - 1]!;
+    const { node, inNote } = top;
+    const child =
+      node.type !== "percentComment" || (keepComments && parseComments)
+        ? node.children?.[top.next++]
+        : undefined;
+    if (child) {
+      const under = inNote || node.type === "footnote";
+      stack.push({ node: child, inNote: under, next: 0, kids: [] });
+      continue;
+    }
+    stack.pop();
+    const made = convert(node, ctx, inNote, top.kids);
+    const parent = stack[stack.length - 1];
+    if (!parent) return made[0]!;
+    parent.kids.push(...made);
+  }
 }
 
-function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
+function convert(
+  node: Node8,
+  ctx: Context,
+  inNote: boolean,
+  converted: Node8[],
+): Node8[] {
   const { doc } = ctx;
   const position = at(node);
-  const kids = (n = inNote) => convertAll(node.children, ctx, n);
+  const kids = () => converted;
 
   switch (node.type) {
     case "footnoteReference":
@@ -275,7 +299,7 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
       ];
     }
     case "footnote":
-      return [{ type: "footnote", children: kids(true), position }];
+      return [{ type: "footnote", children: kids(), position }];
     case "highlight": {
       // Continuation indent is not highlight text (`legacyHighlightQueue`'s `planBody`).
       const strip = (n: Node8): void => {
@@ -544,15 +568,12 @@ export function parseLegacy8(input: string, options: LegacyOptions): Root {
   const definitions = new Set<string>();
   const footnotes = new Set<string>();
   collectDefinitions(tree, definitions, footnotes);
-  const root = convert(
-    tree,
-    { doc, definitions, footnotes, options },
-    false,
-  )[0]!;
+  const root = convertTree(tree, { doc, definitions, footnotes, options });
   mergeText(root);
   clampToParent(root);
   if (options.lineOffsets) root.data = { lineOffsets: offsets };
   if (options.math) mathDisplayTransform(root as unknown as Root, doc);
   if (crlf.length > 0) restoreCrlf(root, crlf);
+  if (options.callouts) calloutMarkerTransform(root as unknown as Root, source);
   return root as unknown as Root;
 }
