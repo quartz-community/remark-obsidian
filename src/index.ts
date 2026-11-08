@@ -167,6 +167,26 @@ export interface RemarkObsidianOptions {
    */
   lineOffsets?: boolean;
   /**
+   * Record on the root as `data.readsPastEnd` whether a top-level link definition would read
+   * differently with more lines after the end of this text, for a caller parsing a note in parts.
+   * remark-parse 8 reads a definition past blank lines, so `[foo]: /url` alone is a definition
+   * and above `'tit` and a blank line is a paragraph.
+   *
+   * `false` is a promise only for a part cut at one of the whole note's block boundaries and read
+   * with its next line attached, ending where that line starts a top-level block: then the part
+   * reads as that stretch of the note does (held over the corpus and generated documents in
+   * `reads-past-end.test.ts`). Read without its next line, a part can differ with the signal
+   * `false` (`> [!note] t` over `2) b` or `---`).
+   *
+   * It speaks for link definitions at a part's end, nothing else. Frontmatter reads to its closer
+   * too, an `<a>` opened above a part's start changes what the part reads, and a part's references
+   * depend on definitions outside it: those stay with the caller.
+   *
+   * `legacy` only, and absent under `strict`. A CommonMark definition stops at a blank line, but
+   * `strict` reads other blocks differently when cut, so a constant `false` would promise too much.
+   */
+  readsPastEnd?: boolean;
+  /**
    * Strip the delimiters from a footnote reference nothing defines, so `see [^x]`
    * reads `see x` as Obsidian renders it. GFM keeps an unmatched reference literal,
    * so this is a deliberate divergence from the spec in favour of matching the app.
@@ -265,6 +285,7 @@ const PRESETS: Record<RemarkObsidianPreset, Partial<RemarkObsidianFlags>> = {
 
 const defaultOptions: RemarkObsidianFlags = {
   ...legacyDefaults,
+  readsPastEnd: false,
   escapedLineBreaks: false,
   bomOffsets: false,
 };

@@ -46,6 +46,7 @@ export const legacyDefaults: LegacyOptions = {
   callouts: true,
   positionedBreaks: true,
   bomOffsets: false,
+  readsPastEnd: false,
 };
 
 interface Context {
@@ -576,7 +577,7 @@ export function parseLegacy8(input: string, options: LegacyOptions): Root {
     crlf.push(at - crlf.length);
   }
   const doc = source.replace(/\r\n?/g, "\n");
-  const { tree, offsets } = parse8WithOffsets(doc, options);
+  const { tree, offsets, readsPastEnd } = parse8WithOffsets(doc, options);
   const definitions = new Set<string>();
   const footnotes = new Set<string>();
   collectDefinitions(tree, definitions, footnotes);
@@ -584,6 +585,9 @@ export function parseLegacy8(input: string, options: LegacyOptions): Root {
   mergeText(root);
   clampToParent(root);
   if (options.lineOffsets) root.data = { lineOffsets: offsets };
+  if (readsPastEnd !== undefined) {
+    root.data = { ...(root.data as object), readsPastEnd };
+  }
   if (options.math) mathDisplayTransform(root as unknown as Root, doc);
   if (crlf.length > 0) restoreCrlf(root, crlf);
   if (options.callouts) calloutMarkerTransform(root as unknown as Root, source);
