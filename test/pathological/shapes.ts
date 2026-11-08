@@ -61,6 +61,12 @@ export const SHAPES: Readonly<Record<string, (n: number) => string>> = {
    */
   "strike-space-run": (n) => "~~a ".repeat(n),
   "strike-newline-run": (n) => "~~a\n".repeat(n),
+  /**
+   * Highlights that each close. `strict` checks every one for emphasis opened before it, and
+   * paired every earlier emphasis run of the paragraph again to do so (77 s at 32,000), until it
+   * carried the pairing forward from one highlight to the next.
+   */
+  "highlight-word-run": (n) => "==a== ".repeat(n),
   "comment-open": (n) => "%%".repeat(n),
   "math-open": (n) => "$".repeat(n) + "a",
   /**

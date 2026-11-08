@@ -241,6 +241,20 @@ function group(character: string | undefined): Group {
   return undefined;
 }
 
+/**
+ * Each text's emphasis runs paired so far, as `emphasisClosesInside` last left them, so that a
+ * line of highlights reads its events once rather than once per `==`.
+ */
+const pairedRuns = new WeakMap<
+  TokenizeContext,
+  {
+    readonly events: TokenizeContext["events"];
+    read: number;
+    last: TokenizeContext["events"][number] | undefined;
+    readonly stack: Array<{ run: Run; outer: boolean }>;
+  }
+>();
+
 interface Run {
   readonly marker: string;
   size: number;
@@ -275,7 +289,21 @@ function flank(marker: string, size: number, before: Group, after: Group): Run {
  * left to the highlight, as before.
  */
 function emphasisClosesInside(self: TokenizeContext, body: string): boolean {
-  const stack: Array<{ run: Run; outer: boolean }> = [];
+  const events = self.events;
+  let paired = pairedRuns.get(self);
+  // Carry on from the pairing of the events already read while they stand as they were.
+  // micromark only appends to them, except where a failed attempt truncates them or a resolver
+  // (a link's, a footnote call's) rewrites them from some point on, and either replaces or moves
+  // the event this pairing stopped after.
+  if (
+    paired?.events !== events ||
+    paired.read > events.length ||
+    (paired.read > 0 && events[paired.read - 1] !== paired.last)
+  ) {
+    paired = { events, read: 0, last: undefined, stack: [] };
+    pairedRuns.set(self, paired);
+  }
+  const stack = paired.stack;
   const take = (run: Run, outer: boolean): boolean => {
     if (run.close) {
       for (let at = stack.length - 1; at >= 0 && run.size > 0; at -= 1) {
@@ -292,7 +320,8 @@ function emphasisClosesInside(self: TokenizeContext, body: string): boolean {
     return false;
   };
 
-  for (const [kind, token] of self.events) {
+  for (; paired.read < events.length; paired.read += 1) {
+    const [kind, token] = events[paired.read]!;
     if (kind !== "enter" || token.type !== "attentionSequence") continue;
     const text = self.sliceSerialize(token);
     const flags = token as typeof token & { _open?: boolean; _close?: boolean };
@@ -306,20 +335,28 @@ function emphasisClosesInside(self: TokenizeContext, body: string): boolean {
       true,
     );
   }
-  if (!stack.some((entry) => entry.outer)) return false;
-
-  for (const match of body.matchAll(/\*+|_+/gu)) {
-    const start = match.index;
-    const end = start + match[0].length;
-    const run = flank(
-      match[0][0]!,
-      match[0].length,
-      group(start > 0 ? body[start - 1] : MARKER),
-      group(end < body.length ? body[end] : MARKER),
-    );
-    if (take(run, false)) return true;
+  paired.last = events[paired.read - 1];
+  // Every entry is an opener from before the `==` here. The body's runs never change one -- a
+  // closer reaching one returns first -- and their own openers stack above them, so cutting the
+  // stack back to this length leaves it as the events alone made it, for the next `==`.
+  const outer = stack.length;
+  if (outer === 0) return false;
+  try {
+    for (const match of body.matchAll(/\*+|_+/gu)) {
+      const start = match.index;
+      const end = start + match[0].length;
+      const run = flank(
+        match[0][0]!,
+        match[0].length,
+        group(start > 0 ? body[start - 1] : MARKER),
+        group(end < body.length ? body[end] : MARKER),
+      );
+      if (take(run, false)) return true;
+    }
+    return false;
+  } finally {
+    stack.length = outer;
   }
-  return false;
 }
 
 export function highlightSyntax(): Extension {

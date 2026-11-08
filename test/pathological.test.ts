@@ -37,6 +37,7 @@ const SIZES: Readonly<Record<string, number>> = {
   "highlight-late-closer": 256_000,
   "strike-space-run": 64_000,
   "strike-newline-run": 64_000,
+  "highlight-word-run": 24_000,
   "comment-open": 20_000,
   "math-open": 20_000,
   "math-prices": 30_000,
