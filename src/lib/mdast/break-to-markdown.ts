@@ -1,7 +1,7 @@
 import { defaultHandlers } from "mdast-util-to-markdown";
 import type { Info, Options, State } from "mdast-util-to-markdown";
 import type { Break, Heading, Parents } from "mdast";
-import { EXIT, visit } from "unist-util-visit";
+import { EXIT, visit } from "../visit.js";
 import { toString } from "mdast-util-to-string";
 import { isEmptyDelete } from "./empty-delete-to-markdown.js";
 

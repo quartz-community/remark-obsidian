@@ -76,6 +76,12 @@ export const SHAPES: Readonly<Record<string, (n: number) => string>> = {
   "table-pipes": (n) => `|${"a|".repeat(n)}\n|${"-|".repeat(n)}\n`,
   "footnote-refs": (n) => "[^a]".repeat(n),
   /**
+   * The same references, defined: one paragraph of tens of thousands of siblings with no text
+   * between them, so stock `remark-gfm` stays linear and only this package's passes are measured.
+   * `strict`'s passes found each visited node's index by scanning its siblings.
+   */
+  "footnote-refs-defined": (n) => "[^a]".repeat(n) + "\n\n[^a]: x\n",
+  /**
    * Closing brackets with no opener. The footnote reader walked back over every earlier event
    * on each `]` looking for the `![` of a possible `![^x]`, so 32,000 of them took 23 s under
    * `strict`; it now stops a label's length back. Stock `remark-gfm` still does the walk.

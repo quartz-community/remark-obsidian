@@ -46,6 +46,7 @@ const SIZES: Readonly<Record<string, number>> = {
   "tag-run": 20_000,
   "table-pipes": 5_000,
   "footnote-refs": 20_000,
+  "footnote-refs-defined": 128_000,
   "bracket-close-run": 30_000,
   "block-ref-run": 20_000,
   "autolink-open": 20_000,
@@ -108,6 +109,14 @@ const STRICT_UPSTREAM: Readonly<Record<string, string>> = {
  * on that whatever the nodes are: on a busy machine, `"$x$ "` and `"*x* "` at 100,000 characters
  * both took over 10 s, where bare remark-parse + remark-gfm + remark-math took 3 s on 150,000
  * characters of this shape and 6 s on 300,000. Not micromark's, so not `STRICT_UPSTREAM`, and open.
+ *
+ * Part of that was this package's: `unist-util-visit` finds each visited node's index by scanning
+ * its siblings, so every pass that visited text was quadratic in a wide paragraph, and the
+ * reading pass did the same by hand. `src/lib/visit.ts` hands the index over instead, and
+ * `footnote-refs-defined` gates it. What is left is upstream's: `mdast-util-find-and-replace`
+ * scans siblings the same way for every text node, and remark-gfm's literal autolinks (which this
+ * package runs a second time over the text its passes rebuilt) and remark-breaks both go through
+ * it. `"*a* "` at 32,000 repetitions: 15.3 s before, 7.3 s after, 4.1 s with no plugin.
  */
 const STRICT_MANY_NODES: Readonly<Record<string, string>> = {
   "math-double-escaped":

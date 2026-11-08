@@ -1,6 +1,6 @@
 import type { List, Paragraph, Root, RootContent } from "mdast";
 import type { Node } from "unist";
-import { visit } from "unist-util-visit";
+import { visit } from "./visit.js";
 
 interface Point {
   line: number;

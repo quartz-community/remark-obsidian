@@ -1,6 +1,6 @@
 import type { Root } from "mdast";
 import type { Point } from "unist";
-import { visit } from "unist-util-visit";
+import { visit } from "./visit.js";
 
 /**
  * Count a leading byte order mark that was read past without being counted, so every offset

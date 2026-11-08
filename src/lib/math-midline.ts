@@ -1,6 +1,6 @@
 import type { Paragraph, PhrasingContent, Root, RootContent } from "mdast";
 import type { Node } from "unist";
-import { visit } from "unist-util-visit";
+import { visit } from "./visit.js";
 import { mapLines } from "./line-map.js";
 import { setMathValue } from "./math-value.js";
 import { pointAt } from "./normalize-points.js";

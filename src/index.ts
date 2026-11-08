@@ -6,7 +6,7 @@ import type { Options as ToMarkdownOptions } from "mdast-util-to-markdown";
 import { legacyDefaults, parseLegacy8 } from "./rp8/adapt.js";
 import type { Root, RootContent } from "mdast";
 import type { Processor } from "unified";
-import { SKIP, visit } from "unist-util-visit";
+import { SKIP, visit } from "./lib/visit.js";
 import { commentHoistTransform } from "./lib/comment-hoist.js";
 import { commentDefinitionExtentTransform } from "./lib/comment-definition-extent.js";
 import { commentInDefinitionTransform } from "./lib/comment-in-definition.js";

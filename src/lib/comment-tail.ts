@@ -1,5 +1,5 @@
 import type { Parent, Root, RootContent, Text } from "mdast";
-import { visit } from "unist-util-visit";
+import { visit } from "./visit.js";
 import type { Comment } from "./types.js";
 import { span } from "./normalize-points.js";
 

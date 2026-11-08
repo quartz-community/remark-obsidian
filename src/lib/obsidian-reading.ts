@@ -271,6 +271,8 @@ function detect(
     hostLine: number,
     parent?: Parent,
     container?: string,
+    /** The node's index in `parent`, which a scan of its siblings would cost each node. */
+    index = -1,
   ): void => {
     if (
       options.comments &&
@@ -308,18 +310,24 @@ function detect(
       (container === "blockquote" || container === "listItem") &&
       (node.type === "math" || (options.comments && node.type === "comment"))
     ) {
-      if (!closesMidline(node, parent)) {
+      if (!closesMidline(node, parent, index)) {
         late.push(...keptLazyLines(node, source, lines, parse));
       }
       if (node.type === "math") edits.push(...containedMathOpener(node, lines));
     }
     if (node.type === "footnoteReference" && parent) {
-      const caret = linkedReference(node, parent, source);
+      const caret = linkedReference(node, parent, index, source);
       if (caret !== undefined)
         edits.push({ kind: "neutralize", offset: caret });
     }
     if (node.type === "footnoteDefinition" && parent) {
-      const colon = labelRowUnderTable(node as Parent, parent, source, lines);
+      const colon = labelRowUnderTable(
+        node as Parent,
+        parent,
+        index,
+        source,
+        lines,
+      );
       if (colon !== undefined)
         edits.push({ kind: "neutralize", offset: colon });
     }
@@ -357,6 +365,7 @@ function detect(
         node.type === "root" ? 0 : (node.position?.start.line ?? 0),
         node as Parent,
         CONTAINERS.has(node.type) ? node.type : container,
+        at,
       ]);
     }
   };
@@ -572,9 +581,12 @@ function keptLazyLines(
  * Whether a `math` node is the closing `$$` of a display span opened mid-paragraph above it
  * (`Hello $$` / `Math` / `$$`), which micromark reads as an opener before the midline pass runs.
  */
-function closesMidline(node: Node, parent: Parent | undefined): boolean {
+function closesMidline(
+  node: Node,
+  parent: Parent | undefined,
+  index: number,
+): boolean {
   if (node.type !== "math" || !parent) return false;
-  const index = parent.children.indexOf(node as Content);
   const before = parent.children[index - 1];
   if (before?.type !== "paragraph") return false;
   if (before.position?.end.line !== (node.position?.start.line ?? 0) - 1) {
@@ -663,9 +675,9 @@ function lazyCommentUnderDefinition(definition: Parent, lines: Lines): Edit[] {
 function linkedReference(
   reference: Node,
   parent: Parent,
+  index: number,
   source: string,
 ): number | undefined {
-  const index = parent.children.indexOf(reference as Content);
   const next = parent.children[index + 1];
   const start = reference.position?.start.offset;
   const end = reference.position?.end.offset;
@@ -686,10 +698,10 @@ function linkedReference(
 function labelRowUnderTable(
   definition: Parent,
   parent: Parent,
+  index: number,
   source: string,
   lines: Lines,
 ): number | undefined {
-  const index = parent.children.indexOf(definition as Content);
   const table = parent.children[index - 1];
   const at = table?.position?.start.offset;
   const line = definition.position?.start.line;

@@ -1,5 +1,5 @@
 import type { Root } from "mdast";
-import { visit } from "unist-util-visit";
+import { visit } from "./visit.js";
 
 export function customTaskCharTransform(tree: Root, source?: string) {
   visit(tree, "listItem", (node: any) => {

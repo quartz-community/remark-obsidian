@@ -1,6 +1,6 @@
 import type { Root, Text } from "mdast";
 import type { Node } from "unist";
-import { visit } from "unist-util-visit";
+import { visit } from "./visit.js";
 
 import { bareFootnoteRefTransform } from "./footnote-bare.js";
 import { footnoteAfterLabelTransform } from "./footnote-after-label.js";

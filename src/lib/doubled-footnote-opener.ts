@@ -1,6 +1,6 @@
 import type { Root, RootContent, Text } from "mdast";
 import type { Node } from "unist";
-import { SKIP, visit } from "unist-util-visit";
+import { SKIP, visit } from "./visit.js";
 import { insideAutolink } from "./footnote-bare.js";
 import { decodeString } from "micromark-util-decode-string";
 import { paragraphSlice } from "./line-map.js";

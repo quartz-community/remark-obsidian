@@ -156,7 +156,6 @@ describe("the legacy entry", () => {
       "micromark-util-decode-string",
       "micromark-util-normalize-identifier",
       "unist-util-is",
-      "unist-util-visit",
       "unist-util-visit-parents",
     ]);
   });

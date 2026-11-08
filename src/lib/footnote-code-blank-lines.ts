@@ -1,6 +1,6 @@
 import type { Code, Root } from "mdast";
 import { setMathValue } from "./math-value.js";
-import { visit } from "unist-util-visit";
+import { visit } from "./visit.js";
 
 /** The indent a footnote definition's continuation lines carry. */
 const DEFINITION_INDENT = 4;

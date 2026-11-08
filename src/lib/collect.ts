@@ -1,5 +1,5 @@
 import type { Nodes, Root } from "mdast";
-import { visit } from "unist-util-visit";
+import { visit } from "./visit.js";
 
 import type { Wikilink } from "./types.js";
 

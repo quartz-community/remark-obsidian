@@ -1,6 +1,6 @@
 import type { List, ListItem, Root } from "mdast";
 import type { Node } from "unist";
-import { visit } from "unist-util-visit";
+import { visit } from "./visit.js";
 
 /**
  * A list item ends where the next one begins, at the latest.

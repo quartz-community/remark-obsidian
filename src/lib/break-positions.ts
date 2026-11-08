@@ -1,6 +1,6 @@
 import type { Break, Root, RootContent, Text } from "mdast";
 import type { Node } from "unist";
-import { visit } from "unist-util-visit";
+import { visit } from "./visit.js";
 
 const NEWLINE = /\r\n|\r|\n/gu;
 

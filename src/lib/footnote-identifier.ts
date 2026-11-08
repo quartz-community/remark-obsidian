@@ -1,5 +1,5 @@
 import type { Root } from "mdast";
-import { visit } from "unist-util-visit";
+import { visit } from "./visit.js";
 
 /**
  * Name every footnote by its label lowercased, as Obsidian does, never case-folded.

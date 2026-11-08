@@ -1,6 +1,6 @@
 import type { Root } from "mdast";
 import type { Node } from "unist";
-import { visit } from "unist-util-visit";
+import { visit } from "./visit.js";
 
 /** A footnote or link label starting a line, which is what E1 calls "another label". */
 const LABEL = /^\[\^?[^\]]*\]:/u;
