@@ -149,6 +149,16 @@ describe.each(PRESETS)("bomOffsets under %s", (preset) => {
     expect(sliceOf(markdown, reference)).toBe("[^1]");
   });
 
+  it("moves a callout's marker and title-line end with everything else", () => {
+    const markdown = `${MARK}> [!note]- T\n> body\n`;
+    const [callout] = findAll(read(markdown, on), "callout");
+    const { marker, lineEnd } = callout.data;
+    expect(markdown.slice(marker.start.offset, marker.end.offset)).toBe(
+      "[!note]-",
+    );
+    expect(lineEnd.offset).toBe(markdown.indexOf("\n"));
+  });
+
   it("does nothing to a document with no mark", () => {
     const markdown = `> [!note] t\n> a[^1]\n\n${definition}\n`;
     expect(read(markdown, on)).toEqual(read(markdown, { preset }));

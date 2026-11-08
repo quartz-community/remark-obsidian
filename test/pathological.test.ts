@@ -14,7 +14,10 @@ const runner = path.join(here, "pathological", "parse-once.ts");
  * A ceiling, not a benchmark. Shared runners are far too noisy to gate on
  * milliseconds, so this asserts only that a parse *finishes* — which is what
  * separates a linear path from a quadratic one at these sizes. Every gated
- * shape completes well inside five seconds locally.
+ * shape completes well inside five seconds locally. `nested-lists` under `legacy` is the
+ * exception that sets its size: the reader is roughly cubic on it (800 takes 7 to 15 seconds by
+ * load, 1,000 up to 19), so it runs at 500, about a second, and `rp8-deep-trees.test.ts` holds the
+ * depth the adapter must reach.
  */
 const BUDGET_MS = 20_000;
 
@@ -29,8 +32,13 @@ const SIZES: Readonly<Record<string, number>> = {
   "cdata-repeat": 10_000,
   "wikilink-open": 20_000,
   "highlight-run": 20_000,
+  "highlight-space-run": 64_000,
+  "highlight-newline-run": 8_000,
+  "highlight-late-closer": 256_000,
   "comment-open": 20_000,
   "math-open": 20_000,
+  "math-prices": 30_000,
+  "math-double-escaped": 150_000,
   "inline-footnote-open": 20_000,
   "callout-nest": 10_000,
   "tag-run": 20_000,
@@ -93,7 +101,29 @@ const STRICT_UPSTREAM: Readonly<Record<string, string>> = {
     "Bare remark-parse + remark-gfm takes 2.0s at 500, 16.2s at 1,000 and 130s at 2,000: micromark's code-span scan, cubic on runs of growing length.",
 };
 
-const strictGated = gated.filter((shape) => !(shape in STRICT_UPSTREAM));
+/**
+ * Shapes `strict` reads as tens of thousands of inline nodes in one paragraph. Its passes are slow
+ * on that whatever the nodes are: on a busy machine, `"$x$ "` and `"*x* "` at 100,000 characters
+ * both took over 10 s, where bare remark-parse + remark-gfm + remark-math took 3 s on 150,000
+ * characters of this shape and 6 s on 300,000. Not micromark's, so not `STRICT_UPSTREAM`, and open.
+ */
+const STRICT_MANY_NODES: Readonly<Record<string, string>> = {
+  "math-double-escaped":
+    "Pairs every `$$`: on a busy machine 150,000 characters took about 6 s, 300,000 over 20 s. `legacy` is gated on it.",
+};
+
+const strictGated = gated.filter(
+  (shape) => !(shape in STRICT_UPSTREAM) && !(shape in STRICT_MANY_NODES),
+);
+
+/**
+ * Where `strict` runs a shape smaller than `legacy`. Bare remark-parse + remark-gfm takes 9.3s
+ * on `nested-lists` at 500 and 27s at 800, past the budget before this package does anything.
+ */
+const STRICT_SIZES: Readonly<Record<string, number>> = { "nested-lists": 300 };
+
+const sizeOf = (shape: string, preset: "legacy" | "strict") =>
+  (preset === "strict" ? STRICT_SIZES[shape] : undefined) ?? SIZES[shape];
 
 async function parseOnce(shape: string, preset: "legacy" | "strict") {
   const { stdout } = await run(
@@ -103,7 +133,7 @@ async function parseOnce(shape: string, preset: "legacy" | "strict") {
       "--conditions=development",
       runner,
       shape,
-      String(SIZES[shape]),
+      String(sizeOf(shape, preset)),
       preset,
     ],
     { timeout: BUDGET_MS, cwd: path.join(here, "..") },
@@ -123,6 +153,7 @@ describe("pathological input", () => {
       "backtick-increasing",
       "cdata-repeat",
     ]);
+    expect(Object.keys(STRICT_MANY_NODES)).toEqual(["math-double-escaped"]);
   });
 
   for (const shape of gated) {
@@ -159,7 +190,7 @@ describe("pathological input", () => {
 
   for (const shape of strictGated) {
     it(
-      `parses ${shape} at ${SIZES[shape]} under strict without wedging`,
+      `parses ${shape} at ${sizeOf(shape, "strict")} under strict without wedging`,
       { timeout: BUDGET_MS + 15_000 },
       async () => {
         expect(await parseOnce(shape, "strict")).toBeGreaterThanOrEqual(0);

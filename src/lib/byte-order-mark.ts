@@ -26,6 +26,16 @@ export function countByteOrderMark(tree: Root): void {
     move(tree.position.end);
   }
   visit(tree, (node) => {
+    // A callout's marker and title-line end are points too (`data.marker`, `data.lineEnd`).
+    const data = node.data as
+      { marker?: { start: Point; end: Point }; lineEnd?: Point } | undefined;
+    if (node.type === ("callout" as never) && data) {
+      if (data.marker) {
+        move(data.marker.start);
+        move(data.marker.end);
+      }
+      if (data.lineEnd) move(data.lineEnd);
+    }
     if (node === tree || !node.position) return;
     move(node.position.start);
     move(node.position.end);

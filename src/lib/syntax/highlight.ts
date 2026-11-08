@@ -35,27 +35,45 @@ export function legacyHighlightQueue(value: string): string | null {
   if (value.charAt(0) !== MARKER || value.charAt(1) !== MARKER) return null;
 
   let index = MARKER_LENGTH;
-  let queue = "";
 
   while (index < value.length) {
-    const character = value.charAt(index);
-    if (character === MARKER && value.charAt(index + 1) === MARKER) {
+    if (value.charAt(index) === MARKER && value.charAt(index + 1) === MARKER) {
       // Content may not be blank or begin with whitespace, and no later closer
-      // can repair either, so the attempt is over.
-      if (!queue.trim() || /^\s/u.test(queue)) return null;
+      // can repair either, so the attempt is over. Blank content that is not
+      // empty begins with whitespace, so the first character decides both.
+      if (index === MARKER_LENGTH || isSpace(value.charAt(MARKER_LENGTH)))
+        return null;
       // Trailing whitespace is different: the scan keeps going and may close
       // further along. `===` / `[^2]: b` / `===` closes on the *last* two
       // markers, because stopping at the first leaves `=⏎[^2]: b⏎` ending in a
       // newline — carrying on takes the next `=` into the content and lands on
       // a closer that does not.
-      if (!/\s$/u.test(queue)) return queue;
+      if (!isSpace(value.charAt(index - 1)))
+        return value.slice(MARKER_LENGTH, index);
     }
-    queue += character;
     index++;
   }
 
   return null;
 }
+
+/**
+ * One character each, not the content so far: with a `==` after every whitespace, testing the
+ * growing content at each one was quadratic per opener. `\s` is `trim`'s own class.
+ */
+function isSpace(character: string): boolean {
+  return /\s/u.test(character);
+}
+
+/**
+ * Per text run, the offset from which no opener can close.
+ *
+ * `legacyHighlightQueue` closes on a `==` with no whitespace straight before it, which is a fact
+ * about that `==` and not about the opener. So once a scan that read to the end of the run answers
+ * `null`, every later opener in the run must too, and need not read it again. `==a ` x8000 scanned
+ * to the end for each of its 8000 openers. A tokenizer reads one run, so it keys the memo.
+ */
+const noCloserFrom = new WeakMap<TokenizeContext, number>();
 
 /**
  * Stop the chunk scan once `legacyHighlightQueue` is bound to answer `null`.
@@ -83,15 +101,30 @@ export function legacyHighlightQueue(value: string): string | null {
 function createQueueBound(): (character: string) => boolean {
   let index = -1;
   let opened = false;
+  let previous = "";
+  let beforePrevious = "";
   return (character: string): boolean => {
     index += 1;
+    const last = previous;
+    const beforeLast = beforePrevious;
+    beforePrevious = previous;
+    previous = character;
     if (index < MARKER_LENGTH) return character !== MARKER;
     if (index === MARKER_LENGTH) {
       opened = character === MARKER;
       return /^\s/u.test(character);
     }
     // The second half of a closer sitting directly on the opener: empty content.
-    return index === MARKER_LENGTH + 1 && opened && character === MARKER;
+    if (index === MARKER_LENGTH + 1) return opened && character === MARKER;
+    // The first closer `legacyHighlightQueue` accepts: two markers with no whitespace before
+    // them. It answers there, so nothing after it is needed. Without this every highlight read
+    // to the end of the run, and `==a== ` x4000 took over 10 s under `strict`.
+    return (
+      character === MARKER &&
+      last === MARKER &&
+      index >= MARKER_LENGTH + 2 &&
+      !/\s/u.test(beforeLast)
+    );
   };
 }
 
@@ -153,13 +186,20 @@ const highlight: Construct = {
 
     function start(code: Code): State | undefined {
       if (code !== EQUALS) return nok(code);
+      const known = noCloserFrom.get(self);
+      if (known !== undefined && self.now().offset >= known) return nok(code);
       characters.length = 0;
       return effects.check(scan, decide, decide)(code);
     }
 
     function decide(code: Code): State | undefined {
       const found = legacyHighlightQueue(characters.join(""));
-      if (found === null) return nok(code);
+      if (found === null) {
+        // Past the `createQueueBound` stops, so this scan did read to the end of the run.
+        if (characters.length > MARKER_LENGTH + 2)
+          noCloserFrom.set(self, self.now().offset);
+        return nok(code);
+      }
       if (emphasisClosesInside(self, found)) return nok(code);
 
       queue = found;
