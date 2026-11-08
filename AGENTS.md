@@ -547,7 +547,7 @@ has no coverage there, not that it agrees. Footnotes are in **neither** spec: GF
 ## Gates — what "done" means
 
 ```bash
-npm test          # 643 tests / 27 files. Contains the contract gate.
+npm test          # 645 tests / 27 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -1139,7 +1139,12 @@ unit test "reads a tag's characters as Obsidian does", which fails on the old cl
    bar the tree check's recorded families; the census baseline holds the rest of the million.
 7. **The fuzz triage's leftovers:** self-embeds (out of scope), and `[^1]: - [ ] [` /
    `^[[^1]]]`, where Obsidian's renderer and its cache disagree.
-8. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,
+8. **Callout shapes that need the live app** (found reviewing PR #36, 2026-11-08). `strict`
+   forms no callout inside a footnote definition (`[^1]: > [!note] T`) or after a task box
+   (`- [ ] > [!note] T`), where `legacy` does; neither preset forms one after `>⇥`
+   (`>\t[!note] T`). Ask 1.15.0 before deciding which side is right. The `\r\n` title-less
+   case from the same review was fixed: `MARKER`'s lookahead took no `\r`.
+9. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,
    `pass-owner*.mts`, `pass-order*.mts` and their kin attribute behaviour to micromark passes
    `legacy` no longer runs. Port to `strict` or delete; do not trust their `legacy` output.
 
