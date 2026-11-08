@@ -81,6 +81,11 @@ declare module "mdast" {
     taskChar?: string;
   }
 
+  interface FootnoteReferenceData {
+    /** `true` on a reference `inertFootnoteRefs` kept inside an inline footnote: it refers to nothing. */
+    inert?: true;
+  }
+
   interface LinkReferenceData {
     /** `false` on a reference `keepUndefinedReferences` kept: this parse found no definition. */
     defined?: false;

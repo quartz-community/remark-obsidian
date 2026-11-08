@@ -32,6 +32,7 @@ const OPTIONS: LegacyOptions = {
   bareFootnoteRefs: false,
   bomOffsets: false,
   keepUndefinedReferences: false,
+  inertFootnoteRefs: false,
 };
 
 const DEPTH = 1_000;

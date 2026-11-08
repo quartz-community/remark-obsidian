@@ -28,8 +28,8 @@ import type { GoldenCase } from "./types.js";
  * stronger, and a weaker duplicate of an existing gate is worse than no gate because it
  * reads as independent confirmation.
  *
- * Single toggles rather than pairs. 18 toggles against 2 presets is 36 corpus parses and runs
- * in the time a normal gate takes; all pairs would be 612 and belongs in a scheduled job
+ * Single toggles rather than pairs. 19 toggles against 2 presets is 38 corpus parses and runs
+ * in the time a normal gate takes; all pairs would be 684 and belongs in a scheduled job
  * rather than a push gate. A crash needing two options to co-occur is therefore still
  * invisible, which is worth knowing rather than implying otherwise.
  */
@@ -54,6 +54,7 @@ const FLAGS = [
   "bareFootnoteRefs",
   "keepUndefinedReferences",
   "inlineFootnotes",
+  "inertFootnoteRefs",
   "callouts",
   "positionedBreaks",
   "escapedLineBreaks",
