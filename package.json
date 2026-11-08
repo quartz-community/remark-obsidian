@@ -31,7 +31,8 @@
     "typecheck": "tsc --noEmit && tsc -p tsconfig.parity.json --noEmit",
     "prepublishOnly": "npm run build",
     "release": "npm run build && changeset publish",
-    "lint": "eslint 'src/**/*.ts'"
+    "lint": "eslint 'src/**/*.ts'",
+    "version-packages": "changeset version && npm install --package-lock-only --ignore-scripts --no-audit --no-fund"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.2",
