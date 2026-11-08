@@ -513,7 +513,12 @@ Both have known-positive controls. Re-run them after ANY change under `src/rp8`.
 **Small inputs, measured on 930 parts of about 24 lines** (a generated 22,386-line note cut at
 blank lines, and 930 parts of package READMEs). The HTML block reader's `RegExp` was 18.8% of self
 time; the precheck alone gives 0.81 and 0.83 of base. Plain text without the decoder alone gives
-0.92 and 0.86. Together: 0.73 and 0.87, against the same build's 0.96 and 0.995.
+0.92 and 0.86. Together: 0.73 and 0.87, against the same build's 0.96 and 0.995. Re-measured in
+review (7 fresh processes, best of 6 passes, medians, a loaded machine): 0.85 on the corpus's
+6,844 documents and 0.89 on 4,094 README parts. 0.73 is the best case, a note with no `&` or
+`<`. Both prechecks return early only where the stock code gives the same answer: 0 of 111,964
+tree digests moved (four `legacy` configurations, corpus, spec, generated, deep and
+HTML/entity-heavy shapes); removing the `&` test moves 23,011, the control.
 
 - **Refused: leaving out the tokenizer's per-eat check (`validateEat`).** 2% of self time, and no
   gain beyond the control on top of the other two, on the parts or on one parse of the whole note.
@@ -1154,7 +1159,11 @@ unit test "reads a tag's characters as Obsidian does", which fails on the old cl
    bar the tree check's recorded families; the census baseline holds the rest of the million.
 7. **The fuzz triage's leftovers:** self-embeds (out of scope), and `[^1]: - [ ] [` /
    `^[[^1]]]`, where Obsidian's renderer and its cache disagree.
-8. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,
+8. **The speed-ups change one reading** (found reviewing PR #24, on `main` before it): with
+   them, ``&#0`&/`` reads as a backtick, U+FFFD and `/` and ``&#xa`&]`` likewise, where the stock reader
+   keeps `` `&/ ``. `rp8-speedups.test.ts` does not reach a character reference before a
+   backtick. Open: the speed-up must give way, since the stock reading is Obsidian's.
+9. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,
    `pass-owner*.mts`, `pass-order*.mts` and their kin attribute behaviour to micromark passes
    `legacy` no longer runs. Port to `strict` or delete; do not trust their `legacy` output.
 
