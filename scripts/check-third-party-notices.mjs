@@ -28,13 +28,16 @@ for (const item of section?.split("\n```")[0].split("\n- ").slice(1) ?? []) {
     listed.add(name);
 }
 const missing = [...bundled].filter((name) => !listed.has(name));
+// A name no bundle holds any more (a package made external, or dropped) is a stale notice.
+const stale = [...listed].filter((name) => !bundled.has(name));
 
 // An empty bundle means this read the maps wrongly, not that there is nothing to notice.
-if (bundled.size === 0 || missing.length > 0) {
+if (bundled.size === 0 || missing.length > 0 || stale.length > 0) {
   console.error(
-    `ERROR: ${bundled.size} npm packages in dist, ${missing.length} without a notice in LICENSE-THIRD-PARTY.md:`,
+    `ERROR: ${bundled.size} npm packages in dist, ${missing.length} without a notice and ${stale.length} listed but not bundled in LICENSE-THIRD-PARTY.md:`,
   );
-  for (const name of missing.sort()) console.error(`  - ${name}`);
+  for (const name of missing.sort()) console.error(`  - missing: ${name}`);
+  for (const name of stale.sort()) console.error(`  - not bundled: ${name}`);
   process.exit(1);
 }
 console.log(

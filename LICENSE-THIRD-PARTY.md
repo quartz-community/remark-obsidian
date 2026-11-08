@@ -171,13 +171,11 @@ esbuild bundles these from `node_modules` into `dist/index.js`, at the versions
   `unist-util-is`, `unist-util-visit` -- Copyright (c) 2015 Titus Wormer <tituswormer@gmail.com>
 - `longest-streak` -- Copyright (c) 2015 Titus Wormer <mailto:tituswormer@gmail.com>
 - `unist-util-visit-parents` -- Copyright (c) 2016 Titus Wormer <tituswormer@gmail.com>
-- `mdast-util-phrasing` -- Copyright (c) 2017 Titus Wormer <tituswormer@gmail.com>;
-  Copyright (c) 2017 Victor Felder <victor@draft.li>
 - `mdast-util-frontmatter`, `mdast-util-math`, `micromark-extension-frontmatter`,
   `micromark-extension-math` -- Copyright (c) 2020 Titus Wormer <tituswormer@gmail.com>
 - `devlop` -- Copyright (c) 2023 Titus Wormer <tituswormer@gmail.com>
-- `decode-named-character-reference`, `mdast-util-to-markdown`, `micromark-core-commonmark`,
-  `micromark-factory-space`, `micromark-util-character`,
+- `decode-named-character-reference`, `micromark-core-commonmark`, `micromark-factory-space`,
+  `micromark-util-character`,
   `micromark-util-decode-numeric-character-reference`, `micromark-util-decode-string`,
   `micromark-util-normalize-identifier`, `micromark-util-symbol` -- Copyright (c) Titus Wormer
   <tituswormer@gmail.com>
