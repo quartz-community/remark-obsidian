@@ -2923,6 +2923,32 @@ describe("setext underline under a definition", () => {
   });
 });
 
+describe("callout over \\r\\n line endings", () => {
+  // Under `strict` the marker's lookahead took no `\r`, so a title-less `> [!note]` over a
+  // `\r\n` line ending formed no callout, and kept as the line's end the `\r` read as a title
+  // written empty. The tree must be the `\n` one, positions aside.
+  const shape = (md: string, preset: "legacy" | "strict") =>
+    JSON.stringify(processWithGfm(md, { preset }), (key, value) =>
+      key === "position" || key === "lineOffsets" ? undefined : value,
+    );
+  it.each(["legacy", "strict"] as const)(
+    "reads as over \\n, under %s",
+    (preset) => {
+      for (const md of [
+        "> [!note]\n> body\n",
+        "> [!note]-\n> body\n",
+        "> [!note] \n> body\n",
+        "> [!note] T\n> body\n",
+        "> [!tip]+ Title\n> body\n\nafter\n",
+      ]) {
+        expect(shape(md.replace(/\n/gu, "\r\n"), preset), md).toBe(
+          shape(md, preset),
+        );
+      }
+    },
+  );
+});
+
 describe("callout marker extent", () => {
   const shape = (md: string) => {
     const f = (n: any): string => {

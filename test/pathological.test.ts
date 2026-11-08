@@ -31,6 +31,8 @@ const SIZES: Readonly<Record<string, number>> = {
   "highlight-run": 20_000,
   "comment-open": 20_000,
   "math-open": 20_000,
+  "math-prices": 30_000,
+  "math-double-escaped": 150_000,
   "inline-footnote-open": 20_000,
   "callout-nest": 10_000,
   "tag-run": 20_000,
@@ -93,7 +95,20 @@ const STRICT_UPSTREAM: Readonly<Record<string, string>> = {
     "Bare remark-parse + remark-gfm takes 2.0s at 500, 16.2s at 1,000 and 130s at 2,000: micromark's code-span scan, cubic on runs of growing length.",
 };
 
-const strictGated = gated.filter((shape) => !(shape in STRICT_UPSTREAM));
+/**
+ * Shapes `strict` reads as tens of thousands of inline nodes in one paragraph. Its passes are slow
+ * on that whatever the nodes are: on a busy machine, `"$x$ "` and `"*x* "` at 100,000 characters
+ * both took over 10 s, where bare remark-parse + remark-gfm + remark-math took 3 s on 150,000
+ * characters of this shape and 6 s on 300,000. Not micromark's, so not `STRICT_UPSTREAM`, and open.
+ */
+const STRICT_MANY_NODES: Readonly<Record<string, string>> = {
+  "math-double-escaped":
+    "Pairs every `$$`: on a busy machine 150,000 characters took about 6 s, 300,000 over 20 s. `legacy` is gated on it.",
+};
+
+const strictGated = gated.filter(
+  (shape) => !(shape in STRICT_UPSTREAM) && !(shape in STRICT_MANY_NODES),
+);
 
 async function parseOnce(shape: string, preset: "legacy" | "strict") {
   const { stdout } = await run(
@@ -123,6 +138,7 @@ describe("pathological input", () => {
       "backtick-increasing",
       "cdata-repeat",
     ]);
+    expect(Object.keys(STRICT_MANY_NODES)).toEqual(["math-double-escaped"]);
   });
 
   for (const shape of gated) {

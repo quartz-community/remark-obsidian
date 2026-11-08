@@ -107,4 +107,49 @@ describe("legacy reader speed-ups", () => {
     }
     expect(differ).toEqual([]);
   }, 120_000);
+
+  it("read documents full of dollars exactly as the plain reader does", () => {
+    // A remembered math search only answers for a second opener in the same run, which the
+    // alphabet above rarely gives. These pin where a looser memory goes wrong: a padded opener,
+    // a `$$` before a `$`, a `$$` only `math` closes, an escaped dollar, and a new run.
+    const pins = [
+      "$ $a$",
+      "$$ $a$",
+      "$$ $$a$$",
+      "$$a$ $b$",
+      "$$a\\\\$$ $b$",
+      "$5 $$ $a$",
+      "$5 \\$6$",
+      "$5 `$6` \\$ $a$",
+      "$5 `\\`$a$",
+      "*$5* $a$",
+      "$5 *$a$*",
+      "[$5](u) $a$",
+      "$5\n\n$a$",
+      "$5\n$a$",
+    ];
+    const atoms =
+      "$ $ $$ $$$ \\ \\\\ \\$ ` `` a 5 * _ [ ](u) %% == ^[ ] #t".split(" ");
+    atoms.push(" ", "\t", "\n", "\n\n");
+    let seed = 0x2545f491;
+    const random = () => {
+      seed ^= seed << 13;
+      seed ^= seed >>> 17;
+      seed ^= seed << 5;
+      return (seed >>> 0) / 0x100000000;
+    };
+    const docs = [...pins];
+    for (let n = 0; n < 30_000; n++) {
+      let doc = "";
+      const length = 2 + Math.floor(random() * 24);
+      for (let i = 0; i < length; i++)
+        doc += atoms[Math.floor(random() * atoms.length)];
+      docs.push(doc);
+    }
+    const differ = docs
+      .filter((doc) => read(doc, true) !== read(doc, false))
+      .slice(0, 5)
+      .map((doc) => JSON.stringify(doc));
+    expect(differ).toEqual([]);
+  }, 120_000);
 });
