@@ -172,6 +172,16 @@ describe("invariant fuzz", () => {
     ["no-break space as a callout title", "> [!note] \u00a0\n", "strict"],
     ["nested doubled footnote openers", "[^[^[^1]]\n", "strict"],
     [
+      "display math holding a dollar in a callout",
+      "> [!note] $$y^2$$\n), $$y^2\n$y^2$$\n",
+      "strict",
+    ],
+    [
+      "display math in a callout in a definition",
+      "[^1]: > [!note] $$y^2$$\n), $$y^2\n$y^2$$\n",
+      "strict",
+    ],
+    [
       "callout title alone in a definition",
       "[^1]: > [!note]\n<br>\n",
       "strict",

@@ -888,6 +888,11 @@ export default function remarkObsidian(
     // Last before positions: every pass above, re-parsed fragments included, built identifiers
     // the CommonMark way; Obsidian's are the label lowercased.
     footnoteIdentifierTransform(tree);
+    // Display math again: the callout, definition and comment passes re-read fragments after
+    // the display pass ran, and their `$$` formulas came back without `data.display`. The writer
+    // then spelled them with one `$`, which a `$` inside the formula closed early
+    // (`> [!note] $$y^2$$` / `), $$y^2` / `$y^2$$`, 11 forms of the million-seed census).
+    if (opts.math) mathDisplayTransform(tree, String(file));
     // A reference whose definition a pass above dissolved is text again, as GFM has an undefined
     // label: `[^1]: def` / `····[^2]: two` leaves `[^2]: two` as the definition's text, and
     // `use[^2]` still referred to it. Obsidian indexes no `[^2]` there (asked of 1.15.0), and

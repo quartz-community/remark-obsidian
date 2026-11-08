@@ -695,7 +695,7 @@ cannot tell order from order there: those passes collect edits order-independent
 ## Gates — what "done" means
 
 ```bash
-npm test          # 936 tests / 35 files. Contains the contract gate.
+npm test          # 938 tests / 35 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
