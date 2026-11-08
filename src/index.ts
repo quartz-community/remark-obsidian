@@ -170,6 +170,12 @@ export interface RemarkObsidianOptions {
    * remark-parse 8 reads a definition past blank lines, so `[foo]: /url` alone is a definition
    * and above `'tit` and a blank line is a paragraph.
    *
+   * `false` is a promise only for a part cut at one of the whole note's block boundaries and read
+   * with its next line attached, ending where that line starts a top-level block: then the part
+   * reads as that stretch of the note does (held over the corpus and generated documents in
+   * `reads-past-end.test.ts`). Read without its next line, a part can differ with the signal
+   * `false` (`> [!note] t` over `2) b` or `---`).
+   *
    * It speaks for link definitions at a part's end, nothing else. Frontmatter reads to its closer
    * too, an `<a>` opened above a part's start changes what the part reads, and a part's references
    * depend on definitions outside it: those stay with the caller.
