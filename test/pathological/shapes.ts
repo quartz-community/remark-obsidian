@@ -15,9 +15,9 @@ export const SHAPES: Readonly<Record<string, (n: number) => string>> = {
   "nested-brackets": (n) => "[".repeat(n) + "a" + "]".repeat(n),
   /** cmark: nested blockquotes, 25,000 deep. */
   "nested-blockquotes": (n) => "> ".repeat(n) + "a",
-  /** cmark: deeply nested lists, 500 levels. */
+  /** cmark: deeply nested lists, 500 levels, two spaces per level. One space nests nothing. */
   "nested-lists": (n) =>
-    Array.from({ length: n }, (_, i) => `${" ".repeat(i)}- a`).join("\n"),
+    Array.from({ length: n }, (_, i) => `${"  ".repeat(i)}- a`).join("\n"),
   /** cmark: unclosed links, 30,000 repetitions. */
   "unclosed-links": (n) => "[a](<b".repeat(n),
   /** cmark: unclosed HTML comments, 300,000 repetitions. */

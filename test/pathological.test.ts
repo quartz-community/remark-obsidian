@@ -14,7 +14,10 @@ const runner = path.join(here, "pathological", "parse-once.ts");
  * A ceiling, not a benchmark. Shared runners are far too noisy to gate on
  * milliseconds, so this asserts only that a parse *finishes* — which is what
  * separates a linear path from a quadratic one at these sizes. Every gated
- * shape completes well inside five seconds locally.
+ * shape completes well inside five seconds locally. `nested-lists` under `legacy` is the
+ * exception that sets its size: the reader is roughly cubic on it (800 takes 7 to 15 seconds by
+ * load, 1,000 up to 19), so it runs at 500, about a second, and `rp8-deep-trees.test.ts` holds the
+ * depth the adapter must reach.
  */
 const BUDGET_MS = 20_000;
 
@@ -113,6 +116,15 @@ const strictGated = gated.filter(
   (shape) => !(shape in STRICT_UPSTREAM) && !(shape in STRICT_MANY_NODES),
 );
 
+/**
+ * Where `strict` runs a shape smaller than `legacy`. Bare remark-parse + remark-gfm takes 9.3s
+ * on `nested-lists` at 500 and 27s at 800, past the budget before this package does anything.
+ */
+const STRICT_SIZES: Readonly<Record<string, number>> = { "nested-lists": 300 };
+
+const sizeOf = (shape: string, preset: "legacy" | "strict") =>
+  (preset === "strict" ? STRICT_SIZES[shape] : undefined) ?? SIZES[shape];
+
 async function parseOnce(shape: string, preset: "legacy" | "strict") {
   const { stdout } = await run(
     "npx",
@@ -121,7 +133,7 @@ async function parseOnce(shape: string, preset: "legacy" | "strict") {
       "--conditions=development",
       runner,
       shape,
-      String(SIZES[shape]),
+      String(sizeOf(shape, preset)),
       preset,
     ],
     { timeout: BUDGET_MS, cwd: path.join(here, "..") },
@@ -178,7 +190,7 @@ describe("pathological input", () => {
 
   for (const shape of strictGated) {
     it(
-      `parses ${shape} at ${SIZES[shape]} under strict without wedging`,
+      `parses ${shape} at ${sizeOf(shape, "strict")} under strict without wedging`,
       { timeout: BUDGET_MS + 15_000 },
       async () => {
         expect(await parseOnce(shape, "strict")).toBeGreaterThanOrEqual(0);
