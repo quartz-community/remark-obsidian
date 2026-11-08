@@ -3,6 +3,7 @@ import type { Info, Options, State } from "mdast-util-to-markdown";
 import type { Break, Heading, Parents } from "mdast";
 import { EXIT, visit } from "unist-util-visit";
 import { toString } from "mdast-util-to-string";
+import { isEmptyDelete } from "./empty-delete-to-markdown.js";
 
 /**
  * Write a line break as a newline rather than a trailing backslash.
@@ -88,7 +89,7 @@ export function breakToMarkdown(escaped = false): Options {
           children?: unknown[];
         }>;
         const next = siblings[siblings.indexOf(node as never) + 1];
-        if (next?.type === "delete" && (next.children ?? []).length === 0) {
+        if (isEmptyDelete(next)) {
           return `${ending}&#x20;`;
         }
         return ending;
