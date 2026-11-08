@@ -1,5 +1,6 @@
 import type { Emphasis, Node, PhrasingContent, Strong } from "mdast";
 import { defaultHandlers, type Options } from "mdast-util-to-markdown";
+import { markEmptyDeletes } from "./empty-delete-to-markdown.js";
 import { removeTagEnds } from "./tag-to-markdown.js";
 
 type Handle = typeof defaultHandlers.emphasis | typeof defaultHandlers.strong;
@@ -289,9 +290,14 @@ export function attentionToMarkdown(options: {
     return handle;
   };
   const root = ((...args: Parameters<typeof defaultHandlers.root>) => {
-    recordParents(args[0]);
-    if (options.legacy) markAdjacent(args[0]);
-    return removeTagEnds(defaultHandlers.root(...args));
+    const restoreEmptyDeletes = markEmptyDeletes(args[0]);
+    try {
+      recordParents(args[0]);
+      if (options.legacy) markAdjacent(args[0]);
+      return removeTagEnds(defaultHandlers.root(...args));
+    } finally {
+      restoreEmptyDeletes();
+    }
   }) as typeof defaultHandlers.root;
   return {
     handlers: {
