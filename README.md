@@ -102,7 +102,7 @@ comments. Nothing was removed from the API.
 ## Obsidian parity
 
 This plugin targets the **reading-mode and `metadataCache` semantics of a specific public
-Obsidian release**, currently 1.14.5. A harness renders a generated corpus inside real Obsidian
+Obsidian release**, currently 1.15.0. A harness renders a generated corpus inside real Obsidian
 and compares the result against ours, so the claim is measured rather than asserted —
 including the divergences, which are enumerated rather than implied:
 
