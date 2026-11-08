@@ -168,7 +168,7 @@ esbuild bundles these from `node_modules` into `dist/index.js`, at the versions
 `micromark-extension-math` source above: `dist` holds both. Each is MIT:
 
 - `character-entities`, `character-entities-legacy`, `fault`, `mdast-util-to-string`,
-  `unist-util-is`, `unist-util-visit` -- Copyright (c) 2015 Titus Wormer <tituswormer@gmail.com>
+  `unist-util-is` -- Copyright (c) 2015 Titus Wormer <tituswormer@gmail.com>
 - `longest-streak` -- Copyright (c) 2015 Titus Wormer <mailto:tituswormer@gmail.com>
 - `unist-util-visit-parents` -- Copyright (c) 2016 Titus Wormer <tituswormer@gmail.com>
 - `mdast-util-frontmatter`, `mdast-util-math`, `micromark-extension-frontmatter`,
