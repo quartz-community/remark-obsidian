@@ -26,6 +26,7 @@ export interface LegacyOptions extends Features {
   parseComments: boolean;
   lineOffsets: boolean;
   bareFootnoteRefs: boolean;
+  keepUndefinedReferences: boolean;
   bomOffsets: boolean;
 }
 
@@ -47,6 +48,7 @@ export const legacyDefaults: LegacyOptions = {
   positionedBreaks: true,
   bomOffsets: false,
   readsPastEnd: false,
+  keepUndefinedReferences: false,
 };
 
 interface Context {
@@ -364,10 +366,9 @@ function convert(
     case "imageReference": {
       const { type, label, referenceType, alt } = node;
       // Obsidian neither trims nor collapses a label (rule 18a), but folds case fully (`ẞ`/`SS`).
-      if (
-        referenceType !== "full" &&
-        !ctx.definitions.has(fold(String(label)))
-      ) {
+      const isDefined = ctx.definitions.has(fold(String(label)));
+      const keep = ctx.options.keepUndefinedReferences;
+      if (referenceType !== "full" && !isDefined && !keep) {
         // Undefined and not full: plain text, as the current tree has it.
         const children = type === "linkReference" ? kids() : [];
         if (children.length === 0)
@@ -383,12 +384,32 @@ function convert(
       const identifier = normalizeIdentifier(
         String(label ?? node.identifier),
       ).toLowerCase();
+      const kept = keep && !isDefined;
       // The label as written, where decoding changed it, for the writer: written decoded,
       // `[x][&amp;]` came back `[x][&]`, another identifier (`link-reference-to-markdown.ts`).
-      const spelled =
-        referenceType === "full" && decodeLabel(label) !== label
-          ? { data: { spelledLabel: label } }
+      const written =
+        (referenceType === "full" || kept) && decodeLabel(label) !== label
+          ? { spelledLabel: label }
           : {};
+      const spelled =
+        kept || "spelledLabel" in written
+          ? { data: { ...written, ...(kept ? { defined: false } : {}) } }
+          : {};
+      // remark-parse 8 takes a `[` that never closes into a shortcut (`[a][`). A kept one gives
+      // it back as text, so it renders and survives a format, as it does by default.
+      const open =
+        kept &&
+        referenceType === "shortcut" &&
+        doc[position.end.offset - 1] === "[";
+      const own = open
+        ? {
+            start: position.start,
+            end: pointAt(doc, position.end.offset - 1),
+          }
+        : position;
+      const tail = open
+        ? [text(doc, position.end.offset - 1, position.end.offset)]
+        : [];
       return [
         type === "imageReference"
           ? {
@@ -397,7 +418,7 @@ function convert(
               label: decodeLabel(label),
               referenceType,
               alt,
-              position,
+              position: own,
               ...spelled,
             }
           : {
@@ -406,9 +427,10 @@ function convert(
               label: decodeLabel(label),
               referenceType,
               children: kids(),
-              position,
+              position: own,
               ...spelled,
             },
+        ...tail,
       ];
     }
     case "definition": {
@@ -437,9 +459,28 @@ function convert(
       // The title as `calloutTransform` reads it: every value under the title, joined.
       const collect = (nodes: readonly Node8[]): string =>
         nodes
-          .map((n) =>
-            "value" in n ? String(n.value) : collect(n.children ?? []),
-          )
+          .map((n) => {
+            if ("value" in n) return String(n.value);
+            // A kept undefined reference is what it was before it was kept: its brackets are
+            // the title's text.
+            if (
+              (n.data as { defined?: boolean } | undefined)?.defined ===
+                false &&
+              n.referenceType !== "full"
+            ) {
+              const { start, end } = n.position;
+              const kids = n.children ?? [];
+              if (kids.length === 0) return doc.slice(start.offset, end.offset);
+              const first = kids[0]!.position.start.offset;
+              const last = kids[kids.length - 1]!.position.end.offset;
+              return (
+                doc.slice(start.offset, first) +
+                collect(kids) +
+                doc.slice(last, end.offset)
+              );
+            }
+            return collect(n.children ?? []);
+          })
           .join("");
       let title = collect(titleBlocks).trim();
       const body = children.slice(1);

@@ -81,7 +81,9 @@ export function textToMarkdown(
           siblings.indexOf(node as never) - 2
         ] as { type: string; value?: string } | undefined;
         if (
-          previous?.type === "footnoteReference" &&
+          (previous?.type === "footnoteReference" ||
+            (previous as { data?: { defined?: boolean } } | undefined)?.data
+              ?.defined === false) &&
           written.startsWith(":") &&
           (beforeReference === undefined ||
             beforeReference.type === "break" ||

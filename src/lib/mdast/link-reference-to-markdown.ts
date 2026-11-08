@@ -61,6 +61,44 @@ function withSpelledLabel<T extends LinkReference | ImageReference>(
     : write(node);
 }
 
+/**
+ * A kept undefined reference (`keepUndefinedReferences`) written as it read, which holds its
+ * label as written: through upstream the text is escaped and the label is not, so `[a\`]` came
+ * back `[a\`][a`]`, a full reference to another label. A reference nothing defines has only the
+ * label's spelling to go by, so the writer must not move it.
+ *
+ * A label like `!note` opening a quote's first line would make a callout of it (`>` /
+ * `> [!note]`, whose blank line goes), where as text it was written `\[!note]`.
+ */
+function keptReference(
+  node: LinkReference | ImageReference,
+  parent: Parents | undefined,
+  state: State,
+): string | undefined {
+  const data = node.data as
+    { defined?: boolean; spelledLabel?: string } | undefined;
+  if (data?.defined !== false || node.referenceType === "full")
+    return undefined;
+  const label = data.spelledLabel ?? node.label;
+  if (label === undefined || label === null) return undefined;
+  const next = parent?.type === "paragraph" ? parent.children[1] : undefined;
+  const callout =
+    parent?.type === "paragraph" &&
+    parent.children[0] === node &&
+    state.stack.includes("blockquote") &&
+    state.indexStack[state.indexStack.length - 2] === 0 &&
+    /^![^\]\n]+$/u.test(label) &&
+    (next === undefined ||
+      next.type === "break" ||
+      (next.type === "text" && /^[+-]?(?:[ \t\n]|$)/u.test(next.value)));
+  return (
+    (node.type === "imageReference" ? "![" : "[") +
+    (callout ? `\\${label}` : label) +
+    "]" +
+    (node.referenceType === "collapsed" ? "[]" : "")
+  );
+}
+
 export function linkReferenceToMarkdown(
   options: { readonly strict?: boolean } = {},
 ): Options {
@@ -72,6 +110,8 @@ export function linkReferenceToMarkdown(
         state: State,
         info: Info,
       ) {
+        const kept = keptReference(node, parent, state);
+        if (kept !== undefined) return kept;
         if (
           node.referenceType === "shortcut" &&
           BLANK.test(node.label ?? node.identifier)
@@ -92,8 +132,11 @@ export function linkReferenceToMarkdown(
         state: State,
         info: Info,
       ) {
-        return withSpelledLabel(node, (own) =>
-          defaultHandlers.imageReference(own, parent, state, info),
+        return (
+          keptReference(node, parent, state) ??
+          withSpelledLabel(node, (own) =>
+            defaultHandlers.imageReference(own, parent, state, info),
+          )
         );
       },
     },

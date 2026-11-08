@@ -81,6 +81,16 @@ declare module "mdast" {
     taskChar?: string;
   }
 
+  interface LinkReferenceData {
+    /** `false` on a reference `keepUndefinedReferences` kept: this parse found no definition. */
+    defined?: false;
+  }
+
+  interface ImageReferenceData {
+    /** `false` on a reference `keepUndefinedReferences` kept: this parse found no definition. */
+    defined?: false;
+  }
+
   interface RootContentMap {
     wikilink: Wikilink;
     highlight: Highlight;

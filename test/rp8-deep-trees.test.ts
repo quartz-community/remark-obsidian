@@ -31,6 +31,7 @@ const OPTIONS: LegacyOptions = {
   lineOffsets: true,
   bareFootnoteRefs: false,
   bomOffsets: false,
+  keepUndefinedReferences: false,
 };
 
 const DEPTH = 1_000;
