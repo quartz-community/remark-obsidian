@@ -32,6 +32,12 @@ export const MARKER = /^\[!([^\]\r\n]+)\]([-+]?)(?=[ \t\r\n]|$)[ \t]?/;
  */
 const QUOTE_MARKER = /^[ \t]{0,3}>/u;
 const LIST_MARKER = /^[ \t]{0,3}(?:[-*+]|\d{1,9}[.)])[ \t]+/u;
+/**
+ * A footnote label too: `[^1]: > [!note] T` is a callout inside the definition, which Obsidian
+ * renders in the footnote list (recorded, 1.15.0, 2026-11-08) and `legacy` builds. Under `strict`
+ * the label's prefix failed this check and the callout stayed a plain quote.
+ */
+const LABEL_MARKER = /^[ \t]{0,3}\[\^[^\]\s]+\]:[ \t]*/u;
 const AT_MARKER = /^ ?\[!/u;
 
 /**
@@ -49,7 +55,7 @@ function atMarkerColumn(line: string): boolean {
       rest = rest.slice(quote[0].length);
       continue;
     }
-    const list = LIST_MARKER.exec(rest);
+    const list = LIST_MARKER.exec(rest) ?? LABEL_MARKER.exec(rest);
     if (!list) break;
     rest = rest.slice(list[0].length);
   }

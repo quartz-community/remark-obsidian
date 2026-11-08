@@ -634,7 +634,7 @@ with that label defined; the other 5 are `[][`, whose empty label nothing can de
 ## Gates — what "done" means
 
 ```bash
-npm test          # 917 tests / 34 files. Contains the contract gate.
+npm test          # 919 tests / 34 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -1119,6 +1119,15 @@ into literal (and invisible) characters three times in this work.
 
 ### Re-recording the goldens
 
+**Callout shapes settled against 1.15.0** (2026-11-08, recorded through the harness's own app,
+twelve probes with controls). `[^1]: > [!note] T` is a callout in the footnote list: `legacy`
+built it, `strict` left a quote, since `atMarkerColumn` stripped quote and list markers but not
+a footnote label; it strips the label now. `- [ ] > [!note] T` renders a callout inside the task
+item, but under GFM a task box is followed by inline text, so `strict` holds `> [!note] T` as the
+item's paragraph -- the quote is CommonMark/GFM's question, read by the spec. `>⇥[!note] T` and
+`> ⇥[!note] T` are indented code in Obsidian (as in `legacy`) and a paragraph under `strict`
+(tab arithmetic), and `>··[!note] T` is a plain quote everywhere.
+
 **The goldens are 1.15.0's now** (2026-11-08, the public build). 1.15.0 renders all 3,471 cases
 as 1.14.5 did: the recording changed nothing but its stamps and the surplus-table-cell family
 below. Two traps that run met:
@@ -1230,14 +1239,9 @@ unit test "reads a tag's characters as Obsidian does", which fails on the old cl
    them, ``&#0`&/`` reads as a backtick, U+FFFD and `/` and ``&#xa`&]`` likewise, where the stock reader
    keeps `` `&/ ``. `rp8-speedups.test.ts` does not reach a character reference before a
    backtick. Open: the speed-up must give way, since the stock reading is Obsidian's.
-9. **Callout shapes that need the live app** (found reviewing PR #36, 2026-11-08). `strict`
-   forms no callout inside a footnote definition (`[^1]: > [!note] T`) or after a task box
-   (`- [ ] > [!note] T`), where `legacy` does; neither preset forms one after `>⇥`
-   (`>\t[!note] T`). Ask 1.15.0 before deciding which side is right. The `\r\n` title-less
-   case from the same review was fixed: `MARKER`'s lookahead took no `\r`.
-10. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,
-    `pass-owner*.mts`, `pass-order*.mts` and their kin attribute behaviour to micromark passes
-    `legacy` no longer runs. Port to `strict` or delete; do not trust their `legacy` output.
+9. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,
+   `pass-owner*.mts`, `pass-order*.mts` and their kin attribute behaviour to micromark passes
+   `legacy` no longer runs. Port to `strict` or delete; do not trust their `legacy` output.
 
 ## Rules that each cost a session
 

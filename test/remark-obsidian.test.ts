@@ -3007,6 +3007,25 @@ describe("setext underline under a definition", () => {
   });
 });
 
+describe("callout inside a footnote definition", () => {
+  // Obsidian renders `[^1]: > [!note] T` as a callout in the footnote list (recorded, 1.15.0,
+  // 2026-11-08), and `legacy` builds one. Under `strict` the label's prefix failed the marker
+  // column check, so the callout stayed a plain quote.
+  const kinds = (md: string, preset: "legacy" | "strict") => {
+    const tree = processWithGfm(md, { preset }) as any;
+    const definition = tree.children.find(
+      (n: any) => n.type === "footnoteDefinition",
+    );
+    return definition.children.map((n: any) => n.type);
+  };
+  it.each(["legacy", "strict"] as const)("forms it under %s", (preset) => {
+    expect(kinds("x[^1]\n\n[^1]: > [!note] T\n    > body\n", preset)).toEqual([
+      "callout",
+    ]);
+    expect(kinds("x[^1]\n\n[^1]: > quote\n", preset)).toEqual(["blockquote"]);
+  });
+});
+
 describe("callout over \\r\\n line endings", () => {
   // Under `strict` the marker's lookahead took no `\r`, so a title-less `> [!note]` over a
   // `\r\n` line ending formed no callout, and kept as the line's end the `\r` read as a title
