@@ -48,15 +48,17 @@ export function commentParseTransform(
   // first line to count, so `> > a` / ` b %%x` / `> > y%%` stripped one `>` from `y` and read
   // a quote into the body (found by `fuzz/invariant-sweep.ts`).
   const depthOf = new Map<Node, number>();
-  const walk = (node: Node, depth: number): void => {
+  // On an explicit stack: quotes nest thousands deep, a frame per level overflowed first.
+  const pending: Array<[Node, number]> = [[tree, 0]];
+  while (pending.length > 0) {
+    const [node, depth] = pending.pop()!;
     const inner =
       node.type === "blockquote" || node.type === "callout" ? depth + 1 : depth;
     for (const child of (node as { children?: Node[] }).children ?? []) {
       if (child.type === "comment") depthOf.set(child, inner);
-      walk(child, inner);
+      pending.push([child, inner]);
     }
-  };
-  walk(tree, 0);
+  }
 
   visit(tree, "comment", (node: Node, _index, parent) => {
     const comment = node as Comment;

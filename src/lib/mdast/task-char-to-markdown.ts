@@ -35,13 +35,10 @@ export function taskCharToMarkdown(
           );
         const indent = state.options.listItemIndent;
         if (wide) state.options.listItemIndent = "tab";
+        // Written in this frame, not a helper's: an item nested in an item recurses through
+        // here, and every frame per level brings the stack's limit closer (a list nests about
+        // 1,400 deep under `legacy`).
         try {
-          return writeItem();
-        } finally {
-          state.options.listItemIndent = indent;
-        }
-
-        function writeItem(): string {
           const head = node.children[0];
           // Not only over a paragraph: a label straight after a task box is a definition inside
           // the item, and without the box `- [>] [^b]: x` was written `* [^b]: x`, losing the task
@@ -82,6 +79,8 @@ export function taskCharToMarkdown(
           );
 
           return value;
+        } finally {
+          state.options.listItemIndent = indent;
         }
       },
     },

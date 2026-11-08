@@ -154,17 +154,40 @@ export function quoteCommentLazyTransform(tree: Root, source: string): void {
 
 /** The comment that is its parent's LAST child, with the ancestor chain down to it. */
 function commentPath(
-  parent: ParentNode,
-  chain: ParentNode[],
+  root: ParentNode,
+  rootChain: ParentNode[],
 ): { comment: CommentNode; chain: ParentNode[] } | undefined {
-  const tail = parent.children[parent.children.length - 1];
-  if (isComment(tail)) return { comment: tail, chain };
-  // A quote whose own tail is not the comment may still HOLD it one level down, which is the
-  // usual shape once a lazy block has been absorbed beside the inner quote.
-  for (const child of parent.children) {
+  // Searched on an explicit stack, in a recursive search's order, without a frame per level
+  // (quotes nest thousands deep).
+  const pending: Array<{
+    parent: ParentNode;
+    chain: ParentNode[];
+    next: number;
+  }> = [];
+  const enter = (
+    parent: ParentNode,
+    chain: ParentNode[],
+  ): { comment: CommentNode; chain: ParentNode[] } | undefined => {
+    const tail = parent.children[parent.children.length - 1];
+    if (isComment(tail)) return { comment: tail, chain };
+    pending.push({ parent, chain, next: 0 });
+    return undefined;
+  };
+  const first = enter(root, rootChain);
+  if (first) return first;
+  while (pending.length > 0) {
+    const top = pending[pending.length - 1]!;
+    const child = top.parent.children[top.next];
+    if (child === undefined) {
+      pending.pop();
+      continue;
+    }
+    top.next += 1;
+    // A quote whose own tail is not the comment may still HOLD it one level down, which is the
+    // usual shape once a lazy block has been absorbed beside the inner quote.
     if (child.type !== "blockquote") continue;
-    const found = commentPath(child as unknown as ParentNode, [
-      ...chain,
+    const found = enter(child as unknown as ParentNode, [
+      ...top.chain,
       child as unknown as ParentNode,
     ]);
     if (found) return found;

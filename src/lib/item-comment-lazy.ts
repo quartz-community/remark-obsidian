@@ -69,20 +69,33 @@ export function itemCommentLazyTransform(tree: Root, source: string): void {
   absorb(tree as unknown as ParentNode, source, []);
 }
 
-/** Every `listItem` at any depth, because a nested item hosts this exactly as a root one does. */
+/**
+ * Every `listItem` at any depth, because a nested item hosts this exactly as a root one does.
+ * Walked on an explicit stack in a recursive walk's order -- each node's children taken as they
+ * stand once the node itself is done -- without a frame per level (a list nests about 1,400
+ * deep).
+ */
 function absorb(
-  node: ParentNode,
+  root: ParentNode,
   source: string,
-  ancestors: readonly ParentNode[],
+  rootAncestors: readonly ParentNode[],
 ): void {
-  const children = node.children;
-  if (!Array.isArray(children)) return;
+  const pending: Array<[ParentNode, readonly ParentNode[]]> = [
+    [root, rootAncestors],
+  ];
+  while (pending.length > 0) {
+    const [node, ancestors] = pending.pop()!;
+    const children = node.children;
+    if (!Array.isArray(children)) continue;
 
-  if ((node as Node).type === "listItem") {
-    swallow(node, source, ancestors);
-  }
-  for (const child of [...children]) {
-    absorb(child as unknown as ParentNode, source, [...ancestors, node]);
+    if ((node as Node).type === "listItem") {
+      swallow(node, source, ancestors);
+    }
+    const below = [...ancestors, node];
+    const snapshot = [...children];
+    for (let at = snapshot.length - 1; at >= 0; at--) {
+      pending.push([snapshot[at] as unknown as ParentNode, below]);
+    }
   }
 }
 

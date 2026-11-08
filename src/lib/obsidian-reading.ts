@@ -346,18 +346,22 @@ function detect(
     if (options.comments && node.type === "footnoteDefinition") {
       settled.push(...lazyCommentUnderDefinition(node as Parent, lines));
     }
-    for (const child of children) {
-      walk(
-        child,
+    // Children go on the stack last first, so they are visited in order, each after its parent
+    // and its parent's earlier siblings' subtrees: the order of a recursive walk, without a
+    // frame per level (a list nests about 1,400 deep).
+    for (let at = children.length - 1; at >= 0; at--) {
+      pending.push([
+        children[at]!,
         inDefinition || node.type === "footnoteDefinition",
         node.type === "listItem" ? node : item,
         node.type === "root" ? 0 : (node.position?.start.line ?? 0),
         node as Parent,
         CONTAINERS.has(node.type) ? node.type : container,
-      );
+      ]);
     }
   };
-  walk(tree, false, undefined, 0);
+  const pending: Array<Parameters<typeof walk>> = [[tree, false, undefined, 0]];
+  while (pending.length > 0) walk(...pending.pop()!);
 
   for (const { node: definition, item, hostLine } of definitions) {
     const position = definition.position;

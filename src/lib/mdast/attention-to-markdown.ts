@@ -1,5 +1,6 @@
 import type { Emphasis, Node, PhrasingContent, Strong } from "mdast";
 import { defaultHandlers, type Options } from "mdast-util-to-markdown";
+import { childrenOf, eachBelow } from "../walk.js";
 import { markEmptyDeletes } from "./empty-delete-to-markdown.js";
 import { removeTagEnds } from "./tag-to-markdown.js";
 
@@ -15,11 +16,16 @@ type Attention = (
  */
 export const parentOf = new WeakMap<Node, Node>();
 
-function recordParents(node: Node): void {
-  for (const child of (node as { children?: Node[] }).children ?? []) {
-    parentOf.set(child, node);
-    recordParents(child);
-  }
+/**
+ * Walked on an explicit stack: the whole tree is walked here, including a comment's parsed body,
+ * which the writer never descends into, so a frame per level overflowed first (about 3,000
+ * levels). The `*` and `_` checks below stay recursive: they look only below attention the
+ * writer is writing, whose own recursion spends more frames a level.
+ */
+function recordParents(root: Node): void {
+  eachBelow(root, (node, parent) => {
+    parentOf.set(node, parent);
+  });
 }
 
 /** The sibling after `node`, by the parents recorded at the root. */
@@ -199,13 +205,11 @@ export function attentionToMarkdown(options: {
   const beforeAttention = new WeakSet<Node>();
   const isAttention = (node: Node | undefined): boolean =>
     node?.type === "emphasis" || node?.type === "strong";
-  const markAdjacent = (node: Node): void => {
-    const children = (node as { children?: Node[] }).children ?? [];
-    children.forEach((child, index) => {
-      if (isAttention(child) && isAttention(children[index + 1])) {
-        beforeAttention.add(child);
+  const markAdjacent = (root: Node): void => {
+    eachBelow(root, (node, parent, index) => {
+      if (isAttention(node) && isAttention(childrenOf(parent)[index + 1])) {
+        beforeAttention.add(node);
       }
-      markAdjacent(child);
     });
   };
   const wrap = <H extends Handle>(base: H): H => {

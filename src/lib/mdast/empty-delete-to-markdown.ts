@@ -1,5 +1,6 @@
 import type { Node } from "mdast";
 import type { Handle, Options } from "mdast-util-to-markdown";
+import { eachBelow } from "../walk.js";
 
 /** The type an empty `delete` is written under, for the length of one serialization. */
 const EMPTY_DELETE = "obsidianEmptyDelete";
@@ -25,15 +26,15 @@ export function isEmptyDelete(
 
 export function markEmptyDeletes(tree: Node): () => void {
   const marked: Node[] = [];
-  const walk = (node: Node): void => {
+  const mark = (node: Node): void => {
     const children = (node as { children?: Node[] }).children;
     if (node.type === "delete" && children?.length === 0) {
       (node as { type: string }).type = EMPTY_DELETE;
       marked.push(node);
     }
-    children?.forEach(walk);
   };
-  walk(tree);
+  mark(tree);
+  eachBelow(tree, mark);
   return () => {
     for (const node of marked) (node as { type: string }).type = "delete";
   };

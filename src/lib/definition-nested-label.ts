@@ -70,20 +70,38 @@ export function definitionNestedLabelTransform(
   }
 }
 
+/**
+ * The first nested definition that continues the line above, in document order. Searched on an
+ * explicit stack, in a recursive search's order, without a frame per level.
+ */
 function find(
-  node: Parent,
-  inDefinition: boolean,
+  root: Parent,
+  inRootDefinition: boolean,
   lines: string[],
 ): { parent: Parent; index: number } | undefined {
-  const children = node.children;
-  if (!Array.isArray(children)) return undefined;
-
-  for (const [index, child] of children.entries()) {
+  if (!Array.isArray(root.children)) return undefined;
+  const pending: Array<{ node: Parent; inDefinition: boolean; next: number }> =
+    [{ node: root, inDefinition: inRootDefinition, next: 0 }];
+  while (pending.length > 0) {
+    const top = pending[pending.length - 1]!;
+    const { node, inDefinition } = top;
+    const index = top.next;
+    const child = node.children?.[index];
+    if (child === undefined) {
+      pending.pop();
+      continue;
+    }
+    top.next = index + 1;
     const isDefinition = child.type === "footnoteDefinition";
     if (isDefinition && inDefinition && continues(child, lines))
       return { parent: node, index };
-    const found = find(child, inDefinition || isDefinition, lines);
-    if (found) return found;
+    if (Array.isArray((child as Partial<Parent>).children)) {
+      pending.push({
+        node: child as Parent,
+        inDefinition: inDefinition || isDefinition,
+        next: 0,
+      });
+    }
   }
   return undefined;
 }
@@ -144,10 +162,21 @@ function labelText(
   };
 }
 
+/** The offset of the deepest first descendant that has one, read down a loop, not a recursion. */
 function firstContentOffset(node: Positioned): number | undefined {
-  const child = node.children?.[0] as Positioned | undefined;
-  if (!child) return undefined;
-  return firstContentOffset(child) ?? child.position?.start.offset;
+  const chain: Positioned[] = [];
+  for (
+    let child = node.children?.[0] as Positioned | undefined;
+    child;
+    child = child.children?.[0] as Positioned | undefined
+  ) {
+    chain.push(child);
+  }
+  for (let at = chain.length - 1; at >= 0; at--) {
+    const offset = chain[at]!.position?.start.offset;
+    if (offset !== undefined) return offset;
+  }
+  return undefined;
 }
 
 function offsetPoint(

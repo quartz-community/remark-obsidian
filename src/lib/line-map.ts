@@ -80,24 +80,32 @@ interface Point {
  * after a split lands on the lines it actually came from.
  */
 export function shiftByMap(node: unknown, map: LineMap, from: number): void {
-  const candidate = node as {
-    position?: { start: Point; end: Point };
-    children?: unknown[];
-  };
+  // Parents before children, siblings in order, on an explicit stack: a fragment nests as deep
+  // as the document, and a frame per level overflowed first.
+  const pending: unknown[] = [node];
+  while (pending.length > 0) {
+    const candidate = pending.pop() as {
+      position?: { start: Point; end: Point };
+      children?: unknown[];
+    };
 
-  if (candidate.position) {
-    for (const point of [candidate.position.start, candidate.position.end]) {
-      const index = from + point.line - 1;
-      const lineStart = map.starts[index];
-      const line = map.lines[index];
-      if (lineStart !== undefined && line !== undefined) {
-        point.offset = lineStart + point.column - 1;
-        point.line = line;
+    if (candidate.position) {
+      for (const point of [candidate.position.start, candidate.position.end]) {
+        const index = from + point.line - 1;
+        const lineStart = map.starts[index];
+        const line = map.lines[index];
+        if (lineStart !== undefined && line !== undefined) {
+          point.offset = lineStart + point.column - 1;
+          point.line = line;
+        }
       }
     }
-  }
 
-  for (const child of candidate.children ?? []) shiftByMap(child, map, from);
+    const children = candidate.children ?? [];
+    for (let at = children.length - 1; at >= 0; at--) {
+      pending.push(children[at]);
+    }
+  }
 }
 
 /**
