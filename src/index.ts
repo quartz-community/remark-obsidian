@@ -66,6 +66,7 @@ import { mathMidlineTransform } from "./lib/math-midline.js";
 import { calloutTitleInterruptTransform } from "./lib/callout-title-interrupt.js";
 import { restoreInlinePositionsTransform } from "./lib/restore-inline-positions.js";
 import { attentionToMarkdown } from "./lib/mdast/attention-to-markdown.js";
+import { emptyDeleteToMarkdown } from "./lib/mdast/empty-delete-to-markdown.js";
 import { autolinkLiteralToMarkdown } from "./lib/mdast/autolink-literal-to-markdown.js";
 import { htmlTailToMarkdown } from "./lib/mdast/html-tail-to-markdown.js";
 import { linkReferenceToMarkdown } from "./lib/mdast/link-reference-to-markdown.js";
@@ -517,6 +518,7 @@ export default function remarkObsidian(
   data.toMarkdownExtensions.push(
     attentionToMarkdown({ legacy: preset === "legacy" }),
   );
+  data.toMarkdownExtensions.push(emptyDeleteToMarkdown());
   // Obsidian (remark-parse 8) reads `<<https://x>` as one autolink whose address starts with
   // `<`; CommonMark reads a `<` and then the autolink. Escaping a `<` written right before
   // another keeps both readings, so formatting reaches a fixed point under either.

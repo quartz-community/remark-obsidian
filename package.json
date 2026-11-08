@@ -31,7 +31,8 @@
     "typecheck": "tsc --noEmit && tsc -p tsconfig.parity.json --noEmit",
     "prepublishOnly": "npm run build",
     "release": "npm run build && changeset publish",
-    "lint": "eslint 'src/**/*.ts'"
+    "lint": "eslint 'src/**/*.ts'",
+    "version-packages": "changeset version && npm install --package-lock-only --ignore-scripts --no-audit --no-fund"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.2",
@@ -59,7 +60,7 @@
     "mdast-util-frontmatter": "^2.0.1",
     "mdast-util-gfm-table": "^2.0.0",
     "mdast-util-math": "^3.0.0",
-    "mdast-util-to-markdown": "^2.1.0",
+    "mdast-util-to-markdown": "^2.2.0",
     "mdast-util-to-string": "^4.0.0",
     "micromark-core-commonmark": "^2.0.4",
     "micromark-extension-frontmatter": "^2.0.0",
@@ -67,6 +68,7 @@
     "micromark-factory-space": "^2.0.1",
     "micromark-util-character": "^2.1.1",
     "micromark-util-decode-string": "^2.0.1",
+    "micromark-util-normalize-identifier": "^2.0.1",
     "micromark-util-symbol": "^2.0.0",
     "micromark-util-types": "^2.0.0",
     "mocha": "^11.8.0",
@@ -95,6 +97,9 @@
     "wdio-obsidian-reporter": "^3.2.1",
     "wdio-obsidian-service": "^3.2.1",
     "webdriverio": "^9.32.0"
+  },
+  "peerDependencies": {
+    "mdast-util-to-markdown": "^2.2.0"
   },
   "engines": {
     "node": ">=22"
