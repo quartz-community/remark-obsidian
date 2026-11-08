@@ -1206,7 +1206,12 @@ found` before a session starts ("Unable to connect"). The flake's shell
   hook now unsets it (`49e2a69`).
 
 `referee-spans.json` and the two strict probe goldens carry a 1.15.0 stamp from 2026-10-27, the
-early-access build; the stamp cannot tell the builds apart.
+early-access build; the stamp cannot tell the builds apart. **Checked against the live app the same
+day**, which had updated itself to 1.15.1 (insider): `record-referee-spans.mts` reproduced
+all 6,844 documents' spans exactly, and all 513 strict probes (406 + 107, `ask.mts --file`,
+projected as `oracle.e2e.ts`'s `computeOf` does and reduced to lines) answered as recorded.
+Control: the same comparison with every line shifted by one flags 406 of 406. The files keep
+their 1.15.0 stamp and date, since nothing in them changed.
 
 `nix develop -c parity-record`; bare `npm run parity:record` fails with `ECONNREFUSED` because the
 downloaded Obsidian needs the `nix-ld` the flake wires up. It takes about ten minutes, and its
