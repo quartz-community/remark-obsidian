@@ -189,4 +189,36 @@ describe("bomOffsets off, the default", () => {
     ]);
     expect(references[0].position.start.column).toBe(2);
   });
+
+  // `strict`'s passes read the source while micromark's offsets leave the mark out, so before
+  // the passes were handed the mark-less text a mark changed the READING of 506 of the 3,471
+  // recorded cases (107 of them a callout gained or lost). A parse bug, not a position choice.
+  const strip = (tree: unknown): string =>
+    JSON.stringify(tree, (key, value) =>
+      key === "position" || key === "lineOffsets" ? undefined : value,
+    );
+
+  it("lets a mark change nothing `strict` reads", () => {
+    const callout = "> [!note] T\n> body\n";
+    const tree = read(MARK + callout, { preset: "strict" });
+    expect(findAll(tree, "callout")).toHaveLength(1);
+    const cases = strideSample(Object.values(golden.cases), 400);
+    const moved = cases
+      .filter(
+        (c) =>
+          strip(read(MARK + c.markdown, { preset: "strict" })) !==
+          strip(read(c.markdown, { preset: "strict" })),
+      )
+      .map((c) => c.id);
+    expect(moved).toEqual([]);
+  });
+
+  // A callout's empty title and the block on its line share one point object, and restoring
+  // `\r\n` shifted it once per node holding it: the definition sat at 19 instead of 15 (58 of
+  // 12,290 corpus, referee and generated documents converted to `\r\n`).
+  it("restores `\\r\\n` once per shared point, under legacy", () => {
+    const markdown = "a\r\n\r\n> [!note] [^1]: def\r\n";
+    const [definition] = findAll(read(markdown, {}), "footnoteDefinition");
+    expect(sliceOf(markdown, definition)).toBe("[^1]: def");
+  });
 });
