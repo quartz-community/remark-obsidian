@@ -63,6 +63,7 @@ import {
   lineOffsetsFromMarkdown,
 } from "./lib/mdast/line-offsets.js";
 import { mathMidlineTransform } from "./lib/math-midline.js";
+import { countByteOrderMark } from "./lib/byte-order-mark.js";
 import { calloutMarkerTransform } from "./lib/callout-marker.js";
 import { calloutTitleInterruptTransform } from "./lib/callout-title-interrupt.js";
 import { restoreInlinePositionsTransform } from "./lib/restore-inline-positions.js";
@@ -204,6 +205,15 @@ export interface RemarkObsidianOptions {
    * `remark-breaks` and a `break` really is a hard break.
    */
   escapedLineBreaks?: boolean;
+  /**
+   * Count a leading byte order mark in every position and in `data.lineOffsets`, so an offset
+   * indexes the string that was parsed, and read the rest as if the mark were not there.
+   *
+   * Off by default, because Obsidian's `metadataCache` leaves the mark out: its offsets and
+   * first-line columns are one short of the editor's, and off is what the parity gates measure.
+   * Turn it on to edit the string by position.
+   */
+  bomOffsets?: boolean;
 }
 
 /**
@@ -256,6 +266,7 @@ const PRESETS: Record<RemarkObsidianPreset, Partial<RemarkObsidianFlags>> = {
 const defaultOptions: RemarkObsidianFlags = {
   ...legacyDefaults,
   escapedLineBreaks: false,
+  bomOffsets: false,
 };
 
 /**
@@ -859,16 +870,18 @@ export default function remarkObsidian(
     return fragment;
   };
 
-  if (!opts.callouts) return transform;
-  // Around `transform`, not inside it: `reparse` runs it on fragments, whose positions the caller
-  // places back. `strict`'s offsets leave out a leading byte order mark, so this does too.
+  // Around `transform`, not inside it: `reparse` runs it on fragments, whose positions the
+  // caller places back. micromark reads past the mark without counting it, so the passes must
+  // read the text the offsets index -- whatever `bomOffsets` says, or the mark changes the
+  // reading. The callout markers are placed in the same coordinates, and only then, if asked,
+  // does every point move.
   return (tree: Root, file: unknown): void => {
-    transform(tree, file);
     const source = String(file);
-    calloutMarkerTransform(
-      tree,
-      source.charCodeAt(0) === 0xfeff ? source.slice(1) : source,
-    );
+    const marked = source.charCodeAt(0) === 0xfeff;
+    const text = marked ? source.slice(1) : source;
+    transform(tree, marked ? text : file);
+    if (opts.callouts) calloutMarkerTransform(tree, text);
+    if (marked && opts.bomOffsets) countByteOrderMark(tree);
   };
 }
 

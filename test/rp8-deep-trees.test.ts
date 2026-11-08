@@ -30,6 +30,7 @@ const OPTIONS: LegacyOptions = {
   parseComments: false,
   lineOffsets: true,
   bareFootnoteRefs: false,
+  bomOffsets: false,
 };
 
 const DEPTH = 1_000;

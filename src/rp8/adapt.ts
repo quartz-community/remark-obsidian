@@ -9,6 +9,7 @@ import type { Root } from "mdast";
 import { decodeString } from "micromark-util-decode-string";
 import { normalizeIdentifier } from "micromark-util-normalize-identifier";
 
+import { countByteOrderMark } from "../lib/byte-order-mark.js";
 import { calloutMarkerTransform } from "../lib/callout-marker.js";
 import { mathDisplayTransform } from "../lib/math-display.js";
 import { resolveTarget, spelledTarget } from "../lib/wikilink-target.js";
@@ -25,6 +26,7 @@ export interface LegacyOptions extends Features {
   parseComments: boolean;
   lineOffsets: boolean;
   bareFootnoteRefs: boolean;
+  bomOffsets: boolean;
 }
 
 /** All on: what `legacy` reads with unless told otherwise. */
@@ -43,6 +45,7 @@ export const legacyDefaults: LegacyOptions = {
   inlineFootnotes: true,
   callouts: true,
   positionedBreaks: true,
+  bomOffsets: false,
 };
 
 interface Context {
@@ -535,7 +538,13 @@ function clampToParent(node: Node8): void {
  * remark-parse 8 reads `\r\n` as `\n`, which moves every later offset; Obsidian reports them in
  * the original text, so each is moved back. A lone `\r` keeps its length and needs nothing.
  */
-function restoreCrlf(node: Node8, crlf: readonly number[]): void {
+// A point object can sit in two nodes (an empty callout title and the block on its line), so
+// each is shifted once, by identity.
+function restoreCrlf(
+  node: Node8,
+  crlf: readonly number[],
+  seen = new Set<object>(),
+): void {
   const shift = (offset: number): number => {
     let low = 0;
     let high = crlf.length;
@@ -547,10 +556,13 @@ function restoreCrlf(node: Node8, crlf: readonly number[]): void {
     return offset + low;
   };
   if (node.position) {
-    node.position.start.offset = shift(node.position.start.offset);
-    node.position.end.offset = shift(node.position.end.offset);
+    for (const point of [node.position.start, node.position.end]) {
+      if (seen.has(point)) continue;
+      seen.add(point);
+      point.offset = shift(point.offset);
+    }
   }
-  for (const child of node.children ?? []) restoreCrlf(child, crlf);
+  for (const child of node.children ?? []) restoreCrlf(child, crlf, seen);
 }
 
 export function parseLegacy8(input: string, options: LegacyOptions): Root {
@@ -575,5 +587,7 @@ export function parseLegacy8(input: string, options: LegacyOptions): Root {
   if (options.math) mathDisplayTransform(root as unknown as Root, doc);
   if (crlf.length > 0) restoreCrlf(root, crlf);
   if (options.callouts) calloutMarkerTransform(root as unknown as Root, source);
+  if (source !== input && options.bomOffsets)
+    countByteOrderMark(root as unknown as Root);
   return root as unknown as Root;
 }
