@@ -942,6 +942,90 @@ describe("remark-obsidian", () => {
       expect(legacyHighlightQueue("== text==")).toBe(null);
     });
 
+    it("answers as testing the whole content at each closer does", () => {
+      // The rule as this function first ran it, quadratic per opener on a run of `==` after
+      // whitespace. The speed-up test cannot see a change here, since both readers call it.
+      const wholeContent = (value: string): string | null => {
+        if (value.charAt(0) !== "=" || value.charAt(1) !== "=") return null;
+        let queue = "";
+        for (let index = 2; index < value.length; index++) {
+          const character = value.charAt(index);
+          if (character === "=" && value.charAt(index + 1) === "=") {
+            if (!queue.trim() || /^\s/u.test(queue)) return null;
+            if (!/\s$/u.test(queue)) return queue;
+          }
+          queue += character;
+        }
+        return null;
+      };
+      const alphabet = ["=", "a", " ", "\n", "\u00a0", "\ud83d\ude00"];
+      let docs = ["=="];
+      let closed = 0;
+      const differ: string[] = [];
+      for (let length = 1; length <= 7; length++) {
+        docs = docs.flatMap((doc) => alphabet.map((c) => doc + c));
+        for (const doc of docs) {
+          const answer = legacyHighlightQueue(doc);
+          if (answer !== null) closed++;
+          if (answer !== wholeContent(doc)) differ.push(JSON.stringify(doc));
+        }
+      }
+      expect(differ).toEqual([]);
+      expect(closed).toBeGreaterThan(9_000);
+    });
+
+    it("lets a later opener close after an earlier one found no closer", () => {
+      // A closer is a fact about its own `==`, so an opener that read to the end and found none
+      // speaks for every later one, but not one that stopped early. Each case below starts with
+      // an opener that fails, and each preset must still read what follows it.
+      const units = ["==a ", "== ", "====", "==a==", "=== ", "="];
+      let docs = ["x"];
+      const shapes: string[] = [];
+      for (let length = 1; length <= 4; length++) {
+        docs = docs.flatMap((doc) => units.map((unit) => doc + unit));
+        shapes.push(...docs);
+      }
+      shapes.push(
+        "==a\n==b==",
+        "== a\n==b==",
+        "==a\n== b==",
+        "==a \n==b",
+        "==a \n==b \n==c==",
+        "====\n==b==",
+        "x\n==a\n==b\n==c==",
+      );
+      // The readings the rule gives by trying each `==` in turn, none remembered.
+      const byTurns = (doc: string): string[] => {
+        const bodies: string[] = [];
+        let at = doc.indexOf("==");
+        while (at !== -1) {
+          const body = legacyHighlightQueue(doc.slice(at));
+          if (body !== null) bodies.push(body);
+          at = doc.indexOf("==", body === null ? at + 1 : at + 4 + body.length);
+        }
+        return bodies;
+      };
+      let highlighted = 0;
+      for (const preset of ["legacy", "strict"] as const) {
+        const differ = shapes.filter((doc) => {
+          // By source span: `legacy` keeps a line ending in a body as a break, not in its text.
+          const found = findNodes(
+            processWithGfm(doc, { preset }),
+            "highlight",
+          ).map((node) =>
+            doc.slice(
+              (node.position.start.offset as number) + 2,
+              (node.position.end.offset as number) - 2,
+            ),
+          );
+          highlighted += found.length;
+          return JSON.stringify(found) !== JSON.stringify(byTurns(doc));
+        });
+        expect(differ).toEqual([]);
+      }
+      expect(highlighted).toBeGreaterThan(1_000);
+    }, 60_000);
+
     it("does not highlight content padded with whitespace", () => {
       for (const md of [
         "before == text== after\n",
