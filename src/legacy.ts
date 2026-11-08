@@ -12,11 +12,8 @@ import type { Root } from "mdast";
 
 import "./lib/types.js";
 
-import {
-  legacyDefaults,
-  parseLegacy8,
-  type LegacyOptions,
-} from "./rp8/adapt.js";
+import type { RemarkObsidianOptions } from "./index.js";
+import { legacyDefaults, parseLegacy8 } from "./rp8/adapt.js";
 
 export type {
   Wikilink,
@@ -28,7 +25,11 @@ export type {
   CalloutTitle,
 } from "./lib/types.js";
 
-export type LegacyParseOptions = Partial<LegacyOptions>;
+/** The main entry's options, documented there, less the two only it reads. */
+export type LegacyParseOptions = Omit<
+  RemarkObsidianOptions,
+  "preset" | "escapedLineBreaks"
+>;
 
 /** Reads `text` as the `legacy` preset does. `text` is the whole input; no processor is involved. */
 export function parse(text: string, options?: LegacyParseOptions): Root {
