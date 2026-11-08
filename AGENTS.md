@@ -583,7 +583,7 @@ npm run build
 
 Inside `npm test`, the gates that matter most:
 
-- **`parity.test.ts` is the contract** — "matches Obsidian 1.14.5 on every case marked match",
+- **`parity.test.ts` is the contract** — "matches Obsidian 1.15.0 on every case marked match",
   3,469 of 3,469. If this regresses, nothing else justifies the change.
 - **`compute.test.ts`** records the positioned oracle's ceilings inline, exact counts with ids.
   `legacy` stands at 8, every one Obsidian's cache (open items below).
@@ -1050,14 +1050,33 @@ into literal (and invisible) characters three times in this work.
   `npx tsx`.** Under `npx` it reports `Obsidian is not answering (got "")` while the same
   `obsidian eval` answers from a shell and from plain Node (2026-10-27, cause not isolated).
 - **Never `2>/dev/null`.** It writes two load-bearing warnings to stderr: that `footnoteRefs` is
-  definition-gated, and that the oracle runs **1.15.0** while goldens pin **1.14.5** — so do not
-  settle a rule against the goldens with it.
+  definition-gated, and that the live app's release differs from the one the goldens pin, when it
+  does -- so do not settle a rule against the goldens with a different release.
 - **Never `--synth` when reading references.** Synthetic answers omit the footnote keys entirely,
   so any probe reading refs through it measures nothing and looks like it worked.
 - **`ask-dom.mts` uses the DETACHED renderer**, so on the known proxy divergences
   (`KNOWN_PROXY_DIVERGENCES` in `oracle.e2e.ts`) it gives the answer Reading View does not.
 
 ### Re-recording the goldens
+
+**The goldens are 1.15.0's now** (2026-11-08, the public build). 1.15.0 renders all 3,471 cases
+as 1.14.5 did: the recording changed nothing but its stamps and the surplus-table-cell family
+below. Two traps that run met:
+
+- **The Reading View pass wrote surplus-cell text INTO the goldens.** Those cells are display,
+  and Reading View shows or hides them by session history -- in both directions, the same day --
+  so three `match` cases failed the contract on text the previous recording had the other way
+  round, and `probe/table-pipes/short-delimiter-closed` and `body-row-unclosed` failed the
+  weekly job on 1.14.5 and 1.15.0. The pass now corrects only captures whose PARSE the
+  renderers disagree on, and both probes joined `SURPLUS_TABLE_CELLS`. The three cases keep
+  their stable, GFM value (surplus cells dropped), which is what both presets produce.
+- **A login shell exporting `LD_LIBRARY_PATH`** (here a system `glib` built for glibc 2.43)
+  overrides the flake's `NIX_LD_LIBRARY_PATH`, and chromedriver dies with `GLIBC_2.43' not
+found` before a session starts ("Unable to connect"). Record with
+  `nix develop -c env -u LD_LIBRARY_PATH parity-record`.
+
+`referee-spans.json` and the two strict probe goldens carry a 1.15.0 stamp from 2026-10-27, the
+early-access build; the stamp cannot tell the builds apart.
 
 `nix develop -c parity-record`; bare `npm run parity:record` fails with `ECONNREFUSED` because the
 downloaded Obsidian needs the `nix-ld` the flake wires up. It takes about ten minutes, and its
