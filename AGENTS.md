@@ -794,7 +794,8 @@ embeds skipped): 428 of 448 agree, 20 causes. The 39 fall into five groups:
   would otherwise write `$$y^2$$http`, so the projection drops it (it did, for column 1 only)
   and `rehype-obsidian`'s `displayMathBreaks` drops the `<br>`.
 - **Footnote bodies:** the renderer puts them after the text, inline notes first
-  (`section.footnotes`), then definitions (`div.footnotes`) in reference order. The projection
+  (`section.footnotes`), then definitions (`div.footnotes`) in reference order (superseded:
+  in the order of their numbers, see "a later night" below). The projection
   does that for links, math, tags, headings and tasks. `metadataCache` keeps a definition where
   it is written, so `meta.links` does not move. The inline notes inside an unreferenced
   definition render their tags and math too. Left: `[^1]: - [ ] [` / `^[[^1]]]`, where the
@@ -1158,6 +1159,36 @@ version emptying `e%%⇥%%h`'s whole one-line body into `%%%%` (240 seeds), and 
 indent keeps `%%note` / `····%%no` one paragraph. Census after: 0 new, 2 fixed (419 -> 417). The charclass report: `strict` turns U+0000 into
 U+FFFD, as CommonMark section 2.3 requires before any construct runs, where Obsidian keeps it.
 `strict` is the spec there by design, and the sweep no longer reports it.
+
+**The rolling `fuzz` issue, a later night** (2026-11-07, 14 `legacy` forms). Recorded with 57
+probes in one batch (1.15.0); every cause was the projection, none the parse or
+`rehype-obsidian`:
+
+- **Footnotes render in the order of their numbers**, in one `section.footnotes`. A definition is
+  numbered at its first reference and an inline note where it is written, in source order over
+  the whole note, definitions' bodies included: `a[^1] b ^[[[x]]]` / `[^1]: [[y]]` gives `y x`,
+  `a[^1] b[^2]` / `[^1]: [[p]] ^[[[q]]]` / `[^2]: [[r]]` gives `p r q`, and an unreferenced
+  definition's note takes its place too (`[^1]: ^[[[y]]]` over `^[[[x]]]` gives `y x`). This
+  replaces "inline notes first, then definitions", which held only where every note came
+  first. What a note holds belongs to the innermost note (a nested note's embed was counted
+  twice).
+- **A surplus table cell's footnotes render**: `| b | c[^1] |` under a one-column header renders
+  the definition, `| b | ^[#t] |` the tag, header row too. `alignTableCells` hands the cells it
+  drops to `projectMdast`.
+- **An undefined reference renders its text**, not its source: `[*a*][nope]` shows an `em`,
+  `[a\!b][nope]` reads `a!b`, `[[[[a#h]]]][^1]` a link. Only the brackets and the label are the
+  source's (`[a][b\!]` keeps its escape).
+- **`[^]` and a pair holding a bracket open no label** for `dropLabelOpeners`: `[^][a`, `[[]][a`
+  and `[[]][[a|b` render as written, `[x][a` as `[x]a`.
+- **Display math swallows a highlight's line ending**, the next line's indent standing in
+  (`==a $$x$$` / `·b==` reads `a ⟨math⟩ b`).
+- **`metadataCache` indexes an empty `^[]` inside `%%`** (`""`), in order with the references there.
+
+Left: `[_[[a|b]]_](u)` (the browser's nested-anchor split, as before), and a `[^1]` inside an
+inline note, which the renderer reads as a reference and renders the definition for while our
+parse and the cache read text (`a ^[[[x]] [^1]]`, the known `^[[^1]]]` family). The 68 matching
+recordings joined `projection-triage.test.ts` (170); the 3,573 recorded cases match exactly as
+before, by identity.
 
 **Traps:** `fmt`-style probes that look a configuration up by name silently run `legacy` for a
 JSON one; a "words" metric must not count node boundaries, and cannot see a loss the PARSE made
