@@ -1,4 +1,5 @@
-import type { Literal, Parent, RootContent } from "mdast";
+import type { Data, Literal, Parent, RootContent } from "mdast";
+import type { Point, Position } from "unist";
 
 export interface Wikilink extends Literal {
   type: "wikilink";
@@ -56,11 +57,23 @@ export interface CalloutTitle extends Parent {
   type: "calloutTitle";
 }
 
+/**
+ * Where a callout's marker and title line sit. Offsets count as every position does: a leading
+ * byte order mark is left out, as Obsidian's cache leaves it out.
+ */
+export interface CalloutData extends Data {
+  /** The marker as written, `[!type]` and its fold character. */
+  marker?: Position;
+  /** Where the marker's line ends. A title and any block on that line lie before it. */
+  lineEnd?: Point;
+}
+
 export interface Callout extends Parent {
   type: "callout";
   calloutType: string;
   title: string;
   collapsed: boolean | null;
+  data?: CalloutData;
 }
 
 declare module "mdast" {

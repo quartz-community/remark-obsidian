@@ -3,7 +3,7 @@
 
 import { decodeString } from "micromark-util-decode-string";
 import type { Options as ToMarkdownOptions } from "mdast-util-to-markdown";
-import { parseLegacy8 } from "./rp8/adapt.js";
+import { legacyDefaults, parseLegacy8 } from "./rp8/adapt.js";
 import type { Root, RootContent } from "mdast";
 import type { Processor } from "unified";
 import { SKIP, visit } from "unist-util-visit";
@@ -63,6 +63,8 @@ import {
   lineOffsetsFromMarkdown,
 } from "./lib/mdast/line-offsets.js";
 import { mathMidlineTransform } from "./lib/math-midline.js";
+import { countByteOrderMark } from "./lib/byte-order-mark.js";
+import { calloutMarkerTransform } from "./lib/callout-marker.js";
 import { calloutTitleInterruptTransform } from "./lib/callout-title-interrupt.js";
 import { restoreInlinePositionsTransform } from "./lib/restore-inline-positions.js";
 import { attentionToMarkdown } from "./lib/mdast/attention-to-markdown.js";
@@ -223,6 +225,15 @@ export interface RemarkObsidianOptions {
    * `remark-breaks` and a `break` really is a hard break.
    */
   escapedLineBreaks?: boolean;
+  /**
+   * Count a leading byte order mark in every position and in `data.lineOffsets`, so an offset
+   * indexes the string that was parsed, and read the rest as if the mark were not there.
+   *
+   * Off by default, because Obsidian's `metadataCache` leaves the mark out: its offsets and
+   * first-line columns are one short of the editor's, and off is what the parity gates measure.
+   * Turn it on to edit the string by position.
+   */
+  bomOffsets?: boolean;
 }
 
 /**
@@ -273,22 +284,10 @@ const PRESETS: Record<RemarkObsidianPreset, Partial<RemarkObsidianFlags>> = {
 };
 
 const defaultOptions: RemarkObsidianFlags = {
-  wikilinks: true,
-  highlights: true,
-  comments: true,
-  tags: true,
-  customTaskChars: true,
-  math: true,
-  frontmatter: true,
-  keepComments: true,
-  parseComments: true,
-  lineOffsets: true,
+  ...legacyDefaults,
   readsPastEnd: false,
-  bareFootnoteRefs: true,
-  inlineFootnotes: true,
-  callouts: true,
-  positionedBreaks: true,
   escapedLineBreaks: false,
+  bomOffsets: false,
 };
 
 /**
@@ -892,7 +891,19 @@ export default function remarkObsidian(
     return fragment;
   };
 
-  return transform;
+  // Around `transform`, not inside it: `reparse` runs it on fragments, whose positions the
+  // caller places back. micromark reads past the mark without counting it, so the passes must
+  // read the text the offsets index -- whatever `bomOffsets` says, or the mark changes the
+  // reading. The callout markers are placed in the same coordinates, and only then, if asked,
+  // does every point move.
+  return (tree: Root, file: unknown): void => {
+    const source = String(file);
+    const marked = source.charCodeAt(0) === 0xfeff;
+    const text = marked ? source.slice(1) : source;
+    transform(tree, marked ? text : file);
+    if (opts.callouts) calloutMarkerTransform(tree, text);
+    if (marked && opts.bomOffsets) countByteOrderMark(tree);
+  };
 }
 
 export { wikilinkSyntax } from "./lib/syntax/wikilink.js";
@@ -930,6 +941,7 @@ export type {
   Tag,
   InlineFootnote,
   Callout,
+  CalloutData,
   CalloutTitle,
 } from "./lib/types.js";
 export type { CollectWikilinksOptions } from "./lib/collect.js";

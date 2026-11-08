@@ -153,3 +153,30 @@ describe.skipIf(!goldens)("Obsidian parity", () => {
     ).toEqual([]);
   });
 });
+
+describe.skipIf(!goldens)("the README's parity section", () => {
+  const bullets = fs
+    .readFileSync("README.md", "utf8")
+    .split("\n## Obsidian parity\n")[1]!
+    .split("\n## ")[0]!
+    .split("\n- ");
+  const recorded = (file: string): string =>
+    (
+      JSON.parse(fs.readFileSync(`test/parity/${file}`, "utf8")) as {
+        obsidian: string;
+      }
+    ).obsidian;
+  const bullet = (claim: string): string =>
+    bullets.find((text) => text.includes(claim)) ?? `no bullet holds ${claim}`;
+
+  it("names the release each claim was recorded on", () => {
+    expect(bullets[0]).toContain(`currently ${goldens!.obsidian.app}`);
+    expect(bullet("6,844 notes")).toContain(recorded("referee-spans.json"));
+    expect(bullet("live probes")).toContain(
+      recorded("goldens/strict-syntax.json"),
+    );
+    expect(bullet("live probes")).toContain(
+      recorded("goldens/strict-footnotes.json"),
+    );
+  });
+});

@@ -104,6 +104,7 @@ const QUARTZ_DEFAULT: ChainProfile = {
     callouts: true,
     positionedBreaks: true,
     escapedLineBreaks: false,
+    bomOffsets: false,
   },
   rehypeObsidian: {
     blockReferences: true,
@@ -134,6 +135,7 @@ const ALL_FEATURES: ChainProfile = {
     callouts: true,
     positionedBreaks: true,
     escapedLineBreaks: false,
+    bomOffsets: false,
   },
   rehypeObsidian: {
     blockReferences: true,
