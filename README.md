@@ -141,6 +141,20 @@ including the divergences, which are enumerated rather than implied:
   `data.taskChar`. It answers 513 live probes
   about Obsidian's syntax and footnotes as Obsidian 1.15.0 does, bar a few recorded exclusions.
 
+## Known limits
+
+Very deep nesting overflows the call stack somewhere, as in any recursive parser or writer. On
+Node's default stack:
+
+- **Parsing:** under `legacy`, remark-parse 8 itself recurses, to about 1,400 nested list items
+  or 1,700 nested quotes. Under `strict`, `unist-util-visit` does, to about 2,800 list items or
+  5,700 quotes.
+- **Formatting** with `remark-stringify`: `mdast-util-to-markdown` recurses at every level it
+  writes, to about 520 nested list items or 1,300 nested quotes, under either preset. Stock
+  `remark-stringify` stops at about the same depth.
+
+Past these depths the call throws `RangeError: Maximum call stack size exceeded`.
+
 ## Development
 
 ```bash

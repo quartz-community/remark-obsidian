@@ -654,10 +654,48 @@ with that label defined; the other 5 are `[][`, whose empty label nothing can de
   `[a]: /url` becomes a link), and loses a `[` the reader took into a reference (`[a][ b` renders
   `[a] b`). So `label` is what to look up, and the option's docs say to leave it off to render.
 
+**Deep trees: what overflows, and where.** Measured in fresh processes (Node 24's default stack,
+`tsx` and the built `dist` agree), binary search per shape, preset and stage:
+
+| shape (depth n)             | parse                             | `runSync` before -> after    | format                       |
+| --------------------------- | --------------------------------- | ---------------------------- | ---------------------------- |
+| `"- ".repeat(n)` legacy     | 1,390 (rp8)                       | 1,390 (rp8)                  | 500 -> **521** (to-markdown) |
+| `"- ".repeat(n)` strict     | 3,000 (visit)                     | 1,390 (ours) -> **2,843**    | 500 -> **521** (to-markdown) |
+| `"> ".repeat(n)` legacy     | 1,687 (rp8)                       | 1,687 (rp8)                  | 1,296 (to-markdown)          |
+| `"> ".repeat(n)` strict     | 6,000 (visit)                     | 2,781 (ours) -> **5,687**    | 1,296 (to-markdown)          |
+| `"> [!note] ".repeat(n)`    | legacy 1,015 (rp8); strict >8,000 | strict: time, ~3,500 in 90 s | strict 1,171 (to-markdown)   |
+| nested `*` emphasis, strict | >8,000                            | 5,812 (ours) -> **>8,000**   | time-bound (~4,700 in 90 s)  |
+
+"visit" is `unist-util-visit-parents`, recursive, called by the parse's own transforms and by
+most passes; "to-markdown" is `mdast-util-to-markdown`, four frames a level in
+`containerFlow`/`containerPhrasing` -> handler -> `one`. Stock `remark-stringify` alone formats
+the same list to about 545, so the writer's ceiling is upstream's, not ours: nothing reasonable
+on our side raises it (a worker with a bigger stack would be a hack). `"^[".repeat(n)` is text
+and nests nothing (>8,000 everywhere); the indented shape is time-bound before any stack limit.
+
+Made iterative, in a recursive walk's order: the writer's `recordParents`, `markAdjacent`
+(`attention-to-markdown.ts`) and `markEmptyDeletes` (`empty-delete-to-markdown.ts`), through
+`src/lib/walk.ts`; `strict`'s `obsidianReadingTransform` walk, `itemCommentLazy`'s `absorb`,
+`definitionNestedLabel`'s `find` and `firstContentOffset`, `quoteCommentLazy`'s `commentPath`,
+`commentParse`'s depth walk and `shiftByMap`. `taskCharToMarkdown` writes in its own frame (no
+`writeItem` helper), the 500 -> 521. The writer's walks over the WHOLE tree were the limit where
+the writer does not descend: a comment's parsed body overflowed them at about 3,000 levels
+(legacy) and 10,000 (strict); 100,000 now take 70 ms. `holdsStar`, `rawHolds` and
+`holdsAttentionOrHighlight` stay recursive: they look only below attention being written, so
+to-markdown always overflows first (legacy emphasis formats to the parse's own 7,375).
+
+Proof: 13,991 documents (corpus, recorded cases, 676 spec examples, 3,000 generated) under
+`legacy`, `strict`, both Quartz profiles and both with `strict`: trees (with positions) and
+written strings byte-identical to `main`'s. Controls: truncating `obsidianReadingTransform`'s
+walk moves 868 written strings under `strict`; truncating `eachBelow` at depth 3 moves 2 under
+`legacy` and the Quartz profile (generated seeds 1520 and 2368, parents and empty strikethrough). Reversing sibling order in the converted passes moved NOTHING, so the gate
+cannot tell order from order there: those passes collect edits order-independently. Gate:
+`test/deep-writers.test.ts` (fails on `main`: all three).
+
 ## Gates — what "done" means
 
 ```bash
-npm test          # 924 tests / 34 files. Contains the contract gate.
+npm test          # TESTCOUNT tests / 35 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
