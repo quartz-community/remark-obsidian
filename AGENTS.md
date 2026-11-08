@@ -1045,8 +1045,8 @@ below. Two traps that run met:
   their stable, GFM value (surplus cells dropped), which is what both presets produce.
 - **A login shell exporting `LD_LIBRARY_PATH`** (here a system `glib` built for glibc 2.43)
   overrides the flake's `NIX_LD_LIBRARY_PATH`, and chromedriver dies with `GLIBC_2.43' not
-found` before a session starts ("Unable to connect"). Record with
-  `nix develop -c env -u LD_LIBRARY_PATH parity-record`.
+found` before a session starts ("Unable to connect"). The flake's shell
+  hook now unsets it (`49e2a69`).
 
 `referee-spans.json` and the two strict probe goldens carry a 1.15.0 stamp from 2026-10-27, the
 early-access build; the stamp cannot tell the builds apart.
