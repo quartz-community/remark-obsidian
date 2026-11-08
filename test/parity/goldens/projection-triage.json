@@ -5951,6 +5951,4448 @@
     }
    },
    "triage": "unreviewed"
+  },
+  "triage/nightly2/n-0": {
+   "id": "triage/nightly2/n-0",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| b |\n| --- |\n| > > ![[![[i.png|100]]\t[[a#h  [[![[d.pdf#page=3]]]]]]](^blk > > [link](u). [[a#h]] \\ [![[i.png|100]]](u) > > [^1]]  ​ _[[[[a#h]]_ | c |\n[^1]: 1. #tag | *\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th>b</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>&gt; &gt; ![[![[i.png</td>\n</tr>\n</tbody>\n</table>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><ol>\n<li dir=\"auto\"><a href=\"#tag\" class=\"tag\" target=\"_blank\" rel=\"noopener nofollow\">#tag</a> | *</li>\n</ol><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "b > > ![[![[i.png",
+     "math": [],
+     "links": [],
+     "tags": [
+      "tag"
+     ],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| b |\n| --- |\n| > > ![[![[i.png|100]]\t[[a#h  [[![[d.pdf#page=3]]]]]]](^blk > > [link](u). [[a#h]] \\ [![[i.png|100]]](u) > > [^1]]  ​ _[[[[a#h]]_ | c |"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: 1. #tag | *"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "u",
+      "a#h",
+      "[a#h"
+     ],
+     "embeds": [
+      "d.pdf#page=3"
+     ],
+     "tags": [
+      "tag"
+     ],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@3:0-3:17"
+     ],
+     "footnoteRefs": [
+      "1@2:110"
+     ],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:136",
+      "footnoteDefinition@3:0-3:17",
+      "text@4:0-4:0",
+      "element@4:0-4:0"
+     ],
+     "links": [
+      "[link](u)=>u|link@2:65-2:74",
+      "[[a#h]]=>a#h|a > h@2:76-2:83",
+      "[[[a#h]]=>[a#h|[a > h@2:121-2:129"
+     ],
+     "embeds": [
+      "![[d.pdf#page=3]]=>d.pdf#page=3|d.pdf > page=3@2:33-2:50"
+     ],
+     "tags": [
+      "#tag@3:9-3:13"
+     ],
+     "listItems": [
+      "-|parent:-3@3:6-3:17"
+     ],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/n-1": {
+   "id": "triage/nightly2/n-1",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "==, $$y^2\ny^2$$\n===\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><mark data-highlight=\"\">, <span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"y^2\ny^2\" display=\"true\" class=\"TEX-N\"><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup><mjx-msup data-latex=\"y^2\"><mjx-mi data-latex=\"y\"><mjx-c class=\"mjx-c1D466\">𝑦</mjx-c></mjx-mi><mjx-script style=\"vertical-align: 0.413em; margin-left: 0.05em;\"><mjx-mn size=\"s\" data-latex=\"2\"><mjx-c class=\"mjx-c32\">2</mjx-c></mjx-mn></mjx-script></mjx-msup></mjx-math></mjx-container></span>=</mark></p>",
+    "projections": {
+     "text": ", ⟨math⟩=",
+     "math": [
+      {
+       "display": true,
+       "tex": "y^2\ny^2"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [
+      ", ⟨math⟩="
+     ],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "==, $$y^2\ny^2$$\n==="
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-2:3"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/n-2": {
+   "id": "triage/nightly2/n-2",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]: !\n    [^1]![[img.png]]](^[![[[[target]]]]]\n",
+   "obsidian": {
+    "html": "\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>!<br>\n<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup><span alt=\"img.png\" src=\"img.png\" class=\"internal-embed is-loaded file-embed mod-empty-attachment\">“img.png” could not be found.</span>](<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"[inline1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\">![<a data-href=\"[target\" href=\"[target\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">[target</a>]]<a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "",
+     "math": [],
+     "links": [
+      {
+       "path": "img.png",
+       "heading": "",
+       "embedded": true
+      },
+      {
+       "path": "[target",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: !\n    [^1]![[img.png]]](^[![[[[target]]]]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "[target"
+     ],
+     "embeds": [
+      "img.png"
+     ],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-1:40",
+      "[inline1@1:24-1:39"
+     ],
+     "footnoteRefs": [
+      "1@1:4"
+     ],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-1:40",
+      "text@2:0-2:0",
+      "element@2:0-2:0"
+     ],
+     "links": [
+      "[[[target]]=>[target|[target@1:26-1:37"
+     ],
+     "embeds": [
+      "![[img.png]]=>img.png|img.png@1:8-1:20"
+     ],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/n-3": {
+   "id": "triage/nightly2/n-3",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "1. [^1]\n\n[^1]: 1. [[a#^blk]]. #tag | ^[[[&amp;]]]\n",
+   "obsidian": {
+    "html": "<ol>\n<li dir=\"auto\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></li>\n</ol>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><ol>\n<li dir=\"auto\"><a data-href=\"a#^blk\" href=\"a#^blk\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a &gt; ^blk</a>. <a href=\"#tag\" class=\"tag\" target=\"_blank\" rel=\"noopener nofollow\">#tag</a> | <sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"[inline1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup></li>\n</ol><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><a data-href=\"&amp;amp;\" href=\"&amp;amp;\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">&amp;amp;</a><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "a",
+       "heading": "^blk",
+       "embedded": false
+      },
+      {
+       "path": "&amp;",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [
+      "tag"
+     ],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "list",
+       "text": "1. [^1]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: 1. [[a#^blk]]. #tag | ^[[[&amp;]]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "a#^blk",
+      "&amp;"
+     ],
+     "embeds": [],
+     "tags": [
+      "tag"
+     ],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@2:0-2:40",
+      "[inline1@2:30-2:39"
+     ],
+     "footnoteRefs": [
+      "1@0:3"
+     ],
+     "headings": [],
+     "sections": [
+      "list@0:0-0:7",
+      "footnoteDefinition@2:0-2:40",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [
+      "[[a#^blk]]=>a#^blk|a > ^blk@2:9-2:19",
+      "[[&amp;]]=>&amp;|&amp;@2:30-2:39"
+     ],
+     "embeds": [],
+     "tags": [
+      "#tag@2:21-2:25"
+     ],
+     "listItems": [
+      "-|parent:-1@0:0-0:7",
+      "-|parent:-2@2:6-2:40"
+     ],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/n-4": {
+   "id": "triage/nightly2/n-4",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^^blk]]([^1], ^[![[https://e.test/p]]]\n\n[^1]: # ![[word]]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">^blk](<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup>, <sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"[inline1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><h1 data-heading=\"![[word]]\" dir=\"auto\"><span alt=\"word\" src=\"word\" class=\"internal-embed is-loaded file-embed mod-empty\">“word” is not created yet. Click to create.</span></h1><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><span alt=\"https://e.test/p\" src=\"https://e.test/p\" class=\"internal-embed is-loaded file-embed mod-empty-attachment\">“https://e.test/p” could not be found.</span><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "^blk](⟨fn⟩, ⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "word",
+       "heading": "",
+       "embedded": true
+      },
+      {
+       "path": "https://e.test/p",
+       "heading": "",
+       "embedded": true
+      }
+     ],
+     "tags": [],
+     "headings": [
+      "1:![[word]]"
+     ],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[^^blk]]([^1], ^[![[https://e.test/p]]]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: # ![[word]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [
+      "word",
+      "https://e.test/p"
+     ],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline1@0:17-0:38",
+      "1@2:0-2:17"
+     ],
+     "footnoteRefs": [
+      "1@0:9"
+     ],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:39",
+      "footnoteDefinition@2:0-2:17",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [],
+     "embeds": [
+      "![[word]]=>word|word@2:8-2:17",
+      "![[https://e.test/p]]=>https://e.test/p|https://e.test/p@0:17-0:38"
+     ],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/n-5": {
+   "id": "triage/nightly2/n-5",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "]], [[[[[[a#h]]]][link](u)\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">]], [[[<a data-href=\"[a#h\" href=\"[a#h\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">[a &gt; h</a>]][link](u)</p>",
+    "projections": {
+     "text": "]], [[[[a > h]][link](u)",
+     "math": [],
+     "links": [
+      {
+       "path": "[a",
+       "heading": "h",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "]], [[[[[[a#h]]]][link](u)"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "[a#h"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:26"
+     ],
+     "links": [
+      "[[[a#h]]=>[a#h|[a > h@0:7-0:15"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/n-6": {
+   "id": "triage/nightly2/n-6",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": " [^][[\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"> [^][[</p>",
+    "projections": {
+     "text": "[^][[",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": " [^][["
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:6"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/n-7": {
+   "id": "triage/nightly2/n-7",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "  [[[[a#h]]]][^1]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">  [<a data-href=\"[a#h\" href=\"[a#h\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">[a &gt; h</a>]][^1]</p>",
+    "projections": {
+     "text": "[[a > h]][^1]",
+     "math": [],
+     "links": [
+      {
+       "path": "[a",
+       "heading": "h",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "  [[[[a#h]]]][^1]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "[a#h"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:17"
+     ],
+     "links": [
+      "[[[a#h]]=>[a#h|[a > h@0:3-0:11"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/n-8": {
+   "id": "triage/nightly2/n-8",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "%%^[]%%\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "%%^[]%%"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      ""
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [
+      "@0:2"
+     ],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:7",
+      "text@1:0-1:0",
+      "element@1:0-1:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/n-9": {
+   "id": "triage/nightly2/n-9",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]: 1. \n    #a/b\n\n| a | b |\n| --- |\n| - [ ] ~~del~~](__under_ - [ ] &amp;](![[i.png|100\\]] | %%^[inline%%](**[^1]]** | c |\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th>a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>- [ ] <del>del</del>](_<em>under</em> - [ ] &amp;](![[i.png</td>\n</tr>\n</tbody>\n</table>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><ol>\n<li dir=\"auto\"><a href=\"#a/b\" class=\"tag\" target=\"_blank\" rel=\"noopener nofollow\">#a/b</a></li>\n</ol><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "a - [ ] del](_under - [ ] &](![[i.png",
+     "math": [],
+     "links": [],
+     "tags": [
+      "a/b"
+     ],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "em:under"
+     ],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: 1. \n    #a/b"
+      },
+      {
+       "type": "table",
+       "text": "| a | b |\n| --- |\n| - [ ] ~~del~~](__under_ - [ ] &amp;](![[i.png|100\\]] | %%^[inline%%](**[^1]]** | c |"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "a/b"
+     ],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-1:8"
+     ],
+     "footnoteRefs": [
+      "1@5:73"
+     ],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-1:8",
+      "table@3:0-5:86",
+      "text@6:0-6:0",
+      "element@6:0-6:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "#a/b@1:4-1:8"
+     ],
+     "listItems": [
+      "-|parent:-1@0:6-1:8"
+     ],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/n-10": {
+   "id": "triage/nightly2/n-10",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| > > [[]][[a|b a|\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">| &gt; &gt; [[]][[a|b a|</p>",
+    "projections": {
+     "text": "| > > [[]][[a|b a|",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "| > > [[]][[a|b a|"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:18"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/n-11": {
+   "id": "triage/nightly2/n-11",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]: > ^[[\n    ^[![[i.png|100]]] img.png]] | [[a|b]]\n",
+   "obsidian": {
+    "html": "\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\">[<br>\n<sup id=\"fnref-2\"><a class=\"footnote-ref\" href=\"#fn-2\" target=\"_blank\" rel=\"noopener nofollow\">2</a></sup> img.png]<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>\n<div class=\"footnotes\">\n<hr>\n<ol>\n<li id=\"fn-2\" dir=\"auto\"><span width=\"100\" alt=\"i.png\" src=\"i.png\" class=\"internal-embed is-loaded file-embed mod-empty-attachment\">“i.png” could not be found.</span><a class=\"footnote-backref\" href=\"#fnref-2\" target=\"_blank\" rel=\"noopener nofollow\">↩</a></li>\n</ol>\n</div>",
+    "projections": {
+     "text": "",
+     "math": [],
+     "links": [
+      {
+       "path": "i.png",
+       "heading": "",
+       "embedded": true
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: > ^[[\n    ^[![[i.png|100]]] img.png]] | [[a|b]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "a"
+     ],
+     "embeds": [
+      "i.png"
+     ],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-1:41",
+      "[inline0@0:10-1:30"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-1:41",
+      "text@2:0-2:0",
+      "element@2:0-2:0"
+     ],
+     "links": [
+      "[[a|b]]=>a|b@1:34-1:41"
+     ],
+     "embeds": [
+      "![[i.png|100]]=>i.png|100@1:6-1:20"
+     ],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/n-12": {
+   "id": "triage/nightly2/n-12",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| b |\n| --- |\n|           ![[i.png|100]]](<br> ![[i.png|100x200]]\t&amp;     ^[[[a#h]]] | c |\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th>b</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>&nbsp;     ![[i.png</td>\n</tr>\n</tbody>\n</table>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a data-href=\"a#h\" href=\"a#h\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">a &gt; h</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "b ![[i.png",
+     "math": [],
+     "links": [
+      {
+       "path": "a",
+       "heading": "h",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| b |\n| --- |\n|           ![[i.png|100]]](<br> ![[i.png|100x200]]\t&amp;     ^[[[a#h]]] | c |"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "a#h"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline0@2:64-2:71"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:78",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [
+      "[[a#h]]=>a#h|a > h@2:64-2:71"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-S1": {
+   "id": "triage/nightly2/np-S1",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| a |\n| --- |\n| b | c[^1] |\n\n[^1]: #t\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th>a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>b</td>\n</tr>\n</tbody>\n</table>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p><a href=\"#t\" class=\"tag\" target=\"_blank\" rel=\"noopener nofollow\">#t</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+    "projections": {
+     "text": "a b",
+     "math": [],
+     "links": [],
+     "tags": [
+      "t"
+     ],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| a |\n| --- |\n| b | c[^1] |"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: #t"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "t"
+     ],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@4:0-4:8"
+     ],
+     "footnoteRefs": [
+      "1@2:7"
+     ],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:13",
+      "footnoteDefinition@4:0-4:8",
+      "text@5:0-5:0",
+      "element@5:0-5:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "#t@4:6-4:8"
+     ],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-S2": {
+   "id": "triage/nightly2/np-S2",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| a |\n| --- |\n| b | c |\n\n[^1]: #t\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th dir=\"ltr\">a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td dir=\"ltr\">b</td>\n</tr>\n</tbody>\n</table>",
+    "projections": {
+     "text": "a b",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| a |\n| --- |\n| b | c |"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: #t"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "t"
+     ],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@4:0-4:8"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:9",
+      "footnoteDefinition@4:0-4:8"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "#t@4:6-4:8"
+     ],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-S3": {
+   "id": "triage/nightly2/np-S3",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| a |\n| --- |\n| b | ^[#t] |\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th>a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>b</td>\n</tr>\n</tbody>\n</table>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a href=\"#t\" class=\"tag\" target=\"_blank\" rel=\"noopener nofollow\">#t</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "a b",
+     "math": [],
+     "links": [],
+     "tags": [
+      "t"
+     ],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| a |\n| --- |\n| b | ^[#t] |"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "t"
+     ],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline0@2:8-2:10"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:13",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "#t@2:8-2:10"
+     ],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-S4": {
+   "id": "triage/nightly2/np-S4",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| a |\n| --- |\n| b | ^[[[y]]] |\n\n^[[[x]]]\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th>a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>b</td>\n</tr>\n</tbody>\n</table>\n<p dir=\"auto\"><sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"[inline1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a data-href=\"y\" href=\"y\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">y</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><a data-href=\"x\" href=\"x\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">x</a><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "a b ⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "y",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "x",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| a |\n| --- |\n| b | ^[[[y]]] |"
+      },
+      {
+       "type": "paragraph",
+       "text": "^[[[x]]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "y",
+      "x"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline0@2:8-2:13",
+      "[inline1@4:2-4:7"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:16",
+      "paragraph@4:0-4:8",
+      "text@5:0-5:0",
+      "element@5:0-5:0"
+     ],
+     "links": [
+      "[[y]]=>y|y@2:8-2:13",
+      "[[x]]=>x|x@4:2-4:7"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-S5": {
+   "id": "triage/nightly2/np-S5",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| a |\n| --- |\n| b | [^2] |\n\nc [^1]\n\n[^1]: [[x]]\n[^2]: [[y]]\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th>a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>b</td>\n</tr>\n</tbody>\n</table>\n<p dir=\"auto\">c <sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p><a data-href=\"y\" href=\"y\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">y</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p><a data-href=\"x\" href=\"x\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">x</a><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+    "projections": {
+     "text": "a b c ⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "y",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "x",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| a |\n| --- |\n| b | [^2] |"
+      },
+      {
+       "type": "paragraph",
+       "text": "c [^1]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: [[x]]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^2]: [[y]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "x",
+      "y"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "2",
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@6:0-6:11",
+      "2@7:0-7:11"
+     ],
+     "footnoteRefs": [
+      "2@2:6",
+      "1@4:2"
+     ],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:12",
+      "paragraph@4:0-4:6",
+      "footnoteDefinition@6:0-6:11",
+      "footnoteDefinition@7:0-7:11",
+      "text@8:0-8:0",
+      "element@8:0-8:0"
+     ],
+     "links": [
+      "[[x]]=>x|x@6:6-6:11",
+      "[[y]]=>y|y@7:6-7:11"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-S6": {
+   "id": "triage/nightly2/np-S6",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| a |\n| --- |\n| b | [[w]] ^[[[y]]] |\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th>a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>b</td>\n</tr>\n</tbody>\n</table>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a data-href=\"y\" href=\"y\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">y</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "a b",
+     "math": [],
+     "links": [
+      {
+       "path": "y",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| a |\n| --- |\n| b | [[w]] ^[[[y]]] |"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "w",
+      "y"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline0@2:14-2:19"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:22",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [
+      "[[w]]=>w|w@2:6-2:11",
+      "[[y]]=>y|y@2:14-2:19"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-S7": {
+   "id": "triage/nightly2/np-S7",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| a | ^[[[h]]] |\n| --- |\n| b |\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th>a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>b</td>\n</tr>\n</tbody>\n</table>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a data-href=\"h\" href=\"h\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">h</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "a b",
+     "math": [],
+     "links": [
+      {
+       "path": "h",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| a | ^[[[h]]] |\n| --- |\n| b |"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "h"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline0@0:8-0:13"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:5",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [
+      "[[h]]=>h|h@0:8-0:13"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-S8": {
+   "id": "triage/nightly2/np-S8",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "| a |\n| --- |\n| ^[[[y]]] | b |\n",
+   "obsidian": {
+    "html": "<table>\n<thead>\n<tr>\n<th>a</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"[inline0\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></td>\n</tr>\n</tbody>\n</table>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a data-href=\"y\" href=\"y\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">y</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "a ⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "y",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "table",
+       "text": "| a |\n| --- |\n| ^[[[y]]] | b |"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "y"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline0@2:4-2:9"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "table@0:0-2:16",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [
+      "[[y]]=>y|y@2:4-2:9"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-F1": {
+   "id": "triage/nightly2/np-F1",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a[^1] b ^[[[x]]]\n\n[^1]: [[y]]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> b <sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"[inline1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p><a data-href=\"y\" href=\"y\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">y</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><a data-href=\"x\" href=\"x\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">x</a><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "a⟨fn⟩ b ⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "y",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "x",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a[^1] b ^[[[x]]]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: [[y]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "y",
+      "x"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline1@0:10-0:15",
+      "1@2:0-2:11"
+     ],
+     "footnoteRefs": [
+      "1@0:1"
+     ],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:16",
+      "footnoteDefinition@2:0-2:11",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [
+      "[[y]]=>y|y@2:6-2:11",
+      "[[x]]=>x|x@0:10-0:15"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-F2": {
+   "id": "triage/nightly2/np-F2",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a ^[[[x]]] b[^1]\n\n[^1]: [[y]]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a <sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"[inline0\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> b<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a data-href=\"x\" href=\"x\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">x</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p><a data-href=\"y\" href=\"y\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">y</a><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+    "projections": {
+     "text": "a ⟨fn⟩ b⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "x",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "y",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a ^[[[x]]] b[^1]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: [[y]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "y",
+      "x"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline0@0:4-0:9",
+      "1@2:0-2:11"
+     ],
+     "footnoteRefs": [
+      "1@0:12"
+     ],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:16",
+      "footnoteDefinition@2:0-2:11",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [
+      "[[y]]=>y|y@2:6-2:11",
+      "[[x]]=>x|x@0:4-0:9"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-F3": {
+   "id": "triage/nightly2/np-F3",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a[^1] b[^2]\n\n[^1]: [[p]] ^[[[q]]]\n[^2]: [[r]]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> b<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"2\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p><a data-href=\"p\" href=\"p\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">p</a> <sup data-footnote-id=\"fnref-3\" class=\"footnote-ref\" id=\"fnref-3\"><a data-footref=\"[inline2\" href=\"#fn-3\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[3]</a></sup><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p><a data-href=\"r\" href=\"r\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">r</a><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-3\" id=\"fn-3\" dir=\"auto\"><a data-href=\"q\" href=\"q\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">q</a><a href=\"#fnref-3\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "a⟨fn⟩ b⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "p",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "r",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "q",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a[^1] b[^2]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: [[p]] ^[[[q]]]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^2]: [[r]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "p",
+      "r",
+      "q"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1",
+      "2"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@2:0-2:20",
+      "[inline2@2:14-2:19",
+      "2@3:0-3:11"
+     ],
+     "footnoteRefs": [
+      "1@0:1",
+      "2@0:7"
+     ],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:11",
+      "footnoteDefinition@2:0-2:20",
+      "footnoteDefinition@3:0-3:11",
+      "text@4:0-4:0",
+      "element@4:0-4:0"
+     ],
+     "links": [
+      "[[p]]=>p|p@2:6-2:11",
+      "[[r]]=>r|r@3:6-3:11",
+      "[[q]]=>q|q@2:14-2:19"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-F4": {
+   "id": "triage/nightly2/np-F4",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a[^1]\n\n[^1]: [[p]] [^2]\n\n[^2]: [[r]]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p><a data-href=\"p\" href=\"p\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">p</a> <sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"2\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p><a data-href=\"r\" href=\"r\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">r</a><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+    "projections": {
+     "text": "a⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "p",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "r",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a[^1]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: [[p]] [^2]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^2]: [[r]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "p",
+      "r"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1",
+      "2"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@2:0-2:16",
+      "2@4:0-4:11"
+     ],
+     "footnoteRefs": [
+      "1@0:1",
+      "2@2:12"
+     ],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:5",
+      "footnoteDefinition@2:0-2:16",
+      "footnoteDefinition@4:0-4:11",
+      "text@5:0-5:0",
+      "element@5:0-5:0"
+     ],
+     "links": [
+      "[[p]]=>p|p@2:6-2:11",
+      "[[r]]=>r|r@4:6-4:11"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-F5": {
+   "id": "triage/nightly2/np-F5",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a[^1] ^[[[x]]]\n\n[^1]: [[p]] ^[[[q]]]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> <sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"[inline1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p><a data-href=\"p\" href=\"p\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">p</a> <sup data-footnote-id=\"fnref-3\" class=\"footnote-ref\" id=\"fnref-3\"><a data-footref=\"[inline2\" href=\"#fn-3\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[3]</a></sup><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><a data-href=\"x\" href=\"x\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">x</a><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n<li data-footnote-id=\"fn-3\" id=\"fn-3\" dir=\"auto\"><a data-href=\"q\" href=\"q\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">q</a><a href=\"#fnref-3\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "a⟨fn⟩ ⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "p",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "x",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "q",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a[^1] ^[[[x]]]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: [[p]] ^[[[q]]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "p",
+      "x",
+      "q"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline1@0:8-0:13",
+      "1@2:0-2:20",
+      "[inline2@2:14-2:19"
+     ],
+     "footnoteRefs": [
+      "1@0:1"
+     ],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:14",
+      "footnoteDefinition@2:0-2:20",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [
+      "[[p]]=>p|p@2:6-2:11",
+      "[[x]]=>x|x@0:8-0:13",
+      "[[q]]=>q|q@2:14-2:19"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-F6": {
+   "id": "triage/nightly2/np-F6",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a[^2]\n\n[^1]: ^[[[x]]]\n\n[^2]: [[y]]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"2\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p><a data-href=\"y\" href=\"y\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">y</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><a data-href=\"x\" href=\"x\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">x</a><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "a⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "y",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "x",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a[^2]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: ^[[[x]]]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^2]: [[y]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "y",
+      "x"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "2"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@2:0-2:14",
+      "[inline1@2:8-2:13",
+      "2@4:0-4:11"
+     ],
+     "footnoteRefs": [
+      "2@0:1"
+     ],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:5",
+      "footnoteDefinition@2:0-2:14",
+      "footnoteDefinition@4:0-4:11",
+      "text@5:0-5:0",
+      "element@5:0-5:0"
+     ],
+     "links": [
+      "[[y]]=>y|y@4:6-4:11",
+      "[[x]]=>x|x@2:8-2:13"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-F7": {
+   "id": "triage/nightly2/np-F7",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a[^1] b[^2]\n\n[^2]: [[r]]\n[^1]: [[p]] [^2]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> b<sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"2\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p><a data-href=\"p\" href=\"p\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">p</a> <sup data-footnote-id=\"fnref-2-1\" class=\"footnote-ref\" id=\"fnref-2-1\"><a data-footref=\"2\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2-1]</a></sup><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p><a data-href=\"r\" href=\"r\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">r</a><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a><a href=\"#fnref-2-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n</ol></section>",
+    "projections": {
+     "text": "a⟨fn⟩ b⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "p",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "r",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a[^1] b[^2]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^2]: [[r]]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: [[p]] [^2]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "r",
+      "p"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1",
+      "2",
+      "2"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "2@2:0-2:11",
+      "1@3:0-3:16"
+     ],
+     "footnoteRefs": [
+      "1@0:1",
+      "2@0:7",
+      "2@3:12"
+     ],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:11",
+      "footnoteDefinition@2:0-2:11",
+      "footnoteDefinition@3:0-3:16",
+      "text@4:0-4:0",
+      "element@4:0-4:0"
+     ],
+     "links": [
+      "[[r]]=>r|r@2:6-2:11",
+      "[[p]]=>p|p@3:6-3:11"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-F9": {
+   "id": "triage/nightly2/np-F9",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a[^1] ^[#x]\n\n[^1]: #p\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> <sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"[inline1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p><a href=\"#p\" class=\"tag\" target=\"_blank\" rel=\"noopener nofollow\">#p</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><a href=\"#x\" class=\"tag\" target=\"_blank\" rel=\"noopener nofollow\">#x</a><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "a⟨fn⟩ ⟨fn⟩",
+     "math": [],
+     "links": [],
+     "tags": [
+      "p",
+      "x"
+     ],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a[^1] ^[#x]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: #p"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "p",
+      "x"
+     ],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline1@0:8-0:10",
+      "1@2:0-2:8"
+     ],
+     "footnoteRefs": [
+      "1@0:1"
+     ],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:11",
+      "footnoteDefinition@2:0-2:8",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "#p@2:6-2:8",
+      "#x@0:8-0:10"
+     ],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-F10": {
+   "id": "triage/nightly2/np-F10",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "^[[[x]]]\n\n[^1]: ^[[[y]]]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"[inline0\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a data-href=\"x\" href=\"x\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">x</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><a data-href=\"y\" href=\"y\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">y</a><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "x",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "y",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "^[[[x]]]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: ^[[[y]]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "x",
+      "y"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline0@0:2-0:7",
+      "1@2:0-2:14",
+      "[inline1@2:8-2:13"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:8",
+      "footnoteDefinition@2:0-2:14",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [
+      "[[x]]=>x|x@0:2-0:7",
+      "[[y]]=>y|y@2:8-2:13"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-F11": {
+   "id": "triage/nightly2/np-F11",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]: ^[[[y]]]\n\n^[[[x]]]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"[inline1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a data-href=\"y\" href=\"y\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">y</a><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><a data-href=\"x\" href=\"x\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">x</a><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "y",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "x",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: ^[[[y]]]"
+      },
+      {
+       "type": "paragraph",
+       "text": "^[[[x]]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "y",
+      "x"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-0:14",
+      "[inline0@0:8-0:13",
+      "[inline1@2:2-2:7"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-0:14",
+      "paragraph@2:0-2:8",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [
+      "[[y]]=>y|y@0:8-0:13",
+      "[[x]]=>x|x@2:2-2:7"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-F12": {
+   "id": "triage/nightly2/np-F12",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a[^1] ^[$x$]\n\n[^1]: $p$\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup> <sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"[inline1\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p><span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"p\" class=\"TEX-N\"><mjx-mi data-latex=\"p\"><mjx-c class=\"mjx-c1D45D\">𝑝</mjx-c></mjx-mi></mjx-math></mjx-container></span><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"x\" class=\"TEX-N\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi></mjx-math></mjx-container></span><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "a⟨fn⟩ ⟨fn⟩",
+     "math": [
+      {
+       "display": false,
+       "tex": "p"
+      },
+      {
+       "display": false,
+       "tex": "x"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a[^1] ^[$x$]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: $p$"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline1@0:8-0:11",
+      "1@2:0-2:9"
+     ],
+     "footnoteRefs": [
+      "1@0:1"
+     ],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:12",
+      "footnoteDefinition@2:0-2:9",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-F13": {
+   "id": "triage/nightly2/np-F13",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a[^1]\n\n[^1]: [[p]] [^2] ^[[[q]]]\n[^2]: [[r]]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a<sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"1\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p><a data-href=\"p\" href=\"p\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">p</a> <sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a data-footref=\"2\" href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup> <sup data-footnote-id=\"fnref-3\" class=\"footnote-ref\" id=\"fnref-3\"><a data-footref=\"[inline2\" href=\"#fn-3\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[3]</a></sup><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><p><a data-href=\"r\" href=\"r\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">r</a><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-3\" id=\"fn-3\" dir=\"auto\"><a data-href=\"q\" href=\"q\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">q</a><a href=\"#fnref-3\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "a⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "p",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "r",
+       "heading": "",
+       "embedded": false
+      },
+      {
+       "path": "q",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a[^1]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: [[p]] [^2] ^[[[q]]]"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^2]: [[r]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "p",
+      "r",
+      "q"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1",
+      "2"
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@2:0-2:25",
+      "[inline2@2:19-2:24",
+      "2@3:0-3:11"
+     ],
+     "footnoteRefs": [
+      "1@0:1",
+      "2@2:12"
+     ],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:5",
+      "footnoteDefinition@2:0-2:25",
+      "footnoteDefinition@3:0-3:11",
+      "text@4:0-4:0",
+      "element@4:0-4:0"
+     ],
+     "links": [
+      "[[p]]=>p|p@2:6-2:11",
+      "[[r]]=>r|r@3:6-3:11",
+      "[[q]]=>q|q@2:19-2:24"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-H1": {
+   "id": "triage/nightly2/np-H1",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "==a $$x$$\nb==\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><mark data-highlight=\"\">a <span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"x\" display=\"true\" class=\"TEX-N\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi></mjx-math></mjx-container></span>b</mark></p>",
+    "projections": {
+     "text": "a ⟨math⟩b",
+     "math": [
+      {
+       "display": true,
+       "tex": "x"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [
+      "a ⟨math⟩b"
+     ],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "==a $$x$$\nb=="
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:3"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-H2": {
+   "id": "triage/nightly2/np-H2",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "==a $$x$$\n b==\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><mark data-highlight=\"\">a <span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"x\" display=\"true\" class=\"TEX-N\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi></mjx-math></mjx-container></span> b</mark></p>",
+    "projections": {
+     "text": "a ⟨math⟩ b",
+     "math": [
+      {
+       "display": true,
+       "tex": "x"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [
+      "a ⟨math⟩ b"
+     ],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "==a $$x$$\n b=="
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:4"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-H3": {
+   "id": "triage/nightly2/np-H3",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "==a $x$\nb==\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><mark data-highlight=\"\">a <span class=\"math math-inline is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\"><mjx-math data-latex=\"x\" class=\"TEX-N\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi></mjx-math></mjx-container></span><br>\nb</mark></p>",
+    "projections": {
+     "text": "a ⟨math⟩ b",
+     "math": [
+      {
+       "display": false,
+       "tex": "x"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [
+      "a ⟨math⟩\nb"
+     ],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "==a $x$\nb=="
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:3"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-H4": {
+   "id": "triage/nightly2/np-H4",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "==$$x$$\nb==\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><mark data-highlight=\"\"><span class=\"math math-block is-loaded\"><mjx-container class=\"MathJax\" jax=\"CHTML\" overflow=\"overflow\" display=\"true\"><mjx-math data-latex=\"x\" display=\"true\" class=\"TEX-N\"><mjx-mi data-latex=\"x\"><mjx-c class=\"mjx-c1D465\">𝑥</mjx-c></mjx-mi></mjx-math></mjx-container></span>b</mark></p>",
+    "projections": {
+     "text": "⟨math⟩b",
+     "math": [
+      {
+       "display": true,
+       "tex": "x"
+      }
+     ],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [
+      "⟨math⟩b"
+     ],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "==$$x$$\nb=="
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-1:3"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-R1": {
+   "id": "triage/nightly2/np-R1",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[[[w]]][nope]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><a data-href=\"[w\" href=\"[w\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">[w</a>][nope]</p>",
+    "projections": {
+     "text": "[w][nope]",
+     "math": [],
+     "links": [
+      {
+       "path": "[w",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[[[w]]][nope]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "[w"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:13"
+     ],
+     "links": [
+      "[[[w]]=>[w|[w@0:0-0:6"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-R2": {
+   "id": "triage/nightly2/np-R2",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[a\\!b][nope]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[a!b][nope]</p>",
+    "projections": {
+     "text": "[a!b][nope]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[a\\!b][nope]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:12"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-R3": {
+   "id": "triage/nightly2/np-R3",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[*a*][nope]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[<em>a</em>][nope]</p>",
+    "projections": {
+     "text": "[a][nope]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [
+      "em:a"
+     ],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[*a*][nope]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:11"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-R4": {
+   "id": "triage/nightly2/np-R4",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "x [[[a#h]]]][^1]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">x <a data-href=\"[a#h\" href=\"[a#h\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">[a &gt; h</a>]]1</p>",
+    "projections": {
+     "text": "x [a > h]]1",
+     "math": [],
+     "links": [
+      {
+       "path": "[a",
+       "heading": "h",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "x [[[a#h]]]][^1]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "[a#h"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:16"
+     ],
+     "links": [
+      "[[[a#h]]=>[a#h|[a > h@0:2-0:10"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-R5": {
+   "id": "triage/nightly2/np-R5",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[a [[w]] b][nope]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[a <a data-href=\"w\" href=\"w\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">w</a> b][nope]</p>",
+    "projections": {
+     "text": "[a w b][nope]",
+     "math": [],
+     "links": [
+      {
+       "path": "w",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[a [[w]] b][nope]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "w"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:17"
+     ],
+     "links": [
+      "[[w]]=>w|w@0:3-0:8"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-R6": {
+   "id": "triage/nightly2/np-R6",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[a][b\\!]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[a][b\\!]</p>",
+    "projections": {
+     "text": "[a][b\\!]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[a][b\\!]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:8"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-R7": {
+   "id": "triage/nightly2/np-R7",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "![[[w]] x][nope]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><span alt=\"[w\" src=\"[w\" class=\"internal-embed is-loaded file-embed mod-empty\">“[w” is not created yet. Click to create.</span> x][nope]</p>",
+    "projections": {
+     "text": "[w x][nope]",
+     "math": [],
+     "links": [
+      {
+       "path": "[w",
+       "heading": "",
+       "embedded": true
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "![[[w]] x][nope]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [
+      "[w"
+     ],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:16"
+     ],
+     "links": [],
+     "embeds": [
+      "![[[w]]=>[w|[w@0:0-0:7"
+     ],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-R8": {
+   "id": "triage/nightly2/np-R8",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[[[w]]][]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><a data-href=\"[w\" href=\"[w\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">[w</a>][]</p>",
+    "projections": {
+     "text": "[w][]",
+     "math": [],
+     "links": [
+      {
+       "path": "[w",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[[[w]]][]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "[w"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:9"
+     ],
+     "links": [
+      "[[[w]]=>[w|[w@0:0-0:6"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-R9": {
+   "id": "triage/nightly2/np-R9",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[x `c` y][nope]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[x <code>c</code> y][nope]</p>",
+    "projections": {
+     "text": "[x c y][nope]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[x `c` y][nope]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:15"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-R10": {
+   "id": "triage/nightly2/np-R10",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[a &amp; b][nope]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[a &amp; b][nope]</p>",
+    "projections": {
+     "text": "[a & b][nope]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[a &amp; b][nope]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:17"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-R11": {
+   "id": "triage/nightly2/np-R11",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[a #t b][nope]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[a <a href=\"#t\" class=\"tag\" target=\"_blank\" rel=\"noopener nofollow\">#t</a> b][nope]</p>",
+    "projections": {
+     "text": "[a #t b][nope]",
+     "math": [],
+     "links": [],
+     "tags": [
+      "t"
+     ],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[a #t b][nope]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "t"
+     ],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:14"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [
+      "#t@0:3-0:5"
+     ],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L1": {
+   "id": "triage/nightly2/np-L1",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[x][[\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[x][</p>",
+    "projections": {
+     "text": "[x][",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[x][["
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:5"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L2": {
+   "id": "triage/nightly2/np-L2",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[x][[a\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[x][a</p>",
+    "projections": {
+     "text": "[x][a",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[x][[a"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:6"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L3": {
+   "id": "triage/nightly2/np-L3",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[x][a\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[x]a</p>",
+    "projections": {
+     "text": "[x]a",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[x][a"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:5"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L4": {
+   "id": "triage/nightly2/np-L4",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^][a\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[^][a</p>",
+    "projections": {
+     "text": "[^][a",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[^][a"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:5"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L5": {
+   "id": "triage/nightly2/np-L5",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^][[a]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[^][[a]</p>",
+    "projections": {
+     "text": "[^][[a]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[^][[a]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:7"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L6": {
+   "id": "triage/nightly2/np-L6",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[x][[]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[x][]</p>",
+    "projections": {
+     "text": "[x][]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[x][[]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:6"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L7": {
+   "id": "triage/nightly2/np-L7",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[[]][[a\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[[]][[a</p>",
+    "projections": {
+     "text": "[[]][[a",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[[]][[a"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:7"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L8": {
+   "id": "triage/nightly2/np-L8",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[[]][a\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[[]][a</p>",
+    "projections": {
+     "text": "[[]][a",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[[]][a"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:6"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L9": {
+   "id": "triage/nightly2/np-L9",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[[]][a]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[[]][a]</p>",
+    "projections": {
+     "text": "[[]][a]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[[]][a]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:7"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L10": {
+   "id": "triage/nightly2/np-L10",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[x][[a|b\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[x][a|b</p>",
+    "projections": {
+     "text": "[x][a|b",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[x][[a|b"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:8"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L11": {
+   "id": "triage/nightly2/np-L11",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[x][a[]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[x]a[]</p>",
+    "projections": {
+     "text": "[x]a[]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[x][a[]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:7"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L12": {
+   "id": "triage/nightly2/np-L12",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[x][[a] b\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[x][a] b</p>",
+    "projections": {
+     "text": "[x][a] b",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[x][[a] b"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:9"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L13": {
+   "id": "triage/nightly2/np-L13",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "a [x][\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">a [x]</p>",
+    "projections": {
+     "text": "a [x]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "a [x]["
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:6"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L14": {
+   "id": "triage/nightly2/np-L14",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[x][[a]] b\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[x][a]] b</p>",
+    "projections": {
+     "text": "[x][a]] b",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[x][[a]] b"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:10"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L15": {
+   "id": "triage/nightly2/np-L15",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[x][a[b\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[x]a[b</p>",
+    "projections": {
+     "text": "[x]a[b",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[x][a[b"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:7"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-L16": {
+   "id": "triage/nightly2/np-L16",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[x][[a [b]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\">[x][a [b]</p>",
+    "projections": {
+     "text": "[x][a [b]",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "[x][[a [b]"
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:10"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-C1": {
+   "id": "triage/nightly2/np-C1",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "%%^[] x%%\n\n^[]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"></p>\n<p dir=\"auto\"><sup data-footnote-id=\"fnref-2\" class=\"footnote-ref\" id=\"fnref-2\"><a href=\"#fn-2\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[2]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "⟨fn⟩",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "%%^[] x%%"
+      },
+      {
+       "type": "paragraph",
+       "text": "^[]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "",
+      ""
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [],
+     "footnoteRefs": [
+      "@0:2",
+      "@2:0"
+     ],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:9",
+      "paragraph@2:0-2:3",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-C2": {
+   "id": "triage/nightly2/np-C2",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "%%[^1] ^[]%%\n\n[^1]: d\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\"><p>d<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></p></li>\n<li data-footnote-id=\"fn-2\" id=\"fn-2\" dir=\"auto\"><a href=\"#fnref-2\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>",
+    "projections": {
+     "text": "",
+     "math": [],
+     "links": [],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "%%[^1] ^[]%%"
+      },
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: d"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "footnotes": [
+      "1",
+      ""
+     ]
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@2:0-2:7"
+     ],
+     "footnoteRefs": [
+      "1@0:2",
+      "@0:7"
+     ],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:12",
+      "footnoteDefinition@2:0-2:7",
+      "text@3:0-3:0",
+      "element@3:0-3:0"
+     ],
+     "links": [],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-N1": {
+   "id": "triage/nightly2/np-N1",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "^[a ^[[[x]]] b]\n",
+   "obsidian": {
+    "html": "<p dir=\"auto\"><sup data-footnote-id=\"fnref-1\" class=\"footnote-ref\" id=\"fnref-1\"><a data-footref=\"[inline0\" href=\"#fn-1\" class=\"footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\">a <sup id=\"fnref-1\"><a class=\"footnote-ref\" href=\"#fn-1\" target=\"_blank\" rel=\"noopener nofollow\">1</a></sup> b<a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>\n<div class=\"footnotes\">\n<hr>\n<ol>\n<li id=\"fn-1\" dir=\"auto\"><a data-href=\"x\" href=\"x\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">x</a><a class=\"footnote-backref\" href=\"#fnref-1\" target=\"_blank\" rel=\"noopener nofollow\">↩</a></li>\n</ol>\n</div>",
+    "projections": {
+     "text": "⟨fn⟩",
+     "math": [],
+     "links": [
+      {
+       "path": "x",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "paragraph",
+       "text": "^[a ^[[[x]]] b]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "x"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "[inline0@0:2-0:14"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "paragraph@0:0-0:15",
+      "text@1:0-1:0",
+      "element@1:0-1:0"
+     ],
+     "links": [
+      "[[x]]=>x|x@0:6-0:11"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
+  },
+  "triage/nightly2/np-N2": {
+   "id": "triage/nightly2/np-N2",
+   "layer": "fuzz",
+   "category": "fuzz",
+   "markdown": "[^1]: ^[a ^[[[x]]]]\n",
+   "obsidian": {
+    "html": "\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\" id=\"fn-1\" dir=\"auto\">a <sup id=\"fnref-2\"><a class=\"footnote-ref\" href=\"#fn-2\" target=\"_blank\" rel=\"noopener nofollow\">2</a></sup><a href=\"#fnref-1\" class=\"footnote-backref footnote-link\" target=\"_blank\" rel=\"noopener nofollow\">↩︎</a></li>\n</ol></section>\n<div class=\"footnotes\">\n<hr>\n<ol>\n<li id=\"fn-2\" dir=\"auto\"><a data-href=\"x\" href=\"x\" class=\"internal-link\" target=\"_blank\" rel=\"noopener nofollow\">x</a><a class=\"footnote-backref\" href=\"#fnref-2\" target=\"_blank\" rel=\"noopener nofollow\">↩</a></li>\n</ol>\n</div>",
+    "projections": {
+     "text": "",
+     "math": [],
+     "links": [
+      {
+       "path": "x",
+       "heading": "",
+       "embedded": false
+      }
+     ],
+     "tags": [],
+     "headings": [],
+     "tasks": [],
+     "highlights": [],
+     "emphasis": [],
+     "sections": [
+      {
+       "type": "footnoteDefinition",
+       "text": "[^1]: ^[a ^[[[x]]]]"
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "element",
+       "text": ""
+      }
+     ]
+    },
+    "meta": {
+     "headings": [],
+     "links": [
+      "x"
+     ],
+     "embeds": [],
+     "tags": [],
+     "footnotes": []
+    },
+    "compute": {
+     "referenceLinks": [],
+     "footnotes": [
+      "1@0:0-0:19",
+      "[inline0@0:8-0:18"
+     ],
+     "footnoteRefs": [],
+     "headings": [],
+     "sections": [
+      "footnoteDefinition@0:0-0:19",
+      "text@1:0-1:0",
+      "element@1:0-1:0"
+     ],
+     "links": [
+      "[[x]]=>x|x@0:12-0:17"
+     ],
+     "embeds": [],
+     "tags": [],
+     "listItems": [],
+     "blocks": [],
+     "frontmatterLinks": []
+    }
+   },
+   "triage": "unreviewed"
   }
  }
 }

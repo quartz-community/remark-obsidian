@@ -22,7 +22,12 @@ import type { GoldenCase } from "./types.js";
  * starts with whitespace. 23 more came from three later nightly runs and their probes (1.15.0): an
  * escaped `]` opens no label, an undefined image reference renders as written, a block id is
  * stripped only from text ending its wrapper or cell, and display math ending a wrapper keeps
- * the line ending after it. Left out: six
+ * the line ending after it. 68 more came from a later nightly run's 14 forms and their probes
+ * (1.15.0): footnotes render in the order of their numbers, given at a definition's first
+ * reference and where an inline note is written; a surplus table cell's footnotes still render;
+ * an undefined reference renders the text between its brackets; `[^]` and a pair holding a
+ * bracket open no label; display math swallows a highlight's line ending; `metadataCache`
+ * indexes an empty `^[]` inside `%%`. Left out: six
  * self-embeds (out of scope, as `fuzz/sweep.ts` skips them) and `[^1]: - [ ] [` / `^[[^1]]]`,
  * where Obsidian's renderer reads a reference its own `metadataCache` does not.
  */
@@ -35,7 +40,7 @@ const golden = JSON.parse(
 
 describe("projection triage", () => {
   it("records every case", () => {
-    expect(Object.keys(golden.cases)).toHaveLength(102);
+    expect(Object.keys(golden.cases)).toHaveLength(170);
   });
 
   it("matches every recorded document", () => {

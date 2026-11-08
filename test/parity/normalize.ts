@@ -138,18 +138,42 @@ function decodeEntities(value: string): string {
  * shared: the two agree on what each node *shows* and disagree on whitespace, and
  * that disagreement is the point.
  */
-function textOf(node: Node, defined?: ReadonlySet<string>): string {
+function textOf(
+  node: Node,
+  defined?: ReadonlySet<string>,
+  source?: string,
+): string {
   let out = "";
+  /** Whether the last thing written was display math, whose line ending the renderer drops. */
+  let afterDisplay = false;
 
   const walk = (child: Node): void => {
+    const wasDisplay = afterDisplay;
+    afterDisplay = false;
     switch (child.type) {
       case "text":
       case "inlineCode":
         out += (child as ValueNode).value;
         return;
-      case "break":
+      case "break": {
+        // Display math swallows the line ending after it, and the next line's leading
+        // whitespace is what stands in for it: `==, $$y^2` / `y^2$$` / `===` reads `, ⟨math⟩=`
+        // and `==a $$x$$` / `·b==` reads `a ⟨math⟩ b`, where `==a $x$` / `b==` keeps its
+        // `\n` (recorded, 1.15.0; the differential fuzz, 2026-11-07). The whitespace comes
+        // from the source, since the reader strips it from the line's text.
+        if (wasDisplay && source !== undefined) {
+          const at = child.position?.start?.offset;
+          const lineEnd = at === undefined ? -1 : source.indexOf("\n", at);
+          if (lineEnd !== -1) {
+            let end = lineEnd + 1;
+            while (source[end] === " " || source[end] === "\t") end += 1;
+            out += source.slice(lineEnd + 1, end);
+            return;
+          }
+        }
         out += "\n";
         return;
+      }
       case "wikilink": {
         const link = child as WikilinkNode;
         out += link.embedded
@@ -166,6 +190,9 @@ function textOf(node: Node, defined?: ReadonlySet<string>): string {
         return;
       case "inlineMath":
         out += "\u27e8math\u27e9";
+        afterDisplay =
+          (child as unknown as { data?: { display?: boolean } }).data
+            ?.display === true;
         return;
       // Renders nothing, and it carries its parsed body as children.
       case "comment":
@@ -193,6 +220,8 @@ function textOf(node: Node, defined?: ReadonlySet<string>): string {
 
     const children = (child as { children?: Node[] }).children;
     if (children) for (const grandchild of children) walk(grandchild);
+    // Display math ending a wrapper keeps the line ending after the wrapper.
+    afterDisplay = false;
   };
 
   walk(node);
@@ -368,6 +397,9 @@ function dropLabelOpeners(
     // after it is shown: Obsidian renders `(u)]][[` and `*]][` as written, where `[x][[w]]`
     // drops the `[` (found by the differential fuzz, 2026-10-28, 2 of 20 causes).
     let closed = false;
+    /** Where each still-open `[` sits, so the pair the `]` closes can be read. */
+    const openers: number[] = [];
+    let opener = -1;
     for (let scan = 0; scan < at; scan++) {
       const character = out[scan];
       if (character === "\\") {
@@ -375,13 +407,24 @@ function dropLabelOpeners(
         continue;
       }
       if (escaped[scan]) continue;
-      if (character === "[") depth += 1;
-      else if (character === "]") {
+      if (character === "[") {
+        depth += 1;
+        openers.push(scan);
+      } else if (character === "]") {
         closed = depth > 0;
-        if (closed) depth -= 1;
+        if (closed) {
+          depth -= 1;
+          opener = openers.pop() ?? -1;
+        }
       }
     }
     if (depth > 0 || !closed) continue;
+    // A pair that is no label opens none after it: a footnote's `[^]` and a pair holding a
+    // bracket. `[^][a`, `[^][[a]`, `[[]][[a` and `[[]][a` render as written, where `[x][a`
+    // renders `[x]a` (recorded, 1.15.0; the differential fuzz, 2026-11-07) -- the pairs the
+    // wikilink rule already exempts.
+    const pair = out.slice(opener + 1, at - 1);
+    if (pair.startsWith("^") || /[[\]]/u.test(pair)) continue;
     // Only a label that is not one: a WELL-FORMED label after the closer is a full reference
     // nothing defines, and renders whole -- `a [text][^9] b` shows `[text][^9]`. A tree from
     // remark-parse 8 never holds that as text, since its reader makes a reference node of
@@ -795,6 +838,25 @@ export function mdastText(
         ) {
           break;
         }
+        // The text between the brackets is rendered, though: `[*a*][nope]` shows an `em`,
+        // `[a [[w]] b][nope]` a link, and `[a\!b][nope]` and `[a &amp; b][nope]` read `a!b`
+        // and `a & b` (recorded, 1.15.0; the differential fuzz, 2026-11-07). Only the
+        // brackets and the label after them are the source's, which keeps `[bar][foo\!]`.
+        const children = (node as { children?: Node[] }).children ?? [];
+        const first = children[0]?.position?.start?.offset;
+        const last = children[children.length - 1]?.position?.end?.offset;
+        if (
+          node.type === "linkReference" &&
+          first !== undefined &&
+          last !== undefined &&
+          from <= first &&
+          last <= to
+        ) {
+          parts.push(source.slice(from, first));
+          for (const child of children) walk(child, phrasing, true);
+          parts.push(source.slice(last, to));
+          return;
+        }
         parts.push(source.slice(from, to));
         return;
       }
@@ -1093,22 +1155,28 @@ export function projectMdast(
   const writtenTargets = options.writtenTargets ?? false;
   const math: MathItem[] = [];
   const defined = definedFootnotes(tree);
+  /** Table cells `alignTableCells` truncated: hidden, but their footnotes render. */
+  const surplus = SURPLUS_CELLS.get(tree) ?? [];
+  const roots: Node[] = [tree, ...surplus];
   /** Every node under a footnote definition or an inline footnote. */
   const inFootnote = new Set<Node>();
-  visit(tree, (node: Node) => {
-    if (node.type !== "footnoteDefinition" && node.type !== "footnote") return;
-    visit(node, (inner: Node) => {
-      inFootnote.add(inner);
-    });
-  });
   /** Every node under a link label, where a bracket is content. */
   const inLabelNode = new Set<Node>();
-  visit(tree, (node: Node) => {
-    if (!LABEL_HOSTS.has(node.type)) return;
-    visit(node, (inner: Node) => {
-      inLabelNode.add(inner);
+  for (const root of roots) {
+    visit(root, (node: Node) => {
+      if (node.type !== "footnoteDefinition" && node.type !== "footnote")
+        return;
+      visit(node, (inner: Node) => {
+        inFootnote.add(inner);
+      });
     });
-  });
+    visit(root, (node: Node) => {
+      if (!LABEL_HOSTS.has(node.type)) return;
+      visit(node, (inner: Node) => {
+        inLabelNode.add(inner);
+      });
+    });
+  }
   /** The last definition for each label, which is the one Obsidian renders. */
   const lastDefinition = new Map<string, Node>();
   visit(tree, "footnoteDefinition", (node: Node) => {
@@ -1118,11 +1186,13 @@ export function projectMdast(
     );
   });
   const referenced = new Set<string>();
-  visit(tree, "footnoteReference", (node: Node) => {
-    referenced.add(
-      String((node as unknown as { identifier: string }).identifier),
-    );
-  });
+  for (const root of roots) {
+    visit(root, "footnoteReference", (node: Node) => {
+      referenced.add(
+        String((node as unknown as { identifier: string }).identifier),
+      );
+    });
+  }
 
   const links: LinkItem[] = [];
   /**
@@ -1143,12 +1213,14 @@ export function projectMdast(
   const skipped: Node[] = [];
   /** Every node under an inline footnote, whose body the renderer moves. */
   const inInlineNote = new Set<Node>();
-  visit(tree, (node: Node) => {
-    if (node.type !== "footnote") return;
-    visit(node, (inner: Node) => {
-      inInlineNote.add(inner);
+  for (const root of roots) {
+    visit(root, (node: Node) => {
+      if (node.type !== "footnote") return;
+      visit(node, (inner: Node) => {
+        inInlineNote.add(inner);
+      });
     });
-  });
+  }
   const tags: string[] = [];
   const headings: string[] = [];
   const tasks: TaskItem[] = [];
@@ -1156,32 +1228,51 @@ export function projectMdast(
   const emphasis: string[] = [];
 
   /**
-   * Where the renderer puts what a footnote holds: after the text, inline notes first, then
-   * definitions. Recorded: `[^1]: x ^[y]` renders a `section.footnotes` of inline notes ahead
-   * of a `div.footnotes` of definitions, and `a[^1] b` / `[^1]: [l](u) c` / `d [m](v)` reports
-   * `v` before `u`. The triage of the differential fuzz found 11 documents with a definition
-   * before later text, which the comment on `relocated` above assumed never happens. A
-   * definition's place in its list is the order of its first reference.
+   * Where the renderer puts what a footnote holds: after the text, in the order of the
+   * footnotes' numbers. A definition is numbered at its first reference and an inline note
+   * where it is written, both in source order across the whole note, definitions' bodies and
+   * surplus table cells included. Recorded (1.15.0; the differential fuzz, 2026-11-07):
+   * `a[^1] b ^[[[x]]]` / `[^1]: [[y]]` reports `y` before `x`, `a[^1] b[^2]` /
+   * `[^1]: [[p]] ^[[[q]]]` / `[^2]: [[r]]` reports `p r q`, and `[^1]: ^[[[y]]]` over
+   * `^[[[x]]]` reports `y x` though nothing references the definition. An earlier reading,
+   * "inline notes first, then definitions", held only where every inline note came first.
+   * What a note holds belongs to the innermost note around it.
    */
   const firstReference = new Map<string, number>();
-  visit(tree, "footnoteReference", (node: Node) => {
-    const id = String((node as unknown as { identifier: string }).identifier);
-    if (!firstReference.has(id)) firstReference.set(id, firstReference.size);
-  });
-  const definitionRank = new Map<Node, number>();
+  for (const root of roots) {
+    visit(root, "footnoteReference", (node: Node) => {
+      const id = String((node as unknown as { identifier: string }).identifier);
+      const at = node.position?.start?.offset ?? Number.POSITIVE_INFINITY;
+      if (!(at >= (firstReference.get(id) ?? Number.POSITIVE_INFINITY)))
+        firstReference.set(id, at);
+    });
+  }
+  const footnoteRank = new Map<Node, number>();
   // Rendered projections only. `metadataCache` indexes a definition where it is written
   // (`[^1]: [l](u)` before `[[a]]` reports `u` first), though it follows the renderer for an
   // inline note's body.
-  visit(tree, "footnoteDefinition", (definition: Node) => {
-    if (!skipUnreferenced) return;
-    const rank = firstReference.get(
-      String((definition as unknown as { identifier: string }).identifier),
-    );
-    if (rank === undefined) return;
-    visit(definition, (inner: Node) => {
-      if (!inInlineNote.has(inner)) definitionRank.set(inner, rank);
-    });
-  });
+  if (skipUnreferenced) {
+    for (const root of roots) {
+      visit(root, "footnoteDefinition", (definition: Node) => {
+        const rank = firstReference.get(
+          String((definition as unknown as { identifier: string }).identifier),
+        );
+        if (rank === undefined) return;
+        visit(definition, (inner: Node) => {
+          footnoteRank.set(inner, rank);
+        });
+      });
+    }
+    // After the definitions, and outer before inner, so a note's rank overwrites theirs.
+    for (const root of roots) {
+      visit(root, "footnote", (note: Node) => {
+        const rank = note.position?.start?.offset ?? Number.POSITIVE_INFINITY;
+        visit(note, (inner: Node) => {
+          footnoteRank.set(inner, rank);
+        });
+      });
+    }
+  }
   const inline = {
     links: relocated,
     math: [] as MathItem[],
@@ -1203,14 +1294,18 @@ export function projectMdast(
     key: K,
     item: (typeof main)[K][number],
   ): void => {
-    const rank = definitionRank.get(node);
-    if (inInlineNote.has(node)) (inline[key] as unknown[]).push(item);
-    else if (rank !== undefined)
+    const rank = footnoteRank.get(node);
+    if (rank !== undefined)
       (deferred[key] as { rank: number; item: unknown }[]).push({ rank, item });
+    else if (inInlineNote.has(node)) (inline[key] as unknown[]).push(item);
     else (main[key] as unknown[]).push(item);
   };
 
-  visit(tree, (node: Node, index, parent) => {
+  const handle = (
+    node: Node,
+    index: number | undefined,
+    parent: Node | undefined,
+  ): typeof SKIP | undefined => {
     // Nothing inside a `%%` comment renders, so nothing inside one reaches a
     // *rendered* projection. The body is parsed into children now, and without
     // this a wikilink or a tag written inside a comment would be collected as
@@ -1313,7 +1408,7 @@ export function projectMdast(
     if (node.type === "html" && parent && index !== undefined) {
       const element = rawPhrasingElement(
         index,
-        (parent as { children: Node[] }).children,
+        (parent as unknown as { children: Node[] }).children,
       );
       if (element && !inFootnote.has(node)) {
         if (element.tag === "mark")
@@ -1329,7 +1424,7 @@ export function projectMdast(
       // report. `math`, `links`, `tags`, `headings` and `tasks` come from the
       // undisturbed root and are not restricted this way.
       if (inFootnote.has(node)) return;
-      highlights.push(stripColourMarker(textOf(node, defined)));
+      highlights.push(stripColourMarker(textOf(node, defined, source)));
       return;
     }
     if (node.type === "inlineMath") {
@@ -1360,7 +1455,9 @@ export function projectMdast(
         checked: node.checked,
       });
     }
-  });
+    return undefined;
+  };
+  visit(tree, handle);
 
   // An inline footnote is self-referencing: the renderer relocates its body to the
   // trailing section and shows it even when the definition around it is never
@@ -1373,43 +1470,19 @@ export function projectMdast(
   // `[a` the recording does not have. Tags, math and tasks too (`[^1]:   ` / `u). ^[#tag]`
   // renders the tag); the text and emphasis projections read a clone with the footnotes
   // section removed, so nothing there is expected either way.
-  for (const definition of skipped) {
-    visit(definition, (node: Node) => {
+  //
+  // A surplus table cell is hidden the same way, and its notes render too: `| a |` / `| --- |` /
+  // `| b | ^[#t] |` renders the tag, and `| b | c[^1] |` over `[^1]: #t` renders the
+  // definition (recorded, 1.15.0; the differential fuzz, 2026-11-07). `alignTableCells` hands
+  // the cells it truncated over in `SURPLUS_CELLS`.
+  for (const hidden of [...skipped, ...surplus]) {
+    visit(hidden, (node: Node) => {
       if (node.type !== "footnote") return;
-      visit(node, (inner: Node) => {
-        if (inner.type === "tag") {
-          inline.tags.push((inner as ValueNode).value);
-          return;
-        }
-        if (inner.type === "inlineMath" || inner.type === "math") {
-          inline.math.push({
-            display:
-              inner.type === "math" ||
-              Boolean(
-                (inner as { data?: { display?: boolean } }).data?.display,
-              ),
-            tex: renderedTex((inner as ValueNode).value),
-          });
-          return;
-        }
-        if (isType<WikilinkNode>(inner, "wikilink")) {
-          relocated.push({
-            path: inner.path,
-            heading: inner.heading,
-            embedded: inner.embedded,
-          });
-          return;
-        }
-        if (inner.type === "image" || inner.type === "link") {
-          const url = (inner as unknown as { url?: string }).url ?? "";
-          if (isVaultTarget(url)) {
-            relocated.push({
-              ...splitTarget(url),
-              embedded: inner.type === "image",
-            });
-          }
-        }
-      });
+      // Through the same walk as the rest, which places a nested note's content once, under
+      // its own rank: `[^1]: > ^[[` / `····^[![[i.png|100]]] img.png]]` renders the embed once
+      // (recorded, 1.15.0), where a second walk over the inner note reported it twice.
+      visit(node, handle);
+      return SKIP;
     });
   }
 
@@ -1433,6 +1506,9 @@ interface ParentNode extends Node {
   children: Node[];
 }
 
+/** The cells `alignTableCells` removed from each tree, for the footnotes they still render. */
+const SURPLUS_CELLS = new WeakMap<Node, Node[]>();
+
 /**
  * GFM 4.10 discards an over-long row's excess cells when *rendering*, so mdast
  * keeps every cell it parsed while `mdast-util-to-hast` truncates. Obsidian's
@@ -1440,6 +1516,8 @@ interface ParentNode extends Node {
  * cells read as a parser divergence where both sides actually agree.
  */
 function alignTableCells(tree: Root): Root {
+  const dropped: Node[] = [];
+  SURPLUS_CELLS.set(tree, dropped);
   visit(tree, "table", (table: Node) => {
     const rows = (table as ParentNode).children;
     // The delimiter row declares the columns, so `align` is the count to
@@ -1452,7 +1530,7 @@ function alignTableCells(tree: Root): Root {
     if (columns === undefined) return;
     for (const row of rows) {
       const cells = (row as ParentNode).children;
-      if (cells.length > columns) cells.length = columns;
+      if (cells.length > columns) dropped.push(...cells.splice(columns));
     }
   });
   return tree;
@@ -1519,8 +1597,14 @@ export function metaOurs(tree: Root, source: string): MetaProjections {
     // it rather than walked.
     if (node.type !== "comment") return;
     const value = String((node as unknown as { value: string }).value);
-    for (const match of value.matchAll(/\[\^([^[\]\s]+)\]/gu)) {
-      const id = match[1]!.toLowerCase();
+    // An empty inline note too, in order with them: `%%[^1] ^[]%%` over `[^1]: d` reports
+    // `1` then `""` (recorded, 1.15.0; the differential fuzz, 2026-11-07).
+    for (const match of value.matchAll(/\[\^([^[\]\s]+)\]|\^\[\]/gu)) {
+      if (match[1] === undefined) {
+        footnotes.push("");
+        continue;
+      }
+      const id = match[1].toLowerCase();
       if (defined.has(id)) footnotes.push(id);
     }
     // The body is also parsed into children, so walking on would find the same
