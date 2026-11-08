@@ -35,6 +35,8 @@ const SIZES: Readonly<Record<string, number>> = {
   "highlight-space-run": 64_000,
   "highlight-newline-run": 8_000,
   "highlight-late-closer": 256_000,
+  "strike-space-run": 64_000,
+  "strike-newline-run": 64_000,
   "comment-open": 20_000,
   "math-open": 20_000,
   "math-prices": 30_000,
@@ -119,8 +121,13 @@ const strictGated = gated.filter(
 /**
  * Where `strict` runs a shape smaller than `legacy`. Bare remark-parse + remark-gfm takes 9.3s
  * on `nested-lists` at 500 and 27s at 800, past the budget before this package does anything.
+ * At 64,000 `strike-newline-run` overflows the stack in `remark-breaks`, which splices one
+ * paragraph's 128,000 children in a single call; 32,000 takes about 0.6s.
  */
-const STRICT_SIZES: Readonly<Record<string, number>> = { "nested-lists": 300 };
+const STRICT_SIZES: Readonly<Record<string, number>> = {
+  "nested-lists": 300,
+  "strike-newline-run": 32_000,
+};
 
 const sizeOf = (shape: string, preset: "legacy" | "strict") =>
   (preset === "strict" ? STRICT_SIZES[shape] : undefined) ?? SIZES[shape];

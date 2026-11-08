@@ -54,6 +54,13 @@ export const SHAPES: Readonly<Record<string, (n: number) => string>> = {
    * 2.4 s and 4.0 s there.
    */
   "highlight-late-closer": (n) => "==a ".repeat(n) + "b==",
+  /**
+   * The same run for `~~`: remark-parse 8's strikethrough reader scanned to the end of the run
+   * from every opener, so `legacy` took 238 / 711 / 2,397 ms at 2,000 / 4,000 / 8,000 until a
+   * closer table declined each opener with none ahead.
+   */
+  "strike-space-run": (n) => "~~a ".repeat(n),
+  "strike-newline-run": (n) => "~~a\n".repeat(n),
   "comment-open": (n) => "%%".repeat(n),
   "math-open": (n) => "$".repeat(n) + "a",
   /**

@@ -703,6 +703,29 @@ function speedUps(tables: any, features: Features): void {
       );
     });
   }
+  // `~~strike~~` (remark-parse 8's `deletion`, stock): from an opener `~~` at `base` whose third
+  // character is no whitespace, its scan closes at the first `j >= base + 3` where `j - 1` and `j`
+  // are `~` and either `j === base + 3` (the scan's `preceding` is still empty there) or the
+  // character at `j - 2` is no whitespace. Past `base + 3` that test reads only the three
+  // characters around the closer, so one table answers it for every opener in the run, and an
+  // opener with no closer ahead declines without reading the rest of the run.
+  precheck("deletion", (frame, base, value) => {
+    if (value.charCodeAt(0) !== 126 || value.charCodeAt(1) !== 126)
+      return false;
+    if (value.charCodeAt(2) === 126 && value.charCodeAt(3) === 126)
+      return false;
+    return (
+      nextWhere(
+        frame,
+        "strike-closer",
+        (v, i) =>
+          i >= 2 &&
+          v.charCodeAt(i) === 126 &&
+          v.charCodeAt(i - 1) === 126 &&
+          !isSpace(v, i - 2),
+      )[base + 4] === -1
+    );
+  });
   // `<scheme://...>` and `<user@host>`: the first space, `>`, `@` or `:/` decides the kind, and
   // the rest must reach a `>` before the next space.
   precheck("autoLink", (frame, base, value) => {

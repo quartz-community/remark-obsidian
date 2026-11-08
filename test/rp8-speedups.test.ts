@@ -194,6 +194,25 @@ describe("legacy reader speed-ups", () => {
     expect(highlighted).toBeGreaterThan(50);
   }, 120_000);
 
+  it("read every short run of `~`, whitespace and text exactly as the plain reader does", () => {
+    // The strikethrough precheck's two closers: one straight after the opener (`~~~~`), whatever
+    // precedes it, and any later `~~` with no whitespace two characters back.
+    const alphabet = ["~", "a", " ", "\n", " "];
+    let docs = [""];
+    let struck = 0;
+    const differ: string[] = [];
+    for (let length = 1; length <= 7; length++) {
+      docs = docs.flatMap((doc) => alphabet.map((c) => doc + c));
+      for (const doc of docs) {
+        const fast = read(doc, true);
+        if (fast.includes('"type":"delete"')) struck++;
+        if (fast !== read(doc, false)) differ.push(JSON.stringify(doc));
+      }
+    }
+    expect(differ).toEqual([]);
+    expect(struck).toBeGreaterThan(200);
+  }, 120_000);
+
   it("read generated documents exactly as the plain reader does", () => {
     // Every character a reader treats specially, so the early returns meet escaped openers,
     // backslash runs, nested and unmatched brackets, U+00A0, and code spans around them.

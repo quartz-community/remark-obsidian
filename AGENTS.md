@@ -489,6 +489,16 @@ check proved blind:
 
 Both have known-positive controls. Re-run them after ANY change under `src/rp8`.
 
+**Strikethrough runs are linear under `legacy`.** Stock rp8's `deletion` reader scanned to the
+end of the run from every `~~`, so `"~~a ".repeat(n)` took 238 / 711 / 2,397 ms at 2,000 / 4,000
+/ 8,000. A `precheck` now declines an opener with no closer ahead, from a table: past the opener's
+fourth character a closer is `~~` with no whitespace two back, which reads only its own three
+characters (`~~~~` is the one closer that depends on the opener, handed to the stock reader).
+11 / 15 / 29 ms after. 0 of 169,955 full trees moved against `main` (33,991 documents: corpus,
+recorded cases, spec, 3,000 generated, 20,000 random over `~~`, `&`, backticks and kin; five
+`legacy` configurations); handing `~~~~` to the table instead moves 183, the control. Gated by
+`strike-space-run` / `strike-newline-run` (both time out on the old reader).
+
 **Traps this cost, each once:**
 
 - **Published rp8 has an EXPONENTIAL ReDoS** in `util/html.js` (`recheck`'s 205-character string:
