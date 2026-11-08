@@ -30,13 +30,12 @@ jobs:
         run: |
           node -e "
           const fs = require('fs');
-          const dist = 'dist/index.js';
-          if (!fs.existsSync(dist)) process.exit(0);
           const pkg = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
           const peerDeps = Object.keys(pkg.peerDependencies || {});
           const builtins = new Set(['assert','buffer','child_process','cluster','console','constants','crypto','dgram','dns','domain','events','fs','http','http2','https','inspector','module','net','os','path','perf_hooks','process','punycode','querystring','readline','repl','stream','string_decoder','sys','timers','tls','trace_events','tty','url','util','v8','vm','wasi','worker_threads','zlib']);
           const shared = ['@quartz-community/','preact','@jackyzha0/quartz','vfile','unified'];
-          const content = fs.readFileSync(dist, 'utf-8');
+          const entries = Object.values(pkg.exports).flatMap((e) => e.import ?? []);
+          const content = entries.map((e) => fs.readFileSync(e, 'utf-8')).join('\\n');
           const re = /^\s*(?:import\s+.*\s+from|export\s+.*\s+from)\s+[\"']([^\"'./][^\"']*)[\"']/gm;
           const unexpected = new Set();
           for (const m of content.matchAll(re)) {
@@ -56,3 +55,5 @@ jobs:
           }
           console.log('dist/ externals verified: all imports are bundled or allowlisted.');
           "
+      - name: Verify third-party notices
+        run: node scripts/check-third-party-notices.mjs

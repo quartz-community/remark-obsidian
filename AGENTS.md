@@ -510,6 +510,79 @@ Both have known-positive controls. Re-run them after ANY change under `src/rp8`.
 - **The Write tool turns a `\uFEFF` escape into a literal BOM**, and prettier reformats `src/rp8`
   between edits -- re-read before anchoring a scripted edit.
 
+**Small inputs, measured on 930 parts of about 24 lines** (a generated 22,386-line note cut at
+blank lines, and 930 parts of package READMEs). The HTML block reader's `RegExp` was 18.8% of self
+time; the precheck alone gives 0.81 and 0.83 of base. Plain text without the decoder alone gives
+0.92 and 0.86. Together: 0.73 and 0.87, against the same build's 0.96 and 0.995. Re-measured in
+review (7 fresh processes, best of 6 passes, medians, a loaded machine): 0.85 on the corpus's
+6,844 documents and 0.89 on 4,094 README parts. 0.73 is the best case, a note with no `&` or
+`<`. Both prechecks return early only where the stock code gives the same answer: 0 of 111,964
+tree digests moved (four `legacy` configurations, corpus, spec, generated, deep and
+HTML/entity-heavy shapes); removing the `&` test moves 23,011, the control.
+
+- **Refused: leaving out the tokenizer's per-eat check (`validateEat`).** 2% of self time, and no
+  gain beyond the control on top of the other two, on the parts or on one parse of the whole note.
+  The vendored tokenizer stays stock.
+- **What is left:** position bookkeeping in the tokenizer (`update`, `Position`, the loop itself,
+  about a quarter), garbage collection (10%), `mathDisplayTransform`'s tree walk (12%, inclusive),
+  and `tokenizeInline`'s per-run tables (5%).
+- **Trap:** on a busy machine, single processes of 12 rounds put a build against ITSELF at 0.73 and
+  at 1.29. Compare in one process, in random order, each part's minimum, and take the median
+  across many fresh processes.
+
+**`/legacy`: the entry for a consumer that only reads.** `src/legacy.ts` exports a plain
+`parse(text, options)` over `parseLegacy8`, for `obsidian-footnotes` and its kin. Measured on that
+plugin's minified `main.js`, median of three builds, `gzip -9`:
+
+|                                      |     raw |    gzip |
+| ------------------------------------ | ------: | ------: |
+| published 2.1.0                      | 519,667 | 172,254 |
+| `fe0311f` built                      | 519,788 | 172,301 |
+| + `sideEffects: false`               | 519,788 | 172,301 |
+| every module split, with or without  | 519,824 | 171,987 |
+| `/legacy`, still behind `unified`    | 381,235 | 130,332 |
+| `/legacy`, adapter without `unified` | 367,710 | 125,569 |
+
+**`sideEffects: false` and module splits are refused: 0 and +36 bytes.** `remarkObsidian` refers
+to both presets and every writer from one function, so no bundler can prove any of it unused. A
+synchronous main entry cannot do better, so only a second entry could.
+
+- **What is left** of the package in that bundle is 148 KB: 88 KB `src/rp8/vendor`, 36 KB
+  `character-entities`, 21 KB `src/rp8`. `character-entities` is there only for `decodeString` on
+  a label in `adapt.ts`. Not attempted: the vendored v1 tables differ from it (97 prefixes, 4
+  values), so swapping is a reading change to settle first.
+- **Trap:** `moduleResolution: "node"`, which Obsidian's sample plugin still uses, ignores
+  `exports`, so `typesVersions` is what gives that consumer the subpath's types (TS2307 without).
+- **Gate:** `legacy-entry.test.ts`. The tree against the main entry's on the whole corpus, each
+  flag on a stride (each flag's control: it must move a document), and the exact list of packages
+  the entry bundles.
+
+**`readsPastEnd`: a part's end, `legacy` only, and two traps in it.** A false signal is a silent
+misread of a long note, so it is held to one property: a part with its next line attached, ending
+where that line starts a top-level block, reads as that part of the whole note. 40,000 generated
+documents through the caller's own decision give 43,588 cuts, 0 misread, 419 saved; the corpus gives
+14,865, 0 misread, 6 saved.
+
+- **The next line is part of the property.** Read without it, `> q` / `2) b` is one quote with a
+  lazy line and the signal is `false`, while `> q` / `2) b` / `---` is a quote, a list, and a break:
+  the underline decides the lazy line, and the top level then reads it as a list. `[^1]: d` over the
+  same lines, and `2. b` / `===`, do the same. Without the next line and without this shape, 10,315
+  corpus documents and 150,000 generated from definition fragments give 15,024 and 150,672 cuts, 0
+  misread, but that generator has no such fragment.
+
+- **"Declined, and more text would complete one" is not enough.** `[foo]: /url` / blank / `'tit` /
+  blank holds a paragraph, and the part above `'tit` alone a definition, where the reader never
+  declined. All 20 differing whole-note cuts in the generated run are that shape. The corpus has 0.
+- **A tree scan cannot see every decline.** A footnote definition asks the reader at each line
+  (`[^1]: d` / `[`), silently, with no paragraph or table to find: 8 misreads in 40,000 with the
+  scan, 0 with the reader wrapped.
+- **Refused: a constant `false` under `strict`.** A CommonMark definition stops at a blank line
+  (no definition node moved), but 320 of 8,948 comparable cuts read differently anyway, such as a
+  fence outliving its list item. `false` would promise what it cannot, so the field is absent.
+- **Not covered, by decision:** frontmatter also reads past the end (197 corpus cuts misread if the
+  caller does not find the closer first). The caller can, cheaply, and a `---` first line with no
+  closer would otherwise make the whole note one part.
+
 ## Two presets, two audiences
 
 |                                                                                                                          | `legacy` (default)                                         | `strict`                    |
@@ -561,7 +634,7 @@ with that label defined; the other 5 are `[][`, whose empty label nothing can de
 ## Gates — what "done" means
 
 ```bash
-npm test          # 643 tests / 27 files. Contains the contract gate.
+npm test          # 645 tests / 27 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -1059,8 +1132,8 @@ below. Two traps that run met:
   their stable, GFM value (surplus cells dropped), which is what both presets produce.
 - **A login shell exporting `LD_LIBRARY_PATH`** (here a system `glib` built for glibc 2.43)
   overrides the flake's `NIX_LD_LIBRARY_PATH`, and chromedriver dies with `GLIBC_2.43' not
-found` before a session starts ("Unable to connect"). Record with
-  `nix develop -c env -u LD_LIBRARY_PATH parity-record`.
+found` before a session starts ("Unable to connect"). The flake's shell
+  hook now unsets it (`49e2a69`).
 
 `referee-spans.json` and the two strict probe goldens carry a 1.15.0 stamp from 2026-10-27, the
 early-access build; the stamp cannot tell the builds apart.
@@ -1153,9 +1226,18 @@ unit test "reads a tag's characters as Obsidian does", which fails on the old cl
    bar the tree check's recorded families; the census baseline holds the rest of the million.
 7. **The fuzz triage's leftovers:** self-embeds (out of scope), and `[^1]: - [ ] [` /
    `^[[^1]]]`, where Obsidian's renderer and its cache disagree.
-8. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,
-   `pass-owner*.mts`, `pass-order*.mts` and their kin attribute behaviour to micromark passes
-   `legacy` no longer runs. Port to `strict` or delete; do not trust their `legacy` output.
+8. **The speed-ups change one reading** (found reviewing PR #24, on `main` before it): with
+   them, ``&#0`&/`` reads as a backtick, U+FFFD and `/` and ``&#xa`&]`` likewise, where the stock reader
+   keeps `` `&/ ``. `rp8-speedups.test.ts` does not reach a character reference before a
+   backtick. Open: the speed-up must give way, since the stock reading is Obsidian's.
+9. **Callout shapes that need the live app** (found reviewing PR #36, 2026-11-08). `strict`
+   forms no callout inside a footnote definition (`[^1]: > [!note] T`) or after a task box
+   (`- [ ] > [!note] T`), where `legacy` does; neither preset forms one after `>⇥`
+   (`>\t[!note] T`). Ask 1.15.0 before deciding which side is right. The `\r\n` title-less
+   case from the same review was fixed: `MARKER`'s lookahead took no `\r`.
+10. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,
+    `pass-owner*.mts`, `pass-order*.mts` and their kin attribute behaviour to micromark passes
+    `legacy` no longer runs. Port to `strict` or delete; do not trust their `legacy` output.
 
 ## Rules that each cost a session
 
