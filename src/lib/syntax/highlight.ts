@@ -101,15 +101,30 @@ const noCloserFrom = new WeakMap<TokenizeContext, number>();
 function createQueueBound(): (character: string) => boolean {
   let index = -1;
   let opened = false;
+  let previous = "";
+  let beforePrevious = "";
   return (character: string): boolean => {
     index += 1;
+    const last = previous;
+    const beforeLast = beforePrevious;
+    beforePrevious = previous;
+    previous = character;
     if (index < MARKER_LENGTH) return character !== MARKER;
     if (index === MARKER_LENGTH) {
       opened = character === MARKER;
       return /^\s/u.test(character);
     }
     // The second half of a closer sitting directly on the opener: empty content.
-    return index === MARKER_LENGTH + 1 && opened && character === MARKER;
+    if (index === MARKER_LENGTH + 1) return opened && character === MARKER;
+    // The first closer `legacyHighlightQueue` accepts: two markers with no whitespace before
+    // them. It answers there, so nothing after it is needed. Without this every highlight read
+    // to the end of the run, and `==a== ` x4000 took over 10 s under `strict`.
+    return (
+      character === MARKER &&
+      last === MARKER &&
+      index >= MARKER_LENGTH + 2 &&
+      !/\s/u.test(beforeLast)
+    );
   };
 }
 
