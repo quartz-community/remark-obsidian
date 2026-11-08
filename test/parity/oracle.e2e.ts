@@ -706,6 +706,11 @@ describe("Obsidian parity oracle", () => {
     ["wikilink/table-unescaped", SURPLUS_TABLE_CELLS],
     ["math/in-table-pipe", SURPLUS_TABLE_CELLS],
     ["hunt/table-delimiter-cell-count/0", SURPLUS_TABLE_CELLS],
+    // Both flagged on 1.15.0 (2026-11-08), in opposite directions -- Reading View showed the
+    // surplus cell of one and hid that of the other -- and `short-delimiter-closed` also failed
+    // the weekly recording on 1.14.5. The same session-dependent display as the three above.
+    ["probe/table-pipes/body-row-unclosed", SURPLUS_TABLE_CELLS],
+    ["probe/table-pipes/short-delimiter-closed", SURPLUS_TABLE_CELLS],
     ["hunt/blockquote-region-outlives-quote/1", UNFAITHFUL_CAPTURE],
     ["commonmark/html-blocks/171", RAW_TEXT_ELEMENT],
   ]);
@@ -806,8 +811,14 @@ describe("Obsidian parity oracle", () => {
       mismatches.push(
         `${c.id}\n    reading:  ${readingText}\n    detached: ${detachedText}`,
       );
-      if (!KNOWN_PROXY_DIVERGENCES.has(c.id)) unexpected.push(c.id);
-      else corrections.set(c.id, readingText);
+      const known = KNOWN_PROXY_DIVERGENCES.get(c.id);
+      if (known === undefined) unexpected.push(c.id);
+      // Only where the renderers disagree about the PARSE is Reading View's text the golden.
+      // A surplus table cell is display, and Reading View shows or hides it by session history,
+      // so writing its text in made the contract flip between recordings (1.15.0, 2026-11-08:
+      // three `match` cases failed on text the previous recording had the other way round).
+      else if (known !== SURPLUS_TABLE_CELLS)
+        corrections.set(c.id, readingText);
     }
 
     await applyReadingViewCorrections(corrections);
