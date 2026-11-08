@@ -3,7 +3,7 @@
 
 import { decodeString } from "micromark-util-decode-string";
 import type { Options as ToMarkdownOptions } from "mdast-util-to-markdown";
-import { parseLegacy8 } from "./rp8/adapt.js";
+import { legacyDefaults, parseLegacy8 } from "./rp8/adapt.js";
 import type { Root, RootContent } from "mdast";
 import type { Processor } from "unified";
 import { SKIP, visit } from "unist-util-visit";
@@ -66,9 +66,12 @@ import {
   lineOffsetsFromMarkdown,
 } from "./lib/mdast/line-offsets.js";
 import { mathMidlineTransform } from "./lib/math-midline.js";
+import { countByteOrderMark } from "./lib/byte-order-mark.js";
+import { calloutMarkerTransform } from "./lib/callout-marker.js";
 import { calloutTitleInterruptTransform } from "./lib/callout-title-interrupt.js";
 import { restoreInlinePositionsTransform } from "./lib/restore-inline-positions.js";
 import { attentionToMarkdown } from "./lib/mdast/attention-to-markdown.js";
+import { emptyDeleteToMarkdown } from "./lib/mdast/empty-delete-to-markdown.js";
 import { autolinkLiteralToMarkdown } from "./lib/mdast/autolink-literal-to-markdown.js";
 import { htmlTailToMarkdown } from "./lib/mdast/html-tail-to-markdown.js";
 import { linkReferenceToMarkdown } from "./lib/mdast/link-reference-to-markdown.js";
@@ -167,11 +170,53 @@ export interface RemarkObsidianOptions {
    */
   lineOffsets?: boolean;
   /**
+   * Record on the root as `data.readsPastEnd` whether a top-level link definition would read
+   * differently with more lines after the end of this text, for a caller parsing a note in parts.
+   * remark-parse 8 reads a definition past blank lines, so `[foo]: /url` alone is a definition
+   * and above `'tit` and a blank line is a paragraph.
+   *
+   * `false` is a promise only for a part cut at one of the whole note's block boundaries and read
+   * with its next line attached, ending where that line starts a top-level block: then the part
+   * reads as that stretch of the note does (held over the corpus and generated documents in
+   * `reads-past-end.test.ts`). Read without its next line, a part can differ with the signal
+   * `false` (`> [!note] t` over `2) b` or `---`).
+   *
+   * It speaks for link definitions at a part's end, nothing else. Frontmatter reads to its closer
+   * too, an `<a>` opened above a part's start changes what the part reads, and a part's references
+   * depend on definitions outside it: those stay with the caller.
+   *
+   * `legacy` only, and absent under `strict`. A CommonMark definition stops at a blank line, but
+   * `strict` reads other blocks differently when cut, so a constant `false` would promise too much.
+   */
+  readsPastEnd?: boolean;
+  /**
    * Strip the delimiters from a footnote reference nothing defines, so `see [^x]`
    * reads `see x` as Obsidian renders it. GFM keeps an unmatched reference literal,
    * so this is a deliberate divergence from the spec in favour of matching the app.
    */
   bareFootnoteRefs?: boolean;
+  /**
+   * Keep a link or image reference whose label this parse found no definition for as a
+   * `linkReference` or `imageReference` with `data: { defined: false }`, rather than the text
+   * it reads as by default: `[a] b` holds a reference to `a`, not the text `[a] b`.
+   *
+   * For a consumer parsing part of a note, or a table cell alone, where the definition may be
+   * somewhere this parse never saw. Whether one is really a link is for the consumer to decide
+   * against the labels it knows, by `label` with case and runs of whitespace folded: Obsidian does
+   * not trim a label, so `[ a ]` is not `[a]`, where `identifier` trims.
+   *
+   * A chain that renders should leave it off. `mdast-util-to-hast` resolves by `identifier`, so
+   * `[ a ]` over `[a]: /url` becomes a link. An unclosed `[` the reader takes into a shortcut
+   * reference (`[a][ b`) is given back as a text sibling, so it still renders.
+   *
+   * Link and image references only: an undefined `[^x]` stays text unless `bareFootnoteRefs` is
+   * on, as without this option.
+   *
+   * `legacy` only, and does nothing under `strict`. remark-parse 8 reads a reference whatever
+   * defines it. micromark reads none, and read back from the text, some are references the note
+   * with that label defined does not hold (`x ^[^[note] y`).
+   */
+  keepUndefinedReferences?: boolean;
   /** Parse Obsidian's `^[body]` inline footnote, which GFM has no form for. */
   inlineFootnotes?: boolean;
   /**
@@ -216,6 +261,15 @@ export interface RemarkObsidianOptions {
    * `remark-breaks` and a `break` really is a hard break.
    */
   escapedLineBreaks?: boolean;
+  /**
+   * Count a leading byte order mark in every position and in `data.lineOffsets`, so an offset
+   * indexes the string that was parsed, and read the rest as if the mark were not there.
+   *
+   * Off by default, because Obsidian's `metadataCache` leaves the mark out: its offsets and
+   * first-line columns are one short of the editor's, and off is what the parity gates measure.
+   * Turn it on to edit the string by position.
+   */
+  bomOffsets?: boolean;
 }
 
 /**
@@ -266,22 +320,10 @@ const PRESETS: Record<RemarkObsidianPreset, Partial<RemarkObsidianFlags>> = {
 };
 
 const defaultOptions: RemarkObsidianFlags = {
-  wikilinks: true,
-  highlights: true,
-  comments: true,
-  tags: true,
-  customTaskChars: true,
-  math: true,
-  frontmatter: true,
-  keepComments: true,
-  parseComments: true,
-  lineOffsets: true,
-  bareFootnoteRefs: true,
-  inlineFootnotes: true,
-  inertFootnoteRefs: false,
-  callouts: true,
-  positionedBreaks: true,
+  ...legacyDefaults,
+  readsPastEnd: false,
   escapedLineBreaks: false,
+  bomOffsets: false,
 };
 
 /**
@@ -533,6 +575,7 @@ export default function remarkObsidian(
   data.toMarkdownExtensions.push(
     attentionToMarkdown({ legacy: preset === "legacy" }),
   );
+  data.toMarkdownExtensions.push(emptyDeleteToMarkdown());
   // Obsidian (remark-parse 8) reads `<<https://x>` as one autolink whose address starts with
   // `<`; CommonMark reads a `<` and then the autolink. Escaping a `<` written right before
   // another keeps both readings, so formatting reaches a fixed point under either.
@@ -893,7 +936,19 @@ export default function remarkObsidian(
     return fragment;
   };
 
-  return transform;
+  // Around `transform`, not inside it: `reparse` runs it on fragments, whose positions the
+  // caller places back. micromark reads past the mark without counting it, so the passes must
+  // read the text the offsets index -- whatever `bomOffsets` says, or the mark changes the
+  // reading. The callout markers are placed in the same coordinates, and only then, if asked,
+  // does every point move.
+  return (tree: Root, file: unknown): void => {
+    const source = String(file);
+    const marked = source.charCodeAt(0) === 0xfeff;
+    const text = marked ? source.slice(1) : source;
+    transform(tree, marked ? text : file);
+    if (opts.callouts) calloutMarkerTransform(tree, text);
+    if (marked && opts.bomOffsets) countByteOrderMark(tree);
+  };
 }
 
 export { wikilinkSyntax } from "./lib/syntax/wikilink.js";
@@ -931,6 +986,7 @@ export type {
   Tag,
   InlineFootnote,
   Callout,
+  CalloutData,
   CalloutTitle,
 } from "./lib/types.js";
 export type { CollectWikilinksOptions } from "./lib/collect.js";

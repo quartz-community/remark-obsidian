@@ -6,11 +6,13 @@
  * Rondeau, Micha Brugger, Jason Qin, and contributors), `src/parsing/obsidian-markdown.ts`,
  * whose test suite asserts agreement with every recorded answer this package's referee reads
  * except four P1/P2 cache-bug documents. Each reader carries the rule letter it has in that
- * project's `docs/obsidian-reading-rules.md`. Left out: their speed-only wrappers and the
- * link-definition-at-end probe, which only matters when a note is parsed in parts.
+ * project's `docs/obsidian-reading-rules.md`. Left out: their speed-only wrappers, but for the math
+ * one in `speedUps`. Their link-definition-at-end probe, which only matters when a note is parsed
+ * in parts, is `reads-past-end.ts`.
  */
 import { legacyHighlightQueue } from "../lib/syntax/highlight.js";
 import listTokenizer from "./list.js";
+import { readsPastEnd, watchDefinitionReader } from "./reads-past-end.js";
 import remarkFootnotes2 from "./vendor/remark-footnotes/index.js";
 import remarkMath3 from "./vendor/remark-math/index.js";
 import Parser8 from "./vendor/remark-parse/parser.js";
@@ -387,6 +389,13 @@ function softBreaks(tables: any): void {
  * - the code span's closer is "the first maximal backtick run of the opener's width after it",
  *   looked up in an index of the run's backtick runs; a found span is still read by the stock
  *   reader, whose scan is then bounded by the span it consumes.
+ *
+ * The rest cost time on any note rather than on a bad one, most on a note parsed in small parts.
+ * They are ported from `obsidian-footnotes`' `textLineByLine` and `htmlBlockPrecheck`:
+ *
+ * - plain text holding no `&` skips the entity decoder;
+ * - a block not starting with `<` skips the HTML block reader, which builds a `RegExp` from its
+ *   whole tag list on every call: at every block, and at every line of a paragraph.
  */
 interface Frame {
   value: string;
@@ -400,6 +409,8 @@ interface Frame {
   lower?: Int32Array;
   /** For each offset, the first backtick at or after it that could open a code span, or -1. */
   spanCapable?: Int32Array;
+  /** The math readers that have already searched this run for a closer and found none. */
+  noCloser?: Set<string>;
 }
 
 /**
@@ -527,6 +538,16 @@ function speedUps(tables: any, features: Features): void {
     }
   };
 
+  const stockHtml: Tokenizer = tables.blockTokenizers.html;
+  // Exactly the stock reader's own first test, before it builds anything.
+  const html: Tokenizer = function (eat, value, silent) {
+    let at = 0;
+    while (value.charCodeAt(at) === 32 || value.charCodeAt(at) === 9) at++;
+    if (value.charCodeAt(at) !== 60) return undefined;
+    return stockHtml.call(this, eat, value, silent);
+  };
+  tables.blockTokenizers.html = html;
+
   const stockText: Tokenizer = tables.inlineTokenizers.text;
   // remark-parse 8's own text reader, with each locator's answer remembered per run.
   const text: Tokenizer = function (eat, value, silent) {
@@ -557,6 +578,12 @@ function speedUps(tables: any, features: Features): void {
       if (at !== -1 && at - base < min) min = at - base;
     }
     const subvalue = value.slice(0, min);
+    // Every character reference starts with `&`, so without one the decoder would walk this
+    // stretch a character at a time and hand back the same single piece of text.
+    if (subvalue !== "" && !subvalue.includes("&")) {
+      eat(subvalue)({ type: "text", value: subvalue });
+      return undefined;
+    }
     this.decode(
       subvalue,
       eat.now(),
@@ -658,6 +685,24 @@ function speedUps(tables: any, features: Features): void {
       );
     });
   }
+  // `==note==`: only a `==` with no whitespace straight before it closes, and not one on the
+  // opener itself, so a run with none ahead declines without reading the rest of the run.
+  if (features.highlights) {
+    precheck("highlight", (frame, base, value) => {
+      if (value.charCodeAt(0) !== 61 || value.charCodeAt(1) !== 61)
+        return false;
+      return (
+        nextWhere(
+          frame,
+          "highlight-closer",
+          (v, i) =>
+            v.charCodeAt(i) === 61 &&
+            v.charCodeAt(i + 1) === 61 &&
+            !isSpace(v, i - 1),
+        )[base + 3] === -1
+      );
+    });
+  }
   // `<scheme://...>` and `<user@host>`: the first space, `>`, `@` or `:/` decides the kind, and
   // the rest must reach a `>` before the next space.
   precheck("autoLink", (frame, base, value) => {
@@ -682,6 +727,47 @@ function speedUps(tables: any, features: Features): void {
     )[rest]!;
     return end === -1 || end === rest || frame.value.charCodeAt(end) !== 62;
   });
+
+  // A math opener searches the rest of the run for a closer, so a line of prices (`$5 or $6 and
+  // ...`) searched to its end from every `$`. A reader judges a closer by the characters around it
+  // alone, and a later opener's search walks what an earlier one walked past it (a backslash's
+  // skip lands just after any `$` it hides), so once a search finds nothing, every later one in
+  // the run finds nothing too. That needs the same reader and the same kind of opener:
+  //
+  // - `math` remembers only `$`. `$ ` declines without searching, so it says nothing about the
+  //   `$a$` after it, and a failed `$$` says nothing about the `$` after it (`$$a$`).
+  // - `math`'s `$$` runs only behind `doubleDollarMath`, which leaves it at most two failed
+  //   searches in a run (`$$$a`), so it has nothing to remember.
+  // - `doubleDollarMath` is its own reader: it refuses a `$$` after any backslash, so `$$a\\$$`
+  //   fails there and is math to `math`, and `\\` lets a line of `$$ a\\` reach it each time.
+  const searchOnce = (name: string, opens: (value: string) => boolean) => {
+    const stock: Tokenizer = tables.inlineTokenizers[name];
+    const wrapped: Tokenizer = function (eat, value, silent) {
+      const frame = frameOf(this, value);
+      if (!frame || !opens(value)) return stock.call(this, eat, value, silent);
+      if (frame.noCloser?.has(name)) return undefined;
+      const result = stock.call(this, eat, value, silent);
+      if (result === undefined) (frame.noCloser ??= new Set()).add(name);
+      return result;
+    };
+    wrapped.locator = stock.locator;
+    tables.inlineTokenizers[name] = wrapped;
+  };
+  if (features.math) {
+    searchOnce("math", (value) => {
+      const after = value.charCodeAt(1);
+      return (
+        value.charCodeAt(0) === 36 &&
+        after !== 36 &&
+        after !== 32 &&
+        after !== 9
+      );
+    });
+    searchOnce(
+      "doubleDollarMath",
+      (value) => value.charCodeAt(0) === 36 && value.charCodeAt(1) === 36,
+    );
+  }
 }
 
 /** Every maximal run of backticks in `value`, as width -> ascending start offsets. */
@@ -711,6 +797,7 @@ export interface Features {
   inlineFootnotes: boolean;
   customTaskChars: boolean;
   positionedBreaks: boolean;
+  readsPastEnd?: boolean;
 }
 
 /**
@@ -750,6 +837,7 @@ function buildParser(features: Features, fast: boolean): any {
   if (features.tags) tags(tables);
   if (features.positionedBreaks) softBreaks(tables);
   if (fast) speedUps(tables, features);
+  if (features.readsPastEnd) watchDefinitionReader(tables);
   return ObsidianParser;
 }
 
@@ -760,7 +848,7 @@ export function parse8WithOffsets(
   doc: string,
   features: Features,
   fast = true,
-): { tree: Node8; offsets: Record<number, number> } {
+): { tree: Node8; offsets: Record<number, number>; readsPastEnd?: boolean } {
   const key = JSON.stringify(features) + String(fast);
   let parserClass = parserClasses.get(key);
   if (parserClass === undefined) {
@@ -776,5 +864,8 @@ export function parse8WithOffsets(
   };
   const parser = new parserClass(doc, file);
   const tree = parser.parse() as Node8;
-  return { tree, offsets: { ...parser.offset } };
+  const offsets = { ...parser.offset };
+  return features.readsPastEnd
+    ? { tree, offsets, readsPastEnd: readsPastEnd(parser, tree) }
+    : { tree, offsets };
 }

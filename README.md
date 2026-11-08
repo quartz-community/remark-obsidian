@@ -70,27 +70,49 @@ emphasis followed by `*` under `strict`, as in CommonMark.
 
 ## Options
 
-Every option is a boolean, works under both presets, and wins over the preset's value for it.
+Every option is a boolean, works under both presets (`readsPastEnd` and `keepUndefinedReferences` are `legacy`'s alone), and wins
+over the preset's value for it.
 
-| option              | default                               | what it does                                                                                                                                                                                            |
-| ------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `preset`            | `"legacy"`                            | `"legacy"` or `"strict"`, as above                                                                                                                                                                      |
-| `wikilinks`         | on                                    | `[[target#heading\|alias]]` and `![[embed]]` as `wikilink` nodes                                                                                                                                        |
-| `highlights`        | on                                    | `==text==` as `highlight`                                                                                                                                                                               |
-| `tags`              | on                                    | `#tag` as `tag`                                                                                                                                                                                         |
-| `math`              | on                                    | `$inline$` and `$$display$$`                                                                                                                                                                            |
-| `comments`          | on                                    | `%%comment%%`                                                                                                                                                                                           |
-| `keepComments`      | on                                    | keep a comment as a `comment` node rather than deleting it; it renders as an empty `<obsidian-comment>`, which `rehype-obsidian` removes                                                                |
-| `parseComments`     | on                                    | parse a kept comment's body into its `children`, so a reference inside one is a `footnoteReference`                                                                                                     |
-| `callouts`          | on                                    | `> [!type] Title` as a `callout` holding a `calloutTitle`                                                                                                                                               |
-| `inlineFootnotes`   | on                                    | `^[note]` as a `footnote`                                                                                                                                                                               |
-| `inertFootnoteRefs` | off                                   | keep a reference inside `^[...]`, which Obsidian does not read as one, as a `footnoteReference` with `data: { inert: true }`, for a consumer reading the tree; a chain that renders should leave it off |
-| `customTaskChars`   | on                                    | any one character in a task box is a checkbox (`- [-]`), kept as `data.taskChar`                                                                                                                        |
-| `frontmatter`       | on                                    | a leading `---` block as a `yaml` node                                                                                                                                                                  |
-| `bareFootnoteRefs`  | on under `legacy`, off under `strict` | Obsidian renders an undefined `[^x]` as `x`; the node stays a `footnoteReference`, and `rehype-obsidian` drops the delimiters when rendering                                                            |
-| `positionedBreaks`  | on under `legacy`, off under `strict` | a soft line ending becomes a positioned `break`, as `remark-breaks` would make it                                                                                                                       |
-| `lineOffsets`       | on                                    | `root.data.lineOffsets`: how many columns each line's containers consume                                                                                                                                |
-| `escapedLineBreaks` | off                                   | write a `break` back as a trailing backslash rather than a newline, for a chain without `remark-breaks`                                                                                                 |
+| option                    | default                               | what it does                                                                                                                                                                                                                                                                       |
+| ------------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `preset`                  | `"legacy"`                            | `"legacy"` or `"strict"`, as above                                                                                                                                                                                                                                                 |
+| `wikilinks`               | on                                    | `[[target#heading\|alias]]` and `![[embed]]` as `wikilink` nodes                                                                                                                                                                                                                   |
+| `highlights`              | on                                    | `==text==` as `highlight`                                                                                                                                                                                                                                                          |
+| `tags`                    | on                                    | `#tag` as `tag`                                                                                                                                                                                                                                                                    |
+| `math`                    | on                                    | `$inline$` and `$$display$$`                                                                                                                                                                                                                                                       |
+| `comments`                | on                                    | `%%comment%%`                                                                                                                                                                                                                                                                      |
+| `keepComments`            | on                                    | keep a comment as a `comment` node rather than deleting it; it renders as an empty `<obsidian-comment>`, which `rehype-obsidian` removes                                                                                                                                           |
+| `parseComments`           | on                                    | parse a kept comment's body into its `children`, so a reference inside one is a `footnoteReference`                                                                                                                                                                                |
+| `callouts`                | on                                    | `> [!type] Title` as a `callout` holding a `calloutTitle`, with the marker's span in `data.marker` and its line's end in `data.lineEnd`                                                                                                                                            |
+| `inlineFootnotes`         | on                                    | `^[note]` as a `footnote`                                                                                                                                                                                                                                                          |
+| `inertFootnoteRefs`       | off                                   | keep a reference inside `^[...]`, which Obsidian does not read as one, as a `footnoteReference` with `data: { inert: true }`, for a consumer reading the tree; a chain that renders should leave it off                                                                            |
+| `customTaskChars`         | on                                    | any one character in a task box is a checkbox (`- [-]`), kept as `data.taskChar`                                                                                                                                                                                                   |
+| `frontmatter`             | on                                    | a leading `---` block as a `yaml` node                                                                                                                                                                                                                                             |
+| `bareFootnoteRefs`        | on under `legacy`, off under `strict` | Obsidian renders an undefined `[^x]` as `x`; the node stays a `footnoteReference`, and `rehype-obsidian` drops the delimiters when rendering                                                                                                                                       |
+| `keepUndefinedReferences` | off                                   | `legacy` only: keep a link or image reference this parse found no definition for as a `linkReference` or `imageReference` with `data: { defined: false }`, rather than text, for a consumer parsing part of a note or a table cell alone; a chain that renders should leave it off |
+| `positionedBreaks`        | on under `legacy`, off under `strict` | a soft line ending becomes a positioned `break`, as `remark-breaks` would make it                                                                                                                                                                                                  |
+| `lineOffsets`             | on                                    | `root.data.lineOffsets`: how many columns each line's containers consume                                                                                                                                                                                                           |
+| `readsPastEnd`            | off                                   | `root.data.readsPastEnd`, `legacy` only: would a top-level link definition read differently with more lines after the end? Trust `false` only for a part read with its next line attached (see the option's doc)                                                                   |
+| `escapedLineBreaks`       | off                                   | write a `break` back as a trailing backslash rather than a newline, for a chain without `remark-breaks`                                                                                                                                                                            |
+| `bomOffsets`              | off                                   | count a leading byte order mark in positions, so an offset indexes the parsed string; off, they match Obsidian's cache, which leaves it out                                                                                                                                        |
+
+## Reading without a processor
+
+A consumer that only reads, such as an Obsidian plugin, can skip `unified` and everything the
+`legacy` preset does not run:
+
+```js
+import { parse } from "@quartz-community/remark-obsidian/legacy";
+
+const tree = parse("A [[note|link]], ==a highlight== and a #tag.\n");
+const part = parse(laterPartOfANote, { frontmatter: false });
+```
+
+`parse(text, options)` returns the tree `unified().use(remarkObsidian, options).parse(text)`
+returns, with the same defaults. It takes the options above except `preset` and
+`escapedLineBreaks`. The main entry holds both presets and every writer in one function, so a
+bundler cannot drop any of them from it; this entry reaches only the `legacy` reader, which took
+one plugin's minified bundle from 519,667 to 367,710 bytes.
 
 ## Upgrading from 1.x
 
@@ -103,7 +125,7 @@ comments. Nothing was removed from the API.
 ## Obsidian parity
 
 This plugin targets the **reading-mode and `metadataCache` semantics of a specific public
-Obsidian release**, currently 1.14.5. A harness renders a generated corpus inside real Obsidian
+Obsidian release**, currently 1.15.0. A harness renders a generated corpus inside real Obsidian
 and compares the result against ours, so the claim is measured rather than asserted —
 including the divergences, which are enumerated rather than implied:
 
@@ -111,12 +133,13 @@ including the divergences, which are enumerated rather than implied:
   two are a rendering difference between Obsidian's own two renderers and an embed that
   resolves a note into itself.
 - **On 6,844 notes whose footnote answers Obsidian's cache recorded**, `legacy` agrees on 6,830,
-  down to every definition's and reference's exact start and end offsets. The 14 left are
-  places where the cache misplaces a fact or the answers' recording added one.
+  down to every definition's and reference's exact start and end offsets, as 1.15.0 reported
+  them. The 14 left are places where the cache misplaces a fact or the answers' recording added
+  one.
 - **`strict` matches `remark-parse` and `remark-gfm`** on every CommonMark and GFM spec example
   except eight: six that hold Obsidian syntax, and two task lists where it adds
   `data.taskChar`. It answers 513 live probes
-  about Obsidian's syntax and footnotes as Obsidian does, bar a few recorded exclusions.
+  about Obsidian's syntax and footnotes as Obsidian 1.15.0 does, bar a few recorded exclusions.
 
 ## Development
 

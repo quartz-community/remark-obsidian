@@ -10,10 +10,39 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { parse8WithOffsets, type Features } from "../src/rp8/reader.js";
 import { SHAPES } from "./pathological/shapes.js";
+
+// Pass through, counting: how often the plain text's decoder and the HTML block reader are asked.
+const asked = vi.hoisted(() => ({ decoder: 0, html: 0 }));
+vi.mock("../src/rp8/vendor/parse-entities/index.js", async (original) => {
+  const stock = (await original<{ default: (...args: unknown[]) => unknown }>())
+    .default;
+  return {
+    default: (...args: unknown[]) => {
+      asked.decoder++;
+      return stock(...args);
+    },
+  };
+});
+vi.mock(
+  "../src/rp8/vendor/remark-parse/tokenize/html-block.js",
+  async (original) => {
+    const stock = (
+      await original<{
+        default: (this: unknown, ...args: unknown[]) => unknown;
+      }>()
+    ).default;
+    return {
+      default(this: unknown, ...args: unknown[]) {
+        asked.html++;
+        return stock.call(this, ...args);
+      },
+    };
+  },
+);
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
@@ -85,6 +114,86 @@ describe("legacy reader speed-ups", () => {
     expect(differ).toEqual([]);
   }, 120_000);
 
+  it("read highlight openers and their near-misses exactly as the plain reader does", () => {
+    // Runs of openers with no closer, against what might close one late in the run, or only
+    // look as if it does, in every wrapper that starts a run of its own.
+    const openers = [
+      "==a ",
+      "==a\n",
+      "==a\t",
+      "==a\u00a0",
+      "==a  \n",
+      "== a",
+      "=== ",
+      "==*a* ",
+      "a == ",
+    ];
+    const closers = [
+      "",
+      "b==",
+      "b==c",
+      "b===",
+      "b ==",
+      "b\n==",
+      "b\u00a0==",
+      "==",
+      "====",
+      "==b==",
+      "=",
+      "b\\==",
+    ];
+    const wrappers = [
+      ["", ""],
+      ["x ", ""],
+      ["*", "*"],
+      ["**", "**"],
+      ["~~", "~~"],
+      ["[", "](u)"],
+      ["^[", "]"],
+      ["%%", "%%"],
+      ["`", "`"],
+      ["> ", ""],
+      ["- ", ""],
+      ["[^1]: ", ""],
+    ] as const;
+    let highlighted = 0;
+    const differ: string[] = [];
+    for (const opener of openers)
+      for (const closer of closers)
+        for (const [before, after] of wrappers)
+          for (const n of [1, 2, 3, 7, 60]) {
+            const run = opener.repeat(n);
+            for (const doc of [
+              before + run + closer + after,
+              before + run + closer + " " + run + after,
+            ]) {
+              const fast = read(doc, true);
+              if (fast.includes('"type":"highlight"')) highlighted++;
+              if (fast !== read(doc, false)) differ.push(JSON.stringify(doc));
+            }
+          }
+    expect(differ).toEqual([]);
+    // Most of them hold a highlight somewhere, so this is not only the decline being compared.
+    expect(highlighted).toBeGreaterThan(5_000);
+  }, 120_000);
+
+  it("read every short run of `=`, whitespace and text exactly as the plain reader does", () => {
+    const alphabet = ["=", "a", " ", "\n"];
+    let docs = [""];
+    let highlighted = 0;
+    const differ: string[] = [];
+    for (let length = 1; length <= 7; length++) {
+      docs = docs.flatMap((doc) => alphabet.map((c) => doc + c));
+      for (const doc of docs) {
+        const fast = read(doc, true);
+        if (fast.includes('"type":"highlight"')) highlighted++;
+        if (fast !== read(doc, false)) differ.push(JSON.stringify(doc));
+      }
+    }
+    expect(differ).toEqual([]);
+    expect(highlighted).toBeGreaterThan(50);
+  }, 120_000);
+
   it("read generated documents exactly as the plain reader does", () => {
     // Every character a reader treats specially, so the early returns meet escaped openers,
     // backslash runs, nested and unmatched brackets, U+00A0, and code spans around them.
@@ -105,6 +214,100 @@ describe("legacy reader speed-ups", () => {
       if (read(doc, true) !== read(doc, false))
         differ.push(JSON.stringify(doc));
     }
+    expect(differ).toEqual([]);
+  }, 120_000);
+
+  it("read generated references and HTML openers exactly as the plain reader does", () => {
+    // What the small-input speed-ups turn on: `&` in its valid and broken forms, and a `<` behind
+    // spaces and tabs. No backtick, because `&#0`&/` already reads differently with the code
+    // locator's skip: it joins two stretches, and rp8 decodes a bare `&` after a reference in the
+    // same stretch as that reference.
+    const alphabet = "&&&#;xX0amp<<>!-/?\\ \t\n\u00a0[]*1".split("");
+    let seed = 0x2545f491;
+    const random = () => {
+      seed ^= seed << 13;
+      seed ^= seed >>> 17;
+      seed ^= seed << 5;
+      return (seed >>> 0) / 0x100000000;
+    };
+    const differ: string[] = [];
+    for (let n = 0; n < 30_000 && differ.length < 5; n++) {
+      let doc = "";
+      const length = 1 + Math.floor(random() * 40);
+      for (let i = 0; i < length; i++)
+        doc += alphabet[Math.floor(random() * alphabet.length)];
+      if (read(doc, true) !== read(doc, false))
+        differ.push(JSON.stringify(doc));
+    }
+    expect(differ).toEqual([]);
+  }, 120_000);
+
+  const askedOf = (reader: keyof typeof asked, doc: string, fast: boolean) => {
+    asked[reader] = 0;
+    read(doc, fast);
+    return asked[reader];
+  };
+
+  it("take text holding no `&` without the decoder", () => {
+    const doc = "Some words[^1] and *more* words\n\n- an item\n\n[^1]: a note";
+    // The plain reader's count is the control: this probe sees the decoder.
+    expect(askedOf("decoder", doc, false)).toBeGreaterThan(0);
+    expect(askedOf("decoder", doc, true)).toBe(0);
+    expect(askedOf("decoder", "fish &amp; chips", true)).toBeGreaterThan(0);
+  });
+
+  it("ask the HTML block reader only about a line whose text starts with `<`", () => {
+    const doc =
+      "One line\nand another\n\n- an item\n\n> a quote\n\n# a heading";
+    // The plain reader's count is the control: this probe sees the HTML block reader.
+    expect(askedOf("html", doc, false)).toBeGreaterThan(0);
+    expect(askedOf("html", doc, true)).toBe(0);
+    expect(askedOf("html", "<div>", true)).toBeGreaterThan(0);
+    expect(askedOf("html", " \t <div>", true)).toBeGreaterThan(0);
+  });
+
+  it("read documents full of dollars exactly as the plain reader does", () => {
+    // A remembered math search only answers for a second opener in the same run, which the
+    // alphabet above rarely gives. These pin where a looser memory goes wrong: a padded opener,
+    // a `$$` before a `$`, a `$$` only `math` closes, an escaped dollar, and a new run.
+    const pins = [
+      "$ $a$",
+      "$$ $a$",
+      "$$ $$a$$",
+      "$$a$ $b$",
+      "$$a\\\\$$ $b$",
+      "$5 $$ $a$",
+      "$5 \\$6$",
+      "$5 `$6` \\$ $a$",
+      "$5 `\\`$a$",
+      "*$5* $a$",
+      "$5 *$a$*",
+      "[$5](u) $a$",
+      "$5\n\n$a$",
+      "$5\n$a$",
+    ];
+    const atoms =
+      "$ $ $$ $$$ \\ \\\\ \\$ ` `` a 5 * _ [ ](u) %% == ^[ ] #t".split(" ");
+    atoms.push(" ", "\t", "\n", "\n\n");
+    let seed = 0x2545f491;
+    const random = () => {
+      seed ^= seed << 13;
+      seed ^= seed >>> 17;
+      seed ^= seed << 5;
+      return (seed >>> 0) / 0x100000000;
+    };
+    const docs = [...pins];
+    for (let n = 0; n < 30_000; n++) {
+      let doc = "";
+      const length = 2 + Math.floor(random() * 24);
+      for (let i = 0; i < length; i++)
+        doc += atoms[Math.floor(random() * atoms.length)];
+      docs.push(doc);
+    }
+    const differ = docs
+      .filter((doc) => read(doc, true) !== read(doc, false))
+      .slice(0, 5)
+      .map((doc) => JSON.stringify(doc));
     expect(differ).toEqual([]);
   }, 120_000);
 });
