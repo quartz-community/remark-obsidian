@@ -634,7 +634,7 @@ with that label defined; the other 5 are `[][`, whose empty label nothing can de
 ## Gates — what "done" means
 
 ```bash
-npm test          # 645 tests / 27 files. Contains the contract gate.
+npm test          # 917 tests / 34 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
