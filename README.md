@@ -82,7 +82,7 @@ Every option is a boolean, works under both presets, and wins over the preset's 
 | `comments`          | on                                    | `%%comment%%`                                                                                                                                |
 | `keepComments`      | on                                    | keep a comment as a `comment` node rather than deleting it; it renders as an empty `<obsidian-comment>`, which `rehype-obsidian` removes     |
 | `parseComments`     | on                                    | parse a kept comment's body into its `children`, so a reference inside one is a `footnoteReference`                                          |
-| `callouts`          | on                                    | `> [!type] Title` as a `callout` holding a `calloutTitle`                                                                                    |
+| `callouts`          | on                                    | `> [!type] Title` as a `callout` holding a `calloutTitle`, with the marker's span in `data.marker` and its line's end in `data.lineEnd`      |
 | `inlineFootnotes`   | on                                    | `^[note]` as a `footnote`                                                                                                                    |
 | `customTaskChars`   | on                                    | any one character in a task box is a checkbox (`- [-]`), kept as `data.taskChar`                                                             |
 | `frontmatter`       | on                                    | a leading `---` block as a `yaml` node                                                                                                       |
