@@ -499,6 +499,19 @@ recorded cases, spec, 3,000 generated, 20,000 random over `~~`, `&`, backticks a
 `legacy` configurations); handing `~~~~` to the table instead moves 183, the control. Gated by
 `strike-space-run` / `strike-newline-run` (both time out on the old reader).
 
+**The code locator's skip no longer joins text across an `&`.** With the speed-ups, ``&#0`&/``
+read its second `&` as U+FFFD (``&#xa`&]`` as a line feed), where the stock reader keeps
+`` `&/ ``. The skip past backticks no span can open at joined text stretches the stock reader
+ends at every backtick, and parse-entities 2 reuses a stale `reference` for a bare `&`: after a
+reference in the same stretch, and for an `&` straight before a backtick, where one that ends
+a stretch is text (``&#0#&` ``). The skip now stops at the last backtick before the first `&`
+from `at - 1` on. Against the previous commit: 0 corpus, recorded, spec or generated documents
+moved; 155 of 20,000 random ones did, every one an `&` before a backtick, and each now equals the
+plain reader's tree. Stopping at the first backtick instead holds the reading but made runs of
+growing backtick width each followed by `&` 60x slower (5.8 s at 2 MB); stopping at the last
+keeps them at 85 ms. `rp8-speedups.test.ts`'s reference alphabet now holds backticks (5 differ
+on the old skip).
+
 **Traps this cost, each once:**
 
 - **Published rp8 has an EXPONENTIAL ReDoS** in `util/html.js` (`recheck`'s 205-character string:
@@ -644,7 +657,7 @@ with that label defined; the other 5 are `[][`, whose empty label nothing can de
 ## Gates — what "done" means
 
 ```bash
-npm test          # 919 tests / 34 files. Contains the contract gate.
+npm test          # 922 tests / 34 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -1245,11 +1258,7 @@ unit test "reads a tag's characters as Obsidian does", which fails on the old cl
    bar the tree check's recorded families; the census baseline holds the rest of the million.
 7. **The fuzz triage's leftovers:** self-embeds (out of scope), and `[^1]: - [ ] [` /
    `^[[^1]]]`, where Obsidian's renderer and its cache disagree.
-8. **The speed-ups change one reading** (found reviewing PR #24, on `main` before it): with
-   them, ``&#0`&/`` reads as a backtick, U+FFFD and `/` and ``&#xa`&]`` likewise, where the stock reader
-   keeps `` `&/ ``. `rp8-speedups.test.ts` does not reach a character reference before a
-   backtick. Open: the speed-up must give way, since the stock reading is Obsidian's.
-9. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,
+8. **Micromark-era instruments.** `mechanism.mts`, `ablate*.mts`, `legacy-oracle.mts`,
    `pass-owner*.mts`, `pass-order*.mts` and their kin attribute behaviour to micromark passes
    `legacy` no longer runs. Port to `strict` or delete; do not trust their `legacy` output.
 

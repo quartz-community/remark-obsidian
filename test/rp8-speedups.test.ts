@@ -238,10 +238,10 @@ describe("legacy reader speed-ups", () => {
 
   it("read generated references and HTML openers exactly as the plain reader does", () => {
     // What the small-input speed-ups turn on: `&` in its valid and broken forms, and a `<` behind
-    // spaces and tabs. No backtick, because `&#0`&/` already reads differently with the code
-    // locator's skip: it joins two stretches, and rp8 decodes a bare `&` after a reference in the
-    // same stretch as that reference.
-    const alphabet = "&&&#;xX0amp<<>!-/?\\ \t\n\u00a0[]*1".split("");
+    // spaces and tabs. With backticks too: the code locator's skip once joined two stretches
+    // across an `&`, and rp8 decodes a bare `&` after a reference in the same stretch as that
+    // reference, so `&#0`&/` read its `&` as U+FFFD.
+    const alphabet = "&&&#;xX0amp<<>!-/?\\ \t\n\u00a0[]*1``".split("");
     let seed = 0x2545f491;
     const random = () => {
       seed ^= seed << 13;
@@ -249,7 +249,9 @@ describe("legacy reader speed-ups", () => {
       seed ^= seed << 5;
       return (seed >>> 0) / 0x100000000;
     };
-    const differ: string[] = [];
+    const differ = ["&#0`&/", "&#xa`&]", "&#0#&`", "&amp;``&/`", "&#0` `` &/"]
+      .filter((doc) => read(doc, true) !== read(doc, false))
+      .map((doc) => JSON.stringify(doc));
     for (let n = 0; n < 30_000 && differ.length < 5; n++) {
       let doc = "";
       const length = 1 + Math.floor(random() * 40);

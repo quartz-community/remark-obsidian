@@ -465,6 +465,22 @@ function nextWhere(
   return table;
 }
 
+/** The last backtick strictly before `at`, or -1; one table per run (`frame.next`, its own key). */
+function backtickBefore(frame: Frame, at: number): number {
+  let table = frame.next.get("backtick-before");
+  if (!table) {
+    const { value } = frame;
+    table = new Int32Array(value.length + 1);
+    let last = -1;
+    for (let i = 0; i <= value.length; i++) {
+      table[i] = last;
+      if (value.charCodeAt(i) === 96) last = i;
+    }
+    frame.next.set("backtick-before", table);
+  }
+  return table[at]!;
+}
+
 /**
  * Where the `[` at `open` closes, by remark-parse 8's link and reference text scans in GFM mode:
  * a backslash skips the next character, every other `[` and `]` counts, code included. The
@@ -570,8 +586,22 @@ function speedUps(tables: any, features: Features): void {
       if (asked === -1 || asked > from || (at !== -1 && at < from)) {
         const position = reader.locator.call(this, value, 1);
         at = position === -1 ? -1 : base + position;
-        // The code locator's next backtick, moved on to the next one a span could open at.
-        if (name === "code" && at !== -1) at = spanCapable(frame)[at]!;
+        // The code locator's next backtick, moved on to the next one a span could open at --
+        // but never past an `&`. The stock reader ends a text stretch at every backtick, and
+        // remark-parse 8's decoder reads a bare `&` after a reference in the same stretch as
+        // that reference (`&#0`&/` keeps its second `&` only because the backtick splits it).
+        // It also reads an `&` that ENDS a stretch as text, but one before a backtick as that
+        // stale reference (`&#0#&``). So the skip stops at the last backtick before the first
+        // `&` from the one before `at` on: the stretch it joins then holds no `&` after `at - 1`,
+        // those pieces decode to themselves, and no reference reads past a backtick.
+        if (name === "code" && at !== -1) {
+          const skipTo = spanCapable(frame)[at]!;
+          const amp = nextWhere(frame, "&", (v, i) => v.charCodeAt(i) === 38)[
+            at - 1
+          ]!;
+          if (amp === -1 || (skipTo !== -1 && skipTo < amp)) at = skipTo;
+          else at = Math.max(at, backtickBefore(frame, amp));
+        }
         frame.askedAt[index] = from;
         frame.answer[index] = at;
       }
