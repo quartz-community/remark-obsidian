@@ -67,10 +67,8 @@ function withSpelledLabel<T extends LinkReference | ImageReference>(
  * back `[a\`][a`]`, a full reference to another label. A reference nothing defines has only the
  * label's spelling to go by, so the writer must not move it.
  *
- * Two things only the writer can keep. remark-parse 8 takes a `[` that never closes into the
- * reference (`[a][`), which goes back escaped, since what follows could close it. And a label
- * like `!note` opening a quote's first line would make a callout of it (`>` / `> [!note]`, whose
- * blank line goes), where as text it was written `\[!note]`.
+ * A label like `!note` opening a quote's first line would make a callout of it (`>` /
+ * `> [!note]`, whose blank line goes), where as text it was written `\[!note]`.
  */
 function keptReference(
   node: LinkReference | ImageReference,
@@ -78,8 +76,7 @@ function keptReference(
   state: State,
 ): string | undefined {
   const data = node.data as
-    | { defined?: boolean; spelledLabel?: string; unclosedBracket?: boolean }
-    | undefined;
+    { defined?: boolean; spelledLabel?: string } | undefined;
   if (data?.defined !== false || node.referenceType === "full")
     return undefined;
   const label = data.spelledLabel ?? node.label;
@@ -98,8 +95,7 @@ function keptReference(
     (node.type === "imageReference" ? "![" : "[") +
     (callout ? `\\${label}` : label) +
     "]" +
-    (node.referenceType === "collapsed" ? "[]" : "") +
-    (data.unclosedBracket ? "\\[" : "")
+    (node.referenceType === "collapsed" ? "[]" : "")
   );
 }
 

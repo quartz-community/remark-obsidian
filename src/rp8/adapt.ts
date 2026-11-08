@@ -344,21 +344,25 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
         (referenceType === "full" || kept) && decodeLabel(label) !== label
           ? { spelledLabel: label }
           : {};
-      // And for a kept one, its flag, and that remark-parse 8 took a `[` that never closes with
-      // the reference: `[a][` is one, and that `[` is in no node.
-      const flags = kept
-        ? {
-            defined: false,
-            ...(referenceType === "shortcut" &&
-            doc[position.end.offset - 1] === "["
-              ? { unclosedBracket: true }
-              : {}),
-          }
-        : {};
       const spelled =
         kept || "spelledLabel" in written
-          ? { data: { ...written, ...flags } }
+          ? { data: { ...written, ...(kept ? { defined: false } : {}) } }
           : {};
+      // remark-parse 8 takes a `[` that never closes into a shortcut (`[a][`). A kept one gives
+      // it back as text, so it renders and survives a format, as it does by default.
+      const open =
+        kept &&
+        referenceType === "shortcut" &&
+        doc[position.end.offset - 1] === "[";
+      const own = open
+        ? {
+            start: position.start,
+            end: pointAt(doc, position.end.offset - 1),
+          }
+        : position;
+      const tail = open
+        ? [text(doc, position.end.offset - 1, position.end.offset)]
+        : [];
       return [
         type === "imageReference"
           ? {
@@ -367,7 +371,7 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
               label: decodeLabel(label),
               referenceType,
               alt,
-              position,
+              position: own,
               ...spelled,
             }
           : {
@@ -376,9 +380,10 @@ function convert(node: Node8, ctx: Context, inNote: boolean): Node8[] {
               label: decodeLabel(label),
               referenceType,
               children: kids(),
-              position,
+              position: own,
               ...spelled,
             },
+        ...tail,
       ];
     }
     case "definition": {

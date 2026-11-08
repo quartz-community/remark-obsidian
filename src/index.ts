@@ -181,8 +181,11 @@ export interface RemarkObsidianOptions {
    * not trim a label, so `[ a ]` is not `[a]`, where `identifier` trims.
    *
    * A chain that renders should leave it off. `mdast-util-to-hast` resolves by `identifier`, so
-   * `[ a ]` over `[a]: /url` becomes a link, and it loses a `[` the reader took into a reference
-   * (`[a][ b` renders `[a] b`).
+   * `[ a ]` over `[a]: /url` becomes a link. An unclosed `[` the reader takes into a shortcut
+   * reference (`[a][ b`) is given back as a text sibling, so it still renders.
+   *
+   * Link and image references only: an undefined `[^x]` stays text unless `bareFootnoteRefs` is
+   * on, as without this option.
    *
    * `legacy` only, and does nothing under `strict`. remark-parse 8 reads a reference whatever
    * defines it. micromark reads none, and read back from the text, some are references the note

@@ -220,11 +220,18 @@ describe("keepUndefinedReferences", () => {
     expect(references(read(`${source}\n[l]: /u\n`, {}))).toEqual([]);
   });
 
-  // remark-parse 8 takes it into the reference: its span is the reader's, as a defined one's is.
-  it("keeps the reader's span over a bracket that never closes", () => {
-    const [node] = references(read("[a][ b", KEEPING));
-    expect(node!.position!.end.offset).toBe(4);
+  // remark-parse 8 takes it into the reference; a kept one gives it back as text, so it renders
+  // and a format keeps the tree.
+  it("gives back a bracket that never closes as text", () => {
+    const tree = read("[a][ b", KEEPING);
+    const [node] = references(tree);
+    expect(node!.position!.end.offset).toBe(3);
     expect(format("[a][ b\n", KEEPING)).toBe("[a]\\[ b\n");
+    const shape = (markdown: string): unknown =>
+      JSON.stringify(read(markdown, KEEPING), (key, value: unknown) =>
+        key === "position" ? undefined : value,
+      );
+    expect(shape("[a]\\[ b\n")).toBe(shape("[a][ b\n"));
   });
 });
 
@@ -290,8 +297,6 @@ describe("keepUndefinedReferences, rendering", () => {
   // and writes a reference nothing defines back from its label and its type alone.
   it.each([
     ["[ a ]\n\n[a]: /url\n", '<p><a href="/url"> a </a></p>', "<p>[ a ]</p>"],
-    ["[a][ b", "<p>[a] b</p>", "<p>[a][ b</p>"],
-    ["a [x][[w]] b", "<p>a [x][w]] b</p>", "<p>a [x][[w]] b</p>"],
   ])("renders %j differently from text", async (markdown, on, off) => {
     expect(await html(markdown, KEEPING)).toBe(on);
     expect(await html(markdown, {})).toBe(off);
@@ -400,7 +405,10 @@ describe("keepUndefinedReferences over the corpus", () => {
             (other) =>
               other.type === node.type &&
               other.position!.start.offset === start.offset + shift &&
-              other.position!.end.offset === end.offset + shift,
+              // A defined one keeps a `[` that never closes in its span; a kept one gives it back.
+              (other.position!.end.offset === end.offset + shift ||
+                (other.position!.end.offset === end.offset + shift + 1 &&
+                  source[end.offset + shift] === "[")),
           );
         if (
           holds(`${markdown}\n\n${definition}\n`, 0) ||
