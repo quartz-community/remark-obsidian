@@ -27,7 +27,7 @@ const removeFormatEval: NonNullable<Options["esbuildPlugins"]>[number] = {
 const EVAL_CALL = /\beval\s*\)?\s*\(/;
 
 export default defineConfig({
-  entry: { index: "src/index.ts" },
+  entry: { index: "src/index.ts", legacy: "src/legacy.ts" },
   format: ["esm"],
   dts: true,
   sourcemap: true,

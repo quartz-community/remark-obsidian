@@ -530,6 +530,33 @@ HTML/entity-heavy shapes); removing the `&` test moves 23,011, the control.
   at 1.29. Compare in one process, in random order, each part's minimum, and take the median
   across many fresh processes.
 
+**`/legacy`: the entry for a consumer that only reads.** `src/legacy.ts` exports a plain
+`parse(text, options)` over `parseLegacy8`, for `obsidian-footnotes` and its kin. Measured on that
+plugin's minified `main.js`, median of three builds, `gzip -9`:
+
+|                                      |     raw |    gzip |
+| ------------------------------------ | ------: | ------: |
+| published 2.1.0                      | 519,667 | 172,254 |
+| `fe0311f` built                      | 519,788 | 172,301 |
+| + `sideEffects: false`               | 519,788 | 172,301 |
+| every module split, with or without  | 519,824 | 171,987 |
+| `/legacy`, still behind `unified`    | 381,235 | 130,332 |
+| `/legacy`, adapter without `unified` | 367,710 | 125,569 |
+
+**`sideEffects: false` and module splits are refused: 0 and +36 bytes.** `remarkObsidian` refers
+to both presets and every writer from one function, so no bundler can prove any of it unused. A
+synchronous main entry cannot do better, so only a second entry could.
+
+- **What is left** of the package in that bundle is 148 KB: 88 KB `src/rp8/vendor`, 36 KB
+  `character-entities`, 21 KB `src/rp8`. `character-entities` is there only for `decodeString` on
+  a label in `adapt.ts`. Not attempted: the vendored v1 tables differ from it (97 prefixes, 4
+  values), so swapping is a reading change to settle first.
+- **Trap:** `moduleResolution: "node"`, which Obsidian's sample plugin still uses, ignores
+  `exports`, so `typesVersions` is what gives that consumer the subpath's types (TS2307 without).
+- **Gate:** `legacy-entry.test.ts`. The tree against the main entry's on the whole corpus, each
+  flag on a stride (each flag's control: it must move a document), and the exact list of packages
+  the entry bundles.
+
 ## Two presets, two audiences
 
 |                                                                                                                          | `legacy` (default)                                         | `strict`                    |
