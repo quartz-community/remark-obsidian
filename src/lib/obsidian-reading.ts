@@ -8,7 +8,7 @@ import type {
   Root,
 } from "mdast";
 import type { Point } from "unist";
-import { MARKER as CALLOUT_MARKER } from "./callout.js";
+import { atMarkerColumn, MARKER as CALLOUT_MARKER } from "./callout.js";
 
 /**
  * Where a footnote definition starts and ends, as Obsidian reads it, for `strict`.
@@ -287,6 +287,23 @@ function detect(
           : node.type === "comment" && parent && parent.children[0] !== node
             ? lazyCommentNode(node, parent, lines)
             : undefined;
+      if (split) alone.push(split);
+    }
+    // A callout title stands alone inside a definition too: `[^1]: > [!note]` forms a callout
+    // there (as Obsidian renders it), and without its own line the lines under the title were
+    // read into it, so formatting moved them (20 seeds of the million-seed census).
+    if (
+      node.type === "paragraph" &&
+      inDefinition &&
+      node.position &&
+      options.callouts &&
+      isCalloutTitle(node as Paragraph, parent) &&
+      // Only where `calloutTransform` will build one: a quote on a definition's indented line
+      // (`[^1]:` / `····>[!~]`) is no callout, and splitting its title changed its paragraph.
+      atMarkerColumn(lineOf(source, node.position.start.offset ?? 0))
+    ) {
+      calloutTitles.add(node as Paragraph);
+      const split = calloutBodySplit(node as Paragraph, lines);
       if (split) alone.push(split);
     }
     if (node.type === "paragraph" && !inDefinition && node.position) {
@@ -718,6 +735,13 @@ function labelRowUnderTable(
 }
 
 /** A paragraph opening a quote with a callout marker: a callout's title, before callouts exist. */
+/** The source line holding `offset`. */
+function lineOf(source: string, offset: number): string {
+  const start = source.lastIndexOf("\n", offset - 1) + 1;
+  const end = source.indexOf("\n", offset);
+  return source.slice(start, end === -1 ? undefined : end);
+}
+
 function isCalloutTitle(
   paragraph: Paragraph,
   parent: Parent | undefined,

@@ -172,6 +172,21 @@ describe("invariant fuzz", () => {
     ["no-break space as a callout title", "> [!note] \u00a0\n", "strict"],
     ["nested doubled footnote openers", "[^[^[^1]]\n", "strict"],
     [
+      "callout title alone in a definition",
+      "[^1]: > [!note]\n<br>\n",
+      "strict",
+    ],
+    [
+      "callout title in a definition over a reference",
+      "[^1]: > [!note] [^[^1]\n    <\n",
+      "strict",
+    ],
+    [
+      "callout in a definition in a comment body",
+      "\n%%note\n\n[^1]: > [!note] $$y^2\n",
+      "strict",
+    ],
+    [
       "whitespace line in a comment in a definition",
       "[^1]: \n      %%note\n    \n    %%\n",
       "strict",

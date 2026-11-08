@@ -47,7 +47,7 @@ const AT_MARKER = /^ ?\[!/u;
  * called the first attempt exponential. Each pattern here is anchored and
  * bounded, and the loop is linear in the prefix.
  */
-function atMarkerColumn(line: string): boolean {
+export function atMarkerColumn(line: string): boolean {
   let rest = line;
   for (;;) {
     const quote = QUOTE_MARKER.exec(rest);
@@ -645,7 +645,12 @@ export function calloutTransform(
       quote.children.unshift({
         type: "calloutTitle",
         children: titleNodes,
-        ...(head && tail ? { position: { start: head, end: tail } } : {}),
+        // Copies, not the children's own points: a pass that moves every node's position (a
+        // comment body's re-parse, placed back by `shiftByMap`) moved a shared point twice, so the
+        // title ran past the source (`%%note` / blank / `[^1]: > [!note] $$y^2`).
+        ...(head && tail
+          ? { position: { start: { ...head }, end: { ...tail } } }
+          : {}),
       } as unknown as (typeof quote.children)[number]);
     }
 

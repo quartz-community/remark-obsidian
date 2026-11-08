@@ -695,7 +695,7 @@ cannot tell order from order there: those passes collect edits order-independent
 ## Gates — what "done" means
 
 ```bash
-npm test          # 933 tests / 35 files. Contains the contract gate.
+npm test          # 936 tests / 35 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -1218,7 +1218,12 @@ a footnote label; it strips the label now. `- [ ] > [!note] T` renders a callout
 item, but under GFM a task box is followed by inline text, so `strict` holds `> [!note] T` as the
 item's paragraph -- the quote is CommonMark/GFM's question, read by the spec. `>⇥[!note] T` and
 `> ⇥[!note] T` are indented code in Obsidian (as in `legacy`) and a paragraph under `strict`
-(tab arithmetic), and `>··[!note] T` is a plain quote everywhere.
+(tab arithmetic), and `>··[!note] T` is a plain quote everywhere. The census after it found 63 new seeds, every one
+a callout inside a definition, now reachable: the reading pass gave a title its own line only
+outside definitions (A2), and a new `calloutTitle` shared its children's points, which a comment
+body's re-parse then moved twice. Both fixed; 53 of the 64 forms pass, and the other 11 are the
+math-writing families whose root forms already fail (`> [!note] $$y^2$$` / `), $$y^2` /
+`$y^2$$`).
 
 **The goldens are 1.15.0's now** (2026-11-08, the public build). 1.15.0 renders all 3,471 cases
 as 1.14.5 did: the recording changed nothing but its stamps and the surplus-table-cell family
