@@ -18,7 +18,8 @@ import { mapLines, shiftByMap } from "./line-map.js";
 // `[^\]\n]` rather than `[^\]]`: the type may not span a line ending. Allowing it
 // made `> [!n` / `note]` a callout of type `n\nnote`, where Obsidian reads an
 // unclosed `[!` as ordinary prose and reports the text `[!n note]`.
-export const MARKER = /^\[!([^\]\n]+)\]([-+]?)(?=[ \t\n]|$)[ \t]?/;
+// `\r` too: under `strict` a title-less `> [!note]` over a `\r\n` line ending formed no callout.
+export const MARKER = /^\[!([^\]\r\n]+)\]([-+]?)(?=[ \t\r\n]|$)[ \t]?/;
 
 /**
  * A marker binds to `>` plus at most one space. `>  [!note]` is a quote, not
@@ -262,6 +263,8 @@ export function calloutTransform(
       const breakAt = source.indexOf("\n", titleFrom);
       firstLine = source.slice(titleFrom, breakAt === -1 ? undefined : breakAt);
     }
+    // A `\r\n` line ending is no title: `> [!note]\r\n` displays the type, as `> [!note]` does.
+    if (firstLine.endsWith("\r")) firstLine = firstLine.slice(0, -1);
     /**
      * Whatever the title line's own paragraph holds after it.
      *

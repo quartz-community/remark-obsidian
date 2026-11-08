@@ -6,8 +6,9 @@
  * Rondeau, Micha Brugger, Jason Qin, and contributors), `src/parsing/obsidian-markdown.ts`,
  * whose test suite asserts agreement with every recorded answer this package's referee reads
  * except four P1/P2 cache-bug documents. Each reader carries the rule letter it has in that
- * project's `docs/obsidian-reading-rules.md`. Left out: their speed-only wrappers and the
- * link-definition-at-end probe, which only matters when a note is parsed in parts.
+ * project's `docs/obsidian-reading-rules.md`. Left out: their speed-only wrappers, but for the math
+ * one in `speedUps`, and the link-definition-at-end probe, which only matters when a note is parsed
+ * in parts.
  */
 import { legacyHighlightQueue } from "../lib/syntax/highlight.js";
 import listTokenizer from "./list.js";
@@ -407,6 +408,8 @@ interface Frame {
   lower?: Int32Array;
   /** For each offset, the first backtick at or after it that could open a code span, or -1. */
   spanCapable?: Int32Array;
+  /** The math readers that have already searched this run for a closer and found none. */
+  noCloser?: Set<string>;
 }
 
 /**
@@ -681,6 +684,24 @@ function speedUps(tables: any, features: Features): void {
       );
     });
   }
+  // `==note==`: only a `==` with no whitespace straight before it closes, and not one on the
+  // opener itself, so a run with none ahead declines without reading the rest of the run.
+  if (features.highlights) {
+    precheck("highlight", (frame, base, value) => {
+      if (value.charCodeAt(0) !== 61 || value.charCodeAt(1) !== 61)
+        return false;
+      return (
+        nextWhere(
+          frame,
+          "highlight-closer",
+          (v, i) =>
+            v.charCodeAt(i) === 61 &&
+            v.charCodeAt(i + 1) === 61 &&
+            !isSpace(v, i - 1),
+        )[base + 3] === -1
+      );
+    });
+  }
   // `<scheme://...>` and `<user@host>`: the first space, `>`, `@` or `:/` decides the kind, and
   // the rest must reach a `>` before the next space.
   precheck("autoLink", (frame, base, value) => {
@@ -705,6 +726,47 @@ function speedUps(tables: any, features: Features): void {
     )[rest]!;
     return end === -1 || end === rest || frame.value.charCodeAt(end) !== 62;
   });
+
+  // A math opener searches the rest of the run for a closer, so a line of prices (`$5 or $6 and
+  // ...`) searched to its end from every `$`. A reader judges a closer by the characters around it
+  // alone, and a later opener's search walks what an earlier one walked past it (a backslash's
+  // skip lands just after any `$` it hides), so once a search finds nothing, every later one in
+  // the run finds nothing too. That needs the same reader and the same kind of opener:
+  //
+  // - `math` remembers only `$`. `$ ` declines without searching, so it says nothing about the
+  //   `$a$` after it, and a failed `$$` says nothing about the `$` after it (`$$a$`).
+  // - `math`'s `$$` runs only behind `doubleDollarMath`, which leaves it at most two failed
+  //   searches in a run (`$$$a`), so it has nothing to remember.
+  // - `doubleDollarMath` is its own reader: it refuses a `$$` after any backslash, so `$$a\\$$`
+  //   fails there and is math to `math`, and `\\` lets a line of `$$ a\\` reach it each time.
+  const searchOnce = (name: string, opens: (value: string) => boolean) => {
+    const stock: Tokenizer = tables.inlineTokenizers[name];
+    const wrapped: Tokenizer = function (eat, value, silent) {
+      const frame = frameOf(this, value);
+      if (!frame || !opens(value)) return stock.call(this, eat, value, silent);
+      if (frame.noCloser?.has(name)) return undefined;
+      const result = stock.call(this, eat, value, silent);
+      if (result === undefined) (frame.noCloser ??= new Set()).add(name);
+      return result;
+    };
+    wrapped.locator = stock.locator;
+    tables.inlineTokenizers[name] = wrapped;
+  };
+  if (features.math) {
+    searchOnce("math", (value) => {
+      const after = value.charCodeAt(1);
+      return (
+        value.charCodeAt(0) === 36 &&
+        after !== 36 &&
+        after !== 32 &&
+        after !== 9
+      );
+    });
+    searchOnce(
+      "doubleDollarMath",
+      (value) => value.charCodeAt(0) === 36 && value.charCodeAt(1) === 36,
+    );
+  }
 }
 
 /** Every maximal run of backticks in `value`, as width -> ascending start offsets. */
