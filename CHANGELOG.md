@@ -1,3 +1,103 @@
+## 2.2.0
+
+### Minor Changes
+
+- d137f08: Add `bomOffsets`, off by default. With it on, a leading byte order mark counts in every
+  position and in `data.lineOffsets`, under both presets, so an offset indexes the string that was
+  parsed, on every line, with `\n`, `\r\n`, or `\r` line endings. Off, positions stay as they were:
+  one short after a mark, which is what Obsidian's cache reports.
+- 1f69157: A `callout` now carries its marker's place under both presets: `data.marker` spans `[!type]` and
+  its fold character, and `data.lineEnd` is where that line ends. `> [!note]` has no `calloutTitle`
+  and `> [!note] [^1]: def` has a zero-width one, so a consumer had to read the source to find them.
+  Additive: the tree is otherwise unchanged, and rendering and formatting ignore the new fields.
+- a4abfd0: Add the `inertFootnoteRefs` option, off by default. A footnote reference inside an inline footnote
+  stays a `footnoteReference` with `data: { inert: true }`, where it was text: `^[x [^2] y]` holds a
+  dead reference to `2`, defined or not. Obsidian reads no reference there, so the node refers to
+  nothing. It is for a consumer reading the tree, a linter reserving a name, say, and is the same
+  idea as `parseComments` for `%%`. `mdast-util-to-hast` renders every `footnoteReference` as a live
+  call, so a chain that renders should leave it off.
+- 6c4e5c5: Add the `keepUndefinedReferences` option, off by default and `legacy` only. A link or image
+  reference this parse found no definition for stays a `linkReference` or `imageReference` with
+  `data: { defined: false }`, where it was text: `[a] b` holds a reference to `a`. It is for a
+  consumer parsing part of a note or a table cell alone, where the definition may be somewhere this
+  parse never saw. A full reference nothing defines gets the same flag. A chain that renders should
+  leave it off, since `mdast-util-to-hast` reads these differently from text.
+- 4c575be: Add `@quartz-community/remark-obsidian/legacy`, a plain `parse(text, options)` that reads as the
+  `legacy` preset does and bundles without `strict`'s micromark chain, the `toMarkdown` writers,
+  or `unified`. The main entry is unchanged.
+- 0aa58b7: A new `readsPastEnd` option, off by default and `legacy` only, records on `root.data.readsPastEnd`
+  whether a top-level link definition would read differently with more lines after the end, for a
+  caller parsing a note in parts.
+
+### Patch Changes
+
+- e146739: Two position and reading fixes on the default path:
+
+  - Under `strict`, a leading byte order mark no longer changes how a note is read. The passes
+    read the text the offsets index, so a callout, a definition or a comment behind a mark reads
+    as it does without one.
+  - Under `legacy`, a note with `\r\n` line endings no longer misplaces a block on a callout's
+    empty title line (`> [!note] [^1]: def`): its start was shifted once per node sharing it.
+
+- a680f89: A deeply nested list or callout under `legacy` no longer throws `RangeError: Maximum call stack
+size exceeded` from the step that reshapes remark-parse 8's tree. That step now walks on an
+  explicit stack, so the limit is the reader's own recursion. Trees are unchanged.
+- 041b71b: Deeply nested trees no longer overflow this package's own tree walks. The writer's walks (over
+  a comment's parsed body, for instance, which the writer never descends into) and five of
+  `strict`'s passes now walk on an explicit stack, so a quote about 2,800 deep and a list about
+  1,400 deep no longer throw `RangeError: Maximum call stack size exceeded` under `strict`. Output
+  is unchanged. Formatting a deep list or quote is still limited by `mdast-util-to-markdown`'s own
+  recursion, at about 520 list levels and 1,300 quote levels.
+- b239f06: The highlight scan is now linear on a long run of `==` openers after whitespace (`==a ==a ==a `),
+  under either preset. Each opener used to read to the end of the run, testing all it had read at each
+  `==`. No tree changes. One limit stays under `strict`: over many lines (`==a\n`), parsing is still
+  superlinear in micromark's `resolveAllText`, as `&&a\n` is with no plugin.
+- d7a3f1d: `legacy` no longer takes quadratic time on a long run of `$` that close nothing, such as a line of
+  prices: once a math opener finds no closer, later openers of its kind in that run skip the search.
+  The readings are unchanged.
+- 3b62a04: `legacy` reads a bare `&` after a character reference and a backtick as remark-parse 8 (and
+  Obsidian) does: ``&#0`&/`` keeps its `` `&/ ``, where the reader's speed-ups read the `&` as
+  U+FFFD.
+- c97e5e9: The `legacy` strikethrough reader is now linear on a long run of `~~` openers with no closer
+  (`~~a ~~a ~~a `, or one per line). Each opener used to read to the end of the run. No tree changes.
+- c13aa4a: `dist/index.js` no longer holds an `eval` call. The bundled `format` package's fallback, which
+  could not run there but read as `eval` to scanners, is removed at build time.
+- 618bde7: `legacy` parses ordinary notes faster: a block not starting with `<` skips the HTML block reader,
+  which built a regular expression on every call. No reading changes.
+- caacd13: `legacy` parses ordinary notes faster: plain text holding no `&` skips the entity decoder. No
+  reading changes.
+- 35ba099: Under `strict`, a callout with no title (`> [!note]`, `> [!note]-`) now forms over `\r\n` line
+  endings, and displays its type as it does over `\n`. It was read as a plain quote.
+- 403b18e: Under `strict`, a callout inside a footnote definition keeps its title on a line of its own, so
+  formatting no longer moves the lines under it into the title, and its title's positions stay
+  inside the source when the definition sits in a `%%` comment.
+- 17ec8d2: Under `strict`, a callout inside a footnote definition (`[^1]: > [!note] Title`) is now a
+  callout, as Obsidian renders it in the footnote list and as `legacy` reads it. It was a plain
+  quote.
+- 15e06c0: `strict` reads a line of many highlights (`==a== ==b== …`) in linear time. Checking each highlight
+  for emphasis opened before it paired every earlier emphasis run of the paragraph again; the
+  pairing is now carried forward from one highlight to the next. The trees are unchanged.
+- c0c1af6: Under `strict`, `$$…$$` math in a callout's title or body (and in other re-read fragments) is
+  display math again, rendered as a block. Formatting such a formula when it holds a `$` no
+  longer closes it early.
+- f14b173: `strict` no longer takes quadratic time on a long run of `$` openers that close nothing, such as
+  `$a $b $c …`, where a `$` after a space cannot close: once a `$` opener finds no closer, later `$`
+  openers in the same paragraph skip the search, as `legacy` already does. The trees are unchanged.
+- ad0c32d: `strict` no longer takes quadratic time in its own passes on a paragraph of many inline nodes,
+  such as a long run of emphasis or footnote references. Each pass found a visited node's position
+  by scanning its siblings; it is now the position the walk already holds. The trees are unchanged.
+  A long run of emphasis or highlights is still superlinear in stock `remark-gfm` and `remark-breaks`,
+  which scan siblings the same way.
+- e65db04: Formatting under `strict` no longer renames a tag that emphasis or strong follows in two shapes:
+
+  - **A web address opening the emphasis.** `#tag*https://e.test/p*` was written
+    `#ta&#x67;*<https://e.test/p>*`, a tag named `ta`. A literal address that opens emphasis,
+    strong or strikethrough and ends a word is now written bare, as GFM reads it back.
+  - **Strikethrough opening the attention.** `#tag**~~del~~**` came back as `#ta&#x67;**~~del~~**`.
+    micromark opens attention before a `~` whatever precedes it, so the tag is now written as it is.
+
+- b931f11: `LICENSE-THIRD-PARTY.md` now carries a notice for every npm package bundled into `dist/index.js`.
+
 ## 2.1.1
 
 ### Patch Changes
