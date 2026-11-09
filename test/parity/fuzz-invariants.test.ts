@@ -204,6 +204,26 @@ describe("invariant fuzz", () => {
     ["empty callout title over code", "> [!note] ~~~\n", "legacy"],
     ["empty callout title over a comment", "> [!note] %%note\n", "strict"],
     ["tag before emphasis opening with punctuation", "#tag*%%%%*\n", "legacy"],
+    [
+      "tag before emphasis opening with a URL",
+      "#tag*https://e.test/p*\n",
+      "strict",
+    ],
+    [
+      "nested tag before emphasis opening with a URL",
+      "  $$y^2$$ #a/b*https://e.test/p*\n",
+      "strict",
+    ],
+    [
+      "URL in emphasis before trimmed punctuation",
+      "#a*https://e.test/p*.\n",
+      "strict",
+    ],
+    [
+      "tag before strong opening with strikethrough",
+      "#tag**~~del~~**\n",
+      "strict",
+    ],
     ["html under a definition's indent", "[^1]:     <br>\n", "legacy"],
     ["code span over an indented line", "  ``\n  **`!\n", "legacy"],
     ["formula over lines opening a highlight", "==$$y^2\ny^2$$==\n", "legacy"],

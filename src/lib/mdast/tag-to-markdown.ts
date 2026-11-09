@@ -11,7 +11,8 @@ import { isTagCharacter } from "../tag-char.js";
  * million-seed census, under "formatting keeps the tree"). remark-parse 8 needs no such
  * encoding, so the encoder is given this character to spend itself on instead. `strict` does
  * need it: `#tag*<https://e.test>*` opens no emphasis after a bare `g` (a census run with the
- * marker under both presets broke 4 seeds that way). U+2E7F ends a
+ * marker under both presets broke 4 seeds that way), except before strikethrough
+ * (`opensWithStrike`). U+2E7F ends a
  * tag (`isTagCharacter`), so no tag holds it, and `textToMarkdown` writes a literal one as a
  * decimal reference.
  */
@@ -28,6 +29,20 @@ export function removeTagEnds(written: string): string {
     while (index >= 0 && isTagCharacter(written[index]!)) index--;
     return index >= 0 && index < at - 1 && written[index] === "#" ? "" : match;
   });
+}
+
+/**
+ * Whether attention opens with strikethrough, through any first children. micromark lets a `~`
+ * after a marker open it whatever precedes (`attentionMarkers`, for markers other constructs
+ * register), so `#tag**~~del~~**` is a tag and strong under `strict` too and needs no
+ * encoding; the writer's encoder does not know that and encoded the `g`.
+ */
+function opensWithStrike(node: { type: string } | undefined): boolean {
+  let at = node as
+    { type: string; children?: Array<{ type: string }> } | undefined;
+  while (at?.type === "emphasis" || at?.type === "strong")
+    at = at.children?.[0];
+  return at?.type === "delete";
 }
 
 export function tagToMarkdown(
@@ -65,7 +80,7 @@ export function tagToMarkdown(
           next?.type === "emphasis" ||
           next?.type === "strong" ||
           next?.type === "delete";
-        return `#${node.value}${options.legacy && attention ? TAG_END : ""}`;
+        return `#${node.value}${attention && (options.legacy || opensWithStrike(next)) ? TAG_END : ""}`;
       },
     },
   };

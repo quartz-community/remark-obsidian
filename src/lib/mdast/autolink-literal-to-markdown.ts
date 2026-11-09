@@ -1,7 +1,8 @@
 import { defaultHandlers } from "mdast-util-to-markdown";
 import { balanceBrackets } from "./inline-footnote-to-markdown.js";
+import { parentOf } from "./attention-to-markdown.js";
 import type { Handle, Options, State } from "mdast-util-to-markdown";
-import type { Link, LinkReference, Parents } from "mdast";
+import type { Link, LinkReference, Node, Parents, Text } from "mdast";
 
 const MAILTO = "mailto:";
 
@@ -83,6 +84,78 @@ function isGfmLiteralEmail(value: string): boolean {
   return true;
 }
 
+/**
+ * A web address GFM's literal reads back whole, written bare: `https://` or `http://`, a domain
+ * of letters, digits and `-` with a dot in it, then a path of characters no Obsidian or
+ * CommonMark construct starts at, ending in a letter, a digit or `/`, so GFM trims nothing off
+ * it. Conservative on purpose: anything else keeps `<...>`.
+ */
+const BARE_URL =
+  /^https?:\/\/[a-z\d-]+(?:\.[a-z\d-]+)+(?:\/[\w\-./?#+:@=]*)?$/iu;
+
+const isAttention = (node: Node | undefined): boolean =>
+  node?.type === "emphasis" ||
+  node?.type === "strong" ||
+  node?.type === "delete";
+
+const siblingsOf = (node: Node): Node[] =>
+  (parentOf.get(node) as { children?: Node[] } | undefined)?.children ?? [];
+
+/**
+ * Whether `link`, a literal web address, opens attention and ends a line or a word, so that
+ * written bare it re-parses to itself (`strict` only). `mdast-util-to-markdown` writes it
+ * `<https://...>`, and attention whose content opens with that `<` needs a punctuation or a
+ * space before its marker (CommonMark's flanking rule), so the writer encodes the character
+ * before it. After a tag that character is the tag's own: `#tag*https://e.test/p*` came back
+ * `#ta&#x67;*<https://e.test/p>*`, a tag named `ta`. Bare, the content opens with `h`.
+ *
+ * GFM's literal starts after a `*`, `_` or `~` and trims those off its end, so the closers
+ * round it are safe; what follows them must be a line's end or whitespace, after any of the
+ * punctuation GFM trims off a literal's end.
+ */
+function opensAttentionBare(link: Link, text: string): boolean {
+  if (link.url !== text || !BARE_URL.test(text) || text.includes("==")) {
+    return false;
+  }
+  const end = text.at(-1)!;
+  if (!/[a-z\d/]/iu.test(end)) return false;
+  // Opens attention: the first child at every level up to the outermost.
+  let node: Node = link;
+  let opens = false;
+  for (;;) {
+    const parent = parentOf.get(node);
+    if (!isAttention(parent) || siblingsOf(node)[0] !== node) break;
+    opens = true;
+    node = parent!;
+  }
+  if (!opens) return false;
+  // Then ends a word: closers only, up to whitespace or the end of the block.
+  node = link;
+  for (;;) {
+    const siblings = siblingsOf(node);
+    const next = siblings[siblings.indexOf(node) + 1];
+    if (next) {
+      if (next.type === "break") return true;
+      if (next.type !== "text") return false;
+      // Punctuation GFM trims off a literal's end, then a word's end.
+      const rest = (next as Text).value.replace(/^[.,:;!?]+/u, "");
+      if (rest !== "") return /^[ \t\n]/u.test(rest);
+      node = next;
+      continue;
+    }
+    const parent = parentOf.get(node);
+    if (isAttention(parent)) {
+      node = parent!;
+      continue;
+    }
+    return (
+      parent?.type === "paragraph" ||
+      parent?.type === "heading" ||
+      parent?.type === "tableCell"
+    );
+  }
+}
+
 /** The single text child of a link, when that is all it has. */
 function soleText(node: Link): string | undefined {
   if (node.children.length !== 1) return undefined;
@@ -146,6 +219,14 @@ export function autolinkLiteralToMarkdown(
           node.url === MAILTO + text &&
           !isCommonMarkEmail(text) &&
           isGfmLiteralEmail(text)
+        ) {
+          return text;
+        }
+        if (
+          options.strict &&
+          text !== undefined &&
+          !node.title &&
+          opensAttentionBare(node, text)
         ) {
           return text;
         }
