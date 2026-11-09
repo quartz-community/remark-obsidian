@@ -208,8 +208,35 @@ function tablePipeStyles(tables: any): void {
   ) {
     const end = tableEnd(value);
     if (end === -1) return undefined;
-    return stockTable.call(this, eat, value.slice(0, end), silent);
+    const table = stockTable.call(this, eat, value.slice(0, end), silent);
+    if (table && typeof table === "object" && !startsWithPipe(value)) {
+      leadingIndentCells(table as Node8, value.slice(0, end));
+    }
+    return table;
   } as Tokenizer;
+}
+
+/**
+ * A table whose rows open with whitespace and then a `|` is a pipeless table to Obsidian (C1),
+ * and in one the first `|` opens no row: it ends an empty first cell, so every cell moves one
+ * column right and the last drops past the delimiter row's count. Recorded on 1.15.0:
+ * `···| a |` / `···| - |` renders one empty header cell, `···| a | b |` / `···| - | - |` an
+ * empty one and `a`, and a body row `··| c |` an empty data cell. Stock rp8 eats the whitespace
+ * and the `|` as the row's preamble, which reads `a`.
+ */
+function leadingIndentCells(table: Node8, source: string): void {
+  const lines = source.split("\n");
+  lines.splice(1, 1);
+  for (const [index, row] of (table.children ?? []).entries()) {
+    const pipe = /^[ \t]+\|/u.exec(lines[index] ?? "");
+    if (!pipe) continue;
+    const at = along(row.position.start, pipe[0].length - 1);
+    row.children?.unshift({
+      type: "tableCell",
+      children: [],
+      position: { start: at, end: { ...at } },
+    });
+  }
 }
 
 // U+2028 and U+2029 end a wikilink as a line ending does: Obsidian reads `[[a\u2028b]]` as no
