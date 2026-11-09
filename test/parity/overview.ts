@@ -261,6 +261,20 @@ export const ORACLES: readonly Oracle[] = [
     test: "projection-triage.test.ts",
   },
   {
+    name: "parse triage",
+    command: "npm test",
+    gate: "absolute",
+    compares: [
+      "our recorded minimal probes of the families another parser's oracle corpus showed us missing",
+      "indented tables, wikilink targets before `\\]]`, tags after a highlight colour, a bare `$$` ending a container, the frontmatter's end",
+      "both presets: legacy matches all 74, strict all but the tables GFM reads by the spec",
+    ],
+    blind: [
+      "anything but the 74 recorded documents; the corpus they came from is not ours to vendor",
+    ],
+    test: "parse-triage.test.ts",
+  },
+  {
     name: "positioned points",
     command: "npm test",
     gate: "ceiling",
