@@ -695,7 +695,7 @@ cannot tell order from order there: those passes collect edits order-independent
 ## Gates — what "done" means
 
 ```bash
-npm test          # 939 tests / 36 files. Contains the contract gate.
+npm test          # 956 tests / 37 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -1195,6 +1195,44 @@ before, by identity.
 JSON one; a "words" metric must not count node boundaries, and cannot see a loss the PARSE made
 (the inline-footnote line ending needed its own assertion); the Write tool turned `\u` escapes
 into literal (and invisible) characters three times in this work.
+
+**Another parser's oracle corpus, triaged** (2026-11-09). `mnaoumov/obsidian-markdown-parser`
+records about 5,000 documents against the live app. Its licence is `UNLICENSED` (all rights
+reserved), so none of its documents are vendored: the 4,183 our goldens and referee lack were
+recorded through `recordBatch` and scored (legacy missed 378, strict 978), and the families
+were reduced to our own minimal probes, recorded beside controls (1.15.0). Its 11 `seed-*`
+files record CodeMirror's editor tree, which no consumer of this package parses. Fixed:
+
+- **Wikilink targets (both):** the backslash before `]]` goes, and then trailing whitespace:
+  `[[a \]]`, `[[ a \|b]]`, `[[a#b \]]` and `![[ p.png \]]` resolve without it, about 40
+  corpus documents. The spelling rides in `spelledPath` / `spelledHeading` for the writer.
+- **Indented tables (legacy):** a table whose rows open with 1-3 spaces and a `|` is pipeless to
+  Obsidian's C1 reader, and that `|` ends an empty first cell (`leadingIndentCells` in
+  `reader.ts`). Stock rp8 eats it as the row's preamble. `strict` keeps GFM's reading.
+- **A tag after a highlight's colour (both):** `==🔴#t==` holds `t`. Obsidian consumes the
+  marker first. `colour-marker.ts` holds the same twelve markers as `rehype-obsidian`.
+- **A bare `$$` on its container's last line (strict):** remark-math 3 wants a line feed after
+  the opener in the container's own content, so `> $$`, `- $$` and a final `$$` with no line
+  ending are text, while `> $$` / `>` is math. The reading pass neutralizes it, except where rule
+  7 keeps lazy lines below or the `$$` closes a span opened above. A first version without those
+  exceptions lost 7 recorded cases and a referee reference (`recorded-facts.json#72`, a span
+  opened in a definition). In a list item micromark ends the block and the item at the next
+  line's start, so ends at column 1 count as the line above, clamped by the next item.
+  Exactly two dollars: the first census also took `> $$$$`, which read as text joins an inline
+  formula above it (`> $x^2` / `> $$$$`) that the writer cannot keep, 2 new seeds.
+- **Frontmatter's end (strict):** a closer with trailing whitespace ends at the `---`.
+
+Measured: `parse-triage.test.ts` holds the 74 probes (legacy all, strict all but 15 GFM
+tables), which fail on the previous commit. strict referee definitions 5,335 -> **5,341**
+(+6 / -0, every one a `$$` ending a quote); referee 6,830, contract 3,469, strict spec 8,
+recorded 2,965 and references 1,526 unchanged by identity. Census 0-999,999: 376 failing
+seeds, 699 pairs, 0 new, 0 fixed (the baseline is unchanged).
+
+Handed to Quartz, as rendering and link classification rather than parsing: a markdown link
+whose path fails percent-decoding is external (`%zz`, `a%E2.md`), `../x:y` is internal while
+`x:y` is external, link paths are NFC-normalized, a block id in link text is stripped, and an
+unresolved embed shows its decoded path. Obsidian's own defects, left: frontmatter holding
+`hasOwnProperty`, `!!omap` or `k: "[t]()"` empties the whole cache.
 
 ### `ask.mts` specifically
 

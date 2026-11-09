@@ -31,6 +31,15 @@ export function spelledTarget(
 }
 
 /**
+ * A resolved part without the backslash before `]]`, and without the whitespace that then
+ * ends it: Obsidian links `[[a \]]` and `[[ a \|b]]` to `a`, and embeds `![[ p.png \]]` as
+ * `p.png` (recorded on 1.15.0, as `[[a\]]` linking to `a` was). It displays them as written.
+ */
+export function dropClosingBackslash(part: string): string {
+  return part.slice(0, -1).trimEnd();
+}
+
+/**
  * The text to write for a part: the author's spelling while it still resolves to the part
  * (an edited target wins), else the part, with the backslash resolving dropped put back.
  */
@@ -39,8 +48,15 @@ export function writtenPart(
   spelled: string | undefined,
   strippedBackslash: boolean,
 ): string {
-  const resolved = strippedBackslash ? `${part}\\` : part;
-  return spelled !== undefined && resolveTarget(spelled) === resolved
-    ? spelled
-    : resolved;
+  if (spelled !== undefined) {
+    const resolved = resolveTarget(spelled);
+    if (
+      strippedBackslash
+        ? resolved.endsWith("\\") && dropClosingBackslash(resolved) === part
+        : resolved === part
+    ) {
+      return spelled;
+    }
+  }
+  return strippedBackslash ? `${part}\\` : part;
 }

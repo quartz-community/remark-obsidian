@@ -39,10 +39,6 @@ export function frontmatterTailTransform(
   if (closeIndex === -1) return;
 
   const tail = lines[closeIndex]!.slice(3);
-  // A bare closer, with or without trailing spaces, is what upstream already
-  // handles correctly. Only a real tail needs repairing.
-  if (tail.trim() === "") return;
-
   let offset = 0;
   const lineStarts = lines.map((line) => {
     const start = offset;
@@ -51,6 +47,22 @@ export function frontmatterTailTransform(
   });
 
   const closeEnd = lineStarts[closeIndex]! + 3;
+
+  // A bare closer, with or without trailing whitespace, is what upstream already reads. Only
+  // its end moves: Obsidian's frontmatter section ends at the `---` (`---···` and `---⇥` closers
+  // report `yaml@0:0-2:3`, recorded on 1.15.0), where the extension's ends past the whitespace.
+  if (tail.trim() === "") {
+    const yaml = tree.children[0];
+    if (
+      tail !== "" &&
+      yaml?.type === "yaml" &&
+      yaml.position &&
+      (yaml.position.end.offset ?? 0) > closeEnd
+    ) {
+      yaml.position.end = { line: closeIndex + 1, column: 4, offset: closeEnd };
+    }
+    return;
+  }
   const rest = [tail, ...lines.slice(closeIndex + 1)].join("\n");
 
   // The tail shares its line with the closing fence, so the first mapped line

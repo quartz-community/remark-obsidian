@@ -264,6 +264,10 @@ function detect(
     hostLine: number;
   }> = [];
 
+  /** The `$$` openers and comments rule 7 continues over lazy lines. */
+  const keepsLazyLines = new WeakSet<Node>();
+  /** The line each list item's next sibling starts on, which ends the item at the latest. */
+  const nextItemLine = new WeakMap<Node, number>();
   const walk = (
     node: Node,
     inDefinition: boolean,
@@ -328,9 +332,34 @@ function detect(
       (node.type === "math" || (options.comments && node.type === "comment"))
     ) {
       if (!closesMidline(node, parent, index)) {
-        late.push(...keptLazyLines(node, source, lines, parse));
+        const lazy = keptLazyLines(node, source, lines, parse);
+        late.push(...lazy);
+        if (lazy.length > 0) keepsLazyLines.add(node);
       }
       if (node.type === "math") edits.push(...containedMathOpener(node, lines));
+    }
+    // After rule 7, whose lazy lines give the opener a line after it (`> $$` / `lazy`), and not
+    // for the `$$` closing a span a paragraph line opened (`> tail $$` / `> x` / `> $$`).
+    if (
+      !inDefinition &&
+      node.type === "math" &&
+      parent &&
+      (parent.type === "root" ||
+        parent.type === "blockquote" ||
+        parent.type === "listItem") &&
+      !keepsLazyLines.has(node) &&
+      !closesSpanAbove(node, parent, index)
+    ) {
+      edits.push(
+        ...lastLineMathOpener(node, parent, lines, nextItemLine.get(parent)),
+      );
+    }
+    if (node.type === "list") {
+      const items = (node as List).children;
+      items.forEach((listItem, at) => {
+        const next = items[at + 1]?.position?.start.line;
+        if (next !== undefined) nextItemLine.set(listItem, next);
+      });
     }
     if (node.type === "footnoteReference" && parent) {
       const caret = linkedReference(node, parent, index, source);
@@ -645,6 +674,73 @@ function containedMathOpener(node: Node, lines: Lines): Edit[] {
     { kind: "neutralize", offset: position.start.offset },
     { kind: "neutralize", offset: position.start.offset + 1 },
   ];
+}
+
+/**
+ * A bare `$$` on its container's last line opens no math, because LaTeX's block needs a line
+ * after its opener: `>$$`, `> $$`, `- $$`, `> - $$`, a callout's `> $$` and `$$` ending a note
+ * with no line ending are text, and `> a` / `> $$` and `- a` / `··$$` continue the paragraph
+ * (recorded on 1.15.0). A line inside the container after it, even an empty `>`, makes the block:
+ * `> $$` / `>` and root `$$` / blank are math. remark-math 3 asks the opener for a line feed in
+ * the container's own content, whose last line has none. micromark opens an empty block there,
+ * so the `$$` is neutralized and the line read as text. Exactly two dollars: a longer run
+ * (`> $$$$`) is unprobed, and read as text it joins the inline math above it
+ * (`> $x^2` / `> $$$$`), which the writer cannot keep (2 seeds of the million-seed census).
+ */
+function lastLineMathOpener(
+  node: Node,
+  parent: Parent,
+  lines: Lines,
+  nextItem: number | undefined,
+): Edit[] {
+  const position = node.position;
+  if (!position || position.start.offset === undefined) return [];
+  const line = position.start.line;
+  if (endLine(position.end) !== line) return [];
+  const start = position.start.offset - (lines.starts[line - 1] ?? 0);
+  if (!/^\$\$[ \t]*$/u.test((lines.text[line - 1] ?? "").slice(start))) {
+    return [];
+  }
+  // The note's last line, past which no line ending stands, or the container's.
+  const last =
+    parent.type === "root"
+      ? line === lines.text.length
+      : parent.position !== undefined &&
+        Math.min(endLine(parent.position.end), (nextItem ?? Infinity) - 1) ===
+          line;
+  if (!last) return [];
+  return [
+    { kind: "neutralize", offset: position.start.offset },
+    { kind: "neutralize", offset: position.start.offset + 1 },
+  ];
+}
+
+/**
+ * Whether a `math` node is the `$$` closing a span the block straight above opened: a
+ * paragraph's line (`closesMidline`), or one ending a definition (`> [^1]: def` / `> tail $$` /
+ * `> math` / `> $$`, where the definition holds the paragraph).
+ */
+function closesSpanAbove(node: Node, parent: Parent, index: number): boolean {
+  const before = parent.children[index - 1];
+  if (
+    !before ||
+    before.position?.end.line !== (node.position?.start.line ?? 0) - 1
+  ) {
+    return false;
+  }
+  let text = "";
+  visitText(before, (value) => {
+    text += value;
+  });
+  return (text.match(/\$\$/gu)?.length ?? 0) % 2 === 1;
+}
+
+/**
+ * The last line a span covers. In a list item micromark ends an unclosed `$$` block, and the
+ * item, at the start of the next line, past the line ending (`- $$` ends at 2:1).
+ */
+function endLine(end: { line: number; column: number }): number {
+  return end.column === 1 && end.line > 1 ? end.line - 1 : end.line;
 }
 
 /**
