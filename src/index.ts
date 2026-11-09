@@ -18,6 +18,7 @@ import { definitionNestedLabelTransform } from "./lib/definition-nested-label.js
 import { definitionMathAbsorbTransform } from "./lib/definition-math-absorb.js";
 import { definitionEndBeforeLabelTransform } from "./lib/definition-end-before-label.js";
 import { tagAgainstTextTransform } from "./lib/tag-against-text.js";
+import { colourMarkerTagTransform } from "./lib/colour-marker.js";
 import { wikilinkAfterLabelTransform } from "./lib/wikilink-after-label.js";
 import { footnoteAfterLabelTransform } from "./lib/footnote-after-label.js";
 import {
@@ -815,6 +816,9 @@ export default function remarkObsidian(
     definitionEndBeforeLabelTransform(tree, String(file));
     // A `#` against literal text is no tag: `a*#t`, `&amp;#t` and `x]#t` hold none.
     tagAgainstTextTransform(tree, String(file));
+    // A tag straight after a highlight's colour marker: `==🔴#t==` holds one.
+    if (opts.tags && opts.highlights)
+      colourMarkerTagTransform(tree, String(file));
     // Everything inside `^[ … ]` is dead text, references included.
     if (opts.inlineFootnotes && !opts.inertFootnoteRefs) {
       inlineFootnoteInertTransform(tree);

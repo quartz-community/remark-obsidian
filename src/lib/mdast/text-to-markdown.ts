@@ -1,5 +1,6 @@
 import type { Node } from "unist";
 import { defaultHandlers, type Options } from "mdast-util-to-markdown";
+import { colourMarkerLength } from "../colour-marker.js";
 import { parentOf } from "./attention-to-markdown.js";
 
 /**
@@ -29,6 +30,18 @@ export function textToMarkdown(
           // whitespace at an emphasis edge as `&#x20;`, and the backslash would then escape its
           // `&` (`*em**\\n \\ *` came back holding `#x20` as a tag). Escaped, it reads the same.
           .replace(/(?<!\\)((?:\\\\)*)\\(\s+)$/u, "$1\\\\$2");
+        // A `#` straight after a highlight's colour marker starts a tag (`==🔴#t==`), so one that
+        // is text is escaped there.
+        if (
+          tags &&
+          parent?.type === "highlight" &&
+          parent.children[0] === node
+        ) {
+          const marker = colourMarkerLength(written);
+          if (marker > 0 && /^#[^\s]/u.test(written.slice(marker))) {
+            written = `${written.slice(0, marker)}\\${written.slice(marker)}`;
+          }
+        }
         const siblingsOf = parent?.children ?? [];
         const afterBreak =
           siblingsOf[siblingsOf.indexOf(node as never) - 1]?.type === "break";

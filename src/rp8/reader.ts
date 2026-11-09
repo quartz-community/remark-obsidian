@@ -10,6 +10,7 @@
  * one in `speedUps`. Their link-definition-at-end probe, which only matters when a note is parsed
  * in parts, is `reads-past-end.ts`.
  */
+import { colourMarkerLength } from "../lib/colour-marker.js";
 import { legacyHighlightQueue } from "../lib/syntax/highlight.js";
 import listTokenizer from "./list.js";
 import { readsPastEnd, watchDefinitionReader } from "./reads-past-end.js";
@@ -323,10 +324,17 @@ function highlights(tables: any): void {
     if (body === null) return undefined;
     if (silent === true) return true;
     const now = eat.now();
-    return eat(`==${body}==`)({
-      type: "highlight",
-      children: this.tokenizeInline(body, along(now, 2)),
-    });
+    // Obsidian consumes a colour marker opening the content and reads what follows on its
+    // own, so `==🔴#t==` holds a tag the marker would otherwise stand against (`colour-marker.ts`).
+    const marker = colourMarkerLength(body);
+    const children =
+      marker > 0 && body.charAt(marker) === "#"
+        ? [
+            ...this.tokenizeInline(body.slice(0, marker), along(now, 2)),
+            ...this.tokenizeInline(body.slice(marker), along(now, 2 + marker)),
+          ]
+        : this.tokenizeInline(body, along(now, 2));
+    return eat(`==${body}==`)({ type: "highlight", children });
   };
   highlight.locator = (value, fromIndex) => value.indexOf("==", fromIndex);
   tables.inlineTokenizers.highlight = highlight;
