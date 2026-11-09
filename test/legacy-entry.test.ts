@@ -145,7 +145,8 @@ describe("the legacy entry", () => {
     const packages = new Set<string>();
     for (const output of Object.values(metafile.outputs)) {
       for (const [file, { bytesInOutput }] of Object.entries(output.inputs)) {
-        const name = /node_modules\/((?:@[^/]+\/)?[^/]+)/u.exec(file)?.[1];
+        // The last node_modules/: pnpm stores packages at node_modules/.pnpm/<id>/node_modules/<name>
+        const name = /.*node_modules\/((?:@[^/]+\/)?[^/]+)/u.exec(file)?.[1];
         if (name !== undefined && bytesInOutput > 0) packages.add(name);
       }
     }
