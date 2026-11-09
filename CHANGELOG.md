@@ -1,3 +1,13 @@
+## 2.2.1
+
+### Patch Changes
+
+- 6556256: A tag straight after a highlight's colour marker forms, as Obsidian reads it: `==🔴#t==` holds the tag `t`, where the marker used to stand against the `#`. Only the first marker, opening the highlight; an escaped `\#` stays text and is written back escaped. Both presets.
+- d7ea738: `legacy`: a table indented one to three spaces before its first `|` reads that `|` as the end of an empty first cell, as Obsidian does (`   | a |` / `   | - |` renders one empty header cell). Obsidian reads such a table as pipeless, so every cell moves one column right. `strict` keeps GFM's reading.
+- 35797a4: `strict`: a bare `$$` on the last line of a quote, list item or callout, or ending a note with no line ending, is text rather than an empty formula, as in Obsidian: `> $$` and `- $$` render `$$`, and `> a` / `> $$` continues the paragraph. A line after it inside the container still opens the block (`> $$` / `>`), as do lazy lines and a `$$` closing a span opened above.
+- c356c66: `strict`: frontmatter whose closing `---` carries trailing whitespace ends at the `---`, as Obsidian's frontmatter section does, rather than past the whitespace.
+- 8e7415d: A wikilink target that ends in whitespace and then a backslash before `]]` resolves to the target without either, as Obsidian does: `[[a \]]`, `[[ a \|b]]` and `![[ p.png \]]` link to `a` and embed `p.png`, where they resolved to `a ` and `p.png `. The displayed text keeps what was written, and formatting writes the target back as spelled. Both presets.
+
 ## 2.2.0
 
 ### Minor Changes
