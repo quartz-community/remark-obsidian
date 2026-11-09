@@ -12,7 +12,11 @@ import { normalizeIdentifier } from "micromark-util-normalize-identifier";
 import { countByteOrderMark } from "../lib/byte-order-mark.js";
 import { calloutMarkerTransform } from "../lib/callout-marker.js";
 import { mathDisplayTransform } from "../lib/math-display.js";
-import { resolveTarget, spelledTarget } from "../lib/wikilink-target.js";
+import {
+  dropClosingBackslash,
+  resolveTarget,
+  spelledTarget,
+} from "../lib/wikilink-target.js";
 import {
   parse8WithOffsets,
   type Features,
@@ -193,12 +197,21 @@ function wikilink(raw: string): { type: "wikilink"; [key: string]: unknown } {
   // the composed heading. Only the resolved parts: `value` keeps what the author typed.
   node.path = resolveTarget(node.path);
   node.heading = resolveTarget(node.heading);
-  const spelled = spelledTarget(written, writtenHeading, node);
+  let spelled = spelledTarget(written, writtenHeading, node);
   const resolved = parts.heading ? "heading" : parts.path ? "path" : undefined;
   let stripped: "path" | "heading" | undefined;
   if (resolved && node[resolved].endsWith("\\")) {
-    node[resolved] = node[resolved].slice(0, -1);
+    const kept = node[resolved].slice(0, -1);
+    node[resolved] = dropClosingBackslash(node[resolved]);
     stripped = resolved;
+    // The whitespace dropped with it is the author's too, kept for the writer.
+    if (kept !== node[resolved] && !parts.alias) {
+      const key = resolved === "path" ? "spelledPath" : "spelledHeading";
+      spelled = {
+        ...spelled,
+        [key]: resolved === "path" ? written : writtenHeading,
+      };
+    }
   }
   const value = embedded
     ? node.path
