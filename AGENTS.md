@@ -695,7 +695,7 @@ cannot tell order from order there: those passes collect edits order-independent
 ## Gates — what "done" means
 
 ```bash
-npm test          # 938 tests / 35 files. Contains the contract gate.
+npm test          # 939 tests / 36 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
@@ -730,14 +730,15 @@ All read `test/parity/referee-answers/` — **vendored**, resolved from the modu
 CWD — and need `--conditions=development`. `PARITY_REFEREE_DIR` overrides it, for pointing an
 instrument at an upstream clone.
 
-| instrument                 | answers                                                                    | trap                                                                                                                      |
-| -------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `classify.ts`              | shared primitives: loading, position identity, populations, lift, sampling | **use this instead of re-reading the corpus**; `--self-test` must be green; it does NOT carry `refsTrustworthy` or `code` |
-| `referee.mts`              | how many of 6,844 documents agree, on facts and on full spans              | diff `--ids` identities, **never totals**                                                                                 |
-| `record-referee-spans.mts` | re-records `referee-spans.json` from the live cache (~15 s)                | keeps a span only where the fresh recording reproduces the vendored fact exactly                                          |
-| `referee-shrink.mts`       | minimise a diverging document                                              | `--live` hits Obsidian                                                                                                    |
-| `regressions.mts`          | which documents WE break that stock already gets right                     | organised by BLAME, not by rule; `--self-test` validates its restated agreement test against the referee's own count      |
-| `ask.mts`, `ask-dom.mts`   | the live Obsidian oracle: cache, and DOM projections                       | see below                                                                                                                 |
+| instrument                 | answers                                                                                | trap                                                                                                                                                                                      |
+| -------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `classify.ts`              | shared primitives: loading, position identity, populations, lift, sampling             | **use this instead of re-reading the corpus**; `--self-test` must be green; it does NOT carry `refsTrustworthy` or `code`                                                                 |
+| `referee.mts`              | how many of 6,844 documents agree, on facts and on full spans                          | diff `--ids` identities, **never totals**                                                                                                                                                 |
+| `record-referee-spans.mts` | re-records `referee-spans.json` from the live cache (~15 s)                            | keeps a span only where the fresh recording reproduces the vendored fact exactly                                                                                                          |
+| `referee-shrink.mts`       | minimise a diverging document                                                          | `--live` hits Obsidian                                                                                                                                                                    |
+| `strict-measure.mts`       | `strict`'s spec divergences, recorded cases, referee definitions and references, by id | proves `PARITY_PRESET` reached the chain first (legacy must give the contract's count); `strict-measure.test.ts` holds `goldens/strict-measure.json`, `--update` after an intended change |
+| `regressions.mts`          | which documents WE break that stock already gets right                                 | organised by BLAME, not by rule; `--self-test` validates its restated agreement test against the referee's own count                                                                      |
+| `ask.mts`, `ask-dom.mts`   | the live Obsidian oracle: cache, and DOM projections                                   | see below                                                                                                                                                                                 |
 
 **Restating the referee's test is how 1.1.0 was scored** (984 of 6,844, against 6,830): `named()`
 drops empty-named rows, the compare is an ORDERED `JSON.stringify`, a `Def` is a FOUR-tuple, and

@@ -64,7 +64,10 @@ import remarkRehype from "remark-rehype";
 import rehypeRaw from "rehype-raw";
 import rehypeStringify from "rehype-stringify";
 import rehypeObsidian from "@quartz-community/rehype-obsidian";
-import remarkObsidian, { type RemarkObsidianFlags } from "../../src/index.js";
+import remarkObsidian, {
+  type RemarkObsidianFlags,
+  type RemarkObsidianOptions,
+} from "../../src/index.js";
 
 /** Options `rehype-obsidian` accepts, mirrored so we do not depend on its types. */
 export interface RehypeObsidianOptions {
@@ -159,6 +162,29 @@ export const PROFILES = {
 export type ProfileName = keyof typeof PROFILES;
 
 /**
+ * A profile's `remarkObsidian` options, under the preset `PARITY_PRESET` names when it is set.
+ *
+ * Every chain this harness builds takes its options from here, so `PARITY_PRESET=strict` runs
+ * the recorded cases through `strict` with the profile's flags, which win over the preset's own
+ * values as the README says. That is how `strict-measure.mts` measures `strict` against the
+ * recordings. It replaced a `sed` patch of this file's line numbers, which silently measured
+ * `legacy` twice once the profiles moved (AGENTS.md, "Instruments"). Anything but `legacy` or
+ * `strict` throws, so a typo cannot measure the default preset either.
+ */
+export function remarkOptions(profileName: ProfileName): RemarkObsidianOptions {
+  const preset = process.env.PARITY_PRESET;
+  if (preset === undefined || preset === "") {
+    return PROFILES[profileName].remarkObsidian;
+  }
+  if (preset !== "legacy" && preset !== "strict") {
+    throw new Error(
+      `PARITY_PRESET must be "legacy" or "strict", not ${JSON.stringify(preset)}`,
+    );
+  }
+  return { preset, ...PROFILES[profileName].remarkObsidian };
+}
+
+/**
  * The ordered stack, recorded into every golden. A reorder or membership change
  * upstream invalidates the corpus, and stamping it is what makes that visible.
  */
@@ -242,7 +268,7 @@ export async function renderOurs(
   const processor = unified()
     .use(remarkParse)
     .use(remarkGfm)
-    .use(remarkObsidian, profile.remarkObsidian)
+    .use(remarkObsidian, remarkOptions(profileName))
     .use(remarkBreaks)
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
@@ -279,7 +305,7 @@ export async function renderWith(
   const processor = unified()
     .use(remarkParse)
     .use(remarkGfm)
-    .use(remarkObsidian, profile.remarkObsidian)
+    .use(remarkObsidian, remarkOptions(profileName))
     .use(remarkBreaks)
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
@@ -302,7 +328,7 @@ export function parseOurs(
   const processor = unified()
     .use(remarkParse)
     .use(remarkGfm)
-    .use(remarkObsidian, PROFILES[profileName].remarkObsidian)
+    .use(remarkObsidian, remarkOptions(profileName))
     .use(remarkBreaks);
   // The source must be passed: transforms that need the original text, such as
   // custom task characters and display-math classification, read it off the file.

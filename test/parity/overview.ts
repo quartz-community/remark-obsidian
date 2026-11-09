@@ -323,6 +323,21 @@ export const ORACLES: readonly Oracle[] = [
     test: "strict-footnotes.test.ts",
   },
   {
+    name: "strict's measured figures",
+    command:
+      "node --import tsx --conditions=development test/parity/strict-measure.mts --baseline test/parity/goldens/strict-measure.json",
+    gate: "regression",
+    compares: [
+      "by id, against goldens/strict-measure.json: spec examples diverging from stock, recorded cases strict matches through the harness's chain (PARITY_PRESET=strict), and referee documents whose definitions and references strict reads as the answers do",
+      "a check that the preset reached the chain: legacy must give the contract's count and strict a different one",
+    ],
+    blind: [
+      "gains: it fails on a loss, and a gain waits for --update",
+      "what the four measures do not reach: the referee measures legacy's oracle, and the recorded cases were recorded for legacy",
+    ],
+    test: "strict-measure.test.ts",
+  },
+  {
     name: "strict Obsidian syntax vs Obsidian",
     command: "npm test",
     gate: "absolute",
