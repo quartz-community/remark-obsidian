@@ -36,6 +36,14 @@ export default defineConfig({
   splitting: false,
   outDir: "dist",
   platform: "node",
+  // These are `dependencies` only so that the declarations' imports resolve for a consumer (the
+  // node types and their augmentations). tsup leaves a dependency external by default; the
+  // runtime code stays bundled, as it was, so only `mdast-util-to-markdown` (a peer) is imported.
+  noExternal: [
+    "mdast-util-from-markdown",
+    "mdast-util-math",
+    "micromark-util-types",
+  ],
   esbuildPlugins: [removeFormatEval],
   async onSuccess() {
     const call = EVAL_CALL.exec(await readFile("dist/index.js", "utf8"));

@@ -999,3 +999,8 @@ export type {
   CalloutTitle,
 } from "./lib/types.js";
 export type { CollectWikilinksOptions } from "./lib/collect.js";
+// Both presets build `math` and `inlineMath`. Re-exporting their types makes the shipped
+// declarations import `mdast-util-math`, whose `mdast` augmentation then reaches a consumer's
+// program with ours, as `remark-math`'s does: `node.type === "inlineMath"` narrows with no
+// extra import.
+export type { InlineMath, Math } from "mdast-util-math";
