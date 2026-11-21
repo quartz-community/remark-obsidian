@@ -1,6 +1,23 @@
 import type { Data, Literal, Parent, RootContent } from "mdast";
 import type { Point, Position } from "unist";
 
+/**
+ * A wikilink's parts as the author spelled them, where Obsidian's resolution changed them. The
+ * writer builds a wikilink from its parts and writes a spelling only while it still resolves to
+ * the part, so editing `path` or `heading` wins over these.
+ */
+export interface WikilinkData extends Data {
+  /**
+   * `path` as written, where resolving changed it: a no-break space read as a space, NFC, or
+   * the backslash before `]]` and the whitespace before it dropped (`[[a \]]` links to `a`).
+   */
+  spelledPath?: string;
+  /** `heading` as written, where resolving changed it, as for `spelledPath`. */
+  spelledHeading?: string;
+  /** Which part lost a backslash before `]]` (`[[a\]]` links to `a`), so it is written back. */
+  strippedBackslash?: "path" | "heading";
+}
+
 export interface Wikilink extends Literal {
   type: "wikilink";
   value: string;
@@ -8,6 +25,7 @@ export interface Wikilink extends Literal {
   path: string;
   heading: string;
   alias: string;
+  data?: WikilinkData;
 }
 
 export interface Highlight extends Parent {
@@ -89,11 +107,25 @@ declare module "mdast" {
   interface LinkReferenceData {
     /** `false` on a reference `keepUndefinedReferences` kept: this parse found no definition. */
     defined?: false;
+    /**
+     * The label as written, under `legacy`, where decoding changed it (`[x][&amp;]`). The writer
+     * uses it while it still decodes to `label`, since the identifier comes from the raw text.
+     */
+    spelledLabel?: string;
   }
 
   interface ImageReferenceData {
     /** `false` on a reference `keepUndefinedReferences` kept: this parse found no definition. */
     defined?: false;
+    /** The label as written, as on a link reference. */
+    spelledLabel?: string;
+  }
+
+  // A callout and a standalone comment are blocks, so a list item, a quote or a footnote
+  // definition holds them too, not only the root.
+  interface BlockContentMap {
+    callout: Callout;
+    comment: Comment;
   }
 
   interface RootContentMap {
@@ -129,6 +161,16 @@ declare module "mdast" {
     comment: Comment;
     tag: Tag;
     footnote: InlineFootnote;
+  }
+}
+
+declare module "mdast-util-math" {
+  interface InlineMathData {
+    /**
+     * `true` on inline math written with `$$` (`a $$x$$ b`), which Obsidian renders as display
+     * math inside the surrounding block. The node stays inline; `hProperties` carries the class.
+     */
+    display?: boolean;
   }
 }
 

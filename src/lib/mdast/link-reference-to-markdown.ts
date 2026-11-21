@@ -46,8 +46,7 @@ function withSpelledLabel<T extends LinkReference | ImageReference>(
   node: T,
   write: (node: T) => string,
 ): string {
-  const spelled = (node.data as { spelledLabel?: string } | undefined)
-    ?.spelledLabel;
+  const spelled = node.data?.spelledLabel;
   if (
     spelled === undefined ||
     node.referenceType !== "full" ||
@@ -75,8 +74,7 @@ function keptReference(
   parent: Parents | undefined,
   state: State,
 ): string | undefined {
-  const data = node.data as
-    { defined?: boolean; spelledLabel?: string } | undefined;
+  const data = node.data;
   if (data?.defined !== false || node.referenceType === "full")
     return undefined;
   const label = data.spelledLabel ?? node.label;

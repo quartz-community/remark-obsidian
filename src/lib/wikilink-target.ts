@@ -1,3 +1,5 @@
+import type { WikilinkData } from "./types.js";
+
 /**
  * A wikilink target as Obsidian resolves it: a no-break space as an ordinary one
  * (`![[*\u00a0*]]` embeds the note `* *`), and NFC (`[[cafe\u0301]]` links to `caf\u00e9`;
@@ -8,10 +10,10 @@ export function resolveTarget(target: string): string {
 }
 
 /** A wikilink's parts as the author spelled them, where resolving changed them. */
-export interface SpelledTarget {
-  spelledPath?: string;
-  spelledHeading?: string;
-}
+export type SpelledTarget = Pick<
+  WikilinkData,
+  "spelledPath" | "spelledHeading"
+>;
 
 /**
  * The spelling to keep beside the resolved parts, or `undefined` when resolving changed

@@ -997,6 +997,7 @@ export type {
   Callout,
   CalloutData,
   CalloutTitle,
+  WikilinkData,
 } from "./lib/types.js";
 export type { CollectWikilinksOptions } from "./lib/collect.js";
 // Both presets build `math` and `inlineMath`. Re-exporting their types makes the shipped
