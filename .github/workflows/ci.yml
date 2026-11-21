@@ -66,5 +66,7 @@ jobs:
           }
           console.log('dist/ externals verified: all imports are bundled or allowlisted.');
           "
+      - name: Verify dist type imports
+        run: node scripts/check-dist-types.mjs
       - name: Verify third-party notices
         run: node scripts/check-third-party-notices.mjs

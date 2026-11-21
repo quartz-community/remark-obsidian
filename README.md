@@ -38,6 +38,28 @@ renderer's job: in Quartz, its `obsidian-flavored-markdown` transformer and
 `@quartz-community/rehype-obsidian`. With plain `remark-rehype` they fall back to generic
 elements.
 
+### TypeScript
+
+The package ships its types, and importing the plugin is enough to register its node types on
+`mdast`'s content maps, together with `math` and `inlineMath`, so a check on `node.type`
+narrows to the right node:
+
+```ts
+import type { Root } from "mdast";
+import { visit } from "unist-util-visit";
+
+processor.use(() => (tree: Root) => {
+  visit(tree, (node) => {
+    if (node.type === "inlineMath") node.value = node.value.trim();
+    if (node.type === "wikilink") console.log(node.path, node.embedded);
+  });
+});
+```
+
+Install `@types/mdast` yourself to name `Root` or any other mdast type in your own code, as with
+every remark plugin. The node interfaces are exported too: `Wikilink`, `Callout`, `Math`,
+`InlineMath` and the rest.
+
 ## Two presets
 
 `strict` is what Obsidian **intends**: the CommonMark, GFM and LaTeX it says it supports,
