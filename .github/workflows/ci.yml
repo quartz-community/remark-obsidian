@@ -68,5 +68,7 @@ jobs:
           "
       - name: Verify dist type imports
         run: node scripts/check-dist-types.mjs
+      - name: Verify consumer types (TypeScript 4.7-7, every module setting)
+        run: node scripts/check-consumer-types.mjs
       - name: Verify third-party notices
         run: node scripts/check-third-party-notices.mjs
