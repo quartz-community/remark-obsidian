@@ -700,7 +700,20 @@ npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
 npm run build
+node scripts/check-dist-types.mjs     # after build: every .d.ts import is declared
+node scripts/check-consumer-types.mjs # after build, needs network: see below
 ```
+
+**The published types are gated as a consumer sees them.** `check-consumer-types.mjs` packs the
+build, installs it with pnpm and `hoist=false` (an undeclared import fails to resolve), and
+type-checks a consumer with `skipLibCheck: false` on TypeScript 4.7 (Obsidian's sample plugin),
+5.0, 5.8, 5.9 and 7.0, under `node10`, `node16` ESM, `bundler` and `nodenext` CommonJS, where
+each version has the setting: 16 compiles. Control: pass it a published spec;
+`@quartz-community/remark-obsidian@2.2.1` fails all 16 (undeclared imports, callouts in a list
+item, math). It targets ES2021 as the sample plugin does: the declarations use `ReadonlySet`, so a
+consumer on ES5's library fails, which no Node consumer is. `node16` CommonJS is left out: every
+ESM-only package fails there, `remark-math` included. `@arethetypeswrong/cli` crashed on every
+package locally (`remark-math` too), so it is not used.
 
 Inside `npm test`, the gates that matter most:
 
