@@ -489,6 +489,19 @@ check proved blind:
 
 Both have known-positive controls. Re-run them after ANY change under `src/rp8`.
 
+**A `legacy` tree keeps memory linear in its source** (#48). rp8's `eat` rewinds through `reset`
+and `test` with `value = subvalue + value`, a new string each time, and the text nodes read
+afterwards are V8 slices of it, so a tree kept one rebuilt remainder per rewind: 2,000 blocks of a
+small table and a paragraph (242 KB) retained 63 / 240 MiB at 1,000 / 2,000, against 4.9 / 9.2
+after. The tokenizer now restores the string it was handed when `value` is still what `eat` left
+(then the two are equal by content, `validateEat` having checked the prefix), and concatenates
+otherwise. Over 10,967 documents under two `legacy` configurations the restore ran 20,510 times and
+the fallback never. Tree hashes equal at every size; `rp8-vendored.test.ts` passes, and fails on
+an unrestored `value = remaining` (the control). Not #22's deep-list cost: that shape's time,
+peak RSS and retention are unchanged, since its memory is transient, not kept. Gate:
+`retention.test.ts`, which measures in a fresh process with `--expose-gc` and fails the old
+tokenizer at 240 MiB.
+
 **Strikethrough runs are linear under `legacy`.** Stock rp8's `deletion` reader scanned to the
 end of the run from every `~~`, so `"~~a ".repeat(n)` took 238 / 711 / 2,397 ms at 2,000 / 4,000
 / 8,000. A `precheck` now declines an opener with no closer ahead, from a table: past the opener's
@@ -695,7 +708,7 @@ cannot tell order from order there: those passes collect edits order-independent
 ## Gates — what "done" means
 
 ```bash
-npm test          # 977 tests / 38 files. Contains the contract gate.
+npm test          # 978 tests / 39 files. Contains the contract gate.
 npm run typecheck # both tsconfig projects; the only type gate over test/
 npm run lint      # src/**/*.ts ONLY -- does not cover test/
 npm run format
