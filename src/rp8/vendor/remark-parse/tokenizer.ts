@@ -239,7 +239,11 @@ function factory(type) {
       reset.test = test
       apply.test = test
 
+      // Changed after conversion (see ../README.md): `reset` and `test` give back the string
+      // they were handed while nothing has eaten since, rather than concatenating a copy of it.
+      var original = value
       value = value.slice(subvalue.length)
+      var remaining = value
 
       updatePosition(subvalue)
 
@@ -262,7 +266,7 @@ function factory(type) {
 
         line = current.line
         column = current.column
-        value = subvalue + value
+        value = value === remaining ? original : subvalue + value
 
         return node
       }
@@ -273,7 +277,7 @@ function factory(type) {
 
         line = current.line
         column = current.column
-        value = subvalue + value
+        value = value === remaining ? original : subvalue + value
 
         return result.position
       }
