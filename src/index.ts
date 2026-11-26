@@ -950,13 +950,42 @@ export default function remarkObsidian(
   // read the text the offsets index -- whatever `bomOffsets` says, or the mark changes the
   // reading. The callout markers are placed in the same coordinates, and only then, if asked,
   // does every point move.
-  return (tree: Root, file: unknown): void => {
+  const finish = (tree: Root, file: unknown): void => {
     const source = String(file);
     const marked = source.charCodeAt(0) === 0xfeff;
     const text = marked ? source.slice(1) : source;
     transform(tree, marked ? text : file);
     if (opts.callouts) calloutMarkerTransform(tree, text);
     if (marked && opts.bomOffsets) countByteOrderMark(tree);
+  };
+
+  // The passes run at PARSE time, as `legacy`'s parser does its reading: they re-parse the
+  // document (`obsidianReadingTransform`) and fragments of it (callouts, comments, definitions),
+  // so as a transformer they discarded what every plugin before this one had done to the tree --
+  // `remark-smartypants` and text replacements were undone in any note holding a callout. A
+  // `self.parse` made by a pass is a plain parse (`finishing`), as it was before; a tree that
+  // reaches the transformer without having come through this parser is finished there.
+  let finishing = false;
+  const finished = new WeakSet<Root>();
+  const finishOnce = (tree: Root, file: unknown): void => {
+    finishing = true;
+    try {
+      finish(tree, file);
+    } finally {
+      finishing = false;
+    }
+    finished.add(tree);
+  };
+  const parser = self.parser;
+  if (parser) {
+    self.parser = (document, file) => {
+      const tree = parser(document, file) as Root;
+      if (!finishing) finishOnce(tree, file);
+      return tree;
+    };
+  }
+  return (tree: Root, file: unknown): void => {
+    if (!finished.has(tree)) finishOnce(tree, file);
   };
 }
 
