@@ -93,7 +93,11 @@ describe.skipIf(!fs.existsSync(sibling))(
         "see [^a] and [^b]\n\n[^b]: only b\n",
       );
       expect(html).toContain("see a and");
-      expect(html).toMatch(/<sup[^>]*>[\s\S]*?>1</);
+      // The one defined footnote is numbered 1, not 2. rehype-obsidian writes
+      // the number as Obsidian does, `[1]`; before its footnote markup matched
+      // Obsidian's it wrote a bare `1`.
+      expect(html).toMatch(/<sup[^>]*>[\s\S]*?>\[?1\]?</);
+      expect(html).not.toMatch(/<sup[^>]*>[\s\S]*?>\[?2\]?</);
     });
   },
 );
