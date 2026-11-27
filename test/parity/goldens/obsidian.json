@@ -5503,7 +5503,7 @@
         }
       },
       "triage": "match",
-      "note": "A2c: a callout title is not a paragraph, so an ordered item below it opens a list whatever its start number. Closed by `calloutTitleInterruptTransform`."
+      "note": "A2c: a callout title is not a paragraph, so an ordered item below it opens a list whatever its start number. Closed by `calloutTransform`, which re-reads the body below the title."
     },
     "probe/title-interrupt/two-in-quote": {
       "id": "probe/title-interrupt/two-in-quote",
@@ -5552,7 +5552,7 @@
         }
       },
       "triage": "match",
-      "note": "A2c: a callout title is not a paragraph, so an ordered item below it opens a list whatever its start number. Closed by `calloutTitleInterruptTransform`."
+      "note": "A2c: a callout title is not a paragraph, so an ordered item below it opens a list whatever its start number. Closed by `calloutTransform`, which re-reads the body below the title."
     },
     "probe/title-interrupt/one-in-callout": {
       "id": "probe/title-interrupt/one-in-callout",
@@ -5603,7 +5603,7 @@
         }
       },
       "triage": "match",
-      "note": "A2c: a callout title is not a paragraph, so an ordered item below it opens a list whatever its start number. Closed by `calloutTitleInterruptTransform`."
+      "note": "A2c: a callout title is not a paragraph, so an ordered item below it opens a list whatever its start number. Closed by `calloutTransform`, which re-reads the body below the title."
     },
     "probe/title-interrupt/two-with-definition": {
       "id": "probe/title-interrupt/two-with-definition",
@@ -5675,7 +5675,7 @@
         }
       },
       "triage": "match",
-      "note": "A2c: a callout title is not a paragraph, so an ordered item below it opens a list whatever its start number. Closed by `calloutTitleInterruptTransform`."
+      "note": "A2c: a callout title is not a paragraph, so an ordered item below it opens a list whatever its start number. Closed by `calloutTransform`, which re-reads the body below the title."
     },
     "probe/title-interrupt/two-lazy": {
       "id": "probe/title-interrupt/two-lazy",
@@ -5747,7 +5747,7 @@
         }
       },
       "triage": "match",
-      "note": "The ordered item opens because a callout title is not a paragraph, and the resulting list is then absorbed into the callout as lazy continuation. Closed by `calloutTitleInterruptTransform` plus a narrow widening of `containerLazyTransform`."
+      "note": "The ordered item opens because a callout title is not a paragraph, and the resulting list is then absorbed into the callout as lazy continuation. Closed by `calloutTransform` re-reading the body below the title, plus a narrow widening of `containerLazyTransform`."
     },
     "probe/autolink/scheme": {
       "id": "probe/autolink/scheme",

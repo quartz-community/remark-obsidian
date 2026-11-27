@@ -854,8 +854,7 @@ function isCalloutTitle(
  *
  * Callouts are built later, so here the title is still a plain paragraph -- and CommonMark lets
  * it absorb the lines under it, since indented code cannot interrupt a paragraph. Obsidian ends
- * the title at its own line (the rule `calloutTitleInterruptTransform` carries), and
- * `calloutTransform` re-reads what follows as the callout's body. So the question is the body's:
+ * the title at its own line, and `calloutTransform` re-reads what follows as the callout's body. So the question is the body's:
  * read with the label line after it, does the label start a definition? `> [!note] Title` /
  * `> [^1]: def` defines, and so does a label under `> [!tip]` / `>     It`, whose body is code;
  * under `> <br>` it does not, since an HTML block runs to the next blank line, and under body
