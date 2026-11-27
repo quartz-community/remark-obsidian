@@ -60,6 +60,23 @@ describe("transformers registered before remark-obsidian", () => {
     expect(texts(ran as Root)).toContain("body -> text");
   });
 
+  it("keep their changes when one processor handles several documents", async () => {
+    // Quartz builds one processor per build and parses every note with it
+    const processor = unified()
+      .use(remarkParse)
+      .use(remarkGfm)
+      .use(arrows)
+      .use(remarkObsidian, { preset: "strict" });
+    const doc = "> [!note] T\n> body -> text\n";
+    for (let pass = 0; pass < 2; pass++) {
+      const values = texts(
+        (await processor.run(processor.parse(doc), doc)) as Root,
+      );
+      expect(values).toContain("body → text");
+      expect(values).not.toContain("body -> text");
+    }
+  });
+
   it("still finish a tree that did not come from this parser", async () => {
     const strict = unified()
       .use(remarkParse)
