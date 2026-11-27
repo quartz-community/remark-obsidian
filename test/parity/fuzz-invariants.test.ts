@@ -404,6 +404,26 @@ describe("invariant fuzz", () => {
     expect(await invariantViolations(markdown, CONFIGS[config]!)).toEqual([]);
   });
 
+  // From the nightly sweep (seed 64818852, shrunk): `legacy` reads `**\n_a_\n_*e` as `*`, then
+  // an emphasis opening on a line break that holds the emphasis `a`. The outer one cannot take `_`
+  // (it ends in one), and written `*` too, the inner one (`*a*`) was where re-reading closed it,
+  // so `a` fell out of both. The inner one takes `_` now. Same under `quartz-legacy` and `all-off`.
+  it.each([
+    ["**\n_a_\n_*e\n", "legacy"],
+    ["**\n_a_\n_*e\n", "all-off"],
+    ["> **\n_under_\t\n> _*e\n", "quartz-legacy"],
+    // Neighbours: more after the inner emphasis, and the same within one line.
+    ["**\n_a_ b\n_*e\n", "legacy"],
+    ["*x _a_ y_*\n", "legacy"],
+    ["*x _a_ y_*\n", "all-off"],
+    ["*x **a** y_*\n", "legacy"],
+  ])(
+    "emphasis opening on a line end around emphasis keeps its tree (%j under %s)",
+    async (markdown, config) => {
+      expect(await invariantViolations(markdown, CONFIGS[config]!)).toEqual([]);
+    },
+  );
+
   // Not a property the words check can see either: the formula keeps its words and only turns
   // display. Written with the fence it was read with, a `$` after whitespace inside cannot close.
   it("writes `$a\\$ $b$` back as inline math", () => {

@@ -201,6 +201,14 @@ export function attentionToMarkdown(options: {
 }): Options {
   /** Emphasis that is a strong's only child, written `***x***` under `legacy`. */
   const pinned = new WeakSet<Node>();
+  /** Attention holding a `*` that is still offered `*` first, so attention inside avoids it. */
+  const keptStar = new WeakSet<Node>();
+  /** The nearest emphasis or strong `node` sits in, by the parents recorded at the root. */
+  const nearestAttention = (node: Node): Node | undefined => {
+    let up = parentOf.get(node);
+    while (up && !isAttention(up)) up = parentOf.get(up);
+    return up;
+  };
   /** Attention straight before more attention, marked when the root is written. */
   const beforeAttention = new WeakSet<Node>();
   const isAttention = (node: Node | undefined): boolean =>
@@ -289,6 +297,14 @@ export function attentionToMarkdown(options: {
       ) {
         return { ...result, markers: ["_", "*"] };
       }
+      // Attention inside attention that holds a `*` but could not take `_` takes `_` itself:
+      // both written `*`, remark-parse 8 closed the outer one on the inner opener, as in
+      // `*\` / `*a*` / `\_*`, where the inner emphasis opens a line (`**` / `_a_` / `_*e`).
+      const outer = nearestAttention(node);
+      if (outer && keptStar.has(outer) && !underscoreUnsafe(node, false)) {
+        return { ...result, markers: ["_", "*"] };
+      }
+      if (holdsStar(node)) keptStar.add(node);
       return result;
     };
     return handle;
