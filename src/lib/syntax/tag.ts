@@ -55,7 +55,11 @@ function isWhitespace(code: Code): boolean {
     code === codes.virtualSpace ||
     code === codes.lineFeed ||
     code === codes.carriageReturn ||
-    code === codes.carriageReturnLineFeed
+    code === codes.carriageReturnLineFeed ||
+    // Any Unicode whitespace, as in Obsidian 1.15.1 (its tag index and reading view agree):
+    // `a\u00a0#t`, `a\u2003#t`, `a\u202f#t`, `a\u3000#t` and `a\u2009#t` each hold a tag, while
+    // `a\u200b#t` (zero-width space, not whitespace) holds none -- which `legacy` already did.
+    (code !== null && code > 0 && /\s/u.test(String.fromCharCode(code)))
   );
 }
 

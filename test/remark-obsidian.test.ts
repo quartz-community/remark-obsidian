@@ -3620,6 +3620,16 @@ describe("tag boundaries and content", () => {
     ["#a//b\n", ["a//b"]],
     ["#📚/status/finished\n", ["📚/status/finished"]],
     ["#😀x\n", ["😀x"]],
+    // after any Unicode whitespace, as Obsidian 1.15.1's tag index reports (dev-mode
+    // obsidian-bases-probe, `app.metadataCache` and the reading view agree); a zero-width
+    // space is not whitespace
+    ["a\u00a0#nbsp\n", ["nbsp"]],
+    ["a\u2003#emsp\n", ["emsp"]],
+    ["a\u202f#nnbsp\n", ["nnbsp"]],
+    ["a\u3000#ideo\n", ["ideo"]],
+    ["a\u2009#thin\n", ["thin"]],
+    ["a\u200b#zwsp\n", []],
+    ["a(#paren\n", []],
   ];
   for (const preset of ["legacy", "strict"] as const) {
     it(`reads every case as the tokenizer's rules say under ${preset}`, () => {
