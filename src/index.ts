@@ -69,7 +69,6 @@ import {
 import { mathMidlineTransform } from "./lib/math-midline.js";
 import { countByteOrderMark } from "./lib/byte-order-mark.js";
 import { calloutMarkerTransform } from "./lib/callout-marker.js";
-import { calloutTitleInterruptTransform } from "./lib/callout-title-interrupt.js";
 import { restoreInlinePositionsTransform } from "./lib/restore-inline-positions.js";
 import { attentionToMarkdown } from "./lib/mdast/attention-to-markdown.js";
 import { emptyDeleteToMarkdown } from "./lib/mdast/empty-delete-to-markdown.js";
@@ -767,12 +766,10 @@ export default function remarkObsidian(
       // a lazy `===` included (`> [!note] [link https://e.test` / `===`, 34 seeds of the
       // million-seed census). Placed again below, for what later passes splice.
       restoreInlinePositionsTransform(tree, String(file));
+      // It re-reads the lines below the title as the callout's body, so the title is its own
+      // line and `> [!note] title` / `> 2. item` opens a list starting at 2, as in Obsidian
+      // (`probe/title-interrupt/*` in the parity corpus).
       calloutTransform(tree, String(file), (markdown) => self.parse(markdown));
-      // After it, since it reads the `calloutTitle` that pass builds: the title is its own
-      // line, so the body below it starts fresh and `2.` there opens a list.
-      calloutTitleInterruptTransform(tree, String(file), (markdown) =>
-        self.parse(markdown),
-      );
     }
     // Obsidian's own syntax inside CommonMark's containers, which `strict` follows: a footnote
     // definition's lazy continuation under a container splits off as root blocks, an unclosed
