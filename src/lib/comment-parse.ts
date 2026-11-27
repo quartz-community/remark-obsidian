@@ -73,7 +73,7 @@ export function commentParseTransform(
     if (!raw.startsWith(MARKER)) return;
     // An unclosed comment runs to the end of the document, so there is no
     // closing marker to exclude.
-    const closed = raw.length > MARKER.length * 2 && raw.endsWith(MARKER);
+    const closed = raw.length >= MARKER.length * 2 && raw.endsWith(MARKER);
     const from = start + MARKER.length;
     const to = closed ? end - MARKER.length : end;
     if (to <= from) return;

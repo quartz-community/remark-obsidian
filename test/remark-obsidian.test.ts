@@ -3412,12 +3412,24 @@ describe("the parsed body of an empty comment", () => {
     expect(comments("a %%%% b\n", "legacy")).toEqual([["", 0]]);
   });
 
-  // Bug (comment-parse.ts:76): `closed` needs the raw span to be LONGER than two markers, so
-  // `%%%%` counts as unclosed and its closing `%%` is parsed as the body -- an unclosed comment
-  // nested in the empty one. `parseComments` consumers (and `findNodes` here) see two comments.
-  it.fails("holds nothing under strict", () => {
+  // `%%%%` is closed: its span is exactly two markers, not an unclosed comment holding `%%`.
+  it("holds nothing under strict", () => {
     expect(comments("%%%%\n", "strict")).toEqual([["", 0]]);
     expect(comments("a %%%% b\n", "strict")).toEqual([["", 0]]);
+  });
+
+  it("holds nothing in a quote or list item, nor with a marker to spare", () => {
+    for (const preset of ["legacy", "strict"] as const) {
+      expect(comments("> %%%%\n", preset)).toEqual([["", 0]]);
+      expect(comments("- %%%%\n", preset)).toEqual([["", 0]]);
+      expect(comments("%%%%%\n", preset)).toEqual([["", 0]]);
+    }
+  });
+
+  it("still parses a one-character body", () => {
+    for (const preset of ["legacy", "strict"] as const) {
+      expect(comments("%%a%%\n", preset)).toEqual([["a", 1]]);
+    }
   });
 });
 
