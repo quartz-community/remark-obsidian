@@ -2616,6 +2616,55 @@ describe("wikilink whitespace", () => {
     expect(parts("[[target\\]]\n")).toEqual(["target||"]);
     expect(parts("[[a#^blk\\]]\n")).toEqual(["a|^blk|"]);
   });
+
+  // Neither form had a test: an empty heading before an alias, and `\|` (as written inside a
+  // table) closing a heading.
+  it("reads an empty heading before an alias, and \\| after a heading", () => {
+    expect(parts("[[page#|alias]]\n")).toEqual(["page||alias"]);
+    expect(parts("[[a#b\\|c]]\n")).toEqual(["a|b|c"]);
+    expect(parts("[[a#b\\]c]]\n")).toEqual(["a|b\\]c|"]);
+  });
+});
+
+// The `strict` tokenizer (`syntax/wikilink.ts`) is reached by few fixed cases outside the
+// golden comparison; these pin its branches under both presets.
+describe("wikilink parts at the edges", () => {
+  const parts = (md: string, preset: "legacy" | "strict") => {
+    const found: string[] = [];
+    visit(processWithGfm(md, { preset }), "wikilink", (n: any) => {
+      found.push(`${n.embedded ? "!" : ""}${n.path}|${n.heading}|${n.alias}`);
+    });
+    return found;
+  };
+  const cases: ReadonlyArray<readonly [string, string[]]> = [
+    // Every line ending ends it, U+2028 and U+2029 included, in any part
+    ["[[a\rb]]", []],
+    ["[[a b]]", []],
+    ["[[a#b c]]", []],
+    ["[[a|b c]]", []],
+    // A single bracket is literal in every part
+    ["[[a[b]]", ["a[b||"]],
+    ["[[a]b]]", ["a]b||"]],
+    ["[[a#b[c]]", ["a|b[c|"]],
+    ["[[a#b]c]]", ["a|b]c|"]],
+    ["[[a|b[c]]", ["a||b[c"]],
+    ["[[a|b]c]]", ["a||b]c"]],
+    // Only the first # and | split
+    ["[[a#b#c]]", ["a|b#c|"]],
+    ["[[a|b#c]]", ["a||b#c"]],
+    ["![[a|b|c]]", ["!a||b|c"]],
+    // A leading | is the target's (golden `wikilink/empty-target-with-alias`)
+    ["[[|al]]", ["|al||"]],
+    ["[[#h]]", ["|h|"]],
+    ["[[]]", []],
+  ];
+  for (const preset of ["legacy", "strict"] as const) {
+    it(`splits every case the same way under ${preset}`, () => {
+      expect(cases.map(([md]) => parts(`${md}\n`, preset))).toEqual(
+        cases.map(([, expected]) => expected),
+      );
+    });
+  }
 });
 
 describe("demoted setext heading content", () => {
@@ -3333,6 +3382,45 @@ describe("footnote label holding a bracket", () => {
   });
 });
 
+describe("block comments over \\r and \\r\\n line endings", () => {
+  for (const preset of ["legacy", "strict"] as const) {
+    it(`reads the whole block as one comment under ${preset}`, () => {
+      for (const eol of ["\r", "\r\n"]) {
+        const markdown = `%%${eol}block${eol}%%${eol}`;
+        const tree = processWithGfm(markdown, { preset });
+        const comments = findNodes(tree, "comment");
+        expect(comments, JSON.stringify(markdown)).toHaveLength(1);
+        // legacy reads line endings as \n, strict keeps them as written
+        expect(comments[0].value).toBe(
+          preset === "legacy" ? "\nblock\n" : `${eol}block${eol}`,
+        );
+        expect(rootTypes(tree)[0]).toBe("comment");
+      }
+    });
+  }
+});
+
+describe("the parsed body of an empty comment", () => {
+  const comments = (markdown: string, preset: "legacy" | "strict") =>
+    findNodes(processWithGfm(markdown, { preset }), "comment").map((n: any) => [
+      n.value,
+      n.children?.length ?? 0,
+    ]);
+
+  it("holds nothing under legacy", () => {
+    expect(comments("%%%%\n", "legacy")).toEqual([["", 0]]);
+    expect(comments("a %%%% b\n", "legacy")).toEqual([["", 0]]);
+  });
+
+  // Bug (comment-parse.ts:76): `closed` needs the raw span to be LONGER than two markers, so
+  // `%%%%` counts as unclosed and its closing `%%` is parsed as the body -- an unclosed comment
+  // nested in the empty one. `parseComments` consumers (and `findNodes` here) see two comments.
+  it.fails("holds nothing under strict", () => {
+    expect(comments("%%%%\n", "strict")).toEqual([["", 0]]);
+    expect(comments("a %%%% b\n", "strict")).toEqual([["", 0]]);
+  });
+});
+
 describe("a kept comment inside a list item", () => {
   // Seventeen documents in the referee corpus crashed on these, all one bug:
   // `trailingEmptyItem` read `item.children.length` on a `list` child that was a
@@ -3416,6 +3504,19 @@ describe("strict: a highlight crossing emphasis", () => {
     expect(shape("**a ==b== c**\n")).toEqual(["strong:a b c", "highlight:b"]);
     expect(shape("==*b*==\n")).toEqual(["highlight:b", "emphasis:b"]);
   });
+
+  // Whether the emphasis closes inside the highlight is micromark's own flanking rule, so `_`
+  // (no intraword closing), a run of another marker or size, and an opener already closed decide
+  // it as they would decide the emphasis alone.
+  it("asks micromark's flanking rules whether the emphasis closes inside", () => {
+    expect(shape("_a==b_ c==\n")).toEqual(["emphasis:a==b"]);
+    expect(shape("_a==b_c==\n")).toEqual(["highlight:b_c"]);
+    expect(shape("*a ==b_ c==\n")).toEqual(["highlight:b_ c"]);
+    expect(shape("**a ==b* c==\n")).toEqual(["emphasis:a ==b"]);
+    expect(shape("*a ==b** c==\n")).toEqual(["emphasis:a ==b"]);
+    expect(shape("*a* ==b*c==\n")).toEqual(["emphasis:a", "highlight:b*c"]);
+    expect(shape("==a *b== c*\n")).toEqual(["highlight:a *b"]);
+  });
 });
 
 describe("strict: a reference opener before an inline footnote", () => {
@@ -3477,6 +3578,70 @@ describe("where a tag starts", () => {
       expect(cases.map(([markdown]) => tags(markdown, preset))).toEqual(
         cases.map(([, expected]) => expected),
       );
+    });
+  }
+});
+
+// The rules `tag.ts` states in its comments, none of which had a case: what may stand before
+// the `#` (every line ending, a tab -- micromark's virtual spaces after it --, the end of a
+// construct), and what the tag needs (a non-digit, a slash counting as one; astral characters).
+describe("tag boundaries and content", () => {
+  const tags = (markdown: string, preset: "legacy" | "strict") =>
+    findNodes(processWithGfm(markdown, { preset }), "tag").map(
+      (node: any) => node.value,
+    );
+  const cases: ReadonlyArray<readonly [string, string[]]> = [
+    ["a\t#tag\n", ["tag"]],
+    ["rd\t#tag\n", ["tag"]],
+    ["a\n#tag\n", ["tag"]],
+    ["a\r\n#tag\n", ["tag"]],
+    ["a\r#tag\n", ["tag"]],
+    ["foo#next\n", []],
+    ["a **b**#next\n", ["next"]],
+    ["a[[t]]#next\n", ["next"]],
+    ["#123\n", []],
+    ["#0\n", []],
+    ["#9a\n", ["9a"]],
+    ["#a9\n", ["a9"]],
+    ["#123/456\n", ["123/456"]],
+    ["#a/\n", ["a/"]],
+    ["#a//b\n", ["a//b"]],
+    ["#📚/status/finished\n", ["📚/status/finished"]],
+    ["#😀x\n", ["😀x"]],
+  ];
+  for (const preset of ["legacy", "strict"] as const) {
+    it(`reads every case as the tokenizer's rules say under ${preset}`, () => {
+      expect(cases.map(([markdown]) => tags(markdown, preset))).toEqual(
+        cases.map(([, expected]) => expected),
+      );
+    });
+  }
+});
+
+// The cases the root-level `test-crash.js` / `test-hashtag-wikilink.js` scripts once probed by
+// hand (a tag running into an embed used to crash the tokenizer), as assertions.
+describe("a tag straight before a wikilink or embed", () => {
+  for (const preset of ["legacy", "strict"] as const) {
+    it(`ends the tag at [[ or ![[ under ${preset}`, () => {
+      for (const [markdown, embedded] of [
+        ["#tag![[image.jpg]]", true],
+        ["#tag[[note]]", false],
+        ["#tag ![[image.jpg]]", true],
+        ["#tag\n![[image.jpg]]", true],
+        ["#tag\r![[image.jpg]]", true],
+        ["#tag\r\n![[image.jpg]]", true],
+      ] as const) {
+        const tree = processWithGfm(markdown, { preset });
+        expect(
+          findNodes(tree, "tag").map((n) => n.value),
+          JSON.stringify(markdown),
+        ).toEqual(["tag"]);
+        const links = findNodes(tree, "wikilink");
+        expect(
+          links.map((n) => [n.value, n.embedded]),
+          JSON.stringify(markdown),
+        ).toEqual([[embedded ? "image.jpg" : "note", embedded]]);
+      }
     });
   }
 });
