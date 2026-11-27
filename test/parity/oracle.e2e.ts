@@ -711,6 +711,10 @@ describe("Obsidian parity oracle", () => {
     // the weekly recording on 1.14.5. The same session-dependent display as the three above.
     ["probe/table-pipes/body-row-unclosed", SURPLUS_TABLE_CELLS],
     ["probe/table-pipes/short-delimiter-closed", SURPLUS_TABLE_CELLS],
+    // A pipe inside code or math splits the row too (`|`x|y`|z|` is three cells under a
+    // two-column header): the same surplus cell, flagged by the scheduled parity recording.
+    ["table/code-pipe", SURPLUS_TABLE_CELLS],
+    ["table/math-pipe", SURPLUS_TABLE_CELLS],
     ["hunt/blockquote-region-outlives-quote/1", UNFAITHFUL_CAPTURE],
     ["commonmark/html-blocks/171", RAW_TEXT_ELEMENT],
   ]);
